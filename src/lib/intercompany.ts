@@ -34,7 +34,7 @@ export type CreateIntercompanyParams = {
 export async function createIntercompanyTransaction(params: CreateIntercompanyParams) {
   const groupId = uuidv4()
 
-  const [fromEntry, toEntry] = await prisma.$transaction(async () => {
+  const [fromEntry, toEntry] = await prisma.$transaction(async (tx) => {
     // FROM side: DR Intercompany Receivable / CR Cash
     const from = await createAndPostEntry({
       tenantId: params.tenantId,
@@ -50,7 +50,7 @@ export async function createIntercompanyTransaction(params: CreateIntercompanyPa
         { accountId: params.accounts.fromReceivableAccountId, debit: params.amountCents },
         { accountId: params.accounts.fromCashAccountId, credit: params.amountCents },
       ],
-    })
+    }, tx)
 
     // TO side: DR Cash / CR Intercompany Payable
     const to = await createAndPostEntry({
@@ -67,7 +67,7 @@ export async function createIntercompanyTransaction(params: CreateIntercompanyPa
         { accountId: params.accounts.toCashAccountId, debit: params.amountCents },
         { accountId: params.accounts.toPayableAccountId, credit: params.amountCents },
       ],
-    })
+    }, tx)
 
     return [from, to] as const
   })

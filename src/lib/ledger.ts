@@ -12,7 +12,12 @@ import { prisma } from "./prisma"
 import { writeAuditLog } from "./db"
 // Re-export for convenience
 export { writeAuditLog }
-import type { JournalEntry, JournalLine, AccountType } from "@/generated/prisma/client"
+import type { PrismaClient, JournalEntry, JournalLine, AccountType } from "@/generated/prisma/client"
+
+type TxClient = Omit<
+  PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>
 
 export type LedgerLine = {
   accountId: string
@@ -128,20 +133,29 @@ export async function postEntry(
   return posted
 }
 
-/** Create AND post an entry atomically (most common path). */
+/** Create AND post an entry atomically (most common path).
+ *  Pass `tx` to enlist in the caller's transaction; omit to open a standalone one. */
 export async function createAndPostEntry(
   params: CreateEntryParams,
+  tx?: TxClient,
 ): Promise<JournalEntry & { lines: JournalLine[] }> {
   assertBalanced(params.lines)
 
-  // Check period before creating
-  const period = await findOpenPeriod(params.tenantId, params.entityId, params.date)
-  if (!period) {
-    throw new Error(`No open accounting period for date ${params.date.toISOString().slice(0, 10)}`)
-  }
-
-  const result = await prisma.$transaction(async (tx) => {
-    const entry = await tx.journalEntry.create({
+  // All DB writes extracted so they run under whichever transaction client is active.
+  async function run(db: TxClient): Promise<JournalEntry & { lines: JournalLine[] }> {
+    const period = await db.accountingPeriod.findFirst({
+      where: {
+        tenantId: params.tenantId,
+        entityId: params.entityId,
+        periodStart: { lte: params.date },
+        periodEnd: { gte: params.date },
+        status: "OPEN",
+      },
+    })
+    if (!period) {
+      throw new Error(`No open accounting period for date ${params.date.toISOString().slice(0, 10)}`)
+    }
+    const entry = await db.journalEntry.create({
       data: {
         tenantId: params.tenantId,
         entityId: params.entityId,
@@ -168,7 +182,7 @@ export async function createAndPostEntry(
       },
       include: { lines: true },
     })
-    await tx.auditLog.create({
+    await db.auditLog.create({
       data: {
         tenantId: params.tenantId,
         entityId: params.entityId,
@@ -180,9 +194,11 @@ export async function createAndPostEntry(
       },
     })
     return entry
-  })
+  }
 
-  return result
+  // If caller supplies a tx, use it directly (they control the boundary).
+  // Otherwise open a standalone transaction (existing behaviour for non-IC callers).
+  return tx ? run(tx) : prisma.$transaction(run)
 }
 
 /** Void a POSTED entry. Creates reversing lines in a new entry. */

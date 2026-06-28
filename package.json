@@ -10,7 +10,7 @@
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
-    "db:push": "prisma db push",
+    "db:push": "DATABASE_URL=\"$DIRECT_URL\" prisma db push",
     "db:studio": "prisma studio"
   },
   "dependencies": {

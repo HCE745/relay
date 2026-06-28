@@ -1,7 +1,9 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, AlertTriangle, CheckCircle2 } from "lucide-react"
+import { ReceiptScanner } from "./ReceiptScanner"
+import type { ScanResult } from "@/lib/scan-types"
 
 type Account = { id: string; code: string; name: string }
 type Vendor = { id: string; name: string }
@@ -35,6 +37,7 @@ function todayStr() { return new Date().toISOString().slice(0, 10) }
 function plus30() { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10) }
 function dollarsToCents(s: string) { return Math.round((parseFloat(s) || 0) * 100) }
 function fmtCents(c: number) { return (c / 100).toLocaleString("en-US", { minimumFractionDigits: 2 }) }
+function centsToStr(c: number | null) { return c != null ? (c / 100).toFixed(2) : "" }
 
 const input = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
 const label = "block text-sm font-medium text-gray-700 mb-1"
@@ -50,6 +53,13 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
+  // Scan state
+  const [scanBanner, setScanBanner] = useState<{
+    confidence: ScanResult["confidence"]
+    vendorName: string | null
+    totalCents: number | null
+  } | null>(null)
+
   function updateLine(key: string, field: keyof LineItem, val: string) {
     setLines((prev) => prev.map((l) => (l.key === key ? { ...l, [field]: val } : l)))
   }
@@ -60,6 +70,50 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
     const qty = parseFloat(l.quantity) || 0
     return s + Math.round(qty * dollarsToCents(l.unitPrice))
   }, 0)
+
+  function handleScanResult(result: ScanResult) {
+    // Vendor: try to match by name (case-insensitive)
+    if (result.vendorName) {
+      const lower = result.vendorName.toLowerCase()
+      const match = vendors.find((v) => v.name.toLowerCase().includes(lower) || lower.includes(v.name.toLowerCase()))
+      if (match) setVendorId(match.id)
+    }
+
+    // Date
+    if (result.date) setDate(result.date)
+
+    // Line items: if scan returned line items, replace the blank default line
+    if (result.lineItems && result.lineItems.length > 0) {
+      setLines(
+        result.lineItems.map((li) => ({
+          key: String(++_key),
+          description: li.description,
+          accountId: "",
+          quantity: "1",
+          unitPrice: centsToStr(li.amountCents),
+          classId: "",
+          departmentId: "",
+        }))
+      )
+    } else if (result.totalCents) {
+      // No detail lines — create one line with the total amount
+      setLines([{
+        key: String(++_key),
+        description: result.vendorName ?? "",
+        accountId: "",
+        quantity: "1",
+        unitPrice: centsToStr(result.totalCents),
+        classId: "",
+        departmentId: "",
+      }])
+    }
+
+    setScanBanner({
+      confidence: result.confidence,
+      vendorName: result.vendorName,
+      totalCents: result.totalCents,
+    })
+  }
 
   async function handleSave() {
     if (!vendorId) { setError("Select a vendor"); return }
@@ -98,6 +152,41 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   return (
     <div className="p-6 max-w-5xl space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Enter Bill</h1>
+
+      {/* Receipt Scanner */}
+      <ReceiptScanner onResult={handleScanResult} />
+
+      {/* Confidence banner shown after a successful scan */}
+      {scanBanner && (
+        <div className={`flex items-start gap-3 px-4 py-3 rounded-lg border text-sm ${
+          scanBanner.confidence === "high"
+            ? "bg-green-50 border-green-200 text-green-800"
+            : "bg-amber-50 border-amber-200 text-amber-800"
+        }`}>
+          {scanBanner.confidence === "high"
+            ? <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            : <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          }
+          <div>
+            {scanBanner.confidence === "high" ? (
+              <span>
+                Receipt read successfully
+                {scanBanner.vendorName && <> — <strong>{scanBanner.vendorName}</strong></>}
+                {scanBanner.totalCents != null && <>, total <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
+                {" "}Fields pre-filled below — assign expense accounts then save.
+              </span>
+            ) : (
+              <span>
+                <strong>Please double-check the scanned amounts before saving</strong>
+                {scanBanner.vendorName && <> — extracted vendor: <em>{scanBanner.vendorName}</em></>}
+                {scanBanner.totalCents != null && <>, extracted total: <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
+                {" "}Confidence: <strong>{scanBanner.confidence}</strong>.
+              </span>
+            )}
+          </div>
+          <button type="button" onClick={() => setScanBanner(null)} className="ml-auto text-current opacity-60 hover:opacity-100">✕</button>
+        </div>
+      )}
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>
@@ -163,7 +252,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
                       <input type="text" value={line.description} onChange={(e) => updateLine(line.key, "description", e.target.value)} placeholder="Description" className={input} />
                     </td>
                     <td className="px-4 py-2 min-w-[180px]">
-                      <select value={line.accountId} onChange={(e) => updateLine(line.key, "accountId", e.target.value)} className={input}>
+                      <select value={line.accountId} onChange={(e) => updateLine(line.key, "accountId", e.target.value)} className={`${input} ${!line.accountId && scanBanner ? "border-amber-400 ring-1 ring-amber-300" : ""}`}>
                         <option value="">Select…</option>
                         {expenseAccounts.map((a) => <option key={a.id} value={a.id}>{a.code} – {a.name}</option>)}
                       </select>

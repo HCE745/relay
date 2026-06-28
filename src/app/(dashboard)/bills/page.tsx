@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 function statusBadge(status: string) {
   const colors: Record<string, string> = {
     ENTERED: "bg-blue-100 text-blue-700",

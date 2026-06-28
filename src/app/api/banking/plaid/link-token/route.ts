@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
 import { createLinkToken } from "@/lib/banking"
 
+export const dynamic = "force-dynamic"
+
 export async function POST() {
   const session = await requireSession()
   try {

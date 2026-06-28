@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { Users, Calendar, Building2, Tag, LayoutGrid } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 export default async function SettingsPage() {
   const { tenantId, entityId, selectedEntity } = await getEntityContext()
 

@@ -4,6 +4,8 @@ import { getPL } from "@/lib/reports"
 import { getAccountBalance } from "@/lib/ledger"
 import { DashboardStats } from "@/components/layout/DashboardStats"
 
+export const dynamic = "force-dynamic"
+
 export default async function DashboardPage() {
   const ctx = await getEntityContext()
   const { tenantId, entityId, selectedEntity } = ctx

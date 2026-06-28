@@ -3,6 +3,8 @@ import { requireSession } from "@/lib/session"
 import { exchangePublicToken } from "@/lib/banking"
 import { getSelectedEntityId } from "@/lib/entity-context"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(req: NextRequest) {
   const session = await requireSession()
   const { publicToken, accountName, ledgerAccountId } = await req.json()

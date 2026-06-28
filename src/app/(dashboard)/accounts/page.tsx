@@ -4,6 +4,8 @@ import { getAccountBalance } from "@/lib/ledger"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 export default async function AccountsPage() {
   const { tenantId, entityId } = await getEntityContext()
 

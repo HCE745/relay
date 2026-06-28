@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
 import { syncBankAccount } from "@/lib/banking"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(req: NextRequest) {
   const session = await requireSession()
   const { bankAccountId } = await req.json()

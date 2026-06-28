@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 export default async function VendorsPage() {
   const { tenantId, entityId } = await getEntityContext()
   const vendors = await prisma.vendor.findMany({

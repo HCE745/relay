@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { getTrialBalance, getPL, getBalanceSheet, getARAgingReport, getAPAgingReport, toCsv, centsToDisplay } from "@/lib/reports"
 import { ReportViewer } from "@/components/reports/ReportViewer"
 
+export const dynamic = "force-dynamic"
+
 export default async function ReportsPage({
   searchParams,
 }: {

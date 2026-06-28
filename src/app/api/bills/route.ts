@@ -3,6 +3,8 @@ import { requireSession } from "@/lib/session"
 import { createAndEnterBill } from "@/lib/ap"
 import { prisma } from "@/lib/prisma"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(req: NextRequest) {
   const session = await requireSession()
   const body = await req.json()

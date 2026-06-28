@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
 import { getPL, getBalanceSheet, getTrialBalance, getARAgingReport, getAPAgingReport, toCsv, centsToDisplay } from "@/lib/reports"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(req: NextRequest) {
   const session = await requireSession()
   const { searchParams } = new URL(req.url)

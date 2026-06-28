@@ -4,6 +4,8 @@ import { sendInvoice } from "@/lib/ar"
 import { prisma } from "@/lib/prisma"
 import { getSelectedEntityId } from "@/lib/entity-context"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(req: NextRequest) {
   const session = await requireSession()
   const { invoiceId } = await req.json()

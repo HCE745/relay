@@ -3,6 +3,8 @@ import { requireSession } from "@/lib/session"
 import { createAndPostEntry } from "@/lib/ledger"
 import { prisma } from "@/lib/prisma"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(req: NextRequest) {
   const session = await requireSession()
   const { searchParams } = new URL(req.url)

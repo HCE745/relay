@@ -55,7 +55,7 @@ export default async function BillsPage() {
             )}
             {bills.map((bill) => (
               <tr key={bill.id}>
-                <td className="font-medium">{bill.billNumber ?? bill.id.slice(0, 8)}</td>
+                <td><Link href={`/bills/${bill.id}`} className="text-blue-600 hover:underline font-medium">{bill.billNumber ?? bill.id.slice(0, 8)}</Link></td>
                 <td>{bill.vendor.name}</td>
                 <td>{bill.date.toISOString().slice(0, 10)}</td>
                 <td>{bill.dueDate.toISOString().slice(0, 10)}</td>

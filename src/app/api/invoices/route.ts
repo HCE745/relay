@@ -29,11 +29,18 @@ export async function POST(req: NextRequest) {
   const session = await requireSession()
   const body = await req.json()
 
+  // Auto-generate invoice number if the caller doesn't supply one
+  let invoiceNumber = body.invoiceNumber as string | undefined
+  if (!invoiceNumber) {
+    const count = await prisma.invoice.count({ where: { tenantId: session.tenantId } })
+    invoiceNumber = `INV-${new Date().getFullYear()}-${String(count + 1).padStart(4, "0")}`
+  }
+
   const invoice = await createInvoice({
     tenantId: session.tenantId,
     entityId: body.entityId,
     customerId: body.customerId,
-    invoiceNumber: body.invoiceNumber,
+    invoiceNumber,
     date: new Date(body.date),
     dueDate: new Date(body.dueDate),
     memo: body.memo,

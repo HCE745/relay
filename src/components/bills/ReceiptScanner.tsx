@@ -1,6 +1,6 @@
 "use client"
 import { useRef, useState } from "react"
-import { Camera, Upload, X, ScanLine } from "lucide-react"
+import { Camera, Upload, X, ScanLine, FileText } from "lucide-react"
 import type { ScanResult } from "@/lib/scan-types"
 
 export type { ScanResult }
@@ -10,7 +10,8 @@ type Props = {
 }
 
 export function ReceiptScanner({ onResult }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const uploadInputRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const [scanning, setScanning] = useState(false)
@@ -21,15 +22,19 @@ export function ReceiptScanner({ onResult }: Props) {
     if (!f) return
     setFile(f)
     setError(null)
-    const url = URL.createObjectURL(f)
-    setPreview(url)
+    if (f.type === "application/pdf") {
+      setPreview("pdf")
+    } else {
+      setPreview(URL.createObjectURL(f))
+    }
   }
 
-  function clearImage() {
+  function clearFile() {
     setFile(null)
     setPreview(null)
     setError(null)
-    if (inputRef.current) inputRef.current.value = ""
+    if (cameraInputRef.current) cameraInputRef.current.value = ""
+    if (uploadInputRef.current) uploadInputRef.current.value = ""
   }
 
   async function handleScan() {
@@ -38,7 +43,7 @@ export function ReceiptScanner({ onResult }: Props) {
     setError(null)
     try {
       const form = new FormData()
-      form.append("image", file)
+      form.append("file", file)
       const res = await fetch("/api/expenses/scan", { method: "POST", body: form })
       const data = await res.json()
       if (!res.ok) {
@@ -53,6 +58,8 @@ export function ReceiptScanner({ onResult }: Props) {
     }
   }
 
+  const isPdf = file?.type === "application/pdf"
+
   return (
     <div className="bg-white rounded-xl border border-blue-200 p-5 space-y-4">
       <div className="flex items-center gap-2">
@@ -63,23 +70,38 @@ export function ReceiptScanner({ onResult }: Props) {
 
       {!preview ? (
         <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-lg py-8 gap-3">
-          <p className="text-sm text-gray-500">Take a photo or upload a receipt image</p>
+          <p className="text-sm text-gray-500">Take a photo or upload a receipt image or PDF</p>
           <div className="flex gap-3">
-            {/* Mobile: opens back camera. Desktop: opens file picker */}
             <button
               type="button"
-              onClick={() => inputRef.current?.click()}
+              onClick={() => cameraInputRef.current?.click()}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
-              <Camera className="w-4 h-4" /> Take Photo / Upload
+              <Camera className="w-4 h-4" /> Take Photo
+            </button>
+            <button
+              type="button"
+              onClick={() => uploadInputRef.current?.click()}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Upload className="w-4 h-4" /> Upload File
             </button>
           </div>
-          <p className="text-xs text-gray-400">JPG, PNG, HEIC, WEBP</p>
+          <p className="text-xs text-gray-400">JPG, PNG, WEBP or PDF</p>
+          {/* Camera capture — image only; cameras don't produce PDFs */}
           <input
-            ref={inputRef}
+            ref={cameraInputRef}
             type="file"
             accept="image/*"
             capture="environment"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          {/* File upload — images and PDFs */}
+          <input
+            ref={uploadInputRef}
+            type="file"
+            accept="image/*,application/pdf"
             className="hidden"
             onChange={handleFileChange}
           />
@@ -87,13 +109,20 @@ export function ReceiptScanner({ onResult }: Props) {
       ) : (
         <div className="flex gap-4 items-start">
           <div className="relative flex-shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Receipt preview" className="w-32 h-40 object-cover rounded-lg border border-gray-200" />
+            {isPdf ? (
+              <div className="w-32 h-40 flex flex-col items-center justify-center bg-red-50 rounded-lg border border-red-200 gap-2">
+                <FileText className="w-10 h-10 text-red-500" />
+                <span className="text-xs text-red-600 font-medium text-center px-2 leading-tight">PDF</span>
+              </div>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={preview} alt="Receipt preview" className="w-32 h-40 object-cover rounded-lg border border-gray-200" />
+            )}
             <button
               type="button"
-              onClick={clearImage}
+              onClick={clearFile}
               className="absolute -top-2 -right-2 w-6 h-6 bg-gray-700 text-white rounded-full flex items-center justify-center hover:bg-gray-900 transition-colors"
-              aria-label="Remove image"
+              aria-label="Remove file"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -120,16 +149,24 @@ export function ReceiptScanner({ onResult }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => { clearImage(); inputRef.current?.click() }}
+              onClick={() => { clearFile(); uploadInputRef.current?.click() }}
               className="flex items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
-              <Upload className="w-4 h-4" /> Choose different image
+              <Upload className="w-4 h-4" /> Choose different file
             </button>
+            {/* Keep both inputs mounted so refs stay valid in preview state */}
             <input
-              ref={inputRef}
+              ref={cameraInputRef}
               type="file"
               accept="image/*"
               capture="environment"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <input
+              ref={uploadInputRef}
+              type="file"
+              accept="image/*,application/pdf"
               className="hidden"
               onChange={handleFileChange}
             />

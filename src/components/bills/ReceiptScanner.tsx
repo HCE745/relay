@@ -1,4 +1,5 @@
 "use client"
+
 import { useRef, useState } from "react"
 import { Camera, Upload, X, ScanLine, FileText } from "lucide-react"
 import type { ScanResult } from "@/lib/scan-types"

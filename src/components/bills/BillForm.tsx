@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Trash2, AlertTriangle, CheckCircle2 } from "lucide-react"
+import { Plus, Trash2, AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react"
 import { ReceiptScanner } from "./ReceiptScanner"
 import type { ScanResult } from "@/lib/scan-types"
 
@@ -23,7 +23,7 @@ type LineItem = {
   description: string
   accountId: string
   quantity: string
-  unitPrice: string  // dollars
+  unitPrice: string
   classId: string
   departmentId: string
 }
@@ -45,6 +45,8 @@ const label = "block text-sm font-medium text-gray-700 mb-1"
 export function BillForm({ entityId, vendors, expenseAccounts, classes, departments }: BillFormProps) {
   const router = useRouter()
   const [vendorId, setVendorId] = useState(vendors[0]?.id ?? "")
+  // When scan finds a vendor not in the list — will be created on save
+  const [newVendorName, setNewVendorName] = useState("")
   const [billNumber, setBillNumber] = useState("")
   const [date, setDate] = useState(todayStr)
   const [dueDate, setDueDate] = useState(plus30)
@@ -53,7 +55,11 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
-  // Scan state
+  // Recurring — pre-filled from scan; stored as informational UI only
+  // TODO: add isRecurring + recurringReason fields to the Bill schema to persist this flag properly
+  const [isRecurring, setIsRecurring] = useState(false)
+  const [recurringReason, setRecurringReason] = useState<string | null>(null)
+
   const [scanBanner, setScanBanner] = useState<{
     confidence: ScanResult["confidence"]
     vendorName: string | null
@@ -72,23 +78,33 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   }, 0)
 
   function handleScanResult(result: ScanResult) {
-    // Vendor: try to match by name (case-insensitive)
-    if (result.vendorName) {
+    // Vendor: use model-matched id first, then fuzzy-match by name, then flag as new
+    if (result.matchedVendorId) {
+      setVendorId(result.matchedVendorId)
+      setNewVendorName("")
+    } else if (result.vendorName) {
       const lower = result.vendorName.toLowerCase()
-      const match = vendors.find((v) => v.name.toLowerCase().includes(lower) || lower.includes(v.name.toLowerCase()))
-      if (match) setVendorId(match.id)
+      const fuzzy = vendors.find(
+        (v) => v.name.toLowerCase().includes(lower) || lower.includes(v.name.toLowerCase())
+      )
+      if (fuzzy) {
+        setVendorId(fuzzy.id)
+        setNewVendorName("")
+      } else {
+        setVendorId("_new_")
+        setNewVendorName(result.vendorName)
+      }
     }
 
-    // Date
     if (result.date) setDate(result.date)
 
-    // Line items: if scan returned line items, replace the blank default line
+    // Line items with pre-filled account suggestions; fall back to overallSuggestedAccountId
     if (result.lineItems && result.lineItems.length > 0) {
       setLines(
         result.lineItems.map((li) => ({
           key: String(++_key),
           description: li.description,
-          accountId: "",
+          accountId: li.suggestedAccountId ?? result.overallSuggestedAccountId ?? "",
           quantity: "1",
           unitPrice: centsToStr(li.amountCents),
           classId: "",
@@ -96,17 +112,19 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         }))
       )
     } else if (result.totalCents) {
-      // No detail lines — create one line with the total amount
       setLines([{
         key: String(++_key),
         description: result.vendorName ?? "",
-        accountId: "",
+        accountId: result.overallSuggestedAccountId ?? "",
         quantity: "1",
         unitPrice: centsToStr(result.totalCents),
         classId: "",
         departmentId: "",
       }])
     }
+
+    setIsRecurring(result.isLikelyRecurring ?? false)
+    setRecurringReason(result.recurringReason ?? null)
 
     setScanBanner({
       confidence: result.confidence,
@@ -116,7 +134,8 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   }
 
   async function handleSave() {
-    if (!vendorId) { setError("Select a vendor"); return }
+    const hasVendor = vendorId && vendorId !== "_new_" ? vendorId : null
+    if (!hasVendor && !newVendorName) { setError("Select a vendor"); return }
     if (lines.some((l) => !l.accountId)) { setError("Select an expense account for every line item"); return }
     setSaving(true); setError("")
     try {
@@ -125,7 +144,8 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           entityId,
-          vendorId,
+          vendorId: hasVendor || undefined,
+          newVendorName: !hasVendor ? newVendorName : undefined,
           billNumber: billNumber || undefined,
           date,
           dueDate,
@@ -149,11 +169,12 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
     }
   }
 
+  const resolvedVendorId = vendorId === "_new_" ? "" : vendorId
+
   return (
     <div className="p-6 max-w-5xl space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Enter Bill</h1>
 
-      {/* Receipt Scanner */}
       <ReceiptScanner onResult={handleScanResult} />
 
       {/* Confidence banner shown after a successful scan */}
@@ -173,11 +194,11 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
                 Receipt read successfully
                 {scanBanner.vendorName && <> — <strong>{scanBanner.vendorName}</strong></>}
                 {scanBanner.totalCents != null && <>, total <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
-                {" "}Fields pre-filled below — assign expense accounts then save.
+                {" "}Fields pre-filled below — review and save.
               </span>
             ) : (
               <span>
-                <strong>Please double-check the scanned amounts before saving</strong>
+                <strong>Please double-check before saving</strong>
                 {scanBanner.vendorName && <> — extracted vendor: <em>{scanBanner.vendorName}</em></>}
                 {scanBanner.totalCents != null && <>, extracted total: <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
                 {" "}Confidence: <strong>{scanBanner.confidence}</strong>.
@@ -185,6 +206,14 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
             )}
           </div>
           <button type="button" onClick={() => setScanBanner(null)} className="ml-auto text-current opacity-60 hover:opacity-100">✕</button>
+        </div>
+      )}
+
+      {/* New vendor notice */}
+      {vendorId === "_new_" && newVendorName && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 text-sm">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+          <span>New vendor <strong>{newVendorName}</strong> will be created when you save. Or select an existing vendor below.</span>
         </div>
       )}
 
@@ -197,8 +226,18 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         <div className="grid grid-cols-2 gap-5">
           <div>
             <label className={label}>Vendor *</label>
-            <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className={input}>
+            <select
+              value={vendorId === "_new_" ? "_new_" : resolvedVendorId}
+              onChange={(e) => {
+                if (e.target.value !== "_new_") setNewVendorName("")
+                setVendorId(e.target.value)
+              }}
+              className={input}
+            >
               <option value="">Select vendor…</option>
+              {newVendorName && (
+                <option value="_new_">+ New vendor: {newVendorName}</option>
+              )}
               {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
             </select>
           </div>
@@ -217,6 +256,23 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
           <div className="col-span-2">
             <label className={label}>Memo</label>
             <input type="text" value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="Optional note" className={input} />
+          </div>
+
+          {/* Recurring flag — pre-filled from scan; informational until Bill schema gains isRecurring */}
+          <div className="col-span-2">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isRecurring}
+                onChange={(e) => setIsRecurring(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <RefreshCw className="w-4 h-4 text-gray-400" />
+              <span className="text-sm font-medium text-gray-700">Recurring bill</span>
+            </label>
+            {isRecurring && recurringReason && (
+              <p className="mt-1 ml-6 text-xs text-gray-500">{recurringReason}</p>
+            )}
           </div>
         </div>
       </div>
@@ -246,13 +302,18 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
             <tbody>
               {lines.map((line) => {
                 const lineCents = Math.round((parseFloat(line.quantity) || 0) * dollarsToCents(line.unitPrice))
+                const accountMissing = !line.accountId && !!scanBanner
                 return (
                   <tr key={line.key} className="border-b border-gray-100">
                     <td className="px-4 py-2">
                       <input type="text" value={line.description} onChange={(e) => updateLine(line.key, "description", e.target.value)} placeholder="Description" className={input} />
                     </td>
                     <td className="px-4 py-2 min-w-[180px]">
-                      <select value={line.accountId} onChange={(e) => updateLine(line.key, "accountId", e.target.value)} className={`${input} ${!line.accountId && scanBanner ? "border-amber-400 ring-1 ring-amber-300" : ""}`}>
+                      <select
+                        value={line.accountId}
+                        onChange={(e) => updateLine(line.key, "accountId", e.target.value)}
+                        className={`${input} ${accountMissing ? "border-amber-400 ring-1 ring-amber-300" : ""}`}
+                      >
                         <option value="">Select…</option>
                         {expenseAccounts.map((a) => <option key={a.id} value={a.id}>{a.code} – {a.name}</option>)}
                       </select>

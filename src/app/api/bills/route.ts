@@ -10,6 +10,18 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const entityId = body.entityId
 
+  // Resolve vendor — use existing id or create a new one from the scan result
+  let vendorId: string = body.vendorId
+  if (!vendorId && body.newVendorName) {
+    const created = await prisma.vendor.create({
+      data: { tenantId: session.tenantId, entityId, name: body.newVendorName },
+    })
+    vendorId = created.id
+  }
+  if (!vendorId) {
+    return NextResponse.json({ error: "Vendor is required" }, { status: 400 })
+  }
+
   const apAccount = await prisma.account.findFirst({
     where: { tenantId: session.tenantId, entityId, code: "2000" },
   })
@@ -20,7 +32,7 @@ export async function POST(req: NextRequest) {
   const bill = await createAndEnterBill({
     tenantId: session.tenantId,
     entityId,
-    vendorId: body.vendorId,
+    vendorId,
     billNumber: body.billNumber,
     date: new Date(body.date),
     dueDate: new Date(body.dueDate),

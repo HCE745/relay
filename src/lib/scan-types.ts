@@ -18,4 +18,6 @@ export type ScanResult = {
   confidence: "high" | "medium" | "low"
   // Vercel Blob URL set server-side if BLOB_READ_WRITE_TOKEN is configured; null otherwise
   receiptUrl: string | null
+  // Set when the scan route created a new vendor (not found in existing list)
+  createdVendorName: string | null
 }

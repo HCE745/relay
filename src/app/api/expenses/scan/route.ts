@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { put } from "@vercel/blob"
-import { requireSession } from "@/lib/session"
+import { getSession } from "@/lib/session"
 import { getSelectedEntityId } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import type { ScanResult } from "@/lib/scan-types"
@@ -40,7 +40,7 @@ function buildSystemPrompt(
 EXISTING VENDORS — if the receipt clearly shows one of these vendors, set matchedVendorId to that vendor's id. If uncertain or not listed, set matchedVendorId to null.
 ${vendorList}
 
-EXPENSE ACCOUNTS (chart of accounts) — use ONLY these ids for suggestedAccountId and overallSuggestedAccountId. Set suggestedAccountName to the human-readable account name even when suggestedAccountId is null (use your best guess for the category name, e.g. "Software & Subscriptions", so we can match it).
+EXPENSE ACCOUNTS (chart of accounts) — use ONLY these ids for suggestedAccountId and overallSuggestedAccountId. Set suggestedAccountName to the human-readable account name even when suggestedAccountId is null.
 ${accountList}
 
 Return exactly this JSON shape:
@@ -68,58 +68,47 @@ Return exactly this JSON shape:
 }
 
 Rules:
-- Convert all money to integer cents (multiply dollars by 100 and round). Example: $12.50 → 1250.
+- Convert all money to integer cents. Example: $12.50 → 1250.
 - matchedVendorId MUST be an id from the EXISTING VENDORS list above, or null.
 - suggestedAccountId MUST be an id from the EXPENSE ACCOUNTS list above, or null. ALWAYS set suggestedAccountName to the best category name even if suggestedAccountId is null.
-- overallSuggestedAccountId: best single expense account for the whole receipt (id from list or null).
+- overallSuggestedAccountId: best single expense account for the whole receipt (id or null).
 - overallSuggestedAccountName: category name for the whole receipt even if id is null.
 - isLikelyRecurring: true for subscriptions, utilities, rent, recurring SaaS, insurance, etc.
 - recurringReason: short explanation when isLikelyRecurring is true, null otherwise.
-- confidence: "high" if clear and all major fields readable; "medium" if some uncertain; "low" if poor quality.
-- lineItems: include individual line items when visible. Empty array [] if no detail lines.
+- confidence: "high" if clear; "medium" if some uncertain; "low" if poor quality.
+- lineItems: include individual line items when visible. Empty array [] if none.
 - For multi-page PDFs, combine all pages into one result.
 - Return ONLY the JSON object — nothing before or after it.`
 }
 
-// Fuzzy-match an account by name against the account list
 function fuzzyMatchAccount(
   name: string,
   accounts: { id: string; code: string; name: string }[]
 ): string | null {
   if (!name || !accounts.length) return null
   const lower = name.toLowerCase().trim()
-
-  // Exact name match
   const exact = accounts.find((a) => a.name.toLowerCase() === lower)
   if (exact) return exact.id
-
-  // Keyword overlap: look for meaningful words (> 3 chars) in the suggestion name inside account names
   const words = lower.split(/\s+/).filter((w) => w.length > 3)
   for (const word of words) {
     const m = accounts.find((a) => a.name.toLowerCase().includes(word))
     if (m) return m.id
   }
-
-  // Reverse: check if any account name appears inside the suggestion name
   for (const acc of accounts) {
     const accLower = acc.name.toLowerCase()
     if (lower.includes(accLower) || accLower.includes(lower)) return acc.id
   }
-
   return null
 }
 
-// Fuzzy-match a vendor by name against the vendor list
 function fuzzyMatchVendor(
   name: string,
   vendors: { id: string; name: string }[]
 ): string | null {
   if (!name || !vendors.length) return null
   const lower = name.toLowerCase().trim()
-
   const exact = vendors.find((v) => v.name.toLowerCase() === lower)
   if (exact) return exact.id
-
   const contains = vendors.find(
     (v) => v.name.toLowerCase().includes(lower) || lower.includes(v.name.toLowerCase())
   )
@@ -132,10 +121,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Anthropic API key not configured on server" }, { status: 500 })
   }
 
-  // Parse the uploaded file first so we can fail fast on bad input
   let fileBase64: string
   let fileType: string
-  let fileName: string = "receipt"
   let fileBuffer: Buffer | null = null
 
   try {
@@ -151,7 +138,6 @@ export async function POST(req: NextRequest) {
       fileBuffer = Buffer.from(buffer)
       fileBase64 = fileBuffer.toString("base64")
       fileType = file.type
-      fileName = file.name ?? "receipt"
     } else {
       const body = await req.json()
       if (!body.fileBase64) return NextResponse.json({ error: "No file provided" }, { status: 400 })
@@ -168,29 +154,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Unsupported file type: ${fileType}` }, { status: 415 })
   }
 
-  // Fetch vendor + account context so the model can match against real data.
-  // Log errors instead of silently swallowing — we still proceed but with empty lists.
+  // Use getSession() (non-redirecting) so a missing cookie doesn't throw NEXT_REDIRECT
+  // into our catch block and silently wipe out vendor/account context.
   let vendors: { id: string; name: string }[] = []
   let accounts: { id: string; code: string; name: string }[] = []
-  try {
-    const session = await requireSession()
-    const entityId = await getSelectedEntityId()
-    ;[vendors, accounts] = await Promise.all([
-      prisma.vendor.findMany({
-        where: { tenantId: session.tenantId, entityId, isActive: true },
-        orderBy: { name: "asc" },
-        select: { id: true, name: true },
-      }),
-      prisma.account.findMany({
-        where: { tenantId: session.tenantId, entityId, type: "EXPENSE", isActive: true },
-        orderBy: { code: "asc" },
-        select: { id: true, code: true, name: true },
-      }),
-    ])
-  } catch (err) {
-    console.error("[scan] Failed to load vendor/account context:", err)
-    // Continue with empty lists — model will still extract names, and we fuzzy-match below
+  let sessionTenantId: string | null = null
+  let sessionEntityId: string | null = null
+
+  const session = await getSession()
+  if (session) {
+    try {
+      const entityId = await getSelectedEntityId()
+      sessionTenantId = session.tenantId
+      sessionEntityId = entityId
+      ;[vendors, accounts] = await Promise.all([
+        prisma.vendor.findMany({
+          where: { tenantId: session.tenantId, entityId, isActive: true },
+          orderBy: { name: "asc" },
+          select: { id: true, name: true },
+        }),
+        prisma.account.findMany({
+          where: { tenantId: session.tenantId, entityId, type: "EXPENSE", isActive: true },
+          orderBy: { code: "asc" },
+          select: { id: true, code: true, name: true },
+        }),
+      ])
+    } catch (err) {
+      console.error("[scan] DB fetch failed:", err)
+    }
+  } else {
+    console.warn("[scan] No session — vendor/account context unavailable")
   }
+
+  // DIAG: log what we fetched (remove after confirming fix)
+  console.log("[scan] existingVendors:", vendors.map((v) => ({ id: v.id, name: v.name })))
+  console.log("[scan] existingAccounts count:", accounts.length)
 
   const fileContentBlock: Anthropic.MessageParam["content"][number] = isPdf
     ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: fileBase64 } }
@@ -214,7 +212,6 @@ export async function POST(req: NextRequest) {
         },
       ],
     })
-
     const block = message.content[0]
     if (block.type !== "text") throw new Error("Unexpected response type from model")
     raw = block.text
@@ -224,38 +221,59 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Receipt scan failed: ${msg}` }, { status: 502 })
   }
 
-  const cleaned = raw
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```\s*$/i, "")
-    .trim()
+  const cleaned = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim()
 
   let parsed: ScanResult & { overallSuggestedAccountName?: string | null }
   try {
     parsed = JSON.parse(cleaned)
   } catch {
-    console.error("[scan] JSON parse failed. Raw model output:", raw)
+    console.error("[scan] JSON parse failed. Raw:", raw)
     return NextResponse.json({ error: "Couldn't read receipt, enter manually" }, { status: 422 })
   }
 
-  // Validate and enrich: ensure any returned IDs come from our lists,
-  // then fuzzy-match by name as a fallback so dropdowns auto-select.
+  // DIAG: log what the model returned for vendor (remove after confirming fix)
+  console.log("[scan] model returned vendor:", {
+    vendorName: parsed.vendorName,
+    matchedVendorId: parsed.matchedVendorId,
+  })
+
   const vendorIds = new Set(vendors.map((v) => v.id))
   const accountIds = new Set(accounts.map((a) => a.id))
 
-  // Vendor: validate model ID → fallback to server-side fuzzy match by name
+  // Vendor: validate → fuzzy-match by name → create if still unresolved
   if (parsed.matchedVendorId && !vendorIds.has(parsed.matchedVendorId)) {
+    console.log("[scan] model matchedVendorId not in list, clearing:", parsed.matchedVendorId)
     parsed.matchedVendorId = null
   }
   if (!parsed.matchedVendorId && parsed.vendorName) {
     parsed.matchedVendorId = fuzzyMatchVendor(parsed.vendorName, vendors)
+    if (parsed.matchedVendorId) {
+      console.log("[scan] fuzzy-matched vendor:", parsed.matchedVendorId)
+    }
   }
 
-  // Line accounts: validate model ID → fallback to fuzzy match by suggestedAccountName
+  // If vendor still unresolved and we have a session, create the vendor now so the
+  // dropdown can show a real selected option instead of "Select…".
+  let createdVendorName: string | null = null
+  if (!parsed.matchedVendorId && parsed.vendorName && sessionTenantId && sessionEntityId) {
+    try {
+      const newVendor = await prisma.vendor.create({
+        data: { tenantId: sessionTenantId, entityId: sessionEntityId, name: parsed.vendorName },
+      })
+      parsed.matchedVendorId = newVendor.id
+      createdVendorName = newVendor.name
+      console.log("[scan] created vendor:", newVendor.id, newVendor.name)
+    } catch (err) {
+      console.error("[scan] failed to create vendor:", err)
+    }
+  }
+
+  console.log("[scan] final matchedVendorId:", parsed.matchedVendorId)
+
+  // Line accounts: validate → fuzzy-match by name
   if (Array.isArray(parsed.lineItems)) {
     parsed.lineItems = parsed.lineItems.map((li) => {
-      let id = li.suggestedAccountId && accountIds.has(li.suggestedAccountId)
-        ? li.suggestedAccountId
-        : null
+      let id = li.suggestedAccountId && accountIds.has(li.suggestedAccountId) ? li.suggestedAccountId : null
       if (!id && li.suggestedAccountName) {
         id = fuzzyMatchAccount(li.suggestedAccountName, accounts)
       }
@@ -265,7 +283,7 @@ export async function POST(req: NextRequest) {
     parsed.lineItems = []
   }
 
-  // Overall account: validate → fallback fuzzy → derive from line items
+  // Overall account: validate → fuzzy-match → derive from lines
   if (parsed.overallSuggestedAccountId && !accountIds.has(parsed.overallSuggestedAccountId)) {
     parsed.overallSuggestedAccountId = null
   }
@@ -273,12 +291,11 @@ export async function POST(req: NextRequest) {
     parsed.overallSuggestedAccountId = fuzzyMatchAccount(parsed.overallSuggestedAccountName, accounts)
   }
   if (!parsed.overallSuggestedAccountId && parsed.lineItems.length > 0) {
-    // Use the most common line account as the overall fallback
     const firstWithAccount = parsed.lineItems.find((l) => l.suggestedAccountId)
     if (firstWithAccount) parsed.overallSuggestedAccountId = firstWithAccount.suggestedAccountId
   }
 
-  // Upload receipt to Vercel Blob for persistence (requires BLOB_READ_WRITE_TOKEN)
+  // Blob upload (production only — requires BLOB_READ_WRITE_TOKEN)
   let receiptUrl: string | null = null
   if (fileBuffer && process.env.BLOB_READ_WRITE_TOKEN) {
     try {
@@ -295,7 +312,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const result: ScanResult = {
+  const result: ScanResult & { createdVendorName?: string | null } = {
     vendorName: parsed.vendorName ?? null,
     matchedVendorId: parsed.matchedVendorId ?? null,
     date: parsed.date ?? null,
@@ -309,6 +326,8 @@ export async function POST(req: NextRequest) {
     recurringReason: parsed.recurringReason ?? null,
     confidence: parsed.confidence ?? "medium",
     receiptUrl,
+    // Let the client know this vendor was just created so it can add it to the dropdown
+    createdVendorName: createdVendorName ?? null,
   }
 
   return NextResponse.json(result)

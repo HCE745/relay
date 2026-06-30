@@ -524,6 +524,7 @@ model Bill {
   amountPaid     Int        @default(0)
   amountDue      Int        @default(0)
   journalEntryId String?
+  receiptUrl     String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 

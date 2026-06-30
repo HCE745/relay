@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Trash2, AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react"
+import { Plus, Trash2, AlertTriangle, CheckCircle2, RefreshCw, FileText, ExternalLink } from "lucide-react"
 import { ReceiptScanner } from "./ReceiptScanner"
 import type { ScanResult } from "@/lib/scan-types"
 
@@ -44,8 +44,7 @@ const label = "block text-sm font-medium text-gray-700 mb-1"
 
 export function BillForm({ entityId, vendors, expenseAccounts, classes, departments }: BillFormProps) {
   const router = useRouter()
-  const [vendorId, setVendorId] = useState(vendors[0]?.id ?? "")
-  // When scan finds a vendor not in the list — will be created on save
+  const [vendorId, setVendorId] = useState("")
   const [newVendorName, setNewVendorName] = useState("")
   const [billNumber, setBillNumber] = useState("")
   const [date, setDate] = useState(todayStr)
@@ -55,15 +54,20 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
-  // Recurring — pre-filled from scan; stored as informational UI only
-  // TODO: add isRecurring + recurringReason fields to the Bill schema to persist this flag properly
+  // TODO: add isRecurring + recurringReason to Bill schema to persist; for now it's UI-only
   const [isRecurring, setIsRecurring] = useState(false)
   const [recurringReason, setRecurringReason] = useState<string | null>(null)
+
+  // Receipt preview: localUrl is an objectURL from the browser file; receiptUrl is the persisted blob URL
+  const [receiptLocalUrl, setReceiptLocalUrl] = useState<string | null>(null)
+  const [receiptLocalIsPdf, setReceiptLocalIsPdf] = useState(false)
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
 
   const [scanBanner, setScanBanner] = useState<{
     confidence: ScanResult["confidence"]
     vendorName: string | null
     totalCents: number | null
+    allFilled: boolean
   } | null>(null)
 
   function updateLine(key: string, field: keyof LineItem, val: string) {
@@ -77,8 +81,16 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
     return s + Math.round(qty * dollarsToCents(l.unitPrice))
   }, 0)
 
-  function handleScanResult(result: ScanResult) {
-    // Vendor: use model-matched id first, then fuzzy-match by name, then flag as new
+  function handleScanResult(result: ScanResult, localUrl: string) {
+    // Detect file type from the local URL (pdf blob type)
+    const isPdfLocal = localUrl.startsWith("blob:") && result.receiptUrl
+      ? result.receiptUrl.endsWith(".pdf")
+      : false
+    setReceiptLocalUrl(localUrl)
+    setReceiptLocalIsPdf(isPdfLocal)
+    if (result.receiptUrl) setReceiptUrl(result.receiptUrl)
+
+    // Vendor: model-matched ID wins; fall back to client fuzzy match; then flag as new
     if (result.matchedVendorId) {
       setVendorId(result.matchedVendorId)
       setNewVendorName("")
@@ -98,21 +110,20 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
 
     if (result.date) setDate(result.date)
 
-    // Line items with pre-filled account suggestions; fall back to overallSuggestedAccountId
+    // Build lines with account IDs pre-selected; fall back to overallSuggestedAccountId
+    let newLines: LineItem[]
     if (result.lineItems && result.lineItems.length > 0) {
-      setLines(
-        result.lineItems.map((li) => ({
-          key: String(++_key),
-          description: li.description,
-          accountId: li.suggestedAccountId ?? result.overallSuggestedAccountId ?? "",
-          quantity: "1",
-          unitPrice: centsToStr(li.amountCents),
-          classId: "",
-          departmentId: "",
-        }))
-      )
+      newLines = result.lineItems.map((li) => ({
+        key: String(++_key),
+        description: li.description,
+        accountId: li.suggestedAccountId ?? result.overallSuggestedAccountId ?? "",
+        quantity: "1",
+        unitPrice: centsToStr(li.amountCents),
+        classId: "",
+        departmentId: "",
+      }))
     } else if (result.totalCents) {
-      setLines([{
+      newLines = [{
         key: String(++_key),
         description: result.vendorName ?? "",
         accountId: result.overallSuggestedAccountId ?? "",
@@ -120,16 +131,22 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         unitPrice: centsToStr(result.totalCents),
         classId: "",
         departmentId: "",
-      }])
+      }]
+    } else {
+      newLines = [newLine()]
     }
+    setLines(newLines)
 
     setIsRecurring(result.isLikelyRecurring ?? false)
     setRecurringReason(result.recurringReason ?? null)
 
+    const vendorFilled = !!(result.matchedVendorId ?? (result.vendorName ? "_new_" : null))
+    const allAccountsFilled = newLines.every((l) => !!l.accountId)
     setScanBanner({
       confidence: result.confidence,
       vendorName: result.vendorName,
       totalCents: result.totalCents,
+      allFilled: vendorFilled && allAccountsFilled,
     })
   }
 
@@ -150,6 +167,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
           date,
           dueDate,
           memo: memo || undefined,
+          receiptUrl: receiptUrl || undefined,
           lines: lines.map((l) => ({
             description: l.description || undefined,
             accountId: l.accountId,
@@ -169,39 +187,80 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
     }
   }
 
-  const resolvedVendorId = vendorId === "_new_" ? "" : vendorId
-
   return (
     <div className="p-6 max-w-5xl space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Enter Bill</h1>
 
       <ReceiptScanner onResult={handleScanResult} />
 
-      {/* Confidence banner shown after a successful scan */}
+      {/* Receipt preview panel — shown after scan, persists while form is open */}
+      {receiptLocalUrl && (
+        <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 flex items-start gap-4">
+          <div className="flex-shrink-0">
+            {receiptLocalIsPdf ? (
+              <div className="w-20 h-24 flex flex-col items-center justify-center bg-red-50 rounded-lg border border-red-200 gap-1">
+                <FileText className="w-7 h-7 text-red-500" />
+                <span className="text-xs text-red-600 font-medium">PDF</span>
+              </div>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={receiptLocalUrl} alt="Receipt" className="w-20 h-24 object-cover rounded-lg border border-gray-200" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-700 mb-2">Receipt attached</p>
+            <a
+              href={receiptLocalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              {receiptLocalIsPdf ? "Open PDF in new tab" : "View full size"}
+            </a>
+            {receiptUrl && (
+              <p className="mt-1 text-xs text-green-600">✓ Saved to cloud — visible from bill detail after saving</p>
+            )}
+            {!receiptUrl && (
+              <p className="mt-1 text-xs text-gray-400">Will be viewable here until you navigate away; cloud storage requires BLOB_READ_WRITE_TOKEN</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Scan banner */}
       {scanBanner && (
         <div className={`flex items-start gap-3 px-4 py-3 rounded-lg border text-sm ${
-          scanBanner.confidence === "high"
+          scanBanner.confidence === "high" && scanBanner.allFilled
             ? "bg-green-50 border-green-200 text-green-800"
             : "bg-amber-50 border-amber-200 text-amber-800"
         }`}>
-          {scanBanner.confidence === "high"
+          {scanBanner.confidence === "high" && scanBanner.allFilled
             ? <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
             : <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
           }
           <div>
-            {scanBanner.confidence === "high" ? (
+            {scanBanner.confidence === "high" && scanBanner.allFilled ? (
               <span>
-                Receipt read successfully
+                All fields filled
                 {scanBanner.vendorName && <> — <strong>{scanBanner.vendorName}</strong></>}
                 {scanBanner.totalCents != null && <>, total <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
-                {" "}Fields pre-filled below — review and save.
+                {" "}Review and save.
+              </span>
+            ) : scanBanner.allFilled ? (
+              <span>
+                Fields pre-filled
+                {scanBanner.vendorName && <> — <strong>{scanBanner.vendorName}</strong></>}
+                {scanBanner.totalCents != null && <>, total <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
+                {" "}<strong>Double-check before saving</strong> (confidence: {scanBanner.confidence}).
               </span>
             ) : (
               <span>
-                <strong>Please double-check before saving</strong>
-                {scanBanner.vendorName && <> — extracted vendor: <em>{scanBanner.vendorName}</em></>}
-                {scanBanner.totalCents != null && <>, extracted total: <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
-                {" "}Confidence: <strong>{scanBanner.confidence}</strong>.
+                <strong>Some fields need attention</strong>
+                {scanBanner.vendorName && <> — vendor: <em>{scanBanner.vendorName}</em></>}
+                {scanBanner.totalCents != null && <>, total: <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
+                {" "}Assign the highlighted expense accounts before saving.
+                {scanBanner.confidence !== "high" && <> Confidence: <strong>{scanBanner.confidence}</strong>.</>}
               </span>
             )}
           </div>
@@ -227,7 +286,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
           <div>
             <label className={label}>Vendor *</label>
             <select
-              value={vendorId === "_new_" ? "_new_" : resolvedVendorId}
+              value={vendorId}
               onChange={(e) => {
                 if (e.target.value !== "_new_") setNewVendorName("")
                 setVendorId(e.target.value)
@@ -258,7 +317,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
             <input type="text" value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="Optional note" className={input} />
           </div>
 
-          {/* Recurring flag — pre-filled from scan; informational until Bill schema gains isRecurring */}
+          {/* Recurring — pre-filled from scan; UI-only until Bill schema gains isRecurring */}
           <div className="col-span-2">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input

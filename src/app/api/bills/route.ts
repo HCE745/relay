@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "AP account not found" }, { status: 400 })
   }
 
-  const bill = await createAndEnterBill({
+  let bill = await createAndEnterBill({
     tenantId: session.tenantId,
     entityId,
     vendorId,
@@ -41,6 +41,14 @@ export async function POST(req: NextRequest) {
     apAccountId: apAccount.id,
     createdByUserId: session.userId,
   })
+
+  // Attach receipt URL if the scan uploaded one to Vercel Blob
+  if (body.receiptUrl) {
+    bill = await prisma.bill.update({
+      where: { id: bill.id },
+      data: { receiptUrl: body.receiptUrl },
+    })
+  }
 
   return NextResponse.json(bill)
 }

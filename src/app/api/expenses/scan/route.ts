@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
+import { put } from "@vercel/blob"
 import { requireSession } from "@/lib/session"
 import { getSelectedEntityId } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
@@ -36,10 +37,10 @@ function buildSystemPrompt(
 
   return `You are a receipt OCR assistant with access to this company's vendor list and chart of accounts. Extract data from the provided receipt or invoice (image or PDF) and return ONLY valid JSON — no prose, no markdown fences, no explanation.
 
-EXISTING VENDORS — if the receipt clearly shows one of these vendors, set matchedVendorId to that vendor's id. If uncertain or the vendor is not listed, set matchedVendorId to null.
+EXISTING VENDORS — if the receipt clearly shows one of these vendors, set matchedVendorId to that vendor's id. If uncertain or not listed, set matchedVendorId to null.
 ${vendorList}
 
-EXPENSE ACCOUNTS (chart of accounts) — use ONLY these ids for suggestedAccountId and overallSuggestedAccountId. If no account fits, use null.
+EXPENSE ACCOUNTS (chart of accounts) — use ONLY these ids for suggestedAccountId and overallSuggestedAccountId. Set suggestedAccountName to the human-readable account name even when suggestedAccountId is null (use your best guess for the category name, e.g. "Software & Subscriptions", so we can match it).
 ${accountList}
 
 Return exactly this JSON shape:
@@ -60,6 +61,7 @@ Return exactly this JSON shape:
     }
   ],
   "overallSuggestedAccountId": string or null,
+  "overallSuggestedAccountName": string or null,
   "isLikelyRecurring": boolean,
   "recurringReason": string or null,
   "confidence": "high" | "medium" | "low"
@@ -68,13 +70,60 @@ Return exactly this JSON shape:
 Rules:
 - Convert all money to integer cents (multiply dollars by 100 and round). Example: $12.50 → 1250.
 - matchedVendorId MUST be an id from the EXISTING VENDORS list above, or null.
-- suggestedAccountId and overallSuggestedAccountId MUST be ids from the EXPENSE ACCOUNTS list above, or null. Pick the most semantically appropriate account. For multi-line receipts, pick per-line accounts when distinct categories are clear; set overallSuggestedAccountId to the best single account if all lines share a category.
-- isLikelyRecurring: true for subscriptions, utilities, rent, recurring software (SaaS), insurance, loan payments, etc. false for one-time purchases.
-- recurringReason: short explanation when isLikelyRecurring is true (e.g. "monthly SaaS subscription", "recurring utility bill"), null otherwise.
-- confidence: "high" if the receipt is clear and all major fields are readable; "medium" if some amounts are uncertain; "low" if poor quality or many fields missing.
+- suggestedAccountId MUST be an id from the EXPENSE ACCOUNTS list above, or null. ALWAYS set suggestedAccountName to the best category name even if suggestedAccountId is null.
+- overallSuggestedAccountId: best single expense account for the whole receipt (id from list or null).
+- overallSuggestedAccountName: category name for the whole receipt even if id is null.
+- isLikelyRecurring: true for subscriptions, utilities, rent, recurring SaaS, insurance, etc.
+- recurringReason: short explanation when isLikelyRecurring is true, null otherwise.
+- confidence: "high" if clear and all major fields readable; "medium" if some uncertain; "low" if poor quality.
 - lineItems: include individual line items when visible. Empty array [] if no detail lines.
 - For multi-page PDFs, combine all pages into one result.
 - Return ONLY the JSON object — nothing before or after it.`
+}
+
+// Fuzzy-match an account by name against the account list
+function fuzzyMatchAccount(
+  name: string,
+  accounts: { id: string; code: string; name: string }[]
+): string | null {
+  if (!name || !accounts.length) return null
+  const lower = name.toLowerCase().trim()
+
+  // Exact name match
+  const exact = accounts.find((a) => a.name.toLowerCase() === lower)
+  if (exact) return exact.id
+
+  // Keyword overlap: look for meaningful words (> 3 chars) in the suggestion name inside account names
+  const words = lower.split(/\s+/).filter((w) => w.length > 3)
+  for (const word of words) {
+    const m = accounts.find((a) => a.name.toLowerCase().includes(word))
+    if (m) return m.id
+  }
+
+  // Reverse: check if any account name appears inside the suggestion name
+  for (const acc of accounts) {
+    const accLower = acc.name.toLowerCase()
+    if (lower.includes(accLower) || accLower.includes(lower)) return acc.id
+  }
+
+  return null
+}
+
+// Fuzzy-match a vendor by name against the vendor list
+function fuzzyMatchVendor(
+  name: string,
+  vendors: { id: string; name: string }[]
+): string | null {
+  if (!name || !vendors.length) return null
+  const lower = name.toLowerCase().trim()
+
+  const exact = vendors.find((v) => v.name.toLowerCase() === lower)
+  if (exact) return exact.id
+
+  const contains = vendors.find(
+    (v) => v.name.toLowerCase().includes(lower) || lower.includes(v.name.toLowerCase())
+  )
+  return contains?.id ?? null
 }
 
 export async function POST(req: NextRequest) {
@@ -83,8 +132,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Anthropic API key not configured on server" }, { status: 500 })
   }
 
+  // Parse the uploaded file first so we can fail fast on bad input
   let fileBase64: string
   let fileType: string
+  let fileName: string = "receipt"
+  let fileBuffer: Buffer | null = null
 
   try {
     const contentType = req.headers.get("content-type") ?? ""
@@ -96,8 +148,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "File too large — maximum 20 MB" }, { status: 413 })
       }
       const buffer = await file.arrayBuffer()
-      fileBase64 = Buffer.from(buffer).toString("base64")
+      fileBuffer = Buffer.from(buffer)
+      fileBase64 = fileBuffer.toString("base64")
       fileType = file.type
+      fileName = file.name ?? "receipt"
     } else {
       const body = await req.json()
       if (!body.fileBase64) return NextResponse.json({ error: "No file provided" }, { status: 400 })
@@ -114,7 +168,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Unsupported file type: ${fileType}` }, { status: 415 })
   }
 
-  // Fetch vendor + account context so the model can match against real data
+  // Fetch vendor + account context so the model can match against real data.
+  // Log errors instead of silently swallowing — we still proceed but with empty lists.
   let vendors: { id: string; name: string }[] = []
   let accounts: { id: string; code: string; name: string }[] = []
   try {
@@ -132,8 +187,9 @@ export async function POST(req: NextRequest) {
         select: { id: true, code: true, name: true },
       }),
     ])
-  } catch {
-    // Proceed without context if session/DB fails — still useful for basic extraction
+  } catch (err) {
+    console.error("[scan] Failed to load vendor/account context:", err)
+    // Continue with empty lists — model will still extract names, and we fuzzy-match below
   }
 
   const fileContentBlock: Anthropic.MessageParam["content"][number] = isPdf
@@ -173,34 +229,87 @@ export async function POST(req: NextRequest) {
     .replace(/\s*```\s*$/i, "")
     .trim()
 
-  let parsed: ScanResult
+  let parsed: ScanResult & { overallSuggestedAccountName?: string | null }
   try {
-    parsed = JSON.parse(cleaned) as ScanResult
+    parsed = JSON.parse(cleaned)
   } catch {
     console.error("[scan] JSON parse failed. Raw model output:", raw)
     return NextResponse.json({ error: "Couldn't read receipt, enter manually" }, { status: 422 })
   }
 
-  // Validate that any IDs the model returned are actually from our lists
+  // Validate and enrich: ensure any returned IDs come from our lists,
+  // then fuzzy-match by name as a fallback so dropdowns auto-select.
   const vendorIds = new Set(vendors.map((v) => v.id))
   const accountIds = new Set(accounts.map((a) => a.id))
 
+  // Vendor: validate model ID → fallback to server-side fuzzy match by name
   if (parsed.matchedVendorId && !vendorIds.has(parsed.matchedVendorId)) {
     parsed.matchedVendorId = null
   }
-  if (parsed.overallSuggestedAccountId && !accountIds.has(parsed.overallSuggestedAccountId)) {
-    parsed.overallSuggestedAccountId = null
+  if (!parsed.matchedVendorId && parsed.vendorName) {
+    parsed.matchedVendorId = fuzzyMatchVendor(parsed.vendorName, vendors)
   }
+
+  // Line accounts: validate model ID → fallback to fuzzy match by suggestedAccountName
   if (Array.isArray(parsed.lineItems)) {
-    parsed.lineItems = parsed.lineItems.map((li) => ({
-      ...li,
-      suggestedAccountId: li.suggestedAccountId && accountIds.has(li.suggestedAccountId)
+    parsed.lineItems = parsed.lineItems.map((li) => {
+      let id = li.suggestedAccountId && accountIds.has(li.suggestedAccountId)
         ? li.suggestedAccountId
-        : null,
-    }))
+        : null
+      if (!id && li.suggestedAccountName) {
+        id = fuzzyMatchAccount(li.suggestedAccountName, accounts)
+      }
+      return { ...li, suggestedAccountId: id }
+    })
   } else {
     parsed.lineItems = []
   }
 
-  return NextResponse.json(parsed)
+  // Overall account: validate → fallback fuzzy → derive from line items
+  if (parsed.overallSuggestedAccountId && !accountIds.has(parsed.overallSuggestedAccountId)) {
+    parsed.overallSuggestedAccountId = null
+  }
+  if (!parsed.overallSuggestedAccountId && parsed.overallSuggestedAccountName) {
+    parsed.overallSuggestedAccountId = fuzzyMatchAccount(parsed.overallSuggestedAccountName, accounts)
+  }
+  if (!parsed.overallSuggestedAccountId && parsed.lineItems.length > 0) {
+    // Use the most common line account as the overall fallback
+    const firstWithAccount = parsed.lineItems.find((l) => l.suggestedAccountId)
+    if (firstWithAccount) parsed.overallSuggestedAccountId = firstWithAccount.suggestedAccountId
+  }
+
+  // Upload receipt to Vercel Blob for persistence (requires BLOB_READ_WRITE_TOKEN)
+  let receiptUrl: string | null = null
+  if (fileBuffer && process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      const ext = isPdf ? "pdf" : (fileType.split("/")[1] ?? "jpg")
+      const pathname = `hce/receipts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const blob = await put(pathname, fileBuffer, {
+        access: "public",
+        contentType: fileType,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      })
+      receiptUrl = blob.url
+    } catch (err) {
+      console.error("[scan] Blob upload failed (non-fatal):", (err as Error).message)
+    }
+  }
+
+  const result: ScanResult = {
+    vendorName: parsed.vendorName ?? null,
+    matchedVendorId: parsed.matchedVendorId ?? null,
+    date: parsed.date ?? null,
+    currency: parsed.currency ?? "USD",
+    subtotalCents: parsed.subtotalCents ?? null,
+    taxCents: parsed.taxCents ?? null,
+    totalCents: parsed.totalCents ?? null,
+    lineItems: parsed.lineItems,
+    overallSuggestedAccountId: parsed.overallSuggestedAccountId ?? null,
+    isLikelyRecurring: parsed.isLikelyRecurring ?? false,
+    recurringReason: parsed.recurringReason ?? null,
+    confidence: parsed.confidence ?? "medium",
+    receiptUrl,
+  }
+
+  return NextResponse.json(result)
 }

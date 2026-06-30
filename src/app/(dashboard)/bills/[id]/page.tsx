@@ -2,7 +2,7 @@ import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, FileText, Image as ImageIcon } from "lucide-react"
 import { BillPaymentForm } from "@/components/bills/BillPaymentForm"
 
 export const dynamic = "force-dynamic"
@@ -153,6 +153,49 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Receipt attachment */}
+      {bill.receiptUrl && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Receipt</h2>
+          {bill.receiptUrl.endsWith(".pdf") ? (
+            <div className="space-y-3">
+              <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: "600px" }}>
+                <iframe
+                  src={bill.receiptUrl}
+                  className="w-full h-full"
+                  title="Receipt PDF"
+                />
+              </div>
+              <a
+                href={bill.receiptUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <FileText className="w-4 h-4" /> Open PDF in new tab
+              </a>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bill.receiptUrl}
+                alt="Receipt"
+                className="max-w-md rounded-lg border border-gray-200"
+              />
+              <a
+                href={bill.receiptUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <ImageIcon className="w-4 h-4" /> View full size
+              </a>
+            </div>
+          )}
         </div>
       )}
 

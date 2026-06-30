@@ -1,13 +1,14 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Camera, Upload, X, ScanLine, FileText } from "lucide-react"
+import { Camera, Upload, X, ScanLine, FileText, ExternalLink } from "lucide-react"
 import type { ScanResult } from "@/lib/scan-types"
 
 export type { ScanResult }
 
 type Props = {
-  onResult: (result: ScanResult) => void
+  // localUrl is an objectURL for the file (stays valid as long as the component is mounted)
+  onResult: (result: ScanResult, localUrl: string) => void
 }
 
 export function ReceiptScanner({ onResult }: Props) {
@@ -16,6 +17,7 @@ export function ReceiptScanner({ onResult }: Props) {
   const [preview, setPreview] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const [scanning, setScanning] = useState(false)
+  const [scanned, setScanned] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -23,6 +25,7 @@ export function ReceiptScanner({ onResult }: Props) {
     if (!f) return
     setFile(f)
     setError(null)
+    setScanned(false)
     if (f.type === "application/pdf") {
       setPreview("pdf")
     } else {
@@ -34,6 +37,7 @@ export function ReceiptScanner({ onResult }: Props) {
     setFile(null)
     setPreview(null)
     setError(null)
+    setScanned(false)
     if (cameraInputRef.current) cameraInputRef.current.value = ""
     if (uploadInputRef.current) uploadInputRef.current.value = ""
   }
@@ -51,7 +55,12 @@ export function ReceiptScanner({ onResult }: Props) {
         setError(data.error ?? "Scan failed")
         return
       }
-      onResult(data as ScanResult)
+      // Generate a stable objectURL for this file so BillForm can show it
+      const localUrl = file.type === "application/pdf"
+        ? URL.createObjectURL(new Blob([await file.arrayBuffer()], { type: "application/pdf" }))
+        : (preview ?? URL.createObjectURL(file))
+      setScanned(true)
+      onResult(data as ScanResult, localUrl)
     } catch {
       setError("Network error — check your connection")
     } finally {
@@ -89,23 +98,8 @@ export function ReceiptScanner({ onResult }: Props) {
             </button>
           </div>
           <p className="text-xs text-gray-400">JPG, PNG, WEBP or PDF</p>
-          {/* Camera capture — image only; cameras don't produce PDFs */}
-          <input
-            ref={cameraInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          {/* File upload — images and PDFs */}
-          <input
-            ref={uploadInputRef}
-            type="file"
-            accept="image/*,application/pdf"
-            className="hidden"
-            onChange={handleFileChange}
-          />
+          <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
+          <input ref={uploadInputRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileChange} />
         </div>
       ) : (
         <div className="flex gap-4 items-start">
@@ -131,23 +125,56 @@ export function ReceiptScanner({ onResult }: Props) {
 
           <div className="flex flex-col gap-3 pt-1">
             <p className="text-sm text-gray-600 font-medium">{file?.name}</p>
-            <button
-              type="button"
-              onClick={handleScan}
-              disabled={scanning}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 transition-colors"
-            >
-              {scanning ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Reading receipt…
-                </>
-              ) : (
-                <>
-                  <ScanLine className="w-4 h-4" /> Read Receipt
-                </>
-              )}
-            </button>
+
+            {isPdf && preview && preview !== "pdf" ? (
+              <a
+                href={preview}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> View PDF
+              </a>
+            ) : isPdf ? null : preview ? (
+              <a
+                href={preview}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> View full size
+              </a>
+            ) : null}
+
+            {!scanned ? (
+              <button
+                type="button"
+                onClick={handleScan}
+                disabled={scanning}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 transition-colors"
+              >
+                {scanning ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                    Reading receipt…
+                  </>
+                ) : (
+                  <>
+                    <ScanLine className="w-4 h-4" /> Read Receipt
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleScan}
+                disabled={scanning}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                <ScanLine className="w-4 h-4" /> Re-scan
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => { clearFile(); uploadInputRef.current?.click() }}
@@ -155,22 +182,10 @@ export function ReceiptScanner({ onResult }: Props) {
             >
               <Upload className="w-4 h-4" /> Choose different file
             </button>
+
             {/* Keep both inputs mounted so refs stay valid in preview state */}
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <input
-              ref={uploadInputRef}
-              type="file"
-              accept="image/*,application/pdf"
-              className="hidden"
-              onChange={handleFileChange}
-            />
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
+            <input ref={uploadInputRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileChange} />
           </div>
         </div>
       )}

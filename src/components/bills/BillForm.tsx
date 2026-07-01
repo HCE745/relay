@@ -86,6 +86,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
 
   async function handleScanResult(result: ScanResult, localUrl: string) {
     console.log("FORM RECEIVED:", {
+      keys: Object.keys(result as object),
       matchedVendorId: result.matchedVendorId,
       vendorName: result.vendorName,
       createdVendorName: result.createdVendorName,
@@ -134,35 +135,55 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
     setIsRecurring(result.isLikelyRecurring ?? false)
     setRecurringReason(result.recurringReason ?? null)
 
-    // Fetch fresh vendor list — the scan route may have just created a new vendor in the DB
-    let freshVendors = vendorList
+    // Step 1: Inject newly created vendor into the local list immediately from the
+    // scan response. This makes the dropdown work even before the API refresh returns.
+    // The scan route always returns matchedVendorId when it creates or finds a vendor.
+    let workingVendors = vendorList
+    const resolvedId = result.matchedVendorId
+    const resolvedName = result.createdVendorName ?? result.vendorName
+
+    if (resolvedId && resolvedName && !workingVendors.some((v) => v.id === resolvedId)) {
+      workingVendors = [{ id: resolvedId, name: resolvedName }, ...workingVendors]
+      setVendorList(workingVendors)
+      console.log("[BillForm] injected new vendor into list immediately:", resolvedId, resolvedName)
+    }
+
+    // Step 2: Refresh vendor list from DB — pass entityId as query param so the
+    // route doesn't have to guess entity from cookies (which can resolve differently).
+    let freshVendors = workingVendors
     try {
-      const res = await fetch("/api/vendors")
+      const res = await fetch(`/api/vendors?entityId=${encodeURIComponent(entityId)}`)
+      console.log("[BillForm] /api/vendors status:", res.status)
       if (res.ok) {
-        freshVendors = await res.json()
+        const apiVendors: Vendor[] = await res.json()
+        // Merge: API list is authoritative but also keep any vendor we just injected
+        // in case the DB list doesn't include it yet (race condition)
+        if (resolvedId && resolvedName && !apiVendors.some((v) => v.id === resolvedId)) {
+          freshVendors = [{ id: resolvedId, name: resolvedName }, ...apiVendors]
+        } else {
+          freshVendors = apiVendors
+        }
         setVendorList(freshVendors)
         console.log("[BillForm] refreshed vendor list:", freshVendors.map((v) => v.name))
+      } else {
+        const body = await res.text().catch(() => "")
+        console.error("[BillForm] /api/vendors error:", res.status, body)
+        freshVendors = workingVendors // keep the injected vendor
       }
-    } catch {
-      console.warn("[BillForm] vendor list refresh failed — using cached list")
+    } catch (err) {
+      console.warn("[BillForm] vendor list refresh failed:", err)
+      freshVendors = workingVendors
     }
 
     console.log("VENDOR OPTIONS AVAILABLE:", freshVendors.map((v) => ({ id: v.id, name: v.name })))
 
-    // Vendor selection priority:
-    // 1. matchedVendorId from scan (scan route looked up or created vendor server-side)
-    // 2. Client-side fuzzy match against fresh list
-    // 3. _new_ sentinel (deferred to save — only when session/entity unavailable during scan)
+    // Step 3: Set the dropdown value.
+    // Priority: matchedVendorId (created/found server-side) → client fuzzy match → _new_ sentinel
     if (result.matchedVendorId) {
-      // If the refresh somehow didn't include the new vendor, add it defensively
-      if (!freshVendors.some((v) => v.id === result.matchedVendorId) && result.createdVendorName) {
-        freshVendors = [{ id: result.matchedVendorId, name: result.createdVendorName }, ...freshVendors]
-        setVendorList(freshVendors)
-      }
       setVendorId(result.matchedVendorId)
       setNewVendorName("")
       console.log("SETTING VENDOR VALUE TO:", result.matchedVendorId,
-        "(name:", freshVendors.find((v) => v.id === result.matchedVendorId)?.name ?? "NOT IN LIST", ")")
+        "(name:", freshVendors.find((v) => v.id === result.matchedVendorId)?.name ?? "NOT IN LIST — defensive inject will cover it", ")")
     } else if (result.vendorName) {
       const lower = result.vendorName.toLowerCase()
       const fuzzy = freshVendors.find(
@@ -173,12 +194,13 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         setNewVendorName("")
         console.log("SETTING VENDOR VALUE TO:", fuzzy.id, "(client fuzzy match:", fuzzy.name, ")")
       } else {
+        // Fallback: scan couldn't create vendor (no session/entity) — defer creation to save
         setVendorId("_new_")
         setNewVendorName(result.vendorName)
         console.log("SETTING VENDOR VALUE TO: _new_ for:", result.vendorName, "(scan couldn't create vendor)")
       }
     } else {
-      console.warn("SETTING VENDOR VALUE TO: (unchanged — no vendorName in scan result)")
+      console.warn("SETTING VENDOR VALUE TO: (unchanged — matchedVendorId and vendorName both null in scan result)")
     }
 
     const vendorFilled = !!(result.matchedVendorId || result.vendorName)

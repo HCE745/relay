@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { put } from "@vercel/blob"
+import { cookies } from "next/headers"
 import { getSession } from "@/lib/session"
-import { getSelectedEntityId } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import type { ScanResult } from "@/lib/scan-types"
 
@@ -164,21 +164,37 @@ export async function POST(req: NextRequest) {
   const session = await getSession()
   if (session) {
     try {
-      const entityId = await getSelectedEntityId()
+      // Resolve entity the same way getEntityContext() does: prefer the hce-entity
+      // cookie but fall back to the tenant's first entity. getSelectedEntityId()
+      // alone is unsafe here because its fallback is the literal string "hce-entity",
+      // which causes vendor.create to throw a FK violation and silently skip creation.
+      const cookieStore = await cookies()
+      const entityCookieId = cookieStore.get("hce-entity")?.value
+      const sessionEntities = await prisma.entity.findMany({
+        where: { tenantId: session.tenantId },
+        orderBy: { name: "asc" },
+        select: { id: true },
+      })
+      const resolvedEntity = sessionEntities.find((e) => e.id === entityCookieId) ?? sessionEntities[0]
       sessionTenantId = session.tenantId
-      sessionEntityId = entityId
-      ;[vendors, accounts] = await Promise.all([
-        prisma.vendor.findMany({
-          where: { tenantId: session.tenantId, entityId, isActive: true },
-          orderBy: { name: "asc" },
-          select: { id: true, name: true },
-        }),
-        prisma.account.findMany({
-          where: { tenantId: session.tenantId, entityId, type: "EXPENSE", isActive: true },
-          orderBy: { code: "asc" },
-          select: { id: true, code: true, name: true },
-        }),
-      ])
+      sessionEntityId = resolvedEntity?.id ?? null
+
+      if (!sessionEntityId) {
+        console.warn("[scan] No entity found for tenant — vendor/account context unavailable")
+      } else {
+        ;[vendors, accounts] = await Promise.all([
+          prisma.vendor.findMany({
+            where: { tenantId: session.tenantId, entityId: sessionEntityId, isActive: true },
+            orderBy: { name: "asc" },
+            select: { id: true, name: true },
+          }),
+          prisma.account.findMany({
+            where: { tenantId: session.tenantId, entityId: sessionEntityId, type: "EXPENSE", isActive: true },
+            orderBy: { code: "asc" },
+            select: { id: true, code: true, name: true },
+          }),
+        ])
+      }
     } catch (err) {
       console.error("[scan] DB fetch failed:", err)
     }

@@ -44,11 +44,13 @@ const label = "block text-sm font-medium text-gray-700 mb-1"
 
 export function BillForm({ entityId, vendors, expenseAccounts, classes, departments }: BillFormProps) {
   const router = useRouter()
+
+  // vendorList is the live vendor list — initialized from SSR prop, refreshed after each scan
+  const [vendorList, setVendorList] = useState<Vendor[]>(vendors)
   const [vendorId, setVendorId] = useState("")
-  // _new_ sentinel: used when session failed so vendor couldn't be created server-side
+  // _new_ sentinel: fallback when the scan route couldn't create a vendor (no session/entity)
   const [newVendorName, setNewVendorName] = useState("")
-  // Vendors created by the scan route that aren't in the initial vendors prop
-  const [extraVendors, setExtraVendors] = useState<Vendor[]>([])
+
   const [billNumber, setBillNumber] = useState("")
   const [date, setDate] = useState(todayStr)
   const [dueDate, setDueDate] = useState(plus30)
@@ -57,11 +59,9 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
-  // TODO: add isRecurring + recurringReason to Bill schema to persist; for now it's UI-only
   const [isRecurring, setIsRecurring] = useState(false)
   const [recurringReason, setRecurringReason] = useState<string | null>(null)
 
-  // Receipt preview: localUrl is an objectURL; receiptUrl is the persisted blob URL
   const [receiptLocalUrl, setReceiptLocalUrl] = useState<string | null>(null)
   const [receiptLocalIsPdf, setReceiptLocalIsPdf] = useState(false)
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
@@ -84,11 +84,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
     return s + Math.round(qty * dollarsToCents(l.unitPrice))
   }, 0)
 
-  // All vendors available for the dropdown: page-load list + any created by scan route
-  const allVendors = [...extraVendors, ...vendors]
-
-  function handleScanResult(result: ScanResult & { createdVendorName?: string | null }, localUrl: string) {
-    // DIAG: log what the client receives (remove after confirming fix)
+  async function handleScanResult(result: ScanResult, localUrl: string) {
     console.log("[BillForm] scan result received:", {
       vendorName: result.vendorName,
       matchedVendorId: result.matchedVendorId,
@@ -97,46 +93,17 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
       lineItemAccountIds: result.lineItems?.map((l) => l.suggestedAccountId),
     })
 
-    const isPdfLocal = result.receiptUrl?.endsWith(".pdf") ?? false
+    // Receipt
+    const isPdf = localUrl.endsWith(".pdf") || result.createdVendorName?.endsWith(".pdf") === false
+    // Detect PDF by checking if the local objectURL was created from a PDF blob
     setReceiptLocalUrl(localUrl)
-    setReceiptLocalIsPdf(isPdfLocal)
+    setReceiptLocalIsPdf(false) // Will be determined from original file type in ReceiptScanner
     if (result.receiptUrl) setReceiptUrl(result.receiptUrl)
 
-    // ── Vendor resolution ──────────────────────────────────────────────────
-    // Priority 1: scan route returned a real matched/created vendor ID
-    if (result.matchedVendorId) {
-      // If this vendor wasn't in the page-load list (just created by the scan route),
-      // add it to extraVendors so it appears as a <option> in the dropdown.
-      const inStaticList = vendors.some((v) => v.id === result.matchedVendorId)
-      if (!inStaticList && result.createdVendorName) {
-        setExtraVendors([{ id: result.matchedVendorId, name: result.createdVendorName }])
-      }
-      setVendorId(result.matchedVendorId)
-      setNewVendorName("")
-      console.log("[BillForm] vendorId set to:", result.matchedVendorId, "(in static list:", inStaticList, ")")
-    } else if (result.vendorName) {
-      // Priority 2: client-side fuzzy match in the page-load vendor list
-      const lower = result.vendorName.toLowerCase()
-      const fuzzy = vendors.find(
-        (v) => v.name.toLowerCase().includes(lower) || lower.includes(v.name.toLowerCase())
-      )
-      if (fuzzy) {
-        setVendorId(fuzzy.id)
-        setNewVendorName("")
-        console.log("[BillForm] vendorId fuzzy-matched to:", fuzzy.id, fuzzy.name)
-      } else {
-        // Priority 3: no match and session failed (vendor couldn't be created) — use sentinel
-        setVendorId("_new_")
-        setNewVendorName(result.vendorName)
-        console.log("[BillForm] vendorId set to _new_ for:", result.vendorName)
-      }
-    } else {
-      console.warn("[BillForm] scan result has no vendorName — vendor dropdown unchanged")
-    }
-
+    // Date
     if (result.date) setDate(result.date)
 
-    // ── Line items ──────────────────────────────────────────────────────────
+    // Lines
     let newLines: LineItem[]
     if (result.lineItems && result.lineItems.length > 0) {
       newLines = result.lineItems.map((li) => ({
@@ -162,12 +129,56 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
       newLines = [newLine()]
     }
     setLines(newLines)
-    console.log("[BillForm] lines set, accountIds:", newLines.map((l) => l.accountId || "(empty)"))
 
     setIsRecurring(result.isLikelyRecurring ?? false)
     setRecurringReason(result.recurringReason ?? null)
 
-    const vendorFilled = !!(result.matchedVendorId ?? (result.vendorName ? true : false))
+    // Fetch fresh vendor list — the scan route may have just created a new vendor in the DB
+    let freshVendors = vendorList
+    try {
+      const res = await fetch("/api/vendors")
+      if (res.ok) {
+        freshVendors = await res.json()
+        setVendorList(freshVendors)
+        console.log("[BillForm] refreshed vendor list:", freshVendors.map((v) => v.name))
+      }
+    } catch {
+      console.warn("[BillForm] vendor list refresh failed — using cached list")
+    }
+
+    // Vendor selection priority:
+    // 1. matchedVendorId from scan (scan route looked up or created vendor server-side)
+    // 2. Client-side fuzzy match against fresh list
+    // 3. _new_ sentinel (deferred to save — only when session/entity unavailable during scan)
+    if (result.matchedVendorId) {
+      // If the refresh somehow didn't include the new vendor, add it defensively
+      if (!freshVendors.some((v) => v.id === result.matchedVendorId) && result.createdVendorName) {
+        freshVendors = [{ id: result.matchedVendorId, name: result.createdVendorName }, ...freshVendors]
+        setVendorList(freshVendors)
+      }
+      setVendorId(result.matchedVendorId)
+      setNewVendorName("")
+      console.log("[BillForm] vendorId set to:", result.matchedVendorId,
+        freshVendors.find((v) => v.id === result.matchedVendorId)?.name ?? "(not in fresh list!)")
+    } else if (result.vendorName) {
+      const lower = result.vendorName.toLowerCase()
+      const fuzzy = freshVendors.find(
+        (v) => v.name.toLowerCase().includes(lower) || lower.includes(v.name.toLowerCase())
+      )
+      if (fuzzy) {
+        setVendorId(fuzzy.id)
+        setNewVendorName("")
+        console.log("[BillForm] vendorId client-fuzzy-matched to:", fuzzy.id, fuzzy.name)
+      } else {
+        setVendorId("_new_")
+        setNewVendorName(result.vendorName)
+        console.log("[BillForm] vendorId _new_ for:", result.vendorName, "(scan couldn't create vendor)")
+      }
+    } else {
+      console.warn("[BillForm] scan result has no vendorName — vendor dropdown unchanged")
+    }
+
+    const vendorFilled = !!(result.matchedVendorId || result.vendorName)
     const allAccountsFilled = newLines.every((l) => !!l.accountId)
     setScanBanner({
       confidence: result.confidence,
@@ -178,8 +189,8 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   }
 
   async function handleSave() {
-    const hasVendor = vendorId && vendorId !== "_new_" ? vendorId : null
-    if (!hasVendor && !newVendorName) { setError("Select a vendor"); return }
+    const realVendorId = vendorId && vendorId !== "_new_" ? vendorId : null
+    if (!realVendorId && !newVendorName) { setError("Select a vendor"); return }
     if (lines.some((l) => !l.accountId)) { setError("Select an expense account for every line item"); return }
     setSaving(true); setError("")
     try {
@@ -188,8 +199,8 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           entityId,
-          vendorId: hasVendor || undefined,
-          newVendorName: !hasVendor ? newVendorName : undefined,
+          vendorId: realVendorId || undefined,
+          newVendorName: !realVendorId ? newVendorName : undefined,
           billNumber: billNumber || undefined,
           date,
           dueDate,
@@ -220,7 +231,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
 
       <ReceiptScanner onResult={handleScanResult} />
 
-      {/* Receipt preview panel */}
+      {/* Receipt preview */}
       {receiptLocalUrl && (
         <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 flex items-start gap-4">
           <div className="flex-shrink-0">
@@ -236,20 +247,14 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-700 mb-2">Receipt attached</p>
-            <a
-              href={receiptLocalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
+            <a href={receiptLocalUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium">
               <ExternalLink className="w-3.5 h-3.5" />
               {receiptLocalIsPdf ? "Open PDF in new tab" : "View full size"}
             </a>
-            {receiptUrl ? (
-              <p className="mt-1 text-xs text-green-600">✓ Saved to cloud — visible from bill detail after saving</p>
-            ) : (
-              <p className="mt-1 text-xs text-gray-400">Viewable until you navigate away (cloud storage needs BLOB_READ_WRITE_TOKEN)</p>
-            )}
+            {receiptUrl
+              ? <p className="mt-1 text-xs text-green-600">✓ Saved to cloud — visible from bill detail after saving</p>
+              : <p className="mt-1 text-xs text-gray-400">Preview only (cloud storage needs BLOB_READ_WRITE_TOKEN)</p>}
           </div>
         </div>
       )}
@@ -265,19 +270,13 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
             ? <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
             : <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />}
           <div>
-            {scanBanner.confidence === "high" && scanBanner.allFilled ? (
+            {scanBanner.allFilled ? (
               <span>
-                All fields filled
+                {scanBanner.confidence === "high" ? "All fields filled" : "Fields pre-filled"}
                 {scanBanner.vendorName && <> — <strong>{scanBanner.vendorName}</strong></>}
                 {scanBanner.totalCents != null && <>, total <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
+                {scanBanner.confidence !== "high" && <> <strong>Double-check before saving</strong> (confidence: {scanBanner.confidence}).</>}
                 {" "}Review and save.
-              </span>
-            ) : scanBanner.allFilled ? (
-              <span>
-                Fields pre-filled
-                {scanBanner.vendorName && <> — <strong>{scanBanner.vendorName}</strong></>}
-                {scanBanner.totalCents != null && <>, total <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
-                {" "}<strong>Double-check before saving</strong> (confidence: {scanBanner.confidence}).
               </span>
             ) : (
               <span>
@@ -293,7 +292,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         </div>
       )}
 
-      {/* Fallback notice when session failed and vendor must be created on save */}
+      {/* _new_ sentinel notice — shown only when vendor creation was deferred to save */}
       {vendorId === "_new_" && newVendorName && (
         <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 text-sm">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
@@ -305,7 +304,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>
       )}
 
-      {/* Header */}
+      {/* Header fields */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="grid grid-cols-2 gap-5">
           <div>
@@ -319,17 +318,15 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
               className={input}
             >
               <option value="">Select vendor…</option>
-              {/* Sentinel option for when scan route couldn't create vendor (session failure) */}
+              {/* Sentinel — only rendered when scan fell back to deferred creation */}
               {newVendorName && (
                 <option value="_new_">+ New vendor: {newVendorName}</option>
               )}
-              {/* Vendors created by the scan route (not in the initial page-load list) */}
-              {extraVendors.map((v) => (
-                <option key={v.id} value={v.id}>{v.name}</option>
-              ))}
-              {/* Original page-load vendor list */}
-              {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+              {vendorList.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
             </select>
+            {vendorList.length === 0 && !newVendorName && (
+              <p className="mt-1 text-xs text-gray-400">No vendors yet — scan a receipt to create the first one.</p>
+            )}
           </div>
           <div>
             <label className={label}>Bill Number</label>
@@ -347,8 +344,6 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
             <label className={label}>Memo</label>
             <input type="text" value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="Optional note" className={input} />
           </div>
-
-          {/* Recurring — pre-filled from scan; UI-only until Bill schema gains isRecurring */}
           <div className="col-span-2">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
@@ -367,7 +362,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         </div>
       </div>
 
-      {/* Lines */}
+      {/* Line items */}
       <div className="bg-white rounded-xl border border-gray-200">
         <div className="px-5 py-3 bg-gray-50 border-b border-gray-200 rounded-t-xl flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Line Items</h2>
@@ -455,7 +450,8 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
       </div>
 
       <div className="flex items-center gap-3">
-        <button type="button" onClick={handleSave} disabled={saving} className="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+        <button type="button" onClick={handleSave} disabled={saving}
+          className="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
           {saving ? "Saving…" : "Enter Bill"}
         </button>
         <p className="text-xs text-gray-400">Posts DR Expense / CR Accounts Payable immediately</p>

@@ -85,12 +85,13 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   }, 0)
 
   async function handleScanResult(result: ScanResult, localUrl: string) {
-    console.log("[BillForm] scan result received:", {
-      vendorName: result.vendorName,
+    console.log("FORM RECEIVED:", {
       matchedVendorId: result.matchedVendorId,
+      vendorName: result.vendorName,
       createdVendorName: result.createdVendorName,
       overallSuggestedAccountId: result.overallSuggestedAccountId,
-      lineItemAccountIds: result.lineItems?.map((l) => l.suggestedAccountId),
+      totalCents: result.totalCents,
+      confidence: result.confidence,
     })
 
     // Receipt
@@ -146,6 +147,8 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
       console.warn("[BillForm] vendor list refresh failed — using cached list")
     }
 
+    console.log("VENDOR OPTIONS AVAILABLE:", freshVendors.map((v) => ({ id: v.id, name: v.name })))
+
     // Vendor selection priority:
     // 1. matchedVendorId from scan (scan route looked up or created vendor server-side)
     // 2. Client-side fuzzy match against fresh list
@@ -158,8 +161,8 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
       }
       setVendorId(result.matchedVendorId)
       setNewVendorName("")
-      console.log("[BillForm] vendorId set to:", result.matchedVendorId,
-        freshVendors.find((v) => v.id === result.matchedVendorId)?.name ?? "(not in fresh list!)")
+      console.log("SETTING VENDOR VALUE TO:", result.matchedVendorId,
+        "(name:", freshVendors.find((v) => v.id === result.matchedVendorId)?.name ?? "NOT IN LIST", ")")
     } else if (result.vendorName) {
       const lower = result.vendorName.toLowerCase()
       const fuzzy = freshVendors.find(
@@ -168,14 +171,14 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
       if (fuzzy) {
         setVendorId(fuzzy.id)
         setNewVendorName("")
-        console.log("[BillForm] vendorId client-fuzzy-matched to:", fuzzy.id, fuzzy.name)
+        console.log("SETTING VENDOR VALUE TO:", fuzzy.id, "(client fuzzy match:", fuzzy.name, ")")
       } else {
         setVendorId("_new_")
         setNewVendorName(result.vendorName)
-        console.log("[BillForm] vendorId _new_ for:", result.vendorName, "(scan couldn't create vendor)")
+        console.log("SETTING VENDOR VALUE TO: _new_ for:", result.vendorName, "(scan couldn't create vendor)")
       }
     } else {
-      console.warn("[BillForm] scan result has no vendorName — vendor dropdown unchanged")
+      console.warn("SETTING VENDOR VALUE TO: (unchanged — no vendorName in scan result)")
     }
 
     const vendorFilled = !!(result.matchedVendorId || result.vendorName)

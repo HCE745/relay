@@ -261,9 +261,11 @@ export async function POST(req: NextRequest) {
     console.log("[scan] model matchedVendorId not in list, clearing:", parsed.matchedVendorId)
     parsed.matchedVendorId = null
   }
+  let existingMatchId: string | null = null
   if (!parsed.matchedVendorId && parsed.vendorName) {
-    parsed.matchedVendorId = fuzzyMatchVendor(parsed.vendorName, vendors)
-    if (parsed.matchedVendorId) {
+    existingMatchId = fuzzyMatchVendor(parsed.vendorName, vendors)
+    if (existingMatchId) {
+      parsed.matchedVendorId = existingMatchId
       console.log("[scan] fuzzy-matched vendor:", parsed.matchedVendorId)
     }
   }
@@ -271,6 +273,7 @@ export async function POST(req: NextRequest) {
   // If vendor still unresolved and we have a session, create the vendor now so the
   // dropdown can show a real selected option instead of "Select…".
   let createdVendorName: string | null = null
+  let createdVendorId: string | null = null
   if (!parsed.matchedVendorId && parsed.vendorName && sessionTenantId && sessionEntityId) {
     try {
       const newVendor = await prisma.vendor.create({
@@ -278,13 +281,22 @@ export async function POST(req: NextRequest) {
       })
       parsed.matchedVendorId = newVendor.id
       createdVendorName = newVendor.name
+      createdVendorId = newVendor.id
       console.log("[scan] created vendor:", newVendor.id, newVendor.name)
     } catch (err) {
       console.error("[scan] failed to create vendor:", err)
     }
   }
 
-  console.log("[scan] final matchedVendorId:", parsed.matchedVendorId)
+  console.log("VENDOR STEP:", {
+    extractedName: parsed.vendorName,
+    sessionTenantId,
+    sessionEntityId,
+    vendorsInDb: vendors.length,
+    foundExisting: existingMatchId ?? "none",
+    createdNew: createdVendorId ?? "none",
+    finalMatchedVendorId: parsed.matchedVendorId ?? "none",
+  })
 
   // Line accounts: validate → fuzzy-match by name
   if (Array.isArray(parsed.lineItems)) {
@@ -342,9 +354,19 @@ export async function POST(req: NextRequest) {
     recurringReason: parsed.recurringReason ?? null,
     confidence: parsed.confidence ?? "medium",
     receiptUrl,
-    // Let the client know this vendor was just created so it can add it to the dropdown
     createdVendorName: createdVendorName ?? null,
   }
+
+  console.log("SCAN RESPONSE:", JSON.stringify({
+    vendorName: result.vendorName,
+    matchedVendorId: result.matchedVendorId,
+    createdVendorName: result.createdVendorName,
+    date: result.date,
+    totalCents: result.totalCents,
+    overallSuggestedAccountId: result.overallSuggestedAccountId,
+    confidence: result.confidence,
+    lineItemCount: result.lineItems.length,
+  }, null, 2))
 
   return NextResponse.json(result)
 }

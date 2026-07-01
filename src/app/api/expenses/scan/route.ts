@@ -161,13 +161,13 @@ export async function POST(req: NextRequest) {
   let sessionTenantId: string | null = null
   let sessionEntityId: string | null = null
 
+  // ── Auth + entity context ────────────────────────────────────────────────────
+  console.log("[scan] env check — SESSION_SECRET set:", !!process.env.SESSION_SECRET,
+    "| ANTHROPIC_API_KEY set:", !!apiKey)
+
   const session = await getSession()
   if (session) {
     try {
-      // Resolve entity the same way getEntityContext() does: prefer the hce-entity
-      // cookie but fall back to the tenant's first entity. getSelectedEntityId()
-      // alone is unsafe here because its fallback is the literal string "hce-entity",
-      // which causes vendor.create to throw a FK violation and silently skip creation.
       const cookieStore = await cookies()
       const entityCookieId = cookieStore.get("hce-entity")?.value
       const sessionEntities = await prisma.entity.findMany({
@@ -178,6 +178,10 @@ export async function POST(req: NextRequest) {
       const resolvedEntity = sessionEntities.find((e) => e.id === entityCookieId) ?? sessionEntities[0]
       sessionTenantId = session.tenantId
       sessionEntityId = resolvedEntity?.id ?? null
+
+      console.log("[scan] session OK — tenantId:", sessionTenantId,
+        "| entityCookie:", entityCookieId ?? "(not set)",
+        "| resolvedEntityId:", sessionEntityId ?? "(none)")
 
       if (!sessionEntityId) {
         console.warn("[scan] No entity found for tenant — vendor/account context unavailable")
@@ -199,12 +203,14 @@ export async function POST(req: NextRequest) {
       console.error("[scan] DB fetch failed:", err)
     }
   } else {
-    console.warn("[scan] No session — vendor/account context unavailable")
+    console.warn("[scan] NO SESSION — getSession() returned null. " +
+      "Check that SESSION_SECRET is set in Vercel env vars and matches the secret used to sign the session cookie.")
   }
 
-  // DIAG: log what we fetched (remove after confirming fix)
-  console.log("[scan] existingVendors:", vendors.map((v) => ({ id: v.id, name: v.name })))
-  console.log("[scan] existingAccounts count:", accounts.length)
+  console.log("[scan] context — tenantId:", sessionTenantId ?? "NULL",
+    "| entityId:", sessionEntityId ?? "NULL",
+    "| vendors:", vendors.length,
+    "| accounts:", accounts.length)
 
   const fileContentBlock: Anthropic.MessageParam["content"][number] = isPdf
     ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: fileBase64 } }
@@ -288,6 +294,15 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  console.log("SCAN VENDOR DEBUG:", {
+    rawExtractedVendorName: parsed.vendorName ?? null,
+    entityId: sessionEntityId ?? null,
+    vendorsAvailableForMatching: vendors.length,
+    foundExisting: existingMatchId ?? null,
+    didCreate: createdVendorId !== null,
+    matchedVendorId: parsed.matchedVendorId ?? null,
+  })
+  // Legacy log kept for consistency
   console.log("VENDOR STEP:", {
     extractedName: parsed.vendorName,
     sessionTenantId,

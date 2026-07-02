@@ -34,6 +34,9 @@ model Tenant {
   auditLogs     AuditLog[]
   budgets       Budget[]
   cashForecastAdjustments CashForecastAdjustment[]
+  recurringTemplates RecurringTemplate[]
+  amortizationSchedules AmortizationSchedule[]
+  anomalyFlags  AnomalyFlag[]
 
   @@schema("hce")
   @@map("hce_tenants")
@@ -68,6 +71,9 @@ model Entity {
   auditLogs      AuditLog[]
   budgets        Budget[]
   cashForecastAdjustments CashForecastAdjustment[]
+  recurringTemplates RecurringTemplate[]
+  amortizationSchedules AmortizationSchedule[]
+  anomalyFlags   AnomalyFlag[]
 
   @@index([tenantId])
   @@schema("hce")
@@ -254,6 +260,8 @@ enum JournalSource {
   RECONCILIATION
   INTERCOMPANY
   CLOSING
+  RECURRING
+  AMORTIZATION
 
   @@schema("hce")
   @@map("hce_journal_source")
@@ -750,4 +758,166 @@ model CashForecastAdjustment {
   @@index([tenantId, entityId, date])
   @@schema("hce")
   @@map("hce_cash_forecast_adjustments")
+}
+
+// ─── RECURRING ENTRIES ────────────────────────────────────────────────────────
+
+enum RecurringType {
+  BILL
+  INVOICE
+  JOURNAL
+
+  @@schema("hce")
+  @@map("hce_recurring_type")
+}
+
+enum RecurringFrequency {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+
+  @@schema("hce")
+  @@map("hce_recurring_frequency")
+}
+
+model RecurringTemplate {
+  id          String             @id @default(cuid())
+  tenantId    String
+  entityId    String
+  name        String
+  type        RecurringType
+  frequency   RecurringFrequency
+  startDate   DateTime
+  endDate     DateTime?
+  nextRunDate DateTime
+  active      Boolean            @default(true)
+  payload     Json
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  tenant Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity         @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  runs   RecurringRun[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_recurring_templates")
+}
+
+model RecurringRun {
+  id          String   @id @default(cuid())
+  templateId  String
+  periodStart DateTime
+  sourceId    String?
+  sourceType  String?
+  runAt       DateTime @default(now())
+
+  template RecurringTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, periodStart])
+  @@index([templateId])
+  @@schema("hce")
+  @@map("hce_recurring_runs")
+}
+
+// ─── AMORTIZATION SCHEDULES ───────────────────────────────────────────────────
+
+enum AmortizationType {
+  PREPAID_EXPENSE
+  DEFERRED_REVENUE
+
+  @@schema("hce")
+  @@map("hce_amortization_type")
+}
+
+enum AmortizationStatus {
+  ACTIVE
+  COMPLETED
+  VOIDED
+
+  @@schema("hce")
+  @@map("hce_amortization_status")
+}
+
+model AmortizationSchedule {
+  id               String             @id @default(cuid())
+  tenantId         String
+  entityId         String
+  name             String
+  type             AmortizationType
+  totalAmountCents Int
+  startDate        DateTime
+  months           Int
+  bsAccountId      String
+  plAccountId      String
+  status           AmortizationStatus @default(ACTIVE)
+  createdAt        DateTime           @default(now())
+
+  tenant  Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity  Entity              @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  entries AmortizationEntry[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_amortization_schedules")
+}
+
+model AmortizationEntry {
+  id             String    @id @default(cuid())
+  scheduleId     String
+  periodNumber   Int
+  periodDate     DateTime
+  amountCents    Int
+  posted         Boolean   @default(false)
+  journalEntryId String?
+  postedAt       DateTime?
+
+  schedule AmortizationSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, periodNumber])
+  @@index([scheduleId])
+  @@schema("hce")
+  @@map("hce_amortization_entries")
+}
+
+// ─── ANOMALY DETECTION ────────────────────────────────────────────────────────
+
+enum AnomalySeverity {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@schema("hce")
+  @@map("hce_anomaly_severity")
+}
+
+enum AnomalyStatus {
+  OPEN
+  DISMISSED
+
+  @@schema("hce")
+  @@map("hce_anomaly_status")
+}
+
+model AnomalyFlag {
+  id          String          @id @default(cuid())
+  tenantId    String
+  entityId    String
+  sourceType  String
+  sourceId    String
+  reason      String
+  severity    AnomalySeverity @default(MEDIUM)
+  ruleType    String
+  status      AnomalyStatus   @default(OPEN)
+  dismissedAt DateTime?
+  dismissedBy String?
+  createdAt   DateTime        @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityId, status])
+  @@schema("hce")
+  @@map("hce_anomaly_flags")
 }

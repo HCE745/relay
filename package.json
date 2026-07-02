@@ -9,6 +9,9 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
+    "reset": "tsx scripts/reset-blank-slate.ts",
+    "reset:confirm": "tsx scripts/reset-blank-slate.ts --confirm",
+    "verify": "tsx scripts/verify.ts",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:studio": "prisma studio"

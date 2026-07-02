@@ -1,7 +1,17 @@
 /**
- * Seed: Creates the HCE tenant, HCE + Relay Software entities,
- * an admin user, standard chart of accounts per entity,
- * and an open accounting period for the current year.
+ * Seed — FOUNDATIONAL STRUCTURE ONLY.
+ *
+ * Creates (idempotent upserts):
+ *   • Tenant: HCE Holdings
+ *   • Entities: HCE (parent) + Relay Software (child)
+ *   • User: will@hce.com (OWNER) with access to both entities
+ *   • Chart of accounts (standard COA + intercompany accounts per entity)
+ *   • Accounting periods (current year + prior year, OPEN)
+ *   • Classes + Departments for Relay Software
+ *
+ * Intentionally creates NO demo transactions, customers, vendors, bills,
+ * invoices, or journal entries — production slate should be clean.
+ * To reset transactional data: npm run reset:confirm
  */
 import "dotenv/config"
 import { PrismaClient } from "../src/generated/prisma/client"

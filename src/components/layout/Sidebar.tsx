@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, FileText, Receipt, Building2, Users, CreditCard, RefreshCw,
   BarChart3, ArrowLeftRight, Settings, LogOut, BookOpen, ChevronDown,
+  TrendingUp, Droplets, MessageSquare,
 } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -26,6 +27,9 @@ const NAV = [
   { href: "/banking", label: "Banking", icon: CreditCard },
   { href: "/reconcile", label: "Reconcile", icon: RefreshCw },
   { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/budgets", label: "Budgets", icon: TrendingUp, group: "Planning" },
+  { href: "/cashflow", label: "Cash Flow", icon: Droplets, group: "Planning" },
+  { href: "/ask", label: "Ask AI", icon: MessageSquare },
   { href: "/accounts", label: "Chart of Accounts", icon: BookOpen },
   { href: "/intercompany", label: "Intercompany", icon: ArrowLeftRight },
   { href: "/settings", label: "Settings", icon: Settings },

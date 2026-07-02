@@ -32,6 +32,8 @@ model Tenant {
   bankTxns      BankTransaction[]
   bankRules     BankRule[]
   auditLogs     AuditLog[]
+  budgets       Budget[]
+  cashForecastAdjustments CashForecastAdjustment[]
 
   @@schema("hce")
   @@map("hce_tenants")
@@ -64,6 +66,8 @@ model Entity {
   bankAccounts   BankAccount[]
   bankTxns       BankTransaction[]
   auditLogs      AuditLog[]
+  budgets        Budget[]
+  cashForecastAdjustments CashForecastAdjustment[]
 
   @@index([tenantId])
   @@schema("hce")
@@ -158,6 +162,7 @@ model Account {
   journalLines JournalLine[]
   invoiceLines InvoiceLine[]
   billLines    BillLine[]
+  budgetLines  BudgetLine[]
 
   @@unique([tenantId, entityId, code])
   @@index([tenantId, entityId])
@@ -680,4 +685,69 @@ model BankRule {
   @@index([tenantId, entityId])
   @@schema("hce")
   @@map("hce_bank_rules")
+}
+
+// ─── BUDGETS ──────────────────────────────────────────────────────────────────
+
+enum BudgetPeriodType {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+
+  @@schema("hce")
+  @@map("hce_budget_period_type")
+}
+
+model Budget {
+  id         String           @id @default(cuid())
+  tenantId   String
+  entityId   String
+  name       String
+  fiscalYear Int
+  periodType BudgetPeriodType @default(MONTHLY)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  tenant Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity       @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  lines  BudgetLine[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_budgets")
+}
+
+model BudgetLine {
+  id          String @id @default(cuid())
+  budgetId    String
+  accountId   String
+  period      Int
+  amountCents Int    @default(0)
+
+  budget  Budget  @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id])
+
+  @@unique([budgetId, accountId, period])
+  @@index([budgetId])
+  @@schema("hce")
+  @@map("hce_budget_lines")
+}
+
+// ─── CASH FORECAST ───────────────────────────────────────────────────────────
+
+model CashForecastAdjustment {
+  id          String   @id @default(cuid())
+  tenantId    String
+  entityId    String
+  date        DateTime
+  description String
+  amountCents Int
+  createdAt   DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityId, date])
+  @@schema("hce")
+  @@map("hce_cash_forecast_adjustments")
 }

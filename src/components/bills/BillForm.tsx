@@ -71,6 +71,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
     vendorName: string | null
     totalCents: number | null
     allFilled: boolean
+    vendorMissing: boolean
   } | null>(null)
 
   function updateLine(key: string, field: keyof LineItem, val: string) {
@@ -200,7 +201,10 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         console.log("SETTING VENDOR VALUE TO: _new_ for:", result.vendorName, "(scan couldn't create vendor)")
       }
     } else {
-      console.warn("SETTING VENDOR VALUE TO: (unchanged — matchedVendorId and vendorName both null in scan result)")
+      // No vendor on document — leave the field blank so user can enter it
+      setVendorId("")
+      setNewVendorName("")
+      console.log("VENDOR: null from model — leaving field empty for user to fill")
     }
 
     const vendorFilled = !!(result.matchedVendorId || result.vendorName)
@@ -210,6 +214,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
       vendorName: result.vendorName,
       totalCents: result.totalCents,
       allFilled: vendorFilled && allAccountsFilled,
+      vendorMissing: !vendorFilled,
     })
   }
 
@@ -305,10 +310,14 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
               </span>
             ) : (
               <span>
-                <strong>Some fields need attention</strong>
-                {scanBanner.vendorName && <> — vendor: <em>{scanBanner.vendorName}</em></>}
-                {scanBanner.totalCents != null && <>, total: <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
-                {" "}Assign the highlighted expense accounts before saving.
+                <strong>Receipt scanned</strong>
+                {scanBanner.totalCents != null && <> — total <strong>${fmtCents(scanBanner.totalCents)}</strong></>}.
+                {scanBanner.vendorMissing
+                  ? <> Vendor not found on document — enter it in the field above.</>
+                  : scanBanner.vendorName
+                    ? <> Vendor: <strong>{scanBanner.vendorName}</strong>.</>
+                    : null}
+                {" "}Check highlighted fields before saving.
                 {scanBanner.confidence !== "high" && <> Confidence: <strong>{scanBanner.confidence}</strong>.</>}
               </span>
             )}
@@ -334,24 +343,32 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
         <div className="grid grid-cols-2 gap-5">
           <div>
             <label className={label}>Vendor *</label>
-            <select
-              value={vendorId}
-              onChange={(e) => {
-                if (e.target.value !== "_new_") setNewVendorName("")
-                setVendorId(e.target.value)
-              }}
-              className={input}
-            >
-              <option value="">Select vendor…</option>
-              {/* Sentinel — only rendered when scan fell back to deferred creation */}
-              {newVendorName && (
-                <option value="_new_">+ New vendor: {newVendorName}</option>
-              )}
-              {vendorList.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
-            </select>
-            {vendorList.length === 0 && !newVendorName && (
-              <p className="mt-1 text-xs text-gray-400">No vendors yet — scan a receipt to create the first one.</p>
-            )}
+            <div className="flex gap-2 items-center">
+              <select
+                value={vendorId === "_new_" ? "" : vendorId}
+                onChange={(e) => {
+                  setNewVendorName("")
+                  setVendorId(e.target.value)
+                }}
+                className={`${input} flex-1`}
+              >
+                <option value="">Select existing…</option>
+                {vendorList.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+              </select>
+              <span className="text-gray-400 text-sm shrink-0">or</span>
+              <input
+                type="text"
+                value={vendorId === "_new_" || !vendorId ? newVendorName : ""}
+                onChange={(e) => {
+                  const typed = e.target.value
+                  setNewVendorName(typed)
+                  setVendorId(typed ? "_new_" : "")
+                }}
+                disabled={!!(vendorId && vendorId !== "_new_")}
+                placeholder="New vendor name…"
+                className={`${input} flex-1 ${(vendorId && vendorId !== "_new_") ? "opacity-40 cursor-not-allowed bg-gray-50" : ""}`}
+              />
+            </div>
           </div>
           <div>
             <label className={label}>Bill Number</label>

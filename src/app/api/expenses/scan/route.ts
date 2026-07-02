@@ -45,7 +45,7 @@ ${accountList}
 
 Return exactly this JSON shape:
 {
-  "vendorName": string,
+  "vendorName": string or null,
   "matchedVendorId": string or null,
   "date": "YYYY-MM-DD" or null,
   "currency": "USD",
@@ -68,7 +68,7 @@ Return exactly this JSON shape:
 }
 
 Rules:
-- vendorName is REQUIRED — never return null. Identify the vendor/merchant/company that issued this receipt or invoice (the business being paid). Look everywhere: company name, logo text, letterhead, "From:", "Billed by:", "Sold by:", domain name in URLs or email addresses, email sender name, header, or footer. If the document is an emailed invoice, the sender company name in the header or footer is the vendor. Make your best determination — use a domain name (e.g. "godaddy.com") if no full company name is visible. Only return null as an absolute last resort if the document contains no business or company identifier whatsoever.
+- Set vendorName to the vendor/merchant/company name ONLY if it is explicitly printed somewhere on the document (logo text, company name, "billed by", "from", sender/header, or a clearly identifiable brand/domain). Do NOT infer, guess, or assume a vendor based on the product type, industry, or what company typically sells such a product. If no vendor name is actually written on the document, set vendorName to null. Accuracy matters more than filling the field — it is correct and expected to return null when the vendor is not stated on the document.
 - Convert all money to integer cents. Example: $12.50 → 1250.
 - matchedVendorId MUST be an id from the EXISTING VENDORS list above, or null.
 - suggestedAccountId MUST be an id from the EXPENSE ACCOUNTS list above, or null. ALWAYS set suggestedAccountName to the best category name even if suggestedAccountId is null.

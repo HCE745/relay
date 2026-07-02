@@ -237,6 +237,7 @@ export async function POST(req: NextRequest) {
     const block = message.content[0]
     if (block.type !== "text") throw new Error("Unexpected response type from model")
     raw = block.text
+    console.log("RAW MODEL OUTPUT:", raw)
   } catch (e) {
     const msg = (e as Error).message ?? "API error"
     console.error("[scan] Anthropic API error:", msg)
@@ -248,6 +249,7 @@ export async function POST(req: NextRequest) {
   let parsed: ScanResult & { overallSuggestedAccountName?: string | null }
   try {
     parsed = JSON.parse(cleaned)
+    console.log("PARSED SCAN:", JSON.stringify(parsed, null, 2))
   } catch {
     console.error("[scan] JSON parse failed. Raw:", raw)
     return NextResponse.json({ error: "Couldn't read receipt, enter manually" }, { status: 422 })
@@ -280,6 +282,12 @@ export async function POST(req: NextRequest) {
   // dropdown can show a real selected option instead of "Select…".
   let createdVendorName: string | null = null
   let createdVendorId: string | null = null
+  console.log("VENDOR HANDLING:", {
+    extractedVendorName: parsed.vendorName ?? "NONE FROM MODEL",
+    entityId: sessionEntityId,
+    willCreate: !!(parsed.vendorName && !parsed.matchedVendorId && sessionTenantId && sessionEntityId),
+    vendorsInContext: vendors.length,
+  })
   if (!parsed.matchedVendorId && parsed.vendorName && sessionTenantId && sessionEntityId) {
     try {
       const newVendor = await prisma.vendor.create({
@@ -383,5 +391,6 @@ export async function POST(req: NextRequest) {
     lineItemCount: result.lineItems.length,
   }, null, 2))
 
+  console.log("FINAL RESPONSE:", JSON.stringify(result, null, 2))
   return NextResponse.json(result)
 }

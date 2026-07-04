@@ -7,6 +7,7 @@
 import "server-only"
 import { prisma } from "./prisma"
 import { createAndPostEntry } from "./ledger"
+import { writeAuditLog } from "./db"
 import type { Invoice, InvoiceLine } from "@/generated/prisma/client"
 
 export type InvoiceLineInput = {
@@ -50,7 +51,7 @@ function calcInvoiceTotals(lines: InvoiceLineInput[], headerTaxRate?: number | n
 export async function createInvoice(params: CreateInvoiceParams): Promise<Invoice> {
   const { subtotal, taxAmount, total, lines } = calcInvoiceTotals(params.lines, params.taxRate)
 
-  return prisma.invoice.create({
+  const invoice = await prisma.invoice.create({
     data: {
       tenantId: params.tenantId,
       entityId: params.entityId,
@@ -82,6 +83,18 @@ export async function createInvoice(params: CreateInvoiceParams): Promise<Invoic
       },
     },
   })
+
+  await writeAuditLog({
+    tenantId: params.tenantId,
+    entityId: params.entityId,
+    userId: params.createdByUserId,
+    action: "CREATE",
+    tableName: "hce_invoices",
+    recordId: invoice.id,
+    after: { status: "DRAFT", total: invoice.total, customerId: params.customerId },
+  })
+
+  return invoice
 }
 
 export type SendInvoiceParams = {
@@ -126,10 +139,23 @@ export async function sendInvoice(params: SendInvoiceParams): Promise<Invoice> {
     lines: ledgerLines,
   })
 
-  return prisma.invoice.update({
+  const updated = await prisma.invoice.update({
     where: { id: params.invoiceId },
     data: { status: "SENT", journalEntryId: entry.id },
   })
+
+  await writeAuditLog({
+    tenantId: invoice.tenantId,
+    entityId: invoice.entityId,
+    userId: params.createdByUserId,
+    action: "SEND",
+    tableName: "hce_invoices",
+    recordId: params.invoiceId,
+    before: { status: "DRAFT" },
+    after: { status: "SENT", journalEntryId: entry.id },
+  })
+
+  return updated
 }
 
 export type RecordPaymentParams = {
@@ -188,6 +214,17 @@ export async function recordInvoicePayment(params: RecordPaymentParams) {
     }),
   ])
 
+  await writeAuditLog({
+    tenantId: invoice.tenantId,
+    entityId: invoice.entityId,
+    userId: params.createdByUserId,
+    action: "PAY",
+    tableName: "hce_invoices",
+    recordId: params.invoiceId,
+    before: { status: invoice.status, amountPaid: invoice.amountPaid, amountDue: invoice.amountDue },
+    after: { status: newStatus, amountPaid: newPaid, amountDue: newDue },
+  })
+
   return { payment, entry }
 }
 
@@ -217,7 +254,7 @@ export async function createCreditMemo(params: {
     ],
   })
 
-  return prisma.creditMemo.create({
+  const memo = await prisma.creditMemo.create({
     data: {
       tenantId: params.tenantId,
       entityId: params.entityId,
@@ -229,4 +266,16 @@ export async function createCreditMemo(params: {
       journalEntryId: entry.id,
     },
   })
+
+  await writeAuditLog({
+    tenantId: params.tenantId,
+    entityId: params.entityId,
+    userId: params.createdByUserId,
+    action: "CREDIT_MEMO",
+    tableName: "hce_credit_memos",
+    recordId: memo.id,
+    after: { amount: params.amountCents, customerId: params.customerId, invoiceId: params.invoiceId ?? null },
+  })
+
+  return memo
 }

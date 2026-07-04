@@ -37,6 +37,7 @@ model Tenant {
   recurringTemplates RecurringTemplate[]
   amortizationSchedules AmortizationSchedule[]
   anomalyFlags  AnomalyFlag[]
+  purchaseOrders PurchaseOrder[]
 
   @@schema("hce")
   @@map("hce_tenants")
@@ -74,6 +75,7 @@ model Entity {
   recurringTemplates RecurringTemplate[]
   amortizationSchedules AmortizationSchedule[]
   anomalyFlags   AnomalyFlag[]
+  purchaseOrders PurchaseOrder[]
 
   @@index([tenantId])
   @@schema("hce")
@@ -159,6 +161,7 @@ model Account {
   normalBalance NormalBalance
   parentId      String?
   isActive      Boolean     @default(true)
+  isCurrent     Boolean     @default(true)
   createdAt     DateTime    @default(now())
 
   tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -169,6 +172,7 @@ model Account {
   invoiceLines InvoiceLine[]
   billLines    BillLine[]
   budgetLines  BudgetLine[]
+  poLines      PurchaseOrderLine[]
 
   @@unique([tenantId, entityId, code])
   @@index([tenantId, entityId])
@@ -374,9 +378,10 @@ model Vendor {
   isActive       Boolean @default(true)
   createdAt      DateTime @default(now())
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
-  bills  Bill[]
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity         Entity          @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  bills          Bill[]
+  purchaseOrders PurchaseOrder[]
 
   @@index([tenantId, entityId])
   @@schema("hce")
@@ -538,15 +543,17 @@ model Bill {
   amountDue      Int        @default(0)
   journalEntryId String?
   receiptUrl     String?
+  poId           String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  tenant   Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  entity   Entity      @relation(fields: [entityId], references: [id], onDelete: Cascade)
-  vendor   Vendor      @relation(fields: [vendorId], references: [id])
-  lines    BillLine[]
-  payments BillPayment[]
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity        Entity         @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  vendor        Vendor         @relation(fields: [vendorId], references: [id])
+  lines         BillLine[]
+  payments      BillPayment[]
   vendorCredits VendorCredit[]
+  purchaseOrder PurchaseOrder? @relation(fields: [poId], references: [id])
 
   @@index([tenantId, entityId])
   @@index([vendorId])
@@ -920,4 +927,79 @@ model AnomalyFlag {
   @@index([tenantId, entityId, status])
   @@schema("hce")
   @@map("hce_anomaly_flags")
+}
+
+// ─── PURCHASE ORDERS ─────────────────────────────────────────────────────────
+
+enum PoStatus {
+  DRAFT
+  OPEN
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CLOSED
+  CANCELLED
+
+  @@schema("hce")
+  @@map("hce_po_status")
+}
+
+model PurchaseOrder {
+  id           String    @id @default(cuid())
+  tenantId     String
+  entityId     String
+  vendorId     String
+  poNumber     String
+  date         DateTime
+  expectedDate DateTime?
+  status       PoStatus  @default(DRAFT)
+  notes        String?
+  totalCents   Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant   Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity   Entity                @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  vendor   Vendor                @relation(fields: [vendorId], references: [id])
+  lines    PurchaseOrderLine[]
+  receipts PurchaseOrderReceipt[]
+  bills    Bill[]
+
+  @@unique([tenantId, entityId, poNumber])
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_purchase_orders")
+}
+
+model PurchaseOrderLine {
+  id             String  @id @default(cuid())
+  poId           String
+  description    String?
+  qty            Float   @default(1)
+  unitPriceCents Int
+  amountCents    Int
+  accountId      String?
+  qtyReceived    Float   @default(0)
+  sortOrder      Int     @default(0)
+
+  po      PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+  account Account?      @relation(fields: [accountId], references: [id])
+
+  @@index([poId])
+  @@schema("hce")
+  @@map("hce_purchase_order_lines")
+}
+
+model PurchaseOrderReceipt {
+  id         String   @id @default(cuid())
+  poId       String
+  receivedAt DateTime @default(now())
+  receivedBy String?
+  notes      String?
+  lines      Json
+
+  po PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+
+  @@index([poId])
+  @@schema("hce")
+  @@map("hce_purchase_order_receipts")
 }

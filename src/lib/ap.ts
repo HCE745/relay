@@ -7,6 +7,7 @@
 import "server-only"
 import { prisma } from "./prisma"
 import { createAndPostEntry } from "./ledger"
+import { writeAuditLog } from "./db"
 import type { Bill } from "@/generated/prisma/client"
 
 export type BillLineInput = {
@@ -53,7 +54,7 @@ export async function createAndEnterBill(params: CreateBillParams): Promise<Bill
     ],
   })
 
-  return prisma.bill.create({
+  const bill = await prisma.bill.create({
     data: {
       tenantId: params.tenantId,
       entityId: params.entityId,
@@ -82,6 +83,18 @@ export async function createAndEnterBill(params: CreateBillParams): Promise<Bill
       },
     },
   })
+
+  await writeAuditLog({
+    tenantId: params.tenantId,
+    entityId: params.entityId,
+    userId: params.createdByUserId,
+    action: "ENTER",
+    tableName: "hce_bills",
+    recordId: bill.id,
+    after: { status: "ENTERED", total: subtotal, vendorId: params.vendorId },
+  })
+
+  return bill
 }
 
 export type PayBillParams = {
@@ -139,6 +152,17 @@ export async function payBill(params: PayBillParams) {
     }),
   ])
 
+  await writeAuditLog({
+    tenantId: bill.tenantId,
+    entityId: bill.entityId,
+    userId: params.createdByUserId,
+    action: "PAY",
+    tableName: "hce_bills",
+    recordId: params.billId,
+    before: { status: bill.status, amountPaid: bill.amountPaid, amountDue: bill.amountDue },
+    after: { status: newStatus, amountPaid: newPaid, amountDue: newDue },
+  })
+
   return { payment, entry }
 }
 
@@ -167,7 +191,7 @@ export async function createVendorCredit(params: {
     ],
   })
 
-  return prisma.vendorCredit.create({
+  const credit = await prisma.vendorCredit.create({
     data: {
       tenantId: params.tenantId,
       entityId: params.entityId,
@@ -179,4 +203,16 @@ export async function createVendorCredit(params: {
       journalEntryId: entry.id,
     },
   })
+
+  await writeAuditLog({
+    tenantId: params.tenantId,
+    entityId: params.entityId,
+    userId: params.createdByUserId,
+    action: "VENDOR_CREDIT",
+    tableName: "hce_vendor_credits",
+    recordId: credit.id,
+    after: { amount: params.amountCents, vendorId: params.vendorId, billId: params.billId ?? null },
+  })
+
+  return credit
 }

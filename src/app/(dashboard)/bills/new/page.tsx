@@ -12,8 +12,44 @@ const BillForm = nextDynamic(
 
 export const dynamic = "force-dynamic"
 
-export default async function NewBillPage() {
+type POPrefill = {
+  poId: string
+  poNumber: string | null
+  vendorId: string
+  vendorName: string
+  lines: { description: string; qty: number; unitPriceCents: number; accountId: string }[]
+}
+
+export default async function NewBillPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ poId?: string }>
+}) {
   const { tenantId, entityId } = await getEntityContext()
+  const { poId } = await searchParams
+
+  // Pre-fill from PO if poId is in query string
+  let poPrefill: POPrefill | null = null
+  if (poId) {
+    const po = await prisma.purchaseOrder.findFirst({
+      where: { id: poId, tenantId, entityId },
+      include: { vendor: { select: { id: true, name: true } }, lines: { orderBy: { sortOrder: "asc" } } },
+    })
+    if (po && ["OPEN", "PARTIALLY_RECEIVED"].includes(po.status)) {
+      poPrefill = {
+        poId: po.id,
+        poNumber: po.poNumber,
+        vendorId: po.vendorId,
+        vendorName: po.vendor.name,
+        lines: po.lines.map((l) => ({
+          description: l.description ?? "",
+          qty: l.qty,
+          unitPriceCents: l.unitPriceCents,
+          accountId: l.accountId ?? "",
+        })),
+      }
+    }
+  }
 
   const [vendors, expenseAccounts, classes, departments] = await Promise.all([
     prisma.vendor.findMany({
@@ -45,6 +81,7 @@ export default async function NewBillPage() {
       expenseAccounts={expenseAccounts}
       classes={classes}
       departments={departments}
+      poPrefill={poPrefill}
     />
   )
 }

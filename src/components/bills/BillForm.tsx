@@ -10,12 +10,21 @@ type Vendor = { id: string; name: string }
 type Klass = { id: string; name: string }
 type Dept = { id: string; name: string }
 
+type POPrefill = {
+  poId: string
+  poNumber: string | null
+  vendorId: string
+  vendorName: string
+  lines: { description: string; qty: number; unitPriceCents: number; accountId: string }[]
+}
+
 export type BillFormProps = {
   entityId: string
   vendors: Vendor[]
   expenseAccounts: Account[]
   classes: Klass[]
   departments: Dept[]
+  poPrefill?: POPrefill | null
 }
 
 type LineItem = {
@@ -42,12 +51,12 @@ function centsToStr(c: number | null) { return c != null ? (c / 100).toFixed(2) 
 const input = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
 const label = "block text-sm font-medium text-gray-700 mb-1"
 
-export function BillForm({ entityId, vendors, expenseAccounts, classes, departments }: BillFormProps) {
+export function BillForm({ entityId, vendors, expenseAccounts, classes, departments, poPrefill }: BillFormProps) {
   const router = useRouter()
 
   // vendorList is the live vendor list — initialized from SSR prop, refreshed after each scan
   const [vendorList, setVendorList] = useState<Vendor[]>(vendors)
-  const [vendorId, setVendorId] = useState("")
+  const [vendorId, setVendorId] = useState(poPrefill?.vendorId ?? "")
   // _new_ sentinel: fallback when the scan route couldn't create a vendor (no session/entity)
   const [newVendorName, setNewVendorName] = useState("")
 
@@ -55,7 +64,19 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   const [date, setDate] = useState(todayStr)
   const [dueDate, setDueDate] = useState(plus30)
   const [memo, setMemo] = useState("")
-  const [lines, setLines] = useState<LineItem[]>([newLine()])
+  const [lines, setLines] = useState<LineItem[]>(
+    poPrefill && poPrefill.lines.length > 0
+      ? poPrefill.lines.map((l) => ({
+          key: String(++_key),
+          description: l.description,
+          accountId: l.accountId,
+          quantity: String(l.qty),
+          unitPrice: (l.unitPriceCents / 100).toFixed(2),
+          classId: "",
+          departmentId: "",
+        }))
+      : [newLine()]
+  )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
@@ -244,6 +265,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
             classId: l.classId || undefined,
             departmentId: l.departmentId || undefined,
           })),
+          poId: poPrefill?.poId ?? undefined,
         }),
       })
       if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Failed to save") }
@@ -258,6 +280,13 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
   return (
     <div className="p-6 max-w-5xl space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Enter Bill</h1>
+
+      {poPrefill && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-green-200 bg-green-50 text-green-800 text-sm">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+          <span>Matched to <strong>PO {poPrefill.poNumber ?? poPrefill.poId.slice(0, 8)}</strong> from {poPrefill.vendorName}. Lines pre-filled — review before saving.</span>
+        </div>
+      )}
 
       <ReceiptScanner onResult={handleScanResult} />
 

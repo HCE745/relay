@@ -29,6 +29,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "AP account not found" }, { status: 400 })
   }
 
+  // Validate poId if provided
+  let poId: string | null = body.poId ?? null
+  if (poId) {
+    const po = await prisma.purchaseOrder.findFirst({
+      where: { id: poId, tenantId: session.tenantId, entityId },
+    })
+    if (!po) return NextResponse.json({ error: "Purchase order not found" }, { status: 404 })
+    if (!["OPEN", "PARTIALLY_RECEIVED"].includes(po.status)) {
+      return NextResponse.json({ error: `PO is ${po.status} — cannot match bills` }, { status: 400 })
+    }
+  }
+
   let bill = await createAndEnterBill({
     tenantId: session.tenantId,
     entityId,
@@ -42,11 +54,33 @@ export async function POST(req: NextRequest) {
     createdByUserId: session.userId,
   })
 
-  // Attach receipt URL if the scan uploaded one to Vercel Blob
-  if (body.receiptUrl) {
-    bill = await prisma.bill.update({
-      where: { id: bill.id },
-      data: { receiptUrl: body.receiptUrl },
+  // Attach receipt URL and/or PO link
+  const extraUpdates: Record<string, unknown> = {}
+  if (body.receiptUrl) extraUpdates.receiptUrl = body.receiptUrl
+  if (poId) extraUpdates.poId = poId
+
+  if (Object.keys(extraUpdates).length > 0) {
+    bill = await prisma.bill.update({ where: { id: bill.id }, data: extraUpdates })
+  }
+
+  // If linked to a PO, update PO status to PARTIALLY_RECEIVED (RECEIVED is set via receive route)
+  if (poId) {
+    const po = await prisma.purchaseOrder.findUnique({ where: { id: poId } })
+    if (po && po.status === "OPEN") {
+      await prisma.purchaseOrder.update({
+        where: { id: poId },
+        data: { status: "PARTIALLY_RECEIVED" },
+      })
+    }
+    const { writeAuditLog } = await import("@/lib/db")
+    await writeAuditLog({
+      tenantId: session.tenantId,
+      entityId,
+      userId: session.userId,
+      action: "MATCH_BILL",
+      tableName: "hce_purchase_orders",
+      recordId: poId,
+      after: { billId: bill.id, billTotal: bill.total },
     })
   }
 

@@ -39,6 +39,7 @@ model Tenant {
   anomalyFlags  AnomalyFlag[]
   purchaseOrders PurchaseOrder[]
   fixedAssets    FixedAsset[]
+  scenarios      Scenario[]
 
   @@schema("hce")
   @@map("hce_tenants")
@@ -78,6 +79,7 @@ model Entity {
   anomalyFlags   AnomalyFlag[]
   purchaseOrders PurchaseOrder[]
   fixedAssets    FixedAsset[]
+  scenarios      Scenario[]
 
   @@index([tenantId])
   @@schema("hce")
@@ -1096,4 +1098,35 @@ model DepreciationEntry {
   @@index([fixedAssetId])
   @@schema("hce")
   @@map("hce_depreciation_entries")
+}
+
+// ─── SCENARIOS ────────────────────────────────────────────────────────────────
+
+enum ScenarioType {
+  HIRING
+  EQUIPMENT
+  DEBT
+
+  @@schema("hce")
+}
+
+model Scenario {
+  id        String       @id @default(cuid())
+  tenantId  String
+  entityId  String
+  name      String
+  type      ScenarioType
+  inputs    Json
+  result    Json
+  aiSummary String?
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_scenarios")
 }

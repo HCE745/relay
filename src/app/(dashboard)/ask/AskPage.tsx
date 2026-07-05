@@ -13,6 +13,10 @@ type QueryIntentType =
   | "cash_position"
   | "ar_summary"
   | "ap_summary"
+  | "affordability"
+  | "profit_drop"
+  | "tax_estimate"
+  | "cash_recommendation"
 
 interface QueryIntent {
   type: QueryIntentType
@@ -24,6 +28,8 @@ interface QueryIntent {
   topN: number | null
   canAnswer: boolean
   cantAnswerReason: string | null
+  affordabilityAmountCents?: number | null
+  affordabilityType?: "hire" | "purchase" | null
 }
 
 interface AskResponse {
@@ -297,6 +303,201 @@ function APSummaryTable({ data }: { data: unknown }) {
   )
 }
 
+function AffordabilityTable({ data }: { data: unknown }) {
+  const d = data as {
+    annualCostCents: number; monthlyCostCents: number; fullyLoadedMonthlyCents: number
+    currentCashCents: number; recommendedReserveCents: number; surplusAboveReserveCents: number
+    avgMonthlyBurnCents: number; newMonthlyBurnCents: number
+    currentRunwayMonths: number | null; newRunwayMonths: number | null
+    breakevenRevenueNeededCents: number | null; canAfford: boolean; type: string
+    breakdown: { label: string; amountCents: number; total?: boolean }[]
+  }
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          { label: "Annual cost", val: fmt(d.annualCostCents) },
+          { label: "Fully-loaded monthly", val: fmt(d.fullyLoadedMonthlyCents) },
+          { label: "Current cash", val: fmt(d.currentCashCents) },
+          { label: "3-month reserve", val: fmt(d.recommendedReserveCents) },
+          { label: "Cash above reserve", val: fmt(Math.abs(d.surplusAboveReserveCents)), red: d.surplusAboveReserveCents < 0 },
+          { label: "Affordability", val: d.canAfford ? "✓ Likely affordable" : "⚠ Review needed", green: d.canAfford, red: !d.canAfford },
+        ].map(({ label, val, red, green }) => (
+          <div key={label} className="bg-gray-50 rounded-lg p-3">
+            <p className="text-xs text-gray-400">{label}</p>
+            <p className={`text-sm font-semibold mt-0.5 ${red ? "text-red-600" : green ? "text-green-700" : "text-gray-900"}`}>{val}</p>
+          </div>
+        ))}
+      </div>
+      <table className="data-table">
+        <thead><tr><th>Calculation</th><th className="text-right">Amount</th></tr></thead>
+        <tbody>
+          {d.breakdown.map((row, i) => (
+            <tr key={i} className={row.total ? "border-t-2 border-gray-400 font-bold" : ""}>
+              <td className={row.total ? "" : "pl-4 text-sm text-gray-600"}>{row.label}</td>
+              <td className={`text-right font-mono ${row.amountCents < 0 ? "text-red-600" : row.total ? "text-blue-700" : "text-gray-800"}`}>
+                {row.amountCents < 0 ? `(${fmt(Math.abs(row.amountCents))})` : fmt(row.amountCents)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="grid grid-cols-2 gap-3 text-sm text-center">
+        <div className="border border-gray-200 rounded-lg p-3">
+          <p className="text-xs text-gray-400">Current Runway</p>
+          <p className="font-semibold">{d.currentRunwayMonths != null ? `${d.currentRunwayMonths} mo` : "Profitable"}</p>
+        </div>
+        <div className="border border-gray-200 rounded-lg p-3">
+          <p className="text-xs text-gray-400">Runway With Cost</p>
+          <p className={`font-semibold ${d.newRunwayMonths !== null && d.newRunwayMonths < 6 ? "text-red-600" : ""}`}>
+            {d.newRunwayMonths != null ? `${d.newRunwayMonths} mo` : "Profitable"}
+          </p>
+        </div>
+      </div>
+      {d.breakevenRevenueNeededCents && (
+        <p className="text-xs text-gray-500">Breakeven: <span className="font-medium">{fmt(d.breakevenRevenueNeededCents)}/mo</span> additional revenue needed to cover this at current margins.</p>
+      )}
+    </div>
+  )
+}
+
+function ProfitDropTable({ data }: { data: unknown }) {
+  const d = data as {
+    currentPeriod: { start: string; end: string }
+    priorPeriod: { start: string; end: string }
+    plCurrent: { totalRevenue: number; totalExpenses: number; totalCogs: number; netIncome: number }
+    plPrior: { totalRevenue: number; totalExpenses: number; totalCogs: number; netIncome: number }
+    netIncomeDelta: number; revenueDelta: number; expensesDelta: number; cogsDelta: number
+    topDrivers: { account: string; current: number; prior: number; delta: number }[]
+  }
+  return (
+    <div className="space-y-4">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Line</th>
+            <th className="text-right">Prior ({d.priorPeriod.start} – {d.priorPeriod.end})</th>
+            <th className="text-right">Current ({d.currentPeriod.start} – {d.currentPeriod.end})</th>
+            <th className="text-right">Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { label: "Revenue", prior: d.plPrior.totalRevenue, curr: d.plCurrent.totalRevenue, delta: d.revenueDelta },
+            { label: "COGS", prior: d.plPrior.totalCogs, curr: d.plCurrent.totalCogs, delta: d.cogsDelta },
+            { label: "Expenses", prior: d.plPrior.totalExpenses, curr: d.plCurrent.totalExpenses, delta: d.expensesDelta },
+          ].map((r) => (
+            <tr key={r.label}>
+              <td>{r.label}</td>
+              <td className="text-right font-mono text-sm">{fmt(r.prior)}</td>
+              <td className="text-right font-mono text-sm">{fmt(r.curr)}</td>
+              <td className={`text-right font-mono text-sm font-semibold ${r.delta < 0 ? "text-red-600" : "text-green-700"}`}>
+                {r.delta >= 0 ? "+" : ""}{fmt(r.delta)}
+              </td>
+            </tr>
+          ))}
+          <tr className="border-t-2 border-gray-400 font-bold">
+            <td>Net Income</td>
+            <td className="text-right font-mono">{fmt(d.plPrior.netIncome)}</td>
+            <td className="text-right font-mono">{fmt(d.plCurrent.netIncome)}</td>
+            <td className={`text-right font-mono ${d.netIncomeDelta < 0 ? "text-red-600" : "text-green-700"}`}>
+              {d.netIncomeDelta >= 0 ? "+" : ""}{fmt(d.netIncomeDelta)}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {d.topDrivers.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Top Account-Level Drivers</p>
+          <table className="data-table">
+            <thead>
+              <tr><th>Account</th><th className="text-right">Prior</th><th className="text-right">Current</th><th className="text-right">Change</th></tr>
+            </thead>
+            <tbody>
+              {d.topDrivers.map((dr, i) => (
+                <tr key={i}>
+                  <td className="text-sm">{dr.account}</td>
+                  <td className="text-right font-mono text-sm">{fmt(dr.prior)}</td>
+                  <td className="text-right font-mono text-sm">{fmt(dr.current)}</td>
+                  <td className={`text-right font-mono text-sm font-semibold ${dr.delta < 0 ? "text-red-600" : "text-green-700"}`}>
+                    {dr.delta >= 0 ? "+" : ""}{fmt(dr.delta)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function TaxEstimateTable({ data }: { data: unknown }) {
+  const d = data as {
+    ytdNetIncomeCents: number; ytdRevenueCents: number; ytdExpensesCents: number
+    estimateRatePct: number; taxEstimateCents: number; disclaimer: string
+    period: { start: string; end: string }
+  }
+  return (
+    <div className="space-y-3">
+      <table className="data-table">
+        <tbody>
+          <tr><td>YTD Revenue</td><td className="text-right font-mono">{fmt(d.ytdRevenueCents)}</td></tr>
+          <tr><td>YTD Expenses</td><td className="text-right font-mono">{fmt(d.ytdExpensesCents)}</td></tr>
+          <tr className="font-semibold border-t border-gray-300"><td>YTD Net Income</td><td className="text-right font-mono">{fmt(d.ytdNetIncomeCents)}</td></tr>
+          <tr><td>Placeholder rate</td><td className="text-right font-mono">{d.estimateRatePct}%</td></tr>
+          <tr className="font-bold border-t-2 border-gray-400">
+            <td>Rough estimate</td>
+            <td className="text-right font-mono text-orange-700">{fmt(d.taxEstimateCents)}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs text-orange-800">
+        ⚠ {d.disclaimer}
+      </div>
+    </div>
+  )
+}
+
+function CashRecoTable({ data }: { data: unknown }) {
+  const d = data as {
+    currentCashCents: number; avgMonthlyExpensesCents: number
+    minimumReserveCents: number; recommendedReserveCents: number
+    apDue30Cents: number; surplusShortfall3mo: number; surplusShortfall6mo: number
+    recommendation: "above_recommended" | "at_minimum" | "below_minimum"
+  }
+  const statusColor = d.recommendation === "above_recommended"
+    ? "border-green-200 bg-green-50 text-green-700"
+    : d.recommendation === "at_minimum"
+    ? "border-yellow-200 bg-yellow-50 text-yellow-700"
+    : "border-red-200 bg-red-50 text-red-700"
+  const statusText = d.recommendation === "above_recommended" ? "Above recommended reserve"
+    : d.recommendation === "at_minimum" ? "At minimum — below recommended"
+    : "Below minimum reserve"
+  return (
+    <div className="space-y-3">
+      <div className={`rounded-lg border px-4 py-3 text-sm font-medium ${statusColor}`}>{statusText}</div>
+      <table className="data-table">
+        <tbody>
+          <tr><td>Current cash</td><td className="text-right font-mono">{fmt(d.currentCashCents)}</td></tr>
+          <tr><td>Avg monthly expenses (3 mo)</td><td className="text-right font-mono">{fmt(d.avgMonthlyExpensesCents)}</td></tr>
+          <tr><td>AP due next 30 days</td><td className="text-right font-mono">{fmt(d.apDue30Cents)}</td></tr>
+          <tr className="border-t border-gray-200 font-semibold"><td>Minimum reserve (3 mo)</td><td className="text-right font-mono">{fmt(d.minimumReserveCents)}</td></tr>
+          <tr className="font-semibold"><td>Recommended reserve (6 mo)</td><td className="text-right font-mono">{fmt(d.recommendedReserveCents)}</td></tr>
+          <tr className={`border-t border-gray-200 font-semibold ${d.surplusShortfall3mo < 0 ? "text-red-600" : "text-green-700"}`}>
+            <td>vs 3-month target</td>
+            <td className="text-right font-mono">{d.surplusShortfall3mo >= 0 ? "+" : ""}{fmt(d.surplusShortfall3mo)}</td>
+          </tr>
+          <tr className={`font-semibold ${d.surplusShortfall6mo < 0 ? "text-red-600" : "text-green-700"}`}>
+            <td>vs 6-month target</td>
+            <td className="text-right font-mono">{d.surplusShortfall6mo >= 0 ? "+" : ""}{fmt(d.surplusShortfall6mo)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function DataTable({ intent, data }: { intent: QueryIntent; data: unknown }) {
   if (!data) return null
   switch (intent.type) {
@@ -308,6 +509,10 @@ function DataTable({ intent, data }: { intent: QueryIntent; data: unknown }) {
     case "top_vendors": return <TopVendorsTable data={data} />
     case "ar_summary": return <ARSummaryTable data={data} />
     case "ap_summary": return <APSummaryTable data={data} />
+    case "affordability": return <AffordabilityTable data={data} />
+    case "profit_drop": return <ProfitDropTable data={data} />
+    case "tax_estimate": return <TaxEstimateTable data={data} />
+    case "cash_recommendation": return <CashRecoTable data={data} />
     default: return null
   }
 }
@@ -315,12 +520,18 @@ function DataTable({ intent, data }: { intent: QueryIntent; data: unknown }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const EXAMPLE_PROMPTS = [
-  "What did we spend this month?",
   "What's our cash balance?",
-  "Show top vendors this year",
   "What's our net income year to date?",
-  "Show accounts receivable summary",
+  "Show top vendors this year",
   "What are our outstanding bills?",
+]
+
+const CFO_PROMPTS = [
+  "Can we afford to hire someone at $80,000 salary?",
+  "Can we buy equipment for $25,000?",
+  "Why did our profit drop this month?",
+  "How much cash should we keep in reserve?",
+  "What is our projected tax bill this year?",
 ]
 
 interface Props {
@@ -426,14 +637,26 @@ export function AskPage({ entityId, entityName }: Props) {
         </div>
 
         {/* Example prompts */}
-        <div className="space-y-1">
-          <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Try asking</p>
+        <div className="space-y-2">
+          <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Data lookups</p>
           <div className="flex flex-wrap gap-2">
             {EXAMPLE_PROMPTS.map((prompt) => (
               <button
                 key={prompt}
                 onClick={() => usePrompt(prompt)}
                 className="px-3 py-1.5 text-sm bg-gray-50 text-gray-600 border border-gray-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-400 font-medium uppercase tracking-wide pt-1">CFO decisions</p>
+          <div className="flex flex-wrap gap-2">
+            {CFO_PROMPTS.map((prompt) => (
+              <button
+                key={prompt}
+                onClick={() => usePrompt(prompt)}
+                className="px-3 py-1.5 text-sm bg-purple-50 text-purple-700 border border-purple-200 rounded-full hover:bg-purple-100 hover:border-purple-300 transition-colors"
               >
                 {prompt}
               </button>

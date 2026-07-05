@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, Receipt, Building2, Users, CreditCard, RefreshCw,
   BarChart3, ArrowLeftRight, Settings, LogOut, BookOpen, ChevronDown,
   TrendingUp, Droplets, MessageSquare, Repeat, CalendarClock, AlertTriangle, ClipboardCheck,
-  LineChart, Shield, Package,
+  LineChart, Shield, Package, Landmark,
 } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -34,6 +34,7 @@ const NAV = [
   { href: "/amortization", label: "Amortization", icon: CalendarClock, group: "Planning" },
   { href: "/kpis", label: "KPI Dashboard", icon: LineChart, group: "Planning" },
   { href: "/purchase-orders", label: "Purchase Orders", icon: Package, group: "Expenses" },
+  { href: "/fixed-assets", label: "Fixed Assets", icon: Landmark, group: "Expenses" },
   { href: "/anomalies", label: "Anomalies", icon: AlertTriangle },
   { href: "/close", label: "Month-End", icon: ClipboardCheck },
   { href: "/audit", label: "Audit Trail", icon: Shield },

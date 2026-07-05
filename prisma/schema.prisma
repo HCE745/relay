@@ -38,6 +38,7 @@ model Tenant {
   amortizationSchedules AmortizationSchedule[]
   anomalyFlags  AnomalyFlag[]
   purchaseOrders PurchaseOrder[]
+  fixedAssets    FixedAsset[]
 
   @@schema("hce")
   @@map("hce_tenants")
@@ -76,6 +77,7 @@ model Entity {
   amortizationSchedules AmortizationSchedule[]
   anomalyFlags   AnomalyFlag[]
   purchaseOrders PurchaseOrder[]
+  fixedAssets    FixedAsset[]
 
   @@index([tenantId])
   @@schema("hce")
@@ -266,6 +268,8 @@ enum JournalSource {
   CLOSING
   RECURRING
   AMORTIZATION
+  FIXED_ASSET
+  DEPRECIATION
 
   @@schema("hce")
   @@map("hce_journal_source")
@@ -1002,4 +1006,94 @@ model PurchaseOrderReceipt {
   @@index([poId])
   @@schema("hce")
   @@map("hce_purchase_order_receipts")
+}
+
+// ─── FIXED ASSETS & DEPRECIATION ─────────────────────────────────────────────
+
+enum AssetCategory {
+  EQUIPMENT
+  VEHICLE
+  FURNITURE
+  COMPUTER
+  BUILDING
+  OTHER
+
+  @@schema("hce")
+  @@map("hce_asset_category")
+}
+
+enum DepreciationMethod {
+  STRAIGHT_LINE
+  DECLINING_BALANCE
+
+  @@schema("hce")
+  @@map("hce_depreciation_method")
+}
+
+enum AssetStatus {
+  ACTIVE
+  FULLY_DEPRECIATED
+  DISPOSED
+
+  @@schema("hce")
+  @@map("hce_asset_status")
+}
+
+enum DepreciationEntryStatus {
+  SCHEDULED
+  POSTED
+
+  @@schema("hce")
+  @@map("hce_depreciation_entry_status")
+}
+
+model FixedAsset {
+  id                               String             @id @default(cuid())
+  tenantId                         String
+  entityId                         String
+  name                             String
+  description                      String?
+  category                         AssetCategory      @default(EQUIPMENT)
+  acquisitionDate                  DateTime
+  inServiceDate                    DateTime
+  costCents                        Int
+  salvageValueCents                Int                @default(0)
+  usefulLifeMonths                 Int
+  depreciationMethod               DepreciationMethod @default(STRAIGHT_LINE)
+  assetAccountId                   String
+  accumulatedDepreciationAccountId String
+  depreciationExpenseAccountId     String
+  sourceAccountId                  String
+  gainLossAccountId                String?
+  status                           AssetStatus        @default(ACTIVE)
+  acquisitionEntryId               String?
+  disposedAt                       DateTime?
+  disposalProceedsCents            Int?
+  createdAt                        DateTime           @default(now())
+  updatedAt                        DateTime           @updatedAt
+
+  tenant              Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity              Entity              @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  depreciationEntries DepreciationEntry[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_fixed_assets")
+}
+
+model DepreciationEntry {
+  id             String                  @id @default(cuid())
+  fixedAssetId   String
+  periodNumber   Int
+  periodDate     DateTime
+  amountCents    Int
+  journalEntryId String?
+  status         DepreciationEntryStatus @default(SCHEDULED)
+
+  fixedAsset FixedAsset @relation(fields: [fixedAssetId], references: [id], onDelete: Cascade)
+
+  @@unique([fixedAssetId, periodNumber])
+  @@index([fixedAssetId])
+  @@schema("hce")
+  @@map("hce_depreciation_entries")
 }

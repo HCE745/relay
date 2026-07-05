@@ -5,11 +5,12 @@ import {
   LayoutDashboard, FileText, Receipt, Building2, Users, CreditCard, RefreshCw,
   BarChart3, ArrowLeftRight, Settings, LogOut, BookOpen, ChevronDown,
   TrendingUp, Droplets, MessageSquare, Repeat, CalendarClock, AlertTriangle, ClipboardCheck,
-  LineChart, Shield, Package, Landmark, FlaskConical, Scale, FolderOpen, Plug,
+  LineChart, Shield, Package, Landmark, FlaskConical, Scale, FolderOpen, Plug, HelpCircle,
 } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useTour } from "@/components/tour/TourProvider"
 
 type Entity = { id: string; name: string; isConsolidationParent: boolean }
 
@@ -20,16 +21,16 @@ type Props = {
 }
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/invoices", label: "Invoices", icon: FileText, group: "Sales" },
-  { href: "/customers", label: "Customers", icon: Users, group: "Sales" },
-  { href: "/bills", label: "Bills", icon: Receipt, group: "Expenses" },
-  { href: "/vendors", label: "Vendors", icon: Building2, group: "Expenses" },
-  { href: "/banking", label: "Banking", icon: CreditCard },
-  { href: "/reconcile", label: "Reconcile", icon: RefreshCw },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, tourId: "nav-dashboard" },
+  { href: "/invoices", label: "Invoices", icon: FileText, group: "Sales", tourId: "nav-invoices" },
+  { href: "/customers", label: "Customers", icon: Users, group: "Sales", tourId: "nav-customers" },
+  { href: "/bills", label: "Bills", icon: Receipt, group: "Expenses", tourId: "nav-bills" },
+  { href: "/vendors", label: "Vendors", icon: Building2, group: "Expenses", tourId: "nav-vendors" },
+  { href: "/banking", label: "Banking", icon: CreditCard, tourId: "nav-banking" },
+  { href: "/reconcile", label: "Reconcile", icon: RefreshCw, tourId: "nav-reconcile" },
+  { href: "/reports", label: "Reports", icon: BarChart3, tourId: "nav-reports" },
   { href: "/budgets", label: "Budgets", icon: TrendingUp, group: "Planning" },
-  { href: "/cashflow", label: "Cash Flow", icon: Droplets, group: "Planning" },
+  { href: "/cashflow", label: "Cash Flow", icon: Droplets, group: "Planning", tourId: "nav-cashflow" },
   { href: "/recurring", label: "Recurring", icon: Repeat, group: "Planning" },
   { href: "/amortization", label: "Amortization", icon: CalendarClock, group: "Planning" },
   { href: "/kpis", label: "KPI Dashboard", icon: LineChart, group: "Planning" },
@@ -38,12 +39,12 @@ const NAV = [
   { href: "/anomalies", label: "Anomalies", icon: AlertTriangle },
   { href: "/close", label: "Month-End", icon: ClipboardCheck },
   { href: "/audit", label: "Audit Trail", icon: Shield },
-  { href: "/ask", label: "Ask AI", icon: MessageSquare },
-  { href: "/scenarios", label: "Scenarios", icon: FlaskConical },
-  { href: "/valuation", label: "Valuation", icon: Scale },
+  { href: "/ask", label: "Ask AI", icon: MessageSquare, tourId: "nav-ask" },
+  { href: "/scenarios", label: "Scenarios", icon: FlaskConical, tourId: "nav-scenarios" },
+  { href: "/valuation", label: "Valuation", icon: Scale, tourId: "nav-valuation" },
   { href: "/packets", label: "Report Packets", icon: FolderOpen },
-  { href: "/accounts", label: "Chart of Accounts", icon: BookOpen },
-  { href: "/intercompany", label: "Intercompany", icon: ArrowLeftRight },
+  { href: "/accounts", label: "Chart of Accounts", icon: BookOpen, tourId: "nav-accounts" },
+  { href: "/intercompany", label: "Intercompany", icon: ArrowLeftRight, tourId: "nav-intercompany" },
   { href: "/integrations", label: "Integrations", icon: Plug },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
@@ -52,6 +53,7 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const [entityOpen, setEntityOpen] = useState(false)
+  const { startTour } = useTour()
 
   const selected = entities.find((e) => e.id === selectedEntityId) ?? entities[0]
 
@@ -83,6 +85,7 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
       {/* Entity switcher */}
       <div className="px-3 py-3 border-b border-gray-700 relative">
         <button
+          data-tour="entity-switcher"
           onClick={() => setEntityOpen(!entityOpen)}
           className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium text-gray-200 transition-colors"
         >
@@ -106,7 +109,7 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      <nav data-tour="sidebar-nav" className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {NAV.map((item) => {
           const Icon = item.icon
           const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
@@ -114,6 +117,7 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
             <Link
               key={item.href}
               href={item.href}
+              {...(item.tourId ? { "data-tour": item.tourId } : {})}
               className={`sidebar-item ${active ? "active" : ""}`}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
@@ -123,8 +127,15 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
         })}
       </nav>
 
-      {/* User */}
-      <div className="px-3 py-3 border-t border-gray-700">
+      {/* User + help */}
+      <div className="px-3 py-3 border-t border-gray-700 space-y-1">
+        <button
+          onClick={startTour}
+          className="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors"
+        >
+          <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" />
+          Take the tour
+        </button>
         <div className="flex items-center justify-between px-2">
           <span className="text-xs text-gray-400 truncate">{userName}</span>
           <button onClick={logout} className="text-gray-400 hover:text-white transition-colors ml-2">

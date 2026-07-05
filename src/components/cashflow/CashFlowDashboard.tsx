@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts"
+import { CashReservePanel } from "./CashReservePanel"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -372,6 +373,9 @@ export function CashFlowDashboard({ entityId, isConsolidationParent, initialData
           </div>
         </div>
       )}
+
+      {/* Cash Reserve & Distribution Analysis */}
+      <CashReservePanel entityId={entityId} consolidated={consolidated} />
 
       {/* Add Adjustment */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">

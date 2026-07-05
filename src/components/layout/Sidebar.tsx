@@ -75,10 +75,19 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
   return (
     <div className="flex flex-col h-full bg-gray-900 text-white w-60 flex-shrink-0">
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-gray-700">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">H</div>
-          <span className="font-bold text-white">HCE Books</span>
+      <div className="px-4 py-4 border-b border-gray-700">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">H</div>
+            <span className="font-bold text-white">HCE Books</span>
+          </div>
+          <button
+            onClick={startTour}
+            title="Take the tour"
+            className="flex items-center justify-center w-7 h-7 rounded-lg bg-gray-800 hover:bg-blue-600 text-gray-400 hover:text-white transition-colors"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
@@ -131,10 +140,10 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
       <div className="px-3 py-3 border-t border-gray-700 space-y-1">
         <button
           onClick={startTour}
-          className="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors"
+          className="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg ring-1 ring-gray-700 hover:ring-blue-500 transition-colors"
         >
-          <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" />
-          Take the tour
+          <HelpCircle className="w-3.5 h-3.5 flex-shrink-0 text-blue-400" />
+          Take the Tour
         </button>
         <div className="flex items-center justify-between px-2">
           <span className="text-xs text-gray-400 truncate">{userName}</span>

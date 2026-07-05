@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, Receipt, Building2, Users, CreditCard, RefreshCw,
   BarChart3, ArrowLeftRight, Settings, LogOut, BookOpen, ChevronDown,
   TrendingUp, Droplets, MessageSquare, Repeat, CalendarClock, AlertTriangle, ClipboardCheck,
-  LineChart, Shield, Package, Landmark, FlaskConical, Scale,
+  LineChart, Shield, Package, Landmark, FlaskConical, Scale, FolderOpen,
 } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -41,6 +41,7 @@ const NAV = [
   { href: "/ask", label: "Ask AI", icon: MessageSquare },
   { href: "/scenarios", label: "Scenarios", icon: FlaskConical },
   { href: "/valuation", label: "Valuation", icon: Scale },
+  { href: "/packets", label: "Report Packets", icon: FolderOpen },
   { href: "/accounts", label: "Chart of Accounts", icon: BookOpen },
   { href: "/intercompany", label: "Intercompany", icon: ArrowLeftRight },
   { href: "/settings", label: "Settings", icon: Settings },

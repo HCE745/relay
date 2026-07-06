@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { getAccountBalance } from "@/lib/ledger"
 
@@ -57,6 +58,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
 
   const entityId = searchParams.get("entityId") ?? ""
+  const deny = assertAccess(session, entityId, "read"); if (deny) return deny
   const mode = (searchParams.get("mode") ?? "weekly") as "weekly" | "monthly"
   const periods = parseInt(searchParams.get("periods") ?? (mode === "weekly" ? "13" : "12"), 10)
   const consolidated = searchParams.get("consolidated") === "true"

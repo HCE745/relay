@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { getAccountBalance } from "@/lib/ledger"
 import { getPL } from "@/lib/reports"
@@ -66,6 +67,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
 
   const entityId = searchParams.get("entityId") ?? (await getEntityIdFromCookie())
+  const deny = assertAccess(session, entityId, "read"); if (deny) return deny
   const consolidated = searchParams.get("consolidated") === "true"
   const reserveMonths = parseInt(searchParams.get("reserveMonths") ?? "3")
 

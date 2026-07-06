@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { writeAuditLog } from "@/lib/db"
 
@@ -22,6 +23,7 @@ export async function POST(
   if (!po || po.tenantId !== session.tenantId) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+  const entityDeny = assertEntityAccess(session, po.entityId); if (entityDeny) return entityDeny
   if (["CLOSED", "CANCELLED"].includes(po.status)) {
     return NextResponse.json({ error: `Cannot receive against a ${po.status} PO` }, { status: 400 })
   }

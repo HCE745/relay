@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import {
   getPL, getBalanceSheet, getCashFlow, getTrialBalance,
@@ -329,6 +330,7 @@ async function assembleInvestor(tenantId: string, entityId: string, consolidated
 export async function POST(req: NextRequest) {
   const session = await requireSession()
   const body = await req.json()
+  const deny = assertAccess(session, body.entityId, "read"); if (deny) return deny
   const { type, entityId, consolidated = false, year, month, fiscalYear } = body
 
   try {

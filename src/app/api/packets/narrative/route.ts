@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import Anthropic from "@anthropic-ai/sdk"
 
 export const dynamic = "force-dynamic"
@@ -130,8 +131,9 @@ Write in professional investor-facing language. Reference specific numbers. Ackn
 }
 
 export async function POST(req: NextRequest) {
-  await requireSession()
+  const session = await requireSession()
   const body = await req.json()
+  const deny = assertAccess(session, body.entityId, "read"); if (deny) return deny
   const { type, packetData } = body as { type: string; packetData: Record<string, unknown> }
 
   if (!type || !packetData) return NextResponse.json({ error: "type and packetData required" }, { status: 400 })

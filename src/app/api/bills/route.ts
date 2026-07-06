@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { createAndEnterBill } from "@/lib/ap"
 import { prisma } from "@/lib/prisma"
 
@@ -9,6 +10,7 @@ export async function POST(req: NextRequest) {
   const session = await requireSession()
   const body = await req.json()
   const entityId = body.entityId
+  const deny = assertAccess(session, entityId, "write"); if (deny) return deny
 
   // Resolve vendor — use existing id or create a new one from the scan result
   let vendorId: string = body.vendorId

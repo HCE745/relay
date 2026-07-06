@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { exchangePublicToken } from "@/lib/banking"
 import { getSelectedEntityId } from "@/lib/entity-context"
 

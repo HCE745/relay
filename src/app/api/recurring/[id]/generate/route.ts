@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { createAndEnterBill } from "@/lib/ap"
 import { createAndPostEntry } from "@/lib/ledger"
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     where: { id, tenantId: session.tenantId },
   })
   if (!template) return NextResponse.json({ error: "Not found" }, { status: 404 })
+  const entityDeny = assertEntityAccess(session, template.entityId); if (entityDeny) return entityDeny
   if (!template.active) return NextResponse.json({ error: "Template is not active" }, { status: 400 })
 
   const today = new Date()

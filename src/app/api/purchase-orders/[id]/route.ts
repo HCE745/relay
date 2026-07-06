@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { writeAuditLog } from "@/lib/db"
 
@@ -51,6 +52,7 @@ export async function PATCH(
   if (!po || po.tenantId !== session.tenantId) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+  const entityDeny = assertEntityAccess(session, po.entityId); if (entityDeny) return entityDeny
 
   const validTransitions: Record<string, string[]> = {
     DRAFT: ["OPEN"],

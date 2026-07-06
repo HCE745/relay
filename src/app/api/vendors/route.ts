@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"

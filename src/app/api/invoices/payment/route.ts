@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { recordInvoicePayment } from "@/lib/ar"
 import { prisma } from "@/lib/prisma"
 
@@ -17,6 +18,7 @@ export async function POST(req: NextRequest) {
   if (!inv || inv.tenantId !== session.tenantId) {
     return NextResponse.json({ error: "Invoice not found" }, { status: 404 })
   }
+  const deny = assertAccess(session, inv.entityId, "post"); if (deny) return deny
 
   const [arAccount, cashAccount] = await Promise.all([
     prisma.account.findFirst({ where: { tenantId: inv.tenantId, entityId: inv.entityId, code: "1100" } }),

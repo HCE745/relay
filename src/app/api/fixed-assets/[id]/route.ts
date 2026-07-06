@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { cookies } from "next/headers"
 
@@ -29,6 +30,7 @@ export async function GET(
   if (!asset || asset.tenantId !== session.tenantId || asset.entityId !== entityId) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+  const entityDeny = assertEntityAccess(session, asset.entityId); if (entityDeny) return entityDeny
 
   const accumulatedDepreciation = asset.depreciationEntries
     .filter((e) => e.status === "POSTED")

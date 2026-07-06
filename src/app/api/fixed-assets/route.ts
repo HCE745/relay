@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { ensureFixedAssetAccounts, createAsset } from "@/lib/fixed-assets"
 import { cookies } from "next/headers"

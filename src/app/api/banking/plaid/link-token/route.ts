@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { createLinkToken } from "@/lib/banking"
 
 export const dynamic = "force-dynamic"

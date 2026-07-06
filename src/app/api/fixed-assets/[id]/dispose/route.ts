@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { disposeAsset } from "@/lib/fixed-assets"
 import { cookies } from "next/headers"
 
@@ -18,6 +19,7 @@ export async function POST(
   const { id } = await params
   const session = await requireSession()
   const entityId = await getEntityId()
+  const entityDeny = assertEntityAccess(session, entityId); if (entityDeny) return entityDeny
   const body = await req.json()
 
   const {

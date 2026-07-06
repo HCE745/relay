@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { createAndPostEntry } from "@/lib/ledger"
 
@@ -17,6 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   })
 
   if (!schedule) return NextResponse.json({ error: "Not found" }, { status: 404 })
+  const entityDeny = assertEntityAccess(session, schedule.entityId); if (entityDeny) return entityDeny
   if (schedule.status === "VOIDED") return NextResponse.json({ error: "Schedule is voided" }, { status: 400 })
 
   const today = new Date()

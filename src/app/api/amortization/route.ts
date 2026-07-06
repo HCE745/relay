@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import type { AmortizationType } from "@/generated/prisma/client"
 
@@ -10,6 +11,7 @@ export async function GET(req: NextRequest) {
   const session = await requireSession()
   const { searchParams } = new URL(req.url)
   const entityId = searchParams.get("entityId") ?? ""
+  const deny = assertAccess(session, entityId, "read"); if (deny) return deny
 
   const schedules = await prisma.amortizationSchedule.findMany({
     where: { tenantId: session.tenantId, entityId },

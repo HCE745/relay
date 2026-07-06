@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess, assertConsolidatedAccess } from "@/lib/permissions"
 import { getPL, getBalanceSheet, getTrialBalance, getARAgingReport, getAPAgingReport, toCsv, centsToDisplay } from "@/lib/reports"
+import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
 
@@ -13,6 +15,12 @@ export async function GET(req: NextRequest) {
   const to = searchParams.get("to") ?? `${new Date().getFullYear()}-12-31`
   const format = searchParams.get("format") ?? "json"
   const consolidated = searchParams.get("consolidated") === "true"
+
+  const deny = assertAccess(session, entityId, "read"); if (deny) return deny
+  if (consolidated) {
+    const allEntities = await prisma.entity.findMany({ where: { tenantId: session.tenantId }, select: { id: true } })
+    const denyC = assertConsolidatedAccess(session, allEntities.map(e => e.id)); if (denyC) return denyC
+  }
 
   const period = { start: new Date(from), end: new Date(to) }
   const { tenantId } = session

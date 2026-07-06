@@ -91,31 +91,33 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
         </div>
       </div>
 
-      {/* Entity switcher */}
-      <div className="px-3 py-3 border-b border-gray-700 relative">
-        <button
-          data-tour="entity-switcher"
-          onClick={() => setEntityOpen(!entityOpen)}
-          className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium text-gray-200 transition-colors"
-        >
-          <span className="truncate">{selected?.name ?? "Select entity"}</span>
-          <ChevronDown className="w-4 h-4 flex-shrink-0 text-gray-400" />
-        </button>
-        {entityOpen && (
-          <div className="absolute left-3 right-3 top-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50">
-            {entities.map((e) => (
-              <button
-                key={e.id}
-                onClick={() => switchEntity(e.id)}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${e.id === selectedEntityId ? "text-blue-400 font-medium" : "text-gray-300"}`}
-              >
-                {e.name}
-                {e.isConsolidationParent && <span className="ml-1 text-xs text-gray-500">(consolidated)</span>}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Entity switcher — hidden when user has access to only one entity */}
+      {entities.length > 1 && (
+        <div className="px-3 py-3 border-b border-gray-700 relative">
+          <button
+            data-tour="entity-switcher"
+            onClick={() => setEntityOpen(!entityOpen)}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium text-gray-200 transition-colors"
+          >
+            <span className="truncate">{selected?.name ?? "Select entity"}</span>
+            <ChevronDown className="w-4 h-4 flex-shrink-0 text-gray-400" />
+          </button>
+          {entityOpen && (
+            <div className="absolute left-3 right-3 top-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50">
+              {entities.map((e) => (
+                <button
+                  key={e.id}
+                  onClick={() => switchEntity(e.id)}
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${e.id === selectedEntityId ? "text-blue-400 font-medium" : "text-gray-300"}`}
+                >
+                  {e.name}
+                  {e.isConsolidationParent && <span className="ml-1 text-xs text-gray-500">(consolidated)</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Nav */}
       <nav data-tour="sidebar-nav" className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">

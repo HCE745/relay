@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { getPL, getBalanceSheet, getTrialBalance } from "@/lib/reports"
 import { getAccountBalance } from "@/lib/ledger"

@@ -1,12 +1,13 @@
 import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { Users, Calendar, Building2, Tag, LayoutGrid } from "lucide-react"
+import { Users, Calendar, Building2, Tag, LayoutGrid, ChevronRight } from "lucide-react"
+import { canManageUsers } from "@/lib/permissions"
 
 export const dynamic = "force-dynamic"
 
 export default async function SettingsPage() {
-  const { tenantId, entityId, selectedEntity } = await getEntityContext()
+  const { session, tenantId, entityId, selectedEntity } = await getEntityContext()
 
   const [users, periods, entities, classes, departments] = await Promise.all([
     prisma.hceUser.findMany({ where: { tenantId }, orderBy: { name: "asc" } }),
@@ -76,13 +77,24 @@ export default async function SettingsPage() {
 
       {/* Users */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-gray-400" />
-          <h2 className="text-base font-semibold text-gray-900">Users & Roles</h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-gray-400" />
+            <h2 className="text-base font-semibold text-gray-900">Users & Roles</h2>
+          </div>
+          {canManageUsers(session.role) && (
+            <Link
+              href="/settings/users"
+              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Manage users
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          )}
         </div>
         <div className="bg-white rounded-xl border border-gray-200">
           <table className="data-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
             <tbody>
               {users.map((u) => (
                 <tr key={u.id}>
@@ -93,8 +105,12 @@ export default async function SettingsPage() {
                       u.role === "OWNER" ? "bg-purple-100 text-purple-700" :
                       u.role === "ADMIN" ? "bg-blue-100 text-blue-700" :
                       u.role === "ACCOUNTANT" ? "bg-green-100 text-green-700" :
+                      u.role === "BOOKKEEPER" ? "bg-yellow-100 text-yellow-700" :
                       "bg-gray-100 text-gray-600"
                     }`}>{u.role}</span>
+                  </td>
+                  <td>
+                    {!u.active && <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-600">Deactivated</span>}
                   </td>
                 </tr>
               ))}

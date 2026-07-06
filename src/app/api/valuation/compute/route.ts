@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { getSelectedEntityId } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import { getPL } from "@/lib/reports"
@@ -249,6 +250,7 @@ export async function POST(req: NextRequest) {
   const session = await requireSession()
   const { tenantId } = session
   const body = await req.json()
+  const deny = assertAccess(session, body.entityId, "read"); if (deny) return deny
 
   const entityId: string = body.entityId ?? (await getSelectedEntityId())
   const consolidated: boolean = body.consolidated === true

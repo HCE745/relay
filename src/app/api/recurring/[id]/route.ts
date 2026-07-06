@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
@@ -15,6 +16,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   })
 
   if (!template) return NextResponse.json({ error: "Not found" }, { status: 404 })
+  const entityDeny = assertEntityAccess(session, template.entityId); if (entityDeny) return entityDeny
   return NextResponse.json(template)
 }
 

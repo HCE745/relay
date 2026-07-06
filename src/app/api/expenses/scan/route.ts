@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk"
 import { put } from "@vercel/blob"
 import { cookies } from "next/headers"
 import { getSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import type { ScanResult } from "@/lib/scan-types"
 

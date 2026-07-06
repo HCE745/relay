@@ -19,6 +19,7 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import type { AccountType, NormalBalance } from "@/generated/prisma/client"
 
@@ -128,6 +129,7 @@ function parseQBOCsv(csv: string): { rows: ParsedRow[]; errors: string[] } {
 export async function POST(req: NextRequest) {
   const session = await requireSession()
   const body = await req.json()
+  const deny = assertAccess(session, body.entityId, "post"); if (deny) return deny
   const { csvText, entityId, preview = true } = body as {
     csvText: string
     entityId: string

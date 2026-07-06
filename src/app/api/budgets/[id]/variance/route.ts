@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 import { toCsv } from "@/lib/reports"
 import type { BudgetPeriodType } from "@/generated/prisma/client"
@@ -68,6 +69,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!budget || budget.tenantId !== session.tenantId) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+  const entityDeny = assertEntityAccess(session, budget.entityId); if (entityDeny) return entityDeny
 
   const totalPeriods = getPeriodCount(budget.periodType)
   const periodLabels = getPeriodLabels(budget.periodType)

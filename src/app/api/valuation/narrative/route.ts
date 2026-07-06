@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import Anthropic from "@anthropic-ai/sdk"
 
 export const dynamic = "force-dynamic"
@@ -10,8 +11,9 @@ function fmt(cents: number): string {
 }
 
 export async function POST(req: NextRequest) {
-  await requireSession()
+  const session = await requireSession()
   const body = await req.json()
+  const deny = assertAccess(session, body.entityId, "read"); if (deny) return deny
   const { computeResult } = body
 
   if (!computeResult) return NextResponse.json({ error: "computeResult required" }, { status: 400 })

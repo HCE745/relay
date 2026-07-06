@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
@@ -25,6 +26,7 @@ export async function GET(
   if (!po || po.tenantId !== session.tenantId) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+  const entityDeny = assertEntityAccess(session, po.entityId); if (entityDeny) return entityDeny
   if (!["OPEN", "PARTIALLY_RECEIVED"].includes(po.status)) {
     return NextResponse.json(
       { error: `PO is ${po.status} — only OPEN or PARTIALLY_RECEIVED POs can be matched` },

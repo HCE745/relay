@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertAccess } from "@/lib/permissions"
 import { createInvoice, sendInvoice } from "@/lib/ar"
 import { prisma } from "@/lib/prisma"
 
@@ -10,6 +11,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const entityId = searchParams.get("entityId") ?? ""
   const status = searchParams.get("status")
+  const deny = assertAccess(session, entityId, "read"); if (deny) return deny
 
   const invoices = await prisma.invoice.findMany({
     where: {
@@ -28,6 +30,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await requireSession()
   const body = await req.json()
+  const deny = assertAccess(session, body.entityId, "write"); if (deny) return deny
 
   // Auto-generate invoice number if the caller doesn't supply one
   let invoiceNumber = body.invoiceNumber as string | undefined

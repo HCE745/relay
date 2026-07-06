@@ -7,12 +7,11 @@ const nextConfig: NextConfig = {
     webpackBuildWorker: false,
   },
   webpack(config, { isServer }) {
-    // Node.js v26: WasmHash not available in the process used by Next.js build.
-    // Switching to pure-JS xxhash64 which webpack bundles itself.
-    if (!isServer) {
-      config.output = config.output ?? {}
-      config.output.hashFunction = "xxhash64"
-    }
+    // Node.js v26: WasmHash crashes in BatchedHash.update with undefined.
+    // Apply xxhash64 to both builds when webpackBuildWorker is disabled
+    // (both compile in the same process, both need the pure-JS fallback).
+    config.output = config.output ?? {}
+    config.output.hashFunction = "xxhash64"
     return config
   },
 }

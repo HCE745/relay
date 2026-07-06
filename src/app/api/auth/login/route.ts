@@ -8,9 +8,16 @@ export const dynamic = "force-dynamic"
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json()
 
-  const user = await prisma.hceUser.findFirst({ where: { email } })
+  const user = await prisma.hceUser.findFirst({
+    where: { email },
+    include: { entityAccess: true },
+  })
+
   if (!user || !user.passwordHash) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+  }
+  if (!user.active) {
+    return NextResponse.json({ error: "Account is deactivated" }, { status: 403 })
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash)
@@ -18,12 +25,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
   }
 
-  const access = await prisma.entityAccess.findMany({ where: { userId: user.id } })
+  // OWNER + ADMIN see all entities in the tenant automatically.
+  // Other roles only see their explicitly granted EntityAccess rows.
+  let entityIds: string[]
+  if (user.role === "OWNER" || user.role === "ADMIN") {
+    const allEntities = await prisma.entity.findMany({
+      where: { tenantId: user.tenantId },
+      select: { id: true },
+    })
+    entityIds = allEntities.map((e) => e.id)
+  } else {
+    entityIds = user.entityAccess.map((a) => a.entityId)
+  }
+
   const token = await createSession({
     userId: user.id,
     tenantId: user.tenantId,
     role: user.role,
-    entityIds: access.map((a) => a.entityId),
+    entityIds,
   })
 
   const res = NextResponse.json({ ok: true })

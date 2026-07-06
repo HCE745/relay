@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSession } from "@/lib/session"
+import { assertEntityAccess } from "@/lib/permissions"
+import { assertAccess } from "@/lib/permissions"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
@@ -17,6 +19,7 @@ export async function POST(
   if (!existing || existing.tenantId !== session.tenantId) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+  const entityDeny = assertEntityAccess(session, existing.entityId); if (entityDeny) return entityDeny
 
   const updated = await prisma.anomalyFlag.update({
     where: { id },

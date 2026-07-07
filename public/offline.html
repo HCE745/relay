@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Relay — Offline</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: #111827;
+      color: #f9fafb;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: max(env(safe-area-inset-top), 24px) 24px max(env(safe-area-inset-bottom), 24px);
+      text-align: center;
+    }
+
+    .icon {
+      width: 80px;
+      height: 80px;
+      background: #2563eb;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+
+    .icon svg { display: block; }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #f9fafb;
+    }
+
+    p {
+      font-size: 0.9375rem;
+      color: #9ca3af;
+      line-height: 1.6;
+      max-width: 300px;
+      margin: 0 auto 32px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: 0.8125rem;
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+    }
+
+    button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:active { background: #1d4ed8; }
+
+    .wordmark {
+      position: absolute;
+      top: max(env(safe-area-inset-top), 20px);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f9fafb;
+    }
+
+    .wordmark-icon {
+      width: 28px;
+      height: 28px;
+      background: #2563eb;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wordmark">
+    <div class="wordmark-icon">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+      </svg>
+    </div>
+    Relay
+  </div>
+
+  <div class="icon">
+    <svg viewBox="0 0 24 24" width="40" height="40" fill="white">
+      <path d="M1 6h4v2H1V6zm0 5h4v2H1v-2zm0 5h4v2H1v-2zM21 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3l-4 5h3v6l4-5h-3V6z"/>
+    </svg>
+  </div>
+
+  <h1>You're offline</h1>
+  <p>Reconnect to continue managing your operations. Your data is safe and waiting.</p>
+
+  <div class="badge">
+    <span class="dot"></span>
+    No internet connection
+  </div>
+
+  <button onclick="window.location.reload()">Try again</button>
+</body>
+</html>

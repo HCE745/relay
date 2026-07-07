@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path":     "/api/cron/imap-sync",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path":     "/api/cron/billing-credits",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}

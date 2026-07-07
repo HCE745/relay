@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  /* Safe area insets for notched/rounded-corner phones */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  /* Smooth momentum scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent text size adjustment on orientation change (iOS) */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Remove tap highlight on interactive elements for native feel */
+a, button, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe-area padding utilities (used by mobile nav components via inline style) */
+.pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* ── Capacitor / Android global safe-area fix ────────────────────────────── */
+/* Automatically clear the Android system navigation bar for common fixed
+   bottom elements (bottom bars, floating action areas, bottom sheets).
+   Inline styles on individual components take precedence over these rules. */
+.fixed.bottom-0,
+.sticky.bottom-0 {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Bottom-sheet modal overlays: shift content above the Android nav bar.
+   Applied to the full-screen backdrop div that wraps bottom-aligned modals. */
+.modal-safe-bottom {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Scrollable containers with momentum scrolling */
+.scroll-smooth-ios {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* ── Dark mode ───────────────────────────────────────────────────────────── */
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+}
+
+.dark body {
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Cards and white surfaces */
+.dark .bg-white { background-color: #1e293b !important; }
+.dark .bg-gray-50 { background-color: #0f172a !important; }
+.dark .bg-gray-100 { background-color: #1e293b !important; }
+
+/* Borders */
+.dark .border-gray-100 { border-color: #334155 !important; }
+.dark .border-gray-200 { border-color: #334155 !important; }
+.dark .border-gray-300 { border-color: #475569 !important; }
+
+/* Text */
+.dark .text-gray-900 { color: #f1f5f9 !important; }
+.dark .text-gray-800 { color: #e2e8f0 !important; }
+.dark .text-gray-700 { color: #cbd5e1 !important; }
+.dark .text-gray-600 { color: #94a3b8 !important; }
+.dark .text-gray-500 { color: #64748b !important; }
+.dark .text-gray-400 { color: #475569 !important; }
+
+/* Table */
+.dark thead tr { background-color: #1e293b !important; }
+.dark tbody tr:hover { background-color: #1e293b !important; }
+.dark table { border-color: #334155 !important; }
+.dark .divide-y > * { border-color: #334155 !important; }
+.dark .divide-gray-100 > * { border-color: #334155 !important; }
+.dark .divide-gray-50 > * { border-color: #1e293b !important; }
+
+/* Form inputs */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: #64748b !important; }
+.dark select option { background-color: #1e293b; color: #f1f5f9; }
+
+/* Header */
+.dark header.sticky { background-color: #1e293b !important; border-color: #334155 !important; }
+
+/* Hover states */
+.dark .hover\:bg-gray-50:hover { background-color: #1e293b !important; }
+.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+
+/* Amber/tip boxes */
+.dark .bg-amber-50 { background-color: #451a03 !important; }
+.dark .border-amber-200 { border-color: #92400e !important; }
+.dark .text-amber-900 { color: #fcd34d !important; }
+.dark .text-amber-800 { color: #fbbf24 !important; }
+
+/* Blue accents (keep as-is, they're visible on dark) */
+.dark .bg-blue-50 { background-color: #1e3a5f !important; }
+.dark .border-blue-200 { border-color: #1d4ed8 !important; }
+.dark .text-blue-800 { color: #93c5fd !important; }
+
+/* Red surfaces */
+.dark .bg-red-50 { background-color: #450a0a !important; }
+.dark .border-red-200 { border-color: #991b1b !important; }
+
+/* Yellow internal note */
+.dark .bg-yellow-50 { background-color: #422006 !important; }
+.dark .border-yellow-100 { border-color: #92400e !important; }

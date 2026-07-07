@@ -1,0 +1,107 @@
+{
+  "version": 3,
+  "outputFile": "relay-demo-v1.mp4",
+  "baseUrl": "https://app.getrelay.software",
+  "demoPath": "/demo-video",
+  "viewport": { "width": 1280, "height": 720 },
+  "fps": 30,
+  "fadeTransitionSeconds": 0.4,
+  "steps": [
+    {
+      "step": 1,
+      "name": "Opening",
+      "startTime": "0:00",
+      "endTime": "0:10",
+      "durationSeconds": 10,
+      "narration": "Every operation has problems. Equipment breaks... maintenance gets missed... and important issues? They disappear. Into texts. Into emails. Into conversations nobody follows up on."
+    },
+    {
+      "step": 2,
+      "name": "Dashboard",
+      "startTime": "0:10",
+      "endTime": "0:26",
+      "durationSeconds": 16,
+      "narration": "This is Relay. Your operational command center. Open issues. Escalations. Resolution times. Everything your team needs... in one place."
+    },
+    {
+      "step": 3,
+      "name": "Issue List",
+      "startTime": "0:26",
+      "endTime": "0:44",
+      "durationSeconds": 18,
+      "narration": "Every issue has a status. A priority. A location. And an owner. Nothing gets lost. Nothing gets ignored. The right person always knows what needs attention."
+    },
+    {
+      "step": 4,
+      "name": "Issue Detail",
+      "startTime": "0:44",
+      "endTime": "1:06",
+      "durationSeconds": 22,
+      "narration": "From the moment an issue is reported... to the moment it is resolved... every action is tracked. Every change is logged. Full accountability. Every time."
+    },
+    {
+      "step": 5,
+      "name": "Issue Intelligence",
+      "startTime": "1:06",
+      "endTime": "1:28",
+      "durationSeconds": 22,
+      "narration": "This is Issue Intelligence. Before your team even opens the ticket... Relay has already analyzed it. Likely causes. Immediate actions. Ranked solutions. AI that actually helps."
+    },
+    {
+      "step": 6,
+      "name": "SOP Connection",
+      "startTime": "1:28",
+      "endTime": "1:42",
+      "durationSeconds": 14,
+      "narration": "When an issue connects to one of your procedures... Relay flags it. Automatically. Stop fixing the same problem twice. Start fixing the process."
+    },
+    {
+      "step": 7,
+      "name": "Asset Management",
+      "startTime": "1:42",
+      "endTime": "2:02",
+      "durationSeconds": 20,
+      "narration": "Every asset has a history. Every breakdown... every repair... every pattern. Instead of treating each failure as something new... your team sees the full story."
+    },
+    {
+      "step": 8,
+      "name": "Analytics",
+      "startTime": "2:02",
+      "endTime": "2:18",
+      "durationSeconds": 16,
+      "narration": "Issue tracking is just the beginning. Relay turns your data into intelligence. Trends. Bottlenecks. Recurring failures. And how you compare... to your industry."
+    },
+    {
+      "step": 9,
+      "name": "QR Reporting",
+      "startTime": "2:18",
+      "endTime": "2:36",
+      "durationSeconds": 18,
+      "narration": "Place a QR code anywhere in your facility. A machine. A restroom. A dock door. Anyone scans it... describes the problem... and Relay handles the rest. No app. No account. Just a phone."
+    },
+    {
+      "step": 10,
+      "name": "Approval Intelligence",
+      "startTime": "2:36",
+      "endTime": "2:54",
+      "durationSeconds": 18,
+      "narration": "Routine replacements should not require a manager signature. Relay identifies the item... verifies the damage... checks your policy... and approves it automatically. Bureaucracy eliminated."
+    },
+    {
+      "step": 11,
+      "name": "Executive View",
+      "startTime": "2:54",
+      "endTime": "3:10",
+      "durationSeconds": 16,
+      "narration": "For larger operations... Relay gives executives the visibility they need. Health scores. Regional performance. AI briefings. The issues that matter most... always front and center."
+    },
+    {
+      "step": 12,
+      "name": "Closing CTA",
+      "startTime": "3:10",
+      "endTime": "3:24",
+      "durationSeconds": 14,
+      "narration": "Every issue gets an owner. Every action gets tracked. Every operation gets smarter. That is Relay."
+    }
+  ]
+}

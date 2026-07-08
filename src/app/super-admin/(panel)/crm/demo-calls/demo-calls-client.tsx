@@ -178,7 +178,10 @@ export function DemoCallsClient({ schedulingUrl }: { schedulingUrl: string | nul
                 return (
                   <tr key={call.id} className="hover:bg-gray-800/40 transition-colors group">
                     <td className="px-4 py-3.5">
-                      <p className="text-sm font-semibold text-white">{call.contactName}</p>
+                      <Link href={`/super-admin/crm/demo-calls/${call.id}`}
+                        className="text-sm font-semibold text-white hover:text-indigo-300 transition-colors">
+                        {call.contactName}
+                      </Link>
                       <p className="text-xs text-gray-500">{call.contactEmail}</p>
                       {call.contactPhone && (
                         <p className="text-xs text-gray-600">{call.contactPhone}</p>
@@ -246,7 +249,7 @@ export function DemoCallsClient({ schedulingUrl }: { schedulingUrl: string | nul
                         )}
                         <Link href={`/super-admin/crm/demo-calls/${call.id}`}
                           className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-md font-medium transition-colors">
-                          Edit
+                          View
                         </Link>
                         <button onClick={() => handleDelete(call.id)}
                           className="text-xs px-2 py-1 bg-red-950/60 hover:bg-red-900/60 text-red-400 rounded-md font-medium transition-colors">

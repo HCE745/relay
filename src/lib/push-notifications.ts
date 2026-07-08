@@ -1,16 +1,16 @@
 import { prisma } from "@/lib/prisma"
 import { GoogleAuth } from "google-auth-library"
 
-const serviceAccount = JSON.parse(
-  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 || "", "base64").toString("utf8")
-)
-
 let _auth: GoogleAuth | null = null
 
 function getAuth(): GoogleAuth {
   if (!_auth) {
+    const raw = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 ?? ""
+    const credentials = raw
+      ? JSON.parse(Buffer.from(raw, "base64").toString("utf8"))
+      : undefined
     _auth = new GoogleAuth({
-      credentials: serviceAccount,
+      credentials,
       scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
     })
   }

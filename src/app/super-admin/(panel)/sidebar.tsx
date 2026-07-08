@@ -8,22 +8,40 @@ import {
   Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, PhoneCall, Tag, Headphones, Megaphone,
 } from "lucide-react"
 
-const NAV = [
-  { href: "/super-admin",                     label: "Overview",        icon: LayoutDashboard },
-  { href: "/super-admin/organizations",       label: "Customers",       icon: Building2       },
-  { href: "/super-admin/crm",                 label: "CRM",             icon: PhoneCall       },
-  { href: "/super-admin/crm/settings",        label: "CRM Settings",    icon: Settings        },
-  { href: "/super-admin/support",             label: "Support Inbox",   icon: Headphones      },
-  { href: "/super-admin/broadcast",           label: "Broadcast",       icon: Megaphone       },
-  { href: "/super-admin/promotions",          label: "Promotions",      icon: Tag             },
-  { href: "/super-admin/referrals",           label: "Referrals",       icon: Users           },
-  { href: "/super-admin/users",               label: "SA Users",        icon: Users           },
-  { href: "/super-admin/bug-reports",         label: "Bug Reports",     icon: Bug             },
-  { href: "/super-admin/feature-requests",    label: "Feedback",        icon: Lightbulb       },
-  { href: "/super-admin/audit",               label: "Audit Log",       icon: Activity        },
-  { href: "/super-admin/insights",            label: "Insights",        icon: TrendingUp      },
-  { href: "/super-admin/platform-health",     label: "Platform Health", icon: HeartPulse      },
-  { href: "/super-admin/settings",            label: "Settings",        icon: Settings        },
+type NavItem = { href: string; label: string; icon: React.ElementType; exact?: boolean }
+type NavSection = { label?: string; items: NavItem[] }
+
+const NAV_SECTIONS: NavSection[] = [
+  {
+    items: [
+      { href: "/super-admin",              label: "Overview",  icon: LayoutDashboard, exact: true },
+      { href: "/super-admin/organizations", label: "Customers", icon: Building2 },
+    ],
+  },
+  {
+    label: "CRM",
+    items: [
+      { href: "/super-admin/crm",                 label: "Dashboard",        icon: LayoutDashboard, exact: true },
+      { href: "/super-admin/crm/demo-calls",       label: "Demo Calls",       icon: PhoneCall },
+      { href: "/super-admin/referrals",            label: "Referrals",        icon: Users },
+      { href: "/super-admin/feature-requests",     label: "Feature Requests", icon: Lightbulb },
+      { href: "/super-admin/support",              label: "Support Inbox",    icon: Headphones },
+      { href: "/super-admin/crm/settings",         label: "Settings",         icon: Settings },
+    ],
+  },
+  {
+    label: "Platform",
+    items: [
+      { href: "/super-admin/broadcast",      label: "Broadcast",       icon: Megaphone },
+      { href: "/super-admin/promotions",     label: "Promotions",      icon: Tag },
+      { href: "/super-admin/users",          label: "SA Users",        icon: Users },
+      { href: "/super-admin/bug-reports",    label: "Bug Reports",     icon: Bug },
+      { href: "/super-admin/audit",          label: "Audit Log",       icon: Activity },
+      { href: "/super-admin/insights",       label: "Insights",        icon: TrendingUp },
+      { href: "/super-admin/platform-health", label: "Platform Health", icon: HeartPulse },
+      { href: "/super-admin/settings",       label: "Settings",        icon: Settings },
+    ],
+  },
 ]
 
 export function SuperAdminSidebar({ name, email }: { name: string; email: string }) {
@@ -36,9 +54,8 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
     router.push("/super-admin/login")
   }
 
-  function isActive(href: string) {
-    if (href === "/super-admin") return pathname === "/super-admin"
-    return pathname.startsWith(href)
+  function isActive({ href, exact }: NavItem) {
+    return exact ? pathname === href : pathname.startsWith(href)
   }
 
   function close() { setOpen(false) }
@@ -68,22 +85,33 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {NAV.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            onClick={close}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-              isActive(href)
-                ? "bg-indigo-600 text-white"
-                : "text-gray-400 hover:text-white hover:bg-gray-800",
+      <nav className="flex-1 px-3 py-4 overflow-y-auto">
+        {NAV_SECTIONS.map((section, si) => (
+          <div key={si} className={si > 0 ? "mt-4" : ""}>
+            {section.label && (
+              <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-600">
+                {section.label}
+              </p>
             )}
-          >
-            <Icon className="w-4 h-4 flex-shrink-0" />
-            {label}
-          </Link>
+            <div className="space-y-0.5">
+              {section.items.map(item => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={close}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    isActive(item)
+                      ? "bg-indigo-600 text-white"
+                      : "text-gray-400 hover:text-white hover:bg-gray-800",
+                  )}
+                >
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
 

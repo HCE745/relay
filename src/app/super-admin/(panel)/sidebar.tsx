@@ -2,52 +2,82 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import {
-  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, PhoneCall, Tag, Headphones, Megaphone,
+  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, PhoneCall, Tag, Headphones, Megaphone, Mail,
 } from "lucide-react"
 
-type NavItem = { href: string; label: string; icon: React.ElementType; exact?: boolean }
+type NavItem = { href: string; label: string; icon: React.ElementType; exact?: boolean; badge?: number }
 type NavSection = { label?: string; items: NavItem[] }
 
-const NAV_SECTIONS: NavSection[] = [
-  {
-    items: [
-      { href: "/super-admin",              label: "Overview",  icon: LayoutDashboard, exact: true },
-      { href: "/super-admin/organizations", label: "Customers", icon: Building2 },
-    ],
-  },
-  {
-    label: "CRM",
-    items: [
-      { href: "/super-admin/crm",                 label: "Dashboard",        icon: LayoutDashboard, exact: true },
-      { href: "/super-admin/crm/demo-calls",       label: "Demo Calls",       icon: PhoneCall },
-      { href: "/super-admin/referrals",            label: "Referrals",        icon: Users },
-      { href: "/super-admin/feature-requests",     label: "Feature Requests", icon: Lightbulb },
-      { href: "/super-admin/support",              label: "Support Inbox",    icon: Headphones },
-      { href: "/super-admin/crm/settings",         label: "Settings",         icon: Settings },
-    ],
-  },
-  {
-    label: "Platform",
-    items: [
-      { href: "/super-admin/broadcast",      label: "Broadcast",       icon: Megaphone },
-      { href: "/super-admin/promotions",     label: "Promotions",      icon: Tag },
-      { href: "/super-admin/users",          label: "SA Users",        icon: Users },
-      { href: "/super-admin/bug-reports",    label: "Bug Reports",     icon: Bug },
-      { href: "/super-admin/audit",          label: "Audit Log",       icon: Activity },
-      { href: "/super-admin/insights",       label: "Insights",        icon: TrendingUp },
-      { href: "/super-admin/platform-health", label: "Platform Health", icon: HeartPulse },
-      { href: "/super-admin/settings",       label: "Settings",        icon: Settings },
-    ],
-  },
-]
+function buildSections(emailUnread: number): NavSection[] {
+  return [
+    {
+      items: [
+        { href: "/super-admin",               label: "Overview",  icon: LayoutDashboard, exact: true },
+        { href: "/super-admin/organizations",  label: "Customers", icon: Building2 },
+      ],
+    },
+    {
+      label: "CRM",
+      items: [
+        { href: "/super-admin/crm",                label: "Dashboard",        icon: LayoutDashboard, exact: true },
+        { href: "/super-admin/crm/demo-calls",      label: "Demo Calls",       icon: PhoneCall },
+        { href: "/super-admin/crm/email",           label: "Email",            icon: Mail, badge: emailUnread },
+        { href: "/super-admin/referrals",           label: "Referrals",        icon: Users },
+        { href: "/super-admin/feature-requests",    label: "Feature Requests", icon: Lightbulb },
+        { href: "/super-admin/support",             label: "Support Inbox",    icon: Headphones },
+        { href: "/super-admin/crm/settings",        label: "Settings",         icon: Settings },
+      ],
+    },
+    {
+      label: "Platform",
+      items: [
+        { href: "/super-admin/broadcast",       label: "Broadcast",       icon: Megaphone },
+        { href: "/super-admin/promotions",      label: "Promotions",      icon: Tag },
+        { href: "/super-admin/users",           label: "SA Users",        icon: Users },
+        { href: "/super-admin/bug-reports",     label: "Bug Reports",     icon: Bug },
+        { href: "/super-admin/audit",           label: "Audit Log",       icon: Activity },
+        { href: "/super-admin/insights",        label: "Insights",        icon: TrendingUp },
+        { href: "/super-admin/platform-health", label: "Platform Health", icon: HeartPulse },
+        { href: "/super-admin/settings",        label: "Settings",        icon: Settings },
+      ],
+    },
+  ]
+}
 
 export function SuperAdminSidebar({ name, email }: { name: string; email: string }) {
-  const pathname        = usePathname()
-  const router          = useRouter()
-  const [open, setOpen] = useState(false)
+  const pathname           = usePathname()
+  const router             = useRouter()
+  const [open, setOpen]    = useState(false)
+  const [emailUnread, setEmailUnread] = useState(0)
+
+  // Fetch unread email count on mount and every 60s
+  useEffect(() => {
+    async function fetchUnread() {
+      try {
+        const res  = await fetch("/api/super-admin/crm/emails?unread=true")
+        const data = await res.json() as { count: number }
+        setEmailUnread(data.count ?? 0)
+      } catch { /* ignore */ }
+    }
+    void fetchUnread()
+    const id = setInterval(fetchUnread, 60_000)
+    return () => clearInterval(id)
+  }, [])
+
+  // Refresh unread when navigating away from the email page
+  useEffect(() => {
+    if (pathname !== "/super-admin/crm/email") {
+      fetch("/api/super-admin/crm/emails?unread=true")
+        .then(r => r.json())
+        .then(d => setEmailUnread((d as { count: number }).count ?? 0))
+        .catch(() => null)
+    }
+  }, [pathname])
+
+  const sections = buildSections(emailUnread)
 
   async function handleLogout() {
     await fetch("/api/super-admin/auth/logout", { method: "POST" })
@@ -86,7 +116,7 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
-        {NAV_SECTIONS.map((section, si) => (
+        {sections.map((section, si) => (
           <div key={si} className={si > 0 ? "mt-4" : ""}>
             {section.label && (
               <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-600">
@@ -107,7 +137,15 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
                   )}
                 >
                   <item.icon className="w-4 h-4 flex-shrink-0" />
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge != null && item.badge > 0 && (
+                    <span className={cn(
+                      "inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold",
+                      isActive(item) ? "bg-white/20 text-white" : "bg-indigo-600 text-white",
+                    )}>
+                      {item.badge > 99 ? "99+" : item.badge}
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>

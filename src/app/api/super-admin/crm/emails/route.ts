@@ -9,23 +9,50 @@ async function requireSA() {
   return s?.superAdmin ? s : null
 }
 
-// GET /api/super-admin/crm/emails?demoCallId=xxx&contactEmail=xxx
+// GET /api/super-admin/crm/emails
+// Query params (mutually exclusive filters):
+//   demoCallId=xxx          — emails for a specific demo call
+//   contactEmail=xxx        — emails for a contact email
+//   direction=received|sent — filter by direction (use with all=true)
+//   all=true                — return all emails (SA inbox/sent view)
+//   unread=true             — return count of unread received emails
 export async function GET(req: NextRequest) {
   if (!await requireSA()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
-  const demoCallId    = searchParams.get("demoCallId")
-  const contactEmail  = searchParams.get("contactEmail")
+  const demoCallId   = searchParams.get("demoCallId")
+  const contactEmail = searchParams.get("contactEmail")
+  const direction    = searchParams.get("direction") as "sent" | "received" | null
+  const all          = searchParams.get("all") === "true"
+  const unread       = searchParams.get("unread") === "true"
 
-  if (!demoCallId && !contactEmail) {
-    return NextResponse.json({ error: "demoCallId or contactEmail required" }, { status: 400 })
+  // Unread count shortcut
+  if (unread) {
+    const count = await prisma.crmEmail.count({
+      where: { direction: "received", isRead: false },
+    })
+    return NextResponse.json({ count })
   }
 
+  if (!demoCallId && !contactEmail && !all) {
+    return NextResponse.json({ error: "demoCallId, contactEmail, or all=true required" }, { status: 400 })
+  }
+
+  const where = demoCallId
+    ? { demoCallId, ...(direction ? { direction } : {}) }
+    : contactEmail
+    ? { contactEmail: { equals: contactEmail, mode: "insensitive" as const }, ...(direction ? { direction } : {}) }
+    : direction
+    ? { direction }
+    : {}
+
   const emails = await prisma.crmEmail.findMany({
-    where: demoCallId
-      ? { demoCallId }
-      : { contactEmail: { equals: contactEmail!, mode: "insensitive" } },
-    orderBy: { sentAt: "asc" },
+    where,
+    include: {
+      demoCall: { select: { id: true, contactName: true, companyName: true } },
+    },
+    orderBy: { sentAt: demoCallId || contactEmail ? "asc" : "desc" },
+    take:    all ? 500 : undefined,
   })
 
   return NextResponse.json({ emails })

@@ -13,7 +13,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!await requireSA()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id }   = await params
-  const body     = await req.json() as { action: string; followUpDate?: string }
+  const body     = await req.json() as { action: string; followUpDate?: string; isRead?: boolean }
 
   const email = await prisma.crmEmail.findUnique({ where: { id } })
   if (!email) return NextResponse.json({ error: "Not found" }, { status: 404 })
@@ -39,6 +39,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const updated = await prisma.crmEmail.update({
       where: { id },
       data:  { followUpDoneAt: new Date() },
+    })
+    return NextResponse.json({ email: updated })
+  }
+
+  if (body.action === "mark_read") {
+    const updated = await prisma.crmEmail.update({
+      where: { id },
+      data:  { isRead: body.isRead ?? true },
     })
     return NextResponse.json({ email: updated })
   }

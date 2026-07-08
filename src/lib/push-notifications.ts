@@ -1,20 +1,16 @@
 import { prisma } from "@/lib/prisma"
 import { GoogleAuth } from "google-auth-library"
-import path from "path"
 
-// Resolve service account — prefer explicit file path, fall back to
-// GOOGLE_APPLICATION_CREDENTIALS env var (which google-auth-library
-// picks up automatically via the ADC chain).
-const SERVICE_ACCOUNT_PATH =
-  process.env.GOOGLE_APPLICATION_CREDENTIALS ??
-  path.join(process.cwd(), "firebase-service-account.json")
+const serviceAccount = JSON.parse(
+  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 || "", "base64").toString("utf8")
+)
 
 let _auth: GoogleAuth | null = null
 
 function getAuth(): GoogleAuth {
   if (!_auth) {
     _auth = new GoogleAuth({
-      keyFile: SERVICE_ACCOUNT_PATH,
+      credentials: serviceAccount,
       scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
     })
   }

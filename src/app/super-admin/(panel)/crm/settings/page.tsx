@@ -29,6 +29,14 @@ interface ImapConfig {
   enabled:            boolean
 }
 
+interface SyncRunResult {
+  fetched:  number
+  matched:  number
+  saved:    number
+  skipped:  number
+  errors:   string[]
+}
+
 export default function CrmSettingsPage() {
   const [tab, setTab] = useState<Tab>("templates")
 
@@ -222,6 +230,7 @@ function ImapTab() {
   const [showPassword, setShowPassword] = useState(false)
   const [syncing,      setSyncing]      = useState(false)
   const [syncMsg,      setSyncMsg]      = useState<{ text: string; ok: boolean } | null>(null)
+  const [syncResult,   setSyncResult]   = useState<SyncRunResult | null>(null)
   const [saving,       setSaving]       = useState(false)
   const [error,        setError]        = useState("")
   const [form, setForm] = useState({
@@ -268,21 +277,20 @@ function ImapTab() {
   }
 
   async function syncNow() {
-    setSyncing(true); setSyncMsg(null)
+    setSyncing(true); setSyncMsg(null); setSyncResult(null)
     try {
-      const res  = await fetch("/api/super-admin/crm/imap-sync", { method: "POST" })
-      const data = await res.json() as { result?: { synced: number; skipped: number; errors: string[] }; error?: string }
-      if (data.error) {
-        setSyncMsg({ text: data.error, ok: false })
-      } else if (data.result) {
-        const r = data.result
-        const errs = r.errors.length ? ` Errors: ${r.errors.join(", ")}` : ""
-        setSyncMsg({ text: `Synced ${r.synced} new email(s), skipped ${r.skipped} duplicates.${errs}`, ok: r.errors.length === 0 })
+      const res  = await fetch("/api/super-admin/crm/run-imap-sync", { method: "POST" })
+      const data = await res.json() as SyncRunResult & { error?: string }
+      if (!res.ok || data.error) {
+        setSyncMsg({ text: data.error ?? `Server error ${res.status}`, ok: false })
       } else {
-        setSyncMsg({ text: "Done.", ok: true })
+        setSyncResult(data)
+        if (data.errors.length) {
+          setSyncMsg({ text: `Completed with ${data.errors.length} error(s) — see details below`, ok: false })
+        }
       }
-    } catch {
-      setSyncMsg({ text: "Sync request failed — check network", ok: false })
+    } catch (err) {
+      setSyncMsg({ text: err instanceof Error ? err.message : "Sync request failed", ok: false })
     }
     setSyncing(false)
     void load()
@@ -306,36 +314,55 @@ function ImapTab() {
         </div>
       )}
 
-      {/* Last sync status card */}
+      {/* Manual Sync card */}
       {config && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <Clock className="w-4 h-4 text-gray-500 shrink-0" />
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500">Last sync</p>
-              <p className="text-sm text-white font-medium">
-                {config.lastSyncAt
-                  ? new Date(config.lastSyncAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
-                  : "Never synced"}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 text-indigo-400" />
+                Manual Sync
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Pulls INBOX and Sent folders from Titan (last 30 days). Auto-sync runs every 15 min via cron.
               </p>
             </div>
-            {config.lastSyncAt && (
-              <div className="ml-4 pl-4 border-l border-gray-800 min-w-0">
-                <p className="text-xs text-gray-500">Last run</p>
-                <p className="text-sm text-white font-medium">
-                  {config.lastSyncEmailCount} email{config.lastSyncEmailCount !== 1 ? "s" : ""} synced
-                </p>
-              </div>
-            )}
+            <button
+              onClick={syncNow}
+              disabled={syncing}
+              className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
+            >
+              <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
+              {syncing ? "Syncing…" : "Sync Now"}
+            </button>
           </div>
-          <button
-            onClick={syncNow}
-            disabled={syncing}
-            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-medium rounded-lg transition-colors shrink-0"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
-            {syncing ? "Syncing…" : "Sync Now"}
-          </button>
+
+          {/* Last sync timestamp */}
+          <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+            <Clock className="w-3.5 h-3.5" />
+            Last sync:{" "}
+            {config.lastSyncAt
+              ? new Date(config.lastSyncAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+              : "never"}
+          </div>
+
+          {/* Last run result stats */}
+          {syncResult && (
+            <div className="grid grid-cols-4 gap-3">
+              <StatCard label="Fetched"  value={syncResult.fetched}  color="gray"   hint="Messages pulled from IMAP" />
+              <StatCard label="Matched"  value={syncResult.matched}  color="blue"   hint="Matched to a CRM contact" />
+              <StatCard label="Saved"    value={syncResult.saved}    color="green"  hint="New emails saved to DB" />
+              <StatCard label="Skipped"  value={syncResult.skipped}  color="gray"   hint="Already in DB (duplicates)" />
+            </div>
+          )}
+          {syncResult && syncResult.errors.length > 0 && (
+            <div className="mt-3 bg-red-950/40 border border-red-800/40 rounded-lg px-4 py-3">
+              <p className="text-xs font-semibold text-red-300 mb-1">Errors ({syncResult.errors.length})</p>
+              {syncResult.errors.map((e, i) => (
+                <p key={i} className="text-xs text-red-400 font-mono">{e}</p>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -475,6 +502,20 @@ function ImapTab() {
           and schedule <code className="bg-blue-950 px-1 rounded">{"*/15 * * * *"}</code>.
         </p>
       </div>
+    </div>
+  )
+}
+
+function StatCard({ label, value, color, hint }: { label: string; value: number; color: "gray" | "blue" | "green"; hint: string }) {
+  const colors = {
+    gray:  "text-gray-200 bg-gray-800",
+    blue:  "text-indigo-300 bg-indigo-900/40",
+    green: "text-green-300 bg-green-900/40",
+  }
+  return (
+    <div className="bg-gray-800/60 border border-gray-700/50 rounded-xl p-3 text-center" title={hint}>
+      <p className={`text-2xl font-bold mb-0.5 ${colors[color].split(" ")[0]}`}>{value}</p>
+      <p className="text-[10px] text-gray-500 uppercase tracking-wide">{label}</p>
     </div>
   )
 }

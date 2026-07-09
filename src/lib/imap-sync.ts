@@ -16,15 +16,17 @@ interface ParsedMessage {
 }
 
 export interface SyncResult {
-  synced:  number
-  skipped: number
-  errors:  string[]
+  fetched:  number   // total messages fetched from IMAP folders
+  matched:  number   // messages matched to a CRM contact (demoCall)
+  synced:   number   // messages newly saved to DB
+  skipped:  number   // duplicates already in DB
+  errors:   string[]
 }
 
 // ─── Main sync entry point ────────────────────────────────────────────────────
 
 export async function syncImapForConfig(imapConfigId: string): Promise<SyncResult> {
-  const result: SyncResult = { synced: 0, skipped: 0, errors: [] }
+  const result: SyncResult = { fetched: 0, matched: 0, synced: 0, skipped: 0, errors: [] }
   console.log(`[imap-sync] Starting sync for config ${imapConfigId}`)
 
   const config = await prisma.imapConfig.findUnique({ where: { id: imapConfigId } })
@@ -79,10 +81,11 @@ export async function syncImapForConfig(imapConfigId: string): Promise<SyncResul
         console.log(`[imap-sync] Folder ${folder} has ${mailbox.exists} messages total`)
 
         const messages = await fetchFolder(client, thirtyDaysAgo)
+        result.fetched += messages.length
         console.log(`[imap-sync] Fetched ${messages.length} messages from ${folder}`)
 
         for (const msg of messages) {
-          const sub = await processMessage(msg, config.id, config.emailAddress)
+          const sub = await processMessage(msg, config.id, config.emailAddress, result)
           if (sub === "synced")  result.synced++
           if (sub === "skipped") result.skipped++
         }
@@ -176,6 +179,7 @@ async function processMessage(
   msg:          ParsedMessage,
   imapConfigId: string,
   configEmail:  string,
+  result:       SyncResult,
 ): Promise<"synced" | "skipped"> {
   // Skip if already stored (deduplicate by messageId)
   if (msg.messageId) {
@@ -196,6 +200,7 @@ async function processMessage(
     where: { contactEmail: { equals: contactEmail, mode: "insensitive" } },
     orderBy: { createdAt: "desc" },
   })
+  if (demoCall) result.matched++
 
   // Resolve threadId: check In-Reply-To first, then look for prior emails in same thread
   let threadId: string | null = null

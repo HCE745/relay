@@ -559,14 +559,14 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
   const [sending,     setSending]     = useState(false)
   const [error,       setError]       = useState("")
   const [showTpl,     setShowTpl]     = useState(false)
-  const [contactSearch, setContactSearch] = useState("")
-  const [showContacts,  setShowContacts]  = useState(false)
+  const [showContacts, setShowContacts] = useState(false)
 
+  // Search contacts against whatever is in the To field
   const filteredContacts = contacts.filter(c =>
-    contactSearch.length >= 1 &&
-    (c.contactName.toLowerCase().includes(contactSearch.toLowerCase()) ||
-     c.contactEmail.toLowerCase().includes(contactSearch.toLowerCase()) ||
-     c.companyName.toLowerCase().includes(contactSearch.toLowerCase()))
+    to.length >= 1 &&
+    (c.contactName.toLowerCase().includes(to.toLowerCase()) ||
+     c.contactEmail.toLowerCase().includes(to.toLowerCase()) ||
+     c.companyName.toLowerCase().includes(to.toLowerCase()))
   ).slice(0, 6)
 
   function applyTemplate(t: Template) {
@@ -577,7 +577,6 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
 
   function pickContact(c: Contact) {
     setTo(c.contactEmail)
-    setContactSearch("")
     setShowContacts(false)
   }
 
@@ -624,22 +623,16 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500 w-12 shrink-0">To</span>
               <input
-                value={to || contactSearch}
-                onChange={e => {
-                  const v = e.target.value
-                  if (to && v !== to) { setTo(""); setContactSearch(v) }
-                  else if (!to) { setContactSearch(v) }
-                  else { setTo(v) }
-                  setShowContacts(true)
-                }}
+                value={to}
+                onChange={e => { setTo(e.target.value); setShowContacts(true) }}
                 onFocus={() => setShowContacts(true)}
                 onBlur={() => setTimeout(() => setShowContacts(false), 150)}
                 placeholder="Email address or search contacts…"
                 className="flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600"
               />
-              {(to || contactSearch) && (
+              {to && (
                 <button
-                  onClick={() => { setTo(""); setContactSearch(""); setShowContacts(false) }}
+                  onClick={() => { setTo(""); setShowContacts(false) }}
                   className="text-gray-600 hover:text-white"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -647,13 +640,6 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
               )}
               <Search className="w-3.5 h-3.5 text-gray-700 shrink-0" />
             </div>
-            {to && (
-              <div className="mt-1 ml-14">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-900/60 border border-indigo-700 rounded-md text-xs text-indigo-300">
-                  <User className="w-3 h-3" />{to}
-                </span>
-              </div>
-            )}
             {showContacts && filteredContacts.length > 0 && (
               <div className="absolute left-14 right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-10 overflow-hidden">
                 {filteredContacts.map(c => (

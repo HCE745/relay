@@ -7436,6 +7436,7 @@ export const CrmEmailScalarFieldEnum = {
   threadId: 'threadId',
   sentAt: 'sentAt',
   source: 'source',
+  isRead: 'isRead',
   followUpDate: 'followUpDate',
   followUpDoneAt: 'followUpDoneAt',
   imapConfigId: 'imapConfigId',
@@ -7466,7 +7467,10 @@ export const ImapConfigScalarFieldEnum = {
   port: 'port',
   emailAddress: 'emailAddress',
   encryptedPassword: 'encryptedPassword',
+  smtpHost: 'smtpHost',
+  smtpPort: 'smtpPort',
   lastSyncAt: 'lastSyncAt',
+  lastSyncEmailCount: 'lastSyncEmailCount',
   enabled: 'enabled',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

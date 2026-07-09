@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { encryptField } from "@/lib/crypto-utils"
+import { syncImapForConfig } from "@/lib/imap-sync"
 
 async function requireSA() {
   const s = await getSession()
@@ -14,7 +15,11 @@ export async function GET() {
 
   const config = await prisma.imapConfig.findUnique({
     where:  { superAdminId: session.superAdminId! },
-    select: { id: true, host: true, port: true, emailAddress: true, lastSyncAt: true, enabled: true, updatedAt: true },
+    select: {
+      id: true, host: true, port: true, smtpHost: true, smtpPort: true,
+      emailAddress: true, lastSyncAt: true, lastSyncEmailCount: true,
+      enabled: true, updatedAt: true,
+    },
   })
 
   return NextResponse.json({ config })
@@ -24,9 +29,11 @@ export async function POST(req: NextRequest) {
   const session = await requireSA()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { host, port, emailAddress, password, enabled } = await req.json() as {
+  const { host, port, smtpHost, smtpPort, emailAddress, password, enabled } = await req.json() as {
     host?:         string
     port?:         number
+    smtpHost?:     string
+    smtpPort?:     number
     emailAddress:  string
     password?:     string
     enabled?:      boolean
@@ -36,37 +43,47 @@ export async function POST(req: NextRequest) {
 
   const existing = await prisma.imapConfig.findUnique({ where: { superAdminId: session.superAdminId! } })
 
+  let savedConfig
   if (existing) {
     const updateData: Record<string, unknown> = {
-      host:         host ?? existing.host,
-      port:         port ?? existing.port,
+      host:         host     ?? existing.host,
+      port:         port     ?? existing.port,
+      smtpHost:     smtpHost ?? existing.smtpHost,
+      smtpPort:     smtpPort ?? existing.smtpPort,
       emailAddress: emailAddress.trim(),
-      enabled:      enabled ?? existing.enabled,
+      enabled:      enabled  ?? existing.enabled,
     }
-    if (password) {
-      updateData.encryptedPassword = encryptField(password)
-    }
-    const config = await prisma.imapConfig.update({
+    if (password) updateData.encryptedPassword = encryptField(password)
+    savedConfig = await prisma.imapConfig.update({
       where: { superAdminId: session.superAdminId! },
       data:  updateData,
     })
-    return NextResponse.json({ config: { ...config, encryptedPassword: undefined } })
+  } else {
+    if (!password) return NextResponse.json({ error: "password required for new config" }, { status: 400 })
+    savedConfig = await prisma.imapConfig.create({
+      data: {
+        superAdminId:      session.superAdminId!,
+        host:              host     ?? "imap.titan.email",
+        port:              port     ?? 993,
+        smtpHost:          smtpHost ?? "smtp.titan.email",
+        smtpPort:          smtpPort ?? 465,
+        emailAddress:      emailAddress.trim(),
+        encryptedPassword: encryptField(password),
+        enabled:           enabled ?? true,
+      },
+    })
   }
 
-  if (!password) return NextResponse.json({ error: "password required for new config" }, { status: 400 })
+  const safeConfig = { ...savedConfig, encryptedPassword: undefined }
 
-  const config = await prisma.imapConfig.create({
-    data: {
-      superAdminId:      session.superAdminId!,
-      host:              host ?? "imap.titan.email",
-      port:              port ?? 993,
-      emailAddress:      emailAddress.trim(),
-      encryptedPassword: encryptField(password),
-      enabled:           enabled ?? true,
-    },
-  })
+  // Trigger an immediate sync in the background — don't await, don't block the response
+  if (savedConfig.enabled) {
+    syncImapForConfig(savedConfig.id)
+      .then(r => console.log(`[imap-config] Post-save sync: synced=${r.synced} skipped=${r.skipped}`))
+      .catch(err => console.error("[imap-config] Post-save sync error:", err))
+  }
 
-  return NextResponse.json({ config: { ...config, encryptedPassword: undefined } })
+  return NextResponse.json({ config: safeConfig, syncTriggered: savedConfig.enabled })
 }
 
 export async function DELETE() {

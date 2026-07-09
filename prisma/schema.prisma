@@ -1690,16 +1690,19 @@ model CrmEmailTemplate {
 }
 
 model ImapConfig {
-  id                String    @id @default(cuid())
-  superAdminId      String    @unique
-  host              String    @default("imap.titan.email")
-  port              Int       @default(993)
-  emailAddress      String
-  encryptedPassword String
-  lastSyncAt        DateTime?
-  enabled           Boolean   @default(true)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  superAdminId         String    @unique
+  host                 String    @default("imap.titan.email")
+  port                 Int       @default(993)
+  emailAddress         String
+  encryptedPassword    String
+  smtpHost             String    @default("smtp.titan.email")
+  smtpPort             Int       @default(465)
+  lastSyncAt           DateTime?
+  lastSyncEmailCount   Int       @default(0)
+  enabled              Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   superAdmin SuperAdmin @relation(fields: [superAdminId], references: [id], onDelete: Cascade)
   crmEmails  CrmEmail[]

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import {
   Settings, Mail, Server, BookOpen, Plus, Pencil, Trash2, Check,
   X, Eye, EyeOff, RefreshCw, ChevronDown, ChevronUp, ExternalLink,
+  Clock, CheckCircle2, AlertCircle,
 } from "lucide-react"
 
 type Tab = "templates" | "imap" | "guide"
@@ -17,11 +18,15 @@ interface Template {
 }
 
 interface ImapConfig {
-  host:         string
-  port:         number
-  emailAddress: string
-  lastSyncAt:   string | null
-  enabled:      boolean
+  id:                 string
+  host:               string
+  port:               number
+  smtpHost:           string
+  smtpPort:           number
+  emailAddress:       string
+  lastSyncAt:         string | null
+  lastSyncEmailCount: number
+  enabled:            boolean
 }
 
 export default function CrmSettingsPage() {
@@ -38,8 +43,8 @@ export default function CrmSettingsPage() {
       <div className="flex gap-1 mb-6 border-b border-gray-800 pb-0">
         {([
           { key: "templates", label: "Email Templates", icon: Mail },
-          { key: "imap",      label: "IMAP / Titan Sync", icon: Server },
-          { key: "guide",     label: "Setup Guide",    icon: BookOpen },
+          { key: "imap",      label: "IMAP / SMTP",     icon: Server },
+          { key: "guide",     label: "Setup Guide",     icon: BookOpen },
         ] as { key: Tab; label: string; icon: React.ElementType }[]).map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -125,7 +130,6 @@ function TemplatesTab() {
         )}
       </div>
 
-      {/* Create / Edit form */}
       {creating && (
         <div className="bg-gray-900 border border-gray-700 rounded-xl p-5 space-y-3">
           <h3 className="text-sm font-semibold text-white">{editingId ? "Edit Template" : "New Template"}</h3>
@@ -162,7 +166,6 @@ function TemplatesTab() {
         </div>
       )}
 
-      {/* Template list */}
       {loading ? (
         <p className="text-sm text-gray-500 py-4">Loading templates…</p>
       ) : (
@@ -208,7 +211,7 @@ function TemplatesTab() {
   )
 }
 
-// ─── IMAP Tab ─────────────────────────────────────────────────────────────────
+// ─── IMAP / SMTP Tab ──────────────────────────────────────────────────────────
 
 function ImapTab() {
   const [config,       setConfig]       = useState<ImapConfig | null>(null)
@@ -216,11 +219,13 @@ function ImapTab() {
   const [editing,      setEditing]      = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [syncing,      setSyncing]      = useState(false)
-  const [syncMsg,      setSyncMsg]      = useState("")
+  const [syncMsg,      setSyncMsg]      = useState<{ text: string; ok: boolean } | null>(null)
   const [saving,       setSaving]       = useState(false)
   const [error,        setError]        = useState("")
   const [form, setForm] = useState({
-    host: "imap.titan.email", port: 993, emailAddress: "", password: "", enabled: true,
+    host: "imap.titan.email", port: 993,
+    smtpHost: "smtp.titan.email", smtpPort: 465,
+    emailAddress: "", password: "", enabled: true,
   })
 
   async function load() {
@@ -229,7 +234,12 @@ function ImapTab() {
     const d = await r.json() as { config: ImapConfig | null }
     setConfig(d.config)
     if (d.config) {
-      setForm(p => ({ ...p, host: d.config!.host, port: d.config!.port, emailAddress: d.config!.emailAddress, enabled: d.config!.enabled }))
+      setForm(p => ({
+        ...p,
+        host: d.config!.host, port: d.config!.port,
+        smtpHost: d.config!.smtpHost, smtpPort: d.config!.smtpPort,
+        emailAddress: d.config!.emailAddress, enabled: d.config!.enabled,
+      }))
     }
     setLoading(false)
   }
@@ -245,98 +255,188 @@ function ImapTab() {
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ ...form, password: form.password || undefined }),
     })
-    if (!res.ok) { const d = await res.json() as { error: string }; setError(d.error); setSaving(false); return }
-    setEditing(false); void load(); setSaving(false)
+    const d = await res.json() as { config?: ImapConfig; syncTriggered?: boolean; error?: string }
+    if (!res.ok) { setError(d.error ?? "Save failed"); setSaving(false); return }
+    setEditing(false)
+    setSaving(false)
+    if (d.syncTriggered) {
+      setSyncMsg({ text: "Configuration saved. Initial sync started in the background — check back in a moment.", ok: true })
+    }
+    void load()
   }
 
   async function syncNow() {
-    setSyncing(true); setSyncMsg("")
-    const res  = await fetch("/api/super-admin/crm/imap-sync", { method: "POST" })
-    const data = await res.json() as { result?: { synced: number; errors: string[] }; error?: string }
-    setSyncMsg(data.error ?? (data.result ? `Synced ${data.result.synced} new email(s).` : "Done."))
+    setSyncing(true); setSyncMsg(null)
+    try {
+      const res  = await fetch("/api/super-admin/crm/imap-sync", { method: "POST" })
+      const data = await res.json() as { result?: { synced: number; skipped: number; errors: string[] }; error?: string }
+      if (data.error) {
+        setSyncMsg({ text: data.error, ok: false })
+      } else if (data.result) {
+        const r = data.result
+        const errs = r.errors.length ? ` Errors: ${r.errors.join(", ")}` : ""
+        setSyncMsg({ text: `Synced ${r.synced} new email(s), skipped ${r.skipped} duplicates.${errs}`, ok: r.errors.length === 0 })
+      } else {
+        setSyncMsg({ text: "Done.", ok: true })
+      }
+    } catch {
+      setSyncMsg({ text: "Sync request failed — check network", ok: false })
+    }
     setSyncing(false)
+    void load()
   }
 
   if (loading) return <p className="text-sm text-gray-500 py-4">Loading…</p>
 
   return (
     <div className="space-y-5">
+      {/* Sync status banner */}
+      {syncMsg && (
+        <div className={`flex items-start gap-2.5 px-4 py-3 rounded-xl text-sm border ${
+          syncMsg.ok
+            ? "bg-green-950/40 border-green-800/40 text-green-300"
+            : "bg-red-950/40 border-red-800/40 text-red-300"
+        }`}>
+          {syncMsg.ok
+            ? <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+            : <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
+          {syncMsg.text}
+        </div>
+      )}
+
+      {/* Last sync status card */}
+      {config && (
+        <div className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <Clock className="w-4 h-4 text-gray-500 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs text-gray-500">Last sync</p>
+              <p className="text-sm text-white font-medium">
+                {config.lastSyncAt
+                  ? new Date(config.lastSyncAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+                  : "Never synced"}
+              </p>
+            </div>
+            {config.lastSyncAt && (
+              <div className="ml-4 pl-4 border-l border-gray-800 min-w-0">
+                <p className="text-xs text-gray-500">Last run</p>
+                <p className="text-sm text-white font-medium">
+                  {config.lastSyncEmailCount} email{config.lastSyncEmailCount !== 1 ? "s" : ""} synced
+                </p>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={syncNow}
+            disabled={syncing}
+            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-medium rounded-lg transition-colors shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? "Syncing…" : "Sync Now"}
+          </button>
+        </div>
+      )}
+
+      {/* IMAP + SMTP config card */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-white flex items-center gap-2">
             <Server className="w-4 h-4 text-indigo-400" />
-            Titan IMAP Configuration
+            Titan IMAP / SMTP Configuration
           </h3>
           {config && !editing && (
-            <div className="flex items-center gap-2">
-              <button onClick={syncNow} disabled={syncing}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition-colors disabled:opacity-40">
-                <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
-                {syncing ? "Syncing…" : "Sync Now"}
-              </button>
-              <button onClick={() => setEditing(true)}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition-colors">
-                <Pencil className="w-3.5 h-3.5" />
-                Edit
-              </button>
-            </div>
+            <button onClick={() => setEditing(true)}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition-colors">
+              <Pencil className="w-3.5 h-3.5" />
+              Edit
+            </button>
           )}
         </div>
 
-        {syncMsg && <p className="text-xs text-green-400 mb-3">{syncMsg}</p>}
-
         {config && !editing ? (
           <div className="space-y-2 text-sm">
-            <Row label="Host"         value={config.host} />
-            <Row label="Port"         value={String(config.port)} />
-            <Row label="Email"        value={config.emailAddress} />
-            <Row label="Status"       value={config.enabled ? "Enabled" : "Disabled"} />
-            <Row label="Last synced"  value={config.lastSyncAt ? new Date(config.lastSyncAt).toLocaleString() : "Never"} />
+            <SectionLabel>IMAP (Incoming)</SectionLabel>
+            <Row label="Host"    value={`${config.host}:${config.port}`} />
+            <Row label="Email"   value={config.emailAddress} />
+            <SectionLabel>SMTP (Outgoing)</SectionLabel>
+            <Row label="Host"    value={`${config.smtpHost}:${config.smtpPort}`} />
+            <Row label="Email"   value={config.emailAddress} />
+            <SectionLabel>Status</SectionLabel>
+            <Row label="Sync"    value={config.enabled ? "Enabled" : "Disabled"} />
           </div>
         ) : (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-gray-400 block mb-1">IMAP Host</label>
-                <input value={form.host} onChange={e => setForm(p => ({ ...p, host: e.target.value }))}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500" />
-              </div>
-              <div>
-                <label className="text-xs text-gray-400 block mb-1">Port</label>
-                <input type="number" value={form.port} onChange={e => setForm(p => ({ ...p, port: Number(e.target.value) }))}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500" />
-              </div>
-            </div>
+          <div className="space-y-4">
+            {/* IMAP section */}
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Titan Email Address</label>
-              <input value={form.emailAddress} onChange={e => setForm(p => ({ ...p, emailAddress: e.target.value }))}
-                placeholder="will@getrelay.software"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500 placeholder-gray-600" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-400 block mb-1">
-                Password {config && <span className="text-gray-600">(leave blank to keep existing)</span>}
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={form.password}
-                  onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-                  placeholder={config ? "••••••••" : "Titan email password"}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pr-10 text-sm text-white outline-none focus:border-indigo-500 placeholder-gray-600"
-                />
-                <button onClick={() => setShowPassword(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">IMAP (Incoming — reads email)</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">IMAP Host</label>
+                  <input value={form.host} onChange={e => setForm(p => ({ ...p, host: e.target.value }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">IMAP Port</label>
+                  <input type="number" value={form.port} onChange={e => setForm(p => ({ ...p, port: Number(e.target.value) }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500" />
+                </div>
               </div>
-              <p className="text-xs text-gray-600 mt-1">Encrypted with AES-256-GCM using IMAP_ENCRYPTION_KEY.</p>
             </div>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="imap-enabled" checked={form.enabled} onChange={e => setForm(p => ({ ...p, enabled: e.target.checked }))}
-                className="rounded" />
-              <label htmlFor="imap-enabled" className="text-sm text-gray-300">Enable IMAP sync</label>
+
+            {/* SMTP section */}
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">SMTP (Outgoing — sends email)</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">SMTP Host</label>
+                  <input value={form.smtpHost} onChange={e => setForm(p => ({ ...p, smtpHost: e.target.value }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">SMTP Port</label>
+                  <input type="number" value={form.smtpPort} onChange={e => setForm(p => ({ ...p, smtpPort: Number(e.target.value) }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500" />
+                </div>
+              </div>
             </div>
+
+            {/* Shared credentials */}
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Credentials (shared for IMAP and SMTP)</p>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">Titan Email Address</label>
+                  <input value={form.emailAddress} onChange={e => setForm(p => ({ ...p, emailAddress: e.target.value }))}
+                    placeholder="will@getrelay.software"
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500 placeholder-gray-600" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">
+                    Password {config && <span className="text-gray-600">(leave blank to keep existing)</span>}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={form.password}
+                      onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                      placeholder={config ? "••••••••" : "Titan email password"}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pr-10 text-sm text-white outline-none focus:border-indigo-500 placeholder-gray-600"
+                    />
+                    <button onClick={() => setShowPassword(v => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">Encrypted with AES-256-GCM using IMAP_ENCRYPTION_KEY.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" id="imap-enabled" checked={form.enabled}
+                    onChange={e => setForm(p => ({ ...p, enabled: e.target.checked }))} className="rounded" />
+                  <label htmlFor="imap-enabled" className="text-sm text-gray-300">Enable IMAP sync</label>
+                </div>
+              </div>
+            </div>
+
             {error && <p className="text-xs text-red-400">{error}</p>}
             <div className="flex gap-2 pt-1">
               <button onClick={save} disabled={saving}
@@ -354,16 +454,32 @@ function ImapTab() {
         )}
       </div>
 
+      {!config && (
+        <div className="bg-blue-950/30 border border-blue-900/40 rounded-xl p-4">
+          <p className="text-xs text-blue-300 font-medium mb-1">No configuration yet</p>
+          <p className="text-xs text-blue-400">
+            Enter your Titan email credentials above to enable CRM email sending via SMTP and automatic
+            inbox/sent-folder sync every 15 minutes.
+          </p>
+        </div>
+      )}
+
       <div className="bg-blue-950/30 border border-blue-900/40 rounded-xl p-4">
         <p className="text-xs text-blue-300 font-medium mb-1">Sync Schedule</p>
         <p className="text-xs text-blue-400">
-          IMAP sync runs automatically every 15 minutes via the cron job at{" "}
-          <code className="bg-blue-950 px-1 rounded">/api/cron/imap-sync</code>.
-          Configure it in your Vercel dashboard with <code className="bg-blue-950 px-1 rounded">{"*/15 * * * *"}</code> schedule.
-          You can also trigger a manual sync using the "Sync Now" button above.
+          IMAP sync runs automatically every 15 minutes. Both the INBOX and Sent folders are synced.
+          Configure the cron job in Vercel dashboard with path{" "}
+          <code className="bg-blue-950 px-1 rounded">/api/cron/imap-sync</code>{" "}
+          and schedule <code className="bg-blue-950 px-1 rounded">{"*/15 * * * *"}</code>.
         </p>
       </div>
     </div>
+  )
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest pt-2 pb-0.5">{children}</p>
   )
 }
 
@@ -372,87 +488,57 @@ function ImapTab() {
 function GuideTab() {
   return (
     <div className="space-y-6">
-      <GuideSection title="Step 1 — Enable Resend Inbound Email">
+      <GuideSection title="Step 1 — Configure Titan IMAP / SMTP">
         <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
-          <li>Log into your <strong>Resend dashboard</strong> at resend.com.</li>
-          <li>Go to <strong>Settings → Inbound</strong>.</li>
-          <li>Enable inbound email for the domain <code className="bg-gray-800 px-1.5 rounded">getrelay.software</code>.</li>
-          <li>Set the webhook URL to:<br />
-            <code className="block bg-gray-800 px-3 py-2 rounded-lg mt-1 text-indigo-300 break-all">
-              https://app.getrelay.software/api/webhooks/crm-email
-            </code>
-          </li>
-          <li>Copy the inbound signing secret and add it to your env as <code className="bg-gray-800 px-1 rounded">RESEND_INBOUND_SECRET</code>.</li>
-        </ol>
-      </GuideSection>
-
-      <GuideSection title="Step 2 — Configure MX Records in Bluehost">
-        <p className="text-sm text-gray-300 mb-3">
-          For <code className="bg-gray-800 px-1.5 rounded">crm@getrelay.software</code> to receive email via Resend inbound, add these MX records in Bluehost:
-        </p>
-        <div className="bg-gray-800 rounded-xl overflow-hidden">
-          <table className="text-xs w-full">
-            <thead>
-              <tr className="border-b border-gray-700">
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">Type</th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">Name</th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">Value</th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">Priority</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700 text-gray-300">
-              <tr><td className="px-4 py-2">MX</td><td className="px-4 py-2">crm</td><td className="px-4 py-2">inbound-smtp.resend.com</td><td className="px-4 py-2">10</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p className="text-xs text-gray-500 mt-2">
-          DNS propagation takes up to 48 hours. After setting the MX record, test by sending an email to crm@getrelay.software.
-        </p>
-      </GuideSection>
-
-      <GuideSection title="Step 3 — Configure Titan IMAP">
-        <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
-          <li>Go to the <strong>IMAP / Titan Sync</strong> tab in this settings page.</li>
+          <li>Go to the <strong>IMAP / SMTP</strong> tab.</li>
           <li>Enter your Titan email credentials:
             <ul className="list-disc list-inside ml-4 mt-1 space-y-1 text-gray-400">
-              <li>Host: <code className="bg-gray-800 px-1 rounded">imap.titan.email</code></li>
-              <li>Port: <code className="bg-gray-800 px-1 rounded">993</code> (TLS)</li>
+              <li>IMAP Host: <code className="bg-gray-800 px-1 rounded">imap.titan.email</code> · Port <code className="bg-gray-800 px-1 rounded">993</code></li>
+              <li>SMTP Host: <code className="bg-gray-800 px-1 rounded">smtp.titan.email</code> · Port <code className="bg-gray-800 px-1 rounded">465</code></li>
               <li>Email: your Titan email address</li>
               <li>Password: your Titan email password</li>
             </ul>
           </li>
-          <li>Save. The first sync will run immediately, pulling the last 30 days of email.</li>
-          <li>Add the cron job in Vercel dashboard (see below).</li>
+          <li>Click <strong>Save Configuration</strong>. An initial sync will start automatically.</li>
+          <li>Add the cron job in Vercel (see Step 3 below).</li>
         </ol>
       </GuideSection>
 
-      <GuideSection title="Step 4 — Set Up 15-Minute Cron Job (Vercel)">
+      <GuideSection title="Step 2 — Enable Resend Inbound (optional — for crm@ alias)">
+        <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
+          <li>Log into your <strong>Resend dashboard</strong> at resend.com.</li>
+          <li>Go to <strong>Settings → Inbound</strong> and enable inbound email for <code className="bg-gray-800 px-1.5 rounded">getrelay.software</code>.</li>
+          <li>Set webhook URL to:
+            <code className="block bg-gray-800 px-3 py-2 rounded-lg mt-1 text-indigo-300 break-all">
+              https://app.getrelay.software/api/webhooks/crm-email
+            </code>
+          </li>
+          <li>Add <code className="bg-gray-800 px-1 rounded">RESEND_INBOUND_SECRET</code> to your Vercel env vars.</li>
+        </ol>
+      </GuideSection>
+
+      <GuideSection title="Step 3 — Set Up 15-Minute Cron Job (Vercel)">
         <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
           <li>In your Vercel project, go to <strong>Settings → Cron Jobs</strong>.</li>
-          <li>Add a new cron job:
-            <ul className="list-disc list-inside ml-4 mt-1 space-y-1 text-gray-400">
-              <li>Path: <code className="bg-gray-800 px-1 rounded">/api/cron/imap-sync</code></li>
-              <li>Schedule: <code className="bg-gray-800 px-1 rounded">{"*/15 * * * *"}</code></li>
-            </ul>
-          </li>
-          <li>Set the <code className="bg-gray-800 px-1 rounded">CRON_SECRET</code> environment variable in Vercel and make sure it matches your local env.</li>
+          <li>Add a cron job: path <code className="bg-gray-800 px-1 rounded">/api/cron/imap-sync</code> · schedule <code className="bg-gray-800 px-1 rounded">{"*/15 * * * *"}</code>.</li>
+          <li>Set <code className="bg-gray-800 px-1 rounded">CRON_SECRET</code> in Vercel env vars.</li>
         </ol>
       </GuideSection>
 
       <GuideSection title="Required Environment Variables">
         <div className="bg-gray-800 rounded-xl p-4 font-mono text-xs space-y-2">
-          <EnvLine name="RESEND_INBOUND_SECRET" desc="Signing secret from Resend inbound settings" />
-          <EnvLine name="IMAP_ENCRYPTION_KEY"  desc="32+ char random string to encrypt IMAP passwords (generate with: openssl rand -base64 32)" />
+          <EnvLine name="IMAP_ENCRYPTION_KEY"  desc="32+ char random string for encrypting credentials (openssl rand -base64 32)" />
           <EnvLine name="CRON_SECRET"           desc="Secret for authenticating cron job requests" />
-          <EnvLine name="RESEND_API_KEY"        desc="Resend API key (already set)" />
+          <EnvLine name="RESEND_API_KEY"        desc="Resend API key — used for all non-CRM transactional emails" />
+          <EnvLine name="RESEND_INBOUND_SECRET" desc="Optional — only needed for crm@ inbound webhook" />
         </div>
       </GuideSection>
 
       <div className="flex items-center gap-2 text-xs text-indigo-400">
         <ExternalLink className="w-3.5 h-3.5" />
-        <a href="https://resend.com/docs/dashboard/domains/inbound" target="_blank" rel="noopener noreferrer"
+        <a href="https://help.titan.email/hc/en-us/articles/900000002426" target="_blank" rel="noopener noreferrer"
           className="hover:underline">
-          Resend Inbound Email Documentation
+          Titan Email IMAP/SMTP Settings
         </a>
       </div>
     </div>
@@ -481,7 +567,7 @@ function EnvLine({ name, desc }: { name: string; desc: string }) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="text-xs text-gray-500 w-24 shrink-0">{label}</span>
+      <span className="text-xs text-gray-500 w-16 shrink-0">{label}</span>
       <span className="text-sm text-gray-200">{value}</span>
     </div>
   )

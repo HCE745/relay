@@ -3,6 +3,8 @@ import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { htmlToText } from "@/lib/html-to-text"
 import { logSAAction } from "@/lib/sa-audit"
+import { decryptField } from "@/lib/crypto-utils"
+import { sendViaTitanSmtp } from "@/lib/titan-smtp"
 
 async function requireSA() {
   const s = await getSession()
@@ -85,33 +87,55 @@ export async function POST(req: NextRequest) {
     // Build a unique Message-ID
     const messageId = `<${Date.now()}.${Math.random().toString(36).slice(2)}@getrelay.software>`
 
-    // Send via Resend
-    const RESEND_API_KEY = process.env.RESEND_API_KEY
-    if (!RESEND_API_KEY) {
-      console.error("[crm-email] RESEND_API_KEY not set")
-      return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 })
-    }
+    // Prefer Titan SMTP if a config is present, else fall back to Resend
+    const imapCfg = session.superAdminId
+      ? await prisma.imapConfig.findUnique({ where: { superAdminId: session.superAdminId } })
+      : null
 
-    const resendPayload: Record<string, unknown> = {
-      from:    "Will @ Relay <will@getrelay.software>",
-      to:      [to],
-      subject,
-      html:    bodyHtml,
-      text:    bodyText,
-      headers: { "Message-ID": messageId, ...(inReplyTo ? { "In-Reply-To": inReplyTo } : {}) },
-    }
-    if (cc) resendPayload.cc = [cc]
-
-    const sendRes = await fetch("https://api.resend.com/emails", {
-      method:  "POST",
-      headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body:    JSON.stringify(resendPayload),
-    })
-
-    if (!sendRes.ok) {
-      const err = await sendRes.text()
-      console.error("[crm-email] Resend rejected:", sendRes.status, err)
-      return NextResponse.json({ error: `Resend error: ${err}` }, { status: 502 })
+    if (imapCfg) {
+      let smtpPassword: string
+      try {
+        smtpPassword = decryptField(imapCfg.encryptedPassword)
+      } catch {
+        return NextResponse.json({ error: "Failed to decrypt SMTP credentials — check IMAP_ENCRYPTION_KEY" }, { status: 500 })
+      }
+      console.log(`[crm-email] Sending via Titan SMTP (${imapCfg.smtpHost}:${imapCfg.smtpPort})`)
+      await sendViaTitanSmtp(
+        {
+          smtpHost:     imapCfg.smtpHost,
+          smtpPort:     imapCfg.smtpPort,
+          emailAddress: imapCfg.emailAddress,
+          password:     smtpPassword,
+          fromName:     "Will @ Relay",
+        },
+        { to, cc, subject, bodyHtml, bodyText, messageId, inReplyTo },
+      )
+    } else {
+      // Fallback: Resend
+      const RESEND_API_KEY = process.env.RESEND_API_KEY
+      if (!RESEND_API_KEY) {
+        console.error("[crm-email] No IMAP config and RESEND_API_KEY not set")
+        return NextResponse.json({ error: "No SMTP configuration found — add one in CRM Settings" }, { status: 500 })
+      }
+      const resendPayload: Record<string, unknown> = {
+        from:    "Will @ Relay <will@getrelay.software>",
+        to:      [to],
+        subject,
+        html:    bodyHtml,
+        text:    bodyText,
+        headers: { "Message-ID": messageId, ...(inReplyTo ? { "In-Reply-To": inReplyTo } : {}) },
+      }
+      if (cc) resendPayload.cc = [cc]
+      const sendRes = await fetch("https://api.resend.com/emails", {
+        method:  "POST",
+        headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+        body:    JSON.stringify(resendPayload),
+      })
+      if (!sendRes.ok) {
+        const err = await sendRes.text()
+        console.error("[crm-email] Resend rejected:", sendRes.status, err)
+        return NextResponse.json({ error: `Resend error: ${err}` }, { status: 502 })
+      }
     }
 
     // Determine threadId: use existing or self
@@ -121,12 +145,14 @@ export async function POST(req: NextRequest) {
       resolvedThreadId = parent?.threadId ?? parent?.id ?? null
     }
 
+    const fromAddress = imapCfg ? imapCfg.emailAddress : "will@getrelay.software"
+
     const email = await prisma.crmEmail.create({
       data: {
         demoCallId:   demoCallId ?? null,
         contactEmail: to,
         direction:    "sent",
-        fromAddress:  "will@getrelay.software",
+        fromAddress,
         toAddress:    to,
         cc:           cc ?? null,
         subject,

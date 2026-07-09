@@ -392,13 +392,18 @@ function ThreadDetail({ thread, onBack, onReplySuccess }: {
         }),
       })
       if (!res.ok) {
-        const d = await res.json() as { error: string }
-        setError(d.error ?? "Failed to send"); return
+        let msg = `Server error ${res.status}`
+        try {
+          const d = await res.json() as { error?: string }
+          msg = d.error ?? msg
+        } catch { /* body was not JSON */ }
+        setError(msg); return
       }
       setReplyText("")
       onReplySuccess()
-    } catch {
-      setError("Network error")
+    } catch (err) {
+      console.error("[reply] send failed:", err)
+      setError(err instanceof Error ? err.message : "Network error")
     } finally {
       setSending(false)
     }
@@ -594,12 +599,17 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
         body:    JSON.stringify({ to: to.trim(), subject: subject.trim(), bodyHtml }),
       })
       if (!res.ok) {
-        const d = await res.json() as { error: string }
-        setError(d.error ?? "Failed to send."); return
+        let msg = `Server error ${res.status}`
+        try {
+          const d = await res.json() as { error?: string }
+          msg = d.error ?? msg
+        } catch { /* body was not JSON */ }
+        setError(msg); return
       }
       onSent()
-    } catch {
-      setError("Network error — please try again.")
+    } catch (err) {
+      console.error("[compose] send failed:", err)
+      setError(err instanceof Error ? err.message : "Network error — please try again.")
     } finally {
       setSending(false)
     }

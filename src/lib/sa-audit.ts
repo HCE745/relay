@@ -20,6 +20,8 @@ export type AuditAction =
   // Referrals
   | "CREATE_REFERRAL"
   | "UPDATE_REFERRAL"
+  // CRM
+  | "SEND_CRM_EMAIL"
 
 export async function logSAAction({
   superAdminId,

@@ -7,7 +7,7 @@ import {
   Clock, CheckCircle2, AlertCircle,
 } from "lucide-react"
 
-type Tab = "templates" | "imap" | "guide"
+type Tab = "templates" | "imap" | "guide" | "debug"
 
 interface Template {
   id:       string
@@ -45,6 +45,7 @@ export default function CrmSettingsPage() {
           { key: "templates", label: "Email Templates", icon: Mail },
           { key: "imap",      label: "IMAP / SMTP",     icon: Server },
           { key: "guide",     label: "Setup Guide",     icon: BookOpen },
+          { key: "debug",     label: "Diagnostics",     icon: AlertCircle },
         ] as { key: Tab; label: string; icon: React.ElementType }[]).map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -64,6 +65,7 @@ export default function CrmSettingsPage() {
       {tab === "templates" && <TemplatesTab />}
       {tab === "imap"      && <ImapTab />}
       {tab === "guide"     && <GuideTab />}
+      {tab === "debug"     && <DiagnosticsTab />}
     </div>
   )
 }
@@ -569,6 +571,93 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="flex items-center gap-4">
       <span className="text-xs text-gray-500 w-16 shrink-0">{label}</span>
       <span className="text-sm text-gray-200">{value}</span>
+    </div>
+  )
+}
+
+// ─── Diagnostics Tab ──────────────────────────────────────────────────────────
+
+function DiagnosticsTab() {
+  const [testLogs,    setTestLogs]    = useState<string[]>([])
+  const [syncLogs,    setSyncLogs]    = useState<string[]>([])
+  const [testRunning, setTestRunning] = useState(false)
+  const [syncRunning, setSyncRunning] = useState(false)
+
+  async function runTest() {
+    setTestRunning(true); setTestLogs([])
+    try {
+      const res  = await fetch("/api/super-admin/crm/test-imap")
+      const data = await res.json() as { ok: boolean; steps: string[] }
+      setTestLogs(data.steps)
+    } catch (err) {
+      setTestLogs([`Request failed: ${err instanceof Error ? err.message : String(err)}`])
+    }
+    setTestRunning(false)
+  }
+
+  async function runDebugSync() {
+    setSyncRunning(true); setSyncLogs([])
+    try {
+      const res  = await fetch("/api/super-admin/crm/debug-sync", { method: "POST" })
+      const data = await res.json() as { ok: boolean; synced?: number; skipped?: number; logs: string[] }
+      setSyncLogs(data.logs)
+    } catch (err) {
+      setSyncLogs([`Request failed: ${err instanceof Error ? err.message : String(err)}`])
+    }
+    setSyncRunning(false)
+  }
+
+  return (
+    <div className="space-y-5">
+      <p className="text-sm text-gray-400">
+        Run these checks to diagnose why emails are not appearing in the CRM. All output is shown inline — nothing is hidden.
+      </p>
+
+      {/* IMAP connection test */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-semibold text-white">IMAP Connection Test</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Checks config, decrypts password, connects, lists folders, shows recent message headers, counts DB records.</p>
+          </div>
+          <button
+            onClick={runTest}
+            disabled={testRunning}
+            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-medium rounded-lg transition-colors shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${testRunning ? "animate-spin" : ""}`} />
+            {testRunning ? "Running…" : "Run Test"}
+          </button>
+        </div>
+        {testLogs.length > 0 && (
+          <pre className="bg-gray-950 border border-gray-800 rounded-lg p-4 text-xs text-green-300 font-mono leading-relaxed overflow-x-auto whitespace-pre-wrap">
+            {testLogs.join("\n")}
+          </pre>
+        )}
+      </div>
+
+      {/* Debug sync */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-semibold text-white">Debug Sync (verbose)</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Runs a full IMAP sync and logs every message fetch, contact match, and DB save/skip attempt.</p>
+          </div>
+          <button
+            onClick={runDebugSync}
+            disabled={syncRunning}
+            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-medium rounded-lg transition-colors shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${syncRunning ? "animate-spin" : ""}`} />
+            {syncRunning ? "Syncing…" : "Run Debug Sync"}
+          </button>
+        </div>
+        {syncLogs.length > 0 && (
+          <pre className="bg-gray-950 border border-gray-800 rounded-lg p-4 text-xs text-green-300 font-mono leading-relaxed overflow-x-auto whitespace-pre-wrap">
+            {syncLogs.join("\n")}
+          </pre>
+        )}
+      </div>
     </div>
   )
 }

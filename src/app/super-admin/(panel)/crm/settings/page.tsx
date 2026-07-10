@@ -223,13 +223,19 @@ function TemplatesTab() {
 
 // ─── IMAP / SMTP Tab ──────────────────────────────────────────────────────────
 
+interface ConnectionTest {
+  ok:   boolean
+  text: string
+}
+
 function ImapTab() {
   const [config,       setConfig]       = useState<ImapConfig | null>(null)
   const [loading,      setLoading]      = useState(true)
   const [editing,      setEditing]      = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [syncing,      setSyncing]      = useState(false)
-  const [resetting,    setResetting]    = useState(false)
+  const [busy,         setBusy]         = useState(false)   // covers reset + test + sync
+  const [phase,        setPhase]        = useState("")      // human-readable current step
+  const [connTest,     setConnTest]     = useState<ConnectionTest | null>(null)
   const [syncMsg,      setSyncMsg]      = useState<{ text: string; ok: boolean } | null>(null)
   const [syncResult,   setSyncResult]   = useState<SyncRunResult | null>(null)
   const [saving,       setSaving]       = useState(false)
@@ -242,7 +248,7 @@ function ImapTab() {
 
   async function load() {
     setLoading(true)
-    const r = await fetch("/api/super-admin/crm/imap-config")
+    const r = await fetch("/api/super-admin/crm/imap-config", { credentials: "include" })
     const d = await r.json() as { config: ImapConfig | null }
     setConfig(d.config)
     if (d.config) {
@@ -263,9 +269,10 @@ function ImapTab() {
     if (!config && !form.password) { setError("Password required for new configuration"); return }
     setSaving(true); setError("")
     const res = await fetch("/api/super-admin/crm/imap-config", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ ...form, password: form.password || undefined }),
+      method:      "POST",
+      credentials: "include",
+      headers:     { "Content-Type": "application/json" },
+      body:        JSON.stringify({ ...form, password: form.password || undefined }),
     })
     const d = await res.json() as { config?: ImapConfig; syncTriggered?: boolean; error?: string }
     if (!res.ok) { setError(d.error ?? "Save failed"); setSaving(false); return }
@@ -277,50 +284,114 @@ function ImapTab() {
     void load()
   }
 
-  async function runSync(statusPrefix = "") {
-    setSyncing(true); setSyncMsg(null); setSyncResult(null)
+  // ── Step: test IMAP connection ─────────────────────────────────────────────
+  async function testConnection(): Promise<boolean> {
+    setPhase("Testing IMAP connection…")
+    setConnTest(null)
     try {
-      const res  = await fetch("/api/super-admin/crm/run-imap-sync", { method: "POST" })
-      const data = await res.json() as SyncRunResult & { error?: string }
+      const res = await fetch("/api/super-admin/crm/test-imap", { credentials: "include" })
+      if (res.status === 401) {
+        setConnTest({ ok: false, text: "Session not recognised — try refreshing the page and signing in again." })
+        return false
+      }
+      const data = await res.json() as {
+        env?:      { IMAP_ENCRYPTION_KEY?: string }
+        decrypt?:  { status: string; error?: string }
+        attempts?: { config: string; status: string; error?: { message?: string; responseText?: string; response?: string } }[]
+      }
+      const encKey  = data.env?.IMAP_ENCRYPTION_KEY ?? "unknown"
+      const decrypt = data.decrypt?.status ?? "unknown"
+      const conn0   = data.attempts?.[0]
+      const connOk  = conn0?.status === "ok"
+      if (!connOk) {
+        const errDetail = conn0?.error?.responseText ?? conn0?.error?.response ?? conn0?.error?.message ?? "no detail"
+        setConnTest({ ok: false, text: `IMAP connection failed (${conn0?.config ?? "n/a"}): ${errDetail} | enc-key: ${encKey} | decrypt: ${decrypt}` })
+        return false
+      }
+      setConnTest({ ok: true, text: `IMAP connected OK (${conn0.config}) | enc-key: ${encKey} | decrypt: ${decrypt}` })
+      return true
+    } catch (err) {
+      setConnTest({ ok: false, text: `test-imap request failed: ${err instanceof Error ? err.message : String(err)}` })
+      return false
+    }
+  }
+
+  // ── Step: run the actual sync ──────────────────────────────────────────────
+  async function runSync() {
+    setPhase("Syncing emails…")
+    setSyncResult(null)
+    try {
+      const res  = await fetch("/api/super-admin/crm/run-imap-sync", {
+        method:      "POST",
+        credentials: "include",
+      })
+      let data: SyncRunResult & { error?: string }
+      try {
+        data = await res.json() as SyncRunResult & { error?: string }
+      } catch {
+        setSyncMsg({ text: `Sync returned non-JSON (status ${res.status}) — check Vercel logs`, ok: false })
+        return
+      }
       if (!res.ok || data.error) {
-        setSyncMsg({ text: data.error ?? `Server error ${res.status}`, ok: false })
+        setSyncMsg({ text: data.error ?? `Sync failed (HTTP ${res.status})`, ok: false })
       } else {
         setSyncResult(data)
+        const summary = `Sync complete — fetched ${data.fetched}, saved ${data.saved}, skipped ${data.skipped}`
         if (data.errors.length) {
-          setSyncMsg({ text: `${statusPrefix}Completed with ${data.errors.length} error(s) — see details below`, ok: false })
+          setSyncMsg({ text: `${summary} — ${data.errors.length} error(s), see below`, ok: false })
+        } else {
+          setSyncMsg({ text: summary, ok: true })
         }
       }
     } catch (err) {
       setSyncMsg({ text: err instanceof Error ? err.message : "Sync request failed", ok: false })
     }
-    setSyncing(false)
-    void load()
   }
 
-  function syncNow() { return runSync() }
-
+  // ── Reset + test + sync ────────────────────────────────────────────────────
   async function resetAndSync() {
-    setResetting(true); setSyncMsg(null); setSyncResult(null)
+    setBusy(true); setSyncMsg(null); setSyncResult(null); setConnTest(null)
+
+    // 1. Reset lastSyncAt so the 90-day window is used
+    setPhase("Resetting sync history…")
     try {
       const res = await fetch("/api/super-admin/crm/imap-config", {
-        method:  "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ resetSyncHistory: true }),
+        method:      "PATCH",
+        credentials: "include",
+        headers:     { "Content-Type": "application/json" },
+        body:        JSON.stringify({ resetSyncHistory: true }),
       })
       if (!res.ok) {
         const d = await res.json() as { error?: string }
         setSyncMsg({ text: d.error ?? "Reset failed", ok: false })
-        setResetting(false)
+        setBusy(false); setPhase("")
         return
       }
     } catch (err) {
       setSyncMsg({ text: err instanceof Error ? err.message : "Reset request failed", ok: false })
-      setResetting(false)
+      setBusy(false); setPhase("")
       return
     }
-    setResetting(false)
-    // lastSyncAt is now null → sync will use the 90-day window
-    await runSync("Re-sync after reset: ")
+
+    // 2. Test connection first — confirms auth + credentials work before sync
+    const connOk = await testConnection()
+    if (!connOk) {
+      setBusy(false); setPhase("")
+      return
+    }
+
+    // 3. Run the full sync
+    await runSync()
+    void load()
+    setBusy(false); setPhase("")
+  }
+
+  // ── Quick sync (no reset, no pre-test) ────────────────────────────────────
+  async function syncNow() {
+    setBusy(true); setSyncMsg(null); setSyncResult(null); setConnTest(null)
+    await runSync()
+    void load()
+    setBusy(false); setPhase("")
   }
 
   if (loading) return <p className="text-sm text-gray-500 py-4">Loading…</p>
@@ -351,29 +422,43 @@ function ImapTab() {
                 Manual Sync
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">
-                Pulls INBOX and Sent folders from Titan (last 30 days). Auto-sync runs every 15 min via cron.
+                Pulls INBOX and Sent folders (90 days on first run, incremental after). Auto-sync runs every 15 min via cron.
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => void resetAndSync()}
-                disabled={syncing || resetting}
-                title="Clears lastSyncAt then runs a full 90-day re-scan"
+                disabled={busy}
+                title="Clears lastSyncAt, tests IMAP connection, then runs a full 90-day re-scan"
                 className="flex items-center gap-1.5 px-3 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-gray-200 text-sm font-medium rounded-lg transition-colors"
               >
-                <RefreshCw className={`w-4 h-4 ${resetting ? "animate-spin" : ""}`} />
-                {resetting ? "Resetting…" : "Reset & Re-sync"}
+                <RefreshCw className={`w-4 h-4 ${busy && phase !== "Syncing emails…" ? "animate-spin" : ""}`} />
+                {busy && phase !== "Syncing emails…" ? (phase || "Working…") : "Reset & Re-sync"}
               </button>
               <button
                 onClick={() => void syncNow()}
-                disabled={syncing || resetting}
+                disabled={busy}
                 className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors"
               >
-                <RefreshCw className={`w-4 h-4 ${syncing && !resetting ? "animate-spin" : ""}`} />
-                {syncing && !resetting ? "Syncing…" : "Sync Now"}
+                <RefreshCw className={`w-4 h-4 ${busy && phase === "Syncing emails…" ? "animate-spin" : ""}`} />
+                {busy && phase === "Syncing emails…" ? "Syncing…" : "Sync Now"}
               </button>
             </div>
           </div>
+
+          {/* Connection test result — shown after Reset & Re-sync runs the test step */}
+          {connTest && (
+            <div className={`flex items-start gap-2 text-xs px-3 py-2 rounded-lg mb-3 ${
+              connTest.ok
+                ? "bg-green-950/40 border border-green-800/40 text-green-300"
+                : "bg-red-950/40 border border-red-800/40 text-red-300"
+            }`}>
+              {connTest.ok
+                ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                : <AlertCircle  className="w-3.5 h-3.5 shrink-0 mt-0.5" />}
+              <span className="font-mono break-all">{connTest.text}</span>
+            </div>
+          )}
 
           {/* Last sync timestamp */}
           <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">

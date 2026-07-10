@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import {
-  X, Send, ChevronDown, Bold, Italic, List, Link2, RotateCcw,
+  X, Send, ChevronDown, Bold, Italic, List, Link2, RotateCcw, AlertTriangle,
 } from "lucide-react"
 
 interface Template {
@@ -43,7 +43,12 @@ export function CrmEmailCompose({
   const [showCc,    setShowCc]    = useState(false)
   const [templates, setTemplates] = useState<Template[]>([])
   const [showTpl,   setShowTpl]   = useState(false)
-  const editorRef                 = useRef<HTMLDivElement>(null)
+  // Company name override — used when the record has no company name set
+  const [companyName,      setCompanyName]      = useState(demoCtx.companyName)
+  const [showCompanyInput, setShowCompanyInput] = useState(false)
+  const [pendingTpl,       setPendingTpl]       = useState<Template | null>(null)
+  const [savingCompany,    setSavingCompany]     = useState(false)
+  const editorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     fetch("/api/super-admin/crm/email-templates")
@@ -58,22 +63,62 @@ export function CrmEmailCompose({
     }
   }, [initialBody])
 
-  function applyMergeTags(text: string): string {
+  function applyMergeTags(text: string, overrideCompany?: string): string {
+    const company = overrideCompany ?? companyName
     const demoDate = demoCtx.scheduledAt
       ? new Date(demoCtx.scheduledAt).toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" })
       : "[demo date]"
     return text
       .replace(/\{\{contact_name\}\}/g, demoCtx.contactName)
-      .replace(/\{\{company_name\}\}/g, demoCtx.companyName)
+      // If company name is still blank, leave the tag in place so the user can see it needs filling
+      .replace(/\{\{company_name\}\}/g, company || "{{company_name}}")
       .replace(/\{\{demo_date\}\}/g,    demoDate)
   }
 
   function applyTemplate(t: Template) {
+    const templateText = t.subject + t.body
+    const needsCompany = templateText.includes("{{company_name}}") && !companyName.trim()
+
+    if (needsCompany) {
+      // Hold the template, ask for company name first
+      setPendingTpl(t)
+      setShowCompanyInput(true)
+      setShowTpl(false)
+      return
+    }
+
     setSubject(applyMergeTags(t.subject))
     if (editorRef.current) {
       editorRef.current.innerHTML = applyMergeTags(t.body).replace(/\n/g, "<br>")
     }
     setShowTpl(false)
+  }
+
+  async function confirmCompanyName() {
+    const name = companyName.trim()
+    if (!name) return
+
+    // Save the company name back to the DemoCall record
+    setSavingCompany(true)
+    try {
+      await fetch(`/api/super-admin/crm/demo-calls/${demoCallId}`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ companyName: name }),
+      })
+    } catch { /* non-fatal */ }
+    setSavingCompany(false)
+
+    setShowCompanyInput(false)
+
+    // Apply the pending template now that we have a company name
+    if (pendingTpl) {
+      setSubject(applyMergeTags(pendingTpl.subject, name))
+      if (editorRef.current) {
+        editorRef.current.innerHTML = applyMergeTags(pendingTpl.body, name).replace(/\n/g, "<br>")
+      }
+      setPendingTpl(null)
+    }
   }
 
   function execCmd(cmd: string, value?: string) {
@@ -94,6 +139,19 @@ export function CrmEmailCompose({
       setError("To, Subject, and Body are required.")
       return
     }
+
+    // Block if any merge tags are still unresolved
+    const unresolvedTag = /\{\{[^}]+\}\}/.exec(bodyHtml) ?? /\{\{[^}]+\}\}/.exec(subject)
+    if (unresolvedTag) {
+      if (unresolvedTag[0] === "{{company_name}}") {
+        setError("Fill in the company name before sending.")
+        setShowCompanyInput(true)
+      } else {
+        setError(`Unresolved merge tag: ${unresolvedTag[0]}`)
+      }
+      return
+    }
+
     setSending(true)
     setError("")
     try {
@@ -130,7 +188,7 @@ export function CrmEmailCompose({
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {/* To / CC */}
+          {/* To / CC / Subject */}
           <div className="border-b border-gray-800 px-5 py-3 space-y-2">
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-500 w-8 shrink-0">To</span>
@@ -164,6 +222,29 @@ export function CrmEmailCompose({
                 placeholder="Subject"
               />
             </div>
+
+            {/* Company name prompt — shown when a template needs it */}
+            {showCompanyInput && (
+              <div className="flex items-center gap-3 rounded-lg bg-yellow-950/40 border border-yellow-700/50 px-3 py-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
+                <span className="text-xs text-yellow-400 shrink-0">Company name:</span>
+                <input
+                  value={companyName}
+                  onChange={e => setCompanyName(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") void confirmCompanyName() }}
+                  placeholder="e.g. Acme Corp"
+                  autoFocus
+                  className="flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600"
+                />
+                <button
+                  onClick={() => void confirmCompanyName()}
+                  disabled={!companyName.trim() || savingCompany}
+                  className="text-xs px-2.5 py-1 bg-yellow-700/70 hover:bg-yellow-700 text-yellow-100 rounded disabled:opacity-40 transition-colors shrink-0"
+                >
+                  {savingCompany ? "…" : pendingTpl ? "Apply" : "Save"}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Toolbar */}

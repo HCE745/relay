@@ -7,7 +7,8 @@ import { decryptField } from "@/lib/crypto-utils"
 interface ParsedMessage {
   messageId:   string | null
   inReplyTo:   string | null
-  from:        string
+  from:        string  // email address only
+  fromName:    string  // display name from From header
   to:          string
   subject:     string
   bodyHtml:    string
@@ -134,8 +135,16 @@ async function fetchFolder(client: import("imapflow").ImapFlow, since: Date): Pr
 
       const parsed = await simpleParser(msg.source)
 
-      const from    = addressToString(parsed.from?.value?.[0]) ?? ""
-      const to      = addressToString(parsed.to && !Array.isArray(parsed.to) ? parsed.to.value[0] : (parsed.to as import("mailparser").AddressObject[])?.[0]?.value?.[0]) ?? ""
+      const fromAddr = parsed.from?.value?.[0]
+      const toAddr   = parsed.to && !Array.isArray(parsed.to)
+        ? parsed.to.value[0]
+        : (parsed.to as import("mailparser").AddressObject[])?.[0]?.value?.[0]
+
+      const from     = fromAddr?.address ?? ""
+      const fromName = (fromAddr?.name?.trim() && fromAddr.name.trim() !== fromAddr.address)
+        ? fromAddr.name.trim()
+        : from.split("@")[0]
+      const to       = toAddr?.address ?? ""
       const subject = parsed.subject ?? "(no subject)"
       const sentAt  = parsed.date ?? new Date()
       const msgId   = normalizeMessageId(parsed.messageId ?? null)
@@ -147,6 +156,7 @@ async function fetchFolder(client: import("imapflow").ImapFlow, since: Date): Pr
         messageId: msgId,
         inReplyTo: inReply,
         from,
+        fromName,
         to,
         subject,
         bodyHtml: html || `<pre style="white-space:pre-wrap">${escapeHtml(text)}</pre>`,
@@ -159,12 +169,6 @@ async function fetchFolder(client: import("imapflow").ImapFlow, since: Date): Pr
   }
 
   return messages
-}
-
-function addressToString(addr: import("mailparser").EmailAddress | undefined): string | undefined {
-  if (!addr) return undefined
-  if (addr.address) return addr.address
-  return undefined
 }
 
 function normalizeMessageId(raw: string | null | undefined): string | null {
@@ -195,11 +199,28 @@ async function processMessage(
   const direction    = fromLower === configLower ? "sent" : "received"
   const contactEmail = direction === "sent" ? msg.to : msg.from
 
-  // Try to find a matching demo call by either From or To
-  const demoCall = await prisma.demoCall.findFirst({
+  // Try to find a matching demo call, or auto-create one for inbound emails
+  let demoCall = await prisma.demoCall.findFirst({
     where: { contactEmail: { equals: contactEmail, mode: "insensitive" } },
     orderBy: { createdAt: "desc" },
   })
+
+  if (!demoCall && direction === "received" && contactEmail) {
+    // Auto-create a Lead from an unknown inbound sender
+    const domain = msg.from.split("@")[1] ?? "Unknown"
+    demoCall = await prisma.demoCall.create({
+      data: {
+        contactName:     msg.fromName,
+        contactEmail:    msg.from.toLowerCase(),
+        companyName:     domain,
+        leadSource:      "Email Inbound",
+        callStatus:      "Lead",
+        createdBySAName: "IMAP Sync",
+      },
+    })
+    console.log(`[imap-sync] Auto-created Lead: ${msg.fromName} <${msg.from}>`)
+  }
+
   if (demoCall) result.matched++
 
   // Resolve threadId: check In-Reply-To first, then look for prior emails in same thread

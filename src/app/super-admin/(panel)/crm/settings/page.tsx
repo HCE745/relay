@@ -229,6 +229,7 @@ function ImapTab() {
   const [editing,      setEditing]      = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [syncing,      setSyncing]      = useState(false)
+  const [resetting,    setResetting]    = useState(false)
   const [syncMsg,      setSyncMsg]      = useState<{ text: string; ok: boolean } | null>(null)
   const [syncResult,   setSyncResult]   = useState<SyncRunResult | null>(null)
   const [saving,       setSaving]       = useState(false)
@@ -276,7 +277,7 @@ function ImapTab() {
     void load()
   }
 
-  async function syncNow() {
+  async function runSync(statusPrefix = "") {
     setSyncing(true); setSyncMsg(null); setSyncResult(null)
     try {
       const res  = await fetch("/api/super-admin/crm/run-imap-sync", { method: "POST" })
@@ -286,7 +287,7 @@ function ImapTab() {
       } else {
         setSyncResult(data)
         if (data.errors.length) {
-          setSyncMsg({ text: `Completed with ${data.errors.length} error(s) — see details below`, ok: false })
+          setSyncMsg({ text: `${statusPrefix}Completed with ${data.errors.length} error(s) — see details below`, ok: false })
         }
       }
     } catch (err) {
@@ -294,6 +295,32 @@ function ImapTab() {
     }
     setSyncing(false)
     void load()
+  }
+
+  function syncNow() { return runSync() }
+
+  async function resetAndSync() {
+    setResetting(true); setSyncMsg(null); setSyncResult(null)
+    try {
+      const res = await fetch("/api/super-admin/crm/imap-config", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ resetSyncHistory: true }),
+      })
+      if (!res.ok) {
+        const d = await res.json() as { error?: string }
+        setSyncMsg({ text: d.error ?? "Reset failed", ok: false })
+        setResetting(false)
+        return
+      }
+    } catch (err) {
+      setSyncMsg({ text: err instanceof Error ? err.message : "Reset request failed", ok: false })
+      setResetting(false)
+      return
+    }
+    setResetting(false)
+    // lastSyncAt is now null → sync will use the 90-day window
+    await runSync("Re-sync after reset: ")
   }
 
   if (loading) return <p className="text-sm text-gray-500 py-4">Loading…</p>
@@ -327,14 +354,25 @@ function ImapTab() {
                 Pulls INBOX and Sent folders from Titan (last 30 days). Auto-sync runs every 15 min via cron.
               </p>
             </div>
-            <button
-              onClick={syncNow}
-              disabled={syncing}
-              className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
-            >
-              <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
-              {syncing ? "Syncing…" : "Sync Now"}
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => void resetAndSync()}
+                disabled={syncing || resetting}
+                title="Clears lastSyncAt then runs a full 90-day re-scan"
+                className="flex items-center gap-1.5 px-3 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-gray-200 text-sm font-medium rounded-lg transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${resetting ? "animate-spin" : ""}`} />
+                {resetting ? "Resetting…" : "Reset & Re-sync"}
+              </button>
+              <button
+                onClick={() => void syncNow()}
+                disabled={syncing || resetting}
+                className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${syncing && !resetting ? "animate-spin" : ""}`} />
+                {syncing && !resetting ? "Syncing…" : "Sync Now"}
+              </button>
+            </div>
           </div>
 
           {/* Last sync timestamp */}

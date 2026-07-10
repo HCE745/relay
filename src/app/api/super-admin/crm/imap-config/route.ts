@@ -86,6 +86,23 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ config: safeConfig, syncTriggered: savedConfig.enabled })
 }
 
+export async function PATCH(req: NextRequest) {
+  const session = await requireSA()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const body = await req.json() as { resetSyncHistory?: boolean }
+
+  if (body.resetSyncHistory) {
+    await prisma.imapConfig.updateMany({
+      where: { superAdminId: session.superAdminId! },
+      data:  { lastSyncAt: null, lastSyncEmailCount: 0 },
+    })
+    return NextResponse.json({ ok: true })
+  }
+
+  return NextResponse.json({ error: "Unknown action" }, { status: 400 })
+}
+
 export async function DELETE() {
   const session = await requireSA()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

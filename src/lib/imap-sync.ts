@@ -71,7 +71,13 @@ export async function syncImapForConfig(imapConfigId: string): Promise<SyncResul
     await client.connect()
     console.log("[imap-sync] Connected and authenticated")
 
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    // First run: go back 90 days to capture all recent history.
+    // Subsequent runs: overlap by 1 day so we never miss messages at the boundary.
+    const sinceDate = config.lastSyncAt
+      ? new Date(config.lastSyncAt.getTime() - 24 * 60 * 60 * 1000)
+      : new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+    console.log(`[imap-sync] Date range: since ${sinceDate.toISOString()} (lastSyncAt=${config.lastSyncAt?.toISOString() ?? "null — first run, using 90 days"})`)
+
     const folders = ["INBOX", "Sent", "Sent Items", "Sent Messages"]
 
     for (const folder of folders) {
@@ -79,9 +85,9 @@ export async function syncImapForConfig(imapConfigId: string): Promise<SyncResul
         console.log(`[imap-sync] Opening folder: ${folder}`)
         const mailbox = await client.mailboxOpen(folder)
         if (!mailbox) { console.log(`[imap-sync] Folder ${folder} not found — skipping`); continue }
-        console.log(`[imap-sync] Folder ${folder} has ${mailbox.exists} messages total`)
+        console.log(`[imap-sync] Folder ${folder}: ${mailbox.exists} messages total`)
 
-        const messages = await fetchFolder(client, thirtyDaysAgo)
+        const messages = await fetchFolder(client, sinceDate)
         result.fetched += messages.length
         console.log(`[imap-sync] Fetched ${messages.length} messages from ${folder}`)
 
@@ -119,12 +125,12 @@ export async function syncImapForConfig(imapConfigId: string): Promise<SyncResul
 async function fetchFolder(client: import("imapflow").ImapFlow, since: Date): Promise<ParsedMessage[]> {
   const messages: ParsedMessage[] = []
 
-  const uids = await client.search({ since })
-  if (!uids || uids.length === 0) {
-    console.log("[imap-sync] No messages found in this date range")
-    return messages
-  }
-  console.log(`[imap-sync] Found ${uids.length} UIDs to fetch`)
+  console.log(`[imap-sync] SEARCH SINCE ${since.toISOString()}`)
+  const rawUids = await client.search({ since })
+  const uids    = Array.isArray(rawUids) ? rawUids : []
+  console.log(`[imap-sync] Search returned: ${Array.isArray(rawUids) ? `${rawUids.length} UIDs` : `false (empty mailbox or search error)`}`)
+  if (uids.length === 0) return messages
+  console.log(`[imap-sync] Fetching ${uids.length} messages…`)
 
   // Import mailparser for proper MIME handling
   const { simpleParser } = await import("mailparser") as typeof import("mailparser")

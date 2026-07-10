@@ -28,31 +28,59 @@ export interface SyncResult {
 
 export async function syncImapForConfig(imapConfigId: string): Promise<SyncResult> {
   const result: SyncResult = { fetched: 0, matched: 0, synced: 0, skipped: 0, errors: [] }
-  console.log(`[imap-sync] Starting sync for config ${imapConfigId}`)
+  const t0 = Date.now()
+  console.error(`[imap-sync] ═══ START syncImapForConfig(${imapConfigId}) ═══`)
 
+  // ── Load config ───────────────────────────────────────────────────────────
   const config = await prisma.imapConfig.findUnique({ where: { id: imapConfigId } })
   if (!config) {
-    console.log("[imap-sync] Config not found — skipping")
+    console.error("[imap-sync] ABORT: config not found in DB")
     return result
   }
-  if (!config.enabled) {
-    console.log("[imap-sync] Config disabled — skipping")
-    return result
-  }
-  console.log(`[imap-sync] Config: ${config.emailAddress} @ ${config.host}:${config.port}`)
+  console.error(`[imap-sync] Config loaded:`)
+  console.error(`[imap-sync]   email:       ${config.emailAddress}`)
+  console.error(`[imap-sync]   host:        ${config.host}`)
+  console.error(`[imap-sync]   port:        ${config.port}`)
+  console.error(`[imap-sync]   enabled:     ${config.enabled}`)
+  console.error(`[imap-sync]   lastSyncAt:  ${config.lastSyncAt?.toISOString() ?? "null (first run)"}`)
+  console.error(`[imap-sync]   encPwdLen:   ${config.encryptedPassword?.length ?? 0} chars`)
 
+  if (!config.enabled) {
+    console.error("[imap-sync] ABORT: sync disabled in config")
+    return result
+  }
+
+  // ── Decrypt password ──────────────────────────────────────────────────────
   let password: string
   try {
     password = decryptField(config.encryptedPassword)
-    console.log("[imap-sync] Decrypted IMAP password OK")
+    console.error(`[imap-sync] Password decrypted OK (length: ${password.length})`)
   } catch (err) {
-    const msg = "Failed to decrypt IMAP password — check IMAP_ENCRYPTION_KEY"
-    console.error("[imap-sync]", msg, err)
+    const msg = `Failed to decrypt IMAP password: ${err instanceof Error ? err.message : String(err)}`
+    console.error("[imap-sync] ABORT:", msg)
     result.errors.push(msg)
     return result
   }
 
+  // ── Compute date range ────────────────────────────────────────────────────
+  // First run (lastSyncAt=null): go back 90 days to capture all recent history.
+  // Subsequent runs: overlap 1 day so we don't miss messages at the boundary.
+  // IMPORTANT: if lastSyncAt was set by a previous zero-result sync, it may be
+  // too recent and will miss older emails. Warn when this is the case.
+  const INITIAL_DAYS = 90
+  const sinceDate = config.lastSyncAt
+    ? new Date(config.lastSyncAt.getTime() - 24 * 60 * 60 * 1000)
+    : new Date(Date.now() - INITIAL_DAYS * 24 * 60 * 60 * 1000)
+
+  const sinceDaysAgo = Math.round((Date.now() - sinceDate.getTime()) / (24 * 60 * 60 * 1000))
+  console.error(`[imap-sync] Since date: ${sinceDate.toISOString()} (~${sinceDaysAgo} days ago)`)
+  if (config.lastSyncAt && sinceDaysAgo < 2) {
+    console.error(`[imap-sync] WARNING: lastSyncAt is very recent (${sinceDaysAgo} days ago). If a previous sync returned 0, this will also return 0. Reset lastSyncAt to null to force a full re-scan.`)
+  }
+
+  // ── Connect ───────────────────────────────────────────────────────────────
   const { ImapFlow } = await import("imapflow") as typeof import("imapflow")
+  console.error(`[imap-sync] Connecting to ${config.host}:${config.port} (secure=true)…`)
 
   const client = new ImapFlow({
     host:    config.host,
@@ -67,52 +95,53 @@ export async function syncImapForConfig(imapConfigId: string): Promise<SyncResul
   })
 
   try {
-    console.log(`[imap-sync] Connecting to ${config.host}:${config.port}…`)
     await client.connect()
-    console.log("[imap-sync] Connected and authenticated")
-
-    // First run: go back 90 days to capture all recent history.
-    // Subsequent runs: overlap by 1 day so we never miss messages at the boundary.
-    const sinceDate = config.lastSyncAt
-      ? new Date(config.lastSyncAt.getTime() - 24 * 60 * 60 * 1000)
-      : new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
-    console.log(`[imap-sync] Date range: since ${sinceDate.toISOString()} (lastSyncAt=${config.lastSyncAt?.toISOString() ?? "null — first run, using 90 days"})`)
+    console.error("[imap-sync] Connected and authenticated OK")
 
     const folders = ["INBOX", "Sent", "Sent Items", "Sent Messages"]
 
     for (const folder of folders) {
+      console.error(`[imap-sync] ── folder: ${folder} ──`)
       try {
-        console.log(`[imap-sync] Opening folder: ${folder}`)
         const mailbox = await client.mailboxOpen(folder)
-        if (!mailbox) { console.log(`[imap-sync] Folder ${folder} not found — skipping`); continue }
-        console.log(`[imap-sync] Folder ${folder}: ${mailbox.exists} messages total`)
+        if (!mailbox) {
+          console.error(`[imap-sync] mailboxOpen returned null — skipping`)
+          continue
+        }
+        console.error(`[imap-sync] Opened ${folder}: ${mailbox.exists} messages total in mailbox`)
 
         const messages = await fetchFolder(client, sinceDate)
         result.fetched += messages.length
-        console.log(`[imap-sync] Fetched ${messages.length} messages from ${folder}`)
+        console.error(`[imap-sync] fetchFolder returned ${messages.length} parsed messages`)
 
         for (const msg of messages) {
           const sub = await processMessage(msg, config.id, config.emailAddress, result)
           if (sub === "synced")  result.synced++
           if (sub === "skipped") result.skipped++
         }
-        console.log(`[imap-sync] Folder ${folder} done — synced: ${result.synced}, skipped: ${result.skipped}`)
+        console.error(`[imap-sync] Folder ${folder} done — synced=${result.synced} skipped=${result.skipped}`)
       } catch (err) {
-        const msg = `Folder ${folder}: ${err instanceof Error ? err.message : String(err)}`
-        console.log(`[imap-sync] Skipping folder (${msg})`)
-        // Don't push to errors — missing folders are expected
+        const detail = err instanceof Error
+          ? `${err.message} | response=${(err as unknown as Record<string,unknown>)["responseText"] ?? (err as unknown as Record<string,unknown>)["response"] ?? "n/a"}`
+          : String(err)
+        console.error(`[imap-sync] Folder ${folder} error (will skip): ${detail}`)
+        // Expected for folders that don't exist — don't push to result.errors
       }
     }
 
+    // Only update lastSyncAt when we actually connected successfully.
+    // Use lastSyncEmailCount = total synced so far (cumulative).
     await prisma.imapConfig.update({
       where: { id: imapConfigId },
       data:  { lastSyncAt: new Date(), lastSyncEmailCount: result.synced },
     })
-    console.log(`[imap-sync] Sync complete — synced: ${result.synced}, skipped: ${result.skipped}`)
+    console.error(`[imap-sync] ═══ DONE in ${Date.now() - t0}ms — fetched=${result.fetched} synced=${result.synced} skipped=${result.skipped} errors=${result.errors.length} ═══`)
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error("[imap-sync] Fatal error:", err)
-    result.errors.push(msg)
+    const detail = err instanceof Error
+      ? `${err.message} | code=${(err as unknown as Record<string,unknown>)["code"] ?? "n/a"} | response=${(err as unknown as Record<string,unknown>)["responseText"] ?? (err as unknown as Record<string,unknown>)["response"] ?? "n/a"}`
+      : String(err)
+    console.error(`[imap-sync] FATAL: ${detail}`)
+    result.errors.push(detail)
   } finally {
     try { await client.logout() } catch { /* ignore */ }
   }
@@ -125,19 +154,32 @@ export async function syncImapForConfig(imapConfigId: string): Promise<SyncResul
 async function fetchFolder(client: import("imapflow").ImapFlow, since: Date): Promise<ParsedMessage[]> {
   const messages: ParsedMessage[] = []
 
-  console.log(`[imap-sync] SEARCH SINCE ${since.toISOString()}`)
-  const rawUids = await client.search({ since })
-  const uids    = Array.isArray(rawUids) ? rawUids : []
-  console.log(`[imap-sync] Search returned: ${Array.isArray(rawUids) ? `${rawUids.length} UIDs` : `false (empty mailbox or search error)`}`)
-  if (uids.length === 0) return messages
-  console.log(`[imap-sync] Fetching ${uids.length} messages…`)
+  console.error(`[imap-sync] IMAP SEARCH SINCE ${since.toISOString()}`)
+  let rawUids: number[] | false
+  try {
+    rawUids = await client.search({ since })
+  } catch (err) {
+    console.error(`[imap-sync] client.search() threw: ${err instanceof Error ? err.message : String(err)}`)
+    return messages
+  }
+  const uids = Array.isArray(rawUids) ? rawUids : []
+  console.error(`[imap-sync] client.search() returned: ${Array.isArray(rawUids) ? `${rawUids.length} UIDs` : "false (server returned no match or empty mailbox)"}`)
+  if (uids.length === 0) {
+    console.error("[imap-sync] 0 UIDs — nothing to fetch for this folder/date range")
+    return messages
+  }
+  console.error(`[imap-sync] Fetching full source for UIDs: ${uids.slice(0, 10).join(",")}${uids.length > 10 ? `… (+${uids.length - 10} more)` : ""}`)
 
-  // Import mailparser for proper MIME handling
   const { simpleParser } = await import("mailparser") as typeof import("mailparser")
+  let fetchCount = 0
 
   for await (const msg of client.fetch(uids, { source: true })) {
+    fetchCount++
     try {
-      if (!msg.source) continue
+      if (!msg.source) {
+        console.error(`[imap-sync] UID ${msg.uid}: source is empty — skipping`)
+        continue
+      }
 
       const parsed = await simpleParser(msg.source)
 
@@ -150,13 +192,15 @@ async function fetchFolder(client: import("imapflow").ImapFlow, since: Date): Pr
       const fromName = (fromAddr?.name?.trim() && fromAddr.name.trim() !== fromAddr.address)
         ? fromAddr.name.trim()
         : from.split("@")[0]
-      const to       = toAddr?.address ?? ""
+      const to      = toAddr?.address ?? ""
       const subject = parsed.subject ?? "(no subject)"
       const sentAt  = parsed.date ?? new Date()
       const msgId   = normalizeMessageId(parsed.messageId ?? null)
       const inReply = normalizeMessageId(parsed.inReplyTo ?? null)
       const html    = parsed.html || ""
       const text    = parsed.text || ""
+
+      console.error(`[imap-sync] UID ${msg.uid}: from=${from} to=${to} subject="${subject}" msgId=${msgId ?? "none"}`)
 
       messages.push({
         messageId: msgId,
@@ -170,9 +214,10 @@ async function fetchFolder(client: import("imapflow").ImapFlow, since: Date): Pr
         sentAt,
       })
     } catch (err) {
-      console.warn("[imap-sync] Failed to parse message:", err instanceof Error ? err.message : err)
+      console.error(`[imap-sync] UID ${msg.uid}: parse error — ${err instanceof Error ? err.message : String(err)}`)
     }
   }
+  console.error(`[imap-sync] fetch loop done: ${fetchCount} streamed, ${messages.length} successfully parsed`)
 
   return messages
 }

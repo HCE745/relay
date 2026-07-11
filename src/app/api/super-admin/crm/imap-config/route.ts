@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { encryptField } from "@/lib/crypto-utils"
-import { syncImapForConfig } from "@/lib/imap-sync"
 
 async function requireSA() {
   const s = await getSession()
@@ -76,14 +75,7 @@ export async function POST(req: NextRequest) {
 
   const safeConfig = { ...savedConfig, encryptedPassword: undefined }
 
-  // Trigger an immediate sync in the background — don't await, don't block the response
-  if (savedConfig.enabled) {
-    syncImapForConfig(savedConfig.id)
-      .then(r => console.log(`[imap-config] Post-save sync: synced=${r.synced} skipped=${r.skipped}`))
-      .catch(err => console.error("[imap-config] Post-save sync error:", err))
-  }
-
-  return NextResponse.json({ config: safeConfig, syncTriggered: savedConfig.enabled })
+  return NextResponse.json({ config: safeConfig, syncTriggered: false })
 }
 
 export async function PATCH(req: NextRequest) {

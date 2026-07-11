@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { decryptField } from "@/lib/crypto-utils"
@@ -6,7 +6,7 @@ import { decryptField } from "@/lib/crypto-utils"
 export const maxDuration = 60
 export const dynamic = "force-dynamic"
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   // ── This is the very first line — confirms the handler is reached ──────────
   process.stdout.write("[run-imap-sync] HANDLER CALLED\n")
   console.error("[run-imap-sync] HANDLER CALLED")
@@ -59,13 +59,24 @@ export async function POST() {
     return NextResponse.json({ error: msg }, { status: 500 })
   }
 
+  // ── Parse body ────────────────────────────────────────────────────────────
+  let full = false
+  try {
+    const body = await req.json() as { full?: boolean }
+    full = body.full === true
+  } catch { /* no body is fine */ }
+  console.error(`[run-imap-sync] full=${full}`)
+
   // ── Date range ────────────────────────────────────────────────────────────
-  const since = config.lastSyncAt
-    ? new Date(config.lastSyncAt.getTime() - 86_400_000)   // 1-day overlap on subsequent runs
-    : new Date(Date.now() - 90 * 86_400_000)               // 90-day window on first run
+  // full=true (Reset & Re-sync): always use 90-day window, ignore lastSyncAt.
+  // This makes the button immune to the race condition where a background sync
+  // set lastSyncAt right after the PATCH reset.
+  const since = (full || !config.lastSyncAt)
+    ? new Date(Date.now() - 90 * 86_400_000)               // 90-day window
+    : new Date(config.lastSyncAt.getTime() - 86_400_000)   // 1-day overlap on subsequent runs
   const sinceDays = Math.round((Date.now() - since.getTime()) / 86_400_000)
   console.error(`[run-imap-sync] Since: ${since.toISOString()} (~${sinceDays} days ago)`)
-  if (sinceDays < 2) {
+  if (!full && sinceDays < 2) {
     console.error("[run-imap-sync] WARNING: since date is very recent — a previous zero-result sync may have set lastSyncAt. Use Reset & Re-sync to clear it.")
   }
 
@@ -102,7 +113,12 @@ export async function POST() {
       const uids = Array.isArray(raw) ? raw : []
       console.error(`[run-imap-sync] ${folder}: search SINCE ${since.toISOString()} → ${uids.length} UIDs${uids.length ? `: ${uids.slice(0, 15).join(",")}${uids.length > 15 ? "…" : ""}` : ""}`)
 
-      if (uids.length === 0) return
+      if (uids.length === 0) {
+        if (mb.exists > 0) {
+          console.error(`[run-imap-sync] ${folder}: WARNING — mailbox has ${mb.exists} messages but SEARCH returned 0. The since date (${since.toISOString()}) may be too recent. Run Reset & Re-sync with full=true to override.`)
+        }
+        return
+      }
 
       for await (const msg of client.fetch(uids, { source: true })) {
         fetched++

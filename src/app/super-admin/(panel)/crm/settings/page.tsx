@@ -278,9 +278,7 @@ function ImapTab() {
     if (!res.ok) { setError(d.error ?? "Save failed"); setSaving(false); return }
     setEditing(false)
     setSaving(false)
-    if (d.syncTriggered) {
-      setSyncMsg({ text: "Configuration saved. Initial sync started in the background — check back in a moment.", ok: true })
-    }
+    setSyncMsg({ text: "Configuration saved. Use Reset & Re-sync to pull the last 90 days of email.", ok: true })
     void load()
   }
 
@@ -317,13 +315,15 @@ function ImapTab() {
   }
 
   // ── Step: run the actual sync ──────────────────────────────────────────────
-  async function runSync() {
+  async function runSync(full = false) {
     setPhase("Syncing emails…")
     setSyncResult(null)
     try {
       const res  = await fetch("/api/super-admin/crm/run-imap-sync", {
         method:      "POST",
         credentials: "include",
+        headers:     { "Content-Type": "application/json" },
+        body:        JSON.stringify({ full }),
       })
       let data: SyncRunResult & { error?: string }
       try {
@@ -380,8 +380,8 @@ function ImapTab() {
       return
     }
 
-    // 3. Run the full sync
-    await runSync()
+    // 3. Run the full sync (full=true bypasses lastSyncAt, always uses 90-day window)
+    await runSync(true)
     void load()
     setBusy(false); setPhase("")
   }

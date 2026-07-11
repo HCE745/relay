@@ -7,9 +7,16 @@ export const maxDuration = 60
 export const dynamic = "force-dynamic"
 
 export async function POST(req: NextRequest) {
-  // ── This is the very first line — confirms the handler is reached ──────────
-  process.stdout.write("[run-imap-sync] HANDLER CALLED\n")
-  console.error("[run-imap-sync] HANDLER CALLED")
+  // ── Parse body FIRST — before any async ops so the stream is still open ───
+  let full = false
+  try {
+    const body = await req.json() as { full?: boolean }
+    full = body.full === true
+  } catch { /* empty body or non-JSON is fine */ }
+
+  // ── This is the second line — confirms the handler is reached ──────────
+  process.stdout.write(`[run-imap-sync] HANDLER CALLED full=${full}\n`)
+  console.error(`[run-imap-sync] HANDLER CALLED full=${full}`)
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   const session = await getSession()
@@ -59,23 +66,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: msg }, { status: 500 })
   }
 
-  // ── Parse body ────────────────────────────────────────────────────────────
-  let full = false
-  try {
-    const body = await req.json() as { full?: boolean }
-    full = body.full === true
-  } catch { /* no body is fine */ }
-  console.error(`[run-imap-sync] full=${full}`)
-
   // ── Date range ────────────────────────────────────────────────────────────
   // full=true (Reset & Re-sync): always use 90-day window, ignore lastSyncAt.
-  // This makes the button immune to the race condition where a background sync
-  // set lastSyncAt right after the PATCH reset.
-  const since = (full || !config.lastSyncAt)
-    ? new Date(Date.now() - 90 * 86_400_000)               // 90-day window
-    : new Date(config.lastSyncAt.getTime() - 86_400_000)   // 1-day overlap on subsequent runs
-  const sinceDays = Math.round((Date.now() - since.getTime()) / 86_400_000)
-  console.error(`[run-imap-sync] Since: ${since.toISOString()} (~${sinceDays} days ago)`)
+  const nowMs   = Date.now()
+  const since   = (full || !config.lastSyncAt)
+    ? new Date(nowMs - 90 * 86_400_000)
+    : new Date(config.lastSyncAt.getTime() - 86_400_000)
+  const sinceMs   = since.getTime()
+  const sinceDays = Math.round((nowMs - sinceMs) / 86_400_000)
+  console.error(`[run-imap-sync] Date calc: nowMs=${nowMs} full=${full} lastSyncAt=${config.lastSyncAt?.toISOString() ?? "null"}`)
+  console.error(`[run-imap-sync] Since: ${since.toISOString()} getTime=${sinceMs} (~${sinceDays} days ago) isValid=${!isNaN(sinceMs)}`)
   if (!full && sinceDays < 2) {
     console.error("[run-imap-sync] WARNING: since date is very recent — a previous zero-result sync may have set lastSyncAt. Use Reset & Re-sync to clear it.")
   }
@@ -83,14 +83,40 @@ export async function POST(req: NextRequest) {
   // Non-null assertion after guard above — captured so the closure below sees it
   const cfg = config
 
+  // ── Protocol logger — captures SEARCH/FETCH lines from imapflow internals ─
+  const protoLog: string[] = []
+  const imapLogger = {
+    debug: (obj: Record<string, unknown>) => {
+      const msg = String(obj["msg"] ?? "")
+      if (/SEARCH|FETCH|SELECT|EXAMINE/i.test(msg)) {
+        protoLog.push(`DBG: ${msg}`)
+        console.error(`[run-imap-sync][proto] ${msg}`)
+      }
+    },
+    info:  (obj: Record<string, unknown>) => {
+      const msg = String(obj["msg"] ?? "")
+      protoLog.push(`INF: ${msg}`)
+      console.error(`[run-imap-sync][proto] ${msg}`)
+    },
+    warn:  (obj: Record<string, unknown>) => { console.error(`[run-imap-sync][proto:W] ${String(obj["msg"] ?? "")}`) },
+    error: (obj: Record<string, unknown>) => { console.error(`[run-imap-sync][proto:E] ${String(obj["msg"] ?? "")}`) },
+    child: function() { return this },
+    trace: () => {},
+    fatal: () => {},
+  }
+
   // ── Connect ───────────────────────────────────────────────────────────────
   const client = new ImapFlow({
-    host:   config.host,
-    port:   config.port,
-    secure: true,
-    logger: false,
-    auth:   { user: config.emailAddress, pass: password },
-    tls:    { rejectUnauthorized: false },
+    host:              config.host,
+    port:              config.port,
+    secure:            true,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    logger:            imapLogger as any,
+    auth:              { user: config.emailAddress, pass: password },
+    tls:               { rejectUnauthorized: false },
+    connectionTimeout: 10_000,
+    greetingTimeout:   8_000,
+    socketTimeout:     20_000,
   })
 
   let fetched = 0, matched = 0, saved = 0, skipped = 0
@@ -109,13 +135,18 @@ export async function POST(req: NextRequest) {
       const mb = await client.mailboxOpen(folder)
       console.error(`[run-imap-sync] ${folder}: ${mb.exists} messages total in mailbox`)
 
+      // Log the exact since value being passed to imapflow so we can compare
+      // with what the test-imap endpoint uses
+      console.error(`[run-imap-sync] ${folder}: calling search({ since: new Date(${sinceMs}) }) = ${since.toISOString()}`)
       const raw = await client.search({ since })
+      // Log the raw return value — imapflow returns number[] | false
+      console.error(`[run-imap-sync] ${folder}: raw search result: typeof=${typeof raw} isArray=${Array.isArray(raw)} isFalse=${raw === false} value=${JSON.stringify(Array.isArray(raw) ? raw.slice(0, 20) : raw)}`)
       const uids = Array.isArray(raw) ? raw : []
-      console.error(`[run-imap-sync] ${folder}: search SINCE ${since.toISOString()} → ${uids.length} UIDs${uids.length ? `: ${uids.slice(0, 15).join(",")}${uids.length > 15 ? "…" : ""}` : ""}`)
+      console.error(`[run-imap-sync] ${folder}: → ${uids.length} UIDs${uids.length ? `: ${uids.slice(0, 15).join(",")}${uids.length > 15 ? "…" : ""}` : ""}`)
 
       if (uids.length === 0) {
         if (mb.exists > 0) {
-          console.error(`[run-imap-sync] ${folder}: WARNING — mailbox has ${mb.exists} messages but SEARCH returned 0. The since date (${since.toISOString()}) may be too recent. Run Reset & Re-sync with full=true to override.`)
+          console.error(`[run-imap-sync] ${folder}: WARNING — mailbox has ${mb.exists} messages but SEARCH returned 0. The since date (${since.toISOString()}, ${sinceDays} days ago) may be too recent for these emails. Use Reset & Re-sync (which passes full=true) to force 90-day window.`)
         }
         return
       }

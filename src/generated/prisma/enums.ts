@@ -76,3 +76,59 @@ export const ReferralRewardStatus = {
 } as const
 
 export type ReferralRewardStatus = (typeof ReferralRewardStatus)[keyof typeof ReferralRewardStatus]
+
+
+export const AssignmentStatus = {
+  pending: 'pending',
+  acknowledged: 'acknowledged',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  cancelled: 'cancelled'
+} as const
+
+export type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
+
+
+export const AssignmentPriority = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  critical: 'critical'
+} as const
+
+export type AssignmentPriority = (typeof AssignmentPriority)[keyof typeof AssignmentPriority]
+
+
+export const AnnouncementPriority = {
+  normal: 'normal',
+  urgent: 'urgent',
+  emergency: 'emergency'
+} as const
+
+export type AnnouncementPriority = (typeof AnnouncementPriority)[keyof typeof AnnouncementPriority]
+
+
+export const AnnouncementScope = {
+  org: 'org',
+  region: 'region',
+  location: 'location',
+  department: 'department',
+  team: 'team',
+  individual: 'individual'
+} as const
+
+export type AnnouncementScope = (typeof AnnouncementScope)[keyof typeof AnnouncementScope]
+
+
+export const EmergencyType = {
+  fire: 'fire',
+  power_outage: 'power_outage',
+  water_leak: 'water_leak',
+  plant_closure: 'plant_closure',
+  evacuation: 'evacuation',
+  medical_emergency: 'medical_emergency',
+  security_incident: 'security_incident',
+  other: 'other'
+} as const
+
+export type EmergencyType = (typeof EmergencyType)[keyof typeof EmergencyType]

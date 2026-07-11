@@ -14,6 +14,7 @@
     "imap-sync": "tsx scripts/imap-sync.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.111.0",
     "@auth/prisma-adapter": "^2.11.2",
     "@capacitor/android": "^8.4.1",
     "@capacitor/app": "^8.1.0",

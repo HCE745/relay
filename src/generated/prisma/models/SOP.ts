@@ -311,6 +311,7 @@ export type SOPWhereInput = {
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
   issues?: Prisma.IssueListRelationFilter
+  assignments?: Prisma.AssignmentListRelationFilter
 }
 
 export type SOPOrderByWithRelationInput = {
@@ -334,6 +335,7 @@ export type SOPOrderByWithRelationInput = {
   organization?: Prisma.OrganizationOrderByWithRelationInput
   department?: Prisma.DepartmentOrderByWithRelationInput
   issues?: Prisma.IssueOrderByRelationAggregateInput
+  assignments?: Prisma.AssignmentOrderByRelationAggregateInput
 }
 
 export type SOPWhereUniqueInput = Prisma.AtLeast<{
@@ -360,6 +362,7 @@ export type SOPWhereUniqueInput = Prisma.AtLeast<{
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
   issues?: Prisma.IssueListRelationFilter
+  assignments?: Prisma.AssignmentListRelationFilter
 }, "id">
 
 export type SOPOrderByWithAggregationInput = {
@@ -429,6 +432,7 @@ export type SOPCreateInput = {
   organization: Prisma.OrganizationCreateNestedOneWithoutSopsInput
   department?: Prisma.DepartmentCreateNestedOneWithoutSopsInput
   issues?: Prisma.IssueCreateNestedManyWithoutSopInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedSopInput
 }
 
 export type SOPUncheckedCreateInput = {
@@ -450,6 +454,7 @@ export type SOPUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutSopInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedSopInput
 }
 
 export type SOPUpdateInput = {
@@ -471,6 +476,7 @@ export type SOPUpdateInput = {
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutSopsNestedInput
   department?: Prisma.DepartmentUpdateOneWithoutSopsNestedInput
   issues?: Prisma.IssueUpdateManyWithoutSopNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedSopNestedInput
 }
 
 export type SOPUncheckedUpdateInput = {
@@ -492,6 +498,7 @@ export type SOPUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   issues?: Prisma.IssueUncheckedUpdateManyWithoutSopNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedSopNestedInput
 }
 
 export type SOPCreateManyInput = {
@@ -733,6 +740,22 @@ export type SOPUpdateOneWithoutIssuesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SOPUpdateToOneWithWhereWithoutIssuesInput, Prisma.SOPUpdateWithoutIssuesInput>, Prisma.SOPUncheckedUpdateWithoutIssuesInput>
 }
 
+export type SOPCreateNestedOneWithoutAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.SOPCreateWithoutAssignmentsInput, Prisma.SOPUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.SOPCreateOrConnectWithoutAssignmentsInput
+  connect?: Prisma.SOPWhereUniqueInput
+}
+
+export type SOPUpdateOneWithoutAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.SOPCreateWithoutAssignmentsInput, Prisma.SOPUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.SOPCreateOrConnectWithoutAssignmentsInput
+  upsert?: Prisma.SOPUpsertWithoutAssignmentsInput
+  disconnect?: Prisma.SOPWhereInput | boolean
+  delete?: Prisma.SOPWhereInput | boolean
+  connect?: Prisma.SOPWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SOPUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.SOPUpdateWithoutAssignmentsInput>, Prisma.SOPUncheckedUpdateWithoutAssignmentsInput>
+}
+
 export type SOPCreateWithoutOrganizationInput = {
   id?: string
   title: string
@@ -751,6 +774,7 @@ export type SOPCreateWithoutOrganizationInput = {
   updatedAt?: Date | string
   department?: Prisma.DepartmentCreateNestedOneWithoutSopsInput
   issues?: Prisma.IssueCreateNestedManyWithoutSopInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedSopInput
 }
 
 export type SOPUncheckedCreateWithoutOrganizationInput = {
@@ -771,6 +795,7 @@ export type SOPUncheckedCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutSopInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedSopInput
 }
 
 export type SOPCreateOrConnectWithoutOrganizationInput = {
@@ -840,6 +865,7 @@ export type SOPCreateWithoutDepartmentInput = {
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutSopsInput
   issues?: Prisma.IssueCreateNestedManyWithoutSopInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedSopInput
 }
 
 export type SOPUncheckedCreateWithoutDepartmentInput = {
@@ -860,6 +886,7 @@ export type SOPUncheckedCreateWithoutDepartmentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutSopInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedSopInput
 }
 
 export type SOPCreateOrConnectWithoutDepartmentInput = {
@@ -906,6 +933,7 @@ export type SOPCreateWithoutIssuesInput = {
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutSopsInput
   department?: Prisma.DepartmentCreateNestedOneWithoutSopsInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedSopInput
 }
 
 export type SOPUncheckedCreateWithoutIssuesInput = {
@@ -926,6 +954,7 @@ export type SOPUncheckedCreateWithoutIssuesInput = {
   healthScore?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedSopInput
 }
 
 export type SOPCreateOrConnectWithoutIssuesInput = {
@@ -962,6 +991,7 @@ export type SOPUpdateWithoutIssuesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutSopsNestedInput
   department?: Prisma.DepartmentUpdateOneWithoutSopsNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedSopNestedInput
 }
 
 export type SOPUncheckedUpdateWithoutIssuesInput = {
@@ -982,6 +1012,107 @@ export type SOPUncheckedUpdateWithoutIssuesInput = {
   healthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedSopNestedInput
+}
+
+export type SOPCreateWithoutAssignmentsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  category?: string | null
+  assetType?: string | null
+  content: string
+  version?: string
+  isActive?: boolean
+  uploadedFilename?: string | null
+  sections?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiImprovementSuggestion?: string | null
+  aiImprovementGeneratedAt?: Date | string | null
+  healthScore?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutSopsInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutSopsInput
+  issues?: Prisma.IssueCreateNestedManyWithoutSopInput
+}
+
+export type SOPUncheckedCreateWithoutAssignmentsInput = {
+  id?: string
+  organizationId: string
+  title: string
+  description?: string | null
+  category?: string | null
+  departmentId?: string | null
+  assetType?: string | null
+  content: string
+  version?: string
+  isActive?: boolean
+  uploadedFilename?: string | null
+  sections?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiImprovementSuggestion?: string | null
+  aiImprovementGeneratedAt?: Date | string | null
+  healthScore?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  issues?: Prisma.IssueUncheckedCreateNestedManyWithoutSopInput
+}
+
+export type SOPCreateOrConnectWithoutAssignmentsInput = {
+  where: Prisma.SOPWhereUniqueInput
+  create: Prisma.XOR<Prisma.SOPCreateWithoutAssignmentsInput, Prisma.SOPUncheckedCreateWithoutAssignmentsInput>
+}
+
+export type SOPUpsertWithoutAssignmentsInput = {
+  update: Prisma.XOR<Prisma.SOPUpdateWithoutAssignmentsInput, Prisma.SOPUncheckedUpdateWithoutAssignmentsInput>
+  create: Prisma.XOR<Prisma.SOPCreateWithoutAssignmentsInput, Prisma.SOPUncheckedCreateWithoutAssignmentsInput>
+  where?: Prisma.SOPWhereInput
+}
+
+export type SOPUpdateToOneWithWhereWithoutAssignmentsInput = {
+  where?: Prisma.SOPWhereInput
+  data: Prisma.XOR<Prisma.SOPUpdateWithoutAssignmentsInput, Prisma.SOPUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type SOPUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  uploadedFilename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sections?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiImprovementSuggestion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiImprovementGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  healthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutSopsNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutSopsNestedInput
+  issues?: Prisma.IssueUpdateManyWithoutSopNestedInput
+}
+
+export type SOPUncheckedUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  uploadedFilename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sections?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiImprovementSuggestion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiImprovementGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  healthScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  issues?: Prisma.IssueUncheckedUpdateManyWithoutSopNestedInput
 }
 
 export type SOPCreateManyOrganizationInput = {
@@ -1021,6 +1152,7 @@ export type SOPUpdateWithoutOrganizationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   department?: Prisma.DepartmentUpdateOneWithoutSopsNestedInput
   issues?: Prisma.IssueUpdateManyWithoutSopNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedSopNestedInput
 }
 
 export type SOPUncheckedUpdateWithoutOrganizationInput = {
@@ -1041,6 +1173,7 @@ export type SOPUncheckedUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   issues?: Prisma.IssueUncheckedUpdateManyWithoutSopNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedSopNestedInput
 }
 
 export type SOPUncheckedUpdateManyWithoutOrganizationInput = {
@@ -1099,6 +1232,7 @@ export type SOPUpdateWithoutDepartmentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutSopsNestedInput
   issues?: Prisma.IssueUpdateManyWithoutSopNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedSopNestedInput
 }
 
 export type SOPUncheckedUpdateWithoutDepartmentInput = {
@@ -1119,6 +1253,7 @@ export type SOPUncheckedUpdateWithoutDepartmentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   issues?: Prisma.IssueUncheckedUpdateManyWithoutSopNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedSopNestedInput
 }
 
 export type SOPUncheckedUpdateManyWithoutDepartmentInput = {
@@ -1147,10 +1282,12 @@ export type SOPUncheckedUpdateManyWithoutDepartmentInput = {
 
 export type SOPCountOutputType = {
   issues: number
+  assignments: number
 }
 
 export type SOPCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   issues?: boolean | SOPCountOutputTypeCountIssuesArgs
+  assignments?: boolean | SOPCountOutputTypeCountAssignmentsArgs
 }
 
 /**
@@ -1168,6 +1305,13 @@ export type SOPCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensio
  */
 export type SOPCountOutputTypeCountIssuesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.IssueWhereInput
+}
+
+/**
+ * SOPCountOutputType without action
+ */
+export type SOPCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentWhereInput
 }
 
 
@@ -1192,6 +1336,7 @@ export type SOPSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   department?: boolean | Prisma.SOP$departmentArgs<ExtArgs>
   issues?: boolean | Prisma.SOP$issuesArgs<ExtArgs>
+  assignments?: boolean | Prisma.SOP$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.SOPCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["sOP"]>
 
@@ -1264,6 +1409,7 @@ export type SOPInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   department?: boolean | Prisma.SOP$departmentArgs<ExtArgs>
   issues?: boolean | Prisma.SOP$issuesArgs<ExtArgs>
+  assignments?: boolean | Prisma.SOP$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.SOPCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SOPIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1281,6 +1427,7 @@ export type $SOPPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     organization: Prisma.$OrganizationPayload<ExtArgs>
     department: Prisma.$DepartmentPayload<ExtArgs> | null
     issues: Prisma.$IssuePayload<ExtArgs>[]
+    assignments: Prisma.$AssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1697,6 +1844,7 @@ export interface Prisma__SOPClient<T, Null = never, ExtArgs extends runtime.Type
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   department<T extends Prisma.SOP$departmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SOP$departmentArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   issues<T extends Prisma.SOP$issuesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SOP$issuesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IssuePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignments<T extends Prisma.SOP$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SOP$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2184,6 +2332,30 @@ export type SOP$issuesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.IssueScalarFieldEnum | Prisma.IssueScalarFieldEnum[]
+}
+
+/**
+ * SOP.assignments
+ */
+export type SOP$assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Assignment
+   */
+  select?: Prisma.AssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Assignment
+   */
+  omit?: Prisma.AssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentWhereInput
+  orderBy?: Prisma.AssignmentOrderByWithRelationInput | Prisma.AssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentScalarFieldEnum | Prisma.AssignmentScalarFieldEnum[]
 }
 
 /**

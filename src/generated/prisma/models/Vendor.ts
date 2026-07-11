@@ -243,6 +243,7 @@ export type VendorWhereInput = {
   issues?: Prisma.IssueListRelationFilter
   maintenanceLogs?: Prisma.MaintenanceLogListRelationFilter
   catalogItems?: Prisma.ApprovedCatalogItemListRelationFilter
+  assignments?: Prisma.AssignmentListRelationFilter
 }
 
 export type VendorOrderByWithRelationInput = {
@@ -263,6 +264,7 @@ export type VendorOrderByWithRelationInput = {
   issues?: Prisma.IssueOrderByRelationAggregateInput
   maintenanceLogs?: Prisma.MaintenanceLogOrderByRelationAggregateInput
   catalogItems?: Prisma.ApprovedCatalogItemOrderByRelationAggregateInput
+  assignments?: Prisma.AssignmentOrderByRelationAggregateInput
 }
 
 export type VendorWhereUniqueInput = Prisma.AtLeast<{
@@ -286,6 +288,7 @@ export type VendorWhereUniqueInput = Prisma.AtLeast<{
   issues?: Prisma.IssueListRelationFilter
   maintenanceLogs?: Prisma.MaintenanceLogListRelationFilter
   catalogItems?: Prisma.ApprovedCatalogItemListRelationFilter
+  assignments?: Prisma.AssignmentListRelationFilter
 }, "id">
 
 export type VendorOrderByWithAggregationInput = {
@@ -341,6 +344,7 @@ export type VendorCreateInput = {
   issues?: Prisma.IssueCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorUncheckedCreateInput = {
@@ -360,6 +364,7 @@ export type VendorUncheckedCreateInput = {
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorUpdateInput = {
@@ -379,6 +384,7 @@ export type VendorUpdateInput = {
   issues?: Prisma.IssueUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorUncheckedUpdateInput = {
@@ -398,6 +404,7 @@ export type VendorUncheckedUpdateInput = {
   issues?: Prisma.IssueUncheckedUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorCreateManyInput = {
@@ -610,6 +617,22 @@ export type VendorUpdateOneWithoutCatalogItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutCatalogItemsInput, Prisma.VendorUpdateWithoutCatalogItemsInput>, Prisma.VendorUncheckedUpdateWithoutCatalogItemsInput>
 }
 
+export type VendorCreateNestedOneWithoutAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutAssignmentsInput, Prisma.VendorUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutAssignmentsInput
+  connect?: Prisma.VendorWhereUniqueInput
+}
+
+export type VendorUpdateOneWithoutAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutAssignmentsInput, Prisma.VendorUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutAssignmentsInput
+  upsert?: Prisma.VendorUpsertWithoutAssignmentsInput
+  disconnect?: Prisma.VendorWhereInput | boolean
+  delete?: Prisma.VendorWhereInput | boolean
+  connect?: Prisma.VendorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.VendorUpdateWithoutAssignmentsInput>, Prisma.VendorUncheckedUpdateWithoutAssignmentsInput>
+}
+
 export type VendorCreateWithoutOrganizationInput = {
   id?: string
   name: string
@@ -626,6 +649,7 @@ export type VendorCreateWithoutOrganizationInput = {
   issues?: Prisma.IssueCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorUncheckedCreateWithoutOrganizationInput = {
@@ -644,6 +668,7 @@ export type VendorUncheckedCreateWithoutOrganizationInput = {
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorCreateOrConnectWithoutOrganizationInput = {
@@ -706,6 +731,7 @@ export type VendorCreateWithoutAssetsInput = {
   issues?: Prisma.IssueCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorUncheckedCreateWithoutAssetsInput = {
@@ -724,6 +750,7 @@ export type VendorUncheckedCreateWithoutAssetsInput = {
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorCreateOrConnectWithoutAssetsInput = {
@@ -758,6 +785,7 @@ export type VendorUpdateWithoutAssetsInput = {
   issues?: Prisma.IssueUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutAssetsInput = {
@@ -776,6 +804,7 @@ export type VendorUncheckedUpdateWithoutAssetsInput = {
   issues?: Prisma.IssueUncheckedUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorCreateWithoutIssuesInput = {
@@ -794,6 +823,7 @@ export type VendorCreateWithoutIssuesInput = {
   assets?: Prisma.AssetCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorUncheckedCreateWithoutIssuesInput = {
@@ -812,6 +842,7 @@ export type VendorUncheckedCreateWithoutIssuesInput = {
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorCreateOrConnectWithoutIssuesInput = {
@@ -846,6 +877,7 @@ export type VendorUpdateWithoutIssuesInput = {
   assets?: Prisma.AssetUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutIssuesInput = {
@@ -864,6 +896,7 @@ export type VendorUncheckedUpdateWithoutIssuesInput = {
   assets?: Prisma.AssetUncheckedUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorCreateWithoutMaintenanceLogsInput = {
@@ -882,6 +915,7 @@ export type VendorCreateWithoutMaintenanceLogsInput = {
   assets?: Prisma.AssetCreateNestedManyWithoutVendorInput
   issues?: Prisma.IssueCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorUncheckedCreateWithoutMaintenanceLogsInput = {
@@ -900,6 +934,7 @@ export type VendorUncheckedCreateWithoutMaintenanceLogsInput = {
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutVendorInput
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutVendorInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedCreateNestedManyWithoutPreferredVendorInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorCreateOrConnectWithoutMaintenanceLogsInput = {
@@ -934,6 +969,7 @@ export type VendorUpdateWithoutMaintenanceLogsInput = {
   assets?: Prisma.AssetUpdateManyWithoutVendorNestedInput
   issues?: Prisma.IssueUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutMaintenanceLogsInput = {
@@ -952,6 +988,7 @@ export type VendorUncheckedUpdateWithoutMaintenanceLogsInput = {
   assets?: Prisma.AssetUncheckedUpdateManyWithoutVendorNestedInput
   issues?: Prisma.IssueUncheckedUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorCreateWithoutCatalogItemsInput = {
@@ -970,6 +1007,7 @@ export type VendorCreateWithoutCatalogItemsInput = {
   assets?: Prisma.AssetCreateNestedManyWithoutVendorInput
   issues?: Prisma.IssueCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutVendorInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorUncheckedCreateWithoutCatalogItemsInput = {
@@ -988,6 +1026,7 @@ export type VendorUncheckedCreateWithoutCatalogItemsInput = {
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutVendorInput
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutVendorInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutVendorInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedVendorInput
 }
 
 export type VendorCreateOrConnectWithoutCatalogItemsInput = {
@@ -1022,6 +1061,7 @@ export type VendorUpdateWithoutCatalogItemsInput = {
   assets?: Prisma.AssetUpdateManyWithoutVendorNestedInput
   issues?: Prisma.IssueUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutVendorNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutCatalogItemsInput = {
@@ -1040,6 +1080,99 @@ export type VendorUncheckedUpdateWithoutCatalogItemsInput = {
   assets?: Prisma.AssetUncheckedUpdateManyWithoutVendorNestedInput
   issues?: Prisma.IssueUncheckedUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutVendorNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedVendorNestedInput
+}
+
+export type VendorCreateWithoutAssignmentsInput = {
+  id?: string
+  name: string
+  contactName?: string | null
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  specialty?: string | null
+  notes?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutVendorsInput
+  assets?: Prisma.AssetCreateNestedManyWithoutVendorInput
+  issues?: Prisma.IssueCreateNestedManyWithoutVendorInput
+  maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutVendorInput
+  catalogItems?: Prisma.ApprovedCatalogItemCreateNestedManyWithoutPreferredVendorInput
+}
+
+export type VendorUncheckedCreateWithoutAssignmentsInput = {
+  id?: string
+  name: string
+  contactName?: string | null
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  specialty?: string | null
+  notes?: string | null
+  isActive?: boolean
+  organizationId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutVendorInput
+  issues?: Prisma.IssueUncheckedCreateNestedManyWithoutVendorInput
+  maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutVendorInput
+  catalogItems?: Prisma.ApprovedCatalogItemUncheckedCreateNestedManyWithoutPreferredVendorInput
+}
+
+export type VendorCreateOrConnectWithoutAssignmentsInput = {
+  where: Prisma.VendorWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorCreateWithoutAssignmentsInput, Prisma.VendorUncheckedCreateWithoutAssignmentsInput>
+}
+
+export type VendorUpsertWithoutAssignmentsInput = {
+  update: Prisma.XOR<Prisma.VendorUpdateWithoutAssignmentsInput, Prisma.VendorUncheckedUpdateWithoutAssignmentsInput>
+  create: Prisma.XOR<Prisma.VendorCreateWithoutAssignmentsInput, Prisma.VendorUncheckedCreateWithoutAssignmentsInput>
+  where?: Prisma.VendorWhereInput
+}
+
+export type VendorUpdateToOneWithWhereWithoutAssignmentsInput = {
+  where?: Prisma.VendorWhereInput
+  data: Prisma.XOR<Prisma.VendorUpdateWithoutAssignmentsInput, Prisma.VendorUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type VendorUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutVendorsNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutVendorNestedInput
+  issues?: Prisma.IssueUpdateManyWithoutVendorNestedInput
+  maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutVendorNestedInput
+  catalogItems?: Prisma.ApprovedCatalogItemUpdateManyWithoutPreferredVendorNestedInput
+}
+
+export type VendorUncheckedUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutVendorNestedInput
+  issues?: Prisma.IssueUncheckedUpdateManyWithoutVendorNestedInput
+  maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutVendorNestedInput
+  catalogItems?: Prisma.ApprovedCatalogItemUncheckedUpdateManyWithoutPreferredVendorNestedInput
 }
 
 export type VendorCreateManyOrganizationInput = {
@@ -1072,6 +1205,7 @@ export type VendorUpdateWithoutOrganizationInput = {
   issues?: Prisma.IssueUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutOrganizationInput = {
@@ -1090,6 +1224,7 @@ export type VendorUncheckedUpdateWithoutOrganizationInput = {
   issues?: Prisma.IssueUncheckedUpdateManyWithoutVendorNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutVendorNestedInput
   catalogItems?: Prisma.ApprovedCatalogItemUncheckedUpdateManyWithoutPreferredVendorNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedVendorNestedInput
 }
 
 export type VendorUncheckedUpdateManyWithoutOrganizationInput = {
@@ -1116,6 +1251,7 @@ export type VendorCountOutputType = {
   issues: number
   maintenanceLogs: number
   catalogItems: number
+  assignments: number
 }
 
 export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1123,6 +1259,7 @@ export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   issues?: boolean | VendorCountOutputTypeCountIssuesArgs
   maintenanceLogs?: boolean | VendorCountOutputTypeCountMaintenanceLogsArgs
   catalogItems?: boolean | VendorCountOutputTypeCountCatalogItemsArgs
+  assignments?: boolean | VendorCountOutputTypeCountAssignmentsArgs
 }
 
 /**
@@ -1163,6 +1300,13 @@ export type VendorCountOutputTypeCountCatalogItemsArgs<ExtArgs extends runtime.T
   where?: Prisma.ApprovedCatalogItemWhereInput
 }
 
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentWhereInput
+}
+
 
 export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1182,6 +1326,7 @@ export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   issues?: boolean | Prisma.Vendor$issuesArgs<ExtArgs>
   maintenanceLogs?: boolean | Prisma.Vendor$maintenanceLogsArgs<ExtArgs>
   catalogItems?: boolean | Prisma.Vendor$catalogItemsArgs<ExtArgs>
+  assignments?: boolean | Prisma.Vendor$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendor"]>
 
@@ -1239,6 +1384,7 @@ export type VendorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   issues?: boolean | Prisma.Vendor$issuesArgs<ExtArgs>
   maintenanceLogs?: boolean | Prisma.Vendor$maintenanceLogsArgs<ExtArgs>
   catalogItems?: boolean | Prisma.Vendor$catalogItemsArgs<ExtArgs>
+  assignments?: boolean | Prisma.Vendor$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VendorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1256,6 +1402,7 @@ export type $VendorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     issues: Prisma.$IssuePayload<ExtArgs>[]
     maintenanceLogs: Prisma.$MaintenanceLogPayload<ExtArgs>[]
     catalogItems: Prisma.$ApprovedCatalogItemPayload<ExtArgs>[]
+    assignments: Prisma.$AssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1669,6 +1816,7 @@ export interface Prisma__VendorClient<T, Null = never, ExtArgs extends runtime.T
   issues<T extends Prisma.Vendor$issuesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$issuesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IssuePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   maintenanceLogs<T extends Prisma.Vendor$maintenanceLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$maintenanceLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaintenanceLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   catalogItems<T extends Prisma.Vendor$catalogItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$catalogItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovedCatalogItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignments<T extends Prisma.Vendor$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2204,6 +2352,30 @@ export type Vendor$catalogItemsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.ApprovedCatalogItemScalarFieldEnum | Prisma.ApprovedCatalogItemScalarFieldEnum[]
+}
+
+/**
+ * Vendor.assignments
+ */
+export type Vendor$assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Assignment
+   */
+  select?: Prisma.AssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Assignment
+   */
+  omit?: Prisma.AssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentWhereInput
+  orderBy?: Prisma.AssignmentOrderByWithRelationInput | Prisma.AssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentScalarFieldEnum | Prisma.AssignmentScalarFieldEnum[]
 }
 
 /**

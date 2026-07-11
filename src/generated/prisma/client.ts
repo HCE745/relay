@@ -426,3 +426,43 @@ export type SupportMessage = Prisma.SupportMessageModel
  * 
  */
 export type Broadcast = Prisma.BroadcastModel
+/**
+ * Model Assignment
+ * 
+ */
+export type Assignment = Prisma.AssignmentModel
+/**
+ * Model AssignmentComment
+ * 
+ */
+export type AssignmentComment = Prisma.AssignmentCommentModel
+/**
+ * Model AssignmentStatusHistory
+ * 
+ */
+export type AssignmentStatusHistory = Prisma.AssignmentStatusHistoryModel
+/**
+ * Model Announcement
+ * 
+ */
+export type Announcement = Prisma.AnnouncementModel
+/**
+ * Model AnnouncementAcknowledgment
+ * 
+ */
+export type AnnouncementAcknowledgment = Prisma.AnnouncementAcknowledgmentModel
+/**
+ * Model EmergencyBroadcast
+ * 
+ */
+export type EmergencyBroadcast = Prisma.EmergencyBroadcastModel
+/**
+ * Model EmergencyAcknowledgment
+ * 
+ */
+export type EmergencyAcknowledgment = Prisma.EmergencyAcknowledgmentModel
+/**
+ * Model DailyBriefingCache
+ * 
+ */
+export type DailyBriefingCache = Prisma.DailyBriefingCacheModel

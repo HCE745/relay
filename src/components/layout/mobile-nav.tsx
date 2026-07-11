@@ -26,48 +26,61 @@ import {
   BarChart2,
   BookOpen,
   ShoppingCart,
+  ClipboardCheck,
+  Radio,
 } from "lucide-react"
 import type { PageKey } from "@/lib/page-access"
 import { RelayIconWhite, RelayWordmarkWhite } from "@/components/logo"
 import { SupportButton } from "@/components/support/support-button"
 
 const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: React.ElementType }> = [
-  { key: "dashboard",      href: "/dashboard",      label: "Dashboard",      icon: LayoutDashboard },
-  { key: "issues",         href: "/issues",          label: "Issues",         icon: AlertCircle },
-  { key: "archive",        href: "/archive",          label: "Archive",        icon: Archive },
-  { key: "my-submissions", href: "/my-submissions",  label: "My Submissions", icon: ClipboardList },
-  { key: "assets",         href: "/assets",          label: "Assets",         icon: Package },
-  { key: "locations",      href: "/locations",        label: "Locations",      icon: MapPin },
-  { key: "departments",    href: "/departments",      label: "Departments",    icon: Building2 },
-  { key: "vendors",        href: "/vendors",          label: "Vendors",        icon: Wrench },
-  { key: "team",           href: "/team",             label: "Team",           icon: Users },
-  { key: "suggestions",        href: "/suggestions",       label: "Suggestions",  icon: Lightbulb },
-  { key: "analytics",          href: "/analytics",         label: "Analytics",    icon: BarChart2 },
-  { key: "sops",               href: "/sops",              label: "SOPs",      icon: BookOpen },
-  { key: "purchase-requests",  href: "/purchase-requests", label: "Purchases", icon: ShoppingCart },
+  { key: "dashboard",       href: "/dashboard",       label: "Dashboard",      icon: LayoutDashboard },
+  { key: "issues",          href: "/issues",           label: "Issues",         icon: AlertCircle },
+  { key: "assignments",     href: "/assignments",      label: "Assignments",    icon: ClipboardCheck },
+  { key: "communications",  href: "/communications",   label: "Communications", icon: Radio },
+  { key: "archive",         href: "/archive",           label: "Archive",        icon: Archive },
+  { key: "my-submissions",  href: "/my-submissions",   label: "My Submissions", icon: ClipboardList },
+  { key: "assets",          href: "/assets",            label: "Assets",         icon: Package },
+  { key: "locations",       href: "/locations",         label: "Locations",      icon: MapPin },
+  { key: "departments",     href: "/departments",       label: "Departments",    icon: Building2 },
+  { key: "vendors",         href: "/vendors",           label: "Vendors",        icon: Wrench },
+  { key: "team",            href: "/team",              label: "Team",           icon: Users },
+  { key: "suggestions",     href: "/suggestions",       label: "Suggestions",    icon: Lightbulb },
+  { key: "analytics",       href: "/analytics",         label: "Analytics",      icon: BarChart2 },
+  { key: "sops",            href: "/sops",              label: "SOPs",           icon: BookOpen },
+  { key: "purchase-requests", href: "/purchase-requests", label: "Purchases",   icon: ShoppingCart },
 ]
 
 // Ordered prefix→title pairs (most-specific first)
 const PAGE_LABELS: [string, string][] = [
-  ["/issues/new",        "Report Issue"],
-  ["/issues/",          "Issue Detail"],
-  ["/assets/",          "Asset Detail"],
-  ["/settings/routing", "Routing Rules"],
-  ["/issues",           "Issues"],
-  ["/dashboard",        "Dashboard"],
-  ["/archive",          "Archive"],
-  ["/my-submissions",   "My Submissions"],
-  ["/assets",           "Assets"],
-  ["/locations",        "Locations"],
-  ["/departments",      "Departments"],
-  ["/vendors",          "Vendors"],
-  ["/team",             "Team"],
-  ["/suggestions",       "Suggestions"],
-  ["/analytics",         "Analytics"],
-  ["/sops",              "SOPs"],
-  ["/purchase-requests", "Purchase Requests"],
-  ["/settings",          "Settings"],
-  ["/notifications",     "Notifications"],
+  ["/issues/new",                              "Report Issue"],
+  ["/issues/",                                 "Issue Detail"],
+  ["/assets/",                                 "Asset Detail"],
+  ["/settings/routing",                        "Routing Rules"],
+  ["/assignments/new",                         "New Assignment"],
+  ["/assignments/",                            "Assignment"],
+  ["/communications/announcements/new",        "New Announcement"],
+  ["/communications/announcements/",           "Announcement"],
+  ["/communications/emergency",                "Emergency"],
+  ["/communications/teams",                    "Team Channels"],
+  ["/communications/announcements",            "Announcements"],
+  ["/communications",                          "Communications"],
+  ["/assignments",                             "Assignments"],
+  ["/issues",                                  "Issues"],
+  ["/dashboard",                               "Dashboard"],
+  ["/archive",                                 "Archive"],
+  ["/my-submissions",                          "My Submissions"],
+  ["/assets",                                  "Assets"],
+  ["/locations",                               "Locations"],
+  ["/departments",                             "Departments"],
+  ["/vendors",                                 "Vendors"],
+  ["/team",                                    "Team"],
+  ["/suggestions",                             "Suggestions"],
+  ["/analytics",                               "Analytics"],
+  ["/sops",                                    "SOPs"],
+  ["/purchase-requests",                       "Purchase Requests"],
+  ["/settings",                                "Settings"],
+  ["/notifications",                           "Notifications"],
 ]
 
 function getPageTitle(pathname: string): string {
@@ -314,16 +327,16 @@ export function MobileNav({ allowedPageKeys, showRouting, corporateDashboardEnab
           <span className="text-[10px] font-medium">Home</span>
         </Link>
 
-        {/* Issues */}
+        {/* Assignments */}
         <Link
-          href="/issues"
+          href="/assignments"
           className={cn(
             "flex-1 flex flex-col items-center justify-center pt-2 pb-1 gap-0.5 min-h-[56px] transition-colors",
-            isActive("/issues") ? "text-blue-600" : "text-gray-400",
+            isActive("/assignments") ? "text-blue-600" : "text-gray-400",
           )}
         >
-          <AlertCircle className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Issues</span>
+          <ClipboardCheck className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Tasks</span>
         </Link>
 
         {/* Report Issue — elevated FAB */}
@@ -338,16 +351,16 @@ export function MobileNav({ allowedPageKeys, showRouting, corporateDashboardEnab
           <span className="text-[10px] font-medium text-gray-400 mt-0.5">Report</span>
         </Link>
 
-        {/* Suggestions */}
+        {/* Communications */}
         <Link
-          href="/suggestions"
+          href="/communications"
           className={cn(
             "flex-1 flex flex-col items-center justify-center pt-2 pb-1 gap-0.5 min-h-[56px] transition-colors",
-            pathname === "/suggestions" ? "text-blue-600" : "text-gray-400",
+            isActive("/communications") ? "text-blue-600" : "text-gray-400",
           )}
         >
-          <Lightbulb className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Suggest</span>
+          <Radio className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Comms</span>
         </Link>
 
         {/* More — opens drawer */}

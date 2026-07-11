@@ -294,6 +294,7 @@ export type AssetWhereInput = {
   maintenanceLogs?: Prisma.MaintenanceLogListRelationFilter
   purchaseRequests?: Prisma.PurchaseRequestListRelationFilter
   qrCodes?: Prisma.QrCodeListRelationFilter
+  assignments?: Prisma.AssignmentListRelationFilter
 }
 
 export type AssetOrderByWithRelationInput = {
@@ -323,6 +324,7 @@ export type AssetOrderByWithRelationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogOrderByRelationAggregateInput
   purchaseRequests?: Prisma.PurchaseRequestOrderByRelationAggregateInput
   qrCodes?: Prisma.QrCodeOrderByRelationAggregateInput
+  assignments?: Prisma.AssignmentOrderByRelationAggregateInput
 }
 
 export type AssetWhereUniqueInput = Prisma.AtLeast<{
@@ -355,6 +357,7 @@ export type AssetWhereUniqueInput = Prisma.AtLeast<{
   maintenanceLogs?: Prisma.MaintenanceLogListRelationFilter
   purchaseRequests?: Prisma.PurchaseRequestListRelationFilter
   qrCodes?: Prisma.QrCodeListRelationFilter
+  assignments?: Prisma.AssignmentListRelationFilter
 }, "id" | "qrCode">
 
 export type AssetOrderByWithAggregationInput = {
@@ -428,6 +431,7 @@ export type AssetCreateInput = {
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateInput = {
@@ -453,6 +457,7 @@ export type AssetUncheckedCreateInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUpdateInput = {
@@ -478,6 +483,7 @@ export type AssetUpdateInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateInput = {
@@ -503,6 +509,7 @@ export type AssetUncheckedUpdateInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetCreateManyInput = {
@@ -877,6 +884,22 @@ export type AssetUpdateOneWithoutQrCodesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AssetUpdateToOneWithWhereWithoutQrCodesInput, Prisma.AssetUpdateWithoutQrCodesInput>, Prisma.AssetUncheckedUpdateWithoutQrCodesInput>
 }
 
+export type AssetCreateNestedOneWithoutAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.AssetCreateWithoutAssignmentsInput, Prisma.AssetUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAssignmentsInput
+  connect?: Prisma.AssetWhereUniqueInput
+}
+
+export type AssetUpdateOneWithoutAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetCreateWithoutAssignmentsInput, Prisma.AssetUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAssignmentsInput
+  upsert?: Prisma.AssetUpsertWithoutAssignmentsInput
+  disconnect?: Prisma.AssetWhereInput | boolean
+  delete?: Prisma.AssetWhereInput | boolean
+  connect?: Prisma.AssetWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AssetUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.AssetUpdateWithoutAssignmentsInput>, Prisma.AssetUncheckedUpdateWithoutAssignmentsInput>
+}
+
 export type AssetCreateWithoutOrganizationInput = {
   id?: string
   name: string
@@ -899,6 +922,7 @@ export type AssetCreateWithoutOrganizationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateWithoutOrganizationInput = {
@@ -923,6 +947,7 @@ export type AssetUncheckedCreateWithoutOrganizationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetCreateOrConnectWithoutOrganizationInput = {
@@ -997,6 +1022,7 @@ export type AssetCreateWithoutLocationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateWithoutLocationInput = {
@@ -1021,6 +1047,7 @@ export type AssetUncheckedCreateWithoutLocationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetCreateOrConnectWithoutLocationInput = {
@@ -1071,6 +1098,7 @@ export type AssetCreateWithoutDepartmentInput = {
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateWithoutDepartmentInput = {
@@ -1095,6 +1123,7 @@ export type AssetUncheckedCreateWithoutDepartmentInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetCreateOrConnectWithoutDepartmentInput = {
@@ -1145,6 +1174,7 @@ export type AssetCreateWithoutVendorInput = {
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateWithoutVendorInput = {
@@ -1169,6 +1199,7 @@ export type AssetUncheckedCreateWithoutVendorInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetCreateOrConnectWithoutVendorInput = {
@@ -1219,6 +1250,7 @@ export type AssetCreateWithoutIssuesInput = {
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateWithoutIssuesInput = {
@@ -1243,6 +1275,7 @@ export type AssetUncheckedCreateWithoutIssuesInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetCreateOrConnectWithoutIssuesInput = {
@@ -1283,6 +1316,7 @@ export type AssetUpdateWithoutIssuesInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateWithoutIssuesInput = {
@@ -1307,6 +1341,7 @@ export type AssetUncheckedUpdateWithoutIssuesInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetCreateWithoutMaintenanceLogsInput = {
@@ -1331,6 +1366,7 @@ export type AssetCreateWithoutMaintenanceLogsInput = {
   issues?: Prisma.IssueCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateWithoutMaintenanceLogsInput = {
@@ -1355,6 +1391,7 @@ export type AssetUncheckedCreateWithoutMaintenanceLogsInput = {
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetCreateOrConnectWithoutMaintenanceLogsInput = {
@@ -1395,6 +1432,7 @@ export type AssetUpdateWithoutMaintenanceLogsInput = {
   issues?: Prisma.IssueUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateWithoutMaintenanceLogsInput = {
@@ -1419,6 +1457,7 @@ export type AssetUncheckedUpdateWithoutMaintenanceLogsInput = {
   issues?: Prisma.IssueUncheckedUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetCreateWithoutPurchaseRequestsInput = {
@@ -1443,6 +1482,7 @@ export type AssetCreateWithoutPurchaseRequestsInput = {
   issues?: Prisma.IssueCreateNestedManyWithoutAssetInput
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateWithoutPurchaseRequestsInput = {
@@ -1467,6 +1507,7 @@ export type AssetUncheckedCreateWithoutPurchaseRequestsInput = {
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssetInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetCreateOrConnectWithoutPurchaseRequestsInput = {
@@ -1507,6 +1548,7 @@ export type AssetUpdateWithoutPurchaseRequestsInput = {
   issues?: Prisma.IssueUpdateManyWithoutAssetNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateWithoutPurchaseRequestsInput = {
@@ -1531,6 +1573,7 @@ export type AssetUncheckedUpdateWithoutPurchaseRequestsInput = {
   issues?: Prisma.IssueUncheckedUpdateManyWithoutAssetNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetCreateWithoutQrCodesInput = {
@@ -1555,6 +1598,7 @@ export type AssetCreateWithoutQrCodesInput = {
   issues?: Prisma.IssueCreateNestedManyWithoutAssetInput
   maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetUncheckedCreateWithoutQrCodesInput = {
@@ -1579,6 +1623,7 @@ export type AssetUncheckedCreateWithoutQrCodesInput = {
   issues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssetInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedAssetInput
 }
 
 export type AssetCreateOrConnectWithoutQrCodesInput = {
@@ -1619,6 +1664,7 @@ export type AssetUpdateWithoutQrCodesInput = {
   issues?: Prisma.IssueUpdateManyWithoutAssetNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateWithoutQrCodesInput = {
@@ -1643,6 +1689,123 @@ export type AssetUncheckedUpdateWithoutQrCodesInput = {
   issues?: Prisma.IssueUncheckedUpdateManyWithoutAssetNestedInput
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
+}
+
+export type AssetCreateWithoutAssignmentsInput = {
+  id?: string
+  name: string
+  assetTag?: string | null
+  qrCode?: string
+  type?: string
+  status?: string
+  manufacturer?: string | null
+  model?: string | null
+  serialNumber?: string | null
+  purchaseDate?: Date | string | null
+  warrantyExpiry?: Date | string | null
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutAssetsInput
+  location?: Prisma.LocationCreateNestedOneWithoutAssetsInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutAssetsInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutAssetsInput
+  issues?: Prisma.IssueCreateNestedManyWithoutAssetInput
+  maintenanceLogs?: Prisma.MaintenanceLogCreateNestedManyWithoutAssetInput
+  purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutAssetInput
+  qrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssetInput
+}
+
+export type AssetUncheckedCreateWithoutAssignmentsInput = {
+  id?: string
+  name: string
+  assetTag?: string | null
+  qrCode?: string
+  type?: string
+  status?: string
+  manufacturer?: string | null
+  model?: string | null
+  serialNumber?: string | null
+  purchaseDate?: Date | string | null
+  warrantyExpiry?: Date | string | null
+  notes?: string | null
+  organizationId: string
+  locationId?: string | null
+  departmentId?: string | null
+  vendorId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  issues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssetInput
+  maintenanceLogs?: Prisma.MaintenanceLogUncheckedCreateNestedManyWithoutAssetInput
+  purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutAssetInput
+  qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssetInput
+}
+
+export type AssetCreateOrConnectWithoutAssignmentsInput = {
+  where: Prisma.AssetWhereUniqueInput
+  create: Prisma.XOR<Prisma.AssetCreateWithoutAssignmentsInput, Prisma.AssetUncheckedCreateWithoutAssignmentsInput>
+}
+
+export type AssetUpsertWithoutAssignmentsInput = {
+  update: Prisma.XOR<Prisma.AssetUpdateWithoutAssignmentsInput, Prisma.AssetUncheckedUpdateWithoutAssignmentsInput>
+  create: Prisma.XOR<Prisma.AssetCreateWithoutAssignmentsInput, Prisma.AssetUncheckedCreateWithoutAssignmentsInput>
+  where?: Prisma.AssetWhereInput
+}
+
+export type AssetUpdateToOneWithWhereWithoutAssignmentsInput = {
+  where?: Prisma.AssetWhereInput
+  data: Prisma.XOR<Prisma.AssetUpdateWithoutAssignmentsInput, Prisma.AssetUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type AssetUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qrCode?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  warrantyExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutAssetsNestedInput
+  location?: Prisma.LocationUpdateOneWithoutAssetsNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutAssetsNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutAssetsNestedInput
+  issues?: Prisma.IssueUpdateManyWithoutAssetNestedInput
+  maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
+  purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
+  qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+}
+
+export type AssetUncheckedUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  assetTag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qrCode?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  warrantyExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  issues?: Prisma.IssueUncheckedUpdateManyWithoutAssetNestedInput
+  maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
+  purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
+  qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
 }
 
 export type AssetCreateManyOrganizationInput = {
@@ -1687,6 +1850,7 @@ export type AssetUpdateWithoutOrganizationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateWithoutOrganizationInput = {
@@ -1711,6 +1875,7 @@ export type AssetUncheckedUpdateWithoutOrganizationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateManyWithoutOrganizationInput = {
@@ -1775,6 +1940,7 @@ export type AssetUpdateWithoutLocationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateWithoutLocationInput = {
@@ -1799,6 +1965,7 @@ export type AssetUncheckedUpdateWithoutLocationInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateManyWithoutLocationInput = {
@@ -1863,6 +2030,7 @@ export type AssetUpdateWithoutDepartmentInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateWithoutDepartmentInput = {
@@ -1887,6 +2055,7 @@ export type AssetUncheckedUpdateWithoutDepartmentInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateManyWithoutDepartmentInput = {
@@ -1951,6 +2120,7 @@ export type AssetUpdateWithoutVendorInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateWithoutVendorInput = {
@@ -1975,6 +2145,7 @@ export type AssetUncheckedUpdateWithoutVendorInput = {
   maintenanceLogs?: Prisma.MaintenanceLogUncheckedUpdateManyWithoutAssetNestedInput
   purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutAssetNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssetNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedAssetNestedInput
 }
 
 export type AssetUncheckedUpdateManyWithoutVendorInput = {
@@ -2007,6 +2178,7 @@ export type AssetCountOutputType = {
   maintenanceLogs: number
   purchaseRequests: number
   qrCodes: number
+  assignments: number
 }
 
 export type AssetCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2014,6 +2186,7 @@ export type AssetCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   maintenanceLogs?: boolean | AssetCountOutputTypeCountMaintenanceLogsArgs
   purchaseRequests?: boolean | AssetCountOutputTypeCountPurchaseRequestsArgs
   qrCodes?: boolean | AssetCountOutputTypeCountQrCodesArgs
+  assignments?: boolean | AssetCountOutputTypeCountAssignmentsArgs
 }
 
 /**
@@ -2054,6 +2227,13 @@ export type AssetCountOutputTypeCountQrCodesArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.QrCodeWhereInput
 }
 
+/**
+ * AssetCountOutputType without action
+ */
+export type AssetCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentWhereInput
+}
+
 
 export type AssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2082,6 +2262,7 @@ export type AssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   maintenanceLogs?: boolean | Prisma.Asset$maintenanceLogsArgs<ExtArgs>
   purchaseRequests?: boolean | Prisma.Asset$purchaseRequestsArgs<ExtArgs>
   qrCodes?: boolean | Prisma.Asset$qrCodesArgs<ExtArgs>
+  assignments?: boolean | Prisma.Asset$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.AssetCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["asset"]>
 
@@ -2166,6 +2347,7 @@ export type AssetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   maintenanceLogs?: boolean | Prisma.Asset$maintenanceLogsArgs<ExtArgs>
   purchaseRequests?: boolean | Prisma.Asset$purchaseRequestsArgs<ExtArgs>
   qrCodes?: boolean | Prisma.Asset$qrCodesArgs<ExtArgs>
+  assignments?: boolean | Prisma.Asset$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.AssetCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AssetIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2192,6 +2374,7 @@ export type $AssetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     maintenanceLogs: Prisma.$MaintenanceLogPayload<ExtArgs>[]
     purchaseRequests: Prisma.$PurchaseRequestPayload<ExtArgs>[]
     qrCodes: Prisma.$QrCodePayload<ExtArgs>[]
+    assignments: Prisma.$AssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2614,6 +2797,7 @@ export interface Prisma__AssetClient<T, Null = never, ExtArgs extends runtime.Ty
   maintenanceLogs<T extends Prisma.Asset$maintenanceLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$maintenanceLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaintenanceLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchaseRequests<T extends Prisma.Asset$purchaseRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$purchaseRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   qrCodes<T extends Prisma.Asset$qrCodesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$qrCodesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QrCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignments<T extends Prisma.Asset$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3212,6 +3396,30 @@ export type Asset$qrCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.QrCodeScalarFieldEnum | Prisma.QrCodeScalarFieldEnum[]
+}
+
+/**
+ * Asset.assignments
+ */
+export type Asset$assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Assignment
+   */
+  select?: Prisma.AssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Assignment
+   */
+  omit?: Prisma.AssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentWhereInput
+  orderBy?: Prisma.AssignmentOrderByWithRelationInput | Prisma.AssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentScalarFieldEnum | Prisma.AssignmentScalarFieldEnum[]
 }
 
 /**

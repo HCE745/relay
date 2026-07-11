@@ -347,6 +347,16 @@ export type UserWhereInput = {
   sentChatMessages?: Prisma.ChatMessageListRelationFilter
   messageReactions?: Prisma.MessageReactionListRelationFilter
   supportMessagesAsUser?: Prisma.SupportMessageListRelationFilter
+  assignedAssignments?: Prisma.AssignmentListRelationFilter
+  createdAssignments?: Prisma.AssignmentListRelationFilter
+  assignmentComments?: Prisma.AssignmentCommentListRelationFilter
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryListRelationFilter
+  createdAnnouncements?: Prisma.AnnouncementListRelationFilter
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentListRelationFilter
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastListRelationFilter
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastListRelationFilter
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentListRelationFilter
+  dailyBriefings?: Prisma.DailyBriefingCacheListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -408,6 +418,16 @@ export type UserOrderByWithRelationInput = {
   sentChatMessages?: Prisma.ChatMessageOrderByRelationAggregateInput
   messageReactions?: Prisma.MessageReactionOrderByRelationAggregateInput
   supportMessagesAsUser?: Prisma.SupportMessageOrderByRelationAggregateInput
+  assignedAssignments?: Prisma.AssignmentOrderByRelationAggregateInput
+  createdAssignments?: Prisma.AssignmentOrderByRelationAggregateInput
+  assignmentComments?: Prisma.AssignmentCommentOrderByRelationAggregateInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryOrderByRelationAggregateInput
+  createdAnnouncements?: Prisma.AnnouncementOrderByRelationAggregateInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentOrderByRelationAggregateInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastOrderByRelationAggregateInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastOrderByRelationAggregateInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentOrderByRelationAggregateInput
+  dailyBriefings?: Prisma.DailyBriefingCacheOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -472,6 +492,16 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sentChatMessages?: Prisma.ChatMessageListRelationFilter
   messageReactions?: Prisma.MessageReactionListRelationFilter
   supportMessagesAsUser?: Prisma.SupportMessageListRelationFilter
+  assignedAssignments?: Prisma.AssignmentListRelationFilter
+  createdAssignments?: Prisma.AssignmentListRelationFilter
+  assignmentComments?: Prisma.AssignmentCommentListRelationFilter
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryListRelationFilter
+  createdAnnouncements?: Prisma.AnnouncementListRelationFilter
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentListRelationFilter
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastListRelationFilter
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastListRelationFilter
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentListRelationFilter
+  dailyBriefings?: Prisma.DailyBriefingCacheListRelationFilter
 }, "id" | "email" | "calendarToken">
 
 export type UserOrderByWithAggregationInput = {
@@ -581,6 +611,16 @@ export type UserCreateInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -636,6 +676,16 @@ export type UserUncheckedCreateInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -691,6 +741,16 @@ export type UserUpdateInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -746,6 +806,16 @@ export type UserUncheckedUpdateInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1616,6 +1686,148 @@ export type UserUpdateOneWithoutSupportMessagesAsUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportMessagesAsUserInput, Prisma.UserUpdateWithoutSupportMessagesAsUserInput>, Prisma.UserUncheckedUpdateWithoutSupportMessagesAsUserInput>
 }
 
+export type UserCreateNestedOneWithoutAssignedAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignedAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutCreatedAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedAssignmentsInput, Prisma.UserUncheckedCreateWithoutCreatedAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAssignedAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignedAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutAssignedAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedAssignmentsInput, Prisma.UserUpdateWithoutAssignedAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutAssignedAssignmentsInput>
+}
+
+export type UserUpdateOneRequiredWithoutCreatedAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedAssignmentsInput, Prisma.UserUncheckedCreateWithoutCreatedAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedAssignmentsInput, Prisma.UserUpdateWithoutCreatedAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutCreatedAssignmentsInput>
+}
+
+export type UserCreateNestedOneWithoutAssignmentCommentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentCommentsInput, Prisma.UserUncheckedCreateWithoutAssignmentCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentCommentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAssignmentCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentCommentsInput, Prisma.UserUncheckedCreateWithoutAssignmentCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentCommentsInput
+  upsert?: Prisma.UserUpsertWithoutAssignmentCommentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignmentCommentsInput, Prisma.UserUpdateWithoutAssignmentCommentsInput>, Prisma.UserUncheckedUpdateWithoutAssignmentCommentsInput>
+}
+
+export type UserCreateNestedOneWithoutAssignmentStatusChangesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentStatusChangesInput, Prisma.UserUncheckedCreateWithoutAssignmentStatusChangesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentStatusChangesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAssignmentStatusChangesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentStatusChangesInput, Prisma.UserUncheckedCreateWithoutAssignmentStatusChangesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentStatusChangesInput
+  upsert?: Prisma.UserUpsertWithoutAssignmentStatusChangesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignmentStatusChangesInput, Prisma.UserUpdateWithoutAssignmentStatusChangesInput>, Prisma.UserUncheckedUpdateWithoutAssignmentStatusChangesInput>
+}
+
+export type UserCreateNestedOneWithoutCreatedAnnouncementsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedAnnouncementsInput, Prisma.UserUncheckedCreateWithoutCreatedAnnouncementsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedAnnouncementsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCreatedAnnouncementsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedAnnouncementsInput, Prisma.UserUncheckedCreateWithoutCreatedAnnouncementsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedAnnouncementsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedAnnouncementsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedAnnouncementsInput, Prisma.UserUpdateWithoutCreatedAnnouncementsInput>, Prisma.UserUncheckedUpdateWithoutCreatedAnnouncementsInput>
+}
+
+export type UserCreateNestedOneWithoutAnnouncementAcksInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementAcksInput, Prisma.UserUncheckedCreateWithoutAnnouncementAcksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAnnouncementAcksInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAnnouncementAcksNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementAcksInput, Prisma.UserUncheckedCreateWithoutAnnouncementAcksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAnnouncementAcksInput
+  upsert?: Prisma.UserUpsertWithoutAnnouncementAcksInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAnnouncementAcksInput, Prisma.UserUpdateWithoutAnnouncementAcksInput>, Prisma.UserUncheckedUpdateWithoutAnnouncementAcksInput>
+}
+
+export type UserCreateNestedOneWithoutEmergencyBroadcastsCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmergencyBroadcastsCreatedInput, Prisma.UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmergencyBroadcastsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutEmergencyBroadcastsResolvedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmergencyBroadcastsResolvedInput, Prisma.UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmergencyBroadcastsResolvedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutEmergencyBroadcastsCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmergencyBroadcastsCreatedInput, Prisma.UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmergencyBroadcastsCreatedInput
+  upsert?: Prisma.UserUpsertWithoutEmergencyBroadcastsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmergencyBroadcastsCreatedInput, Prisma.UserUpdateWithoutEmergencyBroadcastsCreatedInput>, Prisma.UserUncheckedUpdateWithoutEmergencyBroadcastsCreatedInput>
+}
+
+export type UserUpdateOneWithoutEmergencyBroadcastsResolvedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmergencyBroadcastsResolvedInput, Prisma.UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmergencyBroadcastsResolvedInput
+  upsert?: Prisma.UserUpsertWithoutEmergencyBroadcastsResolvedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmergencyBroadcastsResolvedInput, Prisma.UserUpdateWithoutEmergencyBroadcastsResolvedInput>, Prisma.UserUncheckedUpdateWithoutEmergencyBroadcastsResolvedInput>
+}
+
+export type UserCreateNestedOneWithoutEmergencyAcksInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmergencyAcksInput, Prisma.UserUncheckedCreateWithoutEmergencyAcksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmergencyAcksInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutEmergencyAcksNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmergencyAcksInput, Prisma.UserUncheckedCreateWithoutEmergencyAcksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmergencyAcksInput
+  upsert?: Prisma.UserUpsertWithoutEmergencyAcksInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmergencyAcksInput, Prisma.UserUpdateWithoutEmergencyAcksInput>, Prisma.UserUncheckedUpdateWithoutEmergencyAcksInput>
+}
+
+export type UserCreateNestedOneWithoutDailyBriefingsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDailyBriefingsInput, Prisma.UserUncheckedCreateWithoutDailyBriefingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDailyBriefingsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDailyBriefingsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDailyBriefingsInput, Prisma.UserUncheckedCreateWithoutDailyBriefingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDailyBriefingsInput
+  upsert?: Prisma.UserUpsertWithoutDailyBriefingsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDailyBriefingsInput, Prisma.UserUpdateWithoutDailyBriefingsInput>, Prisma.UserUncheckedUpdateWithoutDailyBriefingsInput>
+}
+
 export type UserCreateWithoutOrganizationInput = {
   id?: string
   email: string
@@ -1668,6 +1880,16 @@ export type UserCreateWithoutOrganizationInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOrganizationInput = {
@@ -1722,6 +1944,16 @@ export type UserUncheckedCreateWithoutOrganizationInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOrganizationInput = {
@@ -1829,6 +2061,16 @@ export type UserCreateWithoutDirectReportsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDirectReportsInput = {
@@ -1883,6 +2125,16 @@ export type UserUncheckedCreateWithoutDirectReportsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDirectReportsInput = {
@@ -1942,6 +2194,16 @@ export type UserCreateWithoutManagerInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutManagerInput = {
@@ -1996,6 +2258,16 @@ export type UserUncheckedCreateWithoutManagerInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutManagerInput = {
@@ -2071,6 +2343,16 @@ export type UserUpdateWithoutDirectReportsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDirectReportsInput = {
@@ -2125,6 +2407,16 @@ export type UserUncheckedUpdateWithoutDirectReportsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutManagerInput = {
@@ -2195,6 +2487,16 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -2249,6 +2551,16 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -2319,6 +2631,16 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -2373,6 +2695,16 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSafetyContactAtInput = {
@@ -2427,6 +2759,16 @@ export type UserCreateWithoutSafetyContactAtInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSafetyContactAtInput = {
@@ -2481,6 +2823,16 @@ export type UserUncheckedCreateWithoutSafetyContactAtInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSafetyContactAtInput = {
@@ -2540,6 +2892,16 @@ export type UserCreateWithoutLocationInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLocationInput = {
@@ -2594,6 +2956,16 @@ export type UserUncheckedCreateWithoutLocationInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLocationInput = {
@@ -2669,6 +3041,16 @@ export type UserUpdateWithoutSafetyContactAtInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSafetyContactAtInput = {
@@ -2723,6 +3105,16 @@ export type UserUncheckedUpdateWithoutSafetyContactAtInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutLocationInput = {
@@ -2793,6 +3185,16 @@ export type UserCreateWithoutDepartmentInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDepartmentInput = {
@@ -2847,6 +3249,16 @@ export type UserUncheckedCreateWithoutDepartmentInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDepartmentInput = {
@@ -2927,6 +3339,16 @@ export type UserCreateWithoutReportedIssuesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedIssuesInput = {
@@ -2981,6 +3403,16 @@ export type UserUncheckedCreateWithoutReportedIssuesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedIssuesInput = {
@@ -3040,6 +3472,16 @@ export type UserCreateWithoutAssignedIssuesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedIssuesInput = {
@@ -3094,6 +3536,16 @@ export type UserUncheckedCreateWithoutAssignedIssuesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedIssuesInput = {
@@ -3164,6 +3616,16 @@ export type UserUpdateWithoutReportedIssuesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedIssuesInput = {
@@ -3218,6 +3680,16 @@ export type UserUncheckedUpdateWithoutReportedIssuesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutAssignedIssuesInput = {
@@ -3283,6 +3755,16 @@ export type UserUpdateWithoutAssignedIssuesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedIssuesInput = {
@@ -3337,6 +3819,16 @@ export type UserUncheckedUpdateWithoutAssignedIssuesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -3391,6 +3883,16 @@ export type UserCreateWithoutCommentsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -3445,6 +3947,16 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -3515,6 +4027,16 @@ export type UserUpdateWithoutCommentsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -3569,6 +4091,16 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -3623,6 +4155,16 @@ export type UserCreateWithoutNotificationsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -3677,6 +4219,16 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -3747,6 +4299,16 @@ export type UserUpdateWithoutNotificationsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -3801,6 +4363,16 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRoutingRulesInput = {
@@ -3855,6 +4427,16 @@ export type UserCreateWithoutRoutingRulesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRoutingRulesInput = {
@@ -3909,6 +4491,16 @@ export type UserUncheckedCreateWithoutRoutingRulesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRoutingRulesInput = {
@@ -3979,6 +4571,16 @@ export type UserUpdateWithoutRoutingRulesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoutingRulesInput = {
@@ -4033,6 +4635,16 @@ export type UserUncheckedUpdateWithoutRoutingRulesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSuggestionsInput = {
@@ -4087,6 +4699,16 @@ export type UserCreateWithoutSuggestionsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSuggestionsInput = {
@@ -4141,6 +4763,16 @@ export type UserUncheckedCreateWithoutSuggestionsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSuggestionsInput = {
@@ -4200,6 +4832,16 @@ export type UserCreateWithoutRoutedSuggestionsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRoutedSuggestionsInput = {
@@ -4254,6 +4896,16 @@ export type UserUncheckedCreateWithoutRoutedSuggestionsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRoutedSuggestionsInput = {
@@ -4324,6 +4976,16 @@ export type UserUpdateWithoutSuggestionsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSuggestionsInput = {
@@ -4378,6 +5040,16 @@ export type UserUncheckedUpdateWithoutSuggestionsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutRoutedSuggestionsInput = {
@@ -4443,6 +5115,16 @@ export type UserUpdateWithoutRoutedSuggestionsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoutedSuggestionsInput = {
@@ -4497,6 +5179,16 @@ export type UserUncheckedUpdateWithoutRoutedSuggestionsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentInvitationsInput = {
@@ -4551,6 +5243,16 @@ export type UserCreateWithoutSentInvitationsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentInvitationsInput = {
@@ -4605,6 +5307,16 @@ export type UserUncheckedCreateWithoutSentInvitationsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentInvitationsInput = {
@@ -4675,6 +5387,16 @@ export type UserUpdateWithoutSentInvitationsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentInvitationsInput = {
@@ -4729,6 +5451,16 @@ export type UserUncheckedUpdateWithoutSentInvitationsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignedLocationsInput = {
@@ -4783,6 +5515,16 @@ export type UserCreateWithoutAssignedLocationsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedLocationsInput = {
@@ -4837,6 +5579,16 @@ export type UserUncheckedCreateWithoutAssignedLocationsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedLocationsInput = {
@@ -4907,6 +5659,16 @@ export type UserUpdateWithoutAssignedLocationsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedLocationsInput = {
@@ -4961,6 +5723,16 @@ export type UserUncheckedUpdateWithoutAssignedLocationsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmployeeTypeInput = {
@@ -5015,6 +5787,16 @@ export type UserCreateWithoutEmployeeTypeInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmployeeTypeInput = {
@@ -5069,6 +5851,16 @@ export type UserUncheckedCreateWithoutEmployeeTypeInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmployeeTypeInput = {
@@ -5149,6 +5941,16 @@ export type UserCreateWithoutUserSettingsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserSettingsInput = {
@@ -5203,6 +6005,16 @@ export type UserUncheckedCreateWithoutUserSettingsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserSettingsInput = {
@@ -5273,6 +6085,16 @@ export type UserUpdateWithoutUserSettingsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserSettingsInput = {
@@ -5327,6 +6149,16 @@ export type UserUncheckedUpdateWithoutUserSettingsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCreatedTemplatesInput = {
@@ -5381,6 +6213,16 @@ export type UserCreateWithoutCreatedTemplatesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedTemplatesInput = {
@@ -5435,6 +6277,16 @@ export type UserUncheckedCreateWithoutCreatedTemplatesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedTemplatesInput = {
@@ -5505,6 +6357,16 @@ export type UserUpdateWithoutCreatedTemplatesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedTemplatesInput = {
@@ -5559,6 +6421,16 @@ export type UserUncheckedUpdateWithoutCreatedTemplatesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMaintenanceSchedulesInput = {
@@ -5613,6 +6485,16 @@ export type UserCreateWithoutMaintenanceSchedulesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMaintenanceSchedulesInput = {
@@ -5667,6 +6549,16 @@ export type UserUncheckedCreateWithoutMaintenanceSchedulesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMaintenanceSchedulesInput = {
@@ -5737,6 +6629,16 @@ export type UserUpdateWithoutMaintenanceSchedulesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMaintenanceSchedulesInput = {
@@ -5791,6 +6693,16 @@ export type UserUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSubmittedPurchaseRequestsInput = {
@@ -5845,6 +6757,16 @@ export type UserCreateWithoutSubmittedPurchaseRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSubmittedPurchaseRequestsInput = {
@@ -5899,6 +6821,16 @@ export type UserUncheckedCreateWithoutSubmittedPurchaseRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSubmittedPurchaseRequestsInput = {
@@ -5958,6 +6890,16 @@ export type UserCreateWithoutApprovedPurchaseRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutApprovedPurchaseRequestsInput = {
@@ -6012,6 +6954,16 @@ export type UserUncheckedCreateWithoutApprovedPurchaseRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutApprovedPurchaseRequestsInput = {
@@ -6082,6 +7034,16 @@ export type UserUpdateWithoutSubmittedPurchaseRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubmittedPurchaseRequestsInput = {
@@ -6136,6 +7098,16 @@ export type UserUncheckedUpdateWithoutSubmittedPurchaseRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutApprovedPurchaseRequestsInput = {
@@ -6201,6 +7173,16 @@ export type UserUpdateWithoutApprovedPurchaseRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApprovedPurchaseRequestsInput = {
@@ -6255,6 +7237,16 @@ export type UserUncheckedUpdateWithoutApprovedPurchaseRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPurchaseRequestApprovalsInput = {
@@ -6309,6 +7301,16 @@ export type UserCreateWithoutPurchaseRequestApprovalsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPurchaseRequestApprovalsInput = {
@@ -6363,6 +7365,16 @@ export type UserUncheckedCreateWithoutPurchaseRequestApprovalsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPurchaseRequestApprovalsInput = {
@@ -6433,6 +7445,16 @@ export type UserUpdateWithoutPurchaseRequestApprovalsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPurchaseRequestApprovalsInput = {
@@ -6487,6 +7509,16 @@ export type UserUncheckedUpdateWithoutPurchaseRequestApprovalsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportedInjuriesInput = {
@@ -6541,6 +7573,16 @@ export type UserCreateWithoutReportedInjuriesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedInjuriesInput = {
@@ -6595,6 +7637,16 @@ export type UserUncheckedCreateWithoutReportedInjuriesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedInjuriesInput = {
@@ -6654,6 +7706,16 @@ export type UserCreateWithoutReviewedInjuriesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewedInjuriesInput = {
@@ -6708,6 +7770,16 @@ export type UserUncheckedCreateWithoutReviewedInjuriesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewedInjuriesInput = {
@@ -6778,6 +7850,16 @@ export type UserUpdateWithoutReportedInjuriesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedInjuriesInput = {
@@ -6832,6 +7914,16 @@ export type UserUncheckedUpdateWithoutReportedInjuriesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewedInjuriesInput = {
@@ -6897,6 +7989,16 @@ export type UserUpdateWithoutReviewedInjuriesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewedInjuriesInput = {
@@ -6951,6 +8053,16 @@ export type UserUncheckedUpdateWithoutReviewedInjuriesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBugReportsInput = {
@@ -7005,6 +8117,16 @@ export type UserCreateWithoutBugReportsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBugReportsInput = {
@@ -7059,6 +8181,16 @@ export type UserUncheckedCreateWithoutBugReportsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBugReportsInput = {
@@ -7129,6 +8261,16 @@ export type UserUpdateWithoutBugReportsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBugReportsInput = {
@@ -7183,6 +8325,16 @@ export type UserUncheckedUpdateWithoutBugReportsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFeatureRequestsInput = {
@@ -7237,6 +8389,16 @@ export type UserCreateWithoutFeatureRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFeatureRequestsInput = {
@@ -7291,6 +8453,16 @@ export type UserUncheckedCreateWithoutFeatureRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFeatureRequestsInput = {
@@ -7361,6 +8533,16 @@ export type UserUpdateWithoutFeatureRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFeatureRequestsInput = {
@@ -7415,6 +8597,16 @@ export type UserUncheckedUpdateWithoutFeatureRequestsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRegionInput = {
@@ -7469,6 +8661,16 @@ export type UserCreateWithoutRegionInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRegionInput = {
@@ -7523,6 +8725,16 @@ export type UserUncheckedCreateWithoutRegionInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRegionInput = {
@@ -7603,6 +8815,16 @@ export type UserCreateWithoutAssignedQrCodesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedQrCodesInput = {
@@ -7657,6 +8879,16 @@ export type UserUncheckedCreateWithoutAssignedQrCodesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedQrCodesInput = {
@@ -7727,6 +8959,16 @@ export type UserUpdateWithoutAssignedQrCodesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedQrCodesInput = {
@@ -7781,6 +9023,16 @@ export type UserUncheckedUpdateWithoutAssignedQrCodesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserOrgMembershipsInput = {
@@ -7835,6 +9087,16 @@ export type UserCreateWithoutUserOrgMembershipsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserOrgMembershipsInput = {
@@ -7889,6 +9151,16 @@ export type UserUncheckedCreateWithoutUserOrgMembershipsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserOrgMembershipsInput = {
@@ -7959,6 +9231,16 @@ export type UserUpdateWithoutUserOrgMembershipsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserOrgMembershipsInput = {
@@ -8013,6 +9295,16 @@ export type UserUncheckedUpdateWithoutUserOrgMembershipsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLegalAcceptancesInput = {
@@ -8067,6 +9359,16 @@ export type UserCreateWithoutLegalAcceptancesInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
@@ -8121,6 +9423,16 @@ export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLegalAcceptancesInput = {
@@ -8191,6 +9503,16 @@ export type UserUpdateWithoutLegalAcceptancesInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
@@ -8245,6 +9567,16 @@ export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDeviceTokensInput = {
@@ -8299,6 +9631,16 @@ export type UserCreateWithoutDeviceTokensInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDeviceTokensInput = {
@@ -8353,6 +9695,16 @@ export type UserUncheckedCreateWithoutDeviceTokensInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDeviceTokensInput = {
@@ -8423,6 +9775,16 @@ export type UserUpdateWithoutDeviceTokensInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeviceTokensInput = {
@@ -8477,6 +9839,16 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationsCreatedInput = {
@@ -8531,6 +9903,16 @@ export type UserCreateWithoutConversationsCreatedInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationsCreatedInput = {
@@ -8585,6 +9967,16 @@ export type UserUncheckedCreateWithoutConversationsCreatedInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationsCreatedInput = {
@@ -8655,6 +10047,16 @@ export type UserUpdateWithoutConversationsCreatedInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationsCreatedInput = {
@@ -8709,6 +10111,16 @@ export type UserUncheckedUpdateWithoutConversationsCreatedInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationMembershipsInput = {
@@ -8763,6 +10175,16 @@ export type UserCreateWithoutConversationMembershipsInput = {
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationMembershipsInput = {
@@ -8817,6 +10239,16 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationMembershipsInput = {
@@ -8887,6 +10319,16 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
@@ -8941,6 +10383,16 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentChatMessagesInput = {
@@ -8995,6 +10447,16 @@ export type UserCreateWithoutSentChatMessagesInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentChatMessagesInput = {
@@ -9049,6 +10511,16 @@ export type UserUncheckedCreateWithoutSentChatMessagesInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentChatMessagesInput = {
@@ -9119,6 +10591,16 @@ export type UserUpdateWithoutSentChatMessagesInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
@@ -9173,6 +10655,16 @@ export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessageReactionsInput = {
@@ -9227,6 +10719,16 @@ export type UserCreateWithoutMessageReactionsInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessageReactionsInput = {
@@ -9281,6 +10783,16 @@ export type UserUncheckedCreateWithoutMessageReactionsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessageReactionsInput = {
@@ -9351,6 +10863,16 @@ export type UserUpdateWithoutMessageReactionsInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessageReactionsInput = {
@@ -9405,6 +10927,16 @@ export type UserUncheckedUpdateWithoutMessageReactionsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSupportMessagesAsUserInput = {
@@ -9459,6 +10991,16 @@ export type UserCreateWithoutSupportMessagesAsUserInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSupportMessagesAsUserInput = {
@@ -9513,6 +11055,16 @@ export type UserUncheckedCreateWithoutSupportMessagesAsUserInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSupportMessagesAsUserInput = {
@@ -9583,6 +11135,16 @@ export type UserUpdateWithoutSupportMessagesAsUserInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportMessagesAsUserInput = {
@@ -9637,6 +11199,2736 @@ export type UserUncheckedUpdateWithoutSupportMessagesAsUserInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAssignedAssignmentsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssignedAssignmentsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAssignedAssignmentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignedAssignmentsInput>
+}
+
+export type UserCreateWithoutCreatedAssignmentsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedAssignmentsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedAssignmentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedAssignmentsInput, Prisma.UserUncheckedCreateWithoutCreatedAssignmentsInput>
+}
+
+export type UserUpsertWithoutAssignedAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedAssignmentsInput, Prisma.UserUncheckedUpdateWithoutAssignedAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignedAssignmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignedAssignmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedAssignmentsInput, Prisma.UserUncheckedUpdateWithoutAssignedAssignmentsInput>
+}
+
+export type UserUpdateWithoutAssignedAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignedAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutCreatedAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedAssignmentsInput, Prisma.UserUncheckedUpdateWithoutCreatedAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedAssignmentsInput, Prisma.UserUncheckedCreateWithoutCreatedAssignmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedAssignmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedAssignmentsInput, Prisma.UserUncheckedUpdateWithoutCreatedAssignmentsInput>
+}
+
+export type UserUpdateWithoutCreatedAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAssignmentCommentsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssignmentCommentsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAssignmentCommentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentCommentsInput, Prisma.UserUncheckedCreateWithoutAssignmentCommentsInput>
+}
+
+export type UserUpsertWithoutAssignmentCommentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentCommentsInput, Prisma.UserUncheckedUpdateWithoutAssignmentCommentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentCommentsInput, Prisma.UserUncheckedCreateWithoutAssignmentCommentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignmentCommentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentCommentsInput, Prisma.UserUncheckedUpdateWithoutAssignmentCommentsInput>
+}
+
+export type UserUpdateWithoutAssignmentCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignmentCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAssignmentStatusChangesInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssignmentStatusChangesInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAssignmentStatusChangesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentStatusChangesInput, Prisma.UserUncheckedCreateWithoutAssignmentStatusChangesInput>
+}
+
+export type UserUpsertWithoutAssignmentStatusChangesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentStatusChangesInput, Prisma.UserUncheckedUpdateWithoutAssignmentStatusChangesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentStatusChangesInput, Prisma.UserUncheckedCreateWithoutAssignmentStatusChangesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignmentStatusChangesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentStatusChangesInput, Prisma.UserUncheckedUpdateWithoutAssignmentStatusChangesInput>
+}
+
+export type UserUpdateWithoutAssignmentStatusChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignmentStatusChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCreatedAnnouncementsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedAnnouncementsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedAnnouncementsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedAnnouncementsInput, Prisma.UserUncheckedCreateWithoutCreatedAnnouncementsInput>
+}
+
+export type UserUpsertWithoutCreatedAnnouncementsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedAnnouncementsInput, Prisma.UserUncheckedUpdateWithoutCreatedAnnouncementsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedAnnouncementsInput, Prisma.UserUncheckedCreateWithoutCreatedAnnouncementsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedAnnouncementsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedAnnouncementsInput, Prisma.UserUncheckedUpdateWithoutCreatedAnnouncementsInput>
+}
+
+export type UserUpdateWithoutCreatedAnnouncementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedAnnouncementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAnnouncementAcksInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAnnouncementAcksInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAnnouncementAcksInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementAcksInput, Prisma.UserUncheckedCreateWithoutAnnouncementAcksInput>
+}
+
+export type UserUpsertWithoutAnnouncementAcksInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAnnouncementAcksInput, Prisma.UserUncheckedUpdateWithoutAnnouncementAcksInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAnnouncementAcksInput, Prisma.UserUncheckedCreateWithoutAnnouncementAcksInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAnnouncementAcksInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAnnouncementAcksInput, Prisma.UserUncheckedUpdateWithoutAnnouncementAcksInput>
+}
+
+export type UserUpdateWithoutAnnouncementAcksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAnnouncementAcksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutEmergencyBroadcastsCreatedInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutEmergencyBroadcastsCreatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmergencyBroadcastsCreatedInput, Prisma.UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput>
+}
+
+export type UserCreateWithoutEmergencyBroadcastsResolvedInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutEmergencyBroadcastsResolvedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmergencyBroadcastsResolvedInput, Prisma.UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput>
+}
+
+export type UserUpsertWithoutEmergencyBroadcastsCreatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEmergencyBroadcastsCreatedInput, Prisma.UserUncheckedUpdateWithoutEmergencyBroadcastsCreatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmergencyBroadcastsCreatedInput, Prisma.UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutEmergencyBroadcastsCreatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEmergencyBroadcastsCreatedInput, Prisma.UserUncheckedUpdateWithoutEmergencyBroadcastsCreatedInput>
+}
+
+export type UserUpdateWithoutEmergencyBroadcastsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEmergencyBroadcastsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutEmergencyBroadcastsResolvedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEmergencyBroadcastsResolvedInput, Prisma.UserUncheckedUpdateWithoutEmergencyBroadcastsResolvedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmergencyBroadcastsResolvedInput, Prisma.UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutEmergencyBroadcastsResolvedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEmergencyBroadcastsResolvedInput, Prisma.UserUncheckedUpdateWithoutEmergencyBroadcastsResolvedInput>
+}
+
+export type UserUpdateWithoutEmergencyBroadcastsResolvedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEmergencyBroadcastsResolvedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutEmergencyAcksInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutEmergencyAcksInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutEmergencyAcksInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmergencyAcksInput, Prisma.UserUncheckedCreateWithoutEmergencyAcksInput>
+}
+
+export type UserUpsertWithoutEmergencyAcksInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEmergencyAcksInput, Prisma.UserUncheckedUpdateWithoutEmergencyAcksInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmergencyAcksInput, Prisma.UserUncheckedCreateWithoutEmergencyAcksInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutEmergencyAcksInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEmergencyAcksInput, Prisma.UserUncheckedUpdateWithoutEmergencyAcksInput>
+}
+
+export type UserUpdateWithoutEmergencyAcksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEmergencyAcksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutDailyBriefingsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutDailyBriefingsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutDailyBriefingsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDailyBriefingsInput, Prisma.UserUncheckedCreateWithoutDailyBriefingsInput>
+}
+
+export type UserUpsertWithoutDailyBriefingsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDailyBriefingsInput, Prisma.UserUncheckedUpdateWithoutDailyBriefingsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDailyBriefingsInput, Prisma.UserUncheckedCreateWithoutDailyBriefingsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDailyBriefingsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDailyBriefingsInput, Prisma.UserUncheckedUpdateWithoutDailyBriefingsInput>
+}
+
+export type UserUpdateWithoutDailyBriefingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDailyBriefingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyOrganizationInput = {
@@ -9714,6 +14006,16 @@ export type UserUpdateWithoutOrganizationInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrganizationInput = {
@@ -9768,6 +14070,16 @@ export type UserUncheckedUpdateWithoutOrganizationInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutOrganizationInput = {
@@ -9868,6 +14180,16 @@ export type UserUpdateWithoutManagerInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagerInput = {
@@ -9922,6 +14244,16 @@ export type UserUncheckedUpdateWithoutManagerInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutManagerInput = {
@@ -10022,6 +14354,16 @@ export type UserUpdateWithoutLocationInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLocationInput = {
@@ -10076,6 +14418,16 @@ export type UserUncheckedUpdateWithoutLocationInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutLocationInput = {
@@ -10176,6 +14528,16 @@ export type UserUpdateWithoutDepartmentInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDepartmentInput = {
@@ -10230,6 +14592,16 @@ export type UserUncheckedUpdateWithoutDepartmentInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutDepartmentInput = {
@@ -10330,6 +14702,16 @@ export type UserUpdateWithoutEmployeeTypeInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmployeeTypeInput = {
@@ -10384,6 +14766,16 @@ export type UserUncheckedUpdateWithoutEmployeeTypeInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutEmployeeTypeInput = {
@@ -10484,6 +14876,16 @@ export type UserUpdateWithoutRegionInput = {
   sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRegionInput = {
@@ -10538,6 +14940,16 @@ export type UserUncheckedUpdateWithoutRegionInput = {
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutRegionInput = {
@@ -10599,6 +15011,16 @@ export type UserCountOutputType = {
   sentChatMessages: number
   messageReactions: number
   supportMessagesAsUser: number
+  assignedAssignments: number
+  createdAssignments: number
+  assignmentComments: number
+  assignmentStatusChanges: number
+  createdAnnouncements: number
+  announcementAcks: number
+  emergencyBroadcastsCreated: number
+  emergencyBroadcastsResolved: number
+  emergencyAcks: number
+  dailyBriefings: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -10632,6 +15054,16 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   sentChatMessages?: boolean | UserCountOutputTypeCountSentChatMessagesArgs
   messageReactions?: boolean | UserCountOutputTypeCountMessageReactionsArgs
   supportMessagesAsUser?: boolean | UserCountOutputTypeCountSupportMessagesAsUserArgs
+  assignedAssignments?: boolean | UserCountOutputTypeCountAssignedAssignmentsArgs
+  createdAssignments?: boolean | UserCountOutputTypeCountCreatedAssignmentsArgs
+  assignmentComments?: boolean | UserCountOutputTypeCountAssignmentCommentsArgs
+  assignmentStatusChanges?: boolean | UserCountOutputTypeCountAssignmentStatusChangesArgs
+  createdAnnouncements?: boolean | UserCountOutputTypeCountCreatedAnnouncementsArgs
+  announcementAcks?: boolean | UserCountOutputTypeCountAnnouncementAcksArgs
+  emergencyBroadcastsCreated?: boolean | UserCountOutputTypeCountEmergencyBroadcastsCreatedArgs
+  emergencyBroadcastsResolved?: boolean | UserCountOutputTypeCountEmergencyBroadcastsResolvedArgs
+  emergencyAcks?: boolean | UserCountOutputTypeCountEmergencyAcksArgs
+  dailyBriefings?: boolean | UserCountOutputTypeCountDailyBriefingsArgs
 }
 
 /**
@@ -10854,6 +15286,76 @@ export type UserCountOutputTypeCountSupportMessagesAsUserArgs<ExtArgs extends ru
   where?: Prisma.SupportMessageWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssignedAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssignmentCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentCommentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssignmentStatusChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentStatusHistoryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedAnnouncementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AnnouncementWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAnnouncementAcksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AnnouncementAcknowledgmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountEmergencyBroadcastsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmergencyBroadcastWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountEmergencyBroadcastsResolvedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmergencyBroadcastWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountEmergencyAcksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmergencyAcknowledgmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDailyBriefingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DailyBriefingCacheWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -10914,6 +15416,16 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sentChatMessages?: boolean | Prisma.User$sentChatMessagesArgs<ExtArgs>
   messageReactions?: boolean | Prisma.User$messageReactionsArgs<ExtArgs>
   supportMessagesAsUser?: boolean | Prisma.User$supportMessagesAsUserArgs<ExtArgs>
+  assignedAssignments?: boolean | Prisma.User$assignedAssignmentsArgs<ExtArgs>
+  createdAssignments?: boolean | Prisma.User$createdAssignmentsArgs<ExtArgs>
+  assignmentComments?: boolean | Prisma.User$assignmentCommentsArgs<ExtArgs>
+  assignmentStatusChanges?: boolean | Prisma.User$assignmentStatusChangesArgs<ExtArgs>
+  createdAnnouncements?: boolean | Prisma.User$createdAnnouncementsArgs<ExtArgs>
+  announcementAcks?: boolean | Prisma.User$announcementAcksArgs<ExtArgs>
+  emergencyBroadcastsCreated?: boolean | Prisma.User$emergencyBroadcastsCreatedArgs<ExtArgs>
+  emergencyBroadcastsResolved?: boolean | Prisma.User$emergencyBroadcastsResolvedArgs<ExtArgs>
+  emergencyAcks?: boolean | Prisma.User$emergencyAcksArgs<ExtArgs>
+  dailyBriefings?: boolean | Prisma.User$dailyBriefingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -11040,6 +15552,16 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sentChatMessages?: boolean | Prisma.User$sentChatMessagesArgs<ExtArgs>
   messageReactions?: boolean | Prisma.User$messageReactionsArgs<ExtArgs>
   supportMessagesAsUser?: boolean | Prisma.User$supportMessagesAsUserArgs<ExtArgs>
+  assignedAssignments?: boolean | Prisma.User$assignedAssignmentsArgs<ExtArgs>
+  createdAssignments?: boolean | Prisma.User$createdAssignmentsArgs<ExtArgs>
+  assignmentComments?: boolean | Prisma.User$assignmentCommentsArgs<ExtArgs>
+  assignmentStatusChanges?: boolean | Prisma.User$assignmentStatusChangesArgs<ExtArgs>
+  createdAnnouncements?: boolean | Prisma.User$createdAnnouncementsArgs<ExtArgs>
+  announcementAcks?: boolean | Prisma.User$announcementAcksArgs<ExtArgs>
+  emergencyBroadcastsCreated?: boolean | Prisma.User$emergencyBroadcastsCreatedArgs<ExtArgs>
+  emergencyBroadcastsResolved?: boolean | Prisma.User$emergencyBroadcastsResolvedArgs<ExtArgs>
+  emergencyAcks?: boolean | Prisma.User$emergencyAcksArgs<ExtArgs>
+  dailyBriefings?: boolean | Prisma.User$dailyBriefingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -11099,6 +15621,16 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sentChatMessages: Prisma.$ChatMessagePayload<ExtArgs>[]
     messageReactions: Prisma.$MessageReactionPayload<ExtArgs>[]
     supportMessagesAsUser: Prisma.$SupportMessagePayload<ExtArgs>[]
+    assignedAssignments: Prisma.$AssignmentPayload<ExtArgs>[]
+    createdAssignments: Prisma.$AssignmentPayload<ExtArgs>[]
+    assignmentComments: Prisma.$AssignmentCommentPayload<ExtArgs>[]
+    assignmentStatusChanges: Prisma.$AssignmentStatusHistoryPayload<ExtArgs>[]
+    createdAnnouncements: Prisma.$AnnouncementPayload<ExtArgs>[]
+    announcementAcks: Prisma.$AnnouncementAcknowledgmentPayload<ExtArgs>[]
+    emergencyBroadcastsCreated: Prisma.$EmergencyBroadcastPayload<ExtArgs>[]
+    emergencyBroadcastsResolved: Prisma.$EmergencyBroadcastPayload<ExtArgs>[]
+    emergencyAcks: Prisma.$EmergencyAcknowledgmentPayload<ExtArgs>[]
+    dailyBriefings: Prisma.$DailyBriefingCachePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -11553,6 +16085,16 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sentChatMessages<T extends Prisma.User$sentChatMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentChatMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messageReactions<T extends Prisma.User$messageReactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messageReactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   supportMessagesAsUser<T extends Prisma.User$supportMessagesAsUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportMessagesAsUserArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignedAssignments<T extends Prisma.User$assignedAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdAssignments<T extends Prisma.User$createdAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignmentComments<T extends Prisma.User$assignmentCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignmentCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignmentStatusChanges<T extends Prisma.User$assignmentStatusChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignmentStatusChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdAnnouncements<T extends Prisma.User$createdAnnouncementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdAnnouncementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  announcementAcks<T extends Prisma.User$announcementAcksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$announcementAcksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementAcknowledgmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emergencyBroadcastsCreated<T extends Prisma.User$emergencyBroadcastsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emergencyBroadcastsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emergencyBroadcastsResolved<T extends Prisma.User$emergencyBroadcastsResolvedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emergencyBroadcastsResolvedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emergencyAcks<T extends Prisma.User$emergencyAcksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emergencyAcksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyAcknowledgmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dailyBriefings<T extends Prisma.User$dailyBriefingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$dailyBriefingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyBriefingCachePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12835,6 +17377,246 @@ export type User$supportMessagesAsUserArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.SupportMessageScalarFieldEnum | Prisma.SupportMessageScalarFieldEnum[]
+}
+
+/**
+ * User.assignedAssignments
+ */
+export type User$assignedAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Assignment
+   */
+  select?: Prisma.AssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Assignment
+   */
+  omit?: Prisma.AssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentWhereInput
+  orderBy?: Prisma.AssignmentOrderByWithRelationInput | Prisma.AssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentScalarFieldEnum | Prisma.AssignmentScalarFieldEnum[]
+}
+
+/**
+ * User.createdAssignments
+ */
+export type User$createdAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Assignment
+   */
+  select?: Prisma.AssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Assignment
+   */
+  omit?: Prisma.AssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentWhereInput
+  orderBy?: Prisma.AssignmentOrderByWithRelationInput | Prisma.AssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentScalarFieldEnum | Prisma.AssignmentScalarFieldEnum[]
+}
+
+/**
+ * User.assignmentComments
+ */
+export type User$assignmentCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AssignmentComment
+   */
+  select?: Prisma.AssignmentCommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AssignmentComment
+   */
+  omit?: Prisma.AssignmentCommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentCommentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentCommentWhereInput
+  orderBy?: Prisma.AssignmentCommentOrderByWithRelationInput | Prisma.AssignmentCommentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentCommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentCommentScalarFieldEnum | Prisma.AssignmentCommentScalarFieldEnum[]
+}
+
+/**
+ * User.assignmentStatusChanges
+ */
+export type User$assignmentStatusChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AssignmentStatusHistory
+   */
+  select?: Prisma.AssignmentStatusHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AssignmentStatusHistory
+   */
+  omit?: Prisma.AssignmentStatusHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentStatusHistoryInclude<ExtArgs> | null
+  where?: Prisma.AssignmentStatusHistoryWhereInput
+  orderBy?: Prisma.AssignmentStatusHistoryOrderByWithRelationInput | Prisma.AssignmentStatusHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentStatusHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentStatusHistoryScalarFieldEnum | Prisma.AssignmentStatusHistoryScalarFieldEnum[]
+}
+
+/**
+ * User.createdAnnouncements
+ */
+export type User$createdAnnouncementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Announcement
+   */
+  select?: Prisma.AnnouncementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Announcement
+   */
+  omit?: Prisma.AnnouncementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  where?: Prisma.AnnouncementWhereInput
+  orderBy?: Prisma.AnnouncementOrderByWithRelationInput | Prisma.AnnouncementOrderByWithRelationInput[]
+  cursor?: Prisma.AnnouncementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AnnouncementScalarFieldEnum | Prisma.AnnouncementScalarFieldEnum[]
+}
+
+/**
+ * User.announcementAcks
+ */
+export type User$announcementAcksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AnnouncementAcknowledgment
+   */
+  select?: Prisma.AnnouncementAcknowledgmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AnnouncementAcknowledgment
+   */
+  omit?: Prisma.AnnouncementAcknowledgmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementAcknowledgmentInclude<ExtArgs> | null
+  where?: Prisma.AnnouncementAcknowledgmentWhereInput
+  orderBy?: Prisma.AnnouncementAcknowledgmentOrderByWithRelationInput | Prisma.AnnouncementAcknowledgmentOrderByWithRelationInput[]
+  cursor?: Prisma.AnnouncementAcknowledgmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AnnouncementAcknowledgmentScalarFieldEnum | Prisma.AnnouncementAcknowledgmentScalarFieldEnum[]
+}
+
+/**
+ * User.emergencyBroadcastsCreated
+ */
+export type User$emergencyBroadcastsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmergencyBroadcast
+   */
+  select?: Prisma.EmergencyBroadcastSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmergencyBroadcast
+   */
+  omit?: Prisma.EmergencyBroadcastOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmergencyBroadcastInclude<ExtArgs> | null
+  where?: Prisma.EmergencyBroadcastWhereInput
+  orderBy?: Prisma.EmergencyBroadcastOrderByWithRelationInput | Prisma.EmergencyBroadcastOrderByWithRelationInput[]
+  cursor?: Prisma.EmergencyBroadcastWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmergencyBroadcastScalarFieldEnum | Prisma.EmergencyBroadcastScalarFieldEnum[]
+}
+
+/**
+ * User.emergencyBroadcastsResolved
+ */
+export type User$emergencyBroadcastsResolvedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmergencyBroadcast
+   */
+  select?: Prisma.EmergencyBroadcastSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmergencyBroadcast
+   */
+  omit?: Prisma.EmergencyBroadcastOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmergencyBroadcastInclude<ExtArgs> | null
+  where?: Prisma.EmergencyBroadcastWhereInput
+  orderBy?: Prisma.EmergencyBroadcastOrderByWithRelationInput | Prisma.EmergencyBroadcastOrderByWithRelationInput[]
+  cursor?: Prisma.EmergencyBroadcastWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmergencyBroadcastScalarFieldEnum | Prisma.EmergencyBroadcastScalarFieldEnum[]
+}
+
+/**
+ * User.emergencyAcks
+ */
+export type User$emergencyAcksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmergencyAcknowledgment
+   */
+  select?: Prisma.EmergencyAcknowledgmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmergencyAcknowledgment
+   */
+  omit?: Prisma.EmergencyAcknowledgmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmergencyAcknowledgmentInclude<ExtArgs> | null
+  where?: Prisma.EmergencyAcknowledgmentWhereInput
+  orderBy?: Prisma.EmergencyAcknowledgmentOrderByWithRelationInput | Prisma.EmergencyAcknowledgmentOrderByWithRelationInput[]
+  cursor?: Prisma.EmergencyAcknowledgmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmergencyAcknowledgmentScalarFieldEnum | Prisma.EmergencyAcknowledgmentScalarFieldEnum[]
+}
+
+/**
+ * User.dailyBriefings
+ */
+export type User$dailyBriefingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DailyBriefingCache
+   */
+  select?: Prisma.DailyBriefingCacheSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DailyBriefingCache
+   */
+  omit?: Prisma.DailyBriefingCacheOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DailyBriefingCacheInclude<ExtArgs> | null
+  where?: Prisma.DailyBriefingCacheWhereInput
+  orderBy?: Prisma.DailyBriefingCacheOrderByWithRelationInput | Prisma.DailyBriefingCacheOrderByWithRelationInput[]
+  cursor?: Prisma.DailyBriefingCacheWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DailyBriefingCacheScalarFieldEnum | Prisma.DailyBriefingCacheScalarFieldEnum[]
 }
 
 /**

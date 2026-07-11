@@ -31,7 +31,8 @@ import {
   TrendingUp,
   CheckSquare,
   Clock,
-  MessageSquare,
+  Radio,
+  ClipboardCheck,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { logout } from "@/lib/auth-actions"
@@ -55,6 +56,8 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "corporate-dashboard", href: "/corporate-dashboard", label: "Corporate View",    icon: Globe2 },
   { key: "regional-dashboard",  href: "/regional-dashboard",  label: "Regional View",     icon: Building },
   { key: "issues",              href: "/issues",              label: "Issues",            icon: AlertCircle },
+  { key: "assignments",         href: "/assignments",         label: "Assignments",       icon: ClipboardCheck },
+  { key: "communications",      href: "/communications",      label: "Communications",    icon: Radio },
   { key: "archive",             href: "/archive",             label: "Archive",           icon: Archive },
   { key: "calendar",            href: "/calendar",            label: "Calendar",          icon: CalendarDays },
   { key: "purchase-requests",      href: "/purchase-requests",      label: "Purchase Requests",     icon: ShoppingCart },
@@ -105,13 +108,13 @@ export function Sidebar({
     let cancelled = false
     async function fetchUnread() {
       try {
-        const res = await fetch("/api/conversations/unread")
-        const j   = await res.json() as { count?: number }
-        if (!cancelled) setUnreadCount(j.count ?? 0)
+        const res = await fetch("/api/notifications")
+        const arr = await res.json() as Array<{ isRead?: boolean }>
+        if (!cancelled) setUnreadCount(Array.isArray(arr) ? arr.filter(n => !n.isRead).length : 0)
       } catch {}
     }
     fetchUnread()
-    const iv = setInterval(fetchUnread, 15_000)
+    const iv = setInterval(fetchUnread, 30_000)
     return () => { cancelled = true; clearInterval(iv) }
   }, [])
 
@@ -218,18 +221,17 @@ export function Sidebar({
         {(apiWebhooksEnabled || ssoEnabled) && navLink("/settings/integrations", "Integrations", Key)}
         {sharedFacilityEnabled && navLink("/settings/shared-facility", "Shared Facility", Building2)}
         {navLink("/settings", "Settings", Settings)}
-        {navLink("/notifications", "Notifications", Bell)}
         <Link
-          href="/messages"
+          href="/notifications"
           className={cn(
             "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-            pathname === "/messages" || pathname.startsWith("/messages/")
+            pathname === "/notifications"
               ? "bg-blue-600 text-white"
               : "text-gray-400 hover:text-white hover:bg-gray-800"
           )}
         >
-          <MessageSquare className="w-5 h-5 flex-shrink-0" />
-          Messages
+          <Bell className="w-5 h-5 flex-shrink-0" />
+          Notifications
           {unreadCount > 0 && (
             <span className="ml-auto bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               {unreadCount > 9 ? "9+" : unreadCount}

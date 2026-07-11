@@ -511,6 +511,7 @@ export type IssueWhereInput = {
   convertedFromSuggestion?: Prisma.XOR<Prisma.SuggestionNullableScalarRelationFilter, Prisma.SuggestionWhereInput> | null
   attachments?: Prisma.AttachmentListRelationFilter
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
+  assignments?: Prisma.AssignmentListRelationFilter
 }
 
 export type IssueOrderByWithRelationInput = {
@@ -568,6 +569,7 @@ export type IssueOrderByWithRelationInput = {
   convertedFromSuggestion?: Prisma.SuggestionOrderByWithRelationInput
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
   conversation?: Prisma.ConversationOrderByWithRelationInput
+  assignments?: Prisma.AssignmentOrderByRelationAggregateInput
 }
 
 export type IssueWhereUniqueInput = Prisma.AtLeast<{
@@ -628,6 +630,7 @@ export type IssueWhereUniqueInput = Prisma.AtLeast<{
   convertedFromSuggestion?: Prisma.XOR<Prisma.SuggestionNullableScalarRelationFilter, Prisma.SuggestionWhereInput> | null
   attachments?: Prisma.AttachmentListRelationFilter
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
+  assignments?: Prisma.AssignmentListRelationFilter
 }, "id">
 
 export type IssueOrderByWithAggregationInput = {
@@ -769,6 +772,7 @@ export type IssueCreateInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateInput = {
@@ -818,6 +822,7 @@ export type IssueUncheckedCreateInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUpdateInput = {
@@ -867,6 +872,7 @@ export type IssueUpdateInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateInput = {
@@ -916,6 +922,7 @@ export type IssueUncheckedUpdateInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueCreateManyInput = {
@@ -1644,6 +1651,22 @@ export type IssueUpdateOneWithoutConversationNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.IssueUpdateToOneWithWhereWithoutConversationInput, Prisma.IssueUpdateWithoutConversationInput>, Prisma.IssueUncheckedUpdateWithoutConversationInput>
 }
 
+export type IssueCreateNestedOneWithoutAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.IssueCreateWithoutAssignmentsInput, Prisma.IssueUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.IssueCreateOrConnectWithoutAssignmentsInput
+  connect?: Prisma.IssueWhereUniqueInput
+}
+
+export type IssueUpdateOneWithoutAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.IssueCreateWithoutAssignmentsInput, Prisma.IssueUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.IssueCreateOrConnectWithoutAssignmentsInput
+  upsert?: Prisma.IssueUpsertWithoutAssignmentsInput
+  disconnect?: Prisma.IssueWhereInput | boolean
+  delete?: Prisma.IssueWhereInput | boolean
+  connect?: Prisma.IssueWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.IssueUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.IssueUpdateWithoutAssignmentsInput>, Prisma.IssueUncheckedUpdateWithoutAssignmentsInput>
+}
+
 export type IssueCreateWithoutOrganizationInput = {
   id?: string
   title: string
@@ -1690,6 +1713,7 @@ export type IssueCreateWithoutOrganizationInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutOrganizationInput = {
@@ -1738,6 +1762,7 @@ export type IssueUncheckedCreateWithoutOrganizationInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutOrganizationInput = {
@@ -1857,6 +1882,7 @@ export type IssueCreateWithoutReportedByInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutReportedByInput = {
@@ -1905,6 +1931,7 @@ export type IssueUncheckedCreateWithoutReportedByInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutReportedByInput = {
@@ -1963,6 +1990,7 @@ export type IssueCreateWithoutAssignedToInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutAssignedToInput = {
@@ -2011,6 +2039,7 @@ export type IssueUncheckedCreateWithoutAssignedToInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutAssignedToInput = {
@@ -2101,6 +2130,7 @@ export type IssueCreateWithoutLocationInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutLocationInput = {
@@ -2149,6 +2179,7 @@ export type IssueUncheckedCreateWithoutLocationInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutLocationInput = {
@@ -2223,6 +2254,7 @@ export type IssueCreateWithoutDepartmentInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutDepartmentInput = {
@@ -2271,6 +2303,7 @@ export type IssueUncheckedCreateWithoutDepartmentInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutDepartmentInput = {
@@ -2345,6 +2378,7 @@ export type IssueCreateWithoutAssetInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutAssetInput = {
@@ -2393,6 +2427,7 @@ export type IssueUncheckedCreateWithoutAssetInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutAssetInput = {
@@ -2467,6 +2502,7 @@ export type IssueCreateWithoutVendorInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutVendorInput = {
@@ -2515,6 +2551,7 @@ export type IssueUncheckedCreateWithoutVendorInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutVendorInput = {
@@ -2589,6 +2626,7 @@ export type IssueCreateWithoutCommentsInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutCommentsInput = {
@@ -2637,6 +2675,7 @@ export type IssueUncheckedCreateWithoutCommentsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutCommentsInput = {
@@ -2701,6 +2740,7 @@ export type IssueUpdateWithoutCommentsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutCommentsInput = {
@@ -2749,6 +2789,7 @@ export type IssueUncheckedUpdateWithoutCommentsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueCreateWithoutHistoryInput = {
@@ -2797,6 +2838,7 @@ export type IssueCreateWithoutHistoryInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutHistoryInput = {
@@ -2845,6 +2887,7 @@ export type IssueUncheckedCreateWithoutHistoryInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutHistoryInput = {
@@ -2909,6 +2952,7 @@ export type IssueUpdateWithoutHistoryInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutHistoryInput = {
@@ -2957,6 +3001,7 @@ export type IssueUncheckedUpdateWithoutHistoryInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueCreateWithoutEscalationsInput = {
@@ -3005,6 +3050,7 @@ export type IssueCreateWithoutEscalationsInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutEscalationsInput = {
@@ -3053,6 +3099,7 @@ export type IssueUncheckedCreateWithoutEscalationsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutEscalationsInput = {
@@ -3117,6 +3164,7 @@ export type IssueUpdateWithoutEscalationsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutEscalationsInput = {
@@ -3165,6 +3213,7 @@ export type IssueUncheckedUpdateWithoutEscalationsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueCreateWithoutNotificationsInput = {
@@ -3213,6 +3262,7 @@ export type IssueCreateWithoutNotificationsInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutNotificationsInput = {
@@ -3261,6 +3311,7 @@ export type IssueUncheckedCreateWithoutNotificationsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutNotificationsInput = {
@@ -3325,6 +3376,7 @@ export type IssueUpdateWithoutNotificationsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutNotificationsInput = {
@@ -3373,6 +3425,7 @@ export type IssueUncheckedUpdateWithoutNotificationsInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueCreateWithoutConvertedFromSuggestionInput = {
@@ -3421,6 +3474,7 @@ export type IssueCreateWithoutConvertedFromSuggestionInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutConvertedFromSuggestionInput = {
@@ -3469,6 +3523,7 @@ export type IssueUncheckedCreateWithoutConvertedFromSuggestionInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutConvertedFromSuggestionInput = {
@@ -3533,6 +3588,7 @@ export type IssueUpdateWithoutConvertedFromSuggestionInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutConvertedFromSuggestionInput = {
@@ -3581,6 +3637,7 @@ export type IssueUncheckedUpdateWithoutConvertedFromSuggestionInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueCreateWithoutAttachmentsInput = {
@@ -3629,6 +3686,7 @@ export type IssueCreateWithoutAttachmentsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutIssueInput
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutAttachmentsInput = {
@@ -3677,6 +3735,7 @@ export type IssueUncheckedCreateWithoutAttachmentsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutIssueInput
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutAttachmentsInput = {
@@ -3741,6 +3800,7 @@ export type IssueUpdateWithoutAttachmentsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutIssueNestedInput
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutAttachmentsInput = {
@@ -3789,6 +3849,7 @@ export type IssueUncheckedUpdateWithoutAttachmentsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutIssueNestedInput
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueCreateWithoutSopInput = {
@@ -3837,6 +3898,7 @@ export type IssueCreateWithoutSopInput = {
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutSopInput = {
@@ -3885,6 +3947,7 @@ export type IssueUncheckedCreateWithoutSopInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
   conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutSopInput = {
@@ -3959,6 +4022,7 @@ export type IssueCreateWithoutConversationInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutIssueInput
   convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueUncheckedCreateWithoutConversationInput = {
@@ -4007,6 +4071,7 @@ export type IssueUncheckedCreateWithoutConversationInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutIssueInput
   convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutLinkedIssueInput
 }
 
 export type IssueCreateOrConnectWithoutConversationInput = {
@@ -4071,6 +4136,7 @@ export type IssueUpdateWithoutConversationInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutIssueNestedInput
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutConversationInput = {
@@ -4119,6 +4185,219 @@ export type IssueUncheckedUpdateWithoutConversationInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutIssueNestedInput
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
+}
+
+export type IssueCreateWithoutAssignmentsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: string
+  priority?: string
+  category?: string
+  resolvedAt?: Date | string | null
+  dueDate?: Date | string | null
+  escalationLevel?: number
+  isEscalated?: boolean
+  lastEscalatedAt?: Date | string | null
+  resolvedMethod?: string | null
+  resolutionCost?: number | null
+  rootCause?: string | null
+  timeToResolve?: string | null
+  resolutionCategory?: string | null
+  submitterSuggestion?: string | null
+  assigneeSuggestion?: string | null
+  sopViolation?: boolean
+  sopMatchConfidence?: number | null
+  sopViolationNote?: string | null
+  sopLinkSource?: string | null
+  sopComplianceOutcome?: string | null
+  injurySeverity?: string | null
+  injuryDescription?: string | null
+  areaDetail?: string | null
+  isSharedFacilityIssue?: boolean
+  sourceOrgId?: string | null
+  sourceOrgName?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutIssuesInput
+  location?: Prisma.LocationCreateNestedOneWithoutIssuesInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutIssuesInput
+  asset?: Prisma.AssetCreateNestedOneWithoutIssuesInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutIssuesInput
+  reportedBy: Prisma.UserCreateNestedOneWithoutReportedIssuesInput
+  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedIssuesInput
+  sop?: Prisma.SOPCreateNestedOneWithoutIssuesInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutIssueInput
+  history?: Prisma.IssueHistoryCreateNestedManyWithoutIssueInput
+  escalations?: Prisma.IssueEscalationCreateNestedManyWithoutIssueInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutIssueInput
+  convertedFromSuggestion?: Prisma.SuggestionCreateNestedOneWithoutConvertedToIssueInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutIssueInput
+  conversation?: Prisma.ConversationCreateNestedOneWithoutIssueInput
+}
+
+export type IssueUncheckedCreateWithoutAssignmentsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: string
+  priority?: string
+  category?: string
+  organizationId: string
+  locationId?: string | null
+  departmentId?: string | null
+  assetId?: string | null
+  vendorId?: string | null
+  reportedById: string
+  assignedToId?: string | null
+  resolvedAt?: Date | string | null
+  dueDate?: Date | string | null
+  escalationLevel?: number
+  isEscalated?: boolean
+  lastEscalatedAt?: Date | string | null
+  resolvedMethod?: string | null
+  resolutionCost?: number | null
+  rootCause?: string | null
+  timeToResolve?: string | null
+  resolutionCategory?: string | null
+  submitterSuggestion?: string | null
+  assigneeSuggestion?: string | null
+  sopId?: string | null
+  sopViolation?: boolean
+  sopMatchConfidence?: number | null
+  sopViolationNote?: string | null
+  sopLinkSource?: string | null
+  sopComplianceOutcome?: string | null
+  injurySeverity?: string | null
+  injuryDescription?: string | null
+  areaDetail?: string | null
+  isSharedFacilityIssue?: boolean
+  sourceOrgId?: string | null
+  sourceOrgName?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutIssueInput
+  history?: Prisma.IssueHistoryUncheckedCreateNestedManyWithoutIssueInput
+  escalations?: Prisma.IssueEscalationUncheckedCreateNestedManyWithoutIssueInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutIssueInput
+  convertedFromSuggestion?: Prisma.SuggestionUncheckedCreateNestedOneWithoutConvertedToIssueInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutIssueInput
+  conversation?: Prisma.ConversationUncheckedCreateNestedOneWithoutIssueInput
+}
+
+export type IssueCreateOrConnectWithoutAssignmentsInput = {
+  where: Prisma.IssueWhereUniqueInput
+  create: Prisma.XOR<Prisma.IssueCreateWithoutAssignmentsInput, Prisma.IssueUncheckedCreateWithoutAssignmentsInput>
+}
+
+export type IssueUpsertWithoutAssignmentsInput = {
+  update: Prisma.XOR<Prisma.IssueUpdateWithoutAssignmentsInput, Prisma.IssueUncheckedUpdateWithoutAssignmentsInput>
+  create: Prisma.XOR<Prisma.IssueCreateWithoutAssignmentsInput, Prisma.IssueUncheckedCreateWithoutAssignmentsInput>
+  where?: Prisma.IssueWhereInput
+}
+
+export type IssueUpdateToOneWithWhereWithoutAssignmentsInput = {
+  where?: Prisma.IssueWhereInput
+  data: Prisma.XOR<Prisma.IssueUpdateWithoutAssignmentsInput, Prisma.IssueUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type IssueUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  escalationLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  isEscalated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastEscalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  rootCause?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeToResolve?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submitterSuggestion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeSuggestion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sopViolation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sopMatchConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  sopViolationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sopLinkSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sopComplianceOutcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  injurySeverity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  injuryDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  areaDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSharedFacilityIssue?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceOrgId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceOrgName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutIssuesNestedInput
+  location?: Prisma.LocationUpdateOneWithoutIssuesNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutIssuesNestedInput
+  asset?: Prisma.AssetUpdateOneWithoutIssuesNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutIssuesNestedInput
+  reportedBy?: Prisma.UserUpdateOneRequiredWithoutReportedIssuesNestedInput
+  assignedTo?: Prisma.UserUpdateOneWithoutAssignedIssuesNestedInput
+  sop?: Prisma.SOPUpdateOneWithoutIssuesNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutIssueNestedInput
+  history?: Prisma.IssueHistoryUpdateManyWithoutIssueNestedInput
+  escalations?: Prisma.IssueEscalationUpdateManyWithoutIssueNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutIssueNestedInput
+  convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+}
+
+export type IssueUncheckedUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reportedById?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  escalationLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  isEscalated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastEscalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  rootCause?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeToResolve?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submitterSuggestion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeSuggestion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sopId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sopViolation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sopMatchConfidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  sopViolationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sopLinkSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sopComplianceOutcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  injurySeverity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  injuryDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  areaDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSharedFacilityIssue?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceOrgId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceOrgName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutIssueNestedInput
+  history?: Prisma.IssueHistoryUncheckedUpdateManyWithoutIssueNestedInput
+  escalations?: Prisma.IssueEscalationUncheckedUpdateManyWithoutIssueNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutIssueNestedInput
+  convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
+  conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
 }
 
 export type IssueCreateManyOrganizationInput = {
@@ -4208,6 +4487,7 @@ export type IssueUpdateWithoutOrganizationInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutOrganizationInput = {
@@ -4256,6 +4536,7 @@ export type IssueUncheckedUpdateWithoutOrganizationInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateManyWithoutOrganizationInput = {
@@ -4427,6 +4708,7 @@ export type IssueUpdateWithoutReportedByInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutReportedByInput = {
@@ -4475,6 +4757,7 @@ export type IssueUncheckedUpdateWithoutReportedByInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateManyWithoutReportedByInput = {
@@ -4564,6 +4847,7 @@ export type IssueUpdateWithoutAssignedToInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutAssignedToInput = {
@@ -4612,6 +4896,7 @@ export type IssueUncheckedUpdateWithoutAssignedToInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateManyWithoutAssignedToInput = {
@@ -4742,6 +5027,7 @@ export type IssueUpdateWithoutLocationInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutLocationInput = {
@@ -4790,6 +5076,7 @@ export type IssueUncheckedUpdateWithoutLocationInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateManyWithoutLocationInput = {
@@ -4920,6 +5207,7 @@ export type IssueUpdateWithoutDepartmentInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutDepartmentInput = {
@@ -4968,6 +5256,7 @@ export type IssueUncheckedUpdateWithoutDepartmentInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateManyWithoutDepartmentInput = {
@@ -5098,6 +5387,7 @@ export type IssueUpdateWithoutAssetInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutAssetInput = {
@@ -5146,6 +5436,7 @@ export type IssueUncheckedUpdateWithoutAssetInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateManyWithoutAssetInput = {
@@ -5276,6 +5567,7 @@ export type IssueUpdateWithoutVendorInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutVendorInput = {
@@ -5324,6 +5616,7 @@ export type IssueUncheckedUpdateWithoutVendorInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateManyWithoutVendorInput = {
@@ -5454,6 +5747,7 @@ export type IssueUpdateWithoutSopInput = {
   convertedFromSuggestion?: Prisma.SuggestionUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateWithoutSopInput = {
@@ -5502,6 +5796,7 @@ export type IssueUncheckedUpdateWithoutSopInput = {
   convertedFromSuggestion?: Prisma.SuggestionUncheckedUpdateOneWithoutConvertedToIssueNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutIssueNestedInput
   conversation?: Prisma.ConversationUncheckedUpdateOneWithoutIssueNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutLinkedIssueNestedInput
 }
 
 export type IssueUncheckedUpdateManyWithoutSopInput = {
@@ -5556,6 +5851,7 @@ export type IssueCountOutputType = {
   escalations: number
   notifications: number
   attachments: number
+  assignments: number
 }
 
 export type IssueCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5564,6 +5860,7 @@ export type IssueCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   escalations?: boolean | IssueCountOutputTypeCountEscalationsArgs
   notifications?: boolean | IssueCountOutputTypeCountNotificationsArgs
   attachments?: boolean | IssueCountOutputTypeCountAttachmentsArgs
+  assignments?: boolean | IssueCountOutputTypeCountAssignmentsArgs
 }
 
 /**
@@ -5609,6 +5906,13 @@ export type IssueCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.T
  */
 export type IssueCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AttachmentWhereInput
+}
+
+/**
+ * IssueCountOutputType without action
+ */
+export type IssueCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentWhereInput
 }
 
 
@@ -5667,6 +5971,7 @@ export type IssueSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   convertedFromSuggestion?: boolean | Prisma.Issue$convertedFromSuggestionArgs<ExtArgs>
   attachments?: boolean | Prisma.Issue$attachmentsArgs<ExtArgs>
   conversation?: boolean | Prisma.Issue$conversationArgs<ExtArgs>
+  assignments?: boolean | Prisma.Issue$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.IssueCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["issue"]>
 
@@ -5829,6 +6134,7 @@ export type IssueInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   convertedFromSuggestion?: boolean | Prisma.Issue$convertedFromSuggestionArgs<ExtArgs>
   attachments?: boolean | Prisma.Issue$attachmentsArgs<ExtArgs>
   conversation?: boolean | Prisma.Issue$conversationArgs<ExtArgs>
+  assignments?: boolean | Prisma.Issue$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.IssueCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type IssueIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5870,6 +6176,7 @@ export type $IssuePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     convertedFromSuggestion: Prisma.$SuggestionPayload<ExtArgs> | null
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
     conversation: Prisma.$ConversationPayload<ExtArgs> | null
+    assignments: Prisma.$AssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -6320,6 +6627,7 @@ export interface Prisma__IssueClient<T, Null = never, ExtArgs extends runtime.Ty
   convertedFromSuggestion<T extends Prisma.Issue$convertedFromSuggestionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Issue$convertedFromSuggestionArgs<ExtArgs>>): Prisma.Prisma__SuggestionClient<runtime.Types.Result.GetResult<Prisma.$SuggestionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   attachments<T extends Prisma.Issue$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Issue$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversation<T extends Prisma.Issue$conversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Issue$conversationArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  assignments<T extends Prisma.Issue$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Issue$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7058,6 +7366,30 @@ export type Issue$conversationArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.ConversationInclude<ExtArgs> | null
   where?: Prisma.ConversationWhereInput
+}
+
+/**
+ * Issue.assignments
+ */
+export type Issue$assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Assignment
+   */
+  select?: Prisma.AssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Assignment
+   */
+  omit?: Prisma.AssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentWhereInput
+  orderBy?: Prisma.AssignmentOrderByWithRelationInput | Prisma.AssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentScalarFieldEnum | Prisma.AssignmentScalarFieldEnum[]
 }
 
 /**

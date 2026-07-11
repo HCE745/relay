@@ -127,7 +127,15 @@ export const ModelName = {
   MessageReaction: 'MessageReaction',
   SupportConversation: 'SupportConversation',
   SupportMessage: 'SupportMessage',
-  Broadcast: 'Broadcast'
+  Broadcast: 'Broadcast',
+  Assignment: 'Assignment',
+  AssignmentComment: 'AssignmentComment',
+  AssignmentStatusHistory: 'AssignmentStatusHistory',
+  Announcement: 'Announcement',
+  AnnouncementAcknowledgment: 'AnnouncementAcknowledgment',
+  EmergencyBroadcast: 'EmergencyBroadcast',
+  EmergencyAcknowledgment: 'EmergencyAcknowledgment',
+  DailyBriefingCache: 'DailyBriefingCache'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1509,6 +1517,120 @@ export const BroadcastScalarFieldEnum = {
 } as const
 
 export type BroadcastScalarFieldEnum = (typeof BroadcastScalarFieldEnum)[keyof typeof BroadcastScalarFieldEnum]
+
+
+export const AssignmentScalarFieldEnum = {
+  id: 'id',
+  orgId: 'orgId',
+  title: 'title',
+  description: 'description',
+  status: 'status',
+  priority: 'priority',
+  assigneeId: 'assigneeId',
+  assignedById: 'assignedById',
+  dueDate: 'dueDate',
+  completedAt: 'completedAt',
+  linkedIssueId: 'linkedIssueId',
+  linkedAssetId: 'linkedAssetId',
+  linkedVendorId: 'linkedVendorId',
+  linkedSopId: 'linkedSopId',
+  notes: 'notes',
+  photos: 'photos',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AssignmentScalarFieldEnum = (typeof AssignmentScalarFieldEnum)[keyof typeof AssignmentScalarFieldEnum]
+
+
+export const AssignmentCommentScalarFieldEnum = {
+  id: 'id',
+  assignmentId: 'assignmentId',
+  authorId: 'authorId',
+  content: 'content',
+  photoUrl: 'photoUrl',
+  createdAt: 'createdAt'
+} as const
+
+export type AssignmentCommentScalarFieldEnum = (typeof AssignmentCommentScalarFieldEnum)[keyof typeof AssignmentCommentScalarFieldEnum]
+
+
+export const AssignmentStatusHistoryScalarFieldEnum = {
+  id: 'id',
+  assignmentId: 'assignmentId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  changedById: 'changedById',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type AssignmentStatusHistoryScalarFieldEnum = (typeof AssignmentStatusHistoryScalarFieldEnum)[keyof typeof AssignmentStatusHistoryScalarFieldEnum]
+
+
+export const AnnouncementScalarFieldEnum = {
+  id: 'id',
+  orgId: 'orgId',
+  title: 'title',
+  body: 'body',
+  priority: 'priority',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
+  createdById: 'createdById',
+  requiresAcknowledgment: 'requiresAcknowledgment',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnnouncementScalarFieldEnum = (typeof AnnouncementScalarFieldEnum)[keyof typeof AnnouncementScalarFieldEnum]
+
+
+export const AnnouncementAcknowledgmentScalarFieldEnum = {
+  id: 'id',
+  announcementId: 'announcementId',
+  userId: 'userId',
+  acknowledgedAt: 'acknowledgedAt'
+} as const
+
+export type AnnouncementAcknowledgmentScalarFieldEnum = (typeof AnnouncementAcknowledgmentScalarFieldEnum)[keyof typeof AnnouncementAcknowledgmentScalarFieldEnum]
+
+
+export const EmergencyBroadcastScalarFieldEnum = {
+  id: 'id',
+  orgId: 'orgId',
+  type: 'type',
+  title: 'title',
+  body: 'body',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
+  createdById: 'createdById',
+  resolvedAt: 'resolvedAt',
+  resolvedById: 'resolvedById',
+  createdAt: 'createdAt'
+} as const
+
+export type EmergencyBroadcastScalarFieldEnum = (typeof EmergencyBroadcastScalarFieldEnum)[keyof typeof EmergencyBroadcastScalarFieldEnum]
+
+
+export const EmergencyAcknowledgmentScalarFieldEnum = {
+  id: 'id',
+  emergencyBroadcastId: 'emergencyBroadcastId',
+  userId: 'userId',
+  acknowledgedAt: 'acknowledgedAt'
+} as const
+
+export type EmergencyAcknowledgmentScalarFieldEnum = (typeof EmergencyAcknowledgmentScalarFieldEnum)[keyof typeof EmergencyAcknowledgmentScalarFieldEnum]
+
+
+export const DailyBriefingCacheScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type DailyBriefingCacheScalarFieldEnum = (typeof DailyBriefingCacheScalarFieldEnum)[keyof typeof DailyBriefingCacheScalarFieldEnum]
 
 
 export const SortOrder = {

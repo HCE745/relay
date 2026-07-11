@@ -10,7 +10,8 @@
     "migrate": "prisma migrate deploy",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "imap-sync": "tsx scripts/imap-sync.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

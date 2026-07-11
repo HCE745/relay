@@ -131,23 +131,41 @@ export async function POST(req: NextRequest) {
 
     // Process one folder — shared logic
     async function processFolder(folder: string) {
+      // Close any implicitly-selected mailbox from a prior folder, then open fresh.
+      // This prevents stale SELECT state from affecting the SEARCH result.
+      try { await client.mailboxClose() } catch { /* none open yet */ }
+
       console.error(`[run-imap-sync] Opening ${folder}…`)
       const mb = await client.mailboxOpen(folder)
-      console.error(`[run-imap-sync] ${folder}: ${mb.exists} messages total in mailbox`)
+      console.error(`[run-imap-sync] ${folder}: ${mb.exists} messages total`)
 
-      // Log the exact since value being passed to imapflow so we can compare
-      // with what the test-imap endpoint uses
-      console.error(`[run-imap-sync] ${folder}: calling search({ since: new Date(${sinceMs}) }) = ${since.toISOString()}`)
+      // Give the server 500ms to finish SELECT before we send SEARCH.
+      // Some IMAP servers return 0 results if SEARCH arrives too quickly.
+      await new Promise<void>(r => setTimeout(r, 500))
+
+      // ── Date-filtered search ──────────────────────────────────────────────
+      console.error(`[run-imap-sync] ${folder}: SEARCH SINCE ${since.toISOString()} (${sinceDays} days ago, ms=${sinceMs})`)
       const raw = await client.search({ since })
-      // Log the raw return value — imapflow returns number[] | false
-      console.error(`[run-imap-sync] ${folder}: raw search result: typeof=${typeof raw} isArray=${Array.isArray(raw)} isFalse=${raw === false} value=${JSON.stringify(Array.isArray(raw) ? raw.slice(0, 20) : raw)}`)
-      const uids = Array.isArray(raw) ? raw : []
-      console.error(`[run-imap-sync] ${folder}: → ${uids.length} UIDs${uids.length ? `: ${uids.slice(0, 15).join(",")}${uids.length > 15 ? "…" : ""}` : ""}`)
+      console.error(`[run-imap-sync] ${folder}: raw typeof=${typeof raw} isArray=${Array.isArray(raw)} value=${JSON.stringify(Array.isArray(raw) ? raw.slice(0, 20) : raw)}`)
+      let uids = Array.isArray(raw) ? raw : []
+      console.error(`[run-imap-sync] ${folder}: date-filtered search → ${uids.length} UIDs`)
+
+      // ── Fallback: if date filter returns 0 on a non-empty mailbox, search ALL ─
+      // This catches server nodes where SEARCH SINCE behaves unexpectedly.
+      // Dedup by messageId will skip any already-saved messages.
+      if (uids.length === 0 && mb.exists > 0) {
+        console.error(`[run-imap-sync] ${folder}: date filter returned 0 on non-empty mailbox (${mb.exists} messages) — retrying with ALL search`)
+        const rawAll = await client.search({ all: true })
+        const allUids = Array.isArray(rawAll) ? rawAll : []
+        console.error(`[run-imap-sync] ${folder}: ALL search → ${allUids.length} UIDs${allUids.length ? ` [${allUids.slice(0, 10).join(",")}${allUids.length > 10 ? "…" : ""}]` : ""}`)
+        if (allUids.length > 0) {
+          console.error(`[run-imap-sync] ${folder}: using all ${allUids.length} UIDs (dedup will skip already-saved messages)`)
+          uids = allUids
+        }
+      }
 
       if (uids.length === 0) {
-        if (mb.exists > 0) {
-          console.error(`[run-imap-sync] ${folder}: WARNING — mailbox has ${mb.exists} messages but SEARCH returned 0. The since date (${since.toISOString()}, ${sinceDays} days ago) may be too recent for these emails. Use Reset & Re-sync (which passes full=true) to force 90-day window.`)
-        }
+        console.error(`[run-imap-sync] ${folder}: no messages to process`)
         return
       }
 

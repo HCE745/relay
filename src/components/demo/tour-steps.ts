@@ -352,15 +352,48 @@ export const TOUR_STEPS: TourStep[] = [
       "Choose the package that matches your operational needs today and expand as you grow. Whether you are managing a single location or hundreds of facilities, Relay scales alongside you.",
   },
 
-  // ── Step 18: Completion ───────────────────────────────────────────────────────
+  // ── Step 18: Assignments ──────────────────────────────────────────────────────
   {
     id: 18,
+    path: "/assignments",
+    targetSelector: "[data-tour='assignment-list']",
+    cue: "Issues identify problems. Assignments tell people exactly what work needs to happen.",
+    getTitle: () => "Every problem becomes a clear work order",
+    getExplain: () =>
+      "When an issue is reported, managers create specific assignments for each person involved — shut down the equipment, contact the vendor, order the part. Every piece of work has a clear owner, a priority, a due date, and a direct link back to the issue that triggered it.",
+  },
+
+  // ── Step 19: My Work (Employee View) ─────────────────────────────────────────
+  {
+    id: 19,
+    path: "/assignments",
+    targetSelector: "[data-tour='assignment-list']",
+    cue: "Every employee starts their day knowing exactly what needs to get done.",
+    getTitle: () => "One screen. No hunting. Just their work.",
+    getExplain: () =>
+      "When an employee opens Relay, they see exactly what is assigned to them — what is due today, what is overdue, and what is urgent. No navigating through reports. No checking with a supervisor. A clear answer to the only question that matters: what do I need to do right now?",
+  },
+
+  // ── Step 20: Announcements & Communications ───────────────────────────────────
+  {
+    id: 20,
+    path: "/communications/announcements",
+    targetSelector: "[data-tour='announcements-list']",
+    cue: "Critical information reaches the right people instantly — and you know who got it.",
+    getTitle: () => "Operational communications that leave no one in the dark",
+    getExplain: () =>
+      "Managers broadcast announcements to the entire organization, a specific location, or a single department. For emergencies, Relay sends immediate push notifications and tracks acknowledgment in real time — so you always know who has seen critical information and who has not.",
+  },
+
+  // ── Step 21: Completion ───────────────────────────────────────────────────────
+  {
+    id: 21,
     path: null,
     targetSelector: null,
     type: "completion",
     getTitle: () => "That's Relay — every issue owned, every action tracked.",
     getExplain: () =>
-      "Every issue has an owner. Every action is tracked. Every organization becomes smarter over time. Continue exploring the demo, start your free trial, or schedule a personalized demonstration.",
+      "From the moment a problem is reported to the assignment that resolves it, the announcement that keeps everyone informed, and the analytics that prevent it from happening again — every issue has an owner, every action is tracked, and every organization becomes smarter over time. Continue exploring the demo, start your free trial, or schedule a personalized demonstration.",
   },
 ]
 

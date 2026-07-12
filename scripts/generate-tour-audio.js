@@ -84,7 +84,19 @@ const STEPS = [
   },
   {
     id: 18,
-    text: "You have just seen the core of what Relay can do. Every issue has an owner. Every action is tracked. Every organization becomes smarter over time. Continue exploring the demo, start your free trial, or schedule a personalized demonstration. Thanks for taking the tour.",
+    text: "When an issue is reported, managers can create specific assignments for each person involved — shut down the equipment, contact the vendor, order the part. Every piece of work has a clear owner and a due date. Nothing gets lost, nothing gets forgotten, and every assignment links directly back to the issue that triggered it.",
+  },
+  {
+    id: 19,
+    text: "When an employee opens Relay, they see one thing: their work. No hunting around the system. No missing assignments. Just a clear answer to what needs to get done today, what is overdue, and what is urgent.",
+  },
+  {
+    id: 20,
+    text: "Managers can broadcast operational announcements to the entire company, a specific location, or a single department. For emergencies, Relay tracks acknowledgment in real time so you always know who has received critical information.",
+  },
+  {
+    id: 21,
+    text: "You have just seen the core of what Relay can do. From the moment a problem is reported... to the assignment that resolves it... the announcement that keeps everyone informed... and the analytics that prevent it from happening again. Every issue has an owner. Every action is tracked. Every organization becomes smarter over time. Continue exploring the demo, start your free trial, or schedule a personalized demonstration. Thanks for taking the tour.",
   },
 ]
 

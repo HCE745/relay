@@ -63,7 +63,7 @@ export default async function AnnouncementsPage() {
           <p className="font-medium">No announcements</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3" data-tour="announcements-list">
           {announcements.map(a => {
             const acked    = a.acknowledgments.length > 0
             const priority = PRIORITY_LABEL[a.priority] ?? PRIORITY_LABEL.normal

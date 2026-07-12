@@ -137,7 +137,7 @@ export default async function AssignmentsPage({
           )}
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2" data-tour="assignment-list">
           {assignments.map(a => {
             const StatusIcon = STATUS_ICON[a.status] ?? Clock
             const due = formatDate(a.dueDate)

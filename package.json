@@ -11,7 +11,9 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
-    "imap-sync": "tsx scripts/imap-sync.ts"
+    "imap-sync": "tsx scripts/imap-sync.ts",
+    "tour-audio": "node scripts/generate-tour-audio.js",
+    "tour-audio-new": "node scripts/generate-tour-audio-new-steps.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.111.0",

@@ -72,27 +72,27 @@ const STEPS = [
   },
   {
     id: 15,
-    text: "Every user sees the information they need. Employees report issues. Supervisors manage work. Managers monitor performance. Administrators configure the platform.",
-  },
-  {
-    id: 16,
-    text: "Relay adapts to different industries automatically. Departments, assets, issue categories, and workflows change to match the way your organization operates.",
-  },
-  {
-    id: 17,
-    text: "Whether you are managing a single location or hundreds of facilities, Relay scales alongside your organization. Choose the package that matches your operational needs today and expand as you grow.",
-  },
-  {
-    id: 18,
     text: "When an issue is reported, managers can create specific assignments for each person involved — shut down the equipment, contact the vendor, order the part. Every piece of work has a clear owner and a due date. Nothing gets lost, nothing gets forgotten, and every assignment links directly back to the issue that triggered it.",
   },
   {
-    id: 19,
+    id: 16,
     text: "When an employee opens Relay, they see one thing: their work. No hunting around the system. No missing assignments. Just a clear answer to what needs to get done today, what is overdue, and what is urgent.",
   },
   {
-    id: 20,
+    id: 17,
     text: "Managers can broadcast operational announcements to the entire company, a specific location, or a single department. For emergencies, Relay tracks acknowledgment in real time so you always know who has received critical information.",
+  },
+  {
+    id: 18,
+    text: "Every user sees the information they need. Employees report issues. Supervisors manage work. Managers monitor performance. Administrators configure the platform.",
+  },
+  {
+    id: 19,
+    text: "Relay adapts to different industries automatically. Departments, assets, issue categories, and workflows change to match the way your organization operates.",
+  },
+  {
+    id: 20,
+    text: "Whether you are managing a single location or hundreds of facilities, Relay scales alongside your organization. Choose the package that matches your operational needs today and expand as you grow.",
   },
   {
     id: 21,

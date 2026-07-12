@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Generates only the new/changed tour audio steps: 18, 19, 20, 21
-// Leaves steps 01-17 untouched.
+// Regenerates steps 15-17 (Assignments, My Work, Announcements) in their new positions,
+// and renames old step-15/16/17 (Roles, Industry, Packages) → step-18/19/20.
+// Steps 01-14 and step-21 are not touched.
 
 const fs = require("fs")
 const path = require("path")
@@ -15,22 +16,19 @@ if (!VOICE_ID) { console.error("Missing ELEVENLABS_VOICE_ID"); process.exit(1) }
 const OUT_DIR = path.join(__dirname, "..", "public", "demo-audio")
 if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true })
 
-const STEPS = [
+// New content for steps 15, 16, 17
+const NEW_STEPS = [
   {
-    id: 18,
+    id: 15,
     text: "When an issue is reported, managers can create specific assignments for each person involved — shut down the equipment, contact the vendor, order the part. Every piece of work has a clear owner and a due date. Nothing gets lost, nothing gets forgotten, and every assignment links directly back to the issue that triggered it.",
   },
   {
-    id: 19,
+    id: 16,
     text: "When an employee opens Relay, they see one thing: their work. No hunting around the system. No missing assignments. Just a clear answer to what needs to get done today, what is overdue, and what is urgent.",
   },
   {
-    id: 20,
+    id: 17,
     text: "Managers can broadcast operational announcements to the entire company, a specific location, or a single department. For emergencies, Relay tracks acknowledgment in real time so you always know who has received critical information.",
-  },
-  {
-    id: 21,
-    text: "You have just seen the core of what Relay can do. From the moment a problem is reported... to the assignment that resolves it... the announcement that keeps everyone informed... and the analytics that prevent it from happening again. Every issue has an owner. Every action is tracked. Every organization becomes smarter over time. Continue exploring the demo, start your free trial, or schedule a personalized demonstration. Thanks for taking the tour.",
   },
 ]
 
@@ -85,25 +83,59 @@ function generate(step) {
 }
 
 async function main() {
-  // Delete only the files we're replacing
-  for (const step of STEPS) {
-    const fileName = `step-${String(step.id).padStart(2, "0")}.mp3`
-    const filePath = path.join(OUT_DIR, fileName)
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath)
-      console.log(`✗ deleted ${fileName}`)
+  // Step 1: Backup old step-15/16/17 (Roles, Industry, Packages) to temp names
+  // so we can move them to step-18/19/20 after generating the new files.
+  const backups = [
+    { from: "step-15.mp3", to: "step-15_backup.mp3" },
+    { from: "step-16.mp3", to: "step-16_backup.mp3" },
+    { from: "step-17.mp3", to: "step-17_backup.mp3" },
+  ]
+  for (const { from, to } of backups) {
+    const src = path.join(OUT_DIR, from)
+    const dst = path.join(OUT_DIR, to)
+    if (fs.existsSync(src)) {
+      fs.renameSync(src, dst)
+      console.log(`  renamed ${from} → ${to}`)
     }
   }
-  console.log()
 
-  console.log(`Generating ${STEPS.length} audio clips → ${OUT_DIR}\n`)
-  for (const step of STEPS) {
+  // Step 2: Delete old step-18/19/20 (Assignments, My Work, Announcements at old positions)
+  for (const id of [18, 19, 20]) {
+    const f = path.join(OUT_DIR, `step-${String(id).padStart(2, "0")}.mp3`)
+    if (fs.existsSync(f)) {
+      fs.unlinkSync(f)
+      console.log(`  deleted step-${String(id).padStart(2, "0")}.mp3`)
+    }
+  }
+
+  console.log()
+  console.log(`Generating ${NEW_STEPS.length} audio clips for steps 15-17 → ${OUT_DIR}\n`)
+
+  // Step 3: Generate new step-15, 16, 17
+  for (const step of NEW_STEPS) {
     try {
       await generate(step)
     } catch (err) {
       console.error(`✗ step-${String(step.id).padStart(2, "0")}.mp3:`, err.message)
     }
   }
+
+  // Step 4: Move backups → step-18/19/20
+  console.log()
+  const moves = [
+    { from: "step-15_backup.mp3", to: "step-18.mp3" },
+    { from: "step-16_backup.mp3", to: "step-19.mp3" },
+    { from: "step-17_backup.mp3", to: "step-20.mp3" },
+  ]
+  for (const { from, to } of moves) {
+    const src = path.join(OUT_DIR, from)
+    const dst = path.join(OUT_DIR, to)
+    if (fs.existsSync(src)) {
+      fs.renameSync(src, dst)
+      console.log(`  renamed ${from} → ${to}`)
+    }
+  }
+
   console.log("\nDone.")
 }
 

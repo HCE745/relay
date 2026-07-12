@@ -316,9 +316,42 @@ export const TOUR_STEPS: TourStep[] = [
       "As organizations grow, Relay grows with them. Executive dashboards provide operational health scores, AI-generated summaries, and organization-wide performance metrics — without requiring anyone to build a report.",
   },
 
-  // ── Step 15: Roles (cycling) ──────────────────────────────────────────────────
+  // ── Step 15: Assignments ──────────────────────────────────────────────────────
   {
     id: 15,
+    path: "/assignments",
+    targetSelector: "[data-tour='assignment-list']",
+    cue: "Issues identify problems. Assignments tell people exactly what work needs to happen.",
+    getTitle: () => "Every problem becomes a clear work order",
+    getExplain: () =>
+      "When an issue is reported, managers create specific assignments for each person involved — shut down the equipment, contact the vendor, order the part. Every piece of work has a clear owner, a priority, a due date, and a direct link back to the issue that triggered it.",
+  },
+
+  // ── Step 16: My Work (Employee View) ─────────────────────────────────────────
+  {
+    id: 16,
+    path: "/assignments",
+    targetSelector: "[data-tour='assignment-list']",
+    cue: "Every employee starts their day knowing exactly what needs to get done.",
+    getTitle: () => "One screen. No hunting. Just their work.",
+    getExplain: () =>
+      "When an employee opens Relay, they see exactly what is assigned to them — what is due today, what is overdue, and what is urgent. No navigating through reports. No checking with a supervisor. A clear answer to the only question that matters: what do I need to do right now?",
+  },
+
+  // ── Step 17: Announcements & Communications ───────────────────────────────────
+  {
+    id: 17,
+    path: "/communications/announcements",
+    targetSelector: "[data-tour='announcements-list']",
+    cue: "Critical information reaches the right people instantly — and you know who got it.",
+    getTitle: () => "Operational communications that leave no one in the dark",
+    getExplain: () =>
+      "Managers broadcast announcements to the entire organization, a specific location, or a single department. For emergencies, Relay sends immediate push notifications and tracks acknowledgment in real time — so you always know who has seen critical information and who has not.",
+  },
+
+  // ── Step 18: Roles (cycling) ──────────────────────────────────────────────────
+  {
+    id: 18,
     path: null,
     targetSelector: "[data-tour='role-switcher']",
     type: "cycling-roles",
@@ -328,9 +361,9 @@ export const TOUR_STEPS: TourStep[] = [
       "Employees report issues. Supervisors manage work. Managers monitor performance. Administrators configure the platform. One system, every level of your organization.",
   },
 
-  // ── Step 16: Industry Presets (cycling) ───────────────────────────────────────
+  // ── Step 19: Industry Presets (cycling) ───────────────────────────────────────
   {
-    id: 16,
+    id: 19,
     path: "/dashboard",
     targetSelector: "[data-tour='industry-selector']",
     type: "cycling-industries",
@@ -340,9 +373,9 @@ export const TOUR_STEPS: TourStep[] = [
       "Departments, assets, issue categories, and workflows change automatically to match the way your organization operates. No custom setup required.",
   },
 
-  // ── Step 17: Packages (cycling) ───────────────────────────────────────────────
+  // ── Step 20: Packages (cycling) ───────────────────────────────────────────────
   {
-    id: 17,
+    id: 20,
     path: null,
     targetSelector: "[data-tour='package-selector']",
     type: "cycling-packages",
@@ -350,39 +383,6 @@ export const TOUR_STEPS: TourStep[] = [
     getTitle: () => "Start simple. Unlock more as you grow.",
     getExplain: () =>
       "Choose the package that matches your operational needs today and expand as you grow. Whether you are managing a single location or hundreds of facilities, Relay scales alongside you.",
-  },
-
-  // ── Step 18: Assignments ──────────────────────────────────────────────────────
-  {
-    id: 18,
-    path: "/assignments",
-    targetSelector: "[data-tour='assignment-list']",
-    cue: "Issues identify problems. Assignments tell people exactly what work needs to happen.",
-    getTitle: () => "Every problem becomes a clear work order",
-    getExplain: () =>
-      "When an issue is reported, managers create specific assignments for each person involved — shut down the equipment, contact the vendor, order the part. Every piece of work has a clear owner, a priority, a due date, and a direct link back to the issue that triggered it.",
-  },
-
-  // ── Step 19: My Work (Employee View) ─────────────────────────────────────────
-  {
-    id: 19,
-    path: "/assignments",
-    targetSelector: "[data-tour='assignment-list']",
-    cue: "Every employee starts their day knowing exactly what needs to get done.",
-    getTitle: () => "One screen. No hunting. Just their work.",
-    getExplain: () =>
-      "When an employee opens Relay, they see exactly what is assigned to them — what is due today, what is overdue, and what is urgent. No navigating through reports. No checking with a supervisor. A clear answer to the only question that matters: what do I need to do right now?",
-  },
-
-  // ── Step 20: Announcements & Communications ───────────────────────────────────
-  {
-    id: 20,
-    path: "/communications/announcements",
-    targetSelector: "[data-tour='announcements-list']",
-    cue: "Critical information reaches the right people instantly — and you know who got it.",
-    getTitle: () => "Operational communications that leave no one in the dark",
-    getExplain: () =>
-      "Managers broadcast announcements to the entire organization, a specific location, or a single department. For emergencies, Relay sends immediate push notifications and tracks acknowledgment in real time — so you always know who has seen critical information and who has not.",
   },
 
   // ── Step 21: Completion ───────────────────────────────────────────────────────

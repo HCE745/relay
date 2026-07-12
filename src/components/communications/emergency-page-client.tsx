@@ -2,7 +2,11 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { Siren, CheckCircle2, AlertTriangle, Plus, X } from "lucide-react"
+import { Siren, CheckCircle2, AlertTriangle, Plus, X, Search } from "lucide-react"
+import { ScopeSelector } from "@/components/communications/scope-selector"
+import type { SelectOption } from "@/components/ui/searchable-select"
+import type { ScopeLead } from "@/components/communications/scope-selector"
+import type { Person } from "@/components/ui/people-picker"
 
 type EmergencyType = "fire" | "power_outage" | "water_leak" | "plant_closure" | "evacuation" | "medical_emergency" | "security_incident" | "other"
 
@@ -29,24 +33,59 @@ const EMERGENCY_TYPES: { value: EmergencyType; label: string }[] = [
   { value: "other",              label: "Other" },
 ]
 
-function CreateForm({ onCreated, onCancel }: { onCreated: (b: Broadcast) => void; onCancel: () => void }) {
+const SCOPE_OPTIONS = [
+  { value: "org",        label: "Entire organization" },
+  { value: "location",   label: "Specific location" },
+  { value: "department", label: "Specific department" },
+  { value: "team",       label: "Specific team" },
+  { value: "individual", label: "Individual person" },
+] as const
+
+const SCOPE_REQUIRES_ID = new Set(["location", "department", "team", "individual"])
+
+interface CreateFormProps {
+  locations:   SelectOption[]
+  departments: SelectOption[]
+  teamLeads:   ScopeLead[]
+  users:       Person[]
+  onCreated:   (b: Broadcast) => void
+  onCancel:    () => void
+}
+
+function CreateForm({ locations, departments, teamLeads, users, onCreated, onCancel }: CreateFormProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState("")
-  const [form, setForm]     = useState({ type: "fire" as EmergencyType, title: "", body: "" })
+  const [form, setForm]     = useState({ type: "fire" as EmergencyType, title: "", body: "", scopeType: "org" })
+  const [scopeId, setScopeId] = useState("")
 
   const set = (k: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm(p => ({ ...p, [k]: e.target.value as never }))
 
+  function handleScopeTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setForm(p => ({ ...p, scopeType: e.target.value }))
+    setScopeId("")
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    if (SCOPE_REQUIRES_ID.has(form.scopeType) && !scopeId) {
+      const label = SCOPE_OPTIONS.find(o => o.value === form.scopeType)?.label ?? form.scopeType
+      setError(`Please select a specific ${label.toLowerCase()} for this broadcast`)
+      return
+    }
+
     setSaving(true)
     setError("")
     try {
       const res = await fetch("/api/emergency-broadcasts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          scopeId: SCOPE_REQUIRES_ID.has(form.scopeType) ? scopeId : undefined,
+        }),
       })
       const json = await res.json() as { broadcast?: Broadcast; error?: string }
       if (!res.ok) { setError(json.error ?? "Failed"); return }
@@ -80,6 +119,31 @@ function CreateForm({ onCreated, onCancel }: { onCreated: (b: Broadcast) => void
           {EMERGENCY_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
       </div>
+
+      <div>
+        <label className="block text-sm font-medium text-red-700 dark:text-red-300 mb-1">Scope</label>
+        <select value={form.scopeType} onChange={handleScopeTypeChange}
+          className="w-full px-3 py-2 border border-red-300 dark:border-red-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          {SCOPE_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+        </select>
+      </div>
+
+      {SCOPE_REQUIRES_ID.has(form.scopeType) && (
+        <div className="pl-3 border-l-2 border-red-300 dark:border-red-700">
+          <ScopeSelector
+            key={form.scopeType}
+            scopeType={form.scopeType}
+            scopeId={scopeId}
+            onScopeIdChange={setScopeId}
+            locations={locations}
+            departments={departments}
+            teamLeads={teamLeads}
+            users={users}
+          />
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium text-red-700 dark:text-red-300 mb-1">Title *</label>
         <input value={form.title} onChange={set("title")} required placeholder="Short description of the emergency"
@@ -108,16 +172,25 @@ export function EmergencyPageClient({
   canCreate,
   canResolve,
   showCreate,
+  locations,
+  departments,
+  teamLeads,
+  users,
 }: {
-  broadcasts: Broadcast[]
-  userId: string
-  canCreate: boolean
-  canResolve: boolean
-  showCreate: boolean
+  broadcasts:  Broadcast[]
+  userId:      string
+  canCreate:   boolean
+  canResolve:  boolean
+  showCreate:  boolean
+  locations:   SelectOption[]
+  departments: SelectOption[]
+  teamLeads:   ScopeLead[]
+  users:       Person[]
 }) {
   const [broadcasts, setBroadcasts] = useState(initial)
   const [creating, setCreating]     = useState(showCreate)
   const [working, setWorking]       = useState<string | null>(null)
+  const [query, setQuery]           = useState("")
 
   async function acknowledge(id: string) {
     if (working) return
@@ -161,6 +234,12 @@ export function EmergencyPageClient({
   const active   = broadcasts.filter(b => !b.resolvedAt)
   const resolved = broadcasts.filter(b =>  b.resolvedAt)
 
+  const filteredResolved = resolved.filter(b =>
+    !query ||
+    b.title.toLowerCase().includes(query.toLowerCase()) ||
+    b.body.toLowerCase().includes(query.toLowerCase())
+  )
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -178,6 +257,10 @@ export function EmergencyPageClient({
 
       {creating && (
         <CreateForm
+          locations={locations}
+          departments={departments}
+          teamLeads={teamLeads}
+          users={users}
           onCreated={b => { setBroadcasts(p => [b, ...p]); setCreating(false) }}
           onCancel={() => setCreating(false)}
         />
@@ -200,7 +283,7 @@ export function EmergencyPageClient({
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-bold text-red-700 dark:text-red-300">{b.title}</span>
                       <span className="text-xs px-2 py-0.5 bg-red-200 dark:bg-red-800 text-red-700 dark:text-red-300 rounded-full">
-                        {b.type.replace("_", " ")}
+                        {b.type.replace(/_/g, " ")}
                       </span>
                     </div>
                     <p className="text-sm text-red-800 dark:text-red-200 mt-1 whitespace-pre-wrap">{b.body}</p>
@@ -246,9 +329,22 @@ export function EmergencyPageClient({
 
       {resolved.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Resolved</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+              Resolved ({resolved.length})
+            </h2>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search resolved..."
+                className="pl-8 pr-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 w-44"
+              />
+            </div>
+          </div>
           <div className="space-y-2">
-            {resolved.map(b => (
+            {filteredResolved.map(b => (
               <div key={b.id} className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 opacity-70">
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="w-4 h-4 text-gray-400 flex-shrink-0" />

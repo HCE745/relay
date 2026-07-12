@@ -2,11 +2,31 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { ScopeSelector } from "@/components/communications/scope-selector"
+import type { SelectOption } from "@/components/ui/searchable-select"
+import type { ScopeLead } from "@/components/communications/scope-selector"
+import type { Person } from "@/components/ui/people-picker"
 
 const PRIORITIES = ["normal", "urgent"] as const
-const SCOPES     = ["org", "location", "department", "team"] as const
 
-export function AnnouncementForm() {
+const SCOPE_OPTIONS = [
+  { value: "org",        label: "Entire organization" },
+  { value: "location",   label: "Specific location" },
+  { value: "department", label: "Specific department" },
+  { value: "team",       label: "Specific team" },
+  { value: "individual", label: "Individual person" },
+] as const
+
+const SCOPE_REQUIRES_ID = new Set(["location", "department", "team", "individual"])
+
+interface Props {
+  locations:   SelectOption[]
+  departments: SelectOption[]
+  teamLeads:   ScopeLead[]
+  users:       Person[]
+}
+
+export function AnnouncementForm({ locations, departments, teamLeads, users }: Props) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState("")
@@ -19,13 +39,26 @@ export function AnnouncementForm() {
     requiresAcknowledgment: false,
     expiresAt:              "",
   })
+  const [scopeId, setScopeId] = useState("")
 
   const set = (k: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm(p => ({ ...p, [k]: e.target.value }))
 
+  function handleScopeTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setForm(p => ({ ...p, scopeType: e.target.value }))
+    setScopeId("")
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    if (SCOPE_REQUIRES_ID.has(form.scopeType) && !scopeId) {
+      const label = SCOPE_OPTIONS.find(o => o.value === form.scopeType)?.label ?? form.scopeType
+      setError(`Please select a specific ${label.toLowerCase()} for this announcement`)
+      return
+    }
+
     setSaving(true)
     setError("")
     try {
@@ -34,6 +67,7 @@ export function AnnouncementForm() {
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
           ...form,
+          scopeId:   SCOPE_REQUIRES_ID.has(form.scopeType) ? scopeId : undefined,
           expiresAt: form.expiresAt || undefined,
         }),
       })
@@ -80,18 +114,33 @@ export function AnnouncementForm() {
           <select value={form.priority} onChange={set("priority")}
             className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
+            {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scope</label>
-          <select value={form.scopeType} onChange={set("scopeType")}
+          <select value={form.scopeType} onChange={handleScopeTypeChange}
             className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {SCOPES.map(s => <option key={s} value={s}>{s}</option>)}
+            {SCOPE_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
           </select>
         </div>
       </div>
+
+      {SCOPE_REQUIRES_ID.has(form.scopeType) && (
+        <div className="pl-3 border-l-2 border-blue-200 dark:border-blue-700">
+          <ScopeSelector
+            key={form.scopeType}
+            scopeType={form.scopeType}
+            scopeId={scopeId}
+            onScopeIdChange={setScopeId}
+            locations={locations}
+            departments={departments}
+            teamLeads={teamLeads}
+            users={users}
+          />
+        </div>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expires (optional)</label>

@@ -17,19 +17,57 @@ export default async function EmergencyPage({
   const sp = await searchParams
   const showCreate = sp.create === "1" && ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
 
-  const broadcasts = await prisma.emergencyBroadcast.findMany({
-    where: { orgId: session.organizationId },
-    include: {
-      createdBy:  { select: { id: true, name: true, role: true } },
-      resolvedBy: { select: { id: true, name: true } },
-      acknowledgments: {
-        where: { userId: session.userId },
-        select: { userId: true, acknowledgedAt: true },
+  const orgId = session.organizationId
+
+  const [broadcasts, locationsRaw, departmentsRaw, teamLeadsRaw, usersRaw] = await Promise.all([
+    prisma.emergencyBroadcast.findMany({
+      where: { orgId },
+      include: {
+        createdBy:  { select: { id: true, name: true, role: true } },
+        resolvedBy: { select: { id: true, name: true } },
+        acknowledgments: {
+          where:  { userId: session.userId },
+          select: { userId: true, acknowledgedAt: true },
+        },
+        _count: { select: { acknowledgments: true } },
       },
-      _count: { select: { acknowledgments: true } },
-    },
-    orderBy: [{ resolvedAt: "asc" }, { createdAt: "desc" }],
-  })
+      orderBy: [{ resolvedAt: "asc" }, { createdAt: "desc" }],
+    }),
+    prisma.location.findMany({
+      where:   { organizationId: orgId, isActive: true },
+      select:  { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.department.findMany({
+      where:   { organizationId: orgId },
+      select:  { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.user.findMany({
+      where:   { organizationId: orgId, role: { in: ["MANAGER", "SUPERVISOR"] as never }, isActive: true },
+      select:  { id: true, name: true, role: true, department: { select: { locationId: true } } },
+      orderBy: { name: "asc" },
+    }),
+    prisma.user.findMany({
+      where:   { organizationId: orgId, isActive: true },
+      select:  { id: true, name: true, role: true, email: true },
+      orderBy: { name: "asc" },
+    }),
+  ])
+
+  const locations   = locationsRaw
+  const departments = departmentsRaw
+  const teamLeads   = teamLeadsRaw.map(u => ({
+    id:         u.id,
+    name:       u.name,
+    locationId: (u.department as { locationId: string | null } | null)?.locationId ?? null,
+  }))
+  const users = usersRaw.map(u => ({
+    id:    u.id,
+    name:  u.name,
+    role:  u.role,
+    email: u.email ?? undefined,
+  }))
 
   const canCreate  = ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
   const canResolve = ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
@@ -49,6 +87,10 @@ export default async function EmergencyPage({
         canCreate={canCreate}
         canResolve={canResolve}
         showCreate={showCreate}
+        locations={locations}
+        departments={departments}
+        teamLeads={teamLeads}
+        users={users}
       />
     </div>
   )

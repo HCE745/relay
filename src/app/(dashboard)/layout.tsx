@@ -195,15 +195,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         )}
 
-        <main className="flex-1 overflow-y-auto overscroll-y-contain">
+        <main className="flex-1 overflow-y-auto overscroll-y-contain flex flex-col">
           <div
             className="md:hidden shrink-0"
             style={{ height: "calc(56px + env(safe-area-inset-top, 0px))" }}
           />
 
-          <ReadOnlyProvider readOnly={readOnly}>
-            {children}
-          </ReadOnlyProvider>
+          <div className="flex-1">
+            <ReadOnlyProvider readOnly={readOnly}>
+              {children}
+            </ReadOnlyProvider>
+          </div>
 
           <div
             className="md:hidden shrink-0"

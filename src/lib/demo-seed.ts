@@ -2,6 +2,7 @@ import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
 import { INDUSTRY_TEMPLATES, getTemplate } from "./industry-templates"
 import { EMPLOYEE_TYPE_PRESETS } from "./employee-type-presets"
+import { setWorkforceCommsPlanFlags } from "./workforce-comms"
 
 export const DEFAULT_INDUSTRY = "Manufacturing"
 const DEMO_SLUG_PREFIX        = "demo-"
@@ -543,6 +544,7 @@ export async function createDemoOrg(industry?: string, pkg: DemoPackage = "profe
   if (isPlusOrAbove) {
     await seedPlusDemoContent(org.id, user.id)
   }
+  await setWorkforceCommsPlanFlags(org.id, PACKAGE_PLAN[pkg])
   return { org, user }
 }
 

@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { cn } from "@/lib/utils"
 import { Plus, ClipboardCheck } from "lucide-react"
+import { Header } from "@/components/layout/header"
 import { AssignmentsListClient } from "@/components/assignments/assignments-list-client"
 
 export const dynamic = "force-dynamic"
@@ -43,8 +44,10 @@ export default async function AssignmentsPage({
   const completed = assignments.filter(a => a.status === "completed")
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div>
+      <Header title="Assignments" />
+      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      <div className="flex items-center justify-between md:hidden">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Assignments</h1>
           <p className="text-sm text-gray-500 mt-0.5">
@@ -57,7 +60,7 @@ export default async function AssignmentsPage({
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            New Assignment
+            New
           </Link>
         )}
       </div>
@@ -94,6 +97,7 @@ export default async function AssignmentsPage({
       </div>
 
       <AssignmentsListClient assignments={assignments as never} canCreate={canCreate} />
+      </div>
     </div>
   )
 }

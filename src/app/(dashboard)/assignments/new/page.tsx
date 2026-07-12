@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { Header } from "@/components/layout/header"
 import { AssignmentForm } from "@/components/assignments/assignment-form"
 
 export const dynamic = "force-dynamic"
@@ -45,9 +46,12 @@ export default async function NewAssignmentPage() {
   ])
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">New Assignment</h1>
-      <AssignmentForm users={users} issues={issues} assets={assets} vendors={vendors} sops={sops} />
+    <div>
+      <Header title="New Assignment" />
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 md:hidden">New Assignment</h1>
+        <AssignmentForm users={users} issues={issues} assets={assets} vendors={vendors} sops={sops} />
+      </div>
     </div>
   )
 }

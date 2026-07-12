@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { Header } from "@/components/layout/header"
 import { EmergencyPageClient } from "@/components/communications/emergency-page-client"
 import { UpgradePrompt } from "@/components/ui/feature-gate"
 import { getOrgWCFlags } from "@/lib/workforce-comms"
@@ -78,28 +79,31 @@ export default async function EmergencyPage({
   const hasAccess  = wcFlags?.wc_emergency_broadcasts ?? false
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-        <Link href="/communications" className="hover:text-gray-700 dark:hover:text-gray-300">Communications</Link>
-        <span>/</span>
-        <span>Emergency Broadcasts</span>
-      </div>
+    <div>
+      <Header title="Emergency Broadcasts" />
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Link href="/communications" className="hover:text-gray-700 dark:hover:text-gray-300">Communications</Link>
+          <span>/</span>
+          <span>Emergency Broadcasts</span>
+        </div>
 
-      {!hasAccess ? (
-        <UpgradePrompt feature="Emergency Broadcasts" planRequired="professional" />
-      ) : (
-      <EmergencyPageClient
-        broadcasts={broadcasts as never}
-        userId={userId}
-        canCreate={canCreate}
-        canResolve={canResolve}
-        showCreate={showCreate}
-        locations={locations}
-        departments={departments}
-        teamLeads={teamLeads}
-        users={users}
-      />
-      )}
+        {!hasAccess ? (
+          <UpgradePrompt feature="Emergency Broadcasts" planRequired="professional" />
+        ) : (
+          <EmergencyPageClient
+            broadcasts={broadcasts as never}
+            userId={userId}
+            canCreate={canCreate}
+            canResolve={canResolve}
+            showCreate={showCreate}
+            locations={locations}
+            departments={departments}
+            teamLeads={teamLeads}
+            users={users}
+          />
+        )}
+      </div>
     </div>
   )
 }

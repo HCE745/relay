@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { Header } from "@/components/layout/header"
 import { AssignmentDetailClient } from "@/components/assignments/assignment-detail-client"
 import { getOrgWCFlags } from "@/lib/workforce-comms"
 
@@ -42,21 +43,24 @@ export default async function AssignmentDetailPage({ params }: { params: Promise
   const isManager  = ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <Link href="/assignments" className="hover:text-gray-700 dark:hover:text-gray-300">Assignments</Link>
-        <span>/</span>
-        <span className="text-gray-900 dark:text-white">{assignment.title}</span>
-      </div>
+    <div>
+      <Header title={assignment.title} />
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Link href="/assignments" className="hover:text-gray-700 dark:hover:text-gray-300">Assignments</Link>
+          <span>/</span>
+          <span className="text-gray-900 dark:text-white">{assignment.title}</span>
+        </div>
 
-      <AssignmentDetailClient
-        assignment={assignment as never}
-        userId={session.userId}
-        isAssignee={isAssignee}
-        isManager={isManager}
-        wcComments={wcFlags?.wc_assignment_comments ?? false}
-        wcHistory={wcFlags?.wc_assignment_history ?? false}
-      />
+        <AssignmentDetailClient
+          assignment={assignment as never}
+          userId={session.userId}
+          isAssignee={isAssignee}
+          isManager={isManager}
+          wcComments={wcFlags?.wc_assignment_comments ?? false}
+          wcHistory={wcFlags?.wc_assignment_history ?? false}
+        />
+      </div>
     </div>
   )
 }

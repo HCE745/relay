@@ -30,9 +30,9 @@ export async function POST(request: NextRequest) {
 
   await cleanupExpiredDemos()
 
-  // Always start as Professional — salesperson switches in the demo control panel
+  // Start as Professional Plus — shows the full feature set by default
   const industry = body.industry?.trim() || undefined
-  const { org, user } = await createDemoOrg(industry, "professional")
+  const { org, user } = await createDemoOrg(industry, "professional_plus")
 
   await createSession({
     userId:              user.id,
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     organizationId:      org.id,
     onboardingCompleted: true,
     subscriptionStatus:  "active",
-    plan:                "pro",
+    plan:                "professional_plus",
     isDemo:              true,
   })
 

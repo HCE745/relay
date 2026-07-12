@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { Header } from "@/components/layout/header"
 import { AnnouncementForm } from "@/components/communications/announcement-form"
 import { getScopeOptionsForPlan } from "@/lib/workforce-comms"
 
@@ -55,22 +56,25 @@ export default async function NewAnnouncementPage() {
   }))
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href="/communications" className="hover:text-gray-700 dark:hover:text-gray-300">Communications</Link>
-        <span>/</span>
-        <Link href="/communications/announcements" className="hover:text-gray-700 dark:hover:text-gray-300">Announcements</Link>
-        <span>/</span>
-        <span>New</span>
+    <div>
+      <Header title="New Announcement" />
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+          <Link href="/communications" className="hover:text-gray-700 dark:hover:text-gray-300">Communications</Link>
+          <span>/</span>
+          <Link href="/communications/announcements" className="hover:text-gray-700 dark:hover:text-gray-300">Announcements</Link>
+          <span>/</span>
+          <span>New</span>
+        </div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 md:hidden">New Announcement</h1>
+        <AnnouncementForm
+          locations={locations}
+          departments={departments}
+          teamLeads={teamLeads}
+          users={users}
+          scopeOptions={scopeOptions}
+        />
       </div>
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">New Announcement</h1>
-      <AnnouncementForm
-        locations={locations}
-        departments={departments}
-        teamLeads={teamLeads}
-        users={users}
-        scopeOptions={scopeOptions}
-      />
     </div>
   )
 }

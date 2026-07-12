@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { Header } from "@/components/layout/header"
 import { Megaphone, Siren, Users, ArrowRight } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -28,8 +29,10 @@ export default async function CommunicationsPage() {
   const canCreate = ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-      <div>
+    <div>
+      <Header title="Communications" />
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+      <div className="md:hidden">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Communications</h1>
         <p className="text-sm text-gray-500 mt-0.5">Announcements, emergency broadcasts, and team channels</p>
       </div>
@@ -126,6 +129,7 @@ export default async function CommunicationsPage() {
           </Link>
         </div>
       )}
+      </div>
     </div>
   )
 }

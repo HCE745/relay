@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { Header } from "@/components/layout/header"
 import { Users, ChevronRight } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -28,13 +29,15 @@ export default async function TeamsPage() {
   })
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+    <div>
+      <Header title="Team Channels" />
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="flex items-center gap-2 text-sm text-gray-500">
         <Link href="/communications" className="hover:text-gray-700 dark:hover:text-gray-300">Communications</Link>
         <span>/</span>
         <span>Team Channels</span>
       </div>
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Team Channels</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white md:hidden">Team Channels</h1>
 
       {me?.manager && (
         <div>
@@ -88,6 +91,7 @@ export default async function TeamsPage() {
           <p className="text-sm mt-1">Team channels are created automatically based on your reporting structure.</p>
         </div>
       )}
+      </div>
     </div>
   )
 }

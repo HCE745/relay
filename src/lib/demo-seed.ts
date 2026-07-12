@@ -76,6 +76,9 @@ export async function deleteOrganization(orgId: string): Promise<void> {
     prisma.impersonationLog.deleteMany({ where: { organizationId: orgId } }),
     prisma.superAdminAuditLog.deleteMany({ where: { orgId } }),
     prisma.emailTemplate.deleteMany({ where: { organizationId: orgId } }),
+    prisma.assignment.deleteMany({ where: { orgId } }),
+    prisma.announcement.deleteMany({ where: { orgId } }),
+    prisma.emergencyBroadcast.deleteMany({ where: { orgId } }),
   ])
 
   // ── 6. Escalation steps before policies ──────────────────────────────────
@@ -563,6 +566,11 @@ export async function resetDemoOrg(orgId: string, adminUserId: string, industry?
     prisma.injuryReport.deleteMany({ where: { organizationId: orgId } }),
     prisma.purchaseRequest.deleteMany({ where: { organizationId: orgId } }),
   ])
+  await Promise.all([
+    prisma.assignment.deleteMany({ where: { orgId: orgId } }),
+    prisma.announcement.deleteMany({ where: { orgId: orgId } }),
+    prisma.emergencyBroadcast.deleteMany({ where: { orgId: orgId } }),
+  ])
   await prisma.issue.deleteMany({ where: { organizationId: orgId } })
   await Promise.all([
     prisma.sOP.deleteMany({ where: { organizationId: orgId } }),
@@ -921,6 +929,18 @@ async function seedDemoContent(orgId: string, adminUserId: string, industryLabel
       ],
     })
   }
+
+  // ── Workforce Communications demo data ───────────────────────────────────
+  await seedWorkforceCommsDemoContent({
+    orgId,
+    adminUserId,
+    industryKey,
+    userRecords: userRecords.map(u => ({ id: u.id, name: u.name, role: u.role })),
+    assetIds,
+    deptIds,
+    locationIds,
+    allUserIds,
+  })
 }
 
 // ─── Professional Plus seed additions ─────────────────────────────────────────
@@ -1024,4 +1044,365 @@ async function seedPlusDemoContent(orgId: string, adminUserId: string) {
       isActive:       true,
     },
   })
+}
+
+// ─── Workforce Communications demo content ────────────────────────────────────
+
+async function seedWorkforceCommsDemoContent({
+  orgId,
+  adminUserId,
+  industryKey,
+  userRecords,
+  assetIds,
+  deptIds,
+  locationIds,
+  allUserIds,
+}: {
+  orgId:        string
+  adminUserId:  string
+  industryKey:  string
+  userRecords:  Array<{ id: string; name: string; role: string }>
+  assetIds:     string[]
+  deptIds:      string[]
+  locationIds:  string[]
+  allUserIds:   string[]
+}) {
+  const now      = Date.now()
+  const ago      = (days: number)  => new Date(now - days * 86400000)
+  const fromNow  = (hours: number) => new Date(now + hours * 3600000)
+  const hoursAgo = (hours: number) => new Date(now - hours * 3600000)
+
+  // ── Users by role ────────────────────────────────────────────────────────
+  const managers    = userRecords.filter(u => u.role === "MANAGER")
+  const supervisors = userRecords.filter(u => u.role === "SUPERVISOR")
+  const hrUsers     = userRecords.filter(u => u.role === "HR")
+  const employees   = userRecords.filter(u => u.role === "EMPLOYEE")
+  const fallback    = userRecords[0] ?? { id: adminUserId }
+
+  const mgr = (i = 0) => (managers[i]    ?? fallback).id
+  const sup = (i = 0) => (supervisors[i] ?? fallback).id
+  const hr  = (i = 0) => (hrUsers[i]     ?? managers[0] ?? fallback).id
+  const emp = (i = 0) => (employees[i]   ?? fallback).id
+  const asset   = (i: number) => assetIds[i]    ?? null
+  const dept    = (i: number) => deptIds[i]     ?? null
+
+  // ── Find issues for linking ──────────────────────────────────────────────
+  const escalatedIssue = await prisma.issue.findFirst({
+    where:  { organizationId: orgId, isEscalated: true },
+    select: { id: true },
+  })
+  const escId = escalatedIssue?.id ?? null
+
+  const findIssue = async (keyword: string) => {
+    const i = await prisma.issue.findFirst({
+      where:  { organizationId: orgId, title: { contains: keyword, mode: "insensitive" } },
+      select: { id: true },
+    })
+    return i?.id ?? null
+  }
+
+  // ── Seed data shapes ─────────────────────────────────────────────────────
+  interface AsgInput {
+    title:          string
+    notes?:         string
+    priority:       "low" | "medium" | "high" | "critical"
+    status:         "pending" | "in_progress" | "completed"
+    assigneeId:     string
+    dueDate:        Date
+    linkedIssueId?: string | null
+    linkedAssetId?: string | null
+  }
+  interface AnnInput {
+    title:                  string
+    body:                   string
+    priority:               "normal" | "urgent" | "emergency"
+    scopeType:              "org" | "location" | "department"
+    scopeId?:               string | null
+    requiresAcknowledgment: boolean
+  }
+  interface EmgInput {
+    type:             string
+    title:            string
+    body:             string
+    resolvedHoursAgo: number
+  }
+
+  let asgSeeds: AsgInput[]    = []
+  let annSeeds: AnnInput[]    = []
+  let emgSeed:  EmgInput | null = null
+
+  // ── Industry-specific data ───────────────────────────────────────────────
+  switch (industryKey) {
+
+    case "manufacturing": {
+      asgSeeds = [
+        { title: "Shut down Conveyor Line 2 for hydraulic inspection",     notes: "Tag out the line per LOTO procedure before beginning any inspection.",        priority: "high",    status: "in_progress", assigneeId: emp(0),  dueDate: fromNow(8),   linkedIssueId: escId           },
+        { title: "Order replacement hydraulic hose from vendor",           notes: "Call ProMech first — they carry emergency stock for 4-hour delivery.",          priority: "medium",  status: "pending",     assigneeId: mgr(1),  dueDate: fromNow(32),  linkedIssueId: escId           },
+        { title: "Inspect surrounding area for fluid contamination",       notes: "Check floor, drains, and all nearby equipment surfaces for hydraulic fluid.",   priority: "high",    status: "completed",   assigneeId: hr(0),   dueDate: fromNow(8),   linkedIssueId: escId           },
+        { title: "Replace HVAC filter in Building B",                      notes: "Filter part number is listed on the HVAC panel door label.",                    priority: "low",     status: "pending",     assigneeId: sup(0),  dueDate: fromNow(72)                                  },
+        { title: "Monthly forklift safety inspection — Forklift 3",       notes: "Use the standard forklift inspection checklist. Document all findings.",        priority: "medium",  status: "pending",     assigneeId: emp(0),  dueDate: fromNow(120), linkedAssetId: asset(4)        },
+      ]
+      annSeeds = [
+        { title: "Conveyor Line 2 — Maintenance Shutdown",             body: "Conveyor Line 2 is currently shut down for hydraulic maintenance. Do not operate until further notice. All production should route through Lines 1, 3, and 4. Contact the Maintenance Supervisor with any questions.",                                                                                                                      priority: "urgent", scopeType: "department", scopeId: dept(0), requiresAcknowledgment: true  },
+        { title: "Steel-Toed Boot Requirement — Production Area",     body: "Safety reminder: All personnel must wear steel-toed boots in the production area at all times. This applies to all shifts and to visitors. Non-compliance will result in immediate removal from the production floor.",                                                                                                                          priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+        { title: "Shift B Meeting — Hydraulic Equipment SOP Review",  body: "Shift B meeting today at 2pm in the break room to review the new SOP for hydraulic equipment handling and maintenance procedures. Attendance is mandatory for all Maintenance team members.",                                                                                                                                                    priority: "normal", scopeType: "department", scopeId: dept(1), requiresAcknowledgment: false },
+      ]
+      emgSeed = {
+        type:             "other",
+        title:            "Hydraulic Fluid Spill — Conveyor Line 2",
+        body:             "Hydraulic fluid spill detected near Conveyor Line 2. Area has been cordoned off. Do not enter until cleared by Safety. Spill response team is on-site. Estimated clearance: 45 minutes. All personnel have been accounted for.",
+        resolvedHoursAgo: 2,
+      }
+      break
+    }
+
+    case "warehousing": {
+      const dockIssueId = await findIssue("Dock door 7")
+      asgSeeds = [
+        { title: "Inspect Dock Door 7 — not closing properly",             notes: "Check seal, track alignment, and hydraulic cylinder. Document all findings before ordering parts.",      priority: "high",    status: "in_progress", assigneeId: emp(0),  dueDate: fromNow(8),   linkedIssueId: dockIssueId ?? escId },
+        { title: "Count inventory in Aisle C before end of shift",        notes: "Use RF scanner and reconcile any variances with the WMS before logging off.",                             priority: "medium",  status: "pending",     assigneeId: sup(3),  dueDate: fromNow(8)                                              },
+        { title: "Replace battery on Forklift 4",                         notes: "Coordinate with the charging station supervisor to ensure a charged spare battery is ready.",              priority: "medium",  status: "pending",     assigneeId: emp(0),  dueDate: fromNow(32),  linkedAssetId: asset(1)             },
+        { title: "Clear Receiving Bay 3 before 6am shipment arrival",     notes: "Stage all current pallets in Zone D overflow area. Bay must be fully clear by midnight.",                  priority: "high",    status: "pending",     assigneeId: sup(0),  dueDate: fromNow(32)                                             },
+      ]
+      annSeeds = [
+        { title: "Large Shipment Arriving at 6am Tomorrow",    body: "A large inbound shipment is arriving at Receiving Bay 3 at 6am tomorrow. Bay 3 must be completely cleared by end of shift tonight. Contact the Receiving Supervisor if you need staging space reassigned. Do not leave any pallets in Bay 3 overnight.",                                                                                               priority: "urgent", scopeType: "department", scopeId: dept(1), requiresAcknowledgment: true  },
+        { title: "Dock Door 7 — Out of Service",               body: "Dock Door 7 is currently out of service due to a closing mechanism failure. Use Dock Door 8 as the alternate for all inbound and outbound traffic until repair is complete. Repair crew is scheduled for tomorrow morning.",                                                                                                                           priority: "urgent", scopeType: "org",        requiresAcknowledgment: false },
+        { title: "Weekly Safety Walk — Friday at 8am",         body: "The weekly safety walk is scheduled for Friday at 8am. All supervisors are required to attend. Meet at the main dock entrance. Please complete your area pre-walk inspection checklist before the group walk begins.",                                                                                                                                  priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+      ]
+      emgSeed = {
+        type:             "fire",
+        title:            "Forklift Battery Fire — Charging Area Evacuated",
+        body:             "A forklift battery fire occurred in the charging area. The area was evacuated and the fire was extinguished by on-site responders using a Class D extinguisher. Charging area is closed pending a fire marshal inspection. All personnel accounted for. No injuries reported.",
+        resolvedHoursAgo: 4,
+      }
+      break
+    }
+
+    case "restaurants": {
+      asgSeeds = [
+        { title: "Call refrigeration repair service for Walk-in Cooler 1",   notes: "Use Arctic Cold Solutions — emergency line is on the vendor board in the manager office.",    priority: "critical", status: "in_progress", assigneeId: mgr(0),  dueDate: fromNow(4),  linkedIssueId: escId },
+        { title: "Move perishables from Walk-in 1 to Walk-in 2",             notes: "Prioritize proteins and dairy first. Log all moved items on the transfer sheet on the cooler door.", priority: "critical", status: "completed",   assigneeId: sup(0),  dueDate: fromNow(4),  linkedIssueId: escId },
+        { title: "Deep clean prep area after lunch service",                  notes: "Use NSF-approved cleaner on all food-contact surfaces. Must be complete before 3pm prep starts.",  priority: "medium",  status: "pending",     assigneeId: emp(0),  dueDate: fromNow(8)                       },
+        { title: "Check and restock all hand sanitizer stations",             notes: "Check all 8 stations throughout the building. Log refill date on each station log card.",            priority: "low",     status: "pending",     assigneeId: sup(1),  dueDate: fromNow(8)                       },
+      ]
+      annSeeds = [
+        { title: "Walk-in Refrigerator 1 — Out of Service",         body: "Walk-in Refrigerator 1 is temporarily out of service due to a cooling failure. All perishables have been moved to Walk-in 2. Do not open Walk-in 1. Refrigeration repair is on the way. Contact the Kitchen Manager with any questions about food storage.",                                                                                     priority: "urgent", scopeType: "department", scopeId: dept(0), requiresAcknowledgment: true  },
+        { title: "Health Inspection — Next Tuesday",                 body: "A health inspection is scheduled for next Tuesday. All staff must review the food safety SOPs posted in the kitchen by end of this week. Priority areas: temperature logging, proper handwashing technique, and cross-contamination prevention. Questions? See your manager.",                                                                     priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+        { title: "Saturday Evening — All Hands Required",            body: "Saturday evening is fully booked with two large parties and a full dining room. No time off has been approved for Saturday dinner service. All scheduled staff are expected on time and in full uniform. See your schedule for your assigned station.",                                                                                             priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+      ]
+      emgSeed = {
+        type:             "other",
+        title:            "Gas Smell Reported — Building Evacuated",
+        body:             "A gas smell was reported in the kitchen area. The building was evacuated as a precaution. The gas company responded and confirmed a false alarm — a burner pilot had extinguished and gas briefly accumulated. The fire marshal gave the all-clear. The building is safe to re-enter. All staff accounted for.",
+        resolvedHoursAgo: 24,
+      }
+      break
+    }
+
+    case "retail": {
+      asgSeeds = [
+        { title: "Call POS vendor support — Register 3 offline",                   notes: "Vendor support line: 1-800-555-0142. Reference contract #RT-4421. Ask for priority queue.",    priority: "high",   status: "in_progress", assigneeId: mgr(0),  dueDate: fromNow(4),  linkedIssueId: escId },
+        { title: "Direct Register 3 customers to Registers 1 and 2",              notes: "Post the 'Temporarily Closed' sign on Register 3. Assist customers proactively at the transition.", priority: "high",   status: "completed",   assigneeId: sup(0),  dueDate: fromNow(4),  linkedIssueId: escId },
+        { title: "Restock end caps in Electronics section before store opens",     notes: "Planogram for the current end cap is in the Electronics binder in the back office.",               priority: "medium", status: "pending",     assigneeId: sup(1),  dueDate: fromNow(8)                       },
+        { title: "Weekly cart retrieval and parking lot inspection",               notes: "Note any cart damage, lot hazards, or lighting issues during the inspection. Log in Relay.",        priority: "low",    status: "pending",     assigneeId: emp(2),  dueDate: fromNow(8)                       },
+      ]
+      annSeeds = [
+        { title: "Register 3 — Temporarily Offline",          body: "Register 3 is currently offline due to a system error. Please direct all customers to Registers 1 and 2. The IT team is working with the POS vendor on resolution. We will notify you when Register 3 is back online.",                                                                                                                                priority: "urgent", scopeType: "department", scopeId: dept(0), requiresAcknowledgment: true  },
+        { title: "Corporate Store Audit — This Thursday",     body: "Corporate is conducting a store audit this Thursday. All departments must ensure displays and signage are current with the planogram, pricing is accurate, and back-of-house areas are organized and clean. Managers will be emailed the full audit checklist today.",                                                                                     priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+        { title: "New Markdown Procedures — Effective Monday",body: "New markdown procedures take effect on Monday. All staff must review the updated SOP for markdown tagging and POS entry before your next shift. The SOP is available in the back office binder and on the team portal.",                                                                                                                                 priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+      ]
+      break
+    }
+
+    case "property": {
+      asgSeeds = [
+        { title: "Inspect roof at Unit 4B and document leak damage",              notes: "Take photos before touching anything. Note the extent of water damage to ceiling and walls.",      priority: "high",   status: "in_progress", assigneeId: sup(0),  dueDate: fromNow(8),  linkedIssueId: escId },
+        { title: "Contact roofing contractor for emergency repair estimate",      notes: "We need same-week availability. Get at least two estimates before approving.",                       priority: "high",   status: "pending",     assigneeId: mgr(0),  dueDate: fromNow(8),  linkedIssueId: escId },
+        { title: "Deliver water damage notice to Unit 4B and update tenant",     notes: "Use the standard water damage disclosure form. Offer temporary accommodations if unit is unlivable.", priority: "high",   status: "pending",     assigneeId: mgr(1),  dueDate: fromNow(8),  linkedIssueId: escId },
+        { title: "Monthly common area inspection — Building A",                  notes: "Use the standard common area checklist. Note anything requiring repair or cleaning.",                  priority: "low",    status: "pending",     assigneeId: emp(0),  dueDate: fromNow(120)                       },
+      ]
+      annSeeds = [
+        { title: "Roof Repair Work — Building C This Week",           body: "Roof repair work is scheduled for Building C this week. Residents may experience construction noise between 8am and 4pm. We apologize for the inconvenience and appreciate your patience during this necessary maintenance.",                                                                                                                    priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+        { title: "Planned Water Shut-Off — Building B — Wednesday",   body: "There will be a planned water shut-off for Building B on Wednesday from 10am to 2pm for scheduled plumbing maintenance. All residents have been notified by mail. Hot water will also be unavailable during this window. Please plan accordingly.",                                                                                            priority: "urgent", scopeType: "org",        requiresAcknowledgment: true  },
+        { title: "Work Order Logging Reminder",                        body: "Reminder to all Maintenance team members: all work orders must be logged in Relay before contacting any vendor or beginning any repair work. This ensures accurate cost tracking and compliance with our service level agreements.",                                                                                                            priority: "normal", scopeType: "department", scopeId: dept(0), requiresAcknowledgment: false },
+      ]
+      break
+    }
+
+    case "healthcare": {
+      asgSeeds = [
+        { title: "Inspect and repair HVAC unit — Patient Wing C",              notes: "Wear appropriate PPE. Coordinate with the Charge Nurse to minimize patient disruption.",              priority: "critical", status: "in_progress", assigneeId: emp(0),  dueDate: fromNow(8),  linkedIssueId: escId },
+        { title: "Set up temporary cooling units in Patient Wing C hallway",   notes: "Retrieve portable coolers from the Facilities storage room on Level B. Place every 20 feet.",         priority: "critical", status: "completed",   assigneeId: sup(0),  dueDate: fromNow(8),  linkedIssueId: escId },
+        { title: "Monthly fire extinguisher inspection — all floors",          notes: "Use the inspection log forms in the safety binder. Physically tag each extinguisher after checking.",   priority: "medium",   status: "pending",     assigneeId: hr(0),   dueDate: fromNow(120)                       },
+        { title: "Terminal clean and sanitize Operating Room 2 after procedure", notes: "Follow the OR terminal cleaning protocol exactly. Supervisor must sign off before room is cleared.", priority: "high",     status: "pending",     assigneeId: sup(1),  dueDate: fromNow(8)                         },
+      ]
+      annSeeds = [
+        { title: "HVAC Repair Underway — Patient Wing C",                       body: "The HVAC unit in Patient Wing C is currently under repair. Temporary cooling units have been deployed in the hallways. Facilities is monitoring temperatures continuously. Patient care operations can continue. Contact Facilities immediately if temperatures rise above 75°F.",                                                  priority: "urgent", scopeType: "department", scopeId: dept(0), requiresAcknowledgment: true  },
+        { title: "Joint Commission Inspection — Preparation Required",          body: "The Joint Commission inspection window begins next month. All departments must complete their compliance checklists by end of this week. Department managers will receive their specific checklists via email today. This is a mandatory compliance requirement — no extensions will be granted.",                                    priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+        { title: "Updated Hand Hygiene Protocol — Effective Immediately",       body: "A new hand hygiene protocol is effective immediately per infection control guidelines. Key change: gel must be applied for a minimum of 20 seconds, not 15. Updated posters are being placed at all nursing stations. Please review the full updated SOP. Questions? Contact Infection Control.",                                   priority: "urgent", scopeType: "org",        requiresAcknowledgment: false },
+      ]
+      emgSeed = {
+        type:             "power_outage",
+        title:            "Code Gray — Power Fluctuation in Building B",
+        body:             "Code Gray declared in Building B following a power fluctuation. Backup generators activated successfully. All critical systems including life support, OR lighting, and nurse call systems are confirmed operational. Facilities Engineering is investigating the source. Main power was restored within 8 minutes. All clear issued. No patient impact.",
+        resolvedHoursAgo: 6,
+      }
+      break
+    }
+
+    case "education": {
+      asgSeeds = [
+        { title: "Repair projector in Room 214 — bulb replacement",             notes: "Spare bulbs are in the AV cabinet in the main office. Check the model label for the correct bulb.", priority: "medium", status: "in_progress", assigneeId: emp(0),  dueDate: fromNow(8),   linkedIssueId: escId },
+        { title: "Inspect all emergency exit lighting — Building A",            notes: "Test each unit with the test button. Replace any unit not holding charge for 90 minutes.",             priority: "medium", status: "pending",     assigneeId: hr(0),   dueDate: fromNow(120)                        },
+        { title: "Set up chairs and AV for Thursday assembly in gymnasium",     notes: "Refer to the gymnasium setup diagram on file in the facilities office. AV is in the storage room.",    priority: "medium", status: "pending",     assigneeId: sup(0),  dueDate: fromNow(48)                         },
+        { title: "Monthly grounds inspection — parking lots and walkways",      notes: "Note cracks, drainage issues, and lighting problems. Include photos in your inspection report.",        priority: "low",    status: "pending",     assigneeId: emp(0),  dueDate: fromNow(120)                        },
+      ]
+      annSeeds = [
+        { title: "Projector Repair — Room 214",                  body: "The projector in Room 214 is being repaired today. Teachers with classes in Room 214 should contact the main office for alternate room assignments. We expect the repair to be completed by end of day.",                                                                                                                                              priority: "normal", scopeType: "department", scopeId: dept(2), requiresAcknowledgment: false },
+        { title: "Campus Fire Drill — Friday at 10am",           body: "A campus-wide fire drill is scheduled for this Friday at 10am. All staff must review their building evacuation procedures before Friday. Assembly areas will be confirmed via email this week. Teachers: please review the exit map posted in your classroom with students before the drill.",                                                           priority: "urgent", scopeType: "org",        requiresAcknowledgment: true  },
+        { title: "Hallway Lighting Work — Building C This Week", body: "Maintenance will be replacing hallway lighting in Building C after school hours this week (Monday through Thursday evenings). Some hallway sections may be temporarily unlit between 4pm and 6pm. Please plan your after-school schedule accordingly.",                                                                                                 priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+      ]
+      break
+    }
+
+    case "hospitality": {
+      const hvacIssueId = await findIssue("HVAC Room Block C")
+      asgSeeds = [
+        { title: "Repair heating unit in Room 214 — guest reported no heat",       notes: "Check thermostat wiring and the HVAC unit above the room. Guest is impacted — treat as priority.",         priority: "high",    status: "in_progress", assigneeId: emp(0),  dueDate: fromNow(4),  linkedIssueId: hvacIssueId ?? escId },
+        { title: "Relocate guest in Room 214 to Room 312 — complimentary upgrade", notes: "Offer Room 312 as a complimentary upgrade. Comp one night and add a breakfast amenity in PMS.",            priority: "high",    status: "completed",   assigneeId: mgr(1),  dueDate: fromNow(4),  linkedIssueId: hvacIssueId ?? escId },
+        { title: "Deep clean and inspect Room 214 after heating repair",           notes: "Run the full room inspection checklist. Room should not be assigned again until cleared by supervisor.",     priority: "medium",  status: "pending",     assigneeId: sup(1),  dueDate: fromNow(8),  linkedIssueId: hvacIssueId ?? escId },
+        { title: "Restock all minibar units — Floors 3 and 4",                    notes: "Use the minibar restock cart. Log all items pulled from storeroom on the minibar tracking sheet.",           priority: "low",     status: "pending",     assigneeId: emp(3),  dueDate: fromNow(8)                                               },
+      ]
+      annSeeds = [
+        { title: "Room 214 — Out of Service",              body: "Room 214 is temporarily out of service for heating repair. The guest has been relocated. Do not assign Room 214 to any new guests until Maintenance and Housekeeping have both cleared the room. Update the PMS status to Out of Order until further notice.",                                                                                              priority: "urgent", scopeType: "org",        requiresAcknowledgment: true  },
+        { title: "VIP Arrival Tonight — Suite 501",        body: "A VIP guest is arriving tonight in Suite 501. White glove service is required throughout their stay. All departments: please review the VIP service protocol document. Suite must be inspected by the Housekeeping Manager before 3pm. Food & Beverage has been notified for welcome amenity setup.",                                                        priority: "urgent", scopeType: "org",        requiresAcknowledgment: false },
+        { title: "Pool Closure — Thursday 8am to 12pm",   body: "The pool will be closed for chemical treatment on Thursday from 8am to 12pm. Please update guest-facing signage at the pool entrance and at the front desk before Thursday morning. The Guest Services team should proactively contact guests with pool reservations during this window.",                                                                     priority: "normal", scopeType: "org",        requiresAcknowledgment: false },
+      ]
+      break
+    }
+
+    case "multisite": {
+      asgSeeds = [
+        { title: "Diagnose and repair gate entry system — keypads not responding",  notes: "Check power to the keypad panels first, then the gate controller board. Call vendor if board needs replacement.", priority: "critical", status: "in_progress", assigneeId: emp(0),  dueDate: fromNow(8),   linkedIssueId: escId },
+        { title: "Post manual access notice at gate and notify customers",           notes: "Post the standard Gate Under Repair sign. Override access code is 4471 — include in posted signage.",              priority: "high",    status: "completed",   assigneeId: mgr(1),  dueDate: fromNow(8),   linkedIssueId: escId },
+        { title: "Inspect all unit locks in Row C after break-in attempt",          notes: "Check every lock for tampering or forced-entry damage. File a police report if locks are found compromised.",       priority: "high",    status: "in_progress", assigneeId: emp(2),  dueDate: fromNow(8)                          },
+        { title: "Restock and test all vacuum stations — Units 1 through 4",        notes: "Each vacuum unit should run uninterrupted for at least 2 minutes. Restock coin changers if needed.",                priority: "low",     status: "pending",     assigneeId: emp(4),  dueDate: fromNow(120)                        },
+      ]
+      annSeeds = [
+        { title: "Gate Entry System — Temporary Outage",               body: "The gate entry system is temporarily down and not responding to keypads. Customers can access their units using the manual override code: 4471. Enter code then press #. The repair team is on-site and expects to have the system restored within 2–3 hours. We apologize for the inconvenience.",                                         priority: "urgent", scopeType: "org", requiresAcknowledgment: true  },
+        { title: "Monthly Site Inspection — This Friday",              body: "The monthly site inspection is scheduled for this Friday. All managers should ensure their areas are clean, compliant, and free of safety hazards before the inspection begins. Any deferred maintenance items must be logged in Relay before end of day Thursday.",                                                                           priority: "normal", scopeType: "org", requiresAcknowledgment: false },
+        { title: "New Security Camera System — Installation Monday",   body: "A new security camera system installation begins on Monday. Some camera feeds will be temporarily offline during the installation process. Full security coverage will be maintained throughout. Installation is expected to complete by Wednesday.",                                                                                            priority: "normal", scopeType: "org", requiresAcknowledgment: false },
+      ]
+      break
+    }
+
+    default:
+      return
+  }
+
+  // ── Create assignments ──────────────────────────────────────────────────
+  const createdAssignments = await Promise.all(
+    asgSeeds.map(a =>
+      prisma.assignment.create({
+        data: {
+          orgId,
+          title:         a.title,
+          notes:         a.notes ?? null,
+          priority:      a.priority,
+          status:        a.status,
+          assigneeId:    a.assigneeId,
+          assignedById:  adminUserId,
+          dueDate:       a.dueDate,
+          linkedIssueId: a.linkedIssueId ?? null,
+          linkedAssetId: a.linkedAssetId ?? null,
+          completedAt:   a.status === "completed" ? hoursAgo(2) : null,
+          createdAt:     hoursAgo(6),
+        },
+      })
+    )
+  )
+
+  // Status history for completed assignments
+  const historyData: Array<{
+    assignmentId: string
+    fromStatus:   "pending" | "in_progress"
+    toStatus:     "in_progress" | "completed"
+    changedById:  string
+    note:         string
+    createdAt:    Date
+  }> = []
+  for (let i = 0; i < asgSeeds.length; i++) {
+    if (asgSeeds[i].status === "completed") {
+      historyData.push(
+        { assignmentId: createdAssignments[i].id, fromStatus: "pending",     toStatus: "in_progress", changedById: asgSeeds[i].assigneeId, note: "Started work on this assignment.",       createdAt: hoursAgo(4) },
+        { assignmentId: createdAssignments[i].id, fromStatus: "in_progress", toStatus: "completed",   changedById: asgSeeds[i].assigneeId, note: "Assignment completed successfully.",     createdAt: hoursAgo(2) },
+      )
+    }
+  }
+  if (historyData.length > 0) {
+    await prisma.assignmentStatusHistory.createMany({ data: historyData })
+  }
+
+  // ── Create announcements ────────────────────────────────────────────────
+  const createdAnnouncements = await Promise.all(
+    annSeeds.map(a =>
+      prisma.announcement.create({
+        data: {
+          orgId,
+          title:                  a.title,
+          body:                   a.body,
+          priority:               a.priority,
+          scopeType:              a.scopeType,
+          scopeId:                a.scopeId ?? null,
+          createdById:            adminUserId,
+          requiresAcknowledgment: a.requiresAcknowledgment,
+          createdAt:              hoursAgo(3),
+        },
+      })
+    )
+  )
+
+  // Acknowledgments — half the users have ack'd the requiresAcknowledgment ones
+  const ackData: Array<{ announcementId: string; userId: string; acknowledgedAt: Date }> = []
+  for (let i = 0; i < annSeeds.length; i++) {
+    if (annSeeds[i].requiresAcknowledgment) {
+      const half = allUserIds.slice(0, Math.ceil(allUserIds.length / 2))
+      for (const userId of half) {
+        ackData.push({ announcementId: createdAnnouncements[i].id, userId, acknowledgedAt: hoursAgo(1) })
+      }
+    }
+  }
+  if (ackData.length > 0) {
+    await prisma.announcementAcknowledgment.createMany({ data: ackData, skipDuplicates: true })
+  }
+
+  // ── Create emergency broadcast (resolved) ──────────────────────────────
+  if (emgSeed) {
+    const resolvedAt = hoursAgo(emgSeed.resolvedHoursAgo)
+    const createdAt  = hoursAgo(emgSeed.resolvedHoursAgo + 1)
+
+    const broadcast = await prisma.emergencyBroadcast.create({
+      data: {
+        orgId,
+        type:        emgSeed.type as never,
+        title:       emgSeed.title,
+        body:        emgSeed.body,
+        scopeType:   "org",
+        createdById: adminUserId,
+        resolvedAt,
+        resolvedById: mgr(0),
+        createdAt,
+      },
+    })
+
+    // All users acknowledged the resolved broadcast
+    await prisma.emergencyAcknowledgment.createMany({
+      data: allUserIds.map(userId => ({
+        emergencyBroadcastId: broadcast.id,
+        userId,
+        acknowledgedAt:       new Date(resolvedAt.getTime() - 5 * 60 * 1000),
+      })),
+      skipDuplicates: true,
+    })
+  }
 }

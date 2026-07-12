@@ -3,6 +3,7 @@ import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { AnnouncementForm } from "@/components/communications/announcement-form"
+import { getScopeOptionsForPlan } from "@/lib/workforce-comms"
 
 export const dynamic = "force-dynamic"
 
@@ -38,9 +39,10 @@ export default async function NewAnnouncementPage() {
     }),
   ])
 
-  const locations   = locationsRaw
-  const departments = departmentsRaw
-  const teamLeads   = teamLeadsRaw.map(u => ({
+  const scopeOptions = getScopeOptionsForPlan(session.plan ?? "essentials")
+  const locations    = locationsRaw
+  const departments  = departmentsRaw
+  const teamLeads    = teamLeadsRaw.map(u => ({
     id:         u.id,
     name:       u.name,
     locationId: (u.department as { locationId: string | null } | null)?.locationId ?? null,
@@ -67,6 +69,7 @@ export default async function NewAnnouncementPage() {
         departments={departments}
         teamLeads={teamLeads}
         users={users}
+        scopeOptions={scopeOptions}
       />
     </div>
   )

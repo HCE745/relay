@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { getOrgWCFlags } from "@/lib/workforce-comms"
 import Anthropic from "@anthropic-ai/sdk"
 
 export const dynamic = "force-dynamic"
@@ -16,6 +17,9 @@ export async function GET() {
     where: { userId_date: { userId: session.userId, date: today } },
   })
   if (cached) return NextResponse.json({ briefing: cached.content, cached: true })
+
+  const wcFlags = await getOrgWCFlags(session.organizationId)
+  const aiEnabled = wcFlags?.wc_ai_daily_briefing ?? false
 
   // Gather context
   const [myAssignments, myIssues, announcements] = await Promise.all([
@@ -66,16 +70,50 @@ Context:
 Write a brief, actionable daily briefing in 3-5 sentences. Lead with the most urgent item. Mention overdue items if any. End with a single motivational sentence. Use plain prose, no bullet points, no markdown.`
 
   let content = ""
-  try {
-    const client = new Anthropic()
-    const msg = await client.messages.create({
-      model:      "claude-haiku-4-5-20251001",
-      max_tokens: 300,
-      messages:   [{ role: "user", content: prompt }],
-    })
-    content = (msg.content[0] as { type: string; text: string }).text
-  } catch {
-    content = `Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, ${session.name}! You have ${myAssignments.length} open assignment${myAssignments.length !== 1 ? "s" : ""}${overdueAssignments.length > 0 ? ` (${overdueAssignments.length} overdue)` : ""}. Focus on your highest-priority items first and have a productive day.`
+  if (!aiEnabled) {
+    const todayDate = new Date(today)
+    const dueToday = myAssignments.filter(a => a.dueDate && new Date(a.dueDate).toISOString().split("T")[0] === today)
+    const lines: string[] = [`Daily Briefing — ${today}`]
+    lines.push("")
+    lines.push(`Assignments (${myAssignments.length} open${overdueAssignments.length > 0 ? `, ${overdueAssignments.length} overdue` : ""}):`)
+    if (myAssignments.length === 0) {
+      lines.push("  No open assignments.")
+    } else {
+      myAssignments.slice(0, 10).forEach(a => {
+        const due = a.dueDate ? ` — due ${new Date(a.dueDate).toLocaleDateString()}` : ""
+        const overdue = a.dueDate && new Date(a.dueDate) < new Date() ? " ⚠ overdue" : ""
+        lines.push(`  • [${a.priority}] ${a.title}${due}${overdue}`)
+      })
+    }
+    lines.push("")
+    lines.push(`Issues (${myIssues.length} open):`)
+    if (myIssues.length === 0) {
+      lines.push("  No open issues.")
+    } else {
+      myIssues.forEach(i => {
+        const due = i.dueDate ? ` — due ${new Date(i.dueDate).toLocaleDateString()}` : ""
+        lines.push(`  • [${i.priority}] ${i.title}${due}`)
+      })
+    }
+    if (announcements.length > 0) {
+      lines.push("")
+      lines.push("Recent Announcements:")
+      announcements.forEach(a => lines.push(`  • [${a.priority}] ${a.title}`))
+    }
+    content = lines.join("\n")
+    void todayDate
+  } else {
+    try {
+      const client = new Anthropic()
+      const msg = await client.messages.create({
+        model:      "claude-haiku-4-5-20251001",
+        max_tokens: 300,
+        messages:   [{ role: "user", content: prompt }],
+      })
+      content = (msg.content[0] as { type: string; text: string }).text
+    } catch {
+      content = `Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, ${session.name}! You have ${myAssignments.length} open assignment${myAssignments.length !== 1 ? "s" : ""}${overdueAssignments.length > 0 ? ` (${overdueAssignments.length} overdue)` : ""}. Focus on your highest-priority items first and have a productive day.`
+    }
   }
 
   // Cache it

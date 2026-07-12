@@ -9,6 +9,8 @@ import { OrgNotes } from "./org-notes"
 import { OrgPricing } from "./org-pricing"
 import { OrgDiagnostics } from "@/components/super-admin/org-diagnostics"
 import { OrgFeatureFlagsPanel } from "./feature-flags"
+import { OrgWCFlagsPanel } from "./wc-feature-flags"
+import { ALL_WC_FLAGS, type OrgWCFlags } from "@/lib/workforce-comms"
 import { CURRENT_TERMS_VERSION, CURRENT_PRIVACY_VERSION } from "@/lib/legal-versions"
 import { CrmLifecycleSelector } from "@/components/super-admin/crm-lifecycle-selector"
 import { CrmNotes } from "@/components/super-admin/crm-notes"
@@ -379,6 +381,14 @@ export default async function OrgDetailPage({
                 trend_detection_enabled:            org.trend_detection_enabled,
                 executive_goals_enabled:            org.executive_goals_enabled,
               }}
+            />
+          </div>
+
+          {/* Workforce Communications Feature Flags */}
+          <div className="mb-6">
+            <OrgWCFlagsPanel
+              orgId={org.id}
+              flags={Object.fromEntries(ALL_WC_FLAGS.map(f => [f, (org as Record<string, unknown>)[f] as boolean ?? false])) as unknown as OrgWCFlags}
             />
           </div>
 

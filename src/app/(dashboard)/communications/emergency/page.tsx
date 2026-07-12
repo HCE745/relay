@@ -3,6 +3,8 @@ import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { EmergencyPageClient } from "@/components/communications/emergency-page-client"
+import { UpgradePrompt } from "@/components/ui/feature-gate"
+import { getOrgWCFlags } from "@/lib/workforce-comms"
 
 export const dynamic = "force-dynamic"
 
@@ -17,7 +19,8 @@ export default async function EmergencyPage({
   const sp = await searchParams
   const showCreate = sp.create === "1" && ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
 
-  const orgId = session.organizationId
+  const orgId  = session.organizationId
+  const wcFlags = await getOrgWCFlags(orgId)
 
   const [broadcasts, locationsRaw, departmentsRaw, teamLeadsRaw, usersRaw] = await Promise.all([
     prisma.emergencyBroadcast.findMany({
@@ -72,6 +75,7 @@ export default async function EmergencyPage({
   const canCreate  = ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
   const canResolve = ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
   const userId     = session.userId
+  const hasAccess  = wcFlags?.wc_emergency_broadcasts ?? false
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -81,6 +85,9 @@ export default async function EmergencyPage({
         <span>Emergency Broadcasts</span>
       </div>
 
+      {!hasAccess ? (
+        <UpgradePrompt feature="Emergency Broadcasts" planRequired="professional" />
+      ) : (
       <EmergencyPageClient
         broadcasts={broadcasts as never}
         userId={userId}
@@ -92,6 +99,7 @@ export default async function EmergencyPage({
         teamLeads={teamLeads}
         users={users}
       />
+      )}
     </div>
   )
 }

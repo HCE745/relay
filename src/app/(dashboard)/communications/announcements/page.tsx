@@ -3,6 +3,7 @@ import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { AnnouncementsListClient } from "@/components/communications/announcements-list-client"
+import { getOrgWCFlags } from "@/lib/workforce-comms"
 
 export const dynamic = "force-dynamic"
 
@@ -10,7 +11,8 @@ export default async function AnnouncementsPage() {
   const session = await getSession()
   if (!session) redirect("/login")
 
-  const announcements = await prisma.announcement.findMany({
+  const [announcements, wcFlags] = await Promise.all([
+    prisma.announcement.findMany({
     where: {
       orgId: session.organizationId,
       OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
@@ -24,7 +26,9 @@ export default async function AnnouncementsPage() {
       _count: { select: { acknowledgments: true } },
     },
     orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
-  })
+  }),
+    getOrgWCFlags(session.organizationId),
+  ])
 
   const canCreate = ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
 
@@ -38,6 +42,7 @@ export default async function AnnouncementsPage() {
       <AnnouncementsListClient
         announcements={announcements as never}
         canCreate={canCreate}
+        wcSearch={wcFlags?.wc_communication_search ?? false}
       />
     </div>
   )

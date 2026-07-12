@@ -83,6 +83,66 @@ model Organization {
   trend_detection_enabled            Boolean @default(false)
   executive_goals_enabled            Boolean @default(false)
 
+  // ── Workforce Communications feature flags ────────────────────────────────
+  // To add a new feature: (1) add the flag here with @default(false),
+  // (2) add it to the correct tier array in src/lib/workforce-comms.ts,
+  // (3) check it in the relevant UI component. No other changes required.
+  //
+  // Essentials tier
+  wc_personal_inbox                       Boolean @default(false)
+  wc_individual_assignments               Boolean @default(false)
+  wc_basic_notifications                  Boolean @default(false)
+  wc_basic_announcements                  Boolean @default(false)
+  wc_company_announcements                Boolean @default(false)
+  wc_personal_reminders                   Boolean @default(false)
+  wc_push_notifications                   Boolean @default(false)
+  wc_email_notifications                  Boolean @default(false)
+  wc_inapp_notifications                  Boolean @default(false)
+  wc_basic_daily_briefing                 Boolean @default(false)
+  wc_announcement_history_readonly        Boolean @default(false)
+  // Professional tier
+  wc_department_announcements             Boolean @default(false)
+  wc_team_announcements                   Boolean @default(false)
+  wc_shift_announcements                  Boolean @default(false)
+  wc_emergency_broadcasts                 Boolean @default(false)
+  wc_assignment_management                Boolean @default(false)
+  wc_assignment_comments                  Boolean @default(false)
+  wc_assignment_attachments               Boolean @default(false)
+  wc_assignment_history                   Boolean @default(false)
+  wc_announcement_acknowledgements        Boolean @default(false)
+  wc_ai_daily_briefing                    Boolean @default(false)
+  wc_manager_announcement_dashboard       Boolean @default(false)
+  wc_supervisor_tools                     Boolean @default(false)
+  wc_communication_search                 Boolean @default(false)
+  wc_inbox_filters                        Boolean @default(false)
+  wc_notification_preferences             Boolean @default(false)
+  wc_department_communication_permissions Boolean @default(false)
+  // Professional Plus tier
+  wc_multi_location_announcements         Boolean @default(false)
+  wc_regional_announcements               Boolean @default(false)
+  wc_executive_announcements              Boolean @default(false)
+  wc_org_wide_broadcasts                  Boolean @default(false)
+  wc_cross_location_communication         Boolean @default(false)
+  wc_communication_analytics              Boolean @default(false)
+  wc_announcement_reporting               Boolean @default(false)
+  wc_read_rate_analytics                  Boolean @default(false)
+  wc_executive_communication_dashboard    Boolean @default(false)
+  wc_ai_communication_summaries           Boolean @default(false)
+  wc_ai_announcement_drafting             Boolean @default(false)
+  wc_org_wide_assignment_management       Boolean @default(false)
+  wc_cross_location_assignment_visibility Boolean @default(false)
+  wc_advanced_notification_rules          Boolean @default(false)
+  wc_executive_daily_briefings            Boolean @default(false)
+  // Enterprise tier
+  wc_sms_gateway                          Boolean @default(false)
+  wc_custom_notification_providers        Boolean @default(false)
+  wc_custom_escalation_policies           Boolean @default(false)
+  wc_compliance_logging                   Boolean @default(false)
+  wc_advanced_audit_history               Boolean @default(false)
+  wc_api_access_communications            Boolean @default(false)
+  wc_white_label_communications           Boolean @default(false)
+  wc_enterprise_communication_controls    Boolean @default(false)
+
   users              User[]
   locations          Location[]
   regions            Region[]

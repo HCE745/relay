@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { stripe } from "@/lib/stripe"
 import { buildLineItems, getPriceId } from "@/lib/stripe-prices"
 import { logSAAction } from "@/lib/sa-audit"
+import { setWorkforceCommsPlanFlags } from "@/lib/workforce-comms"
 import type Stripe from "stripe"
 import type { PlanKey, ModuleId } from "@/lib/pricing"
 
@@ -197,6 +198,10 @@ export async function POST(
   }
 
   const updatedOrg = await prisma.organization.update({ where: { id }, data: dbData })
+
+  if (body.plan !== undefined) {
+    await setWorkforceCommsPlanFlags(id, body.plan)
+  }
 
   const after: Record<string, unknown> = {
     plan: updatedOrg.plan,

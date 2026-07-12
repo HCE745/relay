@@ -8,25 +8,19 @@ import type { ScopeLead } from "@/components/communications/scope-selector"
 import type { Person } from "@/components/ui/people-picker"
 
 const PRIORITIES = ["normal", "urgent"] as const
+const SCOPE_REQUIRES_ID = new Set(["location", "region", "department", "team", "individual"])
 
-const SCOPE_OPTIONS = [
-  { value: "org",        label: "Entire organization" },
-  { value: "location",   label: "Specific location" },
-  { value: "department", label: "Specific department" },
-  { value: "team",       label: "Specific team" },
-  { value: "individual", label: "Individual person" },
-] as const
-
-const SCOPE_REQUIRES_ID = new Set(["location", "department", "team", "individual"])
+interface ScopeOption { value: string; label: string }
 
 interface Props {
-  locations:   SelectOption[]
-  departments: SelectOption[]
-  teamLeads:   ScopeLead[]
-  users:       Person[]
+  locations:    SelectOption[]
+  departments:  SelectOption[]
+  teamLeads:    ScopeLead[]
+  users:        Person[]
+  scopeOptions: ScopeOption[]
 }
 
-export function AnnouncementForm({ locations, departments, teamLeads, users }: Props) {
+export function AnnouncementForm({ locations, departments, teamLeads, users, scopeOptions }: Props) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState("")
@@ -54,7 +48,7 @@ export function AnnouncementForm({ locations, departments, teamLeads, users }: P
     e.preventDefault()
 
     if (SCOPE_REQUIRES_ID.has(form.scopeType) && !scopeId) {
-      const label = SCOPE_OPTIONS.find(o => o.value === form.scopeType)?.label ?? form.scopeType
+      const label = scopeOptions.find(o => o.value === form.scopeType)?.label ?? form.scopeType
       setError(`Please select a specific ${label.toLowerCase()} for this announcement`)
       return
     }
@@ -122,7 +116,7 @@ export function AnnouncementForm({ locations, departments, teamLeads, users }: P
           <select value={form.scopeType} onChange={handleScopeTypeChange}
             className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {SCOPE_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            {scopeOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
           </select>
         </div>
       </div>

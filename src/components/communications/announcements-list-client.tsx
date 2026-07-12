@@ -26,9 +26,10 @@ interface Announcement {
 interface Props {
   announcements: Announcement[]
   canCreate:     boolean
+  wcSearch?:     boolean
 }
 
-export function AnnouncementsListClient({ announcements, canCreate }: Props) {
+export function AnnouncementsListClient({ announcements, canCreate, wcSearch = true }: Props) {
   const [query, setQuery] = useState("")
 
   const filtered = announcements.filter(a =>
@@ -53,15 +54,17 @@ export function AnnouncementsListClient({ announcements, canCreate }: Props) {
         )}
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-        <input
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Search announcements..."
-          className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
-        />
-      </div>
+      {wcSearch && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search announcements..."
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+          />
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400">

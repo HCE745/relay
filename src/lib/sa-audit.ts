@@ -22,6 +22,8 @@ export type AuditAction =
   | "UPDATE_REFERRAL"
   // CRM
   | "SEND_CRM_EMAIL"
+  // Workforce Communications
+  | "UPDATE_WC_FLAGS"
 
 export async function logSAAction({
   superAdminId,

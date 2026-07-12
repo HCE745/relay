@@ -6,7 +6,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import {
   Clock, CheckCircle2, AlertTriangle, ClipboardCheck, XCircle,
-  ExternalLink, MessageSquare, Send
+  ExternalLink, MessageSquare, Send, Lock
 } from "lucide-react"
 
 type Status   = "pending" | "acknowledged" | "in_progress" | "completed" | "cancelled"
@@ -63,16 +63,29 @@ function formatTs(d: Date | string) {
   return new Date(d).toLocaleString()
 }
 
+function LockedFeature({ feature, plan }: { feature: string; plan: string }) {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 flex items-center gap-3 text-sm text-gray-500">
+      <Lock className="w-4 h-4 flex-shrink-0" />
+      <span>{feature} requires the <Link href="/settings/billing" className="text-blue-600 hover:underline">{plan} plan</Link>.</span>
+    </div>
+  )
+}
+
 export function AssignmentDetailClient({
   assignment: initial,
   userId,
   isAssignee,
   isManager,
+  wcComments = true,
+  wcHistory  = true,
 }: {
   assignment: Assignment
   userId: string
   isAssignee: boolean
   isManager: boolean
+  wcComments?: boolean
+  wcHistory?:  boolean
 }) {
   const router = useRouter()
   const [assignment, setAssignment] = useState(initial)
@@ -244,70 +257,78 @@ export function AssignmentDetailClient({
       )}
 
       {/* Status history */}
-      {assignment.statusHistory.length > 0 && (
+      {wcHistory ? (
+        assignment.statusHistory.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">History</h2>
+            <div className="space-y-2">
+              {assignment.statusHistory.map(e => (
+                <div key={e.id} className="flex items-start gap-3 text-sm">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <span className="text-gray-900 dark:text-white">
+                      {e.fromStatus ? `${e.fromStatus.replace("_", " ")} → ` : ""}{e.toStatus.replace("_", " ")}
+                    </span>
+                    {e.note && <span className="text-gray-500 ml-1.5">— {e.note}</span>}
+                    <div className="text-xs text-gray-400 mt-0.5">{e.changedBy.name} · {formatTs(e.createdAt)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      ) : (
+        <LockedFeature feature="Assignment history" plan="Professional" />
+      )}
+
+      {/* Conversation */}
+      {wcComments ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">History</h2>
-          <div className="space-y-2">
-            {assignment.statusHistory.map(e => (
-              <div key={e.id} className="flex items-start gap-3 text-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <span className="text-gray-900 dark:text-white">
-                    {e.fromStatus ? `${e.fromStatus.replace("_", " ")} → ` : ""}{e.toStatus.replace("_", " ")}
-                  </span>
-                  {e.note && <span className="text-gray-500 ml-1.5">— {e.note}</span>}
-                  <div className="text-xs text-gray-400 mt-0.5">{e.changedBy.name} · {formatTs(e.createdAt)}</div>
+          <div className="flex items-center gap-2 mb-4">
+            <MessageSquare className="w-4 h-4 text-gray-400" />
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Conversation {assignment.comments.length > 0 && `(${assignment.comments.length})`}
+            </h2>
+          </div>
+
+          {assignment.comments.length === 0 && (
+            <p className="text-sm text-gray-400 mb-4">No comments yet. Start the conversation below.</p>
+          )}
+
+          <div className="space-y-3 mb-4">
+            {assignment.comments.map(c => (
+              <div key={c.id} className="flex gap-3">
+                <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-300 flex-shrink-0">
+                  {c.author.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{c.author.name}</span>
+                    <span className="text-xs text-gray-400">{formatTs(c.createdAt)}</span>
+                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{c.content}</p>
                 </div>
               </div>
             ))}
           </div>
+
+          <form onSubmit={postComment} className="flex gap-2">
+            <input
+              value={comment} onChange={e => setComment(e.target.value)}
+              placeholder="Add a comment..."
+              className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit" disabled={posting || !comment.trim()}
+              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
         </div>
+      ) : (
+        <LockedFeature feature="Assignment comments" plan="Professional" />
       )}
-
-      {/* Conversation */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <MessageSquare className="w-4 h-4 text-gray-400" />
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-            Conversation {assignment.comments.length > 0 && `(${assignment.comments.length})`}
-          </h2>
-        </div>
-
-        {assignment.comments.length === 0 && (
-          <p className="text-sm text-gray-400 mb-4">No comments yet. Start the conversation below.</p>
-        )}
-
-        <div className="space-y-3 mb-4">
-          {assignment.comments.map(c => (
-            <div key={c.id} className="flex gap-3">
-              <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-300 flex-shrink-0">
-                {c.author.name.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">{c.author.name}</span>
-                  <span className="text-xs text-gray-400">{formatTs(c.createdAt)}</span>
-                </div>
-                <p className="text-sm text-gray-700 dark:text-gray-300">{c.content}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <form onSubmit={postComment} className="flex gap-2">
-          <input
-            value={comment} onChange={e => setComment(e.target.value)}
-            placeholder="Add a comment..."
-            className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit" disabled={posting || !comment.trim()}
-            className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </form>
-      </div>
 
       {/* Edit link for managers */}
       {isManager && (

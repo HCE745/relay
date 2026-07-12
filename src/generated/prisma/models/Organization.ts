@@ -116,6 +116,56 @@ export type OrganizationMinAggregateOutputType = {
   health_scores_enabled: boolean | null
   trend_detection_enabled: boolean | null
   executive_goals_enabled: boolean | null
+  wc_personal_inbox: boolean | null
+  wc_individual_assignments: boolean | null
+  wc_basic_notifications: boolean | null
+  wc_basic_announcements: boolean | null
+  wc_company_announcements: boolean | null
+  wc_personal_reminders: boolean | null
+  wc_push_notifications: boolean | null
+  wc_email_notifications: boolean | null
+  wc_inapp_notifications: boolean | null
+  wc_basic_daily_briefing: boolean | null
+  wc_announcement_history_readonly: boolean | null
+  wc_department_announcements: boolean | null
+  wc_team_announcements: boolean | null
+  wc_shift_announcements: boolean | null
+  wc_emergency_broadcasts: boolean | null
+  wc_assignment_management: boolean | null
+  wc_assignment_comments: boolean | null
+  wc_assignment_attachments: boolean | null
+  wc_assignment_history: boolean | null
+  wc_announcement_acknowledgements: boolean | null
+  wc_ai_daily_briefing: boolean | null
+  wc_manager_announcement_dashboard: boolean | null
+  wc_supervisor_tools: boolean | null
+  wc_communication_search: boolean | null
+  wc_inbox_filters: boolean | null
+  wc_notification_preferences: boolean | null
+  wc_department_communication_permissions: boolean | null
+  wc_multi_location_announcements: boolean | null
+  wc_regional_announcements: boolean | null
+  wc_executive_announcements: boolean | null
+  wc_org_wide_broadcasts: boolean | null
+  wc_cross_location_communication: boolean | null
+  wc_communication_analytics: boolean | null
+  wc_announcement_reporting: boolean | null
+  wc_read_rate_analytics: boolean | null
+  wc_executive_communication_dashboard: boolean | null
+  wc_ai_communication_summaries: boolean | null
+  wc_ai_announcement_drafting: boolean | null
+  wc_org_wide_assignment_management: boolean | null
+  wc_cross_location_assignment_visibility: boolean | null
+  wc_advanced_notification_rules: boolean | null
+  wc_executive_daily_briefings: boolean | null
+  wc_sms_gateway: boolean | null
+  wc_custom_notification_providers: boolean | null
+  wc_custom_escalation_policies: boolean | null
+  wc_compliance_logging: boolean | null
+  wc_advanced_audit_history: boolean | null
+  wc_api_access_communications: boolean | null
+  wc_white_label_communications: boolean | null
+  wc_enterprise_communication_controls: boolean | null
   lifecycleStatus: string | null
   referralCode: string | null
   referralLink: string | null
@@ -181,6 +231,56 @@ export type OrganizationMaxAggregateOutputType = {
   health_scores_enabled: boolean | null
   trend_detection_enabled: boolean | null
   executive_goals_enabled: boolean | null
+  wc_personal_inbox: boolean | null
+  wc_individual_assignments: boolean | null
+  wc_basic_notifications: boolean | null
+  wc_basic_announcements: boolean | null
+  wc_company_announcements: boolean | null
+  wc_personal_reminders: boolean | null
+  wc_push_notifications: boolean | null
+  wc_email_notifications: boolean | null
+  wc_inapp_notifications: boolean | null
+  wc_basic_daily_briefing: boolean | null
+  wc_announcement_history_readonly: boolean | null
+  wc_department_announcements: boolean | null
+  wc_team_announcements: boolean | null
+  wc_shift_announcements: boolean | null
+  wc_emergency_broadcasts: boolean | null
+  wc_assignment_management: boolean | null
+  wc_assignment_comments: boolean | null
+  wc_assignment_attachments: boolean | null
+  wc_assignment_history: boolean | null
+  wc_announcement_acknowledgements: boolean | null
+  wc_ai_daily_briefing: boolean | null
+  wc_manager_announcement_dashboard: boolean | null
+  wc_supervisor_tools: boolean | null
+  wc_communication_search: boolean | null
+  wc_inbox_filters: boolean | null
+  wc_notification_preferences: boolean | null
+  wc_department_communication_permissions: boolean | null
+  wc_multi_location_announcements: boolean | null
+  wc_regional_announcements: boolean | null
+  wc_executive_announcements: boolean | null
+  wc_org_wide_broadcasts: boolean | null
+  wc_cross_location_communication: boolean | null
+  wc_communication_analytics: boolean | null
+  wc_announcement_reporting: boolean | null
+  wc_read_rate_analytics: boolean | null
+  wc_executive_communication_dashboard: boolean | null
+  wc_ai_communication_summaries: boolean | null
+  wc_ai_announcement_drafting: boolean | null
+  wc_org_wide_assignment_management: boolean | null
+  wc_cross_location_assignment_visibility: boolean | null
+  wc_advanced_notification_rules: boolean | null
+  wc_executive_daily_briefings: boolean | null
+  wc_sms_gateway: boolean | null
+  wc_custom_notification_providers: boolean | null
+  wc_custom_escalation_policies: boolean | null
+  wc_compliance_logging: boolean | null
+  wc_advanced_audit_history: boolean | null
+  wc_api_access_communications: boolean | null
+  wc_white_label_communications: boolean | null
+  wc_enterprise_communication_controls: boolean | null
   lifecycleStatus: string | null
   referralCode: string | null
   referralLink: string | null
@@ -249,6 +349,56 @@ export type OrganizationCountAggregateOutputType = {
   health_scores_enabled: number
   trend_detection_enabled: number
   executive_goals_enabled: number
+  wc_personal_inbox: number
+  wc_individual_assignments: number
+  wc_basic_notifications: number
+  wc_basic_announcements: number
+  wc_company_announcements: number
+  wc_personal_reminders: number
+  wc_push_notifications: number
+  wc_email_notifications: number
+  wc_inapp_notifications: number
+  wc_basic_daily_briefing: number
+  wc_announcement_history_readonly: number
+  wc_department_announcements: number
+  wc_team_announcements: number
+  wc_shift_announcements: number
+  wc_emergency_broadcasts: number
+  wc_assignment_management: number
+  wc_assignment_comments: number
+  wc_assignment_attachments: number
+  wc_assignment_history: number
+  wc_announcement_acknowledgements: number
+  wc_ai_daily_briefing: number
+  wc_manager_announcement_dashboard: number
+  wc_supervisor_tools: number
+  wc_communication_search: number
+  wc_inbox_filters: number
+  wc_notification_preferences: number
+  wc_department_communication_permissions: number
+  wc_multi_location_announcements: number
+  wc_regional_announcements: number
+  wc_executive_announcements: number
+  wc_org_wide_broadcasts: number
+  wc_cross_location_communication: number
+  wc_communication_analytics: number
+  wc_announcement_reporting: number
+  wc_read_rate_analytics: number
+  wc_executive_communication_dashboard: number
+  wc_ai_communication_summaries: number
+  wc_ai_announcement_drafting: number
+  wc_org_wide_assignment_management: number
+  wc_cross_location_assignment_visibility: number
+  wc_advanced_notification_rules: number
+  wc_executive_daily_briefings: number
+  wc_sms_gateway: number
+  wc_custom_notification_providers: number
+  wc_custom_escalation_policies: number
+  wc_compliance_logging: number
+  wc_advanced_audit_history: number
+  wc_api_access_communications: number
+  wc_white_label_communications: number
+  wc_enterprise_communication_controls: number
   lifecycleStatus: number
   referralCode: number
   referralLink: number
@@ -346,6 +496,56 @@ export type OrganizationMinAggregateInputType = {
   health_scores_enabled?: true
   trend_detection_enabled?: true
   executive_goals_enabled?: true
+  wc_personal_inbox?: true
+  wc_individual_assignments?: true
+  wc_basic_notifications?: true
+  wc_basic_announcements?: true
+  wc_company_announcements?: true
+  wc_personal_reminders?: true
+  wc_push_notifications?: true
+  wc_email_notifications?: true
+  wc_inapp_notifications?: true
+  wc_basic_daily_briefing?: true
+  wc_announcement_history_readonly?: true
+  wc_department_announcements?: true
+  wc_team_announcements?: true
+  wc_shift_announcements?: true
+  wc_emergency_broadcasts?: true
+  wc_assignment_management?: true
+  wc_assignment_comments?: true
+  wc_assignment_attachments?: true
+  wc_assignment_history?: true
+  wc_announcement_acknowledgements?: true
+  wc_ai_daily_briefing?: true
+  wc_manager_announcement_dashboard?: true
+  wc_supervisor_tools?: true
+  wc_communication_search?: true
+  wc_inbox_filters?: true
+  wc_notification_preferences?: true
+  wc_department_communication_permissions?: true
+  wc_multi_location_announcements?: true
+  wc_regional_announcements?: true
+  wc_executive_announcements?: true
+  wc_org_wide_broadcasts?: true
+  wc_cross_location_communication?: true
+  wc_communication_analytics?: true
+  wc_announcement_reporting?: true
+  wc_read_rate_analytics?: true
+  wc_executive_communication_dashboard?: true
+  wc_ai_communication_summaries?: true
+  wc_ai_announcement_drafting?: true
+  wc_org_wide_assignment_management?: true
+  wc_cross_location_assignment_visibility?: true
+  wc_advanced_notification_rules?: true
+  wc_executive_daily_briefings?: true
+  wc_sms_gateway?: true
+  wc_custom_notification_providers?: true
+  wc_custom_escalation_policies?: true
+  wc_compliance_logging?: true
+  wc_advanced_audit_history?: true
+  wc_api_access_communications?: true
+  wc_white_label_communications?: true
+  wc_enterprise_communication_controls?: true
   lifecycleStatus?: true
   referralCode?: true
   referralLink?: true
@@ -411,6 +611,56 @@ export type OrganizationMaxAggregateInputType = {
   health_scores_enabled?: true
   trend_detection_enabled?: true
   executive_goals_enabled?: true
+  wc_personal_inbox?: true
+  wc_individual_assignments?: true
+  wc_basic_notifications?: true
+  wc_basic_announcements?: true
+  wc_company_announcements?: true
+  wc_personal_reminders?: true
+  wc_push_notifications?: true
+  wc_email_notifications?: true
+  wc_inapp_notifications?: true
+  wc_basic_daily_briefing?: true
+  wc_announcement_history_readonly?: true
+  wc_department_announcements?: true
+  wc_team_announcements?: true
+  wc_shift_announcements?: true
+  wc_emergency_broadcasts?: true
+  wc_assignment_management?: true
+  wc_assignment_comments?: true
+  wc_assignment_attachments?: true
+  wc_assignment_history?: true
+  wc_announcement_acknowledgements?: true
+  wc_ai_daily_briefing?: true
+  wc_manager_announcement_dashboard?: true
+  wc_supervisor_tools?: true
+  wc_communication_search?: true
+  wc_inbox_filters?: true
+  wc_notification_preferences?: true
+  wc_department_communication_permissions?: true
+  wc_multi_location_announcements?: true
+  wc_regional_announcements?: true
+  wc_executive_announcements?: true
+  wc_org_wide_broadcasts?: true
+  wc_cross_location_communication?: true
+  wc_communication_analytics?: true
+  wc_announcement_reporting?: true
+  wc_read_rate_analytics?: true
+  wc_executive_communication_dashboard?: true
+  wc_ai_communication_summaries?: true
+  wc_ai_announcement_drafting?: true
+  wc_org_wide_assignment_management?: true
+  wc_cross_location_assignment_visibility?: true
+  wc_advanced_notification_rules?: true
+  wc_executive_daily_briefings?: true
+  wc_sms_gateway?: true
+  wc_custom_notification_providers?: true
+  wc_custom_escalation_policies?: true
+  wc_compliance_logging?: true
+  wc_advanced_audit_history?: true
+  wc_api_access_communications?: true
+  wc_white_label_communications?: true
+  wc_enterprise_communication_controls?: true
   lifecycleStatus?: true
   referralCode?: true
   referralLink?: true
@@ -479,6 +729,56 @@ export type OrganizationCountAggregateInputType = {
   health_scores_enabled?: true
   trend_detection_enabled?: true
   executive_goals_enabled?: true
+  wc_personal_inbox?: true
+  wc_individual_assignments?: true
+  wc_basic_notifications?: true
+  wc_basic_announcements?: true
+  wc_company_announcements?: true
+  wc_personal_reminders?: true
+  wc_push_notifications?: true
+  wc_email_notifications?: true
+  wc_inapp_notifications?: true
+  wc_basic_daily_briefing?: true
+  wc_announcement_history_readonly?: true
+  wc_department_announcements?: true
+  wc_team_announcements?: true
+  wc_shift_announcements?: true
+  wc_emergency_broadcasts?: true
+  wc_assignment_management?: true
+  wc_assignment_comments?: true
+  wc_assignment_attachments?: true
+  wc_assignment_history?: true
+  wc_announcement_acknowledgements?: true
+  wc_ai_daily_briefing?: true
+  wc_manager_announcement_dashboard?: true
+  wc_supervisor_tools?: true
+  wc_communication_search?: true
+  wc_inbox_filters?: true
+  wc_notification_preferences?: true
+  wc_department_communication_permissions?: true
+  wc_multi_location_announcements?: true
+  wc_regional_announcements?: true
+  wc_executive_announcements?: true
+  wc_org_wide_broadcasts?: true
+  wc_cross_location_communication?: true
+  wc_communication_analytics?: true
+  wc_announcement_reporting?: true
+  wc_read_rate_analytics?: true
+  wc_executive_communication_dashboard?: true
+  wc_ai_communication_summaries?: true
+  wc_ai_announcement_drafting?: true
+  wc_org_wide_assignment_management?: true
+  wc_cross_location_assignment_visibility?: true
+  wc_advanced_notification_rules?: true
+  wc_executive_daily_briefings?: true
+  wc_sms_gateway?: true
+  wc_custom_notification_providers?: true
+  wc_custom_escalation_policies?: true
+  wc_compliance_logging?: true
+  wc_advanced_audit_history?: true
+  wc_api_access_communications?: true
+  wc_white_label_communications?: true
+  wc_enterprise_communication_controls?: true
   lifecycleStatus?: true
   referralCode?: true
   referralLink?: true
@@ -634,6 +934,56 @@ export type OrganizationGroupByOutputType = {
   health_scores_enabled: boolean
   trend_detection_enabled: boolean
   executive_goals_enabled: boolean
+  wc_personal_inbox: boolean
+  wc_individual_assignments: boolean
+  wc_basic_notifications: boolean
+  wc_basic_announcements: boolean
+  wc_company_announcements: boolean
+  wc_personal_reminders: boolean
+  wc_push_notifications: boolean
+  wc_email_notifications: boolean
+  wc_inapp_notifications: boolean
+  wc_basic_daily_briefing: boolean
+  wc_announcement_history_readonly: boolean
+  wc_department_announcements: boolean
+  wc_team_announcements: boolean
+  wc_shift_announcements: boolean
+  wc_emergency_broadcasts: boolean
+  wc_assignment_management: boolean
+  wc_assignment_comments: boolean
+  wc_assignment_attachments: boolean
+  wc_assignment_history: boolean
+  wc_announcement_acknowledgements: boolean
+  wc_ai_daily_briefing: boolean
+  wc_manager_announcement_dashboard: boolean
+  wc_supervisor_tools: boolean
+  wc_communication_search: boolean
+  wc_inbox_filters: boolean
+  wc_notification_preferences: boolean
+  wc_department_communication_permissions: boolean
+  wc_multi_location_announcements: boolean
+  wc_regional_announcements: boolean
+  wc_executive_announcements: boolean
+  wc_org_wide_broadcasts: boolean
+  wc_cross_location_communication: boolean
+  wc_communication_analytics: boolean
+  wc_announcement_reporting: boolean
+  wc_read_rate_analytics: boolean
+  wc_executive_communication_dashboard: boolean
+  wc_ai_communication_summaries: boolean
+  wc_ai_announcement_drafting: boolean
+  wc_org_wide_assignment_management: boolean
+  wc_cross_location_assignment_visibility: boolean
+  wc_advanced_notification_rules: boolean
+  wc_executive_daily_briefings: boolean
+  wc_sms_gateway: boolean
+  wc_custom_notification_providers: boolean
+  wc_custom_escalation_policies: boolean
+  wc_compliance_logging: boolean
+  wc_advanced_audit_history: boolean
+  wc_api_access_communications: boolean
+  wc_white_label_communications: boolean
+  wc_enterprise_communication_controls: boolean
   lifecycleStatus: string
   referralCode: string | null
   referralLink: string | null
@@ -725,6 +1075,56 @@ export type OrganizationWhereInput = {
   health_scores_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   trend_detection_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   executive_goals_enabled?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_personal_inbox?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_individual_assignments?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_basic_notifications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_basic_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_company_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_personal_reminders?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_push_notifications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_email_notifications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_inapp_notifications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_department_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_team_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_shift_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_assignment_management?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_assignment_comments?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_assignment_attachments?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_assignment_history?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_supervisor_tools?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_communication_search?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_inbox_filters?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_notification_preferences?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_department_communication_permissions?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_multi_location_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_regional_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_executive_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_cross_location_communication?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_communication_analytics?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_announcement_reporting?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_read_rate_analytics?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_sms_gateway?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_custom_notification_providers?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_compliance_logging?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_advanced_audit_history?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_api_access_communications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_white_label_communications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFilter<"Organization"> | boolean
   lifecycleStatus?: Prisma.StringFilter<"Organization"> | string
   referralCode?: Prisma.StringNullableFilter<"Organization"> | string | null
   referralLink?: Prisma.StringNullableFilter<"Organization"> | string | null
@@ -846,6 +1246,56 @@ export type OrganizationOrderByWithRelationInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  wc_personal_inbox?: Prisma.SortOrder
+  wc_individual_assignments?: Prisma.SortOrder
+  wc_basic_notifications?: Prisma.SortOrder
+  wc_basic_announcements?: Prisma.SortOrder
+  wc_company_announcements?: Prisma.SortOrder
+  wc_personal_reminders?: Prisma.SortOrder
+  wc_push_notifications?: Prisma.SortOrder
+  wc_email_notifications?: Prisma.SortOrder
+  wc_inapp_notifications?: Prisma.SortOrder
+  wc_basic_daily_briefing?: Prisma.SortOrder
+  wc_announcement_history_readonly?: Prisma.SortOrder
+  wc_department_announcements?: Prisma.SortOrder
+  wc_team_announcements?: Prisma.SortOrder
+  wc_shift_announcements?: Prisma.SortOrder
+  wc_emergency_broadcasts?: Prisma.SortOrder
+  wc_assignment_management?: Prisma.SortOrder
+  wc_assignment_comments?: Prisma.SortOrder
+  wc_assignment_attachments?: Prisma.SortOrder
+  wc_assignment_history?: Prisma.SortOrder
+  wc_announcement_acknowledgements?: Prisma.SortOrder
+  wc_ai_daily_briefing?: Prisma.SortOrder
+  wc_manager_announcement_dashboard?: Prisma.SortOrder
+  wc_supervisor_tools?: Prisma.SortOrder
+  wc_communication_search?: Prisma.SortOrder
+  wc_inbox_filters?: Prisma.SortOrder
+  wc_notification_preferences?: Prisma.SortOrder
+  wc_department_communication_permissions?: Prisma.SortOrder
+  wc_multi_location_announcements?: Prisma.SortOrder
+  wc_regional_announcements?: Prisma.SortOrder
+  wc_executive_announcements?: Prisma.SortOrder
+  wc_org_wide_broadcasts?: Prisma.SortOrder
+  wc_cross_location_communication?: Prisma.SortOrder
+  wc_communication_analytics?: Prisma.SortOrder
+  wc_announcement_reporting?: Prisma.SortOrder
+  wc_read_rate_analytics?: Prisma.SortOrder
+  wc_executive_communication_dashboard?: Prisma.SortOrder
+  wc_ai_communication_summaries?: Prisma.SortOrder
+  wc_ai_announcement_drafting?: Prisma.SortOrder
+  wc_org_wide_assignment_management?: Prisma.SortOrder
+  wc_cross_location_assignment_visibility?: Prisma.SortOrder
+  wc_advanced_notification_rules?: Prisma.SortOrder
+  wc_executive_daily_briefings?: Prisma.SortOrder
+  wc_sms_gateway?: Prisma.SortOrder
+  wc_custom_notification_providers?: Prisma.SortOrder
+  wc_custom_escalation_policies?: Prisma.SortOrder
+  wc_compliance_logging?: Prisma.SortOrder
+  wc_advanced_audit_history?: Prisma.SortOrder
+  wc_api_access_communications?: Prisma.SortOrder
+  wc_white_label_communications?: Prisma.SortOrder
+  wc_enterprise_communication_controls?: Prisma.SortOrder
   lifecycleStatus?: Prisma.SortOrder
   referralCode?: Prisma.SortOrderInput | Prisma.SortOrder
   referralLink?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -971,6 +1421,56 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   health_scores_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   trend_detection_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   executive_goals_enabled?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_personal_inbox?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_individual_assignments?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_basic_notifications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_basic_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_company_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_personal_reminders?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_push_notifications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_email_notifications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_inapp_notifications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_department_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_team_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_shift_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_assignment_management?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_assignment_comments?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_assignment_attachments?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_assignment_history?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_supervisor_tools?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_communication_search?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_inbox_filters?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_notification_preferences?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_department_communication_permissions?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_multi_location_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_regional_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_executive_announcements?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_cross_location_communication?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_communication_analytics?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_announcement_reporting?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_read_rate_analytics?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_sms_gateway?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_custom_notification_providers?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_compliance_logging?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_advanced_audit_history?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_api_access_communications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_white_label_communications?: Prisma.BoolFilter<"Organization"> | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFilter<"Organization"> | boolean
   lifecycleStatus?: Prisma.StringFilter<"Organization"> | string
   referralLink?: Prisma.StringNullableFilter<"Organization"> | string | null
   users?: Prisma.UserListRelationFilter
@@ -1091,6 +1591,56 @@ export type OrganizationOrderByWithAggregationInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  wc_personal_inbox?: Prisma.SortOrder
+  wc_individual_assignments?: Prisma.SortOrder
+  wc_basic_notifications?: Prisma.SortOrder
+  wc_basic_announcements?: Prisma.SortOrder
+  wc_company_announcements?: Prisma.SortOrder
+  wc_personal_reminders?: Prisma.SortOrder
+  wc_push_notifications?: Prisma.SortOrder
+  wc_email_notifications?: Prisma.SortOrder
+  wc_inapp_notifications?: Prisma.SortOrder
+  wc_basic_daily_briefing?: Prisma.SortOrder
+  wc_announcement_history_readonly?: Prisma.SortOrder
+  wc_department_announcements?: Prisma.SortOrder
+  wc_team_announcements?: Prisma.SortOrder
+  wc_shift_announcements?: Prisma.SortOrder
+  wc_emergency_broadcasts?: Prisma.SortOrder
+  wc_assignment_management?: Prisma.SortOrder
+  wc_assignment_comments?: Prisma.SortOrder
+  wc_assignment_attachments?: Prisma.SortOrder
+  wc_assignment_history?: Prisma.SortOrder
+  wc_announcement_acknowledgements?: Prisma.SortOrder
+  wc_ai_daily_briefing?: Prisma.SortOrder
+  wc_manager_announcement_dashboard?: Prisma.SortOrder
+  wc_supervisor_tools?: Prisma.SortOrder
+  wc_communication_search?: Prisma.SortOrder
+  wc_inbox_filters?: Prisma.SortOrder
+  wc_notification_preferences?: Prisma.SortOrder
+  wc_department_communication_permissions?: Prisma.SortOrder
+  wc_multi_location_announcements?: Prisma.SortOrder
+  wc_regional_announcements?: Prisma.SortOrder
+  wc_executive_announcements?: Prisma.SortOrder
+  wc_org_wide_broadcasts?: Prisma.SortOrder
+  wc_cross_location_communication?: Prisma.SortOrder
+  wc_communication_analytics?: Prisma.SortOrder
+  wc_announcement_reporting?: Prisma.SortOrder
+  wc_read_rate_analytics?: Prisma.SortOrder
+  wc_executive_communication_dashboard?: Prisma.SortOrder
+  wc_ai_communication_summaries?: Prisma.SortOrder
+  wc_ai_announcement_drafting?: Prisma.SortOrder
+  wc_org_wide_assignment_management?: Prisma.SortOrder
+  wc_cross_location_assignment_visibility?: Prisma.SortOrder
+  wc_advanced_notification_rules?: Prisma.SortOrder
+  wc_executive_daily_briefings?: Prisma.SortOrder
+  wc_sms_gateway?: Prisma.SortOrder
+  wc_custom_notification_providers?: Prisma.SortOrder
+  wc_custom_escalation_policies?: Prisma.SortOrder
+  wc_compliance_logging?: Prisma.SortOrder
+  wc_advanced_audit_history?: Prisma.SortOrder
+  wc_api_access_communications?: Prisma.SortOrder
+  wc_white_label_communications?: Prisma.SortOrder
+  wc_enterprise_communication_controls?: Prisma.SortOrder
   lifecycleStatus?: Prisma.SortOrder
   referralCode?: Prisma.SortOrderInput | Prisma.SortOrder
   referralLink?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1167,6 +1717,56 @@ export type OrganizationScalarWhereWithAggregatesInput = {
   health_scores_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   trend_detection_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   executive_goals_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_personal_inbox?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_individual_assignments?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_basic_notifications?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_basic_announcements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_company_announcements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_personal_reminders?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_push_notifications?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_email_notifications?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_inapp_notifications?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_basic_daily_briefing?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_announcement_history_readonly?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_department_announcements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_team_announcements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_shift_announcements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_emergency_broadcasts?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_assignment_management?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_assignment_comments?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_assignment_attachments?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_assignment_history?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_ai_daily_briefing?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_supervisor_tools?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_communication_search?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_inbox_filters?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_notification_preferences?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_department_communication_permissions?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_multi_location_announcements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_regional_announcements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_executive_announcements?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_cross_location_communication?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_communication_analytics?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_announcement_reporting?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_read_rate_analytics?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_ai_communication_summaries?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_advanced_notification_rules?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_executive_daily_briefings?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_sms_gateway?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_custom_notification_providers?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_custom_escalation_policies?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_compliance_logging?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_advanced_audit_history?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_api_access_communications?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_white_label_communications?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   lifecycleStatus?: Prisma.StringWithAggregatesFilter<"Organization"> | string
   referralCode?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
   referralLink?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
@@ -1235,6 +1835,56 @@ export type OrganizationCreateInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -1356,6 +2006,56 @@ export type OrganizationUncheckedCreateInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -1477,6 +2177,56 @@ export type OrganizationUpdateInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1598,6 +2348,56 @@ export type OrganizationUncheckedUpdateInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1719,6 +2519,56 @@ export type OrganizationCreateManyInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -1787,6 +2637,56 @@ export type OrganizationUpdateManyMutationInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1855,6 +2755,56 @@ export type OrganizationUncheckedUpdateManyInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1931,6 +2881,56 @@ export type OrganizationCountOrderByAggregateInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  wc_personal_inbox?: Prisma.SortOrder
+  wc_individual_assignments?: Prisma.SortOrder
+  wc_basic_notifications?: Prisma.SortOrder
+  wc_basic_announcements?: Prisma.SortOrder
+  wc_company_announcements?: Prisma.SortOrder
+  wc_personal_reminders?: Prisma.SortOrder
+  wc_push_notifications?: Prisma.SortOrder
+  wc_email_notifications?: Prisma.SortOrder
+  wc_inapp_notifications?: Prisma.SortOrder
+  wc_basic_daily_briefing?: Prisma.SortOrder
+  wc_announcement_history_readonly?: Prisma.SortOrder
+  wc_department_announcements?: Prisma.SortOrder
+  wc_team_announcements?: Prisma.SortOrder
+  wc_shift_announcements?: Prisma.SortOrder
+  wc_emergency_broadcasts?: Prisma.SortOrder
+  wc_assignment_management?: Prisma.SortOrder
+  wc_assignment_comments?: Prisma.SortOrder
+  wc_assignment_attachments?: Prisma.SortOrder
+  wc_assignment_history?: Prisma.SortOrder
+  wc_announcement_acknowledgements?: Prisma.SortOrder
+  wc_ai_daily_briefing?: Prisma.SortOrder
+  wc_manager_announcement_dashboard?: Prisma.SortOrder
+  wc_supervisor_tools?: Prisma.SortOrder
+  wc_communication_search?: Prisma.SortOrder
+  wc_inbox_filters?: Prisma.SortOrder
+  wc_notification_preferences?: Prisma.SortOrder
+  wc_department_communication_permissions?: Prisma.SortOrder
+  wc_multi_location_announcements?: Prisma.SortOrder
+  wc_regional_announcements?: Prisma.SortOrder
+  wc_executive_announcements?: Prisma.SortOrder
+  wc_org_wide_broadcasts?: Prisma.SortOrder
+  wc_cross_location_communication?: Prisma.SortOrder
+  wc_communication_analytics?: Prisma.SortOrder
+  wc_announcement_reporting?: Prisma.SortOrder
+  wc_read_rate_analytics?: Prisma.SortOrder
+  wc_executive_communication_dashboard?: Prisma.SortOrder
+  wc_ai_communication_summaries?: Prisma.SortOrder
+  wc_ai_announcement_drafting?: Prisma.SortOrder
+  wc_org_wide_assignment_management?: Prisma.SortOrder
+  wc_cross_location_assignment_visibility?: Prisma.SortOrder
+  wc_advanced_notification_rules?: Prisma.SortOrder
+  wc_executive_daily_briefings?: Prisma.SortOrder
+  wc_sms_gateway?: Prisma.SortOrder
+  wc_custom_notification_providers?: Prisma.SortOrder
+  wc_custom_escalation_policies?: Prisma.SortOrder
+  wc_compliance_logging?: Prisma.SortOrder
+  wc_advanced_audit_history?: Prisma.SortOrder
+  wc_api_access_communications?: Prisma.SortOrder
+  wc_white_label_communications?: Prisma.SortOrder
+  wc_enterprise_communication_controls?: Prisma.SortOrder
   lifecycleStatus?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   referralLink?: Prisma.SortOrder
@@ -2011,6 +3011,56 @@ export type OrganizationMaxOrderByAggregateInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  wc_personal_inbox?: Prisma.SortOrder
+  wc_individual_assignments?: Prisma.SortOrder
+  wc_basic_notifications?: Prisma.SortOrder
+  wc_basic_announcements?: Prisma.SortOrder
+  wc_company_announcements?: Prisma.SortOrder
+  wc_personal_reminders?: Prisma.SortOrder
+  wc_push_notifications?: Prisma.SortOrder
+  wc_email_notifications?: Prisma.SortOrder
+  wc_inapp_notifications?: Prisma.SortOrder
+  wc_basic_daily_briefing?: Prisma.SortOrder
+  wc_announcement_history_readonly?: Prisma.SortOrder
+  wc_department_announcements?: Prisma.SortOrder
+  wc_team_announcements?: Prisma.SortOrder
+  wc_shift_announcements?: Prisma.SortOrder
+  wc_emergency_broadcasts?: Prisma.SortOrder
+  wc_assignment_management?: Prisma.SortOrder
+  wc_assignment_comments?: Prisma.SortOrder
+  wc_assignment_attachments?: Prisma.SortOrder
+  wc_assignment_history?: Prisma.SortOrder
+  wc_announcement_acknowledgements?: Prisma.SortOrder
+  wc_ai_daily_briefing?: Prisma.SortOrder
+  wc_manager_announcement_dashboard?: Prisma.SortOrder
+  wc_supervisor_tools?: Prisma.SortOrder
+  wc_communication_search?: Prisma.SortOrder
+  wc_inbox_filters?: Prisma.SortOrder
+  wc_notification_preferences?: Prisma.SortOrder
+  wc_department_communication_permissions?: Prisma.SortOrder
+  wc_multi_location_announcements?: Prisma.SortOrder
+  wc_regional_announcements?: Prisma.SortOrder
+  wc_executive_announcements?: Prisma.SortOrder
+  wc_org_wide_broadcasts?: Prisma.SortOrder
+  wc_cross_location_communication?: Prisma.SortOrder
+  wc_communication_analytics?: Prisma.SortOrder
+  wc_announcement_reporting?: Prisma.SortOrder
+  wc_read_rate_analytics?: Prisma.SortOrder
+  wc_executive_communication_dashboard?: Prisma.SortOrder
+  wc_ai_communication_summaries?: Prisma.SortOrder
+  wc_ai_announcement_drafting?: Prisma.SortOrder
+  wc_org_wide_assignment_management?: Prisma.SortOrder
+  wc_cross_location_assignment_visibility?: Prisma.SortOrder
+  wc_advanced_notification_rules?: Prisma.SortOrder
+  wc_executive_daily_briefings?: Prisma.SortOrder
+  wc_sms_gateway?: Prisma.SortOrder
+  wc_custom_notification_providers?: Prisma.SortOrder
+  wc_custom_escalation_policies?: Prisma.SortOrder
+  wc_compliance_logging?: Prisma.SortOrder
+  wc_advanced_audit_history?: Prisma.SortOrder
+  wc_api_access_communications?: Prisma.SortOrder
+  wc_white_label_communications?: Prisma.SortOrder
+  wc_enterprise_communication_controls?: Prisma.SortOrder
   lifecycleStatus?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   referralLink?: Prisma.SortOrder
@@ -2076,6 +3126,56 @@ export type OrganizationMinOrderByAggregateInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  wc_personal_inbox?: Prisma.SortOrder
+  wc_individual_assignments?: Prisma.SortOrder
+  wc_basic_notifications?: Prisma.SortOrder
+  wc_basic_announcements?: Prisma.SortOrder
+  wc_company_announcements?: Prisma.SortOrder
+  wc_personal_reminders?: Prisma.SortOrder
+  wc_push_notifications?: Prisma.SortOrder
+  wc_email_notifications?: Prisma.SortOrder
+  wc_inapp_notifications?: Prisma.SortOrder
+  wc_basic_daily_briefing?: Prisma.SortOrder
+  wc_announcement_history_readonly?: Prisma.SortOrder
+  wc_department_announcements?: Prisma.SortOrder
+  wc_team_announcements?: Prisma.SortOrder
+  wc_shift_announcements?: Prisma.SortOrder
+  wc_emergency_broadcasts?: Prisma.SortOrder
+  wc_assignment_management?: Prisma.SortOrder
+  wc_assignment_comments?: Prisma.SortOrder
+  wc_assignment_attachments?: Prisma.SortOrder
+  wc_assignment_history?: Prisma.SortOrder
+  wc_announcement_acknowledgements?: Prisma.SortOrder
+  wc_ai_daily_briefing?: Prisma.SortOrder
+  wc_manager_announcement_dashboard?: Prisma.SortOrder
+  wc_supervisor_tools?: Prisma.SortOrder
+  wc_communication_search?: Prisma.SortOrder
+  wc_inbox_filters?: Prisma.SortOrder
+  wc_notification_preferences?: Prisma.SortOrder
+  wc_department_communication_permissions?: Prisma.SortOrder
+  wc_multi_location_announcements?: Prisma.SortOrder
+  wc_regional_announcements?: Prisma.SortOrder
+  wc_executive_announcements?: Prisma.SortOrder
+  wc_org_wide_broadcasts?: Prisma.SortOrder
+  wc_cross_location_communication?: Prisma.SortOrder
+  wc_communication_analytics?: Prisma.SortOrder
+  wc_announcement_reporting?: Prisma.SortOrder
+  wc_read_rate_analytics?: Prisma.SortOrder
+  wc_executive_communication_dashboard?: Prisma.SortOrder
+  wc_ai_communication_summaries?: Prisma.SortOrder
+  wc_ai_announcement_drafting?: Prisma.SortOrder
+  wc_org_wide_assignment_management?: Prisma.SortOrder
+  wc_cross_location_assignment_visibility?: Prisma.SortOrder
+  wc_advanced_notification_rules?: Prisma.SortOrder
+  wc_executive_daily_briefings?: Prisma.SortOrder
+  wc_sms_gateway?: Prisma.SortOrder
+  wc_custom_notification_providers?: Prisma.SortOrder
+  wc_custom_escalation_policies?: Prisma.SortOrder
+  wc_compliance_logging?: Prisma.SortOrder
+  wc_advanced_audit_history?: Prisma.SortOrder
+  wc_api_access_communications?: Prisma.SortOrder
+  wc_white_label_communications?: Prisma.SortOrder
+  wc_enterprise_communication_controls?: Prisma.SortOrder
   lifecycleStatus?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   referralLink?: Prisma.SortOrder
@@ -2972,6 +4072,56 @@ export type OrganizationCreateWithoutUsersInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -3092,6 +4242,56 @@ export type OrganizationUncheckedCreateWithoutUsersInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -3228,6 +4428,56 @@ export type OrganizationUpdateWithoutUsersInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3348,6 +4598,56 @@ export type OrganizationUncheckedUpdateWithoutUsersInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3468,6 +4768,56 @@ export type OrganizationCreateWithoutLocationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -3588,6 +4938,56 @@ export type OrganizationUncheckedCreateWithoutLocationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -3724,6 +5124,56 @@ export type OrganizationUpdateWithoutLocationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3844,6 +5294,56 @@ export type OrganizationUncheckedUpdateWithoutLocationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3964,6 +5464,56 @@ export type OrganizationCreateWithoutDepartmentsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -4084,6 +5634,56 @@ export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -4220,6 +5820,56 @@ export type OrganizationUpdateWithoutDepartmentsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4340,6 +5990,56 @@ export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4460,6 +6160,56 @@ export type OrganizationCreateWithoutAssetsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -4580,6 +6330,56 @@ export type OrganizationUncheckedCreateWithoutAssetsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -4716,6 +6516,56 @@ export type OrganizationUpdateWithoutAssetsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4836,6 +6686,56 @@ export type OrganizationUncheckedUpdateWithoutAssetsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4956,6 +6856,56 @@ export type OrganizationCreateWithoutVendorsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -5076,6 +7026,56 @@ export type OrganizationUncheckedCreateWithoutVendorsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -5212,6 +7212,56 @@ export type OrganizationUpdateWithoutVendorsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5332,6 +7382,56 @@ export type OrganizationUncheckedUpdateWithoutVendorsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5452,6 +7552,56 @@ export type OrganizationCreateWithoutIssuesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -5572,6 +7722,56 @@ export type OrganizationUncheckedCreateWithoutIssuesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -5708,6 +7908,56 @@ export type OrganizationUpdateWithoutIssuesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5828,6 +8078,56 @@ export type OrganizationUncheckedUpdateWithoutIssuesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5948,6 +8248,56 @@ export type OrganizationCreateWithoutEscalationPoliciesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -6068,6 +8418,56 @@ export type OrganizationUncheckedCreateWithoutEscalationPoliciesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -6204,6 +8604,56 @@ export type OrganizationUpdateWithoutEscalationPoliciesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6324,6 +8774,56 @@ export type OrganizationUncheckedUpdateWithoutEscalationPoliciesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6444,6 +8944,56 @@ export type OrganizationCreateWithoutNotificationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -6564,6 +9114,56 @@ export type OrganizationUncheckedCreateWithoutNotificationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -6700,6 +9300,56 @@ export type OrganizationUpdateWithoutNotificationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6820,6 +9470,56 @@ export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6940,6 +9640,56 @@ export type OrganizationCreateWithoutRoutingRulesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -7060,6 +9810,56 @@ export type OrganizationUncheckedCreateWithoutRoutingRulesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -7196,6 +9996,56 @@ export type OrganizationUpdateWithoutRoutingRulesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7316,6 +10166,56 @@ export type OrganizationUncheckedUpdateWithoutRoutingRulesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7436,6 +10336,56 @@ export type OrganizationCreateWithoutSuggestionsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -7556,6 +10506,56 @@ export type OrganizationUncheckedCreateWithoutSuggestionsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -7692,6 +10692,56 @@ export type OrganizationUpdateWithoutSuggestionsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7812,6 +10862,56 @@ export type OrganizationUncheckedUpdateWithoutSuggestionsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7932,6 +11032,56 @@ export type OrganizationCreateWithoutEmailTemplatesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -8052,6 +11202,56 @@ export type OrganizationUncheckedCreateWithoutEmailTemplatesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -8188,6 +11388,56 @@ export type OrganizationUpdateWithoutEmailTemplatesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8308,6 +11558,56 @@ export type OrganizationUncheckedUpdateWithoutEmailTemplatesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8428,6 +11728,56 @@ export type OrganizationCreateWithoutInvitationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -8548,6 +11898,56 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -8684,6 +12084,56 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8804,6 +12254,56 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8924,6 +12424,56 @@ export type OrganizationCreateWithoutOrgNotesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -9044,6 +12594,56 @@ export type OrganizationUncheckedCreateWithoutOrgNotesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -9180,6 +12780,56 @@ export type OrganizationUpdateWithoutOrgNotesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9300,6 +12950,56 @@ export type OrganizationUncheckedUpdateWithoutOrgNotesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9420,6 +13120,56 @@ export type OrganizationCreateWithoutImpersonationLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -9540,6 +13290,56 @@ export type OrganizationUncheckedCreateWithoutImpersonationLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -9676,6 +13476,56 @@ export type OrganizationUpdateWithoutImpersonationLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9796,6 +13646,56 @@ export type OrganizationUncheckedUpdateWithoutImpersonationLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9916,6 +13816,56 @@ export type OrganizationCreateWithoutAuditLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -10036,6 +13986,56 @@ export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -10172,6 +14172,56 @@ export type OrganizationUpdateWithoutAuditLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10292,6 +14342,56 @@ export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10412,6 +14512,56 @@ export type OrganizationCreateWithoutEmployeeTypesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -10532,6 +14682,56 @@ export type OrganizationUncheckedCreateWithoutEmployeeTypesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -10668,6 +14868,56 @@ export type OrganizationUpdateWithoutEmployeeTypesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10788,6 +15038,56 @@ export type OrganizationUncheckedUpdateWithoutEmployeeTypesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10908,6 +15208,56 @@ export type OrganizationCreateWithoutIssueTemplatesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -11028,6 +15378,56 @@ export type OrganizationUncheckedCreateWithoutIssueTemplatesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -11164,6 +15564,56 @@ export type OrganizationUpdateWithoutIssueTemplatesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11284,6 +15734,56 @@ export type OrganizationUncheckedUpdateWithoutIssueTemplatesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11404,6 +15904,56 @@ export type OrganizationCreateWithoutMaintenanceSchedulesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -11524,6 +16074,56 @@ export type OrganizationUncheckedCreateWithoutMaintenanceSchedulesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -11660,6 +16260,56 @@ export type OrganizationUpdateWithoutMaintenanceSchedulesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11780,6 +16430,56 @@ export type OrganizationUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11900,6 +16600,56 @@ export type OrganizationCreateWithoutAnalyticsSnapshotsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -12020,6 +16770,56 @@ export type OrganizationUncheckedCreateWithoutAnalyticsSnapshotsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -12156,6 +16956,56 @@ export type OrganizationUpdateWithoutAnalyticsSnapshotsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12276,6 +17126,56 @@ export type OrganizationUncheckedUpdateWithoutAnalyticsSnapshotsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12396,6 +17296,56 @@ export type OrganizationCreateWithoutSopsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -12516,6 +17466,56 @@ export type OrganizationUncheckedCreateWithoutSopsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -12652,6 +17652,56 @@ export type OrganizationUpdateWithoutSopsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12772,6 +17822,56 @@ export type OrganizationUncheckedUpdateWithoutSopsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12892,6 +17992,56 @@ export type OrganizationCreateWithoutPurchaseRequestsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -13012,6 +18162,56 @@ export type OrganizationUncheckedCreateWithoutPurchaseRequestsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -13148,6 +18348,56 @@ export type OrganizationUpdateWithoutPurchaseRequestsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13268,6 +18518,56 @@ export type OrganizationUncheckedUpdateWithoutPurchaseRequestsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13388,6 +18688,56 @@ export type OrganizationCreateWithoutApprovedCatalogItemsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -13508,6 +18858,56 @@ export type OrganizationUncheckedCreateWithoutApprovedCatalogItemsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -13644,6 +19044,56 @@ export type OrganizationUpdateWithoutApprovedCatalogItemsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13764,6 +19214,56 @@ export type OrganizationUncheckedUpdateWithoutApprovedCatalogItemsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13884,6 +19384,56 @@ export type OrganizationCreateWithoutApprovalPoliciesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -14004,6 +19554,56 @@ export type OrganizationUncheckedCreateWithoutApprovalPoliciesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -14140,6 +19740,56 @@ export type OrganizationUpdateWithoutApprovalPoliciesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14260,6 +19910,56 @@ export type OrganizationUncheckedUpdateWithoutApprovalPoliciesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14380,6 +20080,56 @@ export type OrganizationCreateWithoutInjuryReportsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -14500,6 +20250,56 @@ export type OrganizationUncheckedCreateWithoutInjuryReportsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -14636,6 +20436,56 @@ export type OrganizationUpdateWithoutInjuryReportsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14756,6 +20606,56 @@ export type OrganizationUncheckedUpdateWithoutInjuryReportsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14876,6 +20776,56 @@ export type OrganizationCreateWithoutBugReportsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -14996,6 +20946,56 @@ export type OrganizationUncheckedCreateWithoutBugReportsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -15132,6 +21132,56 @@ export type OrganizationUpdateWithoutBugReportsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15252,6 +21302,56 @@ export type OrganizationUncheckedUpdateWithoutBugReportsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15372,6 +21472,56 @@ export type OrganizationCreateWithoutFeatureRequestsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -15492,6 +21642,56 @@ export type OrganizationUncheckedCreateWithoutFeatureRequestsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -15628,6 +21828,56 @@ export type OrganizationUpdateWithoutFeatureRequestsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15748,6 +21998,56 @@ export type OrganizationUncheckedUpdateWithoutFeatureRequestsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15868,6 +22168,56 @@ export type OrganizationCreateWithoutRegionsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -15988,6 +22338,56 @@ export type OrganizationUncheckedCreateWithoutRegionsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -16124,6 +22524,56 @@ export type OrganizationUpdateWithoutRegionsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16244,6 +22694,56 @@ export type OrganizationUncheckedUpdateWithoutRegionsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16364,6 +22864,56 @@ export type OrganizationCreateWithoutEscalationChainsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -16484,6 +23034,56 @@ export type OrganizationUncheckedCreateWithoutEscalationChainsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -16620,6 +23220,56 @@ export type OrganizationUpdateWithoutEscalationChainsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16740,6 +23390,56 @@ export type OrganizationUncheckedUpdateWithoutEscalationChainsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16860,6 +23560,56 @@ export type OrganizationCreateWithoutApiKeysInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -16980,6 +23730,56 @@ export type OrganizationUncheckedCreateWithoutApiKeysInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -17116,6 +23916,56 @@ export type OrganizationUpdateWithoutApiKeysInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17236,6 +24086,56 @@ export type OrganizationUncheckedUpdateWithoutApiKeysInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17356,6 +24256,56 @@ export type OrganizationCreateWithoutWebhookEndpointsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -17476,6 +24426,56 @@ export type OrganizationUncheckedCreateWithoutWebhookEndpointsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -17612,6 +24612,56 @@ export type OrganizationUpdateWithoutWebhookEndpointsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17732,6 +24782,56 @@ export type OrganizationUncheckedUpdateWithoutWebhookEndpointsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17852,6 +24952,56 @@ export type OrganizationCreateWithoutSsoConfigInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -17972,6 +25122,56 @@ export type OrganizationUncheckedCreateWithoutSsoConfigInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -18108,6 +25308,56 @@ export type OrganizationUpdateWithoutSsoConfigInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18228,6 +25478,56 @@ export type OrganizationUncheckedUpdateWithoutSsoConfigInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18348,6 +25648,56 @@ export type OrganizationCreateWithoutOrgRelationshipsAsAInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -18468,6 +25818,56 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsAInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -18593,6 +25993,56 @@ export type OrganizationCreateWithoutOrgRelationshipsAsBInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -18713,6 +26163,56 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsBInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -18849,6 +26349,56 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsAInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18969,6 +26519,56 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsAInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19100,6 +26700,56 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsBInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19220,6 +26870,56 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsBInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19340,6 +27040,56 @@ export type OrganizationCreateWithoutQrCodesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -19460,6 +27210,56 @@ export type OrganizationUncheckedCreateWithoutQrCodesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -19596,6 +27396,56 @@ export type OrganizationUpdateWithoutQrCodesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19716,6 +27566,56 @@ export type OrganizationUncheckedUpdateWithoutQrCodesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19836,6 +27736,56 @@ export type OrganizationCreateWithoutUserOrgMembershipsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -19956,6 +27906,56 @@ export type OrganizationUncheckedCreateWithoutUserOrgMembershipsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -20092,6 +28092,56 @@ export type OrganizationUpdateWithoutUserOrgMembershipsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20212,6 +28262,56 @@ export type OrganizationUncheckedUpdateWithoutUserOrgMembershipsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20332,6 +28432,56 @@ export type OrganizationCreateWithoutExecutiveBriefingsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -20452,6 +28602,56 @@ export type OrganizationUncheckedCreateWithoutExecutiveBriefingsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -20588,6 +28788,56 @@ export type OrganizationUpdateWithoutExecutiveBriefingsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20708,6 +28958,56 @@ export type OrganizationUncheckedUpdateWithoutExecutiveBriefingsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20828,6 +29128,56 @@ export type OrganizationCreateWithoutHealthScoresInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -20948,6 +29298,56 @@ export type OrganizationUncheckedCreateWithoutHealthScoresInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -21084,6 +29484,56 @@ export type OrganizationUpdateWithoutHealthScoresInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21204,6 +29654,56 @@ export type OrganizationUncheckedUpdateWithoutHealthScoresInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21324,6 +29824,56 @@ export type OrganizationCreateWithoutTrendAlertsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -21444,6 +29994,56 @@ export type OrganizationUncheckedCreateWithoutTrendAlertsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -21580,6 +30180,56 @@ export type OrganizationUpdateWithoutTrendAlertsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21700,6 +30350,56 @@ export type OrganizationUncheckedUpdateWithoutTrendAlertsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21820,6 +30520,56 @@ export type OrganizationCreateWithoutExecutiveGoalsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -21940,6 +30690,56 @@ export type OrganizationUncheckedCreateWithoutExecutiveGoalsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -22076,6 +30876,56 @@ export type OrganizationUpdateWithoutExecutiveGoalsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22196,6 +31046,56 @@ export type OrganizationUncheckedUpdateWithoutExecutiveGoalsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22316,6 +31216,56 @@ export type OrganizationCreateWithoutLegalAcceptancesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -22436,6 +31386,56 @@ export type OrganizationUncheckedCreateWithoutLegalAcceptancesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -22572,6 +31572,56 @@ export type OrganizationUpdateWithoutLegalAcceptancesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22692,6 +31742,56 @@ export type OrganizationUncheckedUpdateWithoutLegalAcceptancesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22812,6 +31912,56 @@ export type OrganizationCreateWithoutDemoCallsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -22932,6 +32082,56 @@ export type OrganizationUncheckedCreateWithoutDemoCallsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -23068,6 +32268,56 @@ export type OrganizationUpdateWithoutDemoCallsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -23188,6 +32438,56 @@ export type OrganizationUncheckedUpdateWithoutDemoCallsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -23308,6 +32608,56 @@ export type OrganizationCreateWithoutNonConversionReasonsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -23428,6 +32778,56 @@ export type OrganizationUncheckedCreateWithoutNonConversionReasonsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -23564,6 +32964,56 @@ export type OrganizationUpdateWithoutNonConversionReasonsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -23684,6 +33134,56 @@ export type OrganizationUncheckedUpdateWithoutNonConversionReasonsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -23804,6 +33304,56 @@ export type OrganizationCreateWithoutCrmNotesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -23924,6 +33474,56 @@ export type OrganizationUncheckedCreateWithoutCrmNotesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -24060,6 +33660,56 @@ export type OrganizationUpdateWithoutCrmNotesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -24180,6 +33830,56 @@ export type OrganizationUncheckedUpdateWithoutCrmNotesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -24300,6 +34000,56 @@ export type OrganizationCreateWithoutCrmActivitiesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -24420,6 +34170,56 @@ export type OrganizationUncheckedCreateWithoutCrmActivitiesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -24556,6 +34356,56 @@ export type OrganizationUpdateWithoutCrmActivitiesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -24676,6 +34526,56 @@ export type OrganizationUncheckedUpdateWithoutCrmActivitiesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -24796,6 +34696,56 @@ export type OrganizationCreateWithoutBillingCreditsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -24916,6 +34866,56 @@ export type OrganizationUncheckedCreateWithoutBillingCreditsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -25052,6 +35052,56 @@ export type OrganizationUpdateWithoutBillingCreditsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -25172,6 +35222,56 @@ export type OrganizationUncheckedUpdateWithoutBillingCreditsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -25292,6 +35392,56 @@ export type OrganizationCreateWithoutReferralsMadeInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -25412,6 +35562,56 @@ export type OrganizationUncheckedCreateWithoutReferralsMadeInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -25537,6 +35737,56 @@ export type OrganizationCreateWithoutReferralReceivedInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -25657,6 +35907,56 @@ export type OrganizationUncheckedCreateWithoutReferralReceivedInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -25793,6 +36093,56 @@ export type OrganizationUpdateWithoutReferralsMadeInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -25913,6 +36263,56 @@ export type OrganizationUncheckedUpdateWithoutReferralsMadeInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26044,6 +36444,56 @@ export type OrganizationUpdateWithoutReferralReceivedInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26164,6 +36614,56 @@ export type OrganizationUncheckedUpdateWithoutReferralReceivedInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26284,6 +36784,56 @@ export type OrganizationCreateWithoutConversationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -26404,6 +36954,56 @@ export type OrganizationUncheckedCreateWithoutConversationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -26540,6 +37140,56 @@ export type OrganizationUpdateWithoutConversationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26660,6 +37310,56 @@ export type OrganizationUncheckedUpdateWithoutConversationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26780,6 +37480,56 @@ export type OrganizationCreateWithoutSupportConversationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -26900,6 +37650,56 @@ export type OrganizationUncheckedCreateWithoutSupportConversationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -27036,6 +37836,56 @@ export type OrganizationUpdateWithoutSupportConversationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -27156,6 +38006,56 @@ export type OrganizationUncheckedUpdateWithoutSupportConversationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -27276,6 +38176,56 @@ export type OrganizationCreateWithoutBroadcastsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -27396,6 +38346,56 @@ export type OrganizationUncheckedCreateWithoutBroadcastsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -27532,6 +38532,56 @@ export type OrganizationUpdateWithoutBroadcastsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -27652,6 +38702,56 @@ export type OrganizationUncheckedUpdateWithoutBroadcastsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -27772,6 +38872,56 @@ export type OrganizationCreateWithoutAssignmentsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -27892,6 +39042,56 @@ export type OrganizationUncheckedCreateWithoutAssignmentsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -28028,6 +39228,56 @@ export type OrganizationUpdateWithoutAssignmentsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -28148,6 +39398,56 @@ export type OrganizationUncheckedUpdateWithoutAssignmentsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -28268,6 +39568,56 @@ export type OrganizationCreateWithoutAnnouncementsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -28388,6 +39738,56 @@ export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -28524,6 +39924,56 @@ export type OrganizationUpdateWithoutAnnouncementsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -28644,6 +40094,56 @@ export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -28764,6 +40264,56 @@ export type OrganizationCreateWithoutEmergencyBroadcastsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -28884,6 +40434,56 @@ export type OrganizationUncheckedCreateWithoutEmergencyBroadcastsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: string
   referralCode?: string | null
   referralLink?: string | null
@@ -29020,6 +40620,56 @@ export type OrganizationUpdateWithoutEmergencyBroadcastsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -29140,6 +40790,56 @@ export type OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -29741,6 +41441,56 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: boolean
   referralCode?: boolean
   referralLink?: boolean
@@ -29863,6 +41613,56 @@ export type OrganizationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: boolean
   referralCode?: boolean
   referralLink?: boolean
@@ -29931,6 +41731,56 @@ export type OrganizationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: boolean
   referralCode?: boolean
   referralLink?: boolean
@@ -29999,12 +41849,62 @@ export type OrganizationSelectScalar = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
   lifecycleStatus?: boolean
   referralCode?: boolean
   referralLink?: boolean
 }
 
-export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logo" | "industry" | "companySize" | "numberOfLocations" | "onboardingCompletedAt" | "trialStartDate" | "trialEndsAt" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeCouponId" | "subscriptionStatus" | "plan" | "employeeLimit" | "locationLimit" | "checkoutIntentStatus" | "intelligenceSuiteEnabled" | "monthlyBasePrice" | "monthlyScalingCost" | "monthlyModulesCost" | "monthlyTotalBeforeDiscount" | "monthlyTotalAfterDiscount" | "discountPercent" | "discountExpiresAt" | "discountLabel" | "suspendedAt" | "isDemo" | "demoExpiresAt" | "aiSuggestionsAvailable" | "aiSuggestionsPolicy" | "aiSuggestionsAudience" | "purchaseRequestEnabled" | "purchaseRequestItemLimit" | "purchaseRequestMonthlyLimit" | "approval_intelligence_enabled" | "ai_suggest_unmatched_items" | "ai_confidence_threshold" | "injuryAlertEmails" | "sopMatchSensitivity" | "billingFrequency" | "currentPrice" | "priceLockedUntil" | "intelligenceModules" | "createdAt" | "updatedAt" | "pageAccessConfig" | "regions_enabled" | "corporate_dashboard_enabled" | "cross_location_analytics_enabled" | "advanced_escalations_enabled" | "api_webhooks_enabled" | "sso_foundation_enabled" | "shared_facility_enabled" | "qr_codes_enabled" | "external_collaborators_enabled" | "multi_org_enabled" | "executive_briefings_enabled" | "health_scores_enabled" | "trend_detection_enabled" | "executive_goals_enabled" | "lifecycleStatus" | "referralCode" | "referralLink", ExtArgs["result"]["organization"]>
+export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logo" | "industry" | "companySize" | "numberOfLocations" | "onboardingCompletedAt" | "trialStartDate" | "trialEndsAt" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeCouponId" | "subscriptionStatus" | "plan" | "employeeLimit" | "locationLimit" | "checkoutIntentStatus" | "intelligenceSuiteEnabled" | "monthlyBasePrice" | "monthlyScalingCost" | "monthlyModulesCost" | "monthlyTotalBeforeDiscount" | "monthlyTotalAfterDiscount" | "discountPercent" | "discountExpiresAt" | "discountLabel" | "suspendedAt" | "isDemo" | "demoExpiresAt" | "aiSuggestionsAvailable" | "aiSuggestionsPolicy" | "aiSuggestionsAudience" | "purchaseRequestEnabled" | "purchaseRequestItemLimit" | "purchaseRequestMonthlyLimit" | "approval_intelligence_enabled" | "ai_suggest_unmatched_items" | "ai_confidence_threshold" | "injuryAlertEmails" | "sopMatchSensitivity" | "billingFrequency" | "currentPrice" | "priceLockedUntil" | "intelligenceModules" | "createdAt" | "updatedAt" | "pageAccessConfig" | "regions_enabled" | "corporate_dashboard_enabled" | "cross_location_analytics_enabled" | "advanced_escalations_enabled" | "api_webhooks_enabled" | "sso_foundation_enabled" | "shared_facility_enabled" | "qr_codes_enabled" | "external_collaborators_enabled" | "multi_org_enabled" | "executive_briefings_enabled" | "health_scores_enabled" | "trend_detection_enabled" | "executive_goals_enabled" | "wc_personal_inbox" | "wc_individual_assignments" | "wc_basic_notifications" | "wc_basic_announcements" | "wc_company_announcements" | "wc_personal_reminders" | "wc_push_notifications" | "wc_email_notifications" | "wc_inapp_notifications" | "wc_basic_daily_briefing" | "wc_announcement_history_readonly" | "wc_department_announcements" | "wc_team_announcements" | "wc_shift_announcements" | "wc_emergency_broadcasts" | "wc_assignment_management" | "wc_assignment_comments" | "wc_assignment_attachments" | "wc_assignment_history" | "wc_announcement_acknowledgements" | "wc_ai_daily_briefing" | "wc_manager_announcement_dashboard" | "wc_supervisor_tools" | "wc_communication_search" | "wc_inbox_filters" | "wc_notification_preferences" | "wc_department_communication_permissions" | "wc_multi_location_announcements" | "wc_regional_announcements" | "wc_executive_announcements" | "wc_org_wide_broadcasts" | "wc_cross_location_communication" | "wc_communication_analytics" | "wc_announcement_reporting" | "wc_read_rate_analytics" | "wc_executive_communication_dashboard" | "wc_ai_communication_summaries" | "wc_ai_announcement_drafting" | "wc_org_wide_assignment_management" | "wc_cross_location_assignment_visibility" | "wc_advanced_notification_rules" | "wc_executive_daily_briefings" | "wc_sms_gateway" | "wc_custom_notification_providers" | "wc_custom_escalation_policies" | "wc_compliance_logging" | "wc_advanced_audit_history" | "wc_api_access_communications" | "wc_white_label_communications" | "wc_enterprise_communication_controls" | "lifecycleStatus" | "referralCode" | "referralLink", ExtArgs["result"]["organization"]>
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Organization$usersArgs<ExtArgs>
   locations?: boolean | Prisma.Organization$locationsArgs<ExtArgs>
@@ -30184,6 +42084,56 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     health_scores_enabled: boolean
     trend_detection_enabled: boolean
     executive_goals_enabled: boolean
+    wc_personal_inbox: boolean
+    wc_individual_assignments: boolean
+    wc_basic_notifications: boolean
+    wc_basic_announcements: boolean
+    wc_company_announcements: boolean
+    wc_personal_reminders: boolean
+    wc_push_notifications: boolean
+    wc_email_notifications: boolean
+    wc_inapp_notifications: boolean
+    wc_basic_daily_briefing: boolean
+    wc_announcement_history_readonly: boolean
+    wc_department_announcements: boolean
+    wc_team_announcements: boolean
+    wc_shift_announcements: boolean
+    wc_emergency_broadcasts: boolean
+    wc_assignment_management: boolean
+    wc_assignment_comments: boolean
+    wc_assignment_attachments: boolean
+    wc_assignment_history: boolean
+    wc_announcement_acknowledgements: boolean
+    wc_ai_daily_briefing: boolean
+    wc_manager_announcement_dashboard: boolean
+    wc_supervisor_tools: boolean
+    wc_communication_search: boolean
+    wc_inbox_filters: boolean
+    wc_notification_preferences: boolean
+    wc_department_communication_permissions: boolean
+    wc_multi_location_announcements: boolean
+    wc_regional_announcements: boolean
+    wc_executive_announcements: boolean
+    wc_org_wide_broadcasts: boolean
+    wc_cross_location_communication: boolean
+    wc_communication_analytics: boolean
+    wc_announcement_reporting: boolean
+    wc_read_rate_analytics: boolean
+    wc_executive_communication_dashboard: boolean
+    wc_ai_communication_summaries: boolean
+    wc_ai_announcement_drafting: boolean
+    wc_org_wide_assignment_management: boolean
+    wc_cross_location_assignment_visibility: boolean
+    wc_advanced_notification_rules: boolean
+    wc_executive_daily_briefings: boolean
+    wc_sms_gateway: boolean
+    wc_custom_notification_providers: boolean
+    wc_custom_escalation_policies: boolean
+    wc_compliance_logging: boolean
+    wc_advanced_audit_history: boolean
+    wc_api_access_communications: boolean
+    wc_white_label_communications: boolean
+    wc_enterprise_communication_controls: boolean
     lifecycleStatus: string
     referralCode: string | null
     referralLink: string | null
@@ -30725,6 +42675,56 @@ export interface OrganizationFieldRefs {
   readonly health_scores_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly trend_detection_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly executive_goals_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_personal_inbox: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_individual_assignments: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_basic_notifications: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_basic_announcements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_company_announcements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_personal_reminders: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_push_notifications: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_email_notifications: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_inapp_notifications: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_basic_daily_briefing: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_announcement_history_readonly: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_department_announcements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_team_announcements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_shift_announcements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_emergency_broadcasts: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_assignment_management: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_assignment_comments: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_assignment_attachments: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_assignment_history: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_announcement_acknowledgements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_ai_daily_briefing: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_manager_announcement_dashboard: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_supervisor_tools: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_communication_search: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_inbox_filters: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_notification_preferences: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_department_communication_permissions: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_multi_location_announcements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_regional_announcements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_executive_announcements: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_org_wide_broadcasts: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_cross_location_communication: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_communication_analytics: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_announcement_reporting: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_read_rate_analytics: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_executive_communication_dashboard: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_ai_communication_summaries: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_ai_announcement_drafting: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_org_wide_assignment_management: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_cross_location_assignment_visibility: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_advanced_notification_rules: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_executive_daily_briefings: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_sms_gateway: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_custom_notification_providers: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_custom_escalation_policies: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_compliance_logging: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_advanced_audit_history: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_api_access_communications: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_white_label_communications: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly wc_enterprise_communication_controls: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly lifecycleStatus: Prisma.FieldRef<"Organization", 'String'>
   readonly referralCode: Prisma.FieldRef<"Organization", 'String'>
   readonly referralLink: Prisma.FieldRef<"Organization", 'String'>

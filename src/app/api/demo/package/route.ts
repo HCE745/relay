@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession, createSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { setWorkforceCommsPlanFlags } from "@/lib/workforce-comms"
 
 type DemoPkg = "essentials" | "professional" | "professional_plus"
 
@@ -52,6 +53,8 @@ export async function POST(request: NextRequest) {
   const allEnabled  = modules.length === ALL_MODULES.length
   const plan        = PACKAGE_PLAN[pkg]
   const isPlusFlags = PACKAGE_PLUS_FLAGS[pkg]
+
+  await setWorkforceCommsPlanFlags(session.organizationId, plan)
 
   await prisma.organization.update({
     where: { id: session.organizationId },

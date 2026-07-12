@@ -3,6 +3,7 @@ import { stripe } from "@/lib/stripe"
 import { prisma } from "@/lib/prisma"
 import { sendEmail, paymentConfirmationEmail, paymentFailedEmail } from "@/lib/email"
 import { setLifecycle } from "@/lib/crm-lifecycle"
+import { setWorkforceCommsPlanFlags } from "@/lib/workforce-comms"
 import * as Sentry from "@sentry/nextjs"
 import type Stripe from "stripe"
 
@@ -62,7 +63,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   const org = await prisma.organization.findUnique({
     where:  { id: orgId },
-    select: { lifecycleStatus: true },
+    select: { lifecycleStatus: true, plan: true },
   })
 
   await prisma.organization.update({
@@ -76,6 +77,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   if (org) {
     await setLifecycle(orgId, "Converted", "Stripe", org.lifecycleStatus)
+    await setWorkforceCommsPlanFlags(orgId, org.plan)
   }
 }
 

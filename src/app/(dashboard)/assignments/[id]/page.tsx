@@ -3,6 +3,7 @@ import Link from "next/link"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { AssignmentDetailClient } from "@/components/assignments/assignment-detail-client"
+import { getOrgWCFlags } from "@/lib/workforce-comms"
 
 export const dynamic = "force-dynamic"
 
@@ -12,7 +13,8 @@ export default async function AssignmentDetailPage({ params }: { params: Promise
 
   const { id } = await params
 
-  const assignment = await prisma.assignment.findFirst({
+  const [assignment, wcFlags] = await Promise.all([
+    prisma.assignment.findFirst({
     where: { id, orgId: session.organizationId },
     include: {
       assignee:     { select: { id: true, name: true, role: true } },
@@ -30,7 +32,9 @@ export default async function AssignmentDetailPage({ params }: { params: Promise
         orderBy: { createdAt: "asc" },
       },
     },
-  })
+  }),
+    getOrgWCFlags(session.organizationId),
+  ])
 
   if (!assignment) notFound()
 
@@ -50,6 +54,8 @@ export default async function AssignmentDetailPage({ params }: { params: Promise
         userId={session.userId}
         isAssignee={isAssignee}
         isManager={isManager}
+        wcComments={wcFlags?.wc_assignment_comments ?? false}
+        wcHistory={wcFlags?.wc_assignment_history ?? false}
       />
     </div>
   )

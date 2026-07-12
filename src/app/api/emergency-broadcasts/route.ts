@@ -55,32 +55,40 @@ export async function POST(req: NextRequest) {
       scopeId:     body.scopeId,
       createdById: session.userId,
     },
-    include: { createdBy: { select: { id: true, name: true } } },
+    include: {
+      createdBy: { select: { id: true, name: true, role: true } },
+      acknowledgments: { select: { userId: true, acknowledgedAt: true } },
+      _count: { select: { acknowledgments: true } },
+    },
   })
 
-  // Notify all org members immediately with push
-  const members = await prisma.user.findMany({
-    where: { organizationId: session.organizationId, id: { not: session.userId } },
-    select: { id: true },
-  })
-
-  await Promise.all(
-    members.map(async m => {
-      await prisma.notification.create({
-        data: {
-          userId:         m.id,
-          organizationId: session.organizationId,
-          type:           "EMERGENCY_BROADCAST",
-          title:          `EMERGENCY: ${body.title}`,
-          message:        body.body.substring(0, 160),
-        },
-      })
-      sendPushNotification(m.id, `EMERGENCY: ${body.title}`, body.body.substring(0, 160), {
-        type:        "EMERGENCY_BROADCAST",
-        broadcastId: broadcast.id,
-      }).catch(() => {})
+  // Notify all org members — best-effort, never fail the broadcast creation
+  try {
+    const members = await prisma.user.findMany({
+      where: { organizationId: session.organizationId, id: { not: session.userId } },
+      select: { id: true },
     })
-  )
+
+    await Promise.all(
+      members.map(async m => {
+        try {
+          await prisma.notification.create({
+            data: {
+              userId:         m.id,
+              organizationId: session.organizationId,
+              type:           "EMERGENCY_BROADCAST",
+              title:          `EMERGENCY: ${body.title}`,
+              message:        body.body.substring(0, 160),
+            },
+          })
+        } catch { /* non-fatal */ }
+        sendPushNotification(m.id, `EMERGENCY: ${body.title}`, body.body.substring(0, 160), {
+          type:        "EMERGENCY_BROADCAST",
+          broadcastId: broadcast.id,
+        }).catch(() => {})
+      })
+    )
+  } catch { /* non-fatal */ }
 
   return NextResponse.json({ broadcast }, { status: 201 })
 }

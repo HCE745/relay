@@ -4,10 +4,10 @@ import { useState, useEffect } from "react"
 import {
   Settings, Mail, Server, BookOpen, Plus, Pencil, Trash2, Check,
   X, Eye, EyeOff, RefreshCw, ChevronDown, ChevronUp, ExternalLink,
-  Clock, CheckCircle2, AlertCircle,
+  Clock, CheckCircle2, AlertCircle, ListOrdered, Sliders,
 } from "lucide-react"
 
-type Tab = "templates" | "imap" | "guide" | "debug"
+type Tab = "templates" | "imap" | "sequences" | "global" | "guide" | "debug"
 
 interface Template {
   id:       string
@@ -45,6 +45,8 @@ export default function CrmSettingsPage() {
         {([
           { key: "templates", label: "Email Templates", icon: Mail },
           { key: "imap",      label: "IMAP / SMTP",     icon: Server },
+          { key: "sequences", label: "Sequences",        icon: ListOrdered },
+          { key: "global",    label: "Global Settings",  icon: Sliders },
           { key: "guide",     label: "Setup Guide",     icon: BookOpen },
           { key: "debug",     label: "Diagnostics",     icon: AlertCircle },
         ] as { key: Tab; label: string; icon: React.ElementType }[]).map(({ key, label, icon: Icon }) => (
@@ -65,6 +67,8 @@ export default function CrmSettingsPage() {
 
       {tab === "templates" && <TemplatesTab />}
       {tab === "imap"      && <ImapTab />}
+      {tab === "sequences" && <SequencesTab />}
+      {tab === "global"    && <GlobalSettingsTab />}
       {tab === "guide"     && <GuideTab />}
       {tab === "debug"     && <DiagnosticsTab />}
     </div>
@@ -668,6 +672,539 @@ function DiagnosticsTab() {
           </pre>
         )}
       </div>
+    </div>
+  )
+}
+
+// ─── Sequences Tab ────────────────────────────────────────────────────────────
+
+interface SequenceStep {
+  id?:                string
+  stepNumber:         number
+  delayBusinessDays:  number
+  subjectBehavior:    "same" | "re" | "new"
+  newSubject:         string | null
+  messageTemplate:    string
+  aiInstructions:     string
+  requireApproval:    boolean
+  autoSendAllowed:    boolean
+}
+
+interface Sequence {
+  id:           string
+  name:         string
+  description:  string | null
+  isActive:     boolean
+  isDefault:    boolean
+  isSystem:     boolean
+  stopOnReply:  boolean
+  stopOnCustomer: boolean
+  steps:        SequenceStep[]
+}
+
+function SequencesTab() {
+  const [sequences,  setSequences]  = useState<Sequence[]>([])
+  const [loading,    setLoading]    = useState(true)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [creating,   setCreating]   = useState(false)
+  const [editingId,  setEditingId]  = useState<string | null>(null)
+  const [saving,     setSaving]     = useState(false)
+  const [error,      setError]      = useState("")
+  const [form,       setForm]       = useState<Omit<Sequence, "id" | "isSystem">>({
+    name: "", description: "", isActive: true, isDefault: false,
+    stopOnReply: true, stopOnCustomer: true, steps: [],
+  })
+
+  async function load() {
+    setLoading(true)
+    const r = await fetch("/api/super-admin/crm/sequences")
+    const d = await r.json() as { sequences: Sequence[] }
+    setSequences(d.sequences ?? [])
+    setLoading(false)
+  }
+  useEffect(() => { void load() }, [])
+
+  function addStep() {
+    const next = (form.steps.length > 0 ? Math.max(...form.steps.map(s => s.stepNumber)) : 0) + 1
+    setForm(f => ({
+      ...f,
+      steps: [...f.steps, {
+        stepNumber: next, delayBusinessDays: 3, subjectBehavior: "same",
+        newSubject: null, messageTemplate: "", aiInstructions: "", requireApproval: true, autoSendAllowed: false,
+      }],
+    }))
+  }
+
+  function updateStep(idx: number, patch: Partial<SequenceStep>) {
+    setForm(f => ({
+      ...f,
+      steps: f.steps.map((s, i) => i === idx ? { ...s, ...patch } : s),
+    }))
+  }
+
+  function removeStep(idx: number) {
+    setForm(f => ({
+      ...f,
+      steps: f.steps.filter((_, i) => i !== idx).map((s, i) => ({ ...s, stepNumber: i + 1 })),
+    }))
+  }
+
+  function startCreate() {
+    setForm({ name: "", description: "", isActive: true, isDefault: false, stopOnReply: true, stopOnCustomer: true, steps: [] })
+    setEditingId(null); setCreating(true); setError("")
+  }
+
+  function startEdit(seq: Sequence) {
+    setForm({ name: seq.name, description: seq.description ?? "", isActive: seq.isActive, isDefault: seq.isDefault, stopOnReply: seq.stopOnReply, stopOnCustomer: seq.stopOnCustomer, steps: seq.steps })
+    setEditingId(seq.id); setCreating(false); setError("")
+  }
+
+  async function save() {
+    if (!form.name) { setError("Name required"); return }
+    setSaving(true); setError("")
+    const method = editingId ? "PATCH" : "POST"
+    const url    = editingId ? `/api/super-admin/crm/sequences/${editingId}` : "/api/super-admin/crm/sequences"
+    const r = await fetch(url, {
+      method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form),
+    })
+    setSaving(false)
+    if (r.ok) { setCreating(false); setEditingId(null); await load() }
+    else {
+      const d = await r.json() as { error?: string }
+      setError(d.error ?? "Save failed")
+    }
+  }
+
+  async function toggle(seq: Sequence) {
+    await fetch(`/api/super-admin/crm/sequences/${seq.id}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: !seq.isActive }),
+    })
+    await load()
+  }
+
+  async function del(seq: Sequence) {
+    if (!confirm(`Delete sequence "${seq.name}"? This cannot be undone.`)) return
+    const r = await fetch(`/api/super-admin/crm/sequences/${seq.id}`, { method: "DELETE" })
+    if (r.ok) await load()
+    else {
+      const d = await r.json() as { error?: string }
+      setError(d.error ?? "Delete failed")
+    }
+  }
+
+  if (loading) return <div className="text-gray-400 text-sm py-6">Loading sequences…</div>
+
+  const isFormOpen = creating || !!editingId
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-white font-semibold">Follow-Up Sequences</h2>
+          <p className="text-gray-400 text-sm mt-0.5">Templates that define how many follow-ups to send and when.</p>
+        </div>
+        {!isFormOpen && (
+          <button
+            onClick={startCreate}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            New Sequence
+          </button>
+        )}
+      </div>
+
+      {error && <p className="text-red-400 text-sm">{error}</p>}
+
+      {/* Create / Edit form */}
+      {isFormOpen && (
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-5 space-y-5">
+          <h3 className="font-semibold text-white">{editingId ? "Edit Sequence" : "New Sequence"}</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">Name *</label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                placeholder="e.g. After Demo"
+                className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">Description</label>
+              <input
+                type="text"
+                value={form.description ?? ""}
+                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                placeholder="Optional description"
+                className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6 flex-wrap">
+            {([
+              { key: "isActive",       label: "Active" },
+              { key: "isDefault",      label: "Default for new emails" },
+              { key: "stopOnReply",    label: "Stop on reply" },
+              { key: "stopOnCustomer", label: "Stop when becomes customer" },
+            ] as { key: keyof typeof form; label: string }[]).map(({ key, label }) => (
+              <label key={key} className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={!!form[key]}
+                  onChange={e => setForm(f => ({ ...f, [key]: e.target.checked }))}
+                  className="rounded"
+                />
+                <span className="text-sm text-gray-300">{label}</span>
+              </label>
+            ))}
+          </div>
+
+          {/* Steps */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-white">Steps ({form.steps.length})</h4>
+              <button
+                onClick={addStep}
+                className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Step
+              </button>
+            </div>
+            <div className="space-y-3">
+              {form.steps.map((step, idx) => (
+                <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-indigo-300">Step {step.stepNumber}</span>
+                    <button onClick={() => removeStep(idx)} className="text-gray-500 hover:text-red-400 transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Delay (business days)</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={step.delayBusinessDays}
+                        onChange={e => updateStep(idx, { delayBusinessDays: parseInt(e.target.value) || 1 })}
+                        className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Subject</label>
+                      <select
+                        value={step.subjectBehavior}
+                        onChange={e => updateStep(idx, { subjectBehavior: e.target.value as SequenceStep["subjectBehavior"] })}
+                        className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      >
+                        <option value="same">Same as original</option>
+                        <option value="re">Re: original</option>
+                        <option value="new">New subject (specify)</option>
+                      </select>
+                    </div>
+                  </div>
+                  {step.subjectBehavior === "new" && (
+                    <input
+                      type="text"
+                      value={step.newSubject ?? ""}
+                      onChange={e => updateStep(idx, { newSubject: e.target.value })}
+                      placeholder="New subject line"
+                      className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  )}
+                  <div>
+                    <label className="text-xs text-gray-400 mb-1 block">AI Instructions</label>
+                    <textarea
+                      value={step.aiInstructions}
+                      onChange={e => updateStep(idx, { aiInstructions: e.target.value })}
+                      rows={2}
+                      placeholder="e.g. Acknowledge the previous email, share a relevant case study…"
+                      className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={step.requireApproval}
+                        onChange={e => updateStep(idx, { requireApproval: e.target.checked })}
+                      />
+                      <span className="text-xs text-gray-300">Require approval</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={step.autoSendAllowed}
+                        onChange={e => updateStep(idx, { autoSendAllowed: e.target.checked })}
+                      />
+                      <span className="text-xs text-gray-300">Auto-send allowed</span>
+                    </label>
+                  </div>
+                </div>
+              ))}
+              {form.steps.length === 0 && (
+                <p className="text-gray-500 text-sm text-center py-4">No steps yet. Click "Add Step" to add the first one.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              onClick={save}
+              disabled={saving}
+              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              {saving ? "Saving…" : "Save Sequence"}
+            </button>
+            <button
+              onClick={() => { setCreating(false); setEditingId(null); setError("") }}
+              className="text-sm text-gray-400 hover:text-white px-3 py-2 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Sequences list */}
+      <div className="space-y-3">
+        {sequences.map(seq => (
+          <div key={seq.id} className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
+            <div
+              className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer hover:bg-gray-800/50"
+              onClick={() => setExpandedId(v => v === seq.id ? null : seq.id)}
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium text-white">{seq.name}</span>
+                  {seq.isDefault && (
+                    <span className="text-xs bg-indigo-900/50 text-indigo-300 border border-indigo-700/30 px-1.5 py-0.5 rounded">Default</span>
+                  )}
+                  {seq.isSystem && (
+                    <span className="text-xs bg-gray-700 text-gray-400 px-1.5 py-0.5 rounded">Built-in</span>
+                  )}
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${seq.isActive ? "bg-green-900/40 text-green-400" : "bg-gray-700 text-gray-500"}`}>
+                    {seq.isActive ? "Active" : "Inactive"}
+                  </span>
+                </div>
+                {seq.description && <p className="text-xs text-gray-500 mt-0.5">{seq.description}</p>}
+                <p className="text-xs text-gray-500 mt-1">{seq.steps.length} step{seq.steps.length !== 1 ? "s" : ""}</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
+                <button
+                  onClick={() => toggle(seq)}
+                  className="text-xs text-gray-400 hover:text-white px-2.5 py-1.5 rounded hover:bg-gray-700 transition-colors"
+                >
+                  {seq.isActive ? "Deactivate" : "Activate"}
+                </button>
+                {!seq.isSystem && (
+                  <>
+                    <button
+                      onClick={() => startEdit(seq)}
+                      className="text-gray-400 hover:text-white p-1.5 rounded hover:bg-gray-700 transition-colors"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => void del(seq)}
+                      className="text-gray-400 hover:text-red-400 p-1.5 rounded hover:bg-gray-700 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
+                {expandedId === seq.id ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+              </div>
+            </div>
+
+            {expandedId === seq.id && seq.steps.length > 0 && (
+              <div className="border-t border-gray-800 px-5 py-4">
+                <div className="space-y-2">
+                  {seq.steps.map(step => (
+                    <div key={step.stepNumber} className="flex items-start gap-4 text-sm">
+                      <div className="w-6 h-6 rounded-full bg-indigo-900/50 border border-indigo-700/40 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-xs text-indigo-300 font-bold">{step.stepNumber}</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-gray-200">
+                          +{step.delayBusinessDays} business day{step.delayBusinessDays !== 1 ? "s" : ""}
+                          {step.subjectBehavior === "new" && step.newSubject ? ` · New subject: "${step.newSubject}"` : ""}
+                        </p>
+                        {step.aiInstructions && (
+                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{step.aiInstructions}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+        {sequences.length === 0 && !loading && (
+          <p className="text-gray-500 text-sm text-center py-8">No sequences yet. Click "New Sequence" to create one.</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── Global Settings Tab ──────────────────────────────────────────────────────
+
+interface CrmGlobalSettings {
+  id:                  string
+  timezone:            string
+  sendingWindowStart:  number
+  sendingWindowEnd:    number
+  autoSendEnabled:     boolean
+}
+
+const TIMEZONES = [
+  "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles",
+  "America/Anchorage", "Pacific/Honolulu", "Europe/London", "Europe/Paris",
+  "Europe/Berlin", "Asia/Tokyo", "Asia/Singapore", "Australia/Sydney",
+]
+
+function GlobalSettingsTab() {
+  const [settings, setSettings] = useState<CrmGlobalSettings | null>(null)
+  const [loading,  setLoading]  = useState(true)
+  const [saving,   setSaving]   = useState(false)
+  const [saved,    setSaved]    = useState(false)
+  const [error,    setError]    = useState("")
+
+  async function load() {
+    setLoading(true)
+    const r = await fetch("/api/super-admin/crm/settings")
+    const d = await r.json() as { settings: CrmGlobalSettings }
+    setSettings(d.settings)
+    setLoading(false)
+  }
+  useEffect(() => { void load() }, [])
+
+  async function save() {
+    if (!settings) return
+    setSaving(true); setError(""); setSaved(false)
+    const r = await fetch("/api/super-admin/crm/settings", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        timezone:           settings.timezone,
+        sendingWindowStart: settings.sendingWindowStart,
+        sendingWindowEnd:   settings.sendingWindowEnd,
+        autoSendEnabled:    settings.autoSendEnabled,
+      }),
+    })
+    setSaving(false)
+    if (r.ok) { setSaved(true); setTimeout(() => setSaved(false), 3000) }
+    else {
+      const d = await r.json() as { error?: string }
+      setError(d.error ?? "Save failed")
+    }
+  }
+
+  if (loading || !settings) return <div className="text-gray-400 text-sm py-6">Loading…</div>
+
+  return (
+    <div className="space-y-6 max-w-lg">
+      <div>
+        <h2 className="text-white font-semibold">Global CRM Settings</h2>
+        <p className="text-gray-400 text-sm mt-0.5">
+          Controls follow-up scheduling and AI draft generation across all sequences.
+        </p>
+      </div>
+
+      {/* Timezone */}
+      <div>
+        <label className="text-sm font-medium text-gray-300 mb-2 block">CRM Timezone</label>
+        <select
+          value={settings.timezone}
+          onChange={e => setSettings(s => s ? { ...s, timezone: e.target.value } : s)}
+          className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+        >
+          {TIMEZONES.map(tz => (
+            <option key={tz} value={tz}>{tz}</option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-500 mt-1">
+          Follow-up scheduling uses this timezone. AI drafts generate at 8am in this timezone.
+        </p>
+      </div>
+
+      {/* Sending window */}
+      <div>
+        <label className="text-sm font-medium text-gray-300 mb-2 block">Sending Window</label>
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <label className="text-xs text-gray-500 mb-1 block">Start (local hour)</label>
+            <input
+              type="number"
+              min={0}
+              max={23}
+              value={settings.sendingWindowStart}
+              onChange={e => setSettings(s => s ? { ...s, sendingWindowStart: parseInt(e.target.value) || 9 } : s)}
+              className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+          <span className="text-gray-500 mt-5">→</span>
+          <div className="flex-1">
+            <label className="text-xs text-gray-500 mb-1 block">End (local hour)</label>
+            <input
+              type="number"
+              min={0}
+              max={23}
+              value={settings.sendingWindowEnd}
+              onChange={e => setSettings(s => s ? { ...s, sendingWindowEnd: parseInt(e.target.value) || 16 } : s)}
+              className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 mt-1">
+          Follow-ups are scheduled within this window (default 9–16 = 9am–4pm).
+        </p>
+      </div>
+
+      {/* Auto-send */}
+      <div className="bg-gray-900 border border-gray-700 rounded-xl p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-semibold text-white">Auto-Send Mode</h3>
+            <p className="text-xs text-gray-400 mt-1">
+              When enabled, approved follow-ups are sent automatically without manual review.
+              <strong className="text-yellow-400"> Use with caution.</strong> Default: off (Review Before Send).
+            </p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+            <input
+              type="checkbox"
+              checked={settings.autoSendEnabled}
+              onChange={e => setSettings(s => s ? { ...s, autoSendEnabled: e.target.checked } : s)}
+              className="sr-only peer"
+            />
+            <div className="w-10 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600" />
+          </label>
+        </div>
+        {settings.autoSendEnabled && (
+          <div className="mt-3 flex items-start gap-2 text-yellow-400">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <p className="text-xs">Auto-send is ON. Follow-ups will be sent without your approval. Monitor the queue regularly.</p>
+          </div>
+        )}
+      </div>
+
+      {error && <p className="text-red-400 text-sm">{error}</p>}
+
+      <button
+        onClick={save}
+        disabled={saving}
+        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+      >
+        {saved ? <CheckCircle2 className="w-4 h-4 text-green-300" /> : <Check className="w-4 h-4" />}
+        {saving ? "Saving…" : saved ? "Saved!" : "Save Settings"}
+      </button>
     </div>
   )
 }

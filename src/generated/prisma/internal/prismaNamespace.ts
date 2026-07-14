@@ -455,6 +455,11 @@ export const ModelName = {
   CrmEmail: 'CrmEmail',
   CrmEmailTemplate: 'CrmEmailTemplate',
   ImapConfig: 'ImapConfig',
+  CrmSettings: 'CrmSettings',
+  CrmSequence: 'CrmSequence',
+  CrmSequenceStep: 'CrmSequenceStep',
+  CrmEmailSequenceEnrollment: 'CrmEmailSequenceEnrollment',
+  CrmFollowUp: 'CrmFollowUp',
   Conversation: 'Conversation',
   ConversationMember: 'ConversationMember',
   ChatMessage: 'ChatMessage',
@@ -485,7 +490,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache"
+    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -5743,6 +5748,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CrmSettings: {
+      payload: Prisma.$CrmSettingsPayload<ExtArgs>
+      fields: Prisma.CrmSettingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CrmSettingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CrmSettingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>
+        }
+        findFirst: {
+          args: Prisma.CrmSettingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CrmSettingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>
+        }
+        findMany: {
+          args: Prisma.CrmSettingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>[]
+        }
+        create: {
+          args: Prisma.CrmSettingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>
+        }
+        createMany: {
+          args: Prisma.CrmSettingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CrmSettingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>[]
+        }
+        delete: {
+          args: Prisma.CrmSettingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>
+        }
+        update: {
+          args: Prisma.CrmSettingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.CrmSettingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CrmSettingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CrmSettingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.CrmSettingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSettingsPayload>
+        }
+        aggregate: {
+          args: Prisma.CrmSettingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCrmSettings>
+        }
+        groupBy: {
+          args: Prisma.CrmSettingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmSettingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CrmSettingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmSettingsCountAggregateOutputType> | number
+        }
+      }
+    }
+    CrmSequence: {
+      payload: Prisma.$CrmSequencePayload<ExtArgs>
+      fields: Prisma.CrmSequenceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CrmSequenceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CrmSequenceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>
+        }
+        findFirst: {
+          args: Prisma.CrmSequenceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CrmSequenceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>
+        }
+        findMany: {
+          args: Prisma.CrmSequenceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>[]
+        }
+        create: {
+          args: Prisma.CrmSequenceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>
+        }
+        createMany: {
+          args: Prisma.CrmSequenceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CrmSequenceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>[]
+        }
+        delete: {
+          args: Prisma.CrmSequenceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>
+        }
+        update: {
+          args: Prisma.CrmSequenceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>
+        }
+        deleteMany: {
+          args: Prisma.CrmSequenceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CrmSequenceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CrmSequenceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>[]
+        }
+        upsert: {
+          args: Prisma.CrmSequenceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequencePayload>
+        }
+        aggregate: {
+          args: Prisma.CrmSequenceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCrmSequence>
+        }
+        groupBy: {
+          args: Prisma.CrmSequenceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmSequenceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CrmSequenceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmSequenceCountAggregateOutputType> | number
+        }
+      }
+    }
+    CrmSequenceStep: {
+      payload: Prisma.$CrmSequenceStepPayload<ExtArgs>
+      fields: Prisma.CrmSequenceStepFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CrmSequenceStepFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CrmSequenceStepFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>
+        }
+        findFirst: {
+          args: Prisma.CrmSequenceStepFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CrmSequenceStepFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>
+        }
+        findMany: {
+          args: Prisma.CrmSequenceStepFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>[]
+        }
+        create: {
+          args: Prisma.CrmSequenceStepCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>
+        }
+        createMany: {
+          args: Prisma.CrmSequenceStepCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CrmSequenceStepCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>[]
+        }
+        delete: {
+          args: Prisma.CrmSequenceStepDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>
+        }
+        update: {
+          args: Prisma.CrmSequenceStepUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>
+        }
+        deleteMany: {
+          args: Prisma.CrmSequenceStepDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CrmSequenceStepUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CrmSequenceStepUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>[]
+        }
+        upsert: {
+          args: Prisma.CrmSequenceStepUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmSequenceStepPayload>
+        }
+        aggregate: {
+          args: Prisma.CrmSequenceStepAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCrmSequenceStep>
+        }
+        groupBy: {
+          args: Prisma.CrmSequenceStepGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmSequenceStepGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CrmSequenceStepCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmSequenceStepCountAggregateOutputType> | number
+        }
+      }
+    }
+    CrmEmailSequenceEnrollment: {
+      payload: Prisma.$CrmEmailSequenceEnrollmentPayload<ExtArgs>
+      fields: Prisma.CrmEmailSequenceEnrollmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CrmEmailSequenceEnrollmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CrmEmailSequenceEnrollmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>
+        }
+        findFirst: {
+          args: Prisma.CrmEmailSequenceEnrollmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CrmEmailSequenceEnrollmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>
+        }
+        findMany: {
+          args: Prisma.CrmEmailSequenceEnrollmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>[]
+        }
+        create: {
+          args: Prisma.CrmEmailSequenceEnrollmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>
+        }
+        createMany: {
+          args: Prisma.CrmEmailSequenceEnrollmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CrmEmailSequenceEnrollmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>[]
+        }
+        delete: {
+          args: Prisma.CrmEmailSequenceEnrollmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>
+        }
+        update: {
+          args: Prisma.CrmEmailSequenceEnrollmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.CrmEmailSequenceEnrollmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CrmEmailSequenceEnrollmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CrmEmailSequenceEnrollmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.CrmEmailSequenceEnrollmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmEmailSequenceEnrollmentPayload>
+        }
+        aggregate: {
+          args: Prisma.CrmEmailSequenceEnrollmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCrmEmailSequenceEnrollment>
+        }
+        groupBy: {
+          args: Prisma.CrmEmailSequenceEnrollmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmEmailSequenceEnrollmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CrmEmailSequenceEnrollmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmEmailSequenceEnrollmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    CrmFollowUp: {
+      payload: Prisma.$CrmFollowUpPayload<ExtArgs>
+      fields: Prisma.CrmFollowUpFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CrmFollowUpFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CrmFollowUpFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>
+        }
+        findFirst: {
+          args: Prisma.CrmFollowUpFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CrmFollowUpFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>
+        }
+        findMany: {
+          args: Prisma.CrmFollowUpFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>[]
+        }
+        create: {
+          args: Prisma.CrmFollowUpCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>
+        }
+        createMany: {
+          args: Prisma.CrmFollowUpCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CrmFollowUpCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>[]
+        }
+        delete: {
+          args: Prisma.CrmFollowUpDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>
+        }
+        update: {
+          args: Prisma.CrmFollowUpUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>
+        }
+        deleteMany: {
+          args: Prisma.CrmFollowUpDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CrmFollowUpUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CrmFollowUpUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>[]
+        }
+        upsert: {
+          args: Prisma.CrmFollowUpUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CrmFollowUpPayload>
+        }
+        aggregate: {
+          args: Prisma.CrmFollowUpAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCrmFollowUp>
+        }
+        groupBy: {
+          args: Prisma.CrmFollowUpGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmFollowUpGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CrmFollowUpCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CrmFollowUpCountAggregateOutputType> | number
+        }
+      }
+    }
     Conversation: {
       payload: Prisma.$ConversationPayload<ExtArgs>
       fields: Prisma.ConversationFieldRefs
@@ -8042,7 +8417,12 @@ export const DemoCallScalarFieldEnum = {
   calendlyEventId: 'calendlyEventId',
   calendlyPayload: 'calendlyPayload',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  contactRole: 'contactRole',
+  linkedInUrl: 'linkedInUrl',
+  websiteNotes: 'websiteNotes',
+  objectionNotes: 'objectionNotes',
+  featuresDiscussed: 'featuresDiscussed'
 } as const
 
 export type DemoCallScalarFieldEnum = (typeof DemoCallScalarFieldEnum)[keyof typeof DemoCallScalarFieldEnum]
@@ -8261,6 +8641,98 @@ export const ImapConfigScalarFieldEnum = {
 } as const
 
 export type ImapConfigScalarFieldEnum = (typeof ImapConfigScalarFieldEnum)[keyof typeof ImapConfigScalarFieldEnum]
+
+
+export const CrmSettingsScalarFieldEnum = {
+  id: 'id',
+  timezone: 'timezone',
+  sendingWindowStart: 'sendingWindowStart',
+  sendingWindowEnd: 'sendingWindowEnd',
+  autoSendEnabled: 'autoSendEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmSettingsScalarFieldEnum = (typeof CrmSettingsScalarFieldEnum)[keyof typeof CrmSettingsScalarFieldEnum]
+
+
+export const CrmSequenceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  isActive: 'isActive',
+  isDefault: 'isDefault',
+  isSystem: 'isSystem',
+  stopOnReply: 'stopOnReply',
+  stopOnCustomer: 'stopOnCustomer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmSequenceScalarFieldEnum = (typeof CrmSequenceScalarFieldEnum)[keyof typeof CrmSequenceScalarFieldEnum]
+
+
+export const CrmSequenceStepScalarFieldEnum = {
+  id: 'id',
+  sequenceId: 'sequenceId',
+  stepNumber: 'stepNumber',
+  delayBusinessDays: 'delayBusinessDays',
+  subjectBehavior: 'subjectBehavior',
+  newSubject: 'newSubject',
+  messageTemplate: 'messageTemplate',
+  aiInstructions: 'aiInstructions',
+  requireApproval: 'requireApproval',
+  autoSendAllowed: 'autoSendAllowed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmSequenceStepScalarFieldEnum = (typeof CrmSequenceStepScalarFieldEnum)[keyof typeof CrmSequenceStepScalarFieldEnum]
+
+
+export const CrmEmailSequenceEnrollmentScalarFieldEnum = {
+  id: 'id',
+  demoCallId: 'demoCallId',
+  sequenceId: 'sequenceId',
+  currentStep: 'currentStep',
+  status: 'status',
+  mode: 'mode',
+  stopReason: 'stopReason',
+  initialEmailId: 'initialEmailId',
+  lastEmailId: 'lastEmailId',
+  lastContactAt: 'lastContactAt',
+  nextFollowUpAt: 'nextFollowUpAt',
+  enrolledAt: 'enrolledAt',
+  stoppedAt: 'stoppedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmEmailSequenceEnrollmentScalarFieldEnum = (typeof CrmEmailSequenceEnrollmentScalarFieldEnum)[keyof typeof CrmEmailSequenceEnrollmentScalarFieldEnum]
+
+
+export const CrmFollowUpScalarFieldEnum = {
+  id: 'id',
+  enrollmentId: 'enrollmentId',
+  stepNumber: 'stepNumber',
+  status: 'status',
+  scheduledFor: 'scheduledFor',
+  snoozedUntil: 'snoozedUntil',
+  draftSubject: 'draftSubject',
+  draftBodyHtml: 'draftBodyHtml',
+  draftBodyText: 'draftBodyText',
+  approvedAt: 'approvedAt',
+  sentAt: 'sentAt',
+  emailId: 'emailId',
+  jobId: 'jobId',
+  retryCount: 'retryCount',
+  errorLog: 'errorLog',
+  aiGeneratedAt: 'aiGeneratedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmFollowUpScalarFieldEnum = (typeof CrmFollowUpScalarFieldEnum)[keyof typeof CrmFollowUpScalarFieldEnum]
 
 
 export const ConversationScalarFieldEnum = {
@@ -8945,6 +9417,11 @@ export type GlobalOmitConfig = {
   crmEmail?: Prisma.CrmEmailOmit
   crmEmailTemplate?: Prisma.CrmEmailTemplateOmit
   imapConfig?: Prisma.ImapConfigOmit
+  crmSettings?: Prisma.CrmSettingsOmit
+  crmSequence?: Prisma.CrmSequenceOmit
+  crmSequenceStep?: Prisma.CrmSequenceStepOmit
+  crmEmailSequenceEnrollment?: Prisma.CrmEmailSequenceEnrollmentOmit
+  crmFollowUp?: Prisma.CrmFollowUpOmit
   conversation?: Prisma.ConversationOmit
   conversationMember?: Prisma.ConversationMemberOmit
   chatMessage?: Prisma.ChatMessageOmit

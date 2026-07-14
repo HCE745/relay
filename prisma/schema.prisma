@@ -1539,8 +1539,15 @@ model DemoCall {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  organization Organization? @relation(fields: [organizationId], references: [id])
+  contactRole        String?
+  linkedInUrl        String?
+  websiteNotes       String?
+  objectionNotes     String?
+  featuresDiscussed  String[]
+
+  organization Organization?                @relation(fields: [organizationId], references: [id])
   crmEmails    CrmEmail[]
+  enrollments  CrmEmailSequenceEnrollment[]
 
   @@index([organizationId])
   @@index([scheduledAt])
@@ -1865,6 +1872,109 @@ model ImapConfig {
 
   superAdmin SuperAdmin @relation(fields: [superAdminId], references: [id], onDelete: Cascade)
   crmEmails  CrmEmail[]
+}
+
+// ─── CRM Sales Workflow Engine ────────────────────────────────────────────────
+
+// Singleton global CRM settings
+model CrmSettings {
+  id                 String   @id @default(cuid())
+  timezone           String   @default("America/New_York")
+  sendingWindowStart Int      @default(9)
+  sendingWindowEnd   Int      @default(16)
+  autoSendEnabled    Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+// Global reusable follow-up sequence templates
+model CrmSequence {
+  id             String                       @id @default(cuid())
+  name           String
+  description    String?
+  isActive       Boolean                      @default(true)
+  isDefault      Boolean                      @default(false)
+  isSystem       Boolean                      @default(false)
+  stopOnReply    Boolean                      @default(true)
+  stopOnCustomer Boolean                      @default(true)
+  steps          CrmSequenceStep[]
+  enrollments    CrmEmailSequenceEnrollment[]
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @updatedAt
+}
+
+// Steps within a sequence
+model CrmSequenceStep {
+  id                String      @id @default(cuid())
+  sequenceId        String
+  sequence          CrmSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  stepNumber        Int
+  delayBusinessDays Int
+  subjectBehavior   String      @default("same")
+  newSubject        String?
+  messageTemplate   String?
+  aiInstructions    String?
+  requireApproval   Boolean     @default(true)
+  autoSendAllowed   Boolean     @default(false)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@unique([sequenceId, stepNumber])
+  @@index([sequenceId])
+}
+
+// Active enrollment of a contact/DemoCall in a sequence
+model CrmEmailSequenceEnrollment {
+  id             String          @id @default(cuid())
+  demoCallId     String
+  demoCall       DemoCall        @relation(fields: [demoCallId], references: [id], onDelete: Cascade)
+  sequenceId     String
+  sequence       CrmSequence     @relation(fields: [sequenceId], references: [id])
+  currentStep    Int             @default(0)
+  status         String          @default("active")
+  mode           String          @default("review_before_send")
+  stopReason     String?
+  initialEmailId String?
+  lastEmailId    String?
+  lastContactAt  DateTime?
+  nextFollowUpAt DateTime?
+  enrolledAt     DateTime        @default(now())
+  stoppedAt      DateTime?
+  followUps      CrmFollowUp[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([demoCallId])
+  @@index([sequenceId])
+  @@index([status])
+  @@index([nextFollowUpAt])
+}
+
+// Individual scheduled follow-up tasks
+model CrmFollowUp {
+  id             String                     @id @default(cuid())
+  enrollmentId   String
+  enrollment     CrmEmailSequenceEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  stepNumber     Int
+  status         String                     @default("pending")
+  scheduledFor   DateTime?
+  snoozedUntil   DateTime?
+  draftSubject   String?
+  draftBodyHtml  String?
+  draftBodyText  String?
+  approvedAt     DateTime?
+  sentAt         DateTime?
+  emailId        String?
+  jobId          String                     @unique @default(cuid())
+  retryCount     Int                        @default(0)
+  errorLog       String?
+  aiGeneratedAt  DateTime?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+
+  @@unique([enrollmentId, stepNumber])
+  @@index([status])
+  @@index([scheduledFor])
 }
 
 // ─── In-App Messaging ─────────────────────────────────────────────────────────

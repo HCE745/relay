@@ -54,6 +54,13 @@ interface Contact {
   companyName:  string
 }
 
+interface Sequence {
+  id:        string
+  name:      string
+  isDefault: boolean
+  isActive:  boolean
+}
+
 type Filter = "all" | "inbox" | "sent"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -119,6 +126,7 @@ export default function CrmEmailPage() {
   const [emails,      setEmails]      = useState<CrmEmail[]>([])
   const [templates,   setTemplates]   = useState<Template[]>([])
   const [contacts,    setContacts]    = useState<Contact[]>([])
+  const [sequences,   setSequences]   = useState<Sequence[]>([])
   const [loading,     setLoading]     = useState(true)
   const [syncing,     setSyncing]     = useState(false)
   const [syncMsg,     setSyncMsg]     = useState("")
@@ -149,6 +157,10 @@ export default function CrmEmailPage() {
         ((d as { calls: { id: string; contactName: string; contactEmail: string; companyName: string }[] }).calls ?? [])
           .filter(c => c.contactEmail)
       ))
+      .catch(() => null)
+    fetch("/api/super-admin/crm/sequences")
+      .then(r => r.json())
+      .then(d => setSequences(((d as { sequences: Sequence[] }).sequences ?? []).filter(s => s.isActive)))
       .catch(() => null)
   }, [load])
 
@@ -295,6 +307,7 @@ export default function CrmEmailPage() {
         <ComposeModal
           templates={templates}
           contacts={contacts}
+          sequences={sequences}
           onClose={() => setComposing(false)}
           onSent={() => { setComposing(false); void load() }}
         />
@@ -552,19 +565,23 @@ function EmptyState({ onCompose }: { onCompose: () => void }) {
 
 // ─── Compose modal ────────────────────────────────────────────────────────────
 
-function ComposeModal({ templates, contacts, onClose, onSent }: {
+function ComposeModal({ templates, contacts, sequences, onClose, onSent }: {
   templates: Template[]
   contacts:  Contact[]
+  sequences: Sequence[]
   onClose:   () => void
   onSent:    () => void
 }) {
-  const [to,          setTo]          = useState("")
-  const [subject,     setSubject]     = useState("")
-  const [body,        setBody]        = useState("")
-  const [sending,     setSending]     = useState(false)
-  const [error,       setError]       = useState("")
-  const [showTpl,     setShowTpl]     = useState(false)
-  const [showContacts, setShowContacts] = useState(false)
+  const defaultSeq = sequences.find(s => s.isDefault) ?? sequences[0] ?? null
+  const [to,             setTo]             = useState("")
+  const [subject,        setSubject]        = useState("")
+  const [body,           setBody]           = useState("")
+  const [sending,        setSending]        = useState(false)
+  const [error,          setError]          = useState("")
+  const [showTpl,        setShowTpl]        = useState(false)
+  const [showContacts,   setShowContacts]   = useState(false)
+  const [selectedSeqId,  setSelectedSeqId]  = useState<string | null | undefined>(defaultSeq?.id)
+  const [followUpMode,   setFollowUpMode]   = useState("review_before_send")
 
   // Search contacts against whatever is in the To field
   const filteredContacts = contacts.filter(c =>
@@ -596,7 +613,13 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
       const res = await fetch("/api/super-admin/crm/emails", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ to: to.trim(), subject: subject.trim(), bodyHtml }),
+        body:    JSON.stringify({
+          to:           to.trim(),
+          subject:      subject.trim(),
+          bodyHtml,
+          sequenceId:   selectedSeqId ?? null,
+          followUpMode,
+        }),
       })
       if (!res.ok) {
         let msg = `Server error ${res.status}`
@@ -719,6 +742,42 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
           </div>
           <span className="text-xs text-gray-600">Apply a saved template to fill subject and body</span>
         </div>
+
+        {/* Sequence picker */}
+        {sequences.length > 0 && (
+          <div className="px-5 py-3 border-b border-gray-800 space-y-2">
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-gray-500 shrink-0">Follow-up</span>
+              <select
+                value={selectedSeqId === null ? "__none__" : (selectedSeqId ?? "")}
+                onChange={e => setSelectedSeqId(e.target.value === "__none__" ? null : e.target.value || undefined)}
+                className="flex-1 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500"
+              >
+                <option value="">— Select sequence —</option>
+                {sequences.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}{s.isDefault ? " (default)" : ""}</option>
+                ))}
+                <option value="__none__">No follow-up sequence</option>
+              </select>
+              {selectedSeqId && selectedSeqId !== null && (
+                <select
+                  value={followUpMode}
+                  onChange={e => setFollowUpMode(e.target.value)}
+                  className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="review_before_send">Review before send</option>
+                  <option value="auto_send">Auto-send</option>
+                </select>
+              )}
+            </div>
+            {selectedSeqId && selectedSeqId !== null && (
+              <p className="text-xs text-gray-600">
+                AI drafts will be generated each morning and queued for your review in{" "}
+                <a href="/super-admin/crm/follow-ups" className="text-indigo-500 hover:text-indigo-400" target="_blank" rel="noreferrer">Follow-Up Queue</a>.
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Body */}
         <textarea

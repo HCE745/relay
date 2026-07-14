@@ -5,6 +5,7 @@ import { htmlToText } from "@/lib/html-to-text"
 import { logSAAction } from "@/lib/sa-audit"
 import { decryptField } from "@/lib/crypto-utils"
 import { sendViaTitanSmtp } from "@/lib/titan-smtp"
+import { enrollInSequence, getDefaultSequence } from "@/lib/crm-sequences"
 
 async function requireSA() {
   const s = await getSession()
@@ -67,16 +68,18 @@ export async function POST(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json() as {
-      demoCallId?: string
-      to:          string
-      cc?:         string
-      subject:     string
-      bodyHtml:    string
-      inReplyTo?:  string
-      threadId?:   string
+      demoCallId?:    string
+      to:             string
+      cc?:            string
+      subject:        string
+      bodyHtml:       string
+      inReplyTo?:     string
+      threadId?:      string
+      sequenceId?:    string | null   // null = no follow-up sequence
+      followUpMode?:  string          // "manual" | "review_before_send" | "auto_send"
     }
 
-    const { to, cc, subject, bodyHtml, demoCallId, inReplyTo, threadId } = body
+    const { to, cc, subject, bodyHtml, demoCallId, inReplyTo, threadId, sequenceId, followUpMode } = body
 
     if (!to || !subject || !bodyHtml) {
       return NextResponse.json({ error: "to, subject, and bodyHtml required" }, { status: 400 })
@@ -184,6 +187,23 @@ export async function POST(req: NextRequest) {
             metadata:        { emailId: email.id, subject, to },
           },
         })
+      }
+    }
+
+    // Enroll in sequence if requested (and this is an initial outreach, not a reply)
+    if (demoCallId && sequenceId !== null && !inReplyTo) {
+      const crmSettings = await prisma.crmSettings.findFirst()
+      const resolvedSeqId = sequenceId ?? (await getDefaultSequence())?.id
+      if (resolvedSeqId) {
+        await enrollInSequence({
+          demoCallId,
+          sequenceId:         resolvedSeqId,
+          initialEmailId:     email.id,
+          mode:               followUpMode ?? "review_before_send",
+          crmTimezone:        crmSettings?.timezone           ?? "America/New_York",
+          sendingWindowStart: crmSettings?.sendingWindowStart ?? 9,
+          sendingWindowEnd:   crmSettings?.sendingWindowEnd   ?? 16,
+        }).catch(err => console.error("[crm-email] enrollment failed:", err))
       }
     }
 

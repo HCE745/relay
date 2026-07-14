@@ -122,6 +122,11 @@ export const ModelName = {
   CrmEmail: 'CrmEmail',
   CrmEmailTemplate: 'CrmEmailTemplate',
   ImapConfig: 'ImapConfig',
+  CrmSettings: 'CrmSettings',
+  CrmSequence: 'CrmSequence',
+  CrmSequenceStep: 'CrmSequenceStep',
+  CrmEmailSequenceEnrollment: 'CrmEmailSequenceEnrollment',
+  CrmFollowUp: 'CrmFollowUp',
   Conversation: 'Conversation',
   ConversationMember: 'ConversationMember',
   ChatMessage: 'ChatMessage',
@@ -1305,7 +1310,12 @@ export const DemoCallScalarFieldEnum = {
   calendlyEventId: 'calendlyEventId',
   calendlyPayload: 'calendlyPayload',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  contactRole: 'contactRole',
+  linkedInUrl: 'linkedInUrl',
+  websiteNotes: 'websiteNotes',
+  objectionNotes: 'objectionNotes',
+  featuresDiscussed: 'featuresDiscussed'
 } as const
 
 export type DemoCallScalarFieldEnum = (typeof DemoCallScalarFieldEnum)[keyof typeof DemoCallScalarFieldEnum]
@@ -1524,6 +1534,98 @@ export const ImapConfigScalarFieldEnum = {
 } as const
 
 export type ImapConfigScalarFieldEnum = (typeof ImapConfigScalarFieldEnum)[keyof typeof ImapConfigScalarFieldEnum]
+
+
+export const CrmSettingsScalarFieldEnum = {
+  id: 'id',
+  timezone: 'timezone',
+  sendingWindowStart: 'sendingWindowStart',
+  sendingWindowEnd: 'sendingWindowEnd',
+  autoSendEnabled: 'autoSendEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmSettingsScalarFieldEnum = (typeof CrmSettingsScalarFieldEnum)[keyof typeof CrmSettingsScalarFieldEnum]
+
+
+export const CrmSequenceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  isActive: 'isActive',
+  isDefault: 'isDefault',
+  isSystem: 'isSystem',
+  stopOnReply: 'stopOnReply',
+  stopOnCustomer: 'stopOnCustomer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmSequenceScalarFieldEnum = (typeof CrmSequenceScalarFieldEnum)[keyof typeof CrmSequenceScalarFieldEnum]
+
+
+export const CrmSequenceStepScalarFieldEnum = {
+  id: 'id',
+  sequenceId: 'sequenceId',
+  stepNumber: 'stepNumber',
+  delayBusinessDays: 'delayBusinessDays',
+  subjectBehavior: 'subjectBehavior',
+  newSubject: 'newSubject',
+  messageTemplate: 'messageTemplate',
+  aiInstructions: 'aiInstructions',
+  requireApproval: 'requireApproval',
+  autoSendAllowed: 'autoSendAllowed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmSequenceStepScalarFieldEnum = (typeof CrmSequenceStepScalarFieldEnum)[keyof typeof CrmSequenceStepScalarFieldEnum]
+
+
+export const CrmEmailSequenceEnrollmentScalarFieldEnum = {
+  id: 'id',
+  demoCallId: 'demoCallId',
+  sequenceId: 'sequenceId',
+  currentStep: 'currentStep',
+  status: 'status',
+  mode: 'mode',
+  stopReason: 'stopReason',
+  initialEmailId: 'initialEmailId',
+  lastEmailId: 'lastEmailId',
+  lastContactAt: 'lastContactAt',
+  nextFollowUpAt: 'nextFollowUpAt',
+  enrolledAt: 'enrolledAt',
+  stoppedAt: 'stoppedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmEmailSequenceEnrollmentScalarFieldEnum = (typeof CrmEmailSequenceEnrollmentScalarFieldEnum)[keyof typeof CrmEmailSequenceEnrollmentScalarFieldEnum]
+
+
+export const CrmFollowUpScalarFieldEnum = {
+  id: 'id',
+  enrollmentId: 'enrollmentId',
+  stepNumber: 'stepNumber',
+  status: 'status',
+  scheduledFor: 'scheduledFor',
+  snoozedUntil: 'snoozedUntil',
+  draftSubject: 'draftSubject',
+  draftBodyHtml: 'draftBodyHtml',
+  draftBodyText: 'draftBodyText',
+  approvedAt: 'approvedAt',
+  sentAt: 'sentAt',
+  emailId: 'emailId',
+  jobId: 'jobId',
+  retryCount: 'retryCount',
+  errorLog: 'errorLog',
+  aiGeneratedAt: 'aiGeneratedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CrmFollowUpScalarFieldEnum = (typeof CrmFollowUpScalarFieldEnum)[keyof typeof CrmFollowUpScalarFieldEnum]
 
 
 export const ConversationScalarFieldEnum = {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { sendEmail } from "@/lib/email"
+import { batchGenerateDueDrafts } from "@/lib/crm-ai"
 
 export async function POST(req: NextRequest) {
   const auth = req.headers.get("authorization")
@@ -60,6 +61,12 @@ export async function POST(req: NextRequest) {
       },
     })
   }
+
+  // ── Process follow-up queue: generate AI drafts for due follow-ups ────────────
+  const followUpResult = await batchGenerateDueDrafts().catch(err => {
+    console.error("[crm-digest] follow-up processing error:", err)
+    return { generated: 0, failed: 0, skipped: 0 }
+  })
 
   // Gather digest data
   const [
@@ -163,7 +170,15 @@ export async function POST(req: NextRequest) {
     <h3>Demos Scheduled Today</h3>
     <ul>${demosHtml}</ul>
 
-    <h3>Overdue Follow-ups</h3>
+    <h3>Follow-Up Queue</h3>
+    <ul>
+      <li>Drafts generated today: <b>${followUpResult.generated}</b></li>
+      <li>Failed drafts: <b>${followUpResult.failed}</b></li>
+      <li>Skipped (stop conditions): <b>${followUpResult.skipped}</b></li>
+    </ul>
+    <p><a href="https://app.getrelay.software/super-admin/crm/follow-ups">Open Follow-Up Queue →</a></p>
+
+    <h3>Overdue Follow-ups (legacy)</h3>
     <ul>${overdueHtml}</ul>
 
     <h3>Trials Expiring in 7 Days</h3>
@@ -185,8 +200,9 @@ export async function POST(req: NextRequest) {
   })
 
   return NextResponse.json({
-    ok: true,
+    ok:        true,
     expired:   expiredTrials.length,
     activated: trialStarted.length,
+    followUps: followUpResult,
   })
 }

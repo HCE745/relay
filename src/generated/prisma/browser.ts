@@ -373,6 +373,31 @@ export type CrmEmailTemplate = Prisma.CrmEmailTemplateModel
  */
 export type ImapConfig = Prisma.ImapConfigModel
 /**
+ * Model CrmSettings
+ * 
+ */
+export type CrmSettings = Prisma.CrmSettingsModel
+/**
+ * Model CrmSequence
+ * 
+ */
+export type CrmSequence = Prisma.CrmSequenceModel
+/**
+ * Model CrmSequenceStep
+ * 
+ */
+export type CrmSequenceStep = Prisma.CrmSequenceStepModel
+/**
+ * Model CrmEmailSequenceEnrollment
+ * 
+ */
+export type CrmEmailSequenceEnrollment = Prisma.CrmEmailSequenceEnrollmentModel
+/**
+ * Model CrmFollowUp
+ * 
+ */
+export type CrmFollowUp = Prisma.CrmFollowUpModel
+/**
  * Model Conversation
  * 
  */

@@ -4,6 +4,7 @@ import { LIFECYCLE_STAGES, LIFECYCLE_COLORS, LIFECYCLE_CARD_COLORS } from "@/lib
 import {
   TrendingUp, Users, DollarSign, AlertTriangle, PhoneCall, Clock,
   CheckCircle2, XCircle, BarChart3, Zap, Mail, ArrowDownLeft, Calendar, MailWarning,
+  ClipboardList,
 } from "lucide-react"
 import { CrmBackfillButton } from "@/components/super-admin/crm-backfill-button"
 import { CrmSchedulingButton, CrmSchedulingButtonFallback } from "@/components/super-admin/crm-scheduling-button"
@@ -33,6 +34,7 @@ export default async function CrmDashboardPage() {
     emailFollowUpsDue,
     emailFollowupsDueList,
     noEmailContacts,
+    followUpSummary,
   ] = await Promise.all([
     prisma.organization.groupBy({
       by:      ["lifecycleStatus"],
@@ -97,6 +99,13 @@ export default async function CrmDashboardPage() {
       orderBy: { updatedAt: "asc" },
       take:    10,
     }),
+    // Follow-up queue summary
+    Promise.all([
+      prisma.crmFollowUp.count({ where: { status: "draft_generated", enrollment: { status: "active" } } }),
+      prisma.crmFollowUp.count({ where: { status: "pending", scheduledFor: { lt: todayStart }, enrollment: { status: "active" } } }),
+      prisma.crmFollowUp.count({ where: { status: "pending", scheduledFor: { gte: todayStart, lt: todayEnd }, enrollment: { status: "active" } } }),
+      prisma.crmEmailSequenceEnrollment.count({ where: { status: "active" } }),
+    ]).then(([drafted, overdueFU, dueTodayFU, active]) => ({ drafted, overdueFU, dueTodayFU, active })),
   ])
 
   // Build a full pipeline map including 0-count stages
@@ -317,6 +326,67 @@ export default async function CrmDashboardPage() {
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+      </section>
+
+      {/* Follow-Up Queue Widget */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-indigo-400" />
+            Follow-Up Queue
+          </h2>
+          <Link href="/super-admin/crm/follow-ups"
+            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+            Open Queue →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              label: "Drafted for Review",
+              value: followUpSummary.drafted,
+              color: followUpSummary.drafted > 0 ? "bg-indigo-900/30 border-indigo-700/40 text-indigo-300" : "bg-gray-900 border-gray-700 text-gray-400",
+              badge: followUpSummary.drafted > 0 ? "Ready to send" : "None",
+            },
+            {
+              label: "Overdue",
+              value: followUpSummary.overdueFU,
+              color: followUpSummary.overdueFU > 0 ? "bg-red-900/30 border-red-700/40 text-red-300" : "bg-gray-900 border-gray-700 text-gray-400",
+              badge: followUpSummary.overdueFU > 0 ? "Past due" : "None",
+            },
+            {
+              label: "Due Today",
+              value: followUpSummary.dueTodayFU,
+              color: followUpSummary.dueTodayFU > 0 ? "bg-yellow-900/30 border-yellow-700/40 text-yellow-300" : "bg-gray-900 border-gray-700 text-gray-400",
+              badge: followUpSummary.dueTodayFU > 0 ? "Send today" : "None",
+            },
+            {
+              label: "Active Sequences",
+              value: followUpSummary.active,
+              color: "bg-gray-900 border-gray-700 text-gray-300",
+              badge: "In progress",
+            },
+          ].map(({ label, value, color, badge }) => (
+            <Link key={label} href="/super-admin/crm/follow-ups"
+              className={`border rounded-xl p-4 flex flex-col gap-2 hover:opacity-90 transition-opacity ${color}`}
+            >
+              <span className="text-xs font-medium opacity-80">{label}</span>
+              <span className="text-3xl font-bold tabular-nums">{value}</span>
+              <span className="text-xs opacity-70">{badge}</span>
+            </Link>
+          ))}
+        </div>
+        {(followUpSummary.drafted + followUpSummary.overdueFU + followUpSummary.dueTodayFU) > 0 && (
+          <div className="mt-3">
+            <Link
+              href="/super-admin/crm/follow-ups"
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              <ClipboardList className="w-4 h-4" />
+              Work Follow-Up Queue ({followUpSummary.drafted + followUpSummary.overdueFU + followUpSummary.dueTodayFU} items)
+            </Link>
           </div>
         )}
       </section>

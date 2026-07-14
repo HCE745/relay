@@ -58,6 +58,10 @@ export type DemoCallMinAggregateOutputType = {
   calendlyEventId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  contactRole: string | null
+  linkedInUrl: string | null
+  websiteNotes: string | null
+  objectionNotes: string | null
 }
 
 export type DemoCallMaxAggregateOutputType = {
@@ -82,6 +86,10 @@ export type DemoCallMaxAggregateOutputType = {
   calendlyEventId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  contactRole: string | null
+  linkedInUrl: string | null
+  websiteNotes: string | null
+  objectionNotes: string | null
 }
 
 export type DemoCallCountAggregateOutputType = {
@@ -107,6 +115,11 @@ export type DemoCallCountAggregateOutputType = {
   calendlyPayload: number
   createdAt: number
   updatedAt: number
+  contactRole: number
+  linkedInUrl: number
+  websiteNotes: number
+  objectionNotes: number
+  featuresDiscussed: number
   _all: number
 }
 
@@ -143,6 +156,10 @@ export type DemoCallMinAggregateInputType = {
   calendlyEventId?: true
   createdAt?: true
   updatedAt?: true
+  contactRole?: true
+  linkedInUrl?: true
+  websiteNotes?: true
+  objectionNotes?: true
 }
 
 export type DemoCallMaxAggregateInputType = {
@@ -167,6 +184,10 @@ export type DemoCallMaxAggregateInputType = {
   calendlyEventId?: true
   createdAt?: true
   updatedAt?: true
+  contactRole?: true
+  linkedInUrl?: true
+  websiteNotes?: true
+  objectionNotes?: true
 }
 
 export type DemoCallCountAggregateInputType = {
@@ -192,6 +213,11 @@ export type DemoCallCountAggregateInputType = {
   calendlyPayload?: true
   createdAt?: true
   updatedAt?: true
+  contactRole?: true
+  linkedInUrl?: true
+  websiteNotes?: true
+  objectionNotes?: true
+  featuresDiscussed?: true
   _all?: true
 }
 
@@ -304,6 +330,11 @@ export type DemoCallGroupByOutputType = {
   calendlyPayload: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
+  contactRole: string | null
+  linkedInUrl: string | null
+  websiteNotes: string | null
+  objectionNotes: string | null
+  featuresDiscussed: string[]
   _count: DemoCallCountAggregateOutputType | null
   _avg: DemoCallAvgAggregateOutputType | null
   _sum: DemoCallSumAggregateOutputType | null
@@ -352,8 +383,14 @@ export type DemoCallWhereInput = {
   calendlyPayload?: Prisma.JsonNullableFilter<"DemoCall">
   createdAt?: Prisma.DateTimeFilter<"DemoCall"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DemoCall"> | Date | string
+  contactRole?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  linkedInUrl?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  websiteNotes?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  objectionNotes?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  featuresDiscussed?: Prisma.StringNullableListFilter<"DemoCall">
   organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   crmEmails?: Prisma.CrmEmailListRelationFilter
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentListRelationFilter
 }
 
 export type DemoCallOrderByWithRelationInput = {
@@ -379,8 +416,14 @@ export type DemoCallOrderByWithRelationInput = {
   calendlyPayload?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  contactRole?: Prisma.SortOrderInput | Prisma.SortOrder
+  linkedInUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  websiteNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  objectionNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  featuresDiscussed?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
   crmEmails?: Prisma.CrmEmailOrderByRelationAggregateInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentOrderByRelationAggregateInput
 }
 
 export type DemoCallWhereUniqueInput = Prisma.AtLeast<{
@@ -409,8 +452,14 @@ export type DemoCallWhereUniqueInput = Prisma.AtLeast<{
   calendlyPayload?: Prisma.JsonNullableFilter<"DemoCall">
   createdAt?: Prisma.DateTimeFilter<"DemoCall"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DemoCall"> | Date | string
+  contactRole?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  linkedInUrl?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  websiteNotes?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  objectionNotes?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  featuresDiscussed?: Prisma.StringNullableListFilter<"DemoCall">
   organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   crmEmails?: Prisma.CrmEmailListRelationFilter
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentListRelationFilter
 }, "id">
 
 export type DemoCallOrderByWithAggregationInput = {
@@ -436,6 +485,11 @@ export type DemoCallOrderByWithAggregationInput = {
   calendlyPayload?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  contactRole?: Prisma.SortOrderInput | Prisma.SortOrder
+  linkedInUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  websiteNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  objectionNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  featuresDiscussed?: Prisma.SortOrder
   _count?: Prisma.DemoCallCountOrderByAggregateInput
   _avg?: Prisma.DemoCallAvgOrderByAggregateInput
   _max?: Prisma.DemoCallMaxOrderByAggregateInput
@@ -469,6 +523,11 @@ export type DemoCallScalarWhereWithAggregatesInput = {
   calendlyPayload?: Prisma.JsonNullableWithAggregatesFilter<"DemoCall">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DemoCall"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"DemoCall"> | Date | string
+  contactRole?: Prisma.StringNullableWithAggregatesFilter<"DemoCall"> | string | null
+  linkedInUrl?: Prisma.StringNullableWithAggregatesFilter<"DemoCall"> | string | null
+  websiteNotes?: Prisma.StringNullableWithAggregatesFilter<"DemoCall"> | string | null
+  objectionNotes?: Prisma.StringNullableWithAggregatesFilter<"DemoCall"> | string | null
+  featuresDiscussed?: Prisma.StringNullableListFilter<"DemoCall">
 }
 
 export type DemoCallCreateInput = {
@@ -493,8 +552,14 @@ export type DemoCallCreateInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
   organization?: Prisma.OrganizationCreateNestedOneWithoutDemoCallsInput
   crmEmails?: Prisma.CrmEmailCreateNestedManyWithoutDemoCallInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentCreateNestedManyWithoutDemoCallInput
 }
 
 export type DemoCallUncheckedCreateInput = {
@@ -520,7 +585,13 @@ export type DemoCallUncheckedCreateInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
   crmEmails?: Prisma.CrmEmailUncheckedCreateNestedManyWithoutDemoCallInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUncheckedCreateNestedManyWithoutDemoCallInput
 }
 
 export type DemoCallUpdateInput = {
@@ -545,8 +616,14 @@ export type DemoCallUpdateInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
   organization?: Prisma.OrganizationUpdateOneWithoutDemoCallsNestedInput
   crmEmails?: Prisma.CrmEmailUpdateManyWithoutDemoCallNestedInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUpdateManyWithoutDemoCallNestedInput
 }
 
 export type DemoCallUncheckedUpdateInput = {
@@ -572,7 +649,13 @@ export type DemoCallUncheckedUpdateInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
   crmEmails?: Prisma.CrmEmailUncheckedUpdateManyWithoutDemoCallNestedInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUncheckedUpdateManyWithoutDemoCallNestedInput
 }
 
 export type DemoCallCreateManyInput = {
@@ -598,6 +681,11 @@ export type DemoCallCreateManyInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
 }
 
 export type DemoCallUpdateManyMutationInput = {
@@ -622,6 +710,11 @@ export type DemoCallUpdateManyMutationInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
 }
 
 export type DemoCallUncheckedUpdateManyInput = {
@@ -647,6 +740,11 @@ export type DemoCallUncheckedUpdateManyInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
 }
 
 export type DemoCallListRelationFilter = {
@@ -682,6 +780,11 @@ export type DemoCallCountOrderByAggregateInput = {
   calendlyPayload?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  contactRole?: Prisma.SortOrder
+  linkedInUrl?: Prisma.SortOrder
+  websiteNotes?: Prisma.SortOrder
+  objectionNotes?: Prisma.SortOrder
+  featuresDiscussed?: Prisma.SortOrder
 }
 
 export type DemoCallAvgOrderByAggregateInput = {
@@ -711,6 +814,10 @@ export type DemoCallMaxOrderByAggregateInput = {
   calendlyEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  contactRole?: Prisma.SortOrder
+  linkedInUrl?: Prisma.SortOrder
+  websiteNotes?: Prisma.SortOrder
+  objectionNotes?: Prisma.SortOrder
 }
 
 export type DemoCallMinOrderByAggregateInput = {
@@ -735,6 +842,10 @@ export type DemoCallMinOrderByAggregateInput = {
   calendlyEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  contactRole?: Prisma.SortOrder
+  linkedInUrl?: Prisma.SortOrder
+  websiteNotes?: Prisma.SortOrder
+  objectionNotes?: Prisma.SortOrder
 }
 
 export type DemoCallSumOrderByAggregateInput = {
@@ -745,6 +856,11 @@ export type DemoCallSumOrderByAggregateInput = {
 export type DemoCallNullableScalarRelationFilter = {
   is?: Prisma.DemoCallWhereInput | null
   isNot?: Prisma.DemoCallWhereInput | null
+}
+
+export type DemoCallScalarRelationFilter = {
+  is?: Prisma.DemoCallWhereInput
+  isNot?: Prisma.DemoCallWhereInput
 }
 
 export type DemoCallCreateNestedManyWithoutOrganizationInput = {
@@ -789,6 +905,15 @@ export type DemoCallUncheckedUpdateManyWithoutOrganizationNestedInput = {
   deleteMany?: Prisma.DemoCallScalarWhereInput | Prisma.DemoCallScalarWhereInput[]
 }
 
+export type DemoCallCreatefeaturesDiscussedInput = {
+  set: string[]
+}
+
+export type DemoCallUpdatefeaturesDiscussedInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type DemoCallCreateNestedOneWithoutCrmEmailsInput = {
   create?: Prisma.XOR<Prisma.DemoCallCreateWithoutCrmEmailsInput, Prisma.DemoCallUncheckedCreateWithoutCrmEmailsInput>
   connectOrCreate?: Prisma.DemoCallCreateOrConnectWithoutCrmEmailsInput
@@ -803,6 +928,20 @@ export type DemoCallUpdateOneWithoutCrmEmailsNestedInput = {
   delete?: Prisma.DemoCallWhereInput | boolean
   connect?: Prisma.DemoCallWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.DemoCallUpdateToOneWithWhereWithoutCrmEmailsInput, Prisma.DemoCallUpdateWithoutCrmEmailsInput>, Prisma.DemoCallUncheckedUpdateWithoutCrmEmailsInput>
+}
+
+export type DemoCallCreateNestedOneWithoutEnrollmentsInput = {
+  create?: Prisma.XOR<Prisma.DemoCallCreateWithoutEnrollmentsInput, Prisma.DemoCallUncheckedCreateWithoutEnrollmentsInput>
+  connectOrCreate?: Prisma.DemoCallCreateOrConnectWithoutEnrollmentsInput
+  connect?: Prisma.DemoCallWhereUniqueInput
+}
+
+export type DemoCallUpdateOneRequiredWithoutEnrollmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.DemoCallCreateWithoutEnrollmentsInput, Prisma.DemoCallUncheckedCreateWithoutEnrollmentsInput>
+  connectOrCreate?: Prisma.DemoCallCreateOrConnectWithoutEnrollmentsInput
+  upsert?: Prisma.DemoCallUpsertWithoutEnrollmentsInput
+  connect?: Prisma.DemoCallWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DemoCallUpdateToOneWithWhereWithoutEnrollmentsInput, Prisma.DemoCallUpdateWithoutEnrollmentsInput>, Prisma.DemoCallUncheckedUpdateWithoutEnrollmentsInput>
 }
 
 export type DemoCallCreateWithoutOrganizationInput = {
@@ -827,7 +966,13 @@ export type DemoCallCreateWithoutOrganizationInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
   crmEmails?: Prisma.CrmEmailCreateNestedManyWithoutDemoCallInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentCreateNestedManyWithoutDemoCallInput
 }
 
 export type DemoCallUncheckedCreateWithoutOrganizationInput = {
@@ -852,7 +997,13 @@ export type DemoCallUncheckedCreateWithoutOrganizationInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
   crmEmails?: Prisma.CrmEmailUncheckedCreateNestedManyWithoutDemoCallInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUncheckedCreateNestedManyWithoutDemoCallInput
 }
 
 export type DemoCallCreateOrConnectWithoutOrganizationInput = {
@@ -907,6 +1058,11 @@ export type DemoCallScalarWhereInput = {
   calendlyPayload?: Prisma.JsonNullableFilter<"DemoCall">
   createdAt?: Prisma.DateTimeFilter<"DemoCall"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DemoCall"> | Date | string
+  contactRole?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  linkedInUrl?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  websiteNotes?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  objectionNotes?: Prisma.StringNullableFilter<"DemoCall"> | string | null
+  featuresDiscussed?: Prisma.StringNullableListFilter<"DemoCall">
 }
 
 export type DemoCallCreateWithoutCrmEmailsInput = {
@@ -931,7 +1087,13 @@ export type DemoCallCreateWithoutCrmEmailsInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
   organization?: Prisma.OrganizationCreateNestedOneWithoutDemoCallsInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentCreateNestedManyWithoutDemoCallInput
 }
 
 export type DemoCallUncheckedCreateWithoutCrmEmailsInput = {
@@ -957,6 +1119,12 @@ export type DemoCallUncheckedCreateWithoutCrmEmailsInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUncheckedCreateNestedManyWithoutDemoCallInput
 }
 
 export type DemoCallCreateOrConnectWithoutCrmEmailsInput = {
@@ -997,7 +1165,13 @@ export type DemoCallUpdateWithoutCrmEmailsInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
   organization?: Prisma.OrganizationUpdateOneWithoutDemoCallsNestedInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUpdateManyWithoutDemoCallNestedInput
 }
 
 export type DemoCallUncheckedUpdateWithoutCrmEmailsInput = {
@@ -1023,6 +1197,152 @@ export type DemoCallUncheckedUpdateWithoutCrmEmailsInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUncheckedUpdateManyWithoutDemoCallNestedInput
+}
+
+export type DemoCallCreateWithoutEnrollmentsInput = {
+  id?: string
+  contactName: string
+  contactEmail: string
+  contactPhone?: string | null
+  companyName: string
+  industry?: string | null
+  employeeCount?: number | null
+  locationCount?: number | null
+  leadSource?: string
+  scheduledAt?: Date | string | null
+  callStatus?: string
+  callNotes?: string | null
+  painPoints?: string | null
+  followUpDate?: Date | string | null
+  followUpCompleted?: boolean
+  outcome?: string | null
+  createdBySAName: string
+  calendlyEventId?: string | null
+  calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
+  organization?: Prisma.OrganizationCreateNestedOneWithoutDemoCallsInput
+  crmEmails?: Prisma.CrmEmailCreateNestedManyWithoutDemoCallInput
+}
+
+export type DemoCallUncheckedCreateWithoutEnrollmentsInput = {
+  id?: string
+  contactName: string
+  contactEmail: string
+  contactPhone?: string | null
+  companyName: string
+  industry?: string | null
+  employeeCount?: number | null
+  locationCount?: number | null
+  leadSource?: string
+  scheduledAt?: Date | string | null
+  callStatus?: string
+  callNotes?: string | null
+  painPoints?: string | null
+  followUpDate?: Date | string | null
+  followUpCompleted?: boolean
+  outcome?: string | null
+  organizationId?: string | null
+  createdBySAName: string
+  calendlyEventId?: string | null
+  calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
+  crmEmails?: Prisma.CrmEmailUncheckedCreateNestedManyWithoutDemoCallInput
+}
+
+export type DemoCallCreateOrConnectWithoutEnrollmentsInput = {
+  where: Prisma.DemoCallWhereUniqueInput
+  create: Prisma.XOR<Prisma.DemoCallCreateWithoutEnrollmentsInput, Prisma.DemoCallUncheckedCreateWithoutEnrollmentsInput>
+}
+
+export type DemoCallUpsertWithoutEnrollmentsInput = {
+  update: Prisma.XOR<Prisma.DemoCallUpdateWithoutEnrollmentsInput, Prisma.DemoCallUncheckedUpdateWithoutEnrollmentsInput>
+  create: Prisma.XOR<Prisma.DemoCallCreateWithoutEnrollmentsInput, Prisma.DemoCallUncheckedCreateWithoutEnrollmentsInput>
+  where?: Prisma.DemoCallWhereInput
+}
+
+export type DemoCallUpdateToOneWithWhereWithoutEnrollmentsInput = {
+  where?: Prisma.DemoCallWhereInput
+  data: Prisma.XOR<Prisma.DemoCallUpdateWithoutEnrollmentsInput, Prisma.DemoCallUncheckedUpdateWithoutEnrollmentsInput>
+}
+
+export type DemoCallUpdateWithoutEnrollmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  contactName?: Prisma.StringFieldUpdateOperationsInput | string
+  contactEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  leadSource?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  callNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  painPoints?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdBySAName?: Prisma.StringFieldUpdateOperationsInput | string
+  calendlyEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
+  organization?: Prisma.OrganizationUpdateOneWithoutDemoCallsNestedInput
+  crmEmails?: Prisma.CrmEmailUpdateManyWithoutDemoCallNestedInput
+}
+
+export type DemoCallUncheckedUpdateWithoutEnrollmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  contactName?: Prisma.StringFieldUpdateOperationsInput | string
+  contactEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  leadSource?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  callNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  painPoints?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  followUpDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  followUpCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdBySAName?: Prisma.StringFieldUpdateOperationsInput | string
+  calendlyEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
+  crmEmails?: Prisma.CrmEmailUncheckedUpdateManyWithoutDemoCallNestedInput
 }
 
 export type DemoCallCreateManyOrganizationInput = {
@@ -1047,6 +1367,11 @@ export type DemoCallCreateManyOrganizationInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  contactRole?: string | null
+  linkedInUrl?: string | null
+  websiteNotes?: string | null
+  objectionNotes?: string | null
+  featuresDiscussed?: Prisma.DemoCallCreatefeaturesDiscussedInput | string[]
 }
 
 export type DemoCallUpdateWithoutOrganizationInput = {
@@ -1071,7 +1396,13 @@ export type DemoCallUpdateWithoutOrganizationInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
   crmEmails?: Prisma.CrmEmailUpdateManyWithoutDemoCallNestedInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUpdateManyWithoutDemoCallNestedInput
 }
 
 export type DemoCallUncheckedUpdateWithoutOrganizationInput = {
@@ -1096,7 +1427,13 @@ export type DemoCallUncheckedUpdateWithoutOrganizationInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
   crmEmails?: Prisma.CrmEmailUncheckedUpdateManyWithoutDemoCallNestedInput
+  enrollments?: Prisma.CrmEmailSequenceEnrollmentUncheckedUpdateManyWithoutDemoCallNestedInput
 }
 
 export type DemoCallUncheckedUpdateManyWithoutOrganizationInput = {
@@ -1121,6 +1458,11 @@ export type DemoCallUncheckedUpdateManyWithoutOrganizationInput = {
   calendlyPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contactRole?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkedInUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  objectionNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuresDiscussed?: Prisma.DemoCallUpdatefeaturesDiscussedInput | string[]
 }
 
 
@@ -1130,10 +1472,12 @@ export type DemoCallUncheckedUpdateManyWithoutOrganizationInput = {
 
 export type DemoCallCountOutputType = {
   crmEmails: number
+  enrollments: number
 }
 
 export type DemoCallCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   crmEmails?: boolean | DemoCallCountOutputTypeCountCrmEmailsArgs
+  enrollments?: boolean | DemoCallCountOutputTypeCountEnrollmentsArgs
 }
 
 /**
@@ -1151,6 +1495,13 @@ export type DemoCallCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ext
  */
 export type DemoCallCountOutputTypeCountCrmEmailsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CrmEmailWhereInput
+}
+
+/**
+ * DemoCallCountOutputType without action
+ */
+export type DemoCallCountOutputTypeCountEnrollmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CrmEmailSequenceEnrollmentWhereInput
 }
 
 
@@ -1177,8 +1528,14 @@ export type DemoCallSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   calendlyPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  contactRole?: boolean
+  linkedInUrl?: boolean
+  websiteNotes?: boolean
+  objectionNotes?: boolean
+  featuresDiscussed?: boolean
   organization?: boolean | Prisma.DemoCall$organizationArgs<ExtArgs>
   crmEmails?: boolean | Prisma.DemoCall$crmEmailsArgs<ExtArgs>
+  enrollments?: boolean | Prisma.DemoCall$enrollmentsArgs<ExtArgs>
   _count?: boolean | Prisma.DemoCallCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["demoCall"]>
 
@@ -1205,6 +1562,11 @@ export type DemoCallSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   calendlyPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  contactRole?: boolean
+  linkedInUrl?: boolean
+  websiteNotes?: boolean
+  objectionNotes?: boolean
+  featuresDiscussed?: boolean
   organization?: boolean | Prisma.DemoCall$organizationArgs<ExtArgs>
 }, ExtArgs["result"]["demoCall"]>
 
@@ -1231,6 +1593,11 @@ export type DemoCallSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   calendlyPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  contactRole?: boolean
+  linkedInUrl?: boolean
+  websiteNotes?: boolean
+  objectionNotes?: boolean
+  featuresDiscussed?: boolean
   organization?: boolean | Prisma.DemoCall$organizationArgs<ExtArgs>
 }, ExtArgs["result"]["demoCall"]>
 
@@ -1257,12 +1624,18 @@ export type DemoCallSelectScalar = {
   calendlyPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  contactRole?: boolean
+  linkedInUrl?: boolean
+  websiteNotes?: boolean
+  objectionNotes?: boolean
+  featuresDiscussed?: boolean
 }
 
-export type DemoCallOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "contactName" | "contactEmail" | "contactPhone" | "companyName" | "industry" | "employeeCount" | "locationCount" | "leadSource" | "scheduledAt" | "callStatus" | "callNotes" | "painPoints" | "followUpDate" | "followUpCompleted" | "outcome" | "organizationId" | "createdBySAName" | "calendlyEventId" | "calendlyPayload" | "createdAt" | "updatedAt", ExtArgs["result"]["demoCall"]>
+export type DemoCallOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "contactName" | "contactEmail" | "contactPhone" | "companyName" | "industry" | "employeeCount" | "locationCount" | "leadSource" | "scheduledAt" | "callStatus" | "callNotes" | "painPoints" | "followUpDate" | "followUpCompleted" | "outcome" | "organizationId" | "createdBySAName" | "calendlyEventId" | "calendlyPayload" | "createdAt" | "updatedAt" | "contactRole" | "linkedInUrl" | "websiteNotes" | "objectionNotes" | "featuresDiscussed", ExtArgs["result"]["demoCall"]>
 export type DemoCallInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.DemoCall$organizationArgs<ExtArgs>
   crmEmails?: boolean | Prisma.DemoCall$crmEmailsArgs<ExtArgs>
+  enrollments?: boolean | Prisma.DemoCall$enrollmentsArgs<ExtArgs>
   _count?: boolean | Prisma.DemoCallCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DemoCallIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1277,6 +1650,7 @@ export type $DemoCallPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     organization: Prisma.$OrganizationPayload<ExtArgs> | null
     crmEmails: Prisma.$CrmEmailPayload<ExtArgs>[]
+    enrollments: Prisma.$CrmEmailSequenceEnrollmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1301,6 +1675,11 @@ export type $DemoCallPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     calendlyPayload: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
+    contactRole: string | null
+    linkedInUrl: string | null
+    websiteNotes: string | null
+    objectionNotes: string | null
+    featuresDiscussed: string[]
   }, ExtArgs["result"]["demoCall"]>
   composites: {}
 }
@@ -1697,6 +2076,7 @@ export interface Prisma__DemoCallClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organization<T extends Prisma.DemoCall$organizationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DemoCall$organizationArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   crmEmails<T extends Prisma.DemoCall$crmEmailsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DemoCall$crmEmailsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CrmEmailPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  enrollments<T extends Prisma.DemoCall$enrollmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DemoCall$enrollmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CrmEmailSequenceEnrollmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1748,6 +2128,11 @@ export interface DemoCallFieldRefs {
   readonly calendlyPayload: Prisma.FieldRef<"DemoCall", 'Json'>
   readonly createdAt: Prisma.FieldRef<"DemoCall", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"DemoCall", 'DateTime'>
+  readonly contactRole: Prisma.FieldRef<"DemoCall", 'String'>
+  readonly linkedInUrl: Prisma.FieldRef<"DemoCall", 'String'>
+  readonly websiteNotes: Prisma.FieldRef<"DemoCall", 'String'>
+  readonly objectionNotes: Prisma.FieldRef<"DemoCall", 'String'>
+  readonly featuresDiscussed: Prisma.FieldRef<"DemoCall", 'String[]'>
 }
     
 
@@ -2189,6 +2574,30 @@ export type DemoCall$crmEmailsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.CrmEmailScalarFieldEnum | Prisma.CrmEmailScalarFieldEnum[]
+}
+
+/**
+ * DemoCall.enrollments
+ */
+export type DemoCall$enrollmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CrmEmailSequenceEnrollment
+   */
+  select?: Prisma.CrmEmailSequenceEnrollmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CrmEmailSequenceEnrollment
+   */
+  omit?: Prisma.CrmEmailSequenceEnrollmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CrmEmailSequenceEnrollmentInclude<ExtArgs> | null
+  where?: Prisma.CrmEmailSequenceEnrollmentWhereInput
+  orderBy?: Prisma.CrmEmailSequenceEnrollmentOrderByWithRelationInput | Prisma.CrmEmailSequenceEnrollmentOrderByWithRelationInput[]
+  cursor?: Prisma.CrmEmailSequenceEnrollmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CrmEmailSequenceEnrollmentScalarFieldEnum | Prisma.CrmEmailSequenceEnrollmentScalarFieldEnum[]
 }
 
 /**

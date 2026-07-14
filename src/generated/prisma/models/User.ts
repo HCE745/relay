@@ -357,6 +357,7 @@ export type UserWhereInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastListRelationFilter
   emergencyAcks?: Prisma.EmergencyAcknowledgmentListRelationFilter
   dailyBriefings?: Prisma.DailyBriefingCacheListRelationFilter
+  referralsInitiated?: Prisma.ReferralListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -428,6 +429,7 @@ export type UserOrderByWithRelationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastOrderByRelationAggregateInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentOrderByRelationAggregateInput
   dailyBriefings?: Prisma.DailyBriefingCacheOrderByRelationAggregateInput
+  referralsInitiated?: Prisma.ReferralOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -502,6 +504,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastListRelationFilter
   emergencyAcks?: Prisma.EmergencyAcknowledgmentListRelationFilter
   dailyBriefings?: Prisma.DailyBriefingCacheListRelationFilter
+  referralsInitiated?: Prisma.ReferralListRelationFilter
 }, "id" | "email" | "calendarToken">
 
 export type UserOrderByWithAggregationInput = {
@@ -621,6 +624,7 @@ export type UserCreateInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -686,6 +690,7 @@ export type UserUncheckedCreateInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUpdateInput = {
@@ -751,6 +756,7 @@ export type UserUpdateInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -816,6 +822,7 @@ export type UserUncheckedUpdateInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1612,6 +1619,22 @@ export type UserUpdateOneRequiredWithoutDeviceTokensNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeviceTokensInput, Prisma.UserUpdateWithoutDeviceTokensInput>, Prisma.UserUncheckedUpdateWithoutDeviceTokensInput>
 }
 
+export type UserCreateNestedOneWithoutReferralsInitiatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralsInitiatedInput, Prisma.UserUncheckedCreateWithoutReferralsInitiatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralsInitiatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutReferralsInitiatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralsInitiatedInput, Prisma.UserUncheckedCreateWithoutReferralsInitiatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralsInitiatedInput
+  upsert?: Prisma.UserUpsertWithoutReferralsInitiatedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReferralsInitiatedInput, Prisma.UserUpdateWithoutReferralsInitiatedInput>, Prisma.UserUncheckedUpdateWithoutReferralsInitiatedInput>
+}
+
 export type UserCreateNestedOneWithoutConversationsCreatedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutConversationsCreatedInput, Prisma.UserUncheckedCreateWithoutConversationsCreatedInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationsCreatedInput
@@ -1890,6 +1913,7 @@ export type UserCreateWithoutOrganizationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutOrganizationInput = {
@@ -1954,6 +1978,7 @@ export type UserUncheckedCreateWithoutOrganizationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutOrganizationInput = {
@@ -2071,6 +2096,7 @@ export type UserCreateWithoutDirectReportsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutDirectReportsInput = {
@@ -2135,6 +2161,7 @@ export type UserUncheckedCreateWithoutDirectReportsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutDirectReportsInput = {
@@ -2204,6 +2231,7 @@ export type UserCreateWithoutManagerInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutManagerInput = {
@@ -2268,6 +2296,7 @@ export type UserUncheckedCreateWithoutManagerInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutManagerInput = {
@@ -2353,6 +2382,7 @@ export type UserUpdateWithoutDirectReportsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDirectReportsInput = {
@@ -2417,6 +2447,7 @@ export type UserUncheckedUpdateWithoutDirectReportsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutManagerInput = {
@@ -2497,6 +2528,7 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -2561,6 +2593,7 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -2641,6 +2674,7 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -2705,6 +2739,7 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutSafetyContactAtInput = {
@@ -2769,6 +2804,7 @@ export type UserCreateWithoutSafetyContactAtInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutSafetyContactAtInput = {
@@ -2833,6 +2869,7 @@ export type UserUncheckedCreateWithoutSafetyContactAtInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutSafetyContactAtInput = {
@@ -2902,6 +2939,7 @@ export type UserCreateWithoutLocationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutLocationInput = {
@@ -2966,6 +3004,7 @@ export type UserUncheckedCreateWithoutLocationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutLocationInput = {
@@ -3051,6 +3090,7 @@ export type UserUpdateWithoutSafetyContactAtInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSafetyContactAtInput = {
@@ -3115,6 +3155,7 @@ export type UserUncheckedUpdateWithoutSafetyContactAtInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutLocationInput = {
@@ -3195,6 +3236,7 @@ export type UserCreateWithoutDepartmentInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutDepartmentInput = {
@@ -3259,6 +3301,7 @@ export type UserUncheckedCreateWithoutDepartmentInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutDepartmentInput = {
@@ -3349,6 +3392,7 @@ export type UserCreateWithoutReportedIssuesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedIssuesInput = {
@@ -3413,6 +3457,7 @@ export type UserUncheckedCreateWithoutReportedIssuesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedIssuesInput = {
@@ -3482,6 +3527,7 @@ export type UserCreateWithoutAssignedIssuesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedIssuesInput = {
@@ -3546,6 +3592,7 @@ export type UserUncheckedCreateWithoutAssignedIssuesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedIssuesInput = {
@@ -3626,6 +3673,7 @@ export type UserUpdateWithoutReportedIssuesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedIssuesInput = {
@@ -3690,6 +3738,7 @@ export type UserUncheckedUpdateWithoutReportedIssuesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUpsertWithoutAssignedIssuesInput = {
@@ -3765,6 +3814,7 @@ export type UserUpdateWithoutAssignedIssuesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedIssuesInput = {
@@ -3829,6 +3879,7 @@ export type UserUncheckedUpdateWithoutAssignedIssuesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -3893,6 +3944,7 @@ export type UserCreateWithoutCommentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -3957,6 +4009,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -4037,6 +4090,7 @@ export type UserUpdateWithoutCommentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -4101,6 +4155,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -4165,6 +4220,7 @@ export type UserCreateWithoutNotificationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -4229,6 +4285,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -4309,6 +4366,7 @@ export type UserUpdateWithoutNotificationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -4373,6 +4431,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutRoutingRulesInput = {
@@ -4437,6 +4496,7 @@ export type UserCreateWithoutRoutingRulesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutRoutingRulesInput = {
@@ -4501,6 +4561,7 @@ export type UserUncheckedCreateWithoutRoutingRulesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutRoutingRulesInput = {
@@ -4581,6 +4642,7 @@ export type UserUpdateWithoutRoutingRulesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoutingRulesInput = {
@@ -4645,6 +4707,7 @@ export type UserUncheckedUpdateWithoutRoutingRulesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutSuggestionsInput = {
@@ -4709,6 +4772,7 @@ export type UserCreateWithoutSuggestionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutSuggestionsInput = {
@@ -4773,6 +4837,7 @@ export type UserUncheckedCreateWithoutSuggestionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutSuggestionsInput = {
@@ -4842,6 +4907,7 @@ export type UserCreateWithoutRoutedSuggestionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutRoutedSuggestionsInput = {
@@ -4906,6 +4972,7 @@ export type UserUncheckedCreateWithoutRoutedSuggestionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutRoutedSuggestionsInput = {
@@ -4986,6 +5053,7 @@ export type UserUpdateWithoutSuggestionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSuggestionsInput = {
@@ -5050,6 +5118,7 @@ export type UserUncheckedUpdateWithoutSuggestionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUpsertWithoutRoutedSuggestionsInput = {
@@ -5125,6 +5194,7 @@ export type UserUpdateWithoutRoutedSuggestionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoutedSuggestionsInput = {
@@ -5189,6 +5259,7 @@ export type UserUncheckedUpdateWithoutRoutedSuggestionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutSentInvitationsInput = {
@@ -5253,6 +5324,7 @@ export type UserCreateWithoutSentInvitationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutSentInvitationsInput = {
@@ -5317,6 +5389,7 @@ export type UserUncheckedCreateWithoutSentInvitationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutSentInvitationsInput = {
@@ -5397,6 +5470,7 @@ export type UserUpdateWithoutSentInvitationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentInvitationsInput = {
@@ -5461,6 +5535,7 @@ export type UserUncheckedUpdateWithoutSentInvitationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutAssignedLocationsInput = {
@@ -5525,6 +5600,7 @@ export type UserCreateWithoutAssignedLocationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedLocationsInput = {
@@ -5589,6 +5665,7 @@ export type UserUncheckedCreateWithoutAssignedLocationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedLocationsInput = {
@@ -5669,6 +5746,7 @@ export type UserUpdateWithoutAssignedLocationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedLocationsInput = {
@@ -5733,6 +5811,7 @@ export type UserUncheckedUpdateWithoutAssignedLocationsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutEmployeeTypeInput = {
@@ -5797,6 +5876,7 @@ export type UserCreateWithoutEmployeeTypeInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutEmployeeTypeInput = {
@@ -5861,6 +5941,7 @@ export type UserUncheckedCreateWithoutEmployeeTypeInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutEmployeeTypeInput = {
@@ -5951,6 +6032,7 @@ export type UserCreateWithoutUserSettingsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutUserSettingsInput = {
@@ -6015,6 +6097,7 @@ export type UserUncheckedCreateWithoutUserSettingsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutUserSettingsInput = {
@@ -6095,6 +6178,7 @@ export type UserUpdateWithoutUserSettingsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserSettingsInput = {
@@ -6159,6 +6243,7 @@ export type UserUncheckedUpdateWithoutUserSettingsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedTemplatesInput = {
@@ -6223,6 +6308,7 @@ export type UserCreateWithoutCreatedTemplatesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedTemplatesInput = {
@@ -6287,6 +6373,7 @@ export type UserUncheckedCreateWithoutCreatedTemplatesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedTemplatesInput = {
@@ -6367,6 +6454,7 @@ export type UserUpdateWithoutCreatedTemplatesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedTemplatesInput = {
@@ -6431,6 +6519,7 @@ export type UserUncheckedUpdateWithoutCreatedTemplatesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutMaintenanceSchedulesInput = {
@@ -6495,6 +6584,7 @@ export type UserCreateWithoutMaintenanceSchedulesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutMaintenanceSchedulesInput = {
@@ -6559,6 +6649,7 @@ export type UserUncheckedCreateWithoutMaintenanceSchedulesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutMaintenanceSchedulesInput = {
@@ -6639,6 +6730,7 @@ export type UserUpdateWithoutMaintenanceSchedulesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMaintenanceSchedulesInput = {
@@ -6703,6 +6795,7 @@ export type UserUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutSubmittedPurchaseRequestsInput = {
@@ -6767,6 +6860,7 @@ export type UserCreateWithoutSubmittedPurchaseRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutSubmittedPurchaseRequestsInput = {
@@ -6831,6 +6925,7 @@ export type UserUncheckedCreateWithoutSubmittedPurchaseRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutSubmittedPurchaseRequestsInput = {
@@ -6900,6 +6995,7 @@ export type UserCreateWithoutApprovedPurchaseRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutApprovedPurchaseRequestsInput = {
@@ -6964,6 +7060,7 @@ export type UserUncheckedCreateWithoutApprovedPurchaseRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutApprovedPurchaseRequestsInput = {
@@ -7044,6 +7141,7 @@ export type UserUpdateWithoutSubmittedPurchaseRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubmittedPurchaseRequestsInput = {
@@ -7108,6 +7206,7 @@ export type UserUncheckedUpdateWithoutSubmittedPurchaseRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUpsertWithoutApprovedPurchaseRequestsInput = {
@@ -7183,6 +7282,7 @@ export type UserUpdateWithoutApprovedPurchaseRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApprovedPurchaseRequestsInput = {
@@ -7247,6 +7347,7 @@ export type UserUncheckedUpdateWithoutApprovedPurchaseRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutPurchaseRequestApprovalsInput = {
@@ -7311,6 +7412,7 @@ export type UserCreateWithoutPurchaseRequestApprovalsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutPurchaseRequestApprovalsInput = {
@@ -7375,6 +7477,7 @@ export type UserUncheckedCreateWithoutPurchaseRequestApprovalsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutPurchaseRequestApprovalsInput = {
@@ -7455,6 +7558,7 @@ export type UserUpdateWithoutPurchaseRequestApprovalsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPurchaseRequestApprovalsInput = {
@@ -7519,6 +7623,7 @@ export type UserUncheckedUpdateWithoutPurchaseRequestApprovalsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutReportedInjuriesInput = {
@@ -7583,6 +7688,7 @@ export type UserCreateWithoutReportedInjuriesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedInjuriesInput = {
@@ -7647,6 +7753,7 @@ export type UserUncheckedCreateWithoutReportedInjuriesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedInjuriesInput = {
@@ -7716,6 +7823,7 @@ export type UserCreateWithoutReviewedInjuriesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewedInjuriesInput = {
@@ -7780,6 +7888,7 @@ export type UserUncheckedCreateWithoutReviewedInjuriesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewedInjuriesInput = {
@@ -7860,6 +7969,7 @@ export type UserUpdateWithoutReportedInjuriesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedInjuriesInput = {
@@ -7924,6 +8034,7 @@ export type UserUncheckedUpdateWithoutReportedInjuriesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUpsertWithoutReviewedInjuriesInput = {
@@ -7999,6 +8110,7 @@ export type UserUpdateWithoutReviewedInjuriesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewedInjuriesInput = {
@@ -8063,6 +8175,7 @@ export type UserUncheckedUpdateWithoutReviewedInjuriesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutBugReportsInput = {
@@ -8127,6 +8240,7 @@ export type UserCreateWithoutBugReportsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutBugReportsInput = {
@@ -8191,6 +8305,7 @@ export type UserUncheckedCreateWithoutBugReportsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutBugReportsInput = {
@@ -8271,6 +8386,7 @@ export type UserUpdateWithoutBugReportsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBugReportsInput = {
@@ -8335,6 +8451,7 @@ export type UserUncheckedUpdateWithoutBugReportsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutFeatureRequestsInput = {
@@ -8399,6 +8516,7 @@ export type UserCreateWithoutFeatureRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutFeatureRequestsInput = {
@@ -8463,6 +8581,7 @@ export type UserUncheckedCreateWithoutFeatureRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutFeatureRequestsInput = {
@@ -8543,6 +8662,7 @@ export type UserUpdateWithoutFeatureRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFeatureRequestsInput = {
@@ -8607,6 +8727,7 @@ export type UserUncheckedUpdateWithoutFeatureRequestsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutRegionInput = {
@@ -8671,6 +8792,7 @@ export type UserCreateWithoutRegionInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutRegionInput = {
@@ -8735,6 +8857,7 @@ export type UserUncheckedCreateWithoutRegionInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutRegionInput = {
@@ -8825,6 +8948,7 @@ export type UserCreateWithoutAssignedQrCodesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedQrCodesInput = {
@@ -8889,6 +9013,7 @@ export type UserUncheckedCreateWithoutAssignedQrCodesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedQrCodesInput = {
@@ -8969,6 +9094,7 @@ export type UserUpdateWithoutAssignedQrCodesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedQrCodesInput = {
@@ -9033,6 +9159,7 @@ export type UserUncheckedUpdateWithoutAssignedQrCodesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutUserOrgMembershipsInput = {
@@ -9097,6 +9224,7 @@ export type UserCreateWithoutUserOrgMembershipsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutUserOrgMembershipsInput = {
@@ -9161,6 +9289,7 @@ export type UserUncheckedCreateWithoutUserOrgMembershipsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutUserOrgMembershipsInput = {
@@ -9241,6 +9370,7 @@ export type UserUpdateWithoutUserOrgMembershipsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserOrgMembershipsInput = {
@@ -9305,6 +9435,7 @@ export type UserUncheckedUpdateWithoutUserOrgMembershipsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutLegalAcceptancesInput = {
@@ -9369,6 +9500,7 @@ export type UserCreateWithoutLegalAcceptancesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
@@ -9433,6 +9565,7 @@ export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutLegalAcceptancesInput = {
@@ -9513,6 +9646,7 @@ export type UserUpdateWithoutLegalAcceptancesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
@@ -9577,6 +9711,7 @@ export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutDeviceTokensInput = {
@@ -9641,6 +9776,7 @@ export type UserCreateWithoutDeviceTokensInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeviceTokensInput = {
@@ -9705,6 +9841,7 @@ export type UserUncheckedCreateWithoutDeviceTokensInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeviceTokensInput = {
@@ -9785,6 +9922,7 @@ export type UserUpdateWithoutDeviceTokensInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeviceTokensInput = {
@@ -9834,6 +9972,283 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
   userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+}
+
+export type UserCreateWithoutReferralsInitiatedInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReferralsInitiatedInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReferralsInitiatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralsInitiatedInput, Prisma.UserUncheckedCreateWithoutReferralsInitiatedInput>
+}
+
+export type UserUpsertWithoutReferralsInitiatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferralsInitiatedInput, Prisma.UserUncheckedUpdateWithoutReferralsInitiatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralsInitiatedInput, Prisma.UserUncheckedCreateWithoutReferralsInitiatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReferralsInitiatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferralsInitiatedInput, Prisma.UserUncheckedUpdateWithoutReferralsInitiatedInput>
+}
+
+export type UserUpdateWithoutReferralsInitiatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferralsInitiatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -9913,6 +10328,7 @@ export type UserCreateWithoutConversationsCreatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationsCreatedInput = {
@@ -9977,6 +10393,7 @@ export type UserUncheckedCreateWithoutConversationsCreatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationsCreatedInput = {
@@ -10057,6 +10474,7 @@ export type UserUpdateWithoutConversationsCreatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationsCreatedInput = {
@@ -10121,6 +10539,7 @@ export type UserUncheckedUpdateWithoutConversationsCreatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutConversationMembershipsInput = {
@@ -10185,6 +10604,7 @@ export type UserCreateWithoutConversationMembershipsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationMembershipsInput = {
@@ -10249,6 +10669,7 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationMembershipsInput = {
@@ -10329,6 +10750,7 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
@@ -10393,6 +10815,7 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutSentChatMessagesInput = {
@@ -10457,6 +10880,7 @@ export type UserCreateWithoutSentChatMessagesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutSentChatMessagesInput = {
@@ -10521,6 +10945,7 @@ export type UserUncheckedCreateWithoutSentChatMessagesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutSentChatMessagesInput = {
@@ -10601,6 +11026,7 @@ export type UserUpdateWithoutSentChatMessagesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
@@ -10665,6 +11091,7 @@ export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutMessageReactionsInput = {
@@ -10729,6 +11156,7 @@ export type UserCreateWithoutMessageReactionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutMessageReactionsInput = {
@@ -10793,6 +11221,7 @@ export type UserUncheckedCreateWithoutMessageReactionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutMessageReactionsInput = {
@@ -10873,6 +11302,7 @@ export type UserUpdateWithoutMessageReactionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessageReactionsInput = {
@@ -10937,6 +11367,7 @@ export type UserUncheckedUpdateWithoutMessageReactionsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutSupportMessagesAsUserInput = {
@@ -11001,6 +11432,7 @@ export type UserCreateWithoutSupportMessagesAsUserInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutSupportMessagesAsUserInput = {
@@ -11065,6 +11497,7 @@ export type UserUncheckedCreateWithoutSupportMessagesAsUserInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutSupportMessagesAsUserInput = {
@@ -11145,6 +11578,7 @@ export type UserUpdateWithoutSupportMessagesAsUserInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportMessagesAsUserInput = {
@@ -11209,6 +11643,7 @@ export type UserUncheckedUpdateWithoutSupportMessagesAsUserInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutAssignedAssignmentsInput = {
@@ -11273,6 +11708,7 @@ export type UserCreateWithoutAssignedAssignmentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedAssignmentsInput = {
@@ -11337,6 +11773,7 @@ export type UserUncheckedCreateWithoutAssignedAssignmentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedAssignmentsInput = {
@@ -11406,6 +11843,7 @@ export type UserCreateWithoutCreatedAssignmentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedAssignmentsInput = {
@@ -11470,6 +11908,7 @@ export type UserUncheckedCreateWithoutCreatedAssignmentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedAssignmentsInput = {
@@ -11550,6 +11989,7 @@ export type UserUpdateWithoutAssignedAssignmentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedAssignmentsInput = {
@@ -11614,6 +12054,7 @@ export type UserUncheckedUpdateWithoutAssignedAssignmentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedAssignmentsInput = {
@@ -11689,6 +12130,7 @@ export type UserUpdateWithoutCreatedAssignmentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedAssignmentsInput = {
@@ -11753,6 +12195,7 @@ export type UserUncheckedUpdateWithoutCreatedAssignmentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutAssignmentCommentsInput = {
@@ -11817,6 +12260,7 @@ export type UserCreateWithoutAssignmentCommentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignmentCommentsInput = {
@@ -11881,6 +12325,7 @@ export type UserUncheckedCreateWithoutAssignmentCommentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignmentCommentsInput = {
@@ -11961,6 +12406,7 @@ export type UserUpdateWithoutAssignmentCommentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignmentCommentsInput = {
@@ -12025,6 +12471,7 @@ export type UserUncheckedUpdateWithoutAssignmentCommentsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutAssignmentStatusChangesInput = {
@@ -12089,6 +12536,7 @@ export type UserCreateWithoutAssignmentStatusChangesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignmentStatusChangesInput = {
@@ -12153,6 +12601,7 @@ export type UserUncheckedCreateWithoutAssignmentStatusChangesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignmentStatusChangesInput = {
@@ -12233,6 +12682,7 @@ export type UserUpdateWithoutAssignmentStatusChangesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignmentStatusChangesInput = {
@@ -12297,6 +12747,7 @@ export type UserUncheckedUpdateWithoutAssignmentStatusChangesInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutCreatedAnnouncementsInput = {
@@ -12361,6 +12812,7 @@ export type UserCreateWithoutCreatedAnnouncementsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedAnnouncementsInput = {
@@ -12425,6 +12877,7 @@ export type UserUncheckedCreateWithoutCreatedAnnouncementsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedAnnouncementsInput = {
@@ -12505,6 +12958,7 @@ export type UserUpdateWithoutCreatedAnnouncementsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedAnnouncementsInput = {
@@ -12569,6 +13023,7 @@ export type UserUncheckedUpdateWithoutCreatedAnnouncementsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutAnnouncementAcksInput = {
@@ -12633,6 +13088,7 @@ export type UserCreateWithoutAnnouncementAcksInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementAcksInput = {
@@ -12697,6 +13153,7 @@ export type UserUncheckedCreateWithoutAnnouncementAcksInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementAcksInput = {
@@ -12777,6 +13234,7 @@ export type UserUpdateWithoutAnnouncementAcksInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementAcksInput = {
@@ -12841,6 +13299,7 @@ export type UserUncheckedUpdateWithoutAnnouncementAcksInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutEmergencyBroadcastsCreatedInput = {
@@ -12905,6 +13364,7 @@ export type UserCreateWithoutEmergencyBroadcastsCreatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput = {
@@ -12969,6 +13429,7 @@ export type UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutEmergencyBroadcastsCreatedInput = {
@@ -13038,6 +13499,7 @@ export type UserCreateWithoutEmergencyBroadcastsResolvedInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput = {
@@ -13102,6 +13564,7 @@ export type UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutEmergencyBroadcastsResolvedInput = {
@@ -13182,6 +13645,7 @@ export type UserUpdateWithoutEmergencyBroadcastsCreatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyBroadcastsCreatedInput = {
@@ -13246,6 +13710,7 @@ export type UserUncheckedUpdateWithoutEmergencyBroadcastsCreatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUpsertWithoutEmergencyBroadcastsResolvedInput = {
@@ -13321,6 +13786,7 @@ export type UserUpdateWithoutEmergencyBroadcastsResolvedInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyBroadcastsResolvedInput = {
@@ -13385,6 +13851,7 @@ export type UserUncheckedUpdateWithoutEmergencyBroadcastsResolvedInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutEmergencyAcksInput = {
@@ -13449,6 +13916,7 @@ export type UserCreateWithoutEmergencyAcksInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyAcksInput = {
@@ -13513,6 +13981,7 @@ export type UserUncheckedCreateWithoutEmergencyAcksInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutEmergencyAcksInput = {
@@ -13593,6 +14062,7 @@ export type UserUpdateWithoutEmergencyAcksInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyAcksInput = {
@@ -13657,6 +14127,7 @@ export type UserUncheckedUpdateWithoutEmergencyAcksInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutDailyBriefingsInput = {
@@ -13721,6 +14192,7 @@ export type UserCreateWithoutDailyBriefingsInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserUncheckedCreateWithoutDailyBriefingsInput = {
@@ -13785,6 +14257,7 @@ export type UserUncheckedCreateWithoutDailyBriefingsInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
 }
 
 export type UserCreateOrConnectWithoutDailyBriefingsInput = {
@@ -13865,6 +14338,7 @@ export type UserUpdateWithoutDailyBriefingsInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDailyBriefingsInput = {
@@ -13929,6 +14403,7 @@ export type UserUncheckedUpdateWithoutDailyBriefingsInput = {
   emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateManyOrganizationInput = {
@@ -14016,6 +14491,7 @@ export type UserUpdateWithoutOrganizationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrganizationInput = {
@@ -14080,6 +14556,7 @@ export type UserUncheckedUpdateWithoutOrganizationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutOrganizationInput = {
@@ -14190,6 +14667,7 @@ export type UserUpdateWithoutManagerInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagerInput = {
@@ -14254,6 +14732,7 @@ export type UserUncheckedUpdateWithoutManagerInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutManagerInput = {
@@ -14364,6 +14843,7 @@ export type UserUpdateWithoutLocationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLocationInput = {
@@ -14428,6 +14908,7 @@ export type UserUncheckedUpdateWithoutLocationInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutLocationInput = {
@@ -14538,6 +15019,7 @@ export type UserUpdateWithoutDepartmentInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDepartmentInput = {
@@ -14602,6 +15084,7 @@ export type UserUncheckedUpdateWithoutDepartmentInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutDepartmentInput = {
@@ -14712,6 +15195,7 @@ export type UserUpdateWithoutEmployeeTypeInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmployeeTypeInput = {
@@ -14776,6 +15260,7 @@ export type UserUncheckedUpdateWithoutEmployeeTypeInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutEmployeeTypeInput = {
@@ -14886,6 +15371,7 @@ export type UserUpdateWithoutRegionInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRegionInput = {
@@ -14950,6 +15436,7 @@ export type UserUncheckedUpdateWithoutRegionInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutRegionInput = {
@@ -15021,6 +15508,7 @@ export type UserCountOutputType = {
   emergencyBroadcastsResolved: number
   emergencyAcks: number
   dailyBriefings: number
+  referralsInitiated: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -15064,6 +15552,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   emergencyBroadcastsResolved?: boolean | UserCountOutputTypeCountEmergencyBroadcastsResolvedArgs
   emergencyAcks?: boolean | UserCountOutputTypeCountEmergencyAcksArgs
   dailyBriefings?: boolean | UserCountOutputTypeCountDailyBriefingsArgs
+  referralsInitiated?: boolean | UserCountOutputTypeCountReferralsInitiatedArgs
 }
 
 /**
@@ -15356,6 +15845,13 @@ export type UserCountOutputTypeCountDailyBriefingsArgs<ExtArgs extends runtime.T
   where?: Prisma.DailyBriefingCacheWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReferralsInitiatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReferralWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -15426,6 +15922,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   emergencyBroadcastsResolved?: boolean | Prisma.User$emergencyBroadcastsResolvedArgs<ExtArgs>
   emergencyAcks?: boolean | Prisma.User$emergencyAcksArgs<ExtArgs>
   dailyBriefings?: boolean | Prisma.User$dailyBriefingsArgs<ExtArgs>
+  referralsInitiated?: boolean | Prisma.User$referralsInitiatedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -15562,6 +16059,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   emergencyBroadcastsResolved?: boolean | Prisma.User$emergencyBroadcastsResolvedArgs<ExtArgs>
   emergencyAcks?: boolean | Prisma.User$emergencyAcksArgs<ExtArgs>
   dailyBriefings?: boolean | Prisma.User$dailyBriefingsArgs<ExtArgs>
+  referralsInitiated?: boolean | Prisma.User$referralsInitiatedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -15631,6 +16129,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     emergencyBroadcastsResolved: Prisma.$EmergencyBroadcastPayload<ExtArgs>[]
     emergencyAcks: Prisma.$EmergencyAcknowledgmentPayload<ExtArgs>[]
     dailyBriefings: Prisma.$DailyBriefingCachePayload<ExtArgs>[]
+    referralsInitiated: Prisma.$ReferralPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -16095,6 +16594,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   emergencyBroadcastsResolved<T extends Prisma.User$emergencyBroadcastsResolvedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emergencyBroadcastsResolvedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emergencyAcks<T extends Prisma.User$emergencyAcksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emergencyAcksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyAcknowledgmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   dailyBriefings<T extends Prisma.User$dailyBriefingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$dailyBriefingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyBriefingCachePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referralsInitiated<T extends Prisma.User$referralsInitiatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referralsInitiatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17617,6 +18117,30 @@ export type User$dailyBriefingsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.DailyBriefingCacheScalarFieldEnum | Prisma.DailyBriefingCacheScalarFieldEnum[]
+}
+
+/**
+ * User.referralsInitiated
+ */
+export type User$referralsInitiatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Referral
+   */
+  select?: Prisma.ReferralSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Referral
+   */
+  omit?: Prisma.ReferralOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralInclude<ExtArgs> | null
+  where?: Prisma.ReferralWhereInput
+  orderBy?: Prisma.ReferralOrderByWithRelationInput | Prisma.ReferralOrderByWithRelationInput[]
+  cursor?: Prisma.ReferralWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReferralScalarFieldEnum | Prisma.ReferralScalarFieldEnum[]
 }
 
 /**

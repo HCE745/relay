@@ -449,6 +449,10 @@ export async function checkAndActivateScheduledCredits(): Promise<CronResult> {
 
 // ─── Referral reward helpers ───────────────────────────────────────────────────
 
+export async function getActiveReferralProgram() {
+  return prisma.referralProgram.findFirst({ where: { isActive: true } })
+}
+
 export async function triggerReferralReward(
   referralId: string,
   createdBySuperAdminId: string,
@@ -458,29 +462,49 @@ export async function triggerReferralReward(
     include: {
       referrerOrg: { select: { id: true, name: true } },
       referredOrg: { select: { id: true, name: true } },
+      program:     true,
     },
   })
   if (!referral) return { ok: false, error: "Referral not found" }
   if (referral.rewardStatus === "rewarded") return { ok: false, error: "Already rewarded" }
 
-  const creditInput: CreateCreditInput = {
-    creditType:    "free_billing_cycles",
-    appliesTo:     "entire_invoice",
-    discountValue: 1,
-    description:   "Referral reward — 1 free billing cycle",
-    durationType:  "one_invoice",
-    durationCycles: 1,
-    schedulingType: "immediate",
-    reason:        "Referral qualification reward",
+  // Resolve reward config: referral's program > active program > hardcoded defaults
+  const prog = referral.program ?? await getActiveReferralProgram()
+
+  const referrerInput: CreateCreditInput = {
+    creditType:     (prog?.referrerRewardType   ?? "free_billing_cycles") as CreditType,
+    appliesTo:      (prog?.referrerRewardAppliesTo ?? "entire_invoice") as CreditAppliesTo,
+    discountValue:  prog?.referrerRewardValue   ?? 1,
+    durationCycles: prog?.referrerRewardCycles  ?? 1,
+    durationType:   "one_invoice",
+    schedulingType: (prog?.referrerSchedulingType ?? "immediate") as CreditSchedulingType,
+    description:    `Referral reward — ${describeCreditType(
+      (prog?.referrerRewardType ?? "free_billing_cycles") as CreditType,
+      prog?.referrerRewardValue ?? 1,
+    )}`,
+    reason: "Referral qualification reward",
+  }
+
+  const referredInput: CreateCreditInput = {
+    creditType:     (prog?.referredRewardType   ?? "free_billing_cycles") as CreditType,
+    appliesTo:      (prog?.referredRewardAppliesTo ?? "entire_invoice") as CreditAppliesTo,
+    discountValue:  prog?.referredRewardValue   ?? 1,
+    durationCycles: prog?.referredRewardCycles  ?? 1,
+    durationType:   "one_invoice",
+    schedulingType: (prog?.referredSchedulingType ?? "immediate") as CreditSchedulingType,
+    description:    `Welcome referral reward — ${describeCreditType(
+      (prog?.referredRewardType ?? "free_billing_cycles") as CreditType,
+      prog?.referredRewardValue ?? 1,
+    )}`,
+    reason: "Referral qualification reward (referred customer)",
   }
 
   const referrerCredit = await createCredit(
-    referral.referrerOrgId, creditInput, createdBySuperAdminId,
+    referral.referrerOrgId, referrerInput, createdBySuperAdminId,
     { superAdminId: createdBySuperAdminId, superAdminName: "System (referral cron)", orgName: referral.referrerOrg.name },
   )
   const referredCredit = await createCredit(
-    referral.referredOrgId, { ...creditInput, description: "Welcome referral reward — 1 free billing cycle" },
-    createdBySuperAdminId,
+    referral.referredOrgId, referredInput, createdBySuperAdminId,
     { superAdminId: createdBySuperAdminId, superAdminName: "System (referral cron)", orgName: referral.referredOrg.name },
   )
 
@@ -489,6 +513,7 @@ export async function triggerReferralReward(
     data: {
       rewardStatus:     "rewarded",
       rewardDate:       new Date(),
+      qualifiedAt:      referral.qualifiedAt ?? new Date(),
       referrerCreditId: referrerCredit.id,
       referredCreditId: referredCredit.id,
     },

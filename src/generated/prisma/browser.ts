@@ -348,6 +348,11 @@ export type DeviceToken = Prisma.DeviceTokenModel
  */
 export type BillingCredit = Prisma.BillingCreditModel
 /**
+ * Model ReferralProgram
+ * 
+ */
+export type ReferralProgram = Prisma.ReferralProgramModel
+/**
  * Model Referral
  * 
  */

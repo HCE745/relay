@@ -3,6 +3,8 @@ import { getDisplaySession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { WelcomeChecklist } from "@/components/dashboard/welcome-checklist"
+import { ReferralCard } from "@/components/dashboard/referral-card"
+import { getActiveReferralProgram } from "@/lib/billing-credits-engine"
 import {
   AlertCircle,
   CheckCircle2,
@@ -71,6 +73,37 @@ async function getDashboardData(orgId: string) {
   }
 }
 
+async function getReferralCardData(orgId: string) {
+  const [org, program] = await Promise.all([
+    prisma.organization.findUnique({
+      where: { id: orgId },
+      select: { referralCode: true, referralLink: true },
+    }),
+    getActiveReferralProgram(),
+  ])
+
+  if (!program?.showOnDashboard || !org) return null
+
+  const [submitted, qualified, rewarded] = await Promise.all([
+    prisma.referral.count({ where: { referrerOrgId: orgId } }),
+    prisma.referral.count({ where: { referrerOrgId: orgId, qualifiedAt: { not: null } } }),
+    prisma.referral.count({ where: { referrerOrgId: orgId, rewardStatus: "rewarded" } }),
+  ])
+
+  return {
+    referralCode:    org.referralCode,
+    referralLink:    org.referralLink,
+    cardTitle:       program.cardTitle,
+    cardDescription: program.cardDescription,
+    stats: {
+      submitted,
+      qualified,
+      pending:       submitted - rewarded - (qualified - rewarded),
+      creditsEarned: rewarded * (program.referrerRewardCycles ?? 1),
+    },
+  }
+}
+
 export const dynamic = "force-dynamic"
 
 const CHECKLIST_CUTOFF_DAYS = 14
@@ -107,9 +140,11 @@ async function getChecklistData(orgId: string) {
 
 export default async function DashboardPage() {
   const session = await getDisplaySession()
-  const [data, checklist] = await Promise.all([
+  const canSeeReferrals = session?.role === "ADMIN" || session?.role === "MANAGER"
+  const [data, checklist, referralCard] = await Promise.all([
     getDashboardData(session?.organizationId ?? ""),
     getChecklistData(session?.organizationId ?? ""),
+    canSeeReferrals ? getReferralCardData(session?.organizationId ?? "") : Promise.resolve(null),
   ])
 
   const stats = [
@@ -179,6 +214,17 @@ export default async function DashboardPage() {
         {/* Welcome checklist — only for new non-demo orgs */}
         {checklist && checklist.items.filter(i => !i.done).length > 0 && !session?.isDemo && (
           <WelcomeChecklist items={checklist.items} orgName={checklist.orgName} />
+        )}
+
+        {/* Referral card */}
+        {referralCard && (
+          <ReferralCard
+            referralCode={referralCard.referralCode}
+            referralLink={referralCard.referralLink}
+            cardTitle={referralCard.cardTitle}
+            cardDescription={referralCard.cardDescription}
+            stats={referralCard.stats}
+          />
         )}
 
         {/* Stats Grid */}

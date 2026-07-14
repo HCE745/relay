@@ -20,6 +20,8 @@ export type AuditAction =
   // Referrals
   | "CREATE_REFERRAL"
   | "UPDATE_REFERRAL"
+  | "CREATE_REFERRAL_PROGRAM"
+  | "UPDATE_REFERRAL_PROGRAM"
   // CRM
   | "SEND_CRM_EMAIL"
   // Workforce Communications
@@ -42,7 +44,7 @@ export async function logSAAction({
   action: AuditAction
   orgId: string
   orgName: string
-  targetType: "organization" | "user"
+  targetType: "organization" | "user" | "other"
   targetId: string
   targetName: string
   before?: Record<string, unknown>

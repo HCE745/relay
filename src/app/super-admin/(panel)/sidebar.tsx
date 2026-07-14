@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import {
-  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, PhoneCall, Tag, Headphones, Megaphone, Mail,
+  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, PhoneCall, Tag, Headphones, Megaphone, Mail, Gift,
 } from "lucide-react"
 
 type NavItem = { href: string; label: string; icon: React.ElementType; exact?: boolean; badge?: number }
@@ -26,6 +26,7 @@ function buildSections(emailUnread: number): NavSection[] {
         { href: "/super-admin/crm/demo-calls",      label: "Demo Calls",       icon: PhoneCall },
         { href: "/super-admin/crm/email",           label: "Email",            icon: Mail, badge: emailUnread },
         { href: "/super-admin/referrals",           label: "Referrals",        icon: Users },
+        { href: "/super-admin/referral-program",    label: "Referral Program", icon: Gift },
         { href: "/super-admin/feature-requests",    label: "Feature Requests", icon: Lightbulb },
         { href: "/super-admin/support",             label: "Support Inbox",    icon: Headphones },
         { href: "/super-admin/crm/settings",        label: "Settings",         icon: Settings },

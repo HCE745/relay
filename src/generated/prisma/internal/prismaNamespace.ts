@@ -450,6 +450,7 @@ export const ModelName = {
   CrmActivity: 'CrmActivity',
   DeviceToken: 'DeviceToken',
   BillingCredit: 'BillingCredit',
+  ReferralProgram: 'ReferralProgram',
   Referral: 'Referral',
   CrmEmail: 'CrmEmail',
   CrmEmailTemplate: 'CrmEmailTemplate',
@@ -484,7 +485,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache"
+    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -5372,6 +5373,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ReferralProgram: {
+      payload: Prisma.$ReferralProgramPayload<ExtArgs>
+      fields: Prisma.ReferralProgramFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReferralProgramFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReferralProgramFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>
+        }
+        findFirst: {
+          args: Prisma.ReferralProgramFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReferralProgramFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>
+        }
+        findMany: {
+          args: Prisma.ReferralProgramFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>[]
+        }
+        create: {
+          args: Prisma.ReferralProgramCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>
+        }
+        createMany: {
+          args: Prisma.ReferralProgramCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReferralProgramCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>[]
+        }
+        delete: {
+          args: Prisma.ReferralProgramDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>
+        }
+        update: {
+          args: Prisma.ReferralProgramUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReferralProgramDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReferralProgramUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReferralProgramUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReferralProgramUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralProgramPayload>
+        }
+        aggregate: {
+          args: Prisma.ReferralProgramAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReferralProgram>
+        }
+        groupBy: {
+          args: Prisma.ReferralProgramGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralProgramGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReferralProgramCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralProgramCountAggregateOutputType> | number
+        }
+      }
+    }
     Referral: {
       payload: Prisma.$ReferralPayload<ExtArgs>
       fields: Prisma.ReferralFieldRefs
@@ -8050,6 +8125,55 @@ export const BillingCreditScalarFieldEnum = {
 export type BillingCreditScalarFieldEnum = (typeof BillingCreditScalarFieldEnum)[keyof typeof BillingCreditScalarFieldEnum]
 
 
+export const ReferralProgramScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  isActive: 'isActive',
+  cardTitle: 'cardTitle',
+  cardDescription: 'cardDescription',
+  programDescription: 'programDescription',
+  termsText: 'termsText',
+  ctaLabel: 'ctaLabel',
+  linkBaseUrl: 'linkBaseUrl',
+  consecutiveMonthsRequired: 'consecutiveMonthsRequired',
+  requireNewCustomer: 'requireNewCustomer',
+  allowDuringTrial: 'allowDuringTrial',
+  allowSelfReferral: 'allowSelfReferral',
+  allowRelatedOrgs: 'allowRelatedOrgs',
+  pauseOnFailedPayment: 'pauseOnFailedPayment',
+  resetClockOnCancellation: 'resetClockOnCancellation',
+  minimumPlan: 'minimumPlan',
+  excludedPlans: 'excludedPlans',
+  maxRewardsPerOrg: 'maxRewardsPerOrg',
+  maxRewardsPerYear: 'maxRewardsPerYear',
+  programStartDate: 'programStartDate',
+  programEndDate: 'programEndDate',
+  referrerRewardType: 'referrerRewardType',
+  referrerRewardValue: 'referrerRewardValue',
+  referrerRewardAppliesTo: 'referrerRewardAppliesTo',
+  referrerRewardCycles: 'referrerRewardCycles',
+  referrerSchedulingType: 'referrerSchedulingType',
+  referredRewardType: 'referredRewardType',
+  referredRewardValue: 'referredRewardValue',
+  referredRewardAppliesTo: 'referredRewardAppliesTo',
+  referredRewardCycles: 'referredRewardCycles',
+  referredSchedulingType: 'referredSchedulingType',
+  showOnDashboard: 'showOnDashboard',
+  showOnBillingPage: 'showOnBillingPage',
+  showInSettings: 'showInSettings',
+  showInMobileApp: 'showInMobileApp',
+  visibleToRoles: 'visibleToRoles',
+  qualificationExplanation: 'qualificationExplanation',
+  successMessage: 'successMessage',
+  pendingRewardMessage: 'pendingRewardMessage',
+  disqualificationMessage: 'disqualificationMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReferralProgramScalarFieldEnum = (typeof ReferralProgramScalarFieldEnum)[keyof typeof ReferralProgramScalarFieldEnum]
+
+
 export const ReferralScalarFieldEnum = {
   id: 'id',
   referrerOrgId: 'referrerOrgId',
@@ -8063,6 +8187,16 @@ export const ReferralScalarFieldEnum = {
   rewardDate: 'rewardDate',
   referrerCreditId: 'referrerCreditId',
   referredCreditId: 'referredCreditId',
+  programId: 'programId',
+  source: 'source',
+  referredByUserId: 'referredByUserId',
+  fraudReview: 'fraudReview',
+  fraudNotes: 'fraudNotes',
+  internalNotes: 'internalNotes',
+  pausedAt: 'pausedAt',
+  qualifiedAt: 'qualifiedAt',
+  disqualifiedAt: 'disqualifiedAt',
+  disqualifiedReason: 'disqualifiedReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -8806,6 +8940,7 @@ export type GlobalOmitConfig = {
   crmActivity?: Prisma.CrmActivityOmit
   deviceToken?: Prisma.DeviceTokenOmit
   billingCredit?: Prisma.BillingCreditOmit
+  referralProgram?: Prisma.ReferralProgramOmit
   referral?: Prisma.ReferralOmit
   crmEmail?: Prisma.CrmEmailOmit
   crmEmailTemplate?: Prisma.CrmEmailTemplateOmit

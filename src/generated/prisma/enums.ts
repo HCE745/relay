@@ -72,7 +72,9 @@ export const ReferralRewardStatus = {
   qualified: 'qualified',
   rewarded: 'rewarded',
   expired: 'expired',
-  cancelled: 'cancelled'
+  cancelled: 'cancelled',
+  paused: 'paused',
+  disqualified: 'disqualified'
 } as const
 
 export type ReferralRewardStatus = (typeof ReferralRewardStatus)[keyof typeof ReferralRewardStatus]

@@ -117,6 +117,7 @@ export const ModelName = {
   CrmActivity: 'CrmActivity',
   DeviceToken: 'DeviceToken',
   BillingCredit: 'BillingCredit',
+  ReferralProgram: 'ReferralProgram',
   Referral: 'Referral',
   CrmEmail: 'CrmEmail',
   CrmEmailTemplate: 'CrmEmailTemplate',
@@ -1387,6 +1388,55 @@ export const BillingCreditScalarFieldEnum = {
 export type BillingCreditScalarFieldEnum = (typeof BillingCreditScalarFieldEnum)[keyof typeof BillingCreditScalarFieldEnum]
 
 
+export const ReferralProgramScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  isActive: 'isActive',
+  cardTitle: 'cardTitle',
+  cardDescription: 'cardDescription',
+  programDescription: 'programDescription',
+  termsText: 'termsText',
+  ctaLabel: 'ctaLabel',
+  linkBaseUrl: 'linkBaseUrl',
+  consecutiveMonthsRequired: 'consecutiveMonthsRequired',
+  requireNewCustomer: 'requireNewCustomer',
+  allowDuringTrial: 'allowDuringTrial',
+  allowSelfReferral: 'allowSelfReferral',
+  allowRelatedOrgs: 'allowRelatedOrgs',
+  pauseOnFailedPayment: 'pauseOnFailedPayment',
+  resetClockOnCancellation: 'resetClockOnCancellation',
+  minimumPlan: 'minimumPlan',
+  excludedPlans: 'excludedPlans',
+  maxRewardsPerOrg: 'maxRewardsPerOrg',
+  maxRewardsPerYear: 'maxRewardsPerYear',
+  programStartDate: 'programStartDate',
+  programEndDate: 'programEndDate',
+  referrerRewardType: 'referrerRewardType',
+  referrerRewardValue: 'referrerRewardValue',
+  referrerRewardAppliesTo: 'referrerRewardAppliesTo',
+  referrerRewardCycles: 'referrerRewardCycles',
+  referrerSchedulingType: 'referrerSchedulingType',
+  referredRewardType: 'referredRewardType',
+  referredRewardValue: 'referredRewardValue',
+  referredRewardAppliesTo: 'referredRewardAppliesTo',
+  referredRewardCycles: 'referredRewardCycles',
+  referredSchedulingType: 'referredSchedulingType',
+  showOnDashboard: 'showOnDashboard',
+  showOnBillingPage: 'showOnBillingPage',
+  showInSettings: 'showInSettings',
+  showInMobileApp: 'showInMobileApp',
+  visibleToRoles: 'visibleToRoles',
+  qualificationExplanation: 'qualificationExplanation',
+  successMessage: 'successMessage',
+  pendingRewardMessage: 'pendingRewardMessage',
+  disqualificationMessage: 'disqualificationMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReferralProgramScalarFieldEnum = (typeof ReferralProgramScalarFieldEnum)[keyof typeof ReferralProgramScalarFieldEnum]
+
+
 export const ReferralScalarFieldEnum = {
   id: 'id',
   referrerOrgId: 'referrerOrgId',
@@ -1400,6 +1450,16 @@ export const ReferralScalarFieldEnum = {
   rewardDate: 'rewardDate',
   referrerCreditId: 'referrerCreditId',
   referredCreditId: 'referredCreditId',
+  programId: 'programId',
+  source: 'source',
+  referredByUserId: 'referredByUserId',
+  fraudReview: 'fraudReview',
+  fraudNotes: 'fraudNotes',
+  internalNotes: 'internalNotes',
+  pausedAt: 'pausedAt',
+  qualifiedAt: 'qualifiedAt',
+  disqualifiedAt: 'disqualifiedAt',
+  disqualifiedReason: 'disqualifiedReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -276,6 +276,7 @@ model User {
   emergencyBroadcastsResolved EmergencyBroadcast[]     @relation("EmergencyResolvedBy")
   emergencyAcks               EmergencyAcknowledgment[] @relation("EmergencyAcks")
   dailyBriefings              DailyBriefingCache[]     @relation("UserDailyBriefings")
+  referralsInitiated          Referral[]               @relation("ReferralInitiator")
 }
 
 model PasswordResetToken {
@@ -1657,6 +1658,8 @@ enum ReferralRewardStatus {
   rewarded
   expired
   cancelled
+  paused
+  disqualified
 }
 
 model BillingCredit {
@@ -1694,6 +1697,69 @@ model BillingCredit {
   @@index([schedulingType])
 }
 
+model ReferralProgram {
+  id          String  @id @default(cuid())
+  name        String  @default("Standard Referral Program")
+  isActive    Boolean @default(false)
+
+  // Program Basics
+  cardTitle           String @default("Earn Free Months")
+  cardDescription     String @default("Refer another organization to Relay. When they become a qualified customer, both organizations receive a free month.")
+  programDescription  String @default("Share your referral link with other businesses. When they sign up and remain a paying customer for the required period, both organizations earn a reward.")
+  termsText           String @default("Rewards are applied as billing credits. No cash value. Relay reserves the right to modify or cancel the referral program at any time.")
+  ctaLabel            String @default("Copy Referral Link")
+  linkBaseUrl         String @default("https://app.getrelay.software/signup?ref=")
+
+  // Eligibility
+  consecutiveMonthsRequired Int      @default(6)
+  requireNewCustomer        Boolean  @default(true)
+  allowDuringTrial          Boolean  @default(true)
+  allowSelfReferral         Boolean  @default(false)
+  allowRelatedOrgs          Boolean  @default(false)
+  pauseOnFailedPayment      Boolean  @default(true)
+  resetClockOnCancellation  Boolean  @default(true)
+  minimumPlan               String?
+  excludedPlans             String[] @default([])
+  maxRewardsPerOrg          Int?
+  maxRewardsPerYear         Int?
+  programStartDate          DateTime?
+  programEndDate            DateTime?
+
+  // Referrer Reward
+  referrerRewardType      CreditType           @default(free_billing_cycles)
+  referrerRewardValue     Float                @default(1)
+  referrerRewardAppliesTo CreditAppliesTo      @default(entire_invoice)
+  referrerRewardCycles    Int                  @default(1)
+  referrerSchedulingType  CreditSchedulingType @default(immediate)
+
+  // Referred Customer Reward
+  referredRewardType      CreditType           @default(free_billing_cycles)
+  referredRewardValue     Float                @default(1)
+  referredRewardAppliesTo CreditAppliesTo      @default(entire_invoice)
+  referredRewardCycles    Int                  @default(1)
+  referredSchedulingType  CreditSchedulingType @default(immediate)
+
+  // Visibility
+  showOnDashboard   Boolean  @default(true)
+  showOnBillingPage Boolean  @default(false)
+  showInSettings    Boolean  @default(false)
+  showInMobileApp   Boolean  @default(true)
+  visibleToRoles    String[] @default(["ADMIN", "MANAGER"])
+
+  // Messaging
+  qualificationExplanation String @default("Your referral must convert to a paid subscription and remain active for the required number of consecutive months.")
+  successMessage           String @default("Congratulations! Your referral has qualified and your reward has been scheduled.")
+  pendingRewardMessage     String @default("Your reward is scheduled and will be applied to your next eligible invoice.")
+  disqualificationMessage  String @default("Unfortunately this referral no longer qualifies for the reward program.")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  referrals Referral[]
+
+  @@index([isActive])
+}
+
 model Referral {
   id                          String               @id @default(cuid())
   referrerOrgId               String
@@ -1711,12 +1777,27 @@ model Referral {
   referrerCredit              BillingCredit?       @relation("ReferrerCredit", fields: [referrerCreditId], references: [id])
   referredCreditId            String?              @unique
   referredCredit              BillingCredit?       @relation("ReferredCredit", fields: [referredCreditId], references: [id])
+  // Program + source tracking
+  programId                   String?
+  program                     ReferralProgram?     @relation(fields: [programId], references: [id])
+  source                      String               @default("referral_link")
+  referredByUserId            String?
+  referredByUser              User?                @relation("ReferralInitiator", fields: [referredByUserId], references: [id])
+  // SA controls
+  fraudReview                 Boolean              @default(false)
+  fraudNotes                  String?
+  internalNotes               String?
+  pausedAt                    DateTime?
+  qualifiedAt                 DateTime?
+  disqualifiedAt              DateTime?
+  disqualifiedReason          String?
   createdAt                   DateTime             @default(now())
   updatedAt                   DateTime             @updatedAt
 
   @@index([referrerOrgId])
   @@index([rewardStatus])
   @@index([referralCode])
+  @@index([programId])
 }
 
 // ─── CRM Email Client ─────────────────────────────────────────────────────────

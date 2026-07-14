@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { createSession } from "@/lib/session"
 import { sendEmail, welcomeEmail } from "@/lib/email"
 import { checkLimit, getIP, limiters } from "@/lib/ratelimit"
-import { generateUniqueReferralCode, buildReferralLink } from "@/lib/billing-credits-engine"
+import { generateUniqueReferralCode, buildReferralLink, getActiveReferralProgram } from "@/lib/billing-credits-engine"
 
 export async function POST(request: NextRequest) {
   const blocked = await checkLimit(
@@ -16,8 +16,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { name, email, password, orgName, ref } = body as {
-      name?: string; email?: string; password?: string; orgName?: string; ref?: string
+    const { name, email, password, orgName, ref, source } = body as {
+      name?: string; email?: string; password?: string; orgName?: string
+      ref?: string; source?: string
     }
 
     if (!name || !email || !password || !orgName) {
@@ -40,13 +41,19 @@ export async function POST(request: NextRequest) {
     const referralCode = await generateUniqueReferralCode()
     const referralLink = buildReferralLink(referralCode)
 
-    // Look up referrer if ref= param provided
+    // Look up referrer + active program in parallel if ref= param provided
     let referrerOrg: { id: string } | null = null
+    let activeProgram: Awaited<ReturnType<typeof getActiveReferralProgram>> = null
     if (ref) {
-      referrerOrg = await prisma.organization.findUnique({
-        where: { referralCode: ref.toUpperCase() },
-        select: { id: true },
-      })
+      const [org, prog] = await Promise.all([
+        prisma.organization.findUnique({
+          where: { referralCode: ref.toUpperCase() },
+          select: { id: true },
+        }),
+        getActiveReferralProgram(),
+      ])
+      referrerOrg   = org
+      activeProgram = prog
     }
 
     const org = await prisma.organization.create({
@@ -61,10 +68,13 @@ export async function POST(request: NextRequest) {
     if (referrerOrg) {
       await prisma.referral.create({
         data: {
-          referrerOrgId: referrerOrg.id,
-          referredOrgId: org.id,
-          referralCode:  ref!.toUpperCase(),
-          signupDate:    new Date(),
+          referrerOrgId:              referrerOrg.id,
+          referredOrgId:              org.id,
+          referralCode:               ref!.toUpperCase(),
+          signupDate:                 new Date(),
+          source:                     source ?? "referral_link",
+          programId:                  activeProgram?.id ?? null,
+          qualificationMonthsRequired: activeProgram?.consecutiveMonthsRequired ?? 6,
         },
       }).catch(console.error) // don't block registration if referral creation fails
     }

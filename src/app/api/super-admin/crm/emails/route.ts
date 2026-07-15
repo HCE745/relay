@@ -41,13 +41,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "demoCallId, contactEmail, or all=true required" }, { status: 400 })
   }
 
+  // demoCallId queries: include archived (shown with badge in contact timeline), exclude deleted
+  // main/all queries: exclude both deleted and archived
+  const baseFilter = demoCallId || contactEmail
+    ? { isDeleted: false }
+    : { isDeleted: false, isArchived: false }
+
   const where = demoCallId
-    ? { demoCallId, ...(direction ? { direction } : {}) }
+    ? { demoCallId, ...baseFilter, ...(direction ? { direction } : {}) }
     : contactEmail
-    ? { contactEmail: { equals: contactEmail, mode: "insensitive" as const }, ...(direction ? { direction } : {}) }
+    ? { contactEmail: { equals: contactEmail, mode: "insensitive" as const }, ...baseFilter, ...(direction ? { direction } : {}) }
     : direction
-    ? { direction }
-    : {}
+    ? { direction, ...baseFilter }
+    : baseFilter
 
   const emails = await prisma.crmEmail.findMany({
     where,

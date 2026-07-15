@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback } from "react"
 import {
   Mail, ArrowDownLeft, ArrowUpRight, ChevronDown, ChevronUp, Reply,
-  Calendar, CheckCircle2, Clock, X,
+  Calendar, CheckCircle2, Clock, X, Archive,
 } from "lucide-react"
 import { CrmEmailCompose } from "@/components/super-admin/crm-email-compose"
+import { EmailActionMenu } from "@/components/crm/email-action-menu"
 
 interface CrmEmail {
   id:            string
@@ -18,6 +19,7 @@ interface CrmEmail {
   messageId:     string | null
   sentAt:        string
   source:        string
+  isArchived:    boolean
   followUpDate:  string | null
   followUpDoneAt: string | null
 }
@@ -149,7 +151,12 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
             const followupOverdue = hasFollowup && !followupDone && new Date(email.followUpDate!) < new Date()
 
             return (
-              <div key={email.id} className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+              <div
+                key={email.id}
+                className={`bg-gray-900 border rounded-xl overflow-hidden ${
+                  email.isArchived ? "border-gray-700/50 opacity-70" : "border-gray-800"
+                }`}
+              >
                 {/* Email row */}
                 <div
                   className="flex items-start gap-3 px-4 py-3.5 cursor-pointer hover:bg-gray-800/40 transition-colors"
@@ -170,6 +177,12 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
                       <span className="text-sm font-medium text-white truncate">
                         {email.subject}
                       </span>
+                      {email.isArchived && (
+                        <span className="text-[10px] flex items-center gap-1 px-1.5 py-0.5 rounded-full font-medium bg-gray-700 text-gray-400">
+                          <Archive className="w-2.5 h-2.5" />
+                          Archived
+                        </span>
+                      )}
                       {hasFollowup && !followupDone && (
                         <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
                           followupOverdue ? "bg-red-900/40 text-red-400" : "bg-yellow-900/30 text-yellow-400"
@@ -197,8 +210,17 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
                     )}
                   </div>
 
-                  <div className="shrink-0 text-gray-600">
-                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {/* Three-dot action menu */}
+                    <EmailActionMenu
+                      emailId={email.id}
+                      subject={email.subject}
+                      isArchived={email.isArchived}
+                      onSuccess={load}
+                    />
+                    <span className="text-gray-600">
+                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </span>
                   </div>
                 </div>
 

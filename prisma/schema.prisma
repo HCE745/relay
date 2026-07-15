@@ -1826,6 +1826,10 @@ model CrmEmail {
   sentAt         DateTime
   source         String    @default("compose") // "compose" | "inbound_webhook" | "imap_sync"
   isRead         Boolean   @default(false)
+  isArchived     Boolean   @default(false)
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+  deletedByName  String?
   followUpDate   DateTime?
   followUpDoneAt DateTime?
   imapConfigId   String?

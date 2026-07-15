@@ -7,6 +7,7 @@ import {
   Mail, Send, X, ChevronDown, Loader2, RefreshCw, ArrowLeft,
   ArrowUpRight, ArrowDownLeft, Search, User,
 } from "lucide-react"
+import { EmailActionMenu } from "@/components/crm/email-action-menu"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,6 +25,7 @@ interface CrmEmail {
   sentAt:       string
   source:       string
   isRead:       boolean
+  isArchived:   boolean
   contactEmail: string
   demoCall:     { id: string; contactName: string; companyName: string } | null
 }
@@ -290,6 +292,7 @@ export default function CrmEmailPage() {
               thread={selected}
               onBack={() => setSelectedKey(null)}
               onReplySuccess={load}
+              onEmailAction={load}
             />
           ) : (
             <div className="flex flex-col items-center justify-center flex-1 text-center px-8">
@@ -367,10 +370,11 @@ function ThreadRow({ thread, isSelected, onClick }: {
 
 // ─── Thread detail ────────────────────────────────────────────────────────────
 
-function ThreadDetail({ thread, onBack, onReplySuccess }: {
+function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
   thread:          Thread
   onBack:          () => void
   onReplySuccess:  () => void
+  onEmailAction?:  () => void
 }) {
   const [expanded,  setExpanded]  = useState<Record<string, boolean>>({})
   const [replyText, setReplyText] = useState("")
@@ -490,6 +494,13 @@ function ThreadDetail({ thread, onBack, onReplySuccess }: {
                     {new Date(email.sentAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>
+                {/* Three-dot action menu */}
+                <EmailActionMenu
+                  emailId={email.id}
+                  subject={email.subject}
+                  isArchived={email.isArchived ?? false}
+                  onSuccess={() => { onEmailAction?.(); onReplySuccess() }}
+                />
               </div>
 
               {/* Email body */}

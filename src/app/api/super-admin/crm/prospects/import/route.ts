@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
-import { ProspectSource } from "@/generated/prisma"
+import { ProspectSource } from "@/generated/prisma/enums"
 
 type BulkEntry = { companyName: string; website?: string; industry?: string }
 

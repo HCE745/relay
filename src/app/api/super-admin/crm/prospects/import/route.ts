@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
-import { ProspectSource } from "@/generated/prisma/enums"
-
 type BulkEntry = { companyName: string; website?: string; industry?: string }
+
+type ProspectSource = "imported" | "manual"
 
 interface DuplicateEntry {
   companyName: string
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
         website:     e.website?.trim() || undefined,
         industry:    e.industry?.trim() || undefined,
       }))
-    source = ProspectSource.imported
+    source = "imported" as ProspectSource
   } else if (
     typeof body.companyName === "string" &&
     body.companyName.trim().length > 0
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
                        : undefined,
       },
     ]
-    source = ProspectSource.manual
+    source = "manual" as ProspectSource
   } else {
     return NextResponse.json(
       { error: "Invalid request body: supply 'prospects' array or 'companyName' string" },

@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
 import { NextRequest, NextResponse } from "next/server"
-import { ProspectCrmStatus, ProspectSource } from "@/generated/prisma/enums"
 import { Prisma } from "@/generated/prisma/client"
+
+type ProspectSource = "ai_research" | "manual" | "referral" | "inbound" | "imported"
+type ProspectCrmStatus = "researched" | "contacted" | "replied" | "demo_scheduled" | "trial" | "customer" | "not_interested" | "do_not_contact"
 
 export async function GET(req: NextRequest) {
   const session = await getSession()
@@ -181,7 +183,7 @@ export async function POST(req: NextRequest) {
       locationsCount: locationsCount ?? null,
       headquartersCity: headquartersCity ?? null,
       headquartersState: headquartersState ?? null,
-      source: (source as ProspectSource) ?? ProspectSource.manual,
+      source: ((source as ProspectSource) ?? "manual"),
     },
   })
 

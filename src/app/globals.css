@@ -135,3 +135,20 @@ a, button, [role="button"] {
 /* Yellow internal note */
 .dark .bg-yellow-50 { background-color: #422006 !important; }
 .dark .border-yellow-100 { border-color: #92400e !important; }
+
+/* ── Custom scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.30);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.60); }
+
+.dark ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.55); }
+
+/* ── Typography refinements ───────────────────────────────────────────────── */
+/* KPI number dominant weight */
+.font-black { font-weight: 900; }
+.font-extrabold { font-weight: 800; }

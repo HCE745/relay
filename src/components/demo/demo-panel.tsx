@@ -67,7 +67,7 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
   const [localModules, setLocalModules] = useState<string[]>(intelligenceModules)
 
   const panelRef = useRef<HTMLDivElement>(null)
-  const currentPkg = PLAN_TO_PKG[plan] ?? "professional"
+  const currentPkg = PLAN_TO_PKG[plan] ?? "professional_plus"
 
   // Ctrl+Shift+D — hide/show panel entirely
   // Ctrl+Shift+T — toggle tour

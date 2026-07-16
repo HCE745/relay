@@ -11,9 +11,20 @@ export async function POST(request: NextRequest) {
 
   if (existing?.isDemo && !existing.superAdmin) {
     const requestedIndustry = body.industry?.trim()
-    if (requestedIndustry) {
-      await resetDemoOrg(existing.organizationId, existing.userId, requestedIndustry)
-    }
+    // Always reset to Professional Plus (full feature set) on every demo start
+    await resetDemoOrg(existing.organizationId, existing.userId, requestedIndustry, "professional_plus")
+    // Re-issue JWT so plan-gated pages see professional_plus immediately
+    await createSession({
+      userId:              existing.userId,
+      email:               existing.email,
+      name:                existing.name,
+      role:                existing.role,
+      organizationId:      existing.organizationId,
+      onboardingCompleted: true,
+      subscriptionStatus:  "active",
+      plan:                "professional_plus",
+      isDemo:              true,
+    })
     return NextResponse.json({ ok: true })
   }
 

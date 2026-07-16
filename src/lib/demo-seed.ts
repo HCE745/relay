@@ -548,16 +548,36 @@ export async function createDemoOrg(industry?: string, pkg: DemoPackage = "profe
   return { org, user }
 }
 
-export async function resetDemoOrg(orgId: string, adminUserId: string, industry?: string) {
+export async function resetDemoOrg(orgId: string, adminUserId: string, industry?: string, pkg: DemoPackage = "professional_plus") {
   // Get current industry + slug — slug needed to mint unique emails per demo session
   let industryLabel = industry
   let slug = ""
   const orgRecord = await prisma.organization.findUnique({ where: { id: orgId }, select: { industry: true, slug: true } })
   if (!industryLabel) industryLabel = orgRecord?.industry ?? DEFAULT_INDUSTRY
   slug = orgRecord?.slug ?? `demo-${Math.random().toString(36).slice(2, 10)}`
-  const template = getTemplate(industryLabel)
+  const template      = getTemplate(industryLabel)
+  const isPlusOrAbove = pkg === "professional_plus"
 
-  // Delete all content — order matters for FK constraints
+  // ── Delete Plus-specific content first ───────────────────────────────────
+  await Promise.all([
+    prisma.qrCodeSubmission.deleteMany({ where: { qrCode: { organizationId: orgId } } }),
+    prisma.goalProgress.deleteMany({ where: { goal: { organizationId: orgId } } }),
+  ])
+  await Promise.all([
+    prisma.qrCode.deleteMany({ where: { organizationId: orgId } }),
+    prisma.executiveGoal.deleteMany({ where: { organizationId: orgId } }),
+    prisma.executiveBriefing.deleteMany({ where: { organizationId: orgId } }),
+    prisma.healthScore.deleteMany({ where: { organizationId: orgId } }),
+    prisma.trendAlert.deleteMany({ where: { organizationId: orgId } }),
+    prisma.apiKey.deleteMany({ where: { organizationId: orgId } }),
+    prisma.webhookEndpoint.deleteMany({ where: { organizationId: orgId } }),
+    prisma.organizationRelationship.deleteMany({ where: { orgIdA: orgId } }),
+    prisma.analyticsSnapshot.deleteMany({ where: { organizationId: orgId } }),
+  ])
+  await prisma.escalationChainStep.deleteMany({ where: { chain: { organizationId: orgId } } })
+  await prisma.escalationChain.deleteMany({ where: { organizationId: orgId } })
+
+  // ── Delete all base content (order matters for FK constraints) ───────────
   await Promise.all([
     prisma.issueComment.deleteMany({ where: { issue: { organizationId: orgId } } }),
     prisma.issueHistory.deleteMany({ where: { issue: { organizationId: orgId } } }),
@@ -582,16 +602,40 @@ export async function resetDemoOrg(orgId: string, adminUserId: string, industry?
     prisma.routingRule.deleteMany({ where: { organizationId: orgId } }),
   ])
   await prisma.department.deleteMany({ where: { organizationId: orgId } })
+  // Locations reference regions (regionId FK) — delete locations first, then regions
   await prisma.location.deleteMany({ where: { organizationId: orgId } })
-  // Delete non-admin users created during seed
+  // Delete non-admin users (may have regionId FK — delete before regions)
   await prisma.user.deleteMany({ where: { organizationId: orgId, id: { not: adminUserId } } })
+  // Regions are safe to delete once all locations and users are gone
+  await prisma.region.deleteMany({ where: { organizationId: orgId } })
 
+  // ── Update org: reset plan and feature flags ──────────────────────────────
   await prisma.organization.update({
     where: { id: orgId },
-    data: { name: template.demoCompanyName, industry: industryLabel, companySize: "250" },
+    data: {
+      name:                             template.demoCompanyName,
+      industry:                         industryLabel,
+      companySize:                      "250",
+      plan:                             PACKAGE_PLAN[pkg],
+      regions_enabled:                  isPlusOrAbove,
+      corporate_dashboard_enabled:      isPlusOrAbove,
+      cross_location_analytics_enabled: isPlusOrAbove,
+      advanced_escalations_enabled:     isPlusOrAbove,
+      api_webhooks_enabled:             isPlusOrAbove,
+      sso_foundation_enabled:           isPlusOrAbove,
+      shared_facility_enabled:          isPlusOrAbove,
+      executive_briefings_enabled:      isPlusOrAbove,
+      health_scores_enabled:            isPlusOrAbove,
+      trend_detection_enabled:          isPlusOrAbove,
+      executive_goals_enabled:          isPlusOrAbove,
+    },
   })
 
   await seedDemoContent(orgId, adminUserId, industryLabel, slug)
+  if (isPlusOrAbove) {
+    await seedPlusDemoContent(orgId, adminUserId)
+  }
+  await setWorkforceCommsPlanFlags(orgId, PACKAGE_PLAN[pkg])
 }
 
 // ─── Seed content ─────────────────────────────────────────────────────────────

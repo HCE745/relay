@@ -34,7 +34,7 @@ export default async function CommunicationsPage() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       <div className="md:hidden">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Communications</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Announcements, emergency broadcasts, and team channels</p>
+        <p className="text-sm text-gray-400 mt-0.5">Announcements, emergency broadcasts, and team channels</p>
       </div>
 
       {activeEmergencies > 0 && (
@@ -58,7 +58,7 @@ export default async function CommunicationsPage() {
       <div className="grid gap-4">
         <Link
           href="/communications/announcements"
-          className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-5 hover:border-blue-300 dark:hover:border-blue-600 transition-colors group"
+          className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-5 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 group"
         >
           <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
             <Megaphone className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -72,14 +72,14 @@ export default async function CommunicationsPage() {
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500 mt-0.5">Org-wide and scoped announcements</p>
+            <p className="text-sm text-gray-400 mt-0.5">Org-wide and scoped announcements</p>
           </div>
           <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
         </Link>
 
         <Link
           href="/communications/emergency"
-          className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-5 hover:border-red-300 dark:hover:border-red-700 transition-colors group"
+          className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-5 hover:border-red-300 dark:hover:border-red-700 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 group"
         >
           <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
             <Siren className="w-6 h-6 text-red-600 dark:text-red-400" />
@@ -93,21 +93,21 @@ export default async function CommunicationsPage() {
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500 mt-0.5">Fire, evacuation, and critical alerts</p>
+            <p className="text-sm text-gray-400 mt-0.5">Fire, evacuation, and critical alerts</p>
           </div>
           <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
         </Link>
 
         <Link
           href="/communications/teams"
-          className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-5 hover:border-purple-300 dark:hover:border-purple-700 transition-colors group"
+          className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-5 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 group"
         >
           <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
             <Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />
           </div>
           <div className="flex-1">
             <span className="font-semibold text-gray-900 dark:text-white">Team Channels</span>
-            <p className="text-sm text-gray-500 mt-0.5">Your direct reports and supervisor channels</p>
+            <p className="text-sm text-gray-400 mt-0.5">Your direct reports and supervisor channels</p>
           </div>
           <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
         </Link>
@@ -117,13 +117,13 @@ export default async function CommunicationsPage() {
         <div className="border-t border-gray-100 dark:border-gray-700 pt-4 flex flex-wrap gap-3">
           <Link
             href="/communications/announcements/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 hover:shadow-md hover:-translate-y-px transition-all duration-150"
           >
             New Announcement
           </Link>
           <Link
             href="/communications/emergency?create=1"
-            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 hover:shadow-md hover:-translate-y-px transition-all duration-150"
           >
             Emergency Broadcast
           </Link>

@@ -50,14 +50,14 @@ export default async function AssignmentsPage({
       <div className="flex items-center justify-between md:hidden">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Assignments</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-400 mt-0.5">
             {open.length} open · {completed.length} completed
           </p>
         </div>
         {canCreate && (
           <Link
             href="/assignments/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 hover:shadow-md hover:-translate-y-px transition-all duration-150"
           >
             <Plus className="w-4 h-4" />
             New

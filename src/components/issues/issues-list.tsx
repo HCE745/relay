@@ -4,7 +4,7 @@ import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
-import { ChevronRight, Download, UserCheck, AlertCircle, CheckSquare } from "lucide-react"
+import { ChevronRight, Download, AlertCircle, CheckSquare } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { PRIORITY_COLOR, STATUS_COLOR, ISSUE_STATUS, ISSUE_PRIORITY, ISSUE_CATEGORY } from "@/lib/constants"
 import { toast } from "@/lib/toast"
@@ -153,7 +153,7 @@ export function IssuesList({ issues, users, currentFilters }: Props) {
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         {issues.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-gray-400 text-sm mb-4">No issues found</p>
@@ -200,7 +200,7 @@ export function IssuesList({ issues, users, currentFilters }: Props) {
             {/* ── Desktop table ──────────────────────────────────────────── */}
             <table className="hidden md:table w-full">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
+                <tr className="border-b border-gray-100 bg-gray-50/80">
                   <th className="px-4 py-3 w-10">
                     <input
                       type="checkbox"
@@ -209,20 +209,27 @@ export function IssuesList({ issues, users, currentFilters }: Props) {
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 cursor-pointer"
                     />
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Issue</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Priority</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Category</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Assigned To</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Location</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Created</th>
+                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Issue</th>
+                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Priority</th>
+                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Status</th>
+                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Category</th>
+                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Assigned To</th>
+                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Location</th>
+                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Created</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {issues.map((issue) => (
+                {issues.map((issue) => {
+                  const priorityDot: Record<string, string> = {
+                    CRITICAL: "bg-red-500",
+                    HIGH:     "bg-orange-500",
+                    MEDIUM:   "bg-amber-400",
+                    LOW:      "bg-blue-400",
+                  }
+                  return (
                   <tr
                     key={issue.id}
-                    className={`hover:bg-gray-50 transition-colors ${selected.has(issue.id) ? "bg-blue-50/50" : ""}`}
+                    className={`hover:bg-gray-50/80 transition-colors ${selected.has(issue.id) ? "bg-blue-50/40" : ""}`}
                   >
                     <td className="px-4 py-4 w-10" onClick={e => e.stopPropagation()}>
                       <input
@@ -233,9 +240,12 @@ export function IssuesList({ issues, users, currentFilters }: Props) {
                       />
                     </td>
                     <td className="px-4 py-4">
-                      <div className="flex items-start gap-1.5">
+                      <div className="flex items-start gap-2.5">
+                        <div className="shrink-0 pt-1.5">
+                          <div className={`w-2 h-2 rounded-full ${priorityDot[issue.priority] ?? "bg-gray-300"}`} />
+                        </div>
                         <Link href={`/issues/${issue.id}`} className="group flex-1 min-w-0">
-                          <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors text-sm">{issue.title}</div>
+                          <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-sm">{issue.title}</div>
                           <div className="text-xs text-gray-400 mt-0.5 flex items-center gap-2">
                             <span>by {issue.reportedBy.name}</span>
                             {issue._count.comments > 0 && <span>· {issue._count.comments} comment{issue._count.comments > 1 ? "s" : ""}</span>}
@@ -266,7 +276,8 @@ export function IssuesList({ issues, users, currentFilters }: Props) {
                       {formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}
                     </td>
                   </tr>
-                ))}
+                  )
+                })}
               </tbody>
             </table>
           </>

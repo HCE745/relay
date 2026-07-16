@@ -25,6 +25,7 @@ function buildSections(emailUnread: number): NavSection[] {
         { href: "/super-admin/crm",                label: "Dashboard",        icon: LayoutDashboard, exact: true },
         { href: "/super-admin/crm/demo-calls",      label: "Demo Calls",       icon: PhoneCall },
         { href: "/super-admin/crm/email",           label: "Email",            icon: Mail, badge: emailUnread },
+        { href: "/super-admin/crm/prospects",       label: "Prospects",        icon: Users },
         { href: "/super-admin/crm/follow-ups",      label: "Follow-Ups",       icon: ClipboardList },
         { href: "/super-admin/referrals",           label: "Referrals",        icon: Users },
         { href: "/super-admin/referral-program",    label: "Referral Program", icon: Gift },

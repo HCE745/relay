@@ -141,7 +141,10 @@ export const ModelName = {
   AnnouncementAcknowledgment: 'AnnouncementAcknowledgment',
   EmergencyBroadcast: 'EmergencyBroadcast',
   EmergencyAcknowledgment: 'EmergencyAcknowledgment',
-  DailyBriefingCache: 'DailyBriefingCache'
+  DailyBriefingCache: 'DailyBriefingCache',
+  Prospect: 'Prospect',
+  ProspectContact: 'ProspectContact',
+  ProspectNote: 'ProspectNote'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1494,6 +1497,10 @@ export const CrmEmailScalarFieldEnum = {
   sentAt: 'sentAt',
   source: 'source',
   isRead: 'isRead',
+  isArchived: 'isArchived',
+  isDeleted: 'isDeleted',
+  deletedAt: 'deletedAt',
+  deletedByName: 'deletedByName',
   followUpDate: 'followUpDate',
   followUpDoneAt: 'followUpDoneAt',
   imapConfigId: 'imapConfigId',
@@ -1843,6 +1850,71 @@ export const DailyBriefingCacheScalarFieldEnum = {
 } as const
 
 export type DailyBriefingCacheScalarFieldEnum = (typeof DailyBriefingCacheScalarFieldEnum)[keyof typeof DailyBriefingCacheScalarFieldEnum]
+
+
+export const ProspectScalarFieldEnum = {
+  id: 'id',
+  companyName: 'companyName',
+  website: 'website',
+  industry: 'industry',
+  employeeCountMin: 'employeeCountMin',
+  employeeCountMax: 'employeeCountMax',
+  locationsCount: 'locationsCount',
+  headquartersCity: 'headquartersCity',
+  headquartersState: 'headquartersState',
+  headquartersCountry: 'headquartersCountry',
+  linkedinUrl: 'linkedinUrl',
+  source: 'source',
+  aiFitScore: 'aiFitScore',
+  researchSummary: 'researchSummary',
+  operationalPainPoints: 'operationalPainPoints',
+  relayFitReasons: 'relayFitReasons',
+  suggestedDemoEmphasis: 'suggestedDemoEmphasis',
+  suggestedOutreachAngle: 'suggestedOutreachAngle',
+  decisionMakerTitles: 'decisionMakerTitles',
+  confidenceScore: 'confidenceScore',
+  currentCrmStatus: 'currentCrmStatus',
+  assignedToName: 'assignedToName',
+  dateResearched: 'dateResearched',
+  lastOutreachDate: 'lastOutreachDate',
+  lastReplyDate: 'lastReplyDate',
+  pipelineStage: 'pipelineStage',
+  duplicateFlag: 'duplicateFlag',
+  duplicateOfId: 'duplicateOfId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProspectScalarFieldEnum = (typeof ProspectScalarFieldEnum)[keyof typeof ProspectScalarFieldEnum]
+
+
+export const ProspectContactScalarFieldEnum = {
+  id: 'id',
+  prospectId: 'prospectId',
+  name: 'name',
+  title: 'title',
+  email: 'email',
+  emailSource: 'emailSource',
+  emailConfidence: 'emailConfidence',
+  discoveryDate: 'discoveryDate',
+  linkedinUrl: 'linkedinUrl',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProspectContactScalarFieldEnum = (typeof ProspectContactScalarFieldEnum)[keyof typeof ProspectContactScalarFieldEnum]
+
+
+export const ProspectNoteScalarFieldEnum = {
+  id: 'id',
+  prospectId: 'prospectId',
+  noteText: 'noteText',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+} as const
+
+export type ProspectNoteScalarFieldEnum = (typeof ProspectNoteScalarFieldEnum)[keyof typeof ProspectNoteScalarFieldEnum]
 
 
 export const SortOrder = {

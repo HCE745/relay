@@ -562,6 +562,57 @@ export type EnumEmergencyTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumEmergencyTypeFilter<$PrismaModel>
 }
 
+export type EnumProspectSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProspectSource | Prisma.EnumProspectSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.ProspectSource[] | Prisma.ListEnumProspectSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProspectSource[] | Prisma.ListEnumProspectSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProspectSourceFilter<$PrismaModel> | $Enums.ProspectSource
+}
+
+export type EnumProspectCrmStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProspectCrmStatus | Prisma.EnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ProspectCrmStatus[] | Prisma.ListEnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProspectCrmStatus[] | Prisma.ListEnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProspectCrmStatusFilter<$PrismaModel> | $Enums.ProspectCrmStatus
+}
+
+export type EnumProspectSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProspectSource | Prisma.EnumProspectSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.ProspectSource[] | Prisma.ListEnumProspectSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProspectSource[] | Prisma.ListEnumProspectSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProspectSourceWithAggregatesFilter<$PrismaModel> | $Enums.ProspectSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProspectSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProspectSourceFilter<$PrismaModel>
+}
+
+export type EnumProspectCrmStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProspectCrmStatus | Prisma.EnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ProspectCrmStatus[] | Prisma.ListEnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProspectCrmStatus[] | Prisma.ListEnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProspectCrmStatusWithAggregatesFilter<$PrismaModel> | $Enums.ProspectCrmStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProspectCrmStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProspectCrmStatusFilter<$PrismaModel>
+}
+
+export type EnumEmailConfidenceLevelNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmailConfidenceLevel | Prisma.EnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.EmailConfidenceLevel[] | Prisma.ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.EmailConfidenceLevel[] | Prisma.ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel> | $Enums.EmailConfidenceLevel | null
+}
+
+export type EnumEmailConfidenceLevelNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmailConfidenceLevel | Prisma.EnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.EmailConfidenceLevel[] | Prisma.ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.EmailConfidenceLevel[] | Prisma.ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumEmailConfidenceLevelNullableWithAggregatesFilter<$PrismaModel> | $Enums.EmailConfidenceLevel | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1045,6 +1096,57 @@ export type NestedEnumEmergencyTypeWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumEmergencyTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumEmergencyTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumProspectSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProspectSource | Prisma.EnumProspectSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.ProspectSource[] | Prisma.ListEnumProspectSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProspectSource[] | Prisma.ListEnumProspectSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProspectSourceFilter<$PrismaModel> | $Enums.ProspectSource
+}
+
+export type NestedEnumProspectCrmStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProspectCrmStatus | Prisma.EnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ProspectCrmStatus[] | Prisma.ListEnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProspectCrmStatus[] | Prisma.ListEnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProspectCrmStatusFilter<$PrismaModel> | $Enums.ProspectCrmStatus
+}
+
+export type NestedEnumProspectSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProspectSource | Prisma.EnumProspectSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.ProspectSource[] | Prisma.ListEnumProspectSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProspectSource[] | Prisma.ListEnumProspectSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProspectSourceWithAggregatesFilter<$PrismaModel> | $Enums.ProspectSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProspectSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProspectSourceFilter<$PrismaModel>
+}
+
+export type NestedEnumProspectCrmStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProspectCrmStatus | Prisma.EnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ProspectCrmStatus[] | Prisma.ListEnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProspectCrmStatus[] | Prisma.ListEnumProspectCrmStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProspectCrmStatusWithAggregatesFilter<$PrismaModel> | $Enums.ProspectCrmStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProspectCrmStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProspectCrmStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmailConfidenceLevel | Prisma.EnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.EmailConfidenceLevel[] | Prisma.ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.EmailConfidenceLevel[] | Prisma.ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel> | $Enums.EmailConfidenceLevel | null
+}
+
+export type NestedEnumEmailConfidenceLevelNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmailConfidenceLevel | Prisma.EnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.EmailConfidenceLevel[] | Prisma.ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.EmailConfidenceLevel[] | Prisma.ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumEmailConfidenceLevelNullableWithAggregatesFilter<$PrismaModel> | $Enums.EmailConfidenceLevel | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel>
 }
 
 

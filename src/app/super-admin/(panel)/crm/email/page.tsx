@@ -135,6 +135,7 @@ export default function CrmEmailPage() {
   const [filter,      setFilter]      = useState<Filter>("all")
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [composing,   setComposing]   = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -199,6 +200,7 @@ export default function CrmEmailPage() {
     : filter === "sent"
     ? allThreads.filter(t => t.emails.some(e => e.direction === "sent"))
     : allThreads
+  const filteredThreads = searchQuery.trim() ? threads.filter(t => { const q = searchQuery.toLowerCase(); return t.subject.toLowerCase().includes(q) || t.contactName.toLowerCase().includes(q) || t.contactEmail.toLowerCase().includes(q) || t.emails.some(e => e.bodyText?.toLowerCase().includes(q)) }) : threads
   const selected     = threads.find(t => t.key === selectedKey) ?? null
 
   function selectThread(t: Thread) {
@@ -259,17 +261,41 @@ export default function CrmEmailPage() {
             ))}
           </div>
 
+          {/* Search bar */}
+          <div className="px-3 py-2 border-b border-gray-800">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-500" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search emails..."
+                className="w-full pl-8 pr-7 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery("")} className="absolute right-2 top-2 text-gray-500 hover:text-white transition-colors">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            {searchQuery.trim() && (
+              <p className="text-[11px] text-gray-500 mt-1.5 px-0.5">
+                {filteredThreads.length} of {threads.length} email{threads.length !== 1 ? 's' : ''} match
+              </p>
+            )}
+          </div>
+
           {/* Thread list */}
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="w-5 h-5 text-gray-600 animate-spin" />
               </div>
-            ) : threads.length === 0 ? (
+            ) : filteredThreads.length === 0 ? (
               <EmptyState onCompose={() => setComposing(true)} />
             ) : (
               <ul>
-                {threads.map(t => (
+                {filteredThreads.map(t => (
                   <ThreadRow
                     key={t.key}
                     thread={t}

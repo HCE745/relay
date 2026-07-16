@@ -496,3 +496,18 @@ export type EmergencyAcknowledgment = Prisma.EmergencyAcknowledgmentModel
  * 
  */
 export type DailyBriefingCache = Prisma.DailyBriefingCacheModel
+/**
+ * Model Prospect
+ * 
+ */
+export type Prospect = Prisma.ProspectModel
+/**
+ * Model ProspectContact
+ * 
+ */
+export type ProspectContact = Prisma.ProspectContactModel
+/**
+ * Model ProspectNote
+ * 
+ */
+export type ProspectNote = Prisma.ProspectNoteModel

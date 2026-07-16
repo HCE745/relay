@@ -134,3 +134,40 @@ export const EmergencyType = {
 } as const
 
 export type EmergencyType = (typeof EmergencyType)[keyof typeof EmergencyType]
+
+
+export const ProspectSource = {
+  ai_research: 'ai_research',
+  manual: 'manual',
+  referral: 'referral',
+  inbound: 'inbound',
+  imported: 'imported'
+} as const
+
+export type ProspectSource = (typeof ProspectSource)[keyof typeof ProspectSource]
+
+
+export const ProspectCrmStatus = {
+  researched: 'researched',
+  contacted: 'contacted',
+  replied: 'replied',
+  demo_scheduled: 'demo_scheduled',
+  trial: 'trial',
+  customer: 'customer',
+  not_interested: 'not_interested',
+  do_not_contact: 'do_not_contact'
+} as const
+
+export type ProspectCrmStatus = (typeof ProspectCrmStatus)[keyof typeof ProspectCrmStatus]
+
+
+export const EmailConfidenceLevel = {
+  verified: 'verified',
+  accepts_mail: 'accepts_mail',
+  catch_all: 'catch_all',
+  risky: 'risky',
+  unknown: 'unknown',
+  invalid: 'invalid'
+} as const
+
+export type EmailConfidenceLevel = (typeof EmailConfidenceLevel)[keyof typeof EmailConfidenceLevel]

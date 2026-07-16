@@ -2315,3 +2315,105 @@ model DailyBriefingCache {
   @@unique([userId, date])
   @@index([userId])
 }
+
+// ── Sales Intelligence: Prospects ────────────────────────────────────────────
+
+enum ProspectSource {
+  ai_research
+  manual
+  referral
+  inbound
+  imported
+}
+
+enum ProspectCrmStatus {
+  researched
+  contacted
+  replied
+  demo_scheduled
+  trial
+  customer
+  not_interested
+  do_not_contact
+}
+
+enum EmailConfidenceLevel {
+  verified
+  accepts_mail
+  catch_all
+  risky
+  unknown
+  invalid
+}
+
+model Prospect {
+  id                     String            @id @default(cuid())
+  companyName            String
+  website                String?
+  industry               String?
+  employeeCountMin       Int?
+  employeeCountMax       Int?
+  locationsCount         Int?
+  headquartersCity       String?
+  headquartersState      String?
+  headquartersCountry    String?           @default("US")
+  linkedinUrl            String?
+  source                 ProspectSource    @default(ai_research)
+  aiFitScore             Int?
+  researchSummary        String?           @db.Text
+  operationalPainPoints  String?           @db.Text
+  relayFitReasons        String?           @db.Text
+  suggestedDemoEmphasis  String?           @db.Text
+  suggestedOutreachAngle String?           @db.Text
+  decisionMakerTitles    String[]
+  confidenceScore        Int?
+  currentCrmStatus       ProspectCrmStatus @default(researched)
+  assignedToName         String?
+  dateResearched         DateTime?
+  lastOutreachDate       DateTime?
+  lastReplyDate          DateTime?
+  pipelineStage          String?
+  duplicateFlag          Boolean           @default(false)
+  duplicateOfId          String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  contacts ProspectContact[]
+  notes    ProspectNote[]
+
+  @@index([aiFitScore])
+  @@index([currentCrmStatus])
+  @@index([industry])
+  @@index([companyName])
+}
+
+model ProspectContact {
+  id                   String               @id @default(cuid())
+  prospectId           String
+  name                 String
+  title                String?
+  email                String?
+  emailSource          String?
+  emailConfidence      EmailConfidenceLevel?
+  discoveryDate        DateTime?
+  linkedinUrl          String?
+  notes                String?              @db.Text
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  @@index([prospectId])
+}
+
+model ProspectNote {
+  id         String   @id @default(cuid())
+  prospectId String
+  noteText   String   @db.Text
+  createdBy  String?
+  createdAt  DateTime @default(now())
+
+  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  @@index([prospectId])
+}

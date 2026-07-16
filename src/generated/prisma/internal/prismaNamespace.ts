@@ -474,7 +474,10 @@ export const ModelName = {
   AnnouncementAcknowledgment: 'AnnouncementAcknowledgment',
   EmergencyBroadcast: 'EmergencyBroadcast',
   EmergencyAcknowledgment: 'EmergencyAcknowledgment',
-  DailyBriefingCache: 'DailyBriefingCache'
+  DailyBriefingCache: 'DailyBriefingCache',
+  Prospect: 'Prospect',
+  ProspectContact: 'ProspectContact',
+  ProspectNote: 'ProspectNote'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -490,7 +493,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache"
+    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -7228,6 +7231,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Prospect: {
+      payload: Prisma.$ProspectPayload<ExtArgs>
+      fields: Prisma.ProspectFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProspectFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProspectFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>
+        }
+        findFirst: {
+          args: Prisma.ProspectFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProspectFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>
+        }
+        findMany: {
+          args: Prisma.ProspectFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>[]
+        }
+        create: {
+          args: Prisma.ProspectCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>
+        }
+        createMany: {
+          args: Prisma.ProspectCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProspectCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>[]
+        }
+        delete: {
+          args: Prisma.ProspectDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>
+        }
+        update: {
+          args: Prisma.ProspectUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProspectDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProspectUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProspectUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProspectUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectPayload>
+        }
+        aggregate: {
+          args: Prisma.ProspectAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProspect>
+        }
+        groupBy: {
+          args: Prisma.ProspectGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProspectGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProspectCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProspectCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProspectContact: {
+      payload: Prisma.$ProspectContactPayload<ExtArgs>
+      fields: Prisma.ProspectContactFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProspectContactFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProspectContactFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>
+        }
+        findFirst: {
+          args: Prisma.ProspectContactFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProspectContactFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>
+        }
+        findMany: {
+          args: Prisma.ProspectContactFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>[]
+        }
+        create: {
+          args: Prisma.ProspectContactCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>
+        }
+        createMany: {
+          args: Prisma.ProspectContactCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProspectContactCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>[]
+        }
+        delete: {
+          args: Prisma.ProspectContactDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>
+        }
+        update: {
+          args: Prisma.ProspectContactUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProspectContactDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProspectContactUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProspectContactUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProspectContactUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectContactPayload>
+        }
+        aggregate: {
+          args: Prisma.ProspectContactAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProspectContact>
+        }
+        groupBy: {
+          args: Prisma.ProspectContactGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProspectContactGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProspectContactCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProspectContactCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProspectNote: {
+      payload: Prisma.$ProspectNotePayload<ExtArgs>
+      fields: Prisma.ProspectNoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProspectNoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProspectNoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>
+        }
+        findFirst: {
+          args: Prisma.ProspectNoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProspectNoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>
+        }
+        findMany: {
+          args: Prisma.ProspectNoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>[]
+        }
+        create: {
+          args: Prisma.ProspectNoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>
+        }
+        createMany: {
+          args: Prisma.ProspectNoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProspectNoteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>[]
+        }
+        delete: {
+          args: Prisma.ProspectNoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>
+        }
+        update: {
+          args: Prisma.ProspectNoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>
+        }
+        deleteMany: {
+          args: Prisma.ProspectNoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProspectNoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProspectNoteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>[]
+        }
+        upsert: {
+          args: Prisma.ProspectNoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProspectNotePayload>
+        }
+        aggregate: {
+          args: Prisma.ProspectNoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProspectNote>
+        }
+        groupBy: {
+          args: Prisma.ProspectNoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProspectNoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProspectNoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProspectNoteCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -8601,6 +8826,10 @@ export const CrmEmailScalarFieldEnum = {
   sentAt: 'sentAt',
   source: 'source',
   isRead: 'isRead',
+  isArchived: 'isArchived',
+  isDeleted: 'isDeleted',
+  deletedAt: 'deletedAt',
+  deletedByName: 'deletedByName',
   followUpDate: 'followUpDate',
   followUpDoneAt: 'followUpDoneAt',
   imapConfigId: 'imapConfigId',
@@ -8952,6 +9181,71 @@ export const DailyBriefingCacheScalarFieldEnum = {
 export type DailyBriefingCacheScalarFieldEnum = (typeof DailyBriefingCacheScalarFieldEnum)[keyof typeof DailyBriefingCacheScalarFieldEnum]
 
 
+export const ProspectScalarFieldEnum = {
+  id: 'id',
+  companyName: 'companyName',
+  website: 'website',
+  industry: 'industry',
+  employeeCountMin: 'employeeCountMin',
+  employeeCountMax: 'employeeCountMax',
+  locationsCount: 'locationsCount',
+  headquartersCity: 'headquartersCity',
+  headquartersState: 'headquartersState',
+  headquartersCountry: 'headquartersCountry',
+  linkedinUrl: 'linkedinUrl',
+  source: 'source',
+  aiFitScore: 'aiFitScore',
+  researchSummary: 'researchSummary',
+  operationalPainPoints: 'operationalPainPoints',
+  relayFitReasons: 'relayFitReasons',
+  suggestedDemoEmphasis: 'suggestedDemoEmphasis',
+  suggestedOutreachAngle: 'suggestedOutreachAngle',
+  decisionMakerTitles: 'decisionMakerTitles',
+  confidenceScore: 'confidenceScore',
+  currentCrmStatus: 'currentCrmStatus',
+  assignedToName: 'assignedToName',
+  dateResearched: 'dateResearched',
+  lastOutreachDate: 'lastOutreachDate',
+  lastReplyDate: 'lastReplyDate',
+  pipelineStage: 'pipelineStage',
+  duplicateFlag: 'duplicateFlag',
+  duplicateOfId: 'duplicateOfId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProspectScalarFieldEnum = (typeof ProspectScalarFieldEnum)[keyof typeof ProspectScalarFieldEnum]
+
+
+export const ProspectContactScalarFieldEnum = {
+  id: 'id',
+  prospectId: 'prospectId',
+  name: 'name',
+  title: 'title',
+  email: 'email',
+  emailSource: 'emailSource',
+  emailConfidence: 'emailConfidence',
+  discoveryDate: 'discoveryDate',
+  linkedinUrl: 'linkedinUrl',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProspectContactScalarFieldEnum = (typeof ProspectContactScalarFieldEnum)[keyof typeof ProspectContactScalarFieldEnum]
+
+
+export const ProspectNoteScalarFieldEnum = {
+  id: 'id',
+  prospectId: 'prospectId',
+  noteText: 'noteText',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+} as const
+
+export type ProspectNoteScalarFieldEnum = (typeof ProspectNoteScalarFieldEnum)[keyof typeof ProspectNoteScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -9236,6 +9530,48 @@ export type EnumEmergencyTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 export type ListEnumEmergencyTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmergencyType[]'>
     
 
+
+/**
+ * Reference to a field of type 'ProspectSource'
+ */
+export type EnumProspectSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProspectSource'>
+    
+
+
+/**
+ * Reference to a field of type 'ProspectSource[]'
+ */
+export type ListEnumProspectSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProspectSource[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ProspectCrmStatus'
+ */
+export type EnumProspectCrmStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProspectCrmStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ProspectCrmStatus[]'
+ */
+export type ListEnumProspectCrmStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProspectCrmStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EmailConfidenceLevel'
+ */
+export type EnumEmailConfidenceLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailConfidenceLevel'>
+    
+
+
+/**
+ * Reference to a field of type 'EmailConfidenceLevel[]'
+ */
+export type ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailConfidenceLevel[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -9437,6 +9773,9 @@ export type GlobalOmitConfig = {
   emergencyBroadcast?: Prisma.EmergencyBroadcastOmit
   emergencyAcknowledgment?: Prisma.EmergencyAcknowledgmentOmit
   dailyBriefingCache?: Prisma.DailyBriefingCacheOmit
+  prospect?: Prisma.ProspectOmit
+  prospectContact?: Prisma.ProspectContactOmit
+  prospectNote?: Prisma.ProspectNoteOmit
 }
 
 /* Types for Logging */

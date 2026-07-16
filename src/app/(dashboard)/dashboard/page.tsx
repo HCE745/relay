@@ -14,32 +14,54 @@ import {
   ArrowRight,
   ChevronUp,
   MapPin,
-  Bot,
   Sparkles,
+  Cpu,
+  Shield,
+  Wrench,
+  Building2,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { PRIORITY_COLOR, STATUS_COLOR, ISSUE_STATUS, ISSUE_PRIORITY, ISSUE_CATEGORY } from "@/lib/constants"
 import { formatDistanceToNow } from "date-fns"
 
-const PRIORITY_DOT: Record<string, string> = {
-  CRITICAL: "bg-red-500",
-  HIGH:     "bg-orange-500",
-  MEDIUM:   "bg-amber-400",
-  LOW:      "bg-blue-400",
+// Hex colors for chart bars (inline styles — Tailwind purges dynamic classes)
+const CATEGORY_COLOR_HEX: Record<string, string> = {
+  INJURY:              "#ef4444",
+  SAFETY:              "#ef4444",
+  EQUIPMENT_BREAKDOWN: "#f97316",
+  MAINTENANCE:         "#f59e0b",
+  SUPPLY_SHORTAGE:     "#eab308",
+  CUSTOMER_COMPLAINT:  "#a855f7",
+  FACILITY:            "#3b82f6",
+  VEHICLE:             "#06b6d4",
+  EMPLOYEE:            "#6366f1",
+  GENERAL:             "#94a3b8",
 }
 
-// Semantic color per category — matches KPI card colors
-const CATEGORY_COLOR: Record<string, string> = {
-  INJURY:              "bg-red-500",
-  SAFETY:              "bg-red-500",
-  EQUIPMENT_BREAKDOWN: "bg-orange-500",
-  MAINTENANCE:         "bg-amber-500",
-  SUPPLY_SHORTAGE:     "bg-yellow-500",
-  CUSTOMER_COMPLAINT:  "bg-purple-500",
-  FACILITY:            "bg-blue-500",
-  VEHICLE:             "bg-cyan-500",
-  EMPLOYEE:            "bg-indigo-500",
-  GENERAL:             "bg-slate-400",
+// Category icon placeholder bg/color for issue thumbnails
+const CATEGORY_ICON_BG: Record<string, string> = {
+  INJURY:              "bg-red-50",
+  SAFETY:              "bg-red-50",
+  EQUIPMENT_BREAKDOWN: "bg-orange-50",
+  MAINTENANCE:         "bg-amber-50",
+  SUPPLY_SHORTAGE:     "bg-yellow-50",
+  CUSTOMER_COMPLAINT:  "bg-purple-50",
+  FACILITY:            "bg-blue-50",
+  VEHICLE:             "bg-cyan-50",
+  EMPLOYEE:            "bg-indigo-50",
+  GENERAL:             "bg-slate-100",
+}
+const CATEGORY_ICON_CLR: Record<string, string> = {
+  INJURY:              "text-red-500",
+  SAFETY:              "text-red-500",
+  EQUIPMENT_BREAKDOWN: "text-orange-500",
+  MAINTENANCE:         "text-amber-500",
+  SUPPLY_SHORTAGE:     "text-yellow-500",
+  CUSTOMER_COMPLAINT:  "text-purple-500",
+  FACILITY:            "text-blue-500",
+  VEHICLE:             "text-cyan-500",
+  EMPLOYEE:            "text-indigo-500",
+  GENERAL:             "text-slate-400",
 }
 
 async function getDashboardData(orgId: string) {
@@ -56,9 +78,11 @@ async function getDashboardData(orgId: string) {
     totalAssets,
     recentIssues,
     issuesByCategory,
+    openIssuesByCategory,
     newThisWeek,
     resolvedThisWeek,
     newToday,
+    resolvedToday,
   ] = await Promise.all([
     prisma.issue.count({ where: { organizationId: orgId } }),
     prisma.issue.count({ where: { organizationId: orgId, status: "OPEN" } }),
@@ -72,8 +96,9 @@ async function getDashboardData(orgId: string) {
       take: 8,
       include: {
         reportedBy: { select: { name: true } },
-        location: { select: { name: true } },
+        location:   { select: { name: true } },
         assignedTo: { select: { name: true } },
+        attachments: { where: { mimeType: { startsWith: "image/" } }, select: { url: true }, take: 1 },
       },
     }),
     prisma.issue.groupBy({
@@ -82,14 +107,22 @@ async function getDashboardData(orgId: string) {
       _count: { id: true },
       orderBy: { _count: { id: "desc" } },
     }),
+    // Active (non-resolved) issues by category — used for contributor sub-scores
+    prisma.issue.groupBy({
+      by: ["category"],
+      where: { organizationId: orgId, status: { notIn: ["RESOLVED", "CLOSED"] } },
+      _count: { id: true },
+    }),
     prisma.issue.count({ where: { organizationId: orgId, createdAt: { gte: weekAgo } } }),
     prisma.issue.count({ where: { organizationId: orgId, status: { in: ["RESOLVED", "CLOSED"] }, updatedAt: { gte: weekAgo } } }),
     prisma.issue.count({ where: { organizationId: orgId, createdAt: { gte: todayStart } } }),
+    prisma.issue.count({ where: { organizationId: orgId, status: { in: ["RESOLVED", "CLOSED"] }, updatedAt: { gte: todayStart } } }),
   ])
 
   return {
     totalIssues, openIssues, escalatedIssues, resolvedIssues, criticalIssues,
-    totalAssets, recentIssues, issuesByCategory, newThisWeek, resolvedThisWeek, newToday,
+    totalAssets, recentIssues, issuesByCategory, openIssuesByCategory,
+    newThisWeek, resolvedThisWeek, newToday, resolvedToday,
   }
 }
 
@@ -156,7 +189,7 @@ async function getChecklistData(orgId: string) {
   }
 }
 
-// ── Health score helpers ───────────────────────────────────────────────────
+// ── Health score helpers ────────────────────────────────────────────────────
 function computeHealthScore(openIssues: number, criticalIssues: number, escalatedIssues: number, resolvedThisWeek: number): number {
   let score = 100
   score -= Math.min(openIssues, 20)
@@ -166,61 +199,37 @@ function computeHealthScore(openIssues: number, criticalIssues: number, escalate
   return Math.max(0, Math.min(100, score))
 }
 
+function computeSubScore(openCount: number, severity: number): number {
+  return Math.max(0, Math.min(100, 100 - openCount * severity))
+}
+
+function contributorColor(score: number): { text: string; dot: string } {
+  if (score >= 85) return { text: "text-emerald-600", dot: "bg-emerald-400" }
+  if (score >= 70) return { text: "text-blue-600",    dot: "bg-blue-400" }
+  if (score >= 50) return { text: "text-amber-600",   dot: "bg-amber-400" }
+  return { text: "text-red-600", dot: "bg-red-500" }
+}
+
 function getHealthInfo(score: number) {
   if (score >= 90) return {
-    label: "EXCELLENT",
-    text: "text-emerald-600",
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
+    label: "EXCELLENT", text: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200",
     gradient: "linear-gradient(135deg, rgba(240,253,244,0.9) 0%, rgba(167,243,208,0.25) 100%)",
     borderColor: "#a7f3d0",
   }
   if (score >= 80) return {
-    label: "GOOD",
-    text: "text-blue-600",
-    bg: "bg-blue-50",
-    border: "border-blue-200",
+    label: "GOOD", text: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200",
     gradient: "linear-gradient(135deg, rgba(239,246,255,0.9) 0%, rgba(191,219,254,0.25) 100%)",
     borderColor: "#bfdbfe",
   }
   if (score >= 60) return {
-    label: "FAIR",
-    text: "text-amber-600",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
+    label: "FAIR", text: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200",
     gradient: "linear-gradient(135deg, rgba(255,251,235,0.9) 0%, rgba(252,211,77,0.2) 100%)",
     borderColor: "#fde68a",
   }
   return {
-    label: "CRITICAL",
-    text: "text-red-600",
-    bg: "bg-red-50",
-    border: "border-red-200",
+    label: "CRITICAL", text: "text-red-600", bg: "bg-red-50", border: "border-red-200",
     gradient: "linear-gradient(135deg, rgba(255,241,242,0.9) 0%, rgba(254,202,202,0.3) 100%)",
     borderColor: "#fecaca",
-  }
-}
-
-function getAiInsight(d: { openIssues: number; criticalIssues: number; escalatedIssues: number; resolvedThisWeek: number; newThisWeek: number }) {
-  if (d.criticalIssues > 0) return {
-    insight: `${d.criticalIssues} critical issue${d.criticalIssues > 1 ? "s" : ""} active — immediate attention required`,
-    recommendation: `Address ${d.criticalIssues > 1 ? "these" : "this"} critical issue${d.criticalIssues > 1 ? "s" : ""} before shift end to prevent further escalation`,
-  }
-  if (d.escalatedIssues > 0) return {
-    insight: `${d.escalatedIssues} escalated issue${d.escalatedIssues > 1 ? "s" : ""} awaiting resolution — response time monitoring active`,
-    recommendation: "Update stakeholders on escalation status and set clear resolution targets",
-  }
-  if (d.openIssues > 10) return {
-    insight: `${d.openIssues} open issues pending — queue above normal levels`,
-    recommendation: "Consider batch-assigning open items to reduce backlog and improve response time",
-  }
-  if (d.resolvedThisWeek > 0) return {
-    insight: `${d.resolvedThisWeek} issue${d.resolvedThisWeek > 1 ? "s" : ""} resolved this week — operations on track`,
-    recommendation: "Continue current response protocols and review SOPs for efficiency gains",
-  }
-  return {
-    insight: "No active issues — operations running smoothly",
-    recommendation: "Use downtime to review SOPs and ensure team preparedness",
   }
 }
 
@@ -231,35 +240,49 @@ function generateAiInsights(d: {
   criticalIssues: number
   escalatedIssues: number
   totalIssues: number
+  openIssues: number
+  newToday: number
 }): string[] {
   if (d.totalIssues === 0) return []
   const out: string[] = []
 
   if (d.issuesByCategory.length > 0) {
     const top = d.issuesByCategory[0]
+    const pct = Math.round((top._count.id / d.totalIssues) * 100)
     const lbl = ISSUE_CATEGORY[top.category as keyof typeof ISSUE_CATEGORY] ?? top.category
-    if (top._count.id > 1) out.push(`${lbl} is your top reported issue type — ${top._count.id} cases`)
-  }
-
-  if (d.resolvedThisWeek > 0 || d.newThisWeek > 0) {
-    if (d.resolvedThisWeek >= d.newThisWeek && d.resolvedThisWeek > 0) {
-      out.push(`Team is keeping pace — ${d.resolvedThisWeek} resolved vs ${d.newThisWeek} opened this week`)
-    } else if (d.newThisWeek > d.resolvedThisWeek) {
-      out.push(`${d.newThisWeek} new issues opened this week, ${d.resolvedThisWeek} resolved — backlog growing`)
-    } else if (d.newThisWeek > 0) {
-      out.push(`${d.newThisWeek} new issue${d.newThisWeek > 1 ? "s" : ""} reported this week`)
+    if (pct >= 35) {
+      out.push(`${lbl} is driving ${pct}% of your issues — a dedicated resolution workflow could clear the backlog`)
+    } else if (top._count.id >= 3) {
+      out.push(`${lbl} is your highest-volume category with ${top._count.id} cases (${pct}% of all issues)`)
     }
   }
 
-  if (d.criticalIssues >= 2) {
-    out.push(`${d.criticalIssues} critical issues unresolved — prioritize before next shift`)
-  } else if (d.escalatedIssues > 0) {
-    out.push(`${d.escalatedIssues} escalated issue${d.escalatedIssues > 1 ? "s" : ""} awaiting resolution`)
-  } else if (d.criticalIssues === 0 && d.resolvedThisWeek > 0) {
-    out.push("No critical issues — maintain current response standards")
+  const net = d.resolvedThisWeek - d.newThisWeek
+  if (net > 2) {
+    out.push(`Your team is outpacing incoming issues — ${d.resolvedThisWeek} resolved vs ${d.newThisWeek} opened this week`)
+  } else if (net < -2) {
+    out.push(`Backlog is growing: ${d.newThisWeek} opened vs ${d.resolvedThisWeek} resolved this week (+${Math.abs(net)} net)`)
+  } else if (d.resolvedThisWeek > 0) {
+    out.push(`Resolution pace is stable — ${d.resolvedThisWeek} resolved vs ${d.newThisWeek} opened this week`)
+  } else if (d.newThisWeek > 0) {
+    out.push(`${d.newThisWeek} new issue${d.newThisWeek > 1 ? "s" : ""} reported this week — none resolved yet`)
   }
 
-  return out.slice(0, 3)
+  if (d.criticalIssues >= 2) {
+    out.push(`${d.criticalIssues} critical issues unresolved — prioritize before next shift to prevent escalation`)
+  } else if (d.criticalIssues === 1 && d.escalatedIssues > 0) {
+    out.push(`1 critical + ${d.escalatedIssues} escalated issue${d.escalatedIssues > 1 ? "s" : ""} need immediate attention`)
+  } else if (d.escalatedIssues > 0) {
+    out.push(`${d.escalatedIssues} escalated issue${d.escalatedIssues > 1 ? "s" : ""} pending — update stakeholders on resolution targets`)
+  } else if (d.criticalIssues === 1) {
+    out.push("1 critical issue active — resolve before shift end to protect the health score")
+  } else if (d.openIssues === 0) {
+    out.push("All issues resolved — excellent operational standing")
+  } else if (d.newToday === 0 && d.openIssues > 0) {
+    out.push(`No new issues today — focus on clearing the ${d.openIssues} in the backlog`)
+  }
+
+  return out.filter(Boolean).slice(0, 3)
 }
 
 function getWaiting(createdAt: Date, status: string): { label: string; cls: string } | null {
@@ -288,118 +311,100 @@ export default async function DashboardPage() {
 
   const healthScore = computeHealthScore(data.openIssues, data.criticalIssues, data.escalatedIssues, data.resolvedThisWeek)
   const healthInfo = getHealthInfo(healthScore)
-  const aiInsight = getAiInsight(data)
   const aiInsights = generateAiInsights(data)
 
-  const trend = data.resolvedThisWeek > data.newThisWeek
-    ? { icon: "↗", label: "Improving",       cls: "text-emerald-600" }
-    : data.newThisWeek > data.resolvedThisWeek
-    ? { icon: "↘", label: "Under Pressure",  cls: "text-amber-600" }
-    : { icon: "→",  label: "Stable",          cls: "text-gray-400" }
+  // Yesterday score approximation for trend delta
+  const yesterdayOpenApprox = Math.max(0, data.openIssues + data.resolvedToday - data.newToday)
+  const yesterdayScore = computeHealthScore(
+    yesterdayOpenApprox,
+    data.criticalIssues,
+    data.escalatedIssues,
+    Math.max(0, data.resolvedThisWeek - data.resolvedToday),
+  )
+  const scoreDelta = healthScore - yesterdayScore
+
+  // AI confidence based on data volume
+  const aiConfidence = data.totalIssues >= 20 ? "High" : data.totalIssues >= 5 ? "Medium" : "Low"
+  const aiConfidenceColor = data.totalIssues >= 20 ? "text-emerald-600" : data.totalIssues >= 5 ? "text-amber-500" : "text-gray-400"
+  const aiConfidenceDot = data.totalIssues >= 20 ? "bg-emerald-400" : data.totalIssues >= 5 ? "bg-amber-400" : "bg-gray-300"
+
+  // Contributor sub-scores
+  const catCounts: Record<string, number> = {}
+  for (const row of data.openIssuesByCategory) {
+    catCounts[row.category] = row._count.id
+  }
+  const sumCats = (cats: string[]) => cats.reduce((s, c) => s + (catCounts[c] ?? 0), 0)
+
+  const contributors = [
+    { key: "equipment",   label: "Equipment",   icon: Cpu,      open: sumCats(["EQUIPMENT_BREAKDOWN", "VEHICLE"]),                                               severity: 6  },
+    { key: "safety",      label: "Safety",      icon: Shield,   open: sumCats(["SAFETY", "INJURY"]),                                                              severity: 10 },
+    { key: "maintenance", label: "Maintenance", icon: Wrench,   open: sumCats(["MAINTENANCE"]),                                                                    severity: 5  },
+    { key: "facilities",  label: "Facilities",  icon: Building2, open: sumCats(["FACILITY", "GENERAL", "SUPPLY_SHORTAGE", "CUSTOMER_COMPLAINT", "EMPLOYEE"]),      severity: 4  },
+  ].map(c => ({ ...c, score: computeSubScore(c.open, c.severity) }))
 
   const headerSubtitle = [
-    data.openIssues > 0      && `${data.openIssues} open`,
-    data.criticalIssues > 0  && `${data.criticalIssues} critical`,
-    data.escalatedIssues > 0 && `${data.escalatedIssues} escalated`,
+    data.openIssues > 0       && `${data.openIssues} open`,
+    data.criticalIssues > 0   && `${data.criticalIssues} critical`,
+    data.escalatedIssues > 0  && `${data.escalatedIssues} escalated`,
     data.resolvedThisWeek > 0 && `${data.resolvedThisWeek} resolved this week`,
   ].filter(Boolean).join(" · ")
 
-  // Subtle semantic background tints per KPI card (5% opacity of semantic color)
   const stats = [
     {
-      label: "Open Issues",
-      value: data.openIssues,
-      icon: AlertCircle,
-      iconColor: "text-blue-600",
-      iconBg: "bg-blue-100",
-      accentBorder: "border-l-blue-500",
-      bgTint: "rgba(59,130,246,0.05)",
-      href: "/issues?status=OPEN",
+      label: "Open Issues", value: data.openIssues, icon: AlertCircle,
+      iconColor: "text-blue-600", iconBg: "bg-blue-100", accentBorder: "border-l-blue-500",
+      bgTint: "rgba(59,130,246,0.05)", href: "/issues?status=OPEN",
       secondary: data.newThisWeek > 0 ? `${data.newThisWeek} new this week` : "No new this week",
       secondaryColor: data.newThisWeek > 0 ? "text-amber-600" : "text-gray-400",
       trend: data.newThisWeek > 0 ? { sign: "▲", val: data.newThisWeek, cls: "text-amber-500" } : null,
     },
     {
-      label: "Critical",
-      value: data.criticalIssues,
-      icon: AlertTriangle,
-      iconColor: "text-red-600",
-      iconBg: "bg-red-100",
-      accentBorder: "border-l-red-500",
-      bgTint: "rgba(239,68,68,0.05)",
-      href: "/issues?priority=CRITICAL",
-      secondary: "Highest priority",
-      secondaryColor: "text-gray-400",
+      label: "Critical", value: data.criticalIssues, icon: AlertTriangle,
+      iconColor: "text-red-600", iconBg: "bg-red-100", accentBorder: "border-l-red-500",
+      bgTint: "rgba(239,68,68,0.05)", href: "/issues?priority=CRITICAL",
+      secondary: "Highest priority", secondaryColor: "text-gray-400",
       trend: data.criticalIssues > 0 ? { sign: "!", val: null, cls: "text-red-500" } : null,
     },
     {
-      label: "Escalated",
-      value: data.escalatedIssues,
-      icon: ChevronUp,
-      iconColor: "text-orange-600",
-      iconBg: "bg-orange-100",
-      accentBorder: "border-l-orange-500",
-      bgTint: "rgba(245,158,11,0.05)",
-      href: "/issues?status=ESCALATED",
-      secondary: "Requires response",
-      secondaryColor: "text-gray-400",
-      trend: null,
+      label: "Escalated", value: data.escalatedIssues, icon: ChevronUp,
+      iconColor: "text-orange-600", iconBg: "bg-orange-100", accentBorder: "border-l-orange-500",
+      bgTint: "rgba(245,158,11,0.05)", href: "/issues?status=ESCALATED",
+      secondary: "Requires response", secondaryColor: "text-gray-400", trend: null,
     },
     {
-      label: "Resolved",
-      value: data.resolvedIssues,
-      icon: CheckCircle2,
-      iconColor: "text-emerald-600",
-      iconBg: "bg-emerald-100",
-      accentBorder: "border-l-emerald-500",
-      bgTint: "rgba(16,185,129,0.05)",
-      href: "/issues?status=RESOLVED",
+      label: "Resolved", value: data.resolvedIssues, icon: CheckCircle2,
+      iconColor: "text-emerald-600", iconBg: "bg-emerald-100", accentBorder: "border-l-emerald-500",
+      bgTint: "rgba(16,185,129,0.05)", href: "/issues?status=RESOLVED",
       secondary: data.resolvedThisWeek > 0 ? `${data.resolvedThisWeek} this week` : "None this week",
       secondaryColor: data.resolvedThisWeek > 0 ? "text-emerald-600" : "text-gray-400",
       trend: data.resolvedThisWeek > 0 ? { sign: "▲", val: data.resolvedThisWeek, cls: "text-emerald-500" } : null,
     },
     {
-      label: "Total Assets",
-      value: data.totalAssets,
-      icon: Package,
-      iconColor: "text-violet-600",
-      iconBg: "bg-violet-100",
-      accentBorder: "border-l-violet-500",
-      bgTint: "rgba(139,92,246,0.05)",
-      href: "/assets",
-      secondary: "Tracked",
-      secondaryColor: "text-gray-400",
-      trend: null,
+      label: "Total Assets", value: data.totalAssets, icon: Package,
+      iconColor: "text-violet-600", iconBg: "bg-violet-100", accentBorder: "border-l-violet-500",
+      bgTint: "rgba(139,92,246,0.05)", href: "/assets",
+      secondary: "Tracked", secondaryColor: "text-gray-400", trend: null,
     },
     {
-      label: "Total Issues",
-      value: data.totalIssues,
-      icon: TrendingUp,
-      iconColor: "text-slate-500",
-      iconBg: "bg-slate-100",
-      accentBorder: "border-l-slate-400",
-      bgTint: "rgba(100,116,139,0.05)",
-      href: "/issues",
+      label: "Total Issues", value: data.totalIssues, icon: TrendingUp,
+      iconColor: "text-slate-500", iconBg: "bg-slate-100", accentBorder: "border-l-slate-400",
+      bgTint: "rgba(100,116,139,0.05)", href: "/issues",
       secondary: data.newThisWeek > 0 ? `${data.newThisWeek} added this week` : "None this week",
-      secondaryColor: "text-gray-400",
-      trend: null,
+      secondaryColor: "text-gray-400", trend: null,
     },
   ]
 
   return (
     <div>
-      <Header
-        title={`${greeting}, ${firstName} 👋`}
-        subtitle={headerSubtitle || undefined}
-      />
+      <Header title={`${greeting}, ${firstName} 👋`} subtitle={headerSubtitle || undefined} />
 
       {/* Mobile greeting */}
       <div className="md:hidden px-4 pt-4 pb-1">
         <h1 className="text-lg font-bold text-gray-900">{greeting}, {firstName} 👋</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Here&apos;s what&apos;s happening</p>
+        <p className="text-sm text-gray-400 mt-0.5">Here&apos;s what&apos;s happening</p>
       </div>
 
-      <div className="px-3 md:px-6 py-2 md:py-4 space-y-3">
+      <div className="px-3 md:px-6 py-2 md:py-4 space-y-3 md:space-y-4">
         {checklist && checklist.items.filter(i => !i.done).length > 0 && !session?.isDemo && (
           <WelcomeChecklist items={checklist.items} orgName={checklist.orgName} />
         )}
@@ -413,35 +418,45 @@ export default async function DashboardPage() {
           />
         )}
 
-        {/* ── Operations Health (hero card) ─────────────────────────────── */}
+        {/* ── Operations Health Score ───────────────────────────────────── */}
         <div
-          className="hidden md:block rounded-2xl border shadow-[0_4px_24px_rgba(0,0,0,0.07)] overflow-hidden"
+          className="rounded-2xl border shadow-[0_4px_24px_rgba(0,0,0,0.07)] overflow-hidden"
           style={{ background: healthInfo.gradient, borderColor: healthInfo.borderColor }}
         >
-          <div className="px-8 py-6">
-            {/* Top row */}
+          <div className="px-5 md:px-8 py-5 md:py-6">
+            {/* Header row */}
             <div className="flex items-center justify-between mb-4">
               <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">Operations Health</p>
-              <div className={`flex items-center gap-1.5 text-sm font-bold ${trend.cls}`}>
-                <span className="text-base">{trend.icon}</span>
-                {trend.label}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">AI Confidence:</span>
+                <div className={`w-1.5 h-1.5 rounded-full ${aiConfidenceDot} shrink-0`} />
+                <span className={`text-[11px] font-bold ${aiConfidenceColor}`}>{aiConfidence}</span>
               </div>
             </div>
 
-            {/* Score row */}
-            <div className="flex items-end gap-6 mb-5">
-              <div className={`text-[88px] font-black leading-none ${healthInfo.text}`}
-                style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.03em" }}>
+            {/* Score + status + trend */}
+            <div className="flex items-end gap-4 md:gap-6 mb-5">
+              <div
+                className={`text-[64px] md:text-[88px] font-black leading-none ${healthInfo.text}`}
+                style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.03em" }}
+              >
                 {healthScore}
               </div>
-              <div className="pb-2 flex flex-col gap-2">
+              <div className="pb-1.5 flex flex-col gap-2">
                 <span className={`inline-flex items-center text-sm font-black px-3 py-1.5 rounded-full border ${healthInfo.bg} ${healthInfo.text} ${healthInfo.border}`}>
                   {healthInfo.label}
                 </span>
-                <span className="text-xs text-gray-400 font-medium">out of 100</span>
+                <div className={`flex items-center gap-1 text-sm font-semibold ${
+                  scoreDelta > 0 ? "text-emerald-600" : scoreDelta < 0 ? "text-red-500" : "text-gray-400"
+                }`}>
+                  <span>{scoreDelta > 0 ? "↗" : scoreDelta < 0 ? "↘" : "→"}</span>
+                  <span>
+                    {scoreDelta > 0 ? `+${scoreDelta}` : scoreDelta < 0 ? `${scoreDelta}` : "Same"} from yesterday
+                  </span>
+                </div>
               </div>
-              {/* Stat pills */}
-              <div className="ml-auto pb-2 flex items-center gap-3 flex-wrap">
+              {/* Stat pills — desktop only */}
+              <div className="ml-auto pb-1.5 hidden md:flex items-center gap-3 flex-wrap">
                 {data.criticalIssues > 0 && (
                   <div className="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-full px-3 py-1">
                     <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -461,64 +476,129 @@ export default async function DashboardPage() {
                 {data.resolvedThisWeek > 0 && (
                   <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span className="text-xs font-medium text-emerald-700">{data.resolvedThisWeek} Resolved / wk</span>
+                    <span className="text-xs font-medium text-emerald-700">{data.resolvedThisWeek} Resolved/wk</span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* AI Recommendation callout */}
-            <div className="bg-white/65 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/80">
-              <div className="flex items-start gap-2.5">
-                <Bot className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[10px] font-bold tracking-wider text-gray-400 uppercase mb-0.5">AI Recommendation</p>
-                  <p className="text-sm font-semibold text-gray-800">{aiInsight.recommendation}</p>
-                </div>
-              </div>
+            {/* Contributors breakdown — 2-col on mobile, 4-col on desktop */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-3">
+              {contributors.map((c) => {
+                const clr = contributorColor(c.score)
+                const CIcon = c.icon
+                return (
+                  <div key={c.key} className="bg-white/65 backdrop-blur-sm rounded-xl px-3 md:px-4 py-3 border border-white/80">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <CIcon className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">{c.label}</span>
+                    </div>
+                    <div className={`text-2xl md:text-3xl font-black leading-none ${clr.text}`}>{c.score}</div>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <div className={`w-1 h-1 rounded-full ${clr.dot}`} />
+                      <span className="text-[11px] text-gray-400">
+                        {c.open === 0 ? "No issues" : `${c.open} active`}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
 
-        {/* ── Today's Priorities (compact briefing strip) ───────────────── */}
-        <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-5 px-5 py-3">
-            <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase shrink-0">Today&apos;s Priorities</p>
-            <div className="h-6 w-px bg-gray-100 shrink-0" />
-            <div className="flex items-center gap-4 flex-wrap">
-              {data.criticalIssues > 0 && (
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                  <span className="text-sm font-semibold text-red-600">{data.criticalIssues} Critical</span>
-                </div>
-              )}
-              {data.escalatedIssues > 0 && (
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                  <span className="text-sm font-semibold text-orange-600">{data.escalatedIssues} Escalated</span>
-                </div>
-              )}
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                <span className="text-sm text-gray-600">{data.newToday} new today</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-                <span className="text-sm text-gray-500">{data.openIssues} open</span>
-              </div>
+        {/* ── Today's Priorities (2/3) + Relay AI (1/3) — desktop only ──── */}
+        <div className="hidden md:grid grid-cols-3 gap-4">
+          {/* Today's Priorities */}
+          <div className="col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-gray-100">
+              <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">Today&apos;s Priorities</p>
             </div>
-            {aiInsight.recommendation && (
-              <>
-                <div className="h-6 w-px bg-gray-100 shrink-0" />
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <Bot className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                  <span className="text-[12px] text-gray-500 truncate">
-                    <span className="font-semibold text-gray-700">AI: </span>
-                    {aiInsight.recommendation}
-                  </span>
+            <div className="grid grid-cols-2 gap-3 p-4">
+              <Link
+                href="/issues?priority=CRITICAL"
+                className={`flex items-start gap-3 rounded-lg px-3.5 py-3 border hover:shadow-sm hover:-translate-y-0.5 transition-all duration-150 ${
+                  data.criticalIssues > 0 ? "bg-red-50/70 border-red-100 hover:bg-red-50" : "bg-gray-50/50 border-gray-100"
+                }`}
+              >
+                <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${data.criticalIssues > 0 ? "bg-red-500" : "bg-gray-300"}`} />
+                <div>
+                  <div className={`text-2xl font-black ${data.criticalIssues > 0 ? "text-red-600" : "text-gray-400"}`}>{data.criticalIssues}</div>
+                  <div className={`text-[12px] font-medium mt-0.5 ${data.criticalIssues > 0 ? "text-red-500" : "text-gray-400"}`}>Critical Issues</div>
                 </div>
-              </>
-            )}
+              </Link>
+              <Link
+                href="/issues?status=ESCALATED"
+                className={`flex items-start gap-3 rounded-lg px-3.5 py-3 border hover:shadow-sm hover:-translate-y-0.5 transition-all duration-150 ${
+                  data.escalatedIssues > 0 ? "bg-orange-50/70 border-orange-100 hover:bg-orange-50" : "bg-gray-50/50 border-gray-100"
+                }`}
+              >
+                <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${data.escalatedIssues > 0 ? "bg-orange-500" : "bg-gray-300"}`} />
+                <div>
+                  <div className={`text-2xl font-black ${data.escalatedIssues > 0 ? "text-orange-600" : "text-gray-400"}`}>{data.escalatedIssues}</div>
+                  <div className={`text-[12px] font-medium mt-0.5 ${data.escalatedIssues > 0 ? "text-orange-500" : "text-gray-400"}`}>Escalated</div>
+                </div>
+              </Link>
+              <Link
+                href="/issues?status=OPEN"
+                className="flex items-start gap-3 rounded-lg px-3.5 py-3 bg-blue-50/70 border border-blue-100 hover:bg-blue-50 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-150"
+              >
+                <div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+                <div>
+                  <div className="text-2xl font-black text-blue-600">{data.newToday}</div>
+                  <div className="text-[12px] font-medium text-blue-500 mt-0.5">New Today</div>
+                </div>
+              </Link>
+              <Link
+                href="/issues?status=OPEN"
+                className="flex items-start gap-3 rounded-lg px-3.5 py-3 bg-gray-50 border border-gray-100 hover:bg-gray-100/70 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-150"
+              >
+                <div className="w-2 h-2 rounded-full bg-gray-400 mt-1.5 shrink-0" />
+                <div>
+                  <div className="text-2xl font-black text-gray-600">{data.openIssues}</div>
+                  <div className="text-[12px] font-medium text-gray-400 mt-0.5">Open Issues</div>
+                </div>
+              </Link>
+            </div>
+          </div>
+
+          {/* Relay AI */}
+          <div className="col-span-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-gray-100">
+              <div className="relative w-7 h-7 shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
+                </div>
+                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white animate-pulse" />
+              </div>
+              <h2 className="font-bold text-gray-900">Relay AI</h2>
+            </div>
+
+            <div className="px-5 py-4">
+              {data.totalIssues === 0 ? (
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Relay AI is analyzing your operational data. Insights appear as your team logs activity.
+                </p>
+              ) : (
+                <ul className="space-y-2.5">
+                  {aiInsights.map((insight, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <div className="w-1 h-1 rounded-full bg-blue-500 mt-2 shrink-0" />
+                      <p className="text-sm text-gray-600 leading-snug">{insight}</p>
+                    </li>
+                  ))}
+                  {aiInsights.length === 0 && (
+                    <p className="text-sm text-gray-400 leading-relaxed">Log more activity to unlock AI-powered insights.</p>
+                  )}
+                </ul>
+              )}
+              <Link
+                href="/executive-briefings"
+                className="mt-4 inline-flex items-center gap-1 text-[12px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Read Full Analysis <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -542,15 +622,16 @@ export default async function DashboardPage() {
                 )}
               </div>
               <div className="text-3xl font-black text-gray-900 leading-none">{value}</div>
-              <div className="text-[13px] font-medium text-gray-500 mt-1">{label}</div>
+              <div className="text-[13px] font-medium text-gray-600 mt-1">{label}</div>
               <div className={`text-[11px] mt-1.5 ${secondaryColor}`}>{secondary}</div>
             </Link>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* ── Recent Issues ─────────────────────────────────────────── */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        {/* ── Recent Issues (60%) + Category Chart (40%) ───────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+          {/* Recent Issues */}
+          <div className="lg:col-span-3 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h2 className="font-bold text-gray-900">Recent Issues</h2>
               <Link href="/issues" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium">
@@ -559,28 +640,39 @@ export default async function DashboardPage() {
             </div>
             <div className="divide-y divide-gray-50">
               {data.recentIssues.length === 0 ? (
-                <div className="px-6 py-10 text-center">
+                <div className="px-6 py-12 text-center">
                   <AlertCircle className="w-8 h-8 text-gray-200 mx-auto mb-2" />
                   <p className="text-sm text-gray-400">No issues yet</p>
                 </div>
               ) : (
                 data.recentIssues.map((issue) => {
                   const waiting = getWaiting(issue.createdAt, issue.status)
-                  const dot = PRIORITY_DOT[issue.priority] ?? "bg-gray-300"
                   const assigneeInitial = issue.assignedTo?.name?.charAt(0).toUpperCase()
+                  const firstImg = issue.attachments[0]?.url ?? null
+                  const catBg  = CATEGORY_ICON_BG[issue.category]  ?? "bg-gray-100"
+                  const catClr = CATEGORY_ICON_CLR[issue.category] ?? "text-gray-400"
 
                   return (
                     <Link
                       key={issue.id}
                       href={`/issues/${issue.id}`}
-                      className="flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50/80 transition-colors"
+                      className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50/80 transition-all duration-150"
                     >
-                      <div className="shrink-0 pt-[7px]">
-                        <div className={`w-2 h-2 rounded-full ${dot}`} />
+                      {/* Thumbnail */}
+                      <div className="shrink-0">
+                        {firstImg ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={firstImg} alt="" className="w-8 h-8 rounded-lg object-cover border border-gray-100" />
+                        ) : (
+                          <div className={`w-8 h-8 rounded-lg ${catBg} flex items-center justify-center border border-gray-100`}>
+                            <AlertCircle className={`w-4 h-4 ${catClr}`} />
+                          </div>
+                        )}
                       </div>
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-sm font-semibold text-gray-900 truncate max-w-[240px]">{issue.title}</span>
+                          <span className="text-sm font-semibold text-gray-900 truncate max-w-[200px]">{issue.title}</span>
                           <Badge className={`${PRIORITY_COLOR[issue.priority]} text-[10px] px-1.5 py-0 border`}>
                             {ISSUE_PRIORITY[issue.priority as keyof typeof ISSUE_PRIORITY] ?? issue.priority}
                           </Badge>
@@ -595,6 +687,7 @@ export default async function DashboardPage() {
                           )}
                         </div>
                       </div>
+
                       <div className="shrink-0 flex flex-col items-end gap-1.5">
                         {assigneeInitial && (
                           <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
@@ -612,87 +705,41 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* Right column */}
-          <div className="space-y-4">
-            {/* ── Issues by Category ─────────────────────────────────── */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <h2 className="font-bold text-gray-900">By Category</h2>
-                <span className="text-xs text-gray-400 font-medium">{data.totalIssues} total</span>
-              </div>
-              <div className="px-5 py-4 space-y-3.5">
-                {data.issuesByCategory.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-4">No data yet</p>
-                ) : (
-                  data.issuesByCategory.slice(0, 8).map((item) => {
-                    const total = data.totalIssues || 1
-                    const pct = Math.round((item._count.id / total) * 100)
-                    const barColor = CATEGORY_COLOR[item.category] ?? "bg-blue-400"
-                    const label = ISSUE_CATEGORY[item.category as keyof typeof ISSUE_CATEGORY] ?? item.category
+          {/* Category Chart */}
+          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <h2 className="font-bold text-gray-900">By Category</h2>
+              <span className="text-xs text-gray-400 font-medium">{data.totalIssues} total</span>
+            </div>
+            <div className="px-5 py-4 space-y-4">
+              {data.issuesByCategory.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-6">No data yet</p>
+              ) : (
+                data.issuesByCategory.slice(0, 8).map((item) => {
+                  const total = data.totalIssues || 1
+                  const pct = Math.round((item._count.id / total) * 100)
+                  const barHex = CATEGORY_COLOR_HEX[item.category] ?? "#94a3b8"
+                  const label = ISSUE_CATEGORY[item.category as keyof typeof ISSUE_CATEGORY] ?? item.category
 
-                    return (
-                      <div key={item.category}>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[13px] font-medium text-gray-700 truncate max-w-[130px]">{label}</span>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-xs font-semibold text-gray-500">{pct}%</span>
-                            <span className="text-[13px] font-bold text-gray-900 w-5 text-right">{item._count.id}</span>
-                          </div>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-2.5">
-                          <div
-                            className={`${barColor} h-2.5 rounded-full transition-all`}
-                            style={{ width: `${Math.max(pct, 2)}%` }}
-                          />
+                  return (
+                    <div key={item.category}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[13px] font-semibold text-gray-900 truncate max-w-[130px]">{label}</span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-xs font-bold" style={{ color: barHex }}>{pct}%</span>
+                          <span className="text-[13px] font-black text-gray-900 w-5 text-right">{item._count.id}</span>
                         </div>
                       </div>
-                    )
-                  })
-                )}
-              </div>
-            </div>
-
-            {/* ── Relay AI card (replaces Suggestions) ───────────────── */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100">
-                <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
-                  <Sparkles className="w-3.5 h-3.5 text-white" />
-                </div>
-                <h2 className="font-bold text-gray-900">Relay AI</h2>
-              </div>
-
-              <div className="px-5 py-4">
-                <p className="text-[12px] text-gray-400 font-medium mb-3">
-                  {greeting}, {firstName}. Here is your operational summary.
-                </p>
-
-                {data.totalIssues === 0 ? (
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    Relay AI is analyzing your operational data. Insights will appear as your team logs activity.
-                  </p>
-                ) : (
-                  <ul className="space-y-2.5">
-                    {aiInsights.map((insight, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <div className="w-1 h-1 rounded-full bg-blue-500 mt-2 shrink-0" />
-                        <p className="text-sm text-gray-700 leading-snug">{insight}</p>
-                      </li>
-                    ))}
-                    {aiInsights.length === 0 && (
-                      <p className="text-sm text-gray-400 leading-relaxed">
-                        Not enough data for insights yet. Log more activity to get started.
-                      </p>
-                    )}
-                  </ul>
-                )}
-
-                <Link
-                  href="/executive-briefings"
-                  className="mt-4 inline-flex items-center gap-1 text-[12px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  Read Full Brief <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
+                      <div className="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden">
+                        <div
+                          className="h-3.5 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: barHex }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })
+              )}
             </div>
           </div>
         </div>

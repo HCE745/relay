@@ -4,52 +4,115 @@ import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 
 interface DiscoverBody {
-  industry?:         string
-  location?:         string
-  employeeCountMin?: number
-  employeeCountMax?: number
-  locationsMin?:     number
-  keywords?:         string
+  industry?:          string
+  location?:          string
+  employeeCountMin?:  number
+  employeeCountMax?:  number
+  locationsMin?:      number
+  keywords?:          string
   additionalContext?: string
 }
 
 interface ProspectResult {
-  companyName:           string
-  website:               string
-  industry:              string
-  employeeCountMin:      number
-  employeeCountMax:      number
-  locationsCount:        number
-  headquartersCity:      string
-  headquartersState:     string
-  aiFitScore:            number
-  researchSummary:       string
-  operationalPainPoints: string
-  relayFitReasons:       string
-  suggestedDemoEmphasis: string
+  companyName:            string
+  website:                string
+  industry:               string
+  employeeCountMin:       number
+  employeeCountMax:       number
+  locationsCount:         number
+  headquartersCity:       string
+  headquartersState:      string
+  aiFitScore:             number
+  researchSummary:        string
+  operationalPainPoints:  string
+  relayFitReasons:        string
+  suggestedDemoEmphasis:  string
   suggestedOutreachAngle: string
-  decisionMakerTitles:   string[]
-  confidenceScore:       number
+  decisionMakerTitles:    string[]
+  confidenceScore:        number
 }
 
-type AnthropicContentBlock =
+type ContentBlock =
   | { type: "text"; text: string }
   | { type: "tool_use"; id: string; name: string; input: unknown }
   | { type: "tool_result"; tool_use_id: string; content: unknown }
+  | { type: string }
 
-interface AnthropicResponse {
-  content:    AnthropicContentBlock[]
-  stop_reason: string
-}
-
-/** Extract the hostname from a URL for domain-level dedup, or null on failure. */
+/** Extract the bare domain for dedup. Returns null on failure. */
 function extractDomain(url: string): string | null {
   try {
     const normalized = url.startsWith("http") ? url : `https://${url}`
     return new URL(normalized).hostname.replace(/^www\./, "")
-  } catch {
-    return null
+  } catch { return null }
+}
+
+/** Get the last text block from an Anthropic content array. */
+function lastTextBlock(content: ContentBlock[]): string | null {
+  const texts = content.filter((c): c is { type: "text"; text: string } => c.type === "text")
+  return texts.at(-1)?.text?.trim() ?? null
+}
+
+/** Call the Anthropic API. Returns the content array, or throws on non-200. */
+async function callAnthropic(opts: {
+  system: string
+  messages: { role: string; content: string }[]
+  tools?: unknown[]
+  betaHeader?: string
+  maxTokens?: number
+}) {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not set")
+
+  const headers: Record<string, string> = {
+    "x-api-key":         apiKey,
+    "anthropic-version": "2023-06-01",
+    "content-type":      "application/json",
   }
+  if (opts.betaHeader) headers["anthropic-beta"] = opts.betaHeader
+
+  const body: Record<string, unknown> = {
+    model:      "claude-sonnet-5",
+    max_tokens: opts.maxTokens ?? 8000,
+    system:     opts.system,
+    messages:   opts.messages,
+  }
+  if (opts.tools?.length) body.tools = opts.tools
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method:  "POST",
+    headers,
+    body:    JSON.stringify(body),
+    signal:  AbortSignal.timeout(120_000),
+  })
+
+  const responseText = await res.text()
+  if (!res.ok) {
+    console.error("[discover] Anthropic HTTP error", res.status, responseText.slice(0, 400))
+    throw new Error(`Anthropic returned ${res.status}: ${responseText.slice(0, 200)}`)
+  }
+
+  const data = JSON.parse(responseText) as { content: ContentBlock[]; stop_reason: string }
+  console.log("[discover] stop_reason:", data.stop_reason, "| content blocks:", data.content.length,
+    data.content.map(c => c.type).join(", "))
+  return data.content
+}
+
+/** Extract a JSON array from raw text — handles fences, prefix text, and bare arrays. */
+function extractJsonArray(raw: string): ProspectResult[] | null {
+  // 1. Fenced code block: ```json [...] ``` or ``` [...] ```
+  const fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/)
+  if (fence?.[1]) {
+    try { return JSON.parse(fence[1].trim()) as ProspectResult[] } catch { /* fall through */ }
+  }
+
+  // 2. Bare JSON array (possibly with prefix text)
+  const arrayStart = raw.indexOf("[")
+  const arrayEnd   = raw.lastIndexOf("]")
+  if (arrayStart !== -1 && arrayEnd > arrayStart) {
+    try { return JSON.parse(raw.slice(arrayStart, arrayEnd + 1)) as ProspectResult[] } catch { /* fall through */ }
+  }
+
+  return null
 }
 
 export async function POST(req: NextRequest) {
@@ -59,191 +122,165 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json() as DiscoverBody
-  const {
-    industry,
-    location,
-    employeeCountMin,
-    employeeCountMax,
-    locationsMin,
-    keywords,
-    additionalContext,
-  } = body
+  const { industry, location, employeeCountMin, employeeCountMax, locationsMin, keywords, additionalContext } = body
 
-  // ── 1. Load existing prospects for exclusion ──────────────────────────────
-  const existingProspects = await prisma.prospect.findMany({
-    select: { companyName: true, website: true },
-  })
+  console.log("[discover] Request:", { industry, location, employeeCountMin, employeeCountMax, locationsMin, keywords })
 
-  const existingNames   = new Set(existingProspects.map(p => p.companyName.toLowerCase().trim()))
+  // ── Load existing prospects for exclusion ───────────────────────────────────
+  const existing = await prisma.prospect.findMany({ select: { companyName: true, website: true } })
+  const existingNames   = new Set(existing.map(p => p.companyName.toLowerCase().trim()))
   const existingDomains = new Set(
-    existingProspects
-      .map(p => (p.website ? extractDomain(p.website) : null))
-      .filter((d): d is string => d !== null)
+    existing.map(p => p.website ? extractDomain(p.website) : null).filter((d): d is string => d !== null)
   )
+  const exclusionSnippet = existing.map(p => p.companyName).slice(0, 150).join(", ")
 
-  const exclusionList = existingProspects
-    .map(p => p.companyName)
-    .slice(0, 200) // guard against enormous prompts
-    .join(", ")
-
-  // ── 2. Build the search prompt ────────────────────────────────────────────
+  // ── Build criteria text ─────────────────────────────────────────────────────
   const criteria: string[] = []
-  if (industry)         criteria.push(`Industry: ${industry}`)
-  if (location)         criteria.push(`Location/Region: ${location}`)
-  if (employeeCountMin !== undefined || employeeCountMax !== undefined) {
-    const min = employeeCountMin ?? "any"
-    const max = employeeCountMax ?? "any"
-    criteria.push(`Employee count: ${min}–${max}`)
-  }
-  if (locationsMin !== undefined) criteria.push(`Minimum locations: ${locationsMin}`)
-  if (keywords)         criteria.push(`Keywords / focus areas: ${keywords}`)
-  if (additionalContext) criteria.push(`Additional context: ${additionalContext}`)
-
+  if (industry)                              criteria.push(`Industry: ${industry}`)
+  if (location)                              criteria.push(`Location/Region: ${location}`)
+  if (employeeCountMin ?? employeeCountMax)  criteria.push(`Employee count: ${employeeCountMin ?? "any"}–${employeeCountMax ?? "any"}`)
+  if (locationsMin)                          criteria.push(`Minimum locations/facilities: ${locationsMin}`)
+  if (keywords)                              criteria.push(`Keywords/focus: ${keywords}`)
+  if (additionalContext)                     criteria.push(`Additional context: ${additionalContext}`)
   const criteriaText = criteria.length > 0
     ? criteria.join("\n")
-    : "General multi-location B2B businesses across any industry in the US"
+    : "Multi-location B2B businesses across the US in any operational industry"
 
-  const prompt = `Use web search to find 10–15 real companies that would be excellent sales prospects for Relay, a multi-location operations management SaaS platform.
+  // ════════════════════════════════════════════════════════════════════════════
+  // STEP 1 — Web-search research: let the model find real companies naturally
+  // ════════════════════════════════════════════════════════════════════════════
+  console.log("[discover] Step 1: web-search research starting")
+
+  const researchSystem = `You are a B2B sales intelligence researcher for Relay, an operations management platform for multi-location businesses. Relay helps companies manage facility issues, maintenance requests, assets, QR-code reporting, and team communications across multiple physical locations. Ideal customers: 3–20 locations, 50–500 employees, industries like manufacturing, food & beverage, retail chains, warehousing, property management, healthcare facilities, hospitality.`
+
+  const researchPrompt = `Use web search to find 10–15 real companies that would be strong sales prospects for Relay.
 
 SEARCH CRITERIA:
 ${criteriaText}
 
-COMPANIES TO EXCLUDE (already in our CRM — do not include these):
-${exclusionList || "(none yet)"}
+DO NOT INCLUDE these companies (already in our CRM):
+${exclusionSnippet || "(none)"}
 
-WHAT TO SEARCH FOR:
-Search for real, verifiable companies that match the criteria above. Look for companies with:
-- Multiple physical locations (ideally 3+)
-- 50–500 employees
-- Operational / facilities management needs
-- Industries like manufacturing, food & beverage, retail chains, warehousing, property management, or healthcare facilities
+For each company you find, research and note:
+- Company name and website URL
+- Industry and what they do
+- Approximate employee count and number of physical locations
+- Headquarters city and state
+- Likely operational pain points (maintenance, issue tracking, multi-location coordination)
+- Why Relay would be a good fit
+- Which Relay features to emphasize (multi-location dashboard, maintenance routing, QR codes, asset tracking)
+- Best outreach angle
+- Job titles of likely decision makers
+- Your confidence in the data accuracy (0–100)
+- Fit score for Relay (0–100 based on: multiple locations, operational complexity, industry match, company size)
 
-For each company found, provide the following as a JSON array (sorted by aiFitScore descending):
+Search for real companies with verifiable websites. Focus on companies with physical operations across multiple sites.`
 
+  let researchText: string
+  try {
+    const content = await callAnthropic({
+      system:     researchSystem,
+      messages:   [{ role: "user", content: researchPrompt }],
+      tools:      [{ type: "web_search_20250305", name: "web_search" }],
+      betaHeader: "web-search-2025-03-05",
+      maxTokens:  8000,
+    })
+
+    const text = lastTextBlock(content)
+    if (!text) {
+      console.error("[discover] Step 1: no text block found in response")
+      console.error("[discover] Content blocks:", JSON.stringify(content).slice(0, 500))
+      return NextResponse.json({ error: "AI research returned no text content", prospects: [] }, { status: 502 })
+    }
+
+    researchText = text
+    console.log("[discover] Step 1 complete, research text length:", researchText.length)
+    console.log("[discover] Step 1 preview:", researchText.slice(0, 300))
+  } catch (err) {
+    console.error("[discover] Step 1 failed:", err)
+    return NextResponse.json({ error: String(err) }, { status: 502 })
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // STEP 2 — Format the research into strict JSON (no web search, fast)
+  // ════════════════════════════════════════════════════════════════════════════
+  console.log("[discover] Step 2: JSON formatting starting")
+
+  const formatSystem = `You are a data extraction assistant. You receive raw company research notes and output them as a strict JSON array. You output ONLY the JSON array — no explanation, no markdown, no preamble.`
+
+  const formatPrompt = `Convert the following company research into a JSON array sorted by aiFitScore descending.
+
+RESEARCH NOTES:
+${researchText}
+
+Output a JSON array where each element has EXACTLY these fields (use null for missing values, never omit a field):
 [
   {
-    "companyName": "Exact legal or trade name",
-    "website": "https://www.example.com",
-    "industry": "Industry sector",
-    "employeeCountMin": 50,
-    "employeeCountMax": 200,
-    "locationsCount": 12,
-    "headquartersCity": "City",
-    "headquartersState": "ST",
-    "aiFitScore": 85,
-    "researchSummary": "2–3 sentence summary of the company and why they are a fit",
-    "operationalPainPoints": "Specific operational challenges they likely face",
-    "relayFitReasons": "Why Relay's platform directly addresses their needs",
-    "suggestedDemoEmphasis": "Which Relay features to emphasize in a demo",
-    "suggestedOutreachAngle": "Best first-contact messaging angle",
-    "decisionMakerTitles": ["Operations Manager", "Facilities Director"],
-    "confidenceScore": 90
+    "companyName": "string — exact company name",
+    "website": "string — full URL with https://",
+    "industry": "string — industry sector",
+    "employeeCountMin": number | null,
+    "employeeCountMax": number | null,
+    "locationsCount": number | null,
+    "headquartersCity": "string | null",
+    "headquartersState": "string | null — 2-letter state code if US",
+    "aiFitScore": number (0-100),
+    "researchSummary": "string — 2-3 sentences about the company and why they are a fit",
+    "operationalPainPoints": "string — specific operational challenges they face",
+    "relayFitReasons": "string — why Relay directly addresses their needs",
+    "suggestedDemoEmphasis": "string — which Relay features to show in a demo",
+    "suggestedOutreachAngle": "string — best opening message angle",
+    "decisionMakerTitles": ["string array of likely decision maker job titles"],
+    "confidenceScore": number (0-100)
   }
 ]
 
-IMPORTANT RULES:
-- Return ONLY the JSON array — no explanation, no markdown fences, no extra text before or after.
-- All companies must be real and verifiable via their website.
-- Do not include any company from the exclusion list above.
-- aiFitScore (0–100): how well this company fits Relay's ideal customer profile.
-- confidenceScore (0–100): your confidence that the company data is accurate.
-- If you cannot find 10 matching companies that are not already in the exclusion list, return however many you found.`
+Rules:
+- Output ONLY the JSON array, starting with [ and ending with ]
+- Include every company found in the research notes
+- aiFitScore: 80-100 for manufacturing/warehousing/facilities with 5+ locations, 60-79 for retail/healthcare/hospitality, lower for others
+- Do not invent companies not mentioned in the research notes`
 
-  // ── 3. Call Anthropic API with web search ─────────────────────────────────
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
-    console.error("[discover] ANTHROPIC_API_KEY not set")
-    return NextResponse.json({ error: "API key not configured" }, { status: 500 })
-  }
-
-  let rawText: string | null = null
-
+  let candidates: ProspectResult[] = []
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:  "POST",
-      headers: {
-        "x-api-key":         apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-beta":    "web-search-2025-03-05",
-        "content-type":      "application/json",
-      },
-      body: JSON.stringify({
-        model:      "claude-sonnet-5",
-        max_tokens: 8000,
-        system:     "You are a B2B sales intelligence researcher for Relay, a multi-location operations management SaaS. Your job is to find real companies that would benefit from Relay. Relay helps multi-location businesses manage issues, maintenance, assets, and team communications across facilities. Best customers have: 3+ locations, 50-500 employees, operational/facilities management needs, industries like manufacturing, food & beverage, retail chains, warehousing, property management, healthcare facilities.",
-        tools: [
-          { type: "web_search_20250305", name: "web_search" },
-        ],
-        messages: [{ role: "user", content: prompt }],
-      }),
-      signal: AbortSignal.timeout(120_000), // 2-minute timeout for web search
+    const content = await callAnthropic({
+      system:   formatSystem,
+      messages: [{ role: "user", content: formatPrompt }],
+      maxTokens: 6000,
     })
 
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => "")
-      console.error("[discover] Anthropic error:", res.status, errBody.slice(0, 300))
-      return NextResponse.json({ error: "AI search failed", details: errBody.slice(0, 200) }, { status: 502 })
-    }
+    const rawJson = lastTextBlock(content)
+    console.log("[discover] Step 2 raw JSON preview:", rawJson?.slice(0, 400))
 
-    const data = await res.json() as AnthropicResponse
-
-    // Web search responses interleave tool_use (search queries) and text (results/analysis).
-    // We want the last text block, which contains the final JSON output.
-    const textBlocks = data.content.filter((c): c is { type: "text"; text: string } => c.type === "text")
-    rawText = textBlocks.at(-1)?.text?.trim() ?? null
-
-    if (!rawText) {
-      console.error("[discover] No text block in Anthropic response")
-      return NextResponse.json({ prospects: [] })
-    }
-  } catch (err) {
-    console.error("[discover] Fetch failed:", err)
-    return NextResponse.json({ error: "AI request failed" }, { status: 502 })
-  }
-
-  // ── 4. Parse JSON from the response ──────────────────────────────────────
-  let candidates: ProspectResult[] = []
-
-  try {
-    // Direct parse first (model should return raw JSON per the prompt)
-    candidates = JSON.parse(rawText) as ProspectResult[]
-  } catch {
-    // Fallback: extract JSON array from markdown code fences or surrounding text
-    const match = rawText.match(/```(?:json)?\s*([\s\S]*?)```/) ?? rawText.match(/(\[[\s\S]*\])/)
-    if (match) {
-      try {
-        candidates = JSON.parse(match[1]) as ProspectResult[]
-      } catch (e2) {
-        console.error("[discover] JSON parse failed after fallback:", e2)
-        console.error("[discover] Raw response snippet:", rawText.slice(0, 500))
-        // Return empty rather than crashing — caller can retry
-        return NextResponse.json({ prospects: [], parseError: true })
-      }
-    } else {
-      console.error("[discover] Could not locate JSON array in response")
-      console.error("[discover] Raw response snippet:", rawText.slice(0, 500))
+    if (!rawJson) {
+      console.error("[discover] Step 2: no text in format response")
       return NextResponse.json({ prospects: [], parseError: true })
     }
+
+    const parsed = extractJsonArray(rawJson)
+    if (!parsed || !Array.isArray(parsed)) {
+      console.error("[discover] Step 2: JSON parse failed. Raw:", rawJson.slice(0, 600))
+      return NextResponse.json({ prospects: [], parseError: true })
+    }
+
+    candidates = parsed
+    console.log("[discover] Step 2 complete, candidates:", candidates.length)
+  } catch (err) {
+    console.error("[discover] Step 2 failed:", err)
+    return NextResponse.json({ error: String(err) }, { status: 502 })
   }
 
-  if (!Array.isArray(candidates)) {
-    return NextResponse.json({ prospects: [] })
-  }
-
-  // ── 5. Filter duplicates against existing DB records ──────────────────────
+  // ── Deduplicate against existing DB records ──────────────────────────────────
   const prospects = candidates.filter(p => {
     if (!p?.companyName) return false
-
-    const nameLower = p.companyName.toLowerCase().trim()
-    if (existingNames.has(nameLower)) return false
-
+    if (existingNames.has(p.companyName.toLowerCase().trim())) return false
     if (p.website) {
       const domain = extractDomain(p.website)
       if (domain && existingDomains.has(domain)) return false
     }
-
     return true
   })
 
+  console.log("[discover] Final prospects after dedup:", prospects.length, "of", candidates.length)
   return NextResponse.json({ prospects })
 }

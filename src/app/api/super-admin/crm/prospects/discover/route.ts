@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 
+// Web search + two-step LLM can take 60-90 s — raise Vercel's serverless timeout
+export const maxDuration = 120
+
 export interface DiscoveredCompany {
   companyName:          string
   website:              string
@@ -93,6 +96,15 @@ function normalise(raw: Record<string, unknown>): DiscoveredCompany {
   }
 }
 
+// Generic/header words that look like section headings but are NOT company names.
+// The prose fallback sees markdown table headers (### Summary Table) and numbered
+// section titles as potential companies — this set filters them out.
+const PROSE_SKIP = new Set([
+  "summary", "summary table", "table", "overview", "results", "companies",
+  "company", "list", "note", "notes", "disclaimer", "all companies",
+  "company name", "final list", "findings", "prospects",
+])
+
 /** Fallback: parse company sections from prose when JSON extraction fails */
 function extractFromProse(text: string): DiscoveredCompany[] {
   const results: DiscoveredCompany[] = []
@@ -100,12 +112,16 @@ function extractFromProse(text: string): DiscoveredCompany[] {
   for (const sec of sections) {
     const heading = sec.match(/^#{1,3}\s+(.+?)$/m) ?? sec.match(/^\d+\.\s+\*?\*?(.+?)\*?\*?$/m)
     if (!heading) continue
-    const companyName = heading[1].replace(/\*\*/g, "").trim()
-    if (companyName.length < 2 || companyName.length > 100) continue
-    const website      = sec.match(/https?:\/\/[^\s\)\]]+/)?.[0] ?? ""
-    const csMatch      = sec.match(/([A-Z][a-z]+(?: [A-Z][a-z]+)*),\s+([A-Z]{2})\b/)
-    const scoreMatch   = sec.match(/(?:fit\s*score|score)[:\s]+(\d+)/i)
-    const empMatch     = sec.match(/(\d[\d,]*(?:\s*[-–]\s*\d[\d,]*)?)\s*employees?/i)
+    const companyName = heading[1].replace(/\*\*/g, "").replace(/[|#*]/g, "").trim()
+    if (companyName.length < 3 || companyName.length > 100) continue
+    // Skip generic section titles and table headers
+    if (PROSE_SKIP.has(companyName.toLowerCase())) continue
+    // Skip if the "name" is just a number or single word that looks like a header
+    if (/^\d+$/.test(companyName)) continue
+    const website    = sec.match(/https?:\/\/[^\s\)\]]+/)?.[0] ?? ""
+    const csMatch    = sec.match(/([A-Z][a-z]+(?: [A-Z][a-z]+)*),\s+([A-Z]{2})\b/)
+    const scoreMatch = sec.match(/(?:fit\s*score|score)[:\s]+(\d+)/i)
+    const empMatch   = sec.match(/(\d[\d,]*(?:\s*[-–]\s*\d[\d,]*)?)\s*employees?/i)
     results.push({
       companyName, website,
       city:    csMatch?.[1] ?? "", state: csMatch?.[2] ?? "",
@@ -188,7 +204,7 @@ export async function POST(req: NextRequest) {
     let researchText: string
     try {
       const researchContent = await callAnthropic({
-        system: "You are a B2B sales researcher. Use web search to find real companies. Be specific: real company names, real websites, concrete facts about their operations.",
+        system: "You are a B2B sales researcher. Use web search to find real companies. Be specific: real company names, real websites, concrete facts about their operations. Present your findings as a plain numbered list — no markdown tables, no table headers, no summary sections.",
         messages: [{ role: "user", content: `Find exactly 8 to 10 real companies that are strong sales prospects for Relay, an operations management platform for multi-location businesses (issue tracking, maintenance routing, QR-code check-ins, asset management, team messaging across locations).
 
 SEARCH CRITERIA:
@@ -196,18 +212,24 @@ ${criteriaText}
 
 DO NOT include these (already in CRM): ${exclusionList || "(none)"}
 
-For each company, research and note:
-- Company name and real website URL
-- Headquarters city and state
-- Industry
-- Approximate employee count (e.g. "80-150")
-- 3-4 sentence description of what they do and how they operate
-- 3 specific operational pain points they likely have (maintenance issues, multi-site coordination, issue tracking)
-- 3 reasons Relay would specifically help them
-- The best one-sentence outreach angle
-- Relay fit score 0-100 (higher = more locations + more operational complexity)
+For each company, write a numbered entry like this:
+1. [Company Name]
+- Website: https://...
+- City, State: ...
+- Industry: ...
+- Employees: (approximate range)
+- Summary: (3-4 sentences about what they do and their multi-location operations)
+- Pain points: (3 specific operational challenges)
+- Relay fit: (3 reasons Relay would help them)
+- Outreach angle: (one sentence on how to approach them)
+- Fit score: (0-100, higher = more locations + more operational complexity)
 
-Search for these companies, verify they are real, and make your notes specific and concrete.` }],
+IMPORTANT FORMATTING RULES:
+- Use the numbered list format above for every company
+- Do NOT create markdown tables
+- Do NOT add a "Summary Table" or any table at the end
+- Do NOT add any sections other than the numbered company entries
+- Search for each company to verify it is real before including it` }],
         tools: [{ type: "web_search_20250305", name: "web_search" }],
         betaHeader: "web-search-2025-03-05",
         maxTokens: 8000,
@@ -232,23 +254,24 @@ Search for these companies, verify they are real, and make your notes specific a
     let companies: DiscoveredCompany[] = []
     try {
       const fmtContent = await callAnthropic({
-        system: "You are a JSON formatter. Output ONLY a valid JSON array. No explanation. No markdown. Start with [ and end with ].",
+        system: `You must respond with ONLY a valid JSON array. No markdown. No tables. No headers. No explanation. No code blocks. Just a raw JSON array starting with [ and ending with ]. Each element must be a JSON object with these exact keys: companyName, website, city, state, industry, estimatedEmployees, summary, painPoints, relayFitReasons, suggestedOutreachAngle, fitScore. If you cannot find real companies matching the criteria return an empty array []. Do not return anything other than the JSON array.`,
         messages: [
-          { role: "user", content: `Convert these research notes into a JSON array. Include every company found. Each object must have exactly these fields:
+          { role: "user", content: `Convert every company in these research notes into a JSON array. Include ALL companies found — do not skip any.
 
-- companyName (string)
-- website (string, full https:// URL or empty string)
-- city (string, headquarters city or empty string)
-- state (string, 2-letter US state code or empty string)
-- industry (string)
-- estimatedEmployees (string, e.g. "80-150" or "~200")
-- summary (string, 3-4 sentences about what they do and their operations)
-- painPoints (array of exactly 3 strings — specific operational pain points)
-- relayFitReasons (array of exactly 3 strings — why Relay solves their problems)
-- suggestedOutreachAngle (string, one sentence on how to approach them)
-- fitScore (integer 0-100)
+Each JSON object must have exactly these fields (use empty string or empty array if data is missing — never omit a field):
+- companyName: string (the company name)
+- website: string (full https:// URL, or "" if unknown)
+- city: string (headquarters city, or "")
+- state: string (2-letter US state code, or "")
+- industry: string (industry sector)
+- estimatedEmployees: string (e.g. "80-150" or "~200", or "")
+- summary: string (3-4 sentences about what they do)
+- painPoints: array of exactly 3 strings (operational pain points)
+- relayFitReasons: array of exactly 3 strings (why Relay helps them)
+- suggestedOutreachAngle: string (one sentence outreach angle)
+- fitScore: integer from 0 to 100
 
-RESEARCH NOTES:
+RESEARCH NOTES TO CONVERT:
 ${researchText}` },
           { role: "assistant", content: "[" },
         ],

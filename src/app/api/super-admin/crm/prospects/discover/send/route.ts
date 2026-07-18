@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { decryptField } from "@/lib/crypto-utils"
+
+export const maxDuration = 60
 import { sendViaTitanSmtp } from "@/lib/titan-smtp"
 import { htmlToText } from "@/lib/html-to-text"
 import { enrollInSequence, getDefaultSequence } from "@/lib/crm-sequences"

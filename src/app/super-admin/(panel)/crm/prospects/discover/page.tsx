@@ -1,605 +1,659 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import Link from "next/link"
 import {
-  Search, Loader2, CheckCircle2, AlertCircle, Building2, Globe,
-  Users, MapPin, Zap, Save, ChevronLeft, Compass,
+  Search, Loader2, X, ChevronLeft, ExternalLink,
+  MapPin, Users, Zap, CheckCircle2, AlertTriangle,
+  RefreshCw, Send, Building2, Star, Mail,
 } from "lucide-react"
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const INDUSTRY_OPTIONS = [
-  "Manufacturing",
-  "Food & Beverage",
-  "Warehousing & Logistics",
-  "Retail",
-  "Healthcare",
-  "Hospitality",
-  "Construction",
-  "Property Management",
-  "Education",
-  "Other",
-]
+import type { DiscoveredCompany } from "@/app/api/super-admin/crm/prospects/discover/route"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface ProspectResult {
-  companyName:            string
-  website:                string
-  industry:               string
-  employeeCountMin:       number
-  employeeCountMax:       number
-  locationsCount:         number
-  headquartersCity:       string
-  headquartersState:      string
-  aiFitScore:             number
-  researchSummary:        string
-  operationalPainPoints:  string
-  relayFitReasons:        string
-  suggestedDemoEmphasis:  string
-  suggestedOutreachAngle: string
-  decisionMakerTitles:    string[]
-  confidenceScore:        number
+interface EmailDraft {
+  subject: string
+  body:    string
 }
 
-interface FormValues {
-  industry:          string
-  location:          string
-  employeeCountMin:  string
-  employeeCountMax:  string
-  locationsMin:      string
-  keywords:          string
-  additionalContext: string
-}
+type SearchState = "idle" | "loading" | "done" | "error"
+type EmailState  = "idle" | "loading" | "ready" | "sending" | "sent" | "error"
+type SaveState   = "idle" | "saving" | "saved" | "error"
 
-type SaveState = "idle" | "saving" | "saved" | "duplicate" | "error"
+interface DuplicateInfo {
+  companyName: string | null
+  prospectId:  string | null
+  demoCallId:  string | null
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function fitScoreStyle(score: number): { ring: string; text: string; bg: string } {
-  if (score >= 80) return { ring: "border-green-700/60",  text: "text-green-400",  bg: "bg-green-900/25"  }
-  if (score >= 60) return { ring: "border-amber-700/60",  text: "text-amber-400",  bg: "bg-amber-900/25"  }
-  return               { ring: "border-red-800/60",    text: "text-red-400",    bg: "bg-red-900/20"    }
+function fitBadge(score: number) {
+  if (score >= 80) return { bg: "bg-green-900/40",  border: "border-green-700/50",  text: "text-green-400"  }
+  if (score >= 60) return { bg: "bg-amber-900/40",  border: "border-amber-700/50",  text: "text-amber-400"  }
+  return              { bg: "bg-red-900/30",      border: "border-red-800/50",    text: "text-red-400"    }
 }
 
-// ─── ProspectCard ─────────────────────────────────────────────────────────────
+function cleanUrl(url: string): string {
+  return url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")
+}
 
-function ProspectCard({
-  prospect,
-  saveState,
-  duplicateMsg,
-  onSave,
-}: {
-  prospect:     ProspectResult
-  saveState:    SaveState
-  duplicateMsg: string | null
-  onSave:       () => void
+// ─── Company Card (search results) ───────────────────────────────────────────
+
+function CompanyCard({ company, selected, onClick }: {
+  company:  DiscoveredCompany
+  selected: boolean
+  onClick:  () => void
 }) {
-  const score = fitScoreStyle(prospect.aiFitScore)
-  const displayWebsite = prospect.website
-    ? prospect.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")
-    : null
-  const websiteHref = prospect.website
-    ? (prospect.website.startsWith("http") ? prospect.website : `https://${prospect.website}`)
-    : null
-
+  const badge = fitBadge(company.fitScore)
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col gap-3.5 hover:border-gray-700 transition-colors">
-
-      {/* ── Company name + fit score ── */}
-      <div className="flex items-start justify-between gap-3">
+    <button
+      onClick={onClick}
+      className={`w-full text-left bg-gray-900 border rounded-xl p-4 transition-all cursor-pointer ${
+        selected ? "border-indigo-500 ring-1 ring-indigo-500/30" : "border-gray-800 hover:border-gray-700"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1 min-w-0">
-          <h3 className="text-white font-semibold text-[15px] leading-snug">{prospect.companyName}</h3>
-          {websiteHref && displayWebsite && (
-            <a
-              href={websiteHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 mt-0.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
-              <Globe className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate max-w-[180px]">{displayWebsite}</span>
-            </a>
-          )}
-        </div>
-
-        {/* Fit score badge */}
-        <div className={`flex-shrink-0 flex flex-col items-center justify-center w-14 h-14 rounded-lg border ${score.bg} ${score.ring}`}>
-          <span className={`text-2xl font-bold leading-none tabular-nums ${score.text}`}>
-            {prospect.aiFitScore}
-          </span>
-          <span className="text-[9px] font-semibold uppercase tracking-widest text-gray-500 mt-0.5">fit</span>
-        </div>
-      </div>
-
-      {/* ── Attribute badges ── */}
-      <div className="flex flex-wrap gap-1.5">
-        {prospect.industry && (
-          <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-300 border border-gray-700/80">
-            <Building2 className="w-2.5 h-2.5" />
-            {prospect.industry}
-          </span>
-        )}
-        {(prospect.employeeCountMin > 0 || prospect.employeeCountMax > 0) && (
-          <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-300 border border-gray-700/80">
-            <Users className="w-2.5 h-2.5" />
-            {prospect.employeeCountMin && prospect.employeeCountMax
-              ? `${prospect.employeeCountMin}–${prospect.employeeCountMax} emp.`
-              : prospect.employeeCountMin
-              ? `${prospect.employeeCountMin}+ emp.`
-              : `≤${prospect.employeeCountMax} emp.`}
-          </span>
-        )}
-        {prospect.locationsCount > 0 && (
-          <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-300 border border-gray-700/80">
-            <MapPin className="w-2.5 h-2.5" />
-            {prospect.locationsCount} locations
-          </span>
-        )}
-        {(prospect.headquartersCity || prospect.headquartersState) && (
-          <span className="text-[11px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700/80">
-            {[prospect.headquartersCity, prospect.headquartersState].filter(Boolean).join(", ")}
-          </span>
-        )}
-      </div>
-
-      {/* ── Research summary ── */}
-      {prospect.researchSummary && (
-        <p className="text-sm text-gray-300 leading-relaxed line-clamp-2">
-          {prospect.researchSummary}
-        </p>
-      )}
-
-      {/* ── Top pain point ── */}
-      {prospect.operationalPainPoints && (
-        <div className="flex gap-2 items-start bg-amber-950/20 border border-amber-900/30 rounded-lg px-3 py-2">
-          <Zap className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-px" />
-          <p className="text-xs text-amber-300/80 leading-relaxed line-clamp-2">
-            {prospect.operationalPainPoints}
-          </p>
-        </div>
-      )}
-
-      {/* ── Save action ── */}
-      <div className="pt-1 border-t border-gray-800/80 mt-auto">
-        {saveState === "saved" ? (
-          <div className="flex items-center gap-2 text-green-400 text-sm font-medium py-1">
-            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-            Saved to CRM
-          </div>
-        ) : saveState === "duplicate" ? (
-          <div className="flex items-start gap-2 text-amber-400 py-1">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-px" />
-            <span className="text-xs leading-snug">{duplicateMsg ?? "Already exists in CRM"}</span>
-          </div>
-        ) : saveState === "error" ? (
-          <button
-            onClick={onSave}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-900/40 hover:bg-red-900/60 border border-red-800 text-red-300 text-sm font-medium rounded-lg transition-colors"
-          >
-            <AlertCircle className="w-4 h-4" />
-            Save failed — retry
-          </button>
-        ) : (
-          <button
-            onClick={onSave}
-            disabled={saveState === "saving"}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            {saveState === "saving" ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Saving…
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                Save Prospect
-              </>
+          <h3 className="text-white font-semibold text-[14px] leading-snug truncate">{company.companyName}</h3>
+          <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-gray-400">
+            {(company.city || company.state) && (
+              <span className="flex items-center gap-0.5">
+                <MapPin className="w-2.5 h-2.5" />
+                {[company.city, company.state].filter(Boolean).join(", ")}
+              </span>
             )}
-          </button>
-        )}
+            {company.estimatedEmployees && (
+              <><span className="text-gray-600">·</span>
+              <span className="flex items-center gap-0.5">
+                <Users className="w-2.5 h-2.5" />{company.estimatedEmployees} emp.
+              </span></>
+            )}
+          </div>
+        </div>
+        <div className={`flex-shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-lg border ${badge.bg} ${badge.border}`}>
+          <span className={`text-xl font-bold leading-none tabular-nums ${badge.text}`}>{company.fitScore}</span>
+          <span className="text-[8px] uppercase tracking-widest text-gray-500 mt-0.5">fit</span>
+        </div>
       </div>
-    </div>
+      {company.industry && (
+        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700/60 mb-2">
+          <Building2 className="w-2.5 h-2.5" />{company.industry}
+        </span>
+      )}
+      {company.summary && (
+        <p className="text-[12px] text-gray-400 leading-relaxed line-clamp-2">{company.summary}</p>
+      )}
+      {company.painPoints?.length > 0 && (
+        <div className="mt-2 flex items-start gap-1.5">
+          <Zap className="w-3 h-3 text-amber-400 flex-shrink-0 mt-px" />
+          <p className="text-[11px] text-amber-300/70 line-clamp-1">{company.painPoints[0]}</p>
+        </div>
+      )}
+    </button>
   )
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Slide-over panel ─────────────────────────────────────────────────────────
 
-export default function DiscoverPage() {
-  const [form, setForm] = useState<FormValues>({
-    industry:          "",
-    location:          "",
-    employeeCountMin:  "",
-    employeeCountMax:  "",
-    locationsMin:      "",
-    keywords:          "",
-    additionalContext: "",
-  })
+function SlideOver({ company, onClose }: {
+  company: DiscoveredCompany
+  onClose: () => void
+}) {
+  const badge = fitBadge(company.fitScore)
 
-  const [loading,           setLoading]           = useState(false)
-  const [results,           setResults]           = useState<ProspectResult[] | null>(null)
-  const [error,             setError]             = useState<string | null>(null)
-  const [saveStates,        setSaveStates]        = useState<Record<string, SaveState>>({})
-  const [saveDuplicateMsgs, setSaveDuplicateMsgs] = useState<Record<string, string>>({})
-  const [savingAll,         setSavingAll]         = useState(false)
+  // Email state
+  const [emailState,  setEmailState]  = useState<EmailState>("idle")
+  const [draft,       setDraft]       = useState<EmailDraft | null>(null)
+  const [toEmail,     setToEmail]     = useState("")
+  const [subject,     setSubject]     = useState("")
+  const [emailBody,   setEmailBody]   = useState("")
+  const [emailError,  setEmailError]  = useState<string | null>(null)
+  const [sentIds,     setSentIds]     = useState<{ prospectId: string; demoCallId: string } | null>(null)
+  const [duplicate,   setDuplicate]   = useState<DuplicateInfo | null>(null)
+  const [saveState,   setSaveState]   = useState<SaveState>("idle")
 
-  function set(field: keyof FormValues, value: string) {
-    setForm(prev => ({ ...prev, [field]: value }))
-  }
-
-  // ── Search ──────────────────────────────────────────────────────────────────
-
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setResults(null)
-    setSaveStates({})
-    setSaveDuplicateMsgs({})
-
+  // Auto-generate email when panel opens
+  const generateEmail = useCallback(async () => {
+    setEmailState("loading")
+    setEmailError(null)
+    setDuplicate(null)
     try {
-      const body: Record<string, unknown> = {}
-      if (form.industry)          body.industry          = form.industry
-      if (form.location)          body.location          = form.location
-      if (form.employeeCountMin)  body.employeeCountMin  = parseInt(form.employeeCountMin,  10)
-      if (form.employeeCountMax)  body.employeeCountMax  = parseInt(form.employeeCountMax,  10)
-      if (form.locationsMin)      body.locationsMin      = parseInt(form.locationsMin,      10)
-      if (form.keywords)          body.keywords          = form.keywords
-      if (form.additionalContext) body.additionalContext = form.additionalContext
-
-      const res = await fetch("/api/super-admin/crm/prospects/discover", {
-        method:  "POST",
+      const res = await fetch("/api/super-admin/crm/prospects/discover/email", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(body),
+        body: JSON.stringify({ company }),
       })
+      if (!res.ok) throw new Error(`Generation failed (${res.status})`)
+      const data = await res.json() as EmailDraft
+      setDraft(data)
+      setSubject(data.subject)
+      setEmailBody(data.body)
+      setEmailState("ready")
+    } catch (err) {
+      setEmailError(err instanceof Error ? err.message : "Failed to generate email")
+      setEmailState("error")
+    }
+  }, [company])
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string; details?: string }
-        setError(data.error ?? `Search failed (${res.status})`)
+  useEffect(() => { generateEmail() }, [generateEmail])
+
+  async function handleSend(force = false) {
+    if (!toEmail.trim()) { setEmailError("Enter a recipient email address"); return }
+    if (emailState === "sending") return
+    setEmailState("sending")
+    setEmailError(null)
+    setDuplicate(null)
+    try {
+      const res = await fetch("/api/super-admin/crm/prospects/discover/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ company, to: toEmail.trim(), subject, emailBody, force }),
+      })
+      if (res.status === 409) {
+        const data = await res.json() as DuplicateInfo & { duplicate: boolean }
+        setDuplicate({ companyName: data.companyName, prospectId: data.prospectId, demoCallId: data.demoCallId })
+        setEmailState("ready")
         return
       }
-
-      const data = await res.json() as { prospects: ProspectResult[]; parseError?: boolean }
-      setResults(data.prospects ?? [])
-
-      if (data.parseError) {
-        setError("AI returned results but some data may be incomplete — review carefully before saving.")
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(data.error ?? `Send failed (${res.status})`)
       }
+      const data = await res.json() as { prospectId: string; demoCallId: string }
+      setSentIds(data)
+      setEmailState("sent")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Search failed — check your connection and try again.")
-    } finally {
-      setLoading(false)
+      setEmailError(err instanceof Error ? err.message : "Send failed")
+      setEmailState("ready")
     }
   }
 
-  // ── Save one ─────────────────────────────────────────────────────────────────
-
-  async function saveProspect(prospect: ProspectResult) {
-    const key = prospect.companyName
-    setSaveStates(prev => ({ ...prev, [key]: "saving" }))
-
+  async function handleSaveOnly() {
+    setSaveState("saving")
     try {
       const res = await fetch("/api/super-admin/crm/prospects", {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({
-          companyName:       prospect.companyName,
-          website:           prospect.website        || null,
-          industry:          prospect.industry       || null,
-          employeeCountMin:  prospect.employeeCountMin  || null,
-          employeeCountMax:  prospect.employeeCountMax  || null,
-          locationsCount:    prospect.locationsCount    || null,
-          headquartersCity:  prospect.headquartersCity  || null,
-          headquartersState: prospect.headquartersState || null,
-          source:            "ai_research",
+        body: JSON.stringify({
+          companyName:           company.companyName,
+          website:               company.website || null,
+          industry:              company.industry || null,
+          headquartersCity:      company.city || null,
+          headquartersState:     company.state || null,
+          source:                "ai_research",
         }),
       })
-
-      if (res.status === 409) {
-        const data = await res.json() as { error: string; existing?: { companyName: string } }
-        const msg = data.existing
-          ? `Already in CRM as "${data.existing.companyName}"`
-          : "Already exists in CRM"
-        setSaveDuplicateMsgs(prev => ({ ...prev, [key]: msg }))
-        setSaveStates(prev => ({ ...prev, [key]: "duplicate" }))
-        return
-      }
-
-      if (!res.ok) {
-        setSaveStates(prev => ({ ...prev, [key]: "error" }))
-        return
-      }
-
-      setSaveStates(prev => ({ ...prev, [key]: "saved" }))
+      if (res.status === 409) { setSaveState("saved"); return }
+      if (!res.ok) throw new Error("Save failed")
+      setSaveState("saved")
     } catch {
-      setSaveStates(prev => ({ ...prev, [key]: "error" }))
+      setSaveState("error")
     }
   }
-
-  // ── Save all ──────────────────────────────────────────────────────────────────
-
-  async function handleSaveAll() {
-    if (!results) return
-    setSavingAll(true)
-
-    // Snapshot unsaved list before we start (avoids re-checking state during loop)
-    const unsaved = results.filter(p => {
-      const s = saveStates[p.companyName]
-      return !s || s === "idle" || s === "error"
-    })
-
-    for (const prospect of unsaved) {
-      await saveProspect(prospect)
-    }
-
-    setSavingAll(false)
-  }
-
-  // ── Derived state ─────────────────────────────────────────────────────────────
-
-  const unsavedCount = results
-    ? results.filter(p => {
-        const s = saveStates[p.companyName]
-        return !s || s === "idle" || s === "error"
-      }).length
-    : 0
-
-  // ── Shared input styles ────────────────────────────────────────────────────
-
-  const inputCls =
-    "w-full bg-gray-800/60 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white " +
-    "placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/70 " +
-    "focus:border-indigo-500 transition-colors"
-
-  const labelCls = "block text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1.5"
-
-  // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="p-6 md:p-8 max-w-[1440px]">
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
 
-      {/* Page header */}
-      <div className="mb-7">
-        <div className="flex items-center gap-2 mb-1">
-          <Link
-            href="/super-admin/crm/prospects"
-            className="text-gray-500 hover:text-gray-300 transition-colors"
-            aria-label="Back to Prospects"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Link>
-          <Compass className="w-5 h-5 text-indigo-400" />
-          <h1 className="text-2xl font-bold text-white">Prospect Discovery</h1>
-        </div>
-        <p className="text-gray-400 text-sm ml-[52px]">
-          Describe the companies you want to find — AI web research does the rest
-        </p>
-      </div>
-
-      {/* Two-column layout: form left, results right */}
-      <div className="lg:grid lg:grid-cols-[380px_1fr] lg:gap-8 lg:items-start">
-
-        {/* ═══════════════════════════════════════════════════════
-            SECTION 1 — Search Form
-        ════════════════════════════════════════════════════════ */}
-        <div className="lg:sticky lg:top-8 mb-8 lg:mb-0">
-          <form onSubmit={handleSearch} className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-5">
-
-            {/* Industry */}
-            <div>
-              <label className={labelCls}>Industry</label>
-              <select
-                value={form.industry}
-                onChange={e => set("industry", e.target.value)}
-                className={inputCls}
-              >
-                <option value="">All industries</option>
-                {INDUSTRY_OPTIONS.map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Location */}
-            <div>
-              <label className={labelCls}>Location</label>
-              <input
-                type="text"
-                value={form.location}
-                onChange={e => set("location", e.target.value)}
-                placeholder="State, region, or city — e.g. Michigan, Southeast US"
-                className={inputCls}
-              />
-            </div>
-
-            {/* Employee count */}
-            <div>
-              <label className={labelCls}>Employee Count</label>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="number"
-                  value={form.employeeCountMin}
-                  onChange={e => set("employeeCountMin", e.target.value)}
-                  placeholder="Min"
-                  min={0}
-                  className={inputCls}
-                />
-                <input
-                  type="number"
-                  value={form.employeeCountMax}
-                  onChange={e => set("employeeCountMax", e.target.value)}
-                  placeholder="Max"
-                  min={0}
-                  className={inputCls}
-                />
-              </div>
-            </div>
-
-            {/* Min locations */}
-            <div>
-              <label className={labelCls}>Minimum Locations</label>
-              <input
-                type="number"
-                value={form.locationsMin}
-                onChange={e => set("locationsMin", e.target.value)}
-                placeholder="Min. number of locations/facilities"
-                min={0}
-                className={inputCls}
-              />
-            </div>
-
-            {/* Keywords */}
-            <div>
-              <label className={labelCls}>Keywords</label>
-              <input
-                type="text"
-                value={form.keywords}
-                onChange={e => set("keywords", e.target.value)}
-                placeholder="e.g. multi-facility, warehouse operations, maintenance teams"
-                className={inputCls}
-              />
-            </div>
-
-            {/* Additional context */}
-            <div>
-              <label className={labelCls}>Additional Context</label>
-              <textarea
-                value={form.additionalContext}
-                onChange={e => set("additionalContext", e.target.value)}
-                placeholder="e.g. Looking for companies running multiple warehouses with in-house maintenance teams"
-                rows={3}
-                className={inputCls + " resize-none"}
-              />
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Searching…
-                </>
-              ) : (
-                <>
-                  <Search className="w-4 h-4" />
-                  Find Prospects
-                </>
+      {/* Panel */}
+      <div className="fixed right-0 top-0 h-screen w-full sm:w-[520px] bg-gray-950 border-l border-gray-800 z-50 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4 border-b border-gray-800 flex-shrink-0">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-white font-semibold text-base leading-snug">{company.companyName}</h2>
+            <div className="flex items-center flex-wrap gap-2 mt-1">
+              {(company.city || company.state) && (
+                <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />{[company.city, company.state].filter(Boolean).join(", ")}
+                </span>
               )}
+              {company.industry && (
+                <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                  <Building2 className="w-3 h-3" />{company.industry}
+                </span>
+              )}
+              {company.estimatedEmployees && (
+                <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                  <Users className="w-3 h-3" />{company.estimatedEmployees} employees
+                </span>
+              )}
+              {company.website && (
+                <a href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                  onClick={e => e.stopPropagation()}>
+                  <ExternalLink className="w-3 h-3" />{cleanUrl(company.website)}
+                </a>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg border ${badge.bg} ${badge.border}`}>
+              <span className={`text-xl font-bold tabular-nums ${badge.text}`}>{company.fitScore}</span>
+              <span className="text-[8px] uppercase tracking-widest text-gray-500">fit</span>
+            </div>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-300 p-1 rounded transition-colors">
+              <X className="w-5 h-5" />
             </button>
-          </form>
-
-          <p className="text-xs text-gray-600 mt-3 px-1 leading-relaxed">
-            AI research typically takes 15–30 seconds. Results are filtered against existing CRM records automatically.
-          </p>
+          </div>
         </div>
 
-        {/* ═══════════════════════════════════════════════════════
-            SECTION 2 — Results
-        ════════════════════════════════════════════════════════ */}
-        <div>
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="px-5 py-4 space-y-5">
 
-          {/* Loading */}
-          {loading && (
-            <div className="flex flex-col items-center justify-center py-24 gap-5 text-center">
-              <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-indigo-900/30 border border-indigo-800/50 flex items-center justify-center">
-                  <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
-                </div>
-              </div>
+            {/* Summary */}
+            {company.summary && (
               <div>
-                <p className="text-white font-semibold text-base">
-                  Searching for matching companies using AI web research…
-                </p>
-                <p className="text-gray-500 text-sm mt-1.5">This may take 15–30 seconds</p>
+                <p className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Summary</p>
+                <p className="text-sm text-gray-300 leading-relaxed">{company.summary}</p>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Error banner */}
-          {error && !loading && (
-            <div className="flex items-start gap-3 bg-red-950/40 border border-red-800/60 rounded-xl px-4 py-3 text-sm text-red-300 mb-4">
-              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+            {/* Pain Points */}
+            {company.painPoints?.length > 0 && (
+              <div>
+                <p className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Operational Pain Points</p>
+                <ul className="space-y-1.5">
+                  {company.painPoints.map((p, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <Zap className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-amber-300/80">{p}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-          {/* Results grid */}
-          {results !== null && !loading && (
-            <>
-              {/* Results header row */}
-              <div className="flex items-center justify-between mb-4 min-h-[36px]">
-                <p className="text-sm text-gray-400">
-                  Found{" "}
-                  <span className="text-white font-semibold tabular-nums">{results.length}</span>{" "}
-                  {results.length === 1 ? "company" : "companies"} matching your criteria
+            {/* Relay Fit Reasons */}
+            {company.relayFitReasons?.length > 0 && (
+              <div>
+                <p className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Why Relay Fits</p>
+                <ul className="space-y-1.5">
+                  {company.relayFitReasons.map((r, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <Star className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-300">{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Outreach Angle */}
+            {company.suggestedOutreachAngle && (
+              <div className="bg-indigo-950/30 border border-indigo-800/40 rounded-lg px-3.5 py-2.5">
+                <p className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider mb-1">Outreach Angle</p>
+                <p className="text-sm text-indigo-200/80">{company.suggestedOutreachAngle}</p>
+              </div>
+            )}
+
+            {/* ── Email Draft ────────────────────────────────────────────────── */}
+            <div className="border-t border-gray-800 pt-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5" /> Outreach Email
                 </p>
-
-                {results.length > 0 && unsavedCount > 0 && (
-                  <button
-                    onClick={handleSaveAll}
-                    disabled={savingAll}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 border border-gray-700 text-sm text-gray-200 font-medium rounded-lg transition-colors"
-                  >
-                    {savingAll ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Saving all…
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-3.5 h-3.5" />
-                        Save All ({unsavedCount})
-                      </>
-                    )}
+                {emailState !== "loading" && emailState !== "sending" && emailState !== "sent" && (
+                  <button onClick={generateEmail}
+                    className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-gray-300 transition-colors px-2 py-1 rounded hover:bg-gray-800">
+                    <RefreshCw className="w-3 h-3" /> Regenerate
                   </button>
                 )}
               </div>
 
-              {results.length === 0 ? (
-                <div className="bg-gray-900 border border-gray-800 rounded-xl py-16 text-center">
-                  <Compass className="w-10 h-10 text-gray-700 mx-auto mb-3" />
-                  <p className="text-gray-300 font-medium">No results found</p>
-                  <p className="text-gray-600 text-sm mt-1">
-                    Try broadening your criteria or adjusting the keywords.
+              {emailState === "sent" && sentIds && (
+                <div className="bg-green-900/30 border border-green-700/40 rounded-lg p-3.5">
+                  <div className="flex items-center gap-2 text-green-400 font-medium text-sm mb-2">
+                    <CheckCircle2 className="w-4 h-4" /> Email sent
+                  </div>
+                  <p className="text-xs text-green-300/70 mb-2">
+                    {company.companyName} saved to CRM and enrolled in Cold Outreach follow-up sequence.
                   </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {results.map(prospect => (
-                    <ProspectCard
-                      key={prospect.companyName}
-                      prospect={prospect}
-                      saveState={saveStates[prospect.companyName] ?? "idle"}
-                      duplicateMsg={saveDuplicateMsgs[prospect.companyName] ?? null}
-                      onSave={() => void saveProspect(prospect)}
-                    />
-                  ))}
+                  <div className="flex gap-2">
+                    <Link href={`/super-admin/crm/prospects/${sentIds.prospectId}`}
+                      className="text-xs text-indigo-400 hover:text-indigo-300 underline">
+                      View prospect →
+                    </Link>
+                    <span className="text-gray-600">·</span>
+                    <Link href="/super-admin/crm/email"
+                      className="text-xs text-indigo-400 hover:text-indigo-300 underline">
+                      View in inbox →
+                    </Link>
+                  </div>
                 </div>
               )}
-            </>
-          )}
 
-          {/* Empty initial state */}
-          {results === null && !loading && !error && (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center mb-4">
-                <Search className="w-7 h-7 text-gray-600" />
+              {emailState !== "sent" && (
+                <>
+                  {/* Loading skeleton */}
+                  {emailState === "loading" && (
+                    <div className="space-y-2 animate-pulse">
+                      <div className="h-8 bg-gray-800 rounded-lg" />
+                      <div className="h-32 bg-gray-800 rounded-lg" />
+                    </div>
+                  )}
+
+                  {/* Error state */}
+                  {emailState === "error" && (
+                    <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-3 text-sm text-red-400 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                      {emailError ?? "Failed to generate email"}
+                    </div>
+                  )}
+
+                  {/* Draft ready */}
+                  {(emailState === "ready" || emailState === "sending") && draft && (
+                    <div className="space-y-3">
+                      {/* Duplicate warning */}
+                      {duplicate && (
+                        <div className="bg-amber-900/20 border border-amber-700/40 rounded-lg p-3">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                            <div className="text-xs text-amber-300">
+                              <p className="font-medium mb-1">You&apos;ve previously contacted {duplicate.companyName ?? company.companyName}.</p>
+                              <div className="flex gap-2 flex-wrap">
+                                {duplicate.prospectId && (
+                                  <Link href={`/super-admin/crm/prospects/${duplicate.prospectId}`}
+                                    className="underline hover:text-amber-200">View existing prospect</Link>
+                                )}
+                                <button onClick={() => { setDuplicate(null); handleSend(true) }}
+                                  className="underline hover:text-amber-200">Send anyway</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* To field */}
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">To</label>
+                        <input
+                          type="email"
+                          placeholder="recipient@company.com"
+                          value={toEmail}
+                          onChange={e => setToEmail(e.target.value)}
+                          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                        />
+                      </div>
+
+                      {/* Subject */}
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Subject</label>
+                        <input
+                          type="text"
+                          value={subject}
+                          onChange={e => setSubject(e.target.value)}
+                          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                        />
+                      </div>
+
+                      {/* Body */}
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Body</label>
+                        <textarea
+                          rows={10}
+                          value={emailBody}
+                          onChange={e => setEmailBody(e.target.value)}
+                          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white leading-relaxed focus:outline-none focus:border-indigo-500 transition-colors resize-none font-mono"
+                        />
+                      </div>
+
+                      {/* Error */}
+                      {emailError && !duplicate && (
+                        <p className="text-xs text-red-400 flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5" />{emailError}
+                        </p>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={() => handleSend()}
+                          disabled={emailState === "sending"}
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                          {emailState === "sending"
+                            ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
+                            : <><Send className="w-4 h-4" /> Send Now</>
+                          }
+                        </button>
+                        <button
+                          onClick={handleSaveOnly}
+                          disabled={saveState === "saving" || saveState === "saved" || emailState === "sending"}
+                          className="px-3 py-2.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-300 text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
+                        >
+                          {saveState === "saved" ? "✓ Saved" : saveState === "saving" ? "Saving…" : "Save only"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ─── Search Form ──────────────────────────────────────────────────────────────
+
+const INDUSTRY_OPTIONS = [
+  "Manufacturing", "Food & Beverage", "Warehousing & Logistics",
+  "Retail", "Healthcare", "Hospitality", "Construction",
+  "Property Management", "Education",
+]
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function DiscoverPage() {
+  const [industry,    setIndustry]    = useState("")
+  const [location,    setLocation]    = useState("")
+  const [empMin,      setEmpMin]      = useState("")
+  const [empMax,      setEmpMax]      = useState("")
+  const [locMin,      setLocMin]      = useState("")
+  const [keywords,    setKeywords]    = useState("")
+  const [context,     setContext]     = useState("")
+
+  const [searchState, setSearchState] = useState<SearchState>("idle")
+  const [companies,   setCompanies]   = useState<DiscoveredCompany[]>([])
+  const [searchError, setSearchError] = useState<string | null>(null)
+  const [selected,    setSelected]    = useState<DiscoveredCompany | null>(null)
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    setSearchState("loading")
+    setSearchError(null)
+    setCompanies([])
+    setSelected(null)
+
+    const body: Record<string, unknown> = {}
+    if (industry)  body.industry          = industry
+    if (location)  body.location          = location
+    if (empMin)    body.employeeCountMin   = parseInt(empMin,  10)
+    if (empMax)    body.employeeCountMax   = parseInt(empMax,  10)
+    if (locMin)    body.locationsMin       = parseInt(locMin,  10)
+    if (keywords)  body.keywords           = keywords
+    if (context)   body.additionalContext  = context
+
+    try {
+      const res = await fetch("/api/super-admin/crm/prospects/discover", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(data.error ?? `Search failed (${res.status})`)
+      }
+      const data = await res.json() as { companies: DiscoveredCompany[] }
+      setCompanies(data.companies ?? [])
+      setSearchState("done")
+    } catch (err) {
+      setSearchError(err instanceof Error ? err.message : "Search failed")
+      setSearchState("error")
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white">
+      {/* Top bar */}
+      <div className="sticky top-0 z-30 bg-gray-950/95 backdrop-blur border-b border-gray-800 px-4 py-3 flex items-center gap-3">
+        <Link href="/super-admin/crm/prospects"
+          className="text-gray-400 hover:text-gray-200 transition-colors p-1 rounded">
+          <ChevronLeft className="w-5 h-5" />
+        </Link>
+        <div>
+          <h1 className="text-sm font-semibold text-white">Prospect Discovery</h1>
+          <p className="text-[11px] text-gray-500">AI-powered search for new sales prospects</p>
+        </div>
+      </div>
+
+      <div className="flex h-[calc(100vh-57px)]">
+        {/* ── Left: Search form ───────────────────────────────────────────── */}
+        <div className="w-72 flex-shrink-0 border-r border-gray-800 overflow-y-auto">
+          <form onSubmit={handleSearch} className="p-4 space-y-4">
+            <div>
+              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Industry</label>
+              <select
+                value={industry}
+                onChange={e => setIndustry(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+              >
+                <option value="">Any industry</option>
+                {INDUSTRY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Region / Location</label>
+              <input
+                type="text" placeholder="e.g. Midwest, Texas, Southeast"
+                value={location} onChange={e => setLocation(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Employee Count</label>
+              <div className="flex gap-2">
+                <input type="number" placeholder="Min" value={empMin} onChange={e => setEmpMin(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                <input type="number" placeholder="Max" value={empMax} onChange={e => setEmpMax(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
               </div>
-              <p className="text-gray-400 font-medium">Configure your search and click Find Prospects</p>
-              <p className="text-gray-600 text-sm mt-1.5 max-w-xs">
-                AI web research will surface real companies that match your criteria.
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Min. Locations</label>
+              <input type="number" placeholder="e.g. 3" value={locMin} onChange={e => setLocMin(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Keywords</label>
+              <input type="text" placeholder="e.g. warehousing, cold storage" value={keywords} onChange={e => setKeywords(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Additional Context</label>
+              <textarea rows={3} placeholder="Any other targeting details..." value={context} onChange={e => setContext(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 resize-none" />
+            </div>
+
+            <button
+              type="submit"
+              disabled={searchState === "loading"}
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              {searchState === "loading"
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Searching…</>
+                : <><Search className="w-4 h-4" /> Find Prospects</>
+              }
+            </button>
+
+            {searchState === "loading" && (
+              <p className="text-[11px] text-gray-500 text-center">
+                AI is searching the web for real companies — this takes ~30 seconds
+              </p>
+            )}
+          </form>
+        </div>
+
+        {/* ── Right: Results ──────────────────────────────────────────────── */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {searchState === "idle" && (
+            <div className="h-full flex flex-col items-center justify-center text-center px-8">
+              <Search className="w-12 h-12 text-gray-700 mb-3" />
+              <p className="text-gray-400 font-medium mb-1">Search for prospects</p>
+              <p className="text-sm text-gray-600">
+                Fill in your criteria and click Find Prospects. The AI will search the web for real companies and generate personalized outreach emails.
               </p>
             </div>
           )}
 
+          {searchState === "loading" && (
+            <div className="h-full flex flex-col items-center justify-center">
+              <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
+              <p className="text-gray-400 font-medium">Finding prospects…</p>
+              <p className="text-sm text-gray-600 mt-1">Searching the web for real companies</p>
+            </div>
+          )}
+
+          {searchState === "error" && (
+            <div className="h-full flex items-center justify-center">
+              <div className="bg-red-900/20 border border-red-800/40 rounded-xl p-6 text-center max-w-sm">
+                <AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-2" />
+                <p className="text-red-300 font-medium mb-1">Search failed</p>
+                <p className="text-sm text-red-400/70">{searchError}</p>
+              </div>
+            </div>
+          )}
+
+          {searchState === "done" && (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-gray-300 font-medium">
+                  Found {companies.length} {companies.length === 1 ? "company" : "companies"}
+                </p>
+                {companies.length > 0 && (
+                  <p className="text-[11px] text-gray-500">Click a card to generate an outreach email</p>
+                )}
+              </div>
+
+              {companies.length === 0 && (
+                <div className="text-center py-16 text-gray-500">
+                  <Building2 className="w-10 h-10 mx-auto mb-2 opacity-40" />
+                  <p>No companies found for this search.</p>
+                  <p className="text-sm mt-1">Try broader criteria.</p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {companies.map(c => (
+                  <CompanyCard
+                    key={c.companyName}
+                    company={c}
+                    selected={selected?.companyName === c.companyName}
+                    onClick={() => setSelected(prev => prev?.companyName === c.companyName ? null : c)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Slide-over */}
+      {selected && (
+        <SlideOver
+          company={selected}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </div>
   )
 }

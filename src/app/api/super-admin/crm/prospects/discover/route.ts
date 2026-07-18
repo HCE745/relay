@@ -124,7 +124,7 @@ async function callAnthropic(opts: {
   tools?: unknown[]; betaHeader?: string; maxTokens?: number
 }) {
   const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not set")
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY environment variable is not set")
   const headers: Record<string, string> = {
     "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json",
   }
@@ -139,41 +139,57 @@ async function callAnthropic(opts: {
     signal: AbortSignal.timeout(120_000),
   })
   const text = await res.text()
-  if (!res.ok) { console.error("[discover] API error", res.status, text.slice(0, 400)); throw new Error(`Anthropic ${res.status}`) }
+  if (!res.ok) {
+    // Include the full response body so the actual Anthropic error is visible in logs
+    console.error("[discover] Anthropic API error — status:", res.status, "\nbody:", text)
+    throw new Error(`Anthropic API returned ${res.status}: ${text.slice(0, 500)}`)
+  }
   const data = JSON.parse(text) as { content: ContentBlock[]; stop_reason: string }
   console.log("[discover] stop_reason:", data.stop_reason, "blocks:", data.content.map(c => c.type).join(", "))
   return data.content
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  // Top-level catch: every unhandled throw returns a 500 with the actual message
+  // instead of a generic Next.js error page — and logs the full stack to Vercel.
+  try {
+    const session = await getSession()
+    if (!session?.superAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
-  const body = await req.json() as {
-    industry?: string; location?: string; employeeCountMin?: number; employeeCountMax?: number
-    locationsMin?: number; keywords?: string; additionalContext?: string
-  }
-  console.log("[discover] request:", body)
+    // Early API key check — fail fast with a clear message
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error("[discover] ANTHROPIC_API_KEY is not set in environment")
+      return NextResponse.json({ error: "ANTHROPIC_API_KEY is not configured on the server" }, { status: 500 })
+    }
+    console.log("[discover] ANTHROPIC_API_KEY present, length:", process.env.ANTHROPIC_API_KEY.length)
 
-  const existing = await prisma.prospect.findMany({ select: { companyName: true, website: true } })
-  const existingNames   = new Set(existing.map(p => p.companyName.toLowerCase().trim()))
-  const existingDomains = new Set(existing.flatMap(p => { const d = p.website ? extractDomain(p.website) : null; return d ? [d] : [] }))
-  const exclusionList   = existing.map(p => p.companyName).slice(0, 100).join(", ")
+    const body = await req.json() as {
+      industry?: string; location?: string; employeeCountMin?: number; employeeCountMax?: number
+      locationsMin?: number; keywords?: string; additionalContext?: string
+    }
+    console.log("[discover] request:", body)
 
-  const criteria: string[] = []
-  if (body.industry)                                  criteria.push(`Industry: ${body.industry}`)
-  if (body.location)                                  criteria.push(`Region: ${body.location}`)
-  if (body.employeeCountMin ?? body.employeeCountMax) criteria.push(`Employees: ${body.employeeCountMin ?? "any"}–${body.employeeCountMax ?? "any"}`)
-  if (body.locationsMin)                              criteria.push(`Min locations/sites: ${body.locationsMin}`)
-  if (body.keywords)                                  criteria.push(`Keywords: ${body.keywords}`)
-  if (body.additionalContext)                         criteria.push(`Context: ${body.additionalContext}`)
-  const criteriaText = criteria.length ? criteria.join("\n") : "Multi-location B2B businesses in the US"
+    const existing = await prisma.prospect.findMany({ select: { companyName: true, website: true } })
+    const existingNames   = new Set(existing.map(p => p.companyName.toLowerCase().trim()))
+    const existingDomains = new Set(existing.flatMap(p => { const d = p.website ? extractDomain(p.website) : null; return d ? [d] : [] }))
+    const exclusionList   = existing.map(p => p.companyName).slice(0, 100).join(", ")
 
-  // ── Step 1: Research (web search → prose) ──────────────────────────────────
-  console.log("[discover] step 1: research")
-  const researchContent = await callAnthropic({
-    system: "You are a B2B sales researcher. Use web search to find real companies. Be specific: real company names, real websites, concrete facts about their operations.",
-    messages: [{ role: "user", content: `Find exactly 8 to 10 real companies that are strong sales prospects for Relay, an operations management platform for multi-location businesses (issue tracking, maintenance routing, QR-code check-ins, asset management, team messaging across locations).
+    const criteria: string[] = []
+    if (body.industry)                                  criteria.push(`Industry: ${body.industry}`)
+    if (body.location)                                  criteria.push(`Region: ${body.location}`)
+    if (body.employeeCountMin ?? body.employeeCountMax) criteria.push(`Employees: ${body.employeeCountMin ?? "any"}–${body.employeeCountMax ?? "any"}`)
+    if (body.locationsMin)                              criteria.push(`Min locations/sites: ${body.locationsMin}`)
+    if (body.keywords)                                  criteria.push(`Keywords: ${body.keywords}`)
+    if (body.additionalContext)                         criteria.push(`Context: ${body.additionalContext}`)
+    const criteriaText = criteria.length ? criteria.join("\n") : "Multi-location B2B businesses in the US"
+
+    // ── Step 1: Research (web search → prose) ────────────────────────────────
+    console.log("[discover] step 1: starting web-search research")
+    let researchText: string
+    try {
+      const researchContent = await callAnthropic({
+        system: "You are a B2B sales researcher. Use web search to find real companies. Be specific: real company names, real websites, concrete facts about their operations.",
+        messages: [{ role: "user", content: `Find exactly 8 to 10 real companies that are strong sales prospects for Relay, an operations management platform for multi-location businesses (issue tracking, maintenance routing, QR-code check-ins, asset management, team messaging across locations).
 
 SEARCH CRITERIA:
 ${criteriaText}
@@ -192,28 +208,33 @@ For each company, research and note:
 - Relay fit score 0-100 (higher = more locations + more operational complexity)
 
 Search for these companies, verify they are real, and make your notes specific and concrete.` }],
-    tools: [{ type: "web_search_20250305", name: "web_search" }],
-    betaHeader: "web-search-2025-03-05",
-    maxTokens: 8000,
-  })
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        betaHeader: "web-search-2025-03-05",
+        maxTokens: 8000,
+      })
+      const text = lastTextBlock(researchContent)
+      if (!text) {
+        console.error("[discover] step 1: no text block in response. Content:", JSON.stringify(researchContent).slice(0, 800))
+        return NextResponse.json({ error: "AI research returned no text content — the web search may have failed", companies: [] }, { status: 502 })
+      }
+      researchText = text
+      console.log("[discover] step 1 complete. Text length:", researchText.length)
+      console.log("[discover] step 1 full text:\n", researchText)
+    } catch (step1Err) {
+      const msg = step1Err instanceof Error ? step1Err.message : String(step1Err)
+      console.error("[discover] step 1 FAILED:", msg)
+      if (step1Err instanceof Error) console.error("[discover] step 1 stack:", step1Err.stack)
+      return NextResponse.json({ error: `Research step failed: ${msg}`, companies: [] }, { status: 502 })
+    }
 
-  const researchText = lastTextBlock(researchContent)
-  if (!researchText) {
-    console.error("[discover] step 1: no text. blocks:", JSON.stringify(researchContent).slice(0, 500))
-    return NextResponse.json({ error: "Research step returned no text", companies: [] }, { status: 502 })
-  }
-  console.log("[discover] step 1 text length:", researchText.length)
-  console.log("[discover] step 1 full text:\n", researchText)
-
-  // ── Step 2: Format as JSON (assistant prefill forces array start) ───────────
-  console.log("[discover] step 2: JSON format")
-  let companies: DiscoveredCompany[] = []
-
-  try {
-    const fmtContent = await callAnthropic({
-      system: "You are a JSON formatter. Output ONLY a valid JSON array. No explanation. No markdown. Start with [ and end with ].",
-      messages: [
-        { role: "user", content: `Convert these research notes into a JSON array. Include every company found. Each object must have exactly these fields:
+    // ── Step 2: Format as JSON (assistant prefill forces array start) ─────────
+    console.log("[discover] step 2: JSON formatting")
+    let companies: DiscoveredCompany[] = []
+    try {
+      const fmtContent = await callAnthropic({
+        system: "You are a JSON formatter. Output ONLY a valid JSON array. No explanation. No markdown. Start with [ and end with ].",
+        messages: [
+          { role: "user", content: `Convert these research notes into a JSON array. Include every company found. Each object must have exactly these fields:
 
 - companyName (string)
 - website (string, full https:// URL or empty string)
@@ -229,41 +250,54 @@ Search for these companies, verify they are real, and make your notes specific a
 
 RESEARCH NOTES:
 ${researchText}` },
-        { role: "assistant", content: "[" },
-      ],
-      maxTokens: 8192,
+          { role: "assistant", content: "[" },
+        ],
+        maxTokens: 8192,
+      })
+
+      const raw = lastTextBlock(fmtContent)
+      console.log("[discover] step 2 raw (first 2000 chars):\n", raw?.slice(0, 2000))
+      if (raw) {
+        const parsed = extractArray(raw, true)
+        if (parsed?.length) {
+          companies = parsed.map(p => normalise(p as unknown as Record<string, unknown>))
+          console.log("[discover] step 2 parsed", companies.length, "companies")
+        } else {
+          console.warn("[discover] step 2: JSON extraction failed. Full raw response:\n", raw)
+        }
+      } else {
+        console.warn("[discover] step 2: no text block in format response")
+      }
+    } catch (step2Err) {
+      const msg = step2Err instanceof Error ? step2Err.message : String(step2Err)
+      console.error("[discover] step 2 FAILED (non-fatal, using prose fallback):", msg)
+      if (step2Err instanceof Error) console.error("[discover] step 2 stack:", step2Err.stack)
+    }
+
+    // Fallback: extract from prose
+    if (!companies.length) {
+      console.log("[discover] using prose fallback on step 1 research text")
+      companies = extractFromProse(researchText)
+      console.log("[discover] prose fallback found:", companies.length, "companies")
+    }
+
+    // Deduplicate
+    const filtered = companies.filter(c => {
+      if (!c.companyName || c.companyName === "Unknown") return false
+      if (existingNames.has(c.companyName.toLowerCase().trim())) return false
+      if (c.website) { const d = extractDomain(c.website); if (d && existingDomains.has(d)) return false }
+      return true
     })
 
-    const raw = lastTextBlock(fmtContent)
-    console.log("[discover] step 2 raw (first 2000 chars):\n", raw?.slice(0, 2000))
-    if (raw) {
-      const parsed = extractArray(raw, true)
-      if (parsed?.length) {
-        companies = parsed.map(p => normalise(p as unknown as Record<string, unknown>))
-        console.log("[discover] step 2 parsed", companies.length, "companies")
-      } else {
-        console.warn("[discover] step 2 JSON failed, full raw:\n", raw)
-      }
-    }
+    console.log("[discover] final:", filtered.length, "of", companies.length, "after dedup")
+    return NextResponse.json({ companies: filtered })
+
   } catch (err) {
-    console.error("[discover] step 2 error:", err)
+    // Catch-all: log full stack and return the actual error message to the client
+    const msg   = err instanceof Error ? err.message : String(err)
+    const stack = err instanceof Error ? err.stack   : undefined
+    console.error("[discover] UNHANDLED ERROR:", msg)
+    if (stack) console.error("[discover] stack:", stack)
+    return NextResponse.json({ error: msg, companies: [] }, { status: 500 })
   }
-
-  // Fallback: extract from prose
-  if (!companies.length) {
-    console.log("[discover] prose fallback")
-    companies = extractFromProse(researchText)
-    console.log("[discover] prose fallback found:", companies.length)
-  }
-
-  // Deduplicate
-  const filtered = companies.filter(c => {
-    if (!c.companyName || c.companyName === "Unknown") return false
-    if (existingNames.has(c.companyName.toLowerCase().trim())) return false
-    if (c.website) { const d = extractDomain(c.website); if (d && existingDomains.has(d)) return false }
-    return true
-  })
-
-  console.log("[discover] final:", filtered.length, "of", companies.length)
-  return NextResponse.json({ companies: filtered })
 }

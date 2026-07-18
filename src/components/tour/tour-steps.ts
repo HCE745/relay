@@ -27,7 +27,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ═══════════════════════════════════════════════════════
   {
     target: "body",
-    placement: "bottom",
+    placement: "center",
     title: "👋 Welcome to HCE Books",
     content: "This is your accounting home base for HCE Holdings and Relay. This quick tour will show you where everything lives and what it all means — no accounting degree required. Takes about 3 minutes.",
     data: { chapter: 1, chapterTitle: "Welcome", navigate: "/dashboard" },
@@ -213,7 +213,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ═══════════════════════════════════════════════════════
   {
     target: "body",
-    placement: "bottom",
+    placement: "center",
     title: "🎉 You're Ready!",
     content: "Great job! Here's where to start:\n\n1. Set up your Chart of Accounts (or import from QBO/Xero)\n2. Add your first customer and send an invoice\n3. Enter any outstanding vendor bills\n4. Connect a bank account in Banking\n\nYou can relaunch this tour anytime from the Help button in the sidebar.",
     data: { chapter: 9, chapterTitle: "You're Ready!" },

@@ -104,6 +104,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
         steps={TOUR_STEPS}
         run={run}
         stepIndex={stepIndex}
+        continuous
         scrollToFirstStep
         onEvent={handleEvent}
         options={{

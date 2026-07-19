@@ -1,24 +1,22 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect } from "react"
+import { useState, useCallback, useEffect, useMemo } from "react"
 import Link from "next/link"
 import {
   Search, Loader2, X, ChevronLeft, ExternalLink,
   MapPin, Users, Zap, CheckCircle2, AlertTriangle,
-  RefreshCw, Send, Building2, Star, Mail,
+  RefreshCw, Send, Building2, Star, Mail, Globe,
 } from "lucide-react"
-import type { DiscoveredCompany } from "@/app/api/super-admin/crm/prospects/discover/route"
+import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api/super-admin/crm/prospects/discover/route"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface EmailDraft {
-  subject: string
-  body:    string
-}
+interface EmailDraft { subject: string; body: string }
 
-type SearchState = "idle" | "loading" | "done" | "error"
-type EmailState  = "idle" | "loading" | "ready" | "sending" | "sent" | "error"
-type SaveState   = "idle" | "saving" | "saved" | "error"
+type SearchState  = "idle" | "loading" | "done" | "error"
+type DetailsState = "loading" | "ready" | "error"
+type EmailState   = "idle" | "loading" | "ready" | "sending" | "sent" | "error"
+type SaveState    = "idle" | "saving" | "saved" | "error"
 
 interface DuplicateInfo {
   companyName: string | null
@@ -38,10 +36,28 @@ function cleanUrl(url: string): string {
   return url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")
 }
 
-// ─── Company Card (search results) ───────────────────────────────────────────
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  } catch { return "" }
+}
+
+function domainFromWebsite(website: string): string | null {
+  try {
+    return new URL(website.startsWith("http") ? website : `https://${website}`).hostname.replace(/^www\./, "")
+  } catch { return null }
+}
+
+function suggestEmailsFromDomain(website: string): string[] {
+  const domain = domainFromWebsite(website)
+  if (!domain) return []
+  return [`info@${domain}`, `operations@${domain}`, `contact@${domain}`, `facilities@${domain}`]
+}
+
+// ─── Company Card ─────────────────────────────────────────────────────────────
 
 function CompanyCard({ company, selected, onClick }: {
-  company:  DiscoveredCompany
+  company:  DiscoveredCompanyBasic
   selected: boolean
   onClick:  () => void
 }) {
@@ -53,10 +69,25 @@ function CompanyCard({ company, selected, onClick }: {
         selected ? "border-indigo-500 ring-1 ring-indigo-500/30" : "border-gray-800 hover:border-gray-700"
       }`}
     >
+      {/* Header row */}
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1 min-w-0">
-          <h3 className="text-white font-semibold text-[14px] leading-snug truncate">{company.companyName}</h3>
-          <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-gray-400">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-white font-semibold text-[14px] leading-snug">{company.companyName}</h3>
+            {company.crmStatus === "contacted" && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-orange-900/30 text-orange-400 border border-orange-800/50 flex-shrink-0">
+                <CheckCircle2 className="w-2 h-2" />
+                Contacted {company.lastContactAt ? formatDate(company.lastContactAt) : ""}
+              </span>
+            )}
+            {company.crmStatus === "in_crm" && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-900/30 text-indigo-400 border border-indigo-800/50 flex-shrink-0">
+                <Building2 className="w-2 h-2" />
+                In CRM
+              </span>
+            )}
+          </div>
+          <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5 text-[11px] text-gray-400">
             {(company.city || company.state) && (
               <span className="flex items-center gap-0.5">
                 <MapPin className="w-2.5 h-2.5" />
@@ -64,18 +95,26 @@ function CompanyCard({ company, selected, onClick }: {
               </span>
             )}
             {company.estimatedEmployees && (
-              <><span className="text-gray-600">·</span>
               <span className="flex items-center gap-0.5">
                 <Users className="w-2.5 h-2.5" />{company.estimatedEmployees} emp.
-              </span></>
+              </span>
+            )}
+            {company.website && (
+              <a href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-0.5 text-indigo-400/80 hover:text-indigo-300 transition-colors"
+                onClick={e => e.stopPropagation()}>
+                <ExternalLink className="w-2.5 h-2.5" />{cleanUrl(company.website)}
+              </a>
             )}
           </div>
         </div>
-        <div className={`flex-shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-lg border ${badge.bg} ${badge.border}`}>
-          <span className={`text-xl font-bold leading-none tabular-nums ${badge.text}`}>{company.fitScore}</span>
+        <div className={`flex-shrink-0 flex flex-col items-center justify-center w-11 h-11 rounded-lg border ${badge.bg} ${badge.border}`}>
+          <span className={`text-lg font-bold leading-none tabular-nums ${badge.text}`}>{company.fitScore}</span>
           <span className="text-[8px] uppercase tracking-widest text-gray-500 mt-0.5">fit</span>
         </div>
       </div>
+
       {company.industry && (
         <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700/60 mb-2">
           <Building2 className="w-2.5 h-2.5" />{company.industry}
@@ -84,28 +123,27 @@ function CompanyCard({ company, selected, onClick }: {
       {company.summary && (
         <p className="text-[12px] text-gray-400 leading-relaxed line-clamp-2">{company.summary}</p>
       )}
-      {company.painPoints?.length > 0 && (
-        <div className="mt-2 flex items-start gap-1.5">
-          <Zap className="w-3 h-3 text-amber-400 flex-shrink-0 mt-px" />
-          <p className="text-[11px] text-amber-300/70 line-clamp-1">{company.painPoints[0]}</p>
-        </div>
-      )}
     </button>
   )
 }
 
-// ─── Slide-over panel ─────────────────────────────────────────────────────────
+// ─── Slide-over ───────────────────────────────────────────────────────────────
 
 function SlideOver({ company, onClose }: {
-  company: DiscoveredCompany
+  company: DiscoveredCompanyBasic
   onClose: () => void
 }) {
   const badge = fitBadge(company.fitScore)
 
-  // Email state
+  const suggestedEmails = useMemo(() => company.website ? suggestEmailsFromDomain(company.website) : [], [company.website])
+
+  const [detailsState, setDetailsState] = useState<DetailsState>("loading")
+  const [details,      setDetails]      = useState<DiscoveredCompanyDetails | null>(null)
+  const [detailsErr,   setDetailsErr]   = useState<string | null>(null)
+
   const [emailState,  setEmailState]  = useState<EmailState>("idle")
   const [draft,       setDraft]       = useState<EmailDraft | null>(null)
-  const [toEmail,     setToEmail]     = useState("")
+  const [toEmail,     setToEmail]     = useState(suggestedEmails[0] ?? "")
   const [subject,     setSubject]     = useState("")
   const [emailBody,   setEmailBody]   = useState("")
   const [emailError,  setEmailError]  = useState<string | null>(null)
@@ -113,16 +151,15 @@ function SlideOver({ company, onClose }: {
   const [duplicate,   setDuplicate]   = useState<DuplicateInfo | null>(null)
   const [saveState,   setSaveState]   = useState<SaveState>("idle")
 
-  // Auto-generate email when panel opens
-  const generateEmail = useCallback(async () => {
+  const generateEmail = useCallback(async (detailsData: DiscoveredCompanyDetails) => {
     setEmailState("loading")
     setEmailError(null)
     setDuplicate(null)
     try {
       const res = await fetch("/api/super-admin/crm/prospects/discover/email", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ company }),
+        body:    JSON.stringify({ company: detailsData }),
       })
       if (!res.ok) throw new Error(`Generation failed (${res.status})`)
       const data = await res.json() as EmailDraft
@@ -134,21 +171,45 @@ function SlideOver({ company, onClose }: {
       setEmailError(err instanceof Error ? err.message : "Failed to generate email")
       setEmailState("error")
     }
-  }, [company])
+  }, [])
 
-  useEffect(() => { generateEmail() }, [generateEmail])
+  // On open: fetch details, then auto-generate email
+  useEffect(() => {
+    async function fetchDetails() {
+      setDetailsState("loading")
+      setDetailsErr(null)
+      try {
+        const res = await fetch("/api/super-admin/crm/prospects/discover/details", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ company }),
+        })
+        if (!res.ok) throw new Error(`Details failed (${res.status})`)
+        const data = await res.json() as DiscoveredCompanyDetails
+        setDetails(data)
+        setDetailsState("ready")
+        void generateEmail(data)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Failed to load research"
+        setDetailsErr(msg)
+        setDetailsState("error")
+      }
+    }
+    void fetchDetails()
+  }, [company, generateEmail])
 
   async function handleSend(force = false) {
     if (!toEmail.trim()) { setEmailError("Enter a recipient email address"); return }
     if (emailState === "sending") return
+    const payload = details ?? { ...company, painPoints: [], relayFitReasons: [], suggestedOutreachAngle: "" }
     setEmailState("sending")
     setEmailError(null)
     setDuplicate(null)
     try {
       const res = await fetch("/api/super-admin/crm/prospects/discover/send", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ company, to: toEmail.trim(), subject, emailBody, force }),
+        body:    JSON.stringify({ company: payload, to: toEmail.trim(), subject, emailBody, force }),
       })
       if (res.status === 409) {
         const data = await res.json() as DuplicateInfo & { duplicate: boolean }
@@ -173,37 +234,52 @@ function SlideOver({ company, onClose }: {
     setSaveState("saving")
     try {
       const res = await fetch("/api/super-admin/crm/prospects", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          companyName:           company.companyName,
-          website:               company.website || null,
-          industry:              company.industry || null,
-          headquartersCity:      company.city || null,
-          headquartersState:     company.state || null,
-          source:                "ai_research",
+        body:    JSON.stringify({
+          companyName:      company.companyName,
+          website:          company.website || null,
+          industry:         company.industry || null,
+          headquartersCity:  company.city || null,
+          headquartersState: company.state || null,
+          source:           "ai_research",
         }),
       })
       if (res.status === 409) { setSaveState("saved"); return }
       if (!res.ok) throw new Error("Save failed")
       setSaveState("saved")
-    } catch {
-      setSaveState("error")
-    }
+    } catch { setSaveState("error") }
   }
+
+  const canSend = emailState === "ready" || emailState === "sending"
+  const websiteHref = company.website
+    ? (company.website.startsWith("http") ? company.website : `https://${company.website}`)
+    : null
 
   return (
     <>
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
-
-      {/* Panel */}
       <div className="fixed right-0 top-0 h-screen w-full sm:w-[520px] bg-gray-950 border-l border-gray-800 z-50 flex flex-col overflow-hidden">
+
         {/* Header */}
         <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4 border-b border-gray-800 flex-shrink-0">
           <div className="flex-1 min-w-0">
-            <h2 className="text-white font-semibold text-base leading-snug">{company.companyName}</h2>
-            <div className="flex items-center flex-wrap gap-2 mt-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-white font-semibold text-base leading-snug">{company.companyName}</h2>
+              {company.crmStatus === "contacted" && (
+                <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-orange-900/30 text-orange-400 border border-orange-800/50">
+                  <CheckCircle2 className="w-2 h-2" />
+                  Contacted {company.lastContactAt ? formatDate(company.lastContactAt) : ""}
+                </span>
+              )}
+              {company.crmStatus === "in_crm" && (
+                <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-900/30 text-indigo-400 border border-indigo-800/50">
+                  <Building2 className="w-2 h-2" />
+                  In CRM
+                </span>
+              )}
+            </div>
+            <div className="flex items-center flex-wrap gap-2 mt-1.5">
               {(company.city || company.state) && (
                 <span className="text-[11px] text-gray-400 flex items-center gap-1">
                   <MapPin className="w-3 h-3" />{[company.city, company.state].filter(Boolean).join(", ")}
@@ -219,19 +295,18 @@ function SlideOver({ company, onClose }: {
                   <Users className="w-3 h-3" />{company.estimatedEmployees} employees
                 </span>
               )}
-              {company.website && (
-                <a href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
-                  target="_blank" rel="noopener noreferrer"
+              {websiteHref && (
+                <a href={websiteHref} target="_blank" rel="noopener noreferrer"
                   className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
                   onClick={e => e.stopPropagation()}>
-                  <ExternalLink className="w-3 h-3" />{cleanUrl(company.website)}
+                  <Globe className="w-3 h-3" />{cleanUrl(company.website)}
                 </a>
               )}
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg border ${badge.bg} ${badge.border}`}>
-              <span className={`text-xl font-bold tabular-nums ${badge.text}`}>{company.fitScore}</span>
+            <div className={`flex flex-col items-center justify-center w-11 h-11 rounded-lg border ${badge.bg} ${badge.border}`}>
+              <span className={`text-lg font-bold tabular-nums ${badge.text}`}>{company.fitScore}</span>
               <span className="text-[8px] uppercase tracking-widest text-gray-500">fit</span>
             </div>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-300 p-1 rounded transition-colors">
@@ -246,58 +321,78 @@ function SlideOver({ company, onClose }: {
 
             {/* Summary */}
             {company.summary && (
-              <div>
-                <p className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Summary</p>
-                <p className="text-sm text-gray-300 leading-relaxed">{company.summary}</p>
+              <p className="text-sm text-gray-300 leading-relaxed">{company.summary}</p>
+            )}
+
+            {/* Research section */}
+            {detailsState === "loading" && (
+              <div className="space-y-3 animate-pulse">
+                <div className="h-3 bg-gray-800 rounded w-32" />
+                <div className="space-y-2">
+                  <div className="h-3 bg-gray-800 rounded w-full" />
+                  <div className="h-3 bg-gray-800 rounded w-4/5" />
+                  <div className="h-3 bg-gray-800 rounded w-full" />
+                </div>
               </div>
             )}
 
-            {/* Pain Points */}
-            {company.painPoints?.length > 0 && (
-              <div>
-                <p className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Operational Pain Points</p>
-                <ul className="space-y-1.5">
-                  {company.painPoints.map((p, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <Zap className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-amber-300/80">{p}</span>
-                    </li>
-                  ))}
-                </ul>
+            {detailsState === "error" && (
+              <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-3 text-xs text-red-400 flex items-start gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                <span>Research failed: {detailsErr}</span>
               </div>
             )}
 
-            {/* Relay Fit Reasons */}
-            {company.relayFitReasons?.length > 0 && (
-              <div>
-                <p className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Why Relay Fits</p>
-                <ul className="space-y-1.5">
-                  {company.relayFitReasons.map((r, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <Star className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-300">{r}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            {detailsState === "ready" && details && (
+              <>
+                {/* Pain Points */}
+                {details.painPoints?.length > 0 && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Operational Pain Points</p>
+                    <ul className="space-y-1.5">
+                      {details.painPoints.map((p, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <Zap className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-amber-300/80">{p}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Relay Fit */}
+                {details.relayFitReasons?.length > 0 && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Why Relay Fits</p>
+                    <ul className="space-y-1.5">
+                      {details.relayFitReasons.map((r, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <Star className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-gray-300">{r}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Outreach Angle */}
+                {details.suggestedOutreachAngle && (
+                  <div className="bg-indigo-950/30 border border-indigo-800/40 rounded-lg px-3.5 py-2.5">
+                    <p className="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider mb-1">Outreach Angle</p>
+                    <p className="text-sm text-indigo-200/80">{details.suggestedOutreachAngle}</p>
+                  </div>
+                )}
+              </>
             )}
 
-            {/* Outreach Angle */}
-            {company.suggestedOutreachAngle && (
-              <div className="bg-indigo-950/30 border border-indigo-800/40 rounded-lg px-3.5 py-2.5">
-                <p className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider mb-1">Outreach Angle</p>
-                <p className="text-sm text-indigo-200/80">{company.suggestedOutreachAngle}</p>
-              </div>
-            )}
-
-            {/* ── Email Draft ────────────────────────────────────────────────── */}
+            {/* ── Email Draft ──────────────────────────────────────────────── */}
             <div className="border-t border-gray-800 pt-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5" /> Outreach Email
                 </p>
-                {emailState !== "loading" && emailState !== "sending" && emailState !== "sent" && (
-                  <button onClick={generateEmail}
+                {details && emailState !== "loading" && emailState !== "sending" && emailState !== "sent" && (
+                  <button onClick={() => void generateEmail(details)}
                     className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-gray-300 transition-colors px-2 py-1 rounded hover:bg-gray-800">
                     <RefreshCw className="w-3 h-3" /> Regenerate
                   </button>
@@ -328,7 +423,7 @@ function SlideOver({ company, onClose }: {
 
               {emailState !== "sent" && (
                 <>
-                  {/* Loading skeleton */}
+                  {/* Email loading */}
                   {emailState === "loading" && (
                     <div className="space-y-2 animate-pulse">
                       <div className="h-8 bg-gray-800 rounded-lg" />
@@ -336,7 +431,7 @@ function SlideOver({ company, onClose }: {
                     </div>
                   )}
 
-                  {/* Error state */}
+                  {/* Email error */}
                   {emailState === "error" && (
                     <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-3 text-sm text-red-400 flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 flex-shrink-0" />
@@ -345,7 +440,7 @@ function SlideOver({ company, onClose }: {
                   )}
 
                   {/* Draft ready */}
-                  {(emailState === "ready" || emailState === "sending") && draft && (
+                  {(emailState === "ready" || emailState === "sending" || emailState === "idle") && (
                     <div className="space-y-3">
                       {/* Duplicate warning */}
                       {duplicate && (
@@ -359,10 +454,32 @@ function SlideOver({ company, onClose }: {
                                   <Link href={`/super-admin/crm/prospects/${duplicate.prospectId}`}
                                     className="underline hover:text-amber-200">View existing prospect</Link>
                                 )}
-                                <button onClick={() => { setDuplicate(null); handleSend(true) }}
+                                <button onClick={() => { setDuplicate(null); void handleSend(true) }}
                                   className="underline hover:text-amber-200">Send anyway</button>
                               </div>
                             </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Suggested emails */}
+                      {suggestedEmails.length > 0 && (
+                        <div>
+                          <p className="text-[10px] text-gray-500 mb-1.5 flex items-center gap-1">
+                            <AlertTriangle className="w-2.5 h-2.5 text-amber-600" />
+                            Suggested contact emails — not verified
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {suggestedEmails.map(e => (
+                              <button key={e} onClick={() => setToEmail(e)}
+                                className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
+                                  toEmail === e
+                                    ? "bg-indigo-600/20 border-indigo-500/50 text-indigo-300"
+                                    : "bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600"
+                                }`}>
+                                {e}
+                              </button>
+                            ))}
                           </div>
                         </div>
                       )}
@@ -380,28 +497,30 @@ function SlideOver({ company, onClose }: {
                       </div>
 
                       {/* Subject */}
-                      <div>
-                        <label className="block text-[11px] text-gray-500 mb-1">Subject</label>
-                        <input
-                          type="text"
-                          value={subject}
-                          onChange={e => setSubject(e.target.value)}
-                          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
-                        />
-                      </div>
+                      {draft && (
+                        <>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 mb-1">Subject</label>
+                            <input
+                              type="text"
+                              value={subject}
+                              onChange={e => setSubject(e.target.value)}
+                              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 mb-1">Body</label>
+                            <textarea
+                              rows={10}
+                              value={emailBody}
+                              onChange={e => setEmailBody(e.target.value)}
+                              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white leading-relaxed focus:outline-none focus:border-indigo-500 transition-colors resize-none font-mono"
+                            />
+                          </div>
+                        </>
+                      )}
 
-                      {/* Body */}
-                      <div>
-                        <label className="block text-[11px] text-gray-500 mb-1">Body</label>
-                        <textarea
-                          rows={10}
-                          value={emailBody}
-                          onChange={e => setEmailBody(e.target.value)}
-                          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white leading-relaxed focus:outline-none focus:border-indigo-500 transition-colors resize-none font-mono"
-                        />
-                      </div>
-
-                      {/* Error */}
+                      {/* Error (non-duplicate) */}
                       {emailError && !duplicate && (
                         <p className="text-xs text-red-400 flex items-center gap-1.5">
                           <AlertTriangle className="w-3.5 h-3.5" />{emailError}
@@ -411,9 +530,9 @@ function SlideOver({ company, onClose }: {
                       {/* Actions */}
                       <div className="flex gap-2 pt-1">
                         <button
-                          onClick={() => handleSend()}
-                          disabled={emailState === "sending"}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                          onClick={() => void handleSend()}
+                          disabled={!canSend || !draft}
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
                         >
                           {emailState === "sending"
                             ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
@@ -421,7 +540,7 @@ function SlideOver({ company, onClose }: {
                           }
                         </button>
                         <button
-                          onClick={handleSaveOnly}
+                          onClick={() => void handleSaveOnly()}
                           disabled={saveState === "saving" || saveState === "saved" || emailState === "sending"}
                           className="px-3 py-2.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-300 text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
                         >
@@ -440,7 +559,7 @@ function SlideOver({ company, onClose }: {
   )
 }
 
-// ─── Search Form ──────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const INDUSTRY_OPTIONS = [
   "Manufacturing", "Food & Beverage", "Warehousing & Logistics",
@@ -448,21 +567,32 @@ const INDUSTRY_OPTIONS = [
   "Property Management", "Education",
 ]
 
+const COUNTRY_OPTIONS = [
+  { value: "United States", label: "United States" },
+  { value: "Canada",        label: "Canada" },
+  { value: "United Kingdom", label: "United Kingdom" },
+  { value: "Australia",     label: "Australia" },
+  { value: "Other",         label: "Other" },
+]
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DiscoverPage() {
-  const [industry,    setIndustry]    = useState("")
-  const [location,    setLocation]    = useState("")
-  const [empMin,      setEmpMin]      = useState("")
-  const [empMax,      setEmpMax]      = useState("")
-  const [locMin,      setLocMin]      = useState("")
-  const [keywords,    setKeywords]    = useState("")
-  const [context,     setContext]     = useState("")
+  const [country,      setCountry]      = useState("United States")
+  const [stateProvince, setStateProvince] = useState("")
+  const [industry,     setIndustry]     = useState("")
+  const [empMin,       setEmpMin]       = useState("")
+  const [empMax,       setEmpMax]       = useState("")
+  const [locMin,       setLocMin]       = useState("")
+  const [keywords,     setKeywords]     = useState("")
+  const [context,      setContext]      = useState("")
 
-  const [searchState, setSearchState] = useState<SearchState>("idle")
-  const [companies,   setCompanies]   = useState<DiscoveredCompany[]>([])
-  const [searchError, setSearchError] = useState<string | null>(null)
-  const [selected,    setSelected]    = useState<DiscoveredCompany | null>(null)
+  const [searchState,  setSearchState]  = useState<SearchState>("idle")
+  const [companies,    setCompanies]    = useState<DiscoveredCompanyBasic[]>([])
+  const [searchError,  setSearchError]  = useState<string | null>(null)
+  const [selected,     setSelected]     = useState<DiscoveredCompanyBasic | null>(null)
+
+  const stateLabel = country === "Canada" ? "Province" : country === "United States" ? "State" : "Region"
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -471,14 +601,14 @@ export default function DiscoverPage() {
     setCompanies([])
     setSelected(null)
 
-    const body: Record<string, unknown> = {}
-    if (industry)  body.industry          = industry
-    if (location)  body.location          = location
-    if (empMin)    body.employeeCountMin   = parseInt(empMin,  10)
-    if (empMax)    body.employeeCountMax   = parseInt(empMax,  10)
-    if (locMin)    body.locationsMin       = parseInt(locMin,  10)
-    if (keywords)  body.keywords           = keywords
-    if (context)   body.additionalContext  = context
+    const body: Record<string, unknown> = { country }
+    if (stateProvince) body.stateProvince     = stateProvince
+    if (industry)      body.industry          = industry
+    if (empMin)        body.employeeCountMin   = parseInt(empMin,  10)
+    if (empMax)        body.employeeCountMax   = parseInt(empMax,  10)
+    if (locMin)        body.locationsMin       = parseInt(locMin,  10)
+    if (keywords)      body.keywords           = keywords
+    if (context)       body.additionalContext  = context
 
     try {
       const res = await fetch("/api/super-admin/crm/prospects/discover", {
@@ -488,7 +618,7 @@ export default function DiscoverPage() {
         const data = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(data.error ?? `Search failed (${res.status})`)
       }
-      const data = await res.json() as { companies: DiscoveredCompany[] }
+      const data = await res.json() as { companies: DiscoveredCompanyBasic[] }
       setCompanies(data.companies ?? [])
       setSearchState("done")
     } catch (err) {
@@ -496,6 +626,9 @@ export default function DiscoverPage() {
       setSearchState("error")
     }
   }
+
+  const inputCls = "w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+  const labelCls = "block text-[11px] font-medium text-gray-400 mb-1.5"
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -512,56 +645,76 @@ export default function DiscoverPage() {
       </div>
 
       <div className="flex h-[calc(100vh-57px)]">
-        {/* ── Left: Search form ───────────────────────────────────────────── */}
+        {/* ── Left: Search form ─────────────────────────────────────────── */}
         <div className="w-72 flex-shrink-0 border-r border-gray-800 overflow-y-auto">
-          <form onSubmit={handleSearch} className="p-4 space-y-4">
+          <form onSubmit={handleSearch} className="p-4 space-y-3">
+
+            {/* Country — first filter */}
             <div>
-              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Industry</label>
-              <select
-                value={industry}
-                onChange={e => setIndustry(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
-              >
+              <label className={labelCls}>Country</label>
+              <select value={country} onChange={e => { setCountry(e.target.value); setStateProvince("") }}
+                className={inputCls}>
+                {COUNTRY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+
+            {/* State / Province — shown for all but Other */}
+            {country !== "Other" && (
+              <div>
+                <label className={labelCls}>{stateLabel}</label>
+                <input type="text"
+                  placeholder={country === "Canada" ? "e.g. Ontario, BC" : "e.g. Texas, Midwest"}
+                  value={stateProvince} onChange={e => setStateProvince(e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+            )}
+
+            {country === "Other" && (
+              <div>
+                <label className={labelCls}>Region / Location</label>
+                <input type="text" placeholder="e.g. Southeast Asia, Germany"
+                  value={stateProvince} onChange={e => setStateProvince(e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+            )}
+
+            <div>
+              <label className={labelCls}>Industry</label>
+              <select value={industry} onChange={e => setIndustry(e.target.value)} className={inputCls}>
                 <option value="">Any industry</option>
                 {INDUSTRY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Region / Location</label>
-              <input
-                type="text" placeholder="e.g. Midwest, Texas, Southeast"
-                value={location} onChange={e => setLocation(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Employee Count</label>
+              <label className={labelCls}>Employee Count</label>
               <div className="flex gap-2">
                 <input type="number" placeholder="Min" value={empMin} onChange={e => setEmpMin(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                  className={inputCls} />
                 <input type="number" placeholder="Max" value={empMax} onChange={e => setEmpMax(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                  className={inputCls} />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Min. Locations</label>
+              <label className={labelCls}>Min. Locations</label>
               <input type="number" placeholder="e.g. 3" value={locMin} onChange={e => setLocMin(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                className={inputCls} />
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Keywords</label>
-              <input type="text" placeholder="e.g. warehousing, cold storage" value={keywords} onChange={e => setKeywords(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+              <label className={labelCls}>Keywords</label>
+              <input type="text" placeholder="e.g. warehousing, cold storage" value={keywords}
+                onChange={e => setKeywords(e.target.value)} className={inputCls} />
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-gray-400 mb-1.5">Additional Context</label>
-              <textarea rows={3} placeholder="Any other targeting details..." value={context} onChange={e => setContext(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 resize-none" />
+              <label className={labelCls}>Additional Context</label>
+              <textarea rows={3} placeholder="Any other targeting details..." value={context}
+                onChange={e => setContext(e.target.value)}
+                className={`${inputCls} resize-none`} />
             </div>
 
             <button
@@ -577,20 +730,20 @@ export default function DiscoverPage() {
 
             {searchState === "loading" && (
               <p className="text-[11px] text-gray-500 text-center">
-                AI is searching the web for real companies — this takes ~30 seconds
+                Claude is finding real companies — this takes ~20 seconds
               </p>
             )}
           </form>
         </div>
 
-        {/* ── Right: Results ──────────────────────────────────────────────── */}
+        {/* ── Right: Results ──────────────────────────────────────────── */}
         <div className="flex-1 overflow-y-auto p-4">
           {searchState === "idle" && (
             <div className="h-full flex flex-col items-center justify-center text-center px-8">
               <Search className="w-12 h-12 text-gray-700 mb-3" />
-              <p className="text-gray-400 font-medium mb-1">Search for prospects</p>
+              <p className="text-gray-400 font-medium mb-1">Find sales prospects</p>
               <p className="text-sm text-gray-600">
-                Fill in your criteria and click Find Prospects. The AI will search the web for real companies and generate personalized outreach emails.
+                Choose a country and fill in your criteria. Claude will return 8-10 real companies — click any card to load full research and generate a personalized outreach email.
               </p>
             </div>
           )}
@@ -599,7 +752,7 @@ export default function DiscoverPage() {
             <div className="h-full flex flex-col items-center justify-center">
               <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
               <p className="text-gray-400 font-medium">Finding prospects…</p>
-              <p className="text-sm text-gray-600 mt-1">Searching the web for real companies</p>
+              <p className="text-sm text-gray-600 mt-1">Using Claude&apos;s training knowledge to find real companies</p>
             </div>
           )}
 
@@ -618,9 +771,14 @@ export default function DiscoverPage() {
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-gray-300 font-medium">
                   Found {companies.length} {companies.length === 1 ? "company" : "companies"}
+                  {companies.some(c => c.crmStatus !== "none") && (
+                    <span className="text-[11px] text-gray-500 ml-2 font-normal">
+                      · {companies.filter(c => c.crmStatus !== "none").length} flagged in CRM
+                    </span>
+                  )}
                 </p>
                 {companies.length > 0 && (
-                  <p className="text-[11px] text-gray-500">Click a card to generate an outreach email</p>
+                  <p className="text-[11px] text-gray-500">Click a card to research + draft email</p>
                 )}
               </div>
 

@@ -96,14 +96,19 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
   const sidebarContent = (
     <>
       {/* Branding */}
-      <div className="px-5 py-5 border-b border-gray-800 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-gray-900 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center flex-shrink-0">
             <Shield className="w-4 h-4 text-white" />
           </div>
           <div>
-            <p className="text-white text-sm font-bold leading-none">Relay</p>
-            <p className="text-indigo-400 text-[10px] font-semibold uppercase tracking-wider mt-0.5">
+            <div className="flex items-center gap-2">
+              <p className="text-white text-sm font-bold leading-none">Relay</p>
+              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-red-600 text-white uppercase tracking-widest leading-none">
+                ADMIN
+              </span>
+            </div>
+            <p className="text-indigo-400/80 text-[10px] font-medium uppercase tracking-wider mt-0.5">
               Control Panel
             </p>
           </div>
@@ -133,10 +138,10 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
                   href={item.href}
                   onClick={close}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive(item)
                       ? "bg-indigo-600 text-white"
-                      : "text-gray-400 hover:text-white hover:bg-gray-800",
+                      : "text-gray-400 hover:text-white hover:bg-white/5",
                   )}
                 >
                   <item.icon className="w-4 h-4 flex-shrink-0" />
@@ -157,14 +162,14 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
       </nav>
 
       {/* User + logout */}
-      <div className="px-3 pb-4 border-t border-gray-800 pt-4">
+      <div className="px-3 pb-4 border-t border-gray-900 pt-4">
         <div className="px-3 py-2 mb-2">
           <p className="text-white text-xs font-semibold truncate">{name}</p>
           <p className="text-gray-500 text-[11px] truncate">{email}</p>
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Sign out
@@ -176,7 +181,7 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
   return (
     <>
       {/* Mobile top header bar */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-50 flex items-center gap-3 px-4 h-14 bg-gray-900 border-b border-gray-800">
+      <div className="md:hidden fixed top-0 inset-x-0 z-50 flex items-center gap-3 px-4 h-14 bg-[#0b1120] border-b border-gray-900">
         <button
           onClick={() => setOpen(true)}
           className="text-gray-400 hover:text-white p-1 -ml-1"
@@ -202,7 +207,7 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
       {/* Sidebar — always visible on desktop, slide-in on mobile */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 w-60 bg-gray-900 border-r border-gray-800 flex flex-col z-50 transition-transform duration-200",
+          "fixed inset-y-0 left-0 w-60 bg-[#0b1120] border-r border-gray-900 flex flex-col z-50 transition-transform duration-200",
           "md:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         )}

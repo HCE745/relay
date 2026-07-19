@@ -2,6 +2,7 @@ import "server-only"
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { getPlatformConfig } from "@/lib/platform-config"
 
 export const maxDuration = 60
 
@@ -135,6 +136,15 @@ export async function POST(req: NextRequest) {
     const session = await getSession()
     if (!session?.superAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
+    // Check if AI discovery is enabled
+    const discoveryEnabled = (await getPlatformConfig("ai_prospect_discovery_enabled")) !== "false"
+    if (!discoveryEnabled) {
+      return NextResponse.json(
+        { error: "AI prospect discovery is disabled in CRM Settings", disabled: true, companies: [] },
+        { status: 403 }
+      )
+    }
+
     const apiKey = process.env.ANTHROPIC_API_KEY
     if (!apiKey) {
       console.error("[discover] ANTHROPIC_API_KEY is not set")
@@ -161,7 +171,12 @@ export async function POST(req: NextRequest) {
         if (d) domainToProspect.set(d, { id: p.id })
       }
     }
-    const exclusionList = existingProspects.map(p => p.companyName).slice(0, 80).join(", ")
+    const exclusionList = existingProspects.map(p => p.companyName).slice(0, 100).join(", ")
+
+    // Build complete domain list for hard exclusion
+    const existingDomains = existingProspects
+      .flatMap(p => { const d = p.website ? extractDomain(p.website) : null; return d ? [d] : [] })
+      .slice(0, 500)
 
     // Load sent emails — for "contacted" annotation
     const sentEmails = await prisma.crmEmail.findMany({
@@ -211,7 +226,9 @@ CRITICAL — WEBSITE REQUIRED: You MUST include a real working website URL (with
 CRITERIA:
 ${criteriaText}
 
-EXCLUDE (already in our CRM): ${exclusionList || "(none yet)"}
+EXCLUDE — company names already in our CRM: ${exclusionList || "(none yet)"}
+
+CRITICAL — DOMAIN EXCLUSION: Do not suggest any company whose website domain appears in this list: ${existingDomains.length > 0 ? existingDomains.join(", ") : "(none yet)"}. Only return companies whose domain is NOT on this list.
 
 For each company provide:
 - companyName: exact legal or trade name

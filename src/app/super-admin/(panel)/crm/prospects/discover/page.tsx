@@ -578,19 +578,32 @@ const COUNTRY_OPTIONS = [
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DiscoverPage() {
-  const [country,      setCountry]      = useState("United States")
-  const [stateProvince, setStateProvince] = useState("")
-  const [industry,     setIndustry]     = useState("")
-  const [empMin,       setEmpMin]       = useState("")
-  const [empMax,       setEmpMax]       = useState("")
-  const [locMin,       setLocMin]       = useState("")
-  const [keywords,     setKeywords]     = useState("")
-  const [context,      setContext]      = useState("")
+  const [discoveryEnabled, setDiscoveryEnabled] = useState<boolean | null>(null)
 
-  const [searchState,  setSearchState]  = useState<SearchState>("idle")
-  const [companies,    setCompanies]    = useState<DiscoveredCompanyBasic[]>([])
-  const [searchError,  setSearchError]  = useState<string | null>(null)
-  const [selected,     setSelected]     = useState<DiscoveredCompanyBasic | null>(null)
+  const [country,       setCountry]       = useState("United States")
+  const [stateProvince, setStateProvince] = useState("")
+  const [industry,      setIndustry]      = useState("")
+  const [empMin,        setEmpMin]        = useState("")
+  const [empMax,        setEmpMax]        = useState("")
+  const [locMin,        setLocMin]        = useState("")
+  const [keywords,      setKeywords]      = useState("")
+  const [context,       setContext]       = useState("")
+
+  const [searchState, setSearchState] = useState<SearchState>("idle")
+  const [companies,   setCompanies]   = useState<DiscoveredCompanyBasic[]>([])
+  const [searchError, setSearchError] = useState<string | null>(null)
+  const [selected,    setSelected]    = useState<DiscoveredCompanyBasic | null>(null)
+
+  // Load enabled/disabled setting from CRM settings
+  useEffect(() => {
+    fetch("/api/super-admin/crm/settings")
+      .then(r => r.json())
+      .then(d => {
+        const enabled = (d as { settings?: { aiProspectDiscoveryEnabled?: boolean } }).settings?.aiProspectDiscoveryEnabled
+        setDiscoveryEnabled(enabled !== false)
+      })
+      .catch(() => setDiscoveryEnabled(true))
+  }, [])
 
   const stateLabel = country === "Canada" ? "Province" : country === "United States" ? "State" : "Region"
 
@@ -717,16 +730,33 @@ export default function DiscoverPage() {
                 className={`${inputCls} resize-none`} />
             </div>
 
-            <button
-              type="submit"
-              disabled={searchState === "loading"}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-            >
-              {searchState === "loading"
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Searching…</>
-                : <><Search className="w-4 h-4" /> Find Prospects</>
-              }
-            </button>
+            {discoveryEnabled === false ? (
+              <div>
+                <button
+                  type="button"
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-800 opacity-50 cursor-not-allowed text-gray-400 text-sm font-medium rounded-lg"
+                >
+                  <Search className="w-4 h-4" /> Find Prospects
+                </button>
+                <p className="text-[11px] text-amber-500/80 text-center mt-2 leading-snug">
+                  AI prospect discovery is currently disabled. Enable it in{" "}
+                  <Link href="/super-admin/crm/settings" className="underline hover:text-amber-400">CRM Settings</Link>{" "}
+                  or add prospects manually.
+                </p>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={searchState === "loading"}
+                className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                {searchState === "loading"
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Searching…</>
+                  : <><Search className="w-4 h-4" /> Find Prospects</>
+                }
+              </button>
+            )}
 
             {searchState === "loading" && (
               <p className="text-[11px] text-gray-500 text-center">

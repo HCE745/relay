@@ -1057,11 +1057,12 @@ function SequencesTab() {
 // ─── Global Settings Tab ──────────────────────────────────────────────────────
 
 interface CrmGlobalSettings {
-  id:                  string
-  timezone:            string
-  sendingWindowStart:  number
-  sendingWindowEnd:    number
-  autoSendEnabled:     boolean
+  id:                          string
+  timezone:                    string
+  sendingWindowStart:          number
+  sendingWindowEnd:            number
+  autoSendEnabled:             boolean
+  aiProspectDiscoveryEnabled:  boolean
 }
 
 const TIMEZONES = [
@@ -1092,10 +1093,11 @@ function GlobalSettingsTab() {
     const r = await fetch("/api/super-admin/crm/settings", {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        timezone:           settings.timezone,
-        sendingWindowStart: settings.sendingWindowStart,
-        sendingWindowEnd:   settings.sendingWindowEnd,
-        autoSendEnabled:    settings.autoSendEnabled,
+        timezone:                   settings.timezone,
+        sendingWindowStart:         settings.sendingWindowStart,
+        sendingWindowEnd:           settings.sendingWindowEnd,
+        autoSendEnabled:            settings.autoSendEnabled,
+        aiProspectDiscoveryEnabled: settings.aiProspectDiscoveryEnabled,
       }),
     })
     setSaving(false)
@@ -1191,6 +1193,33 @@ function GlobalSettingsTab() {
           <div className="mt-3 flex items-start gap-2 text-yellow-400">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <p className="text-xs">Auto-send is ON. Follow-ups will be sent without your approval. Monitor the queue regularly.</p>
+          </div>
+        )}
+      </div>
+
+      {/* AI Prospect Discovery */}
+      <div className="bg-gray-900 border border-gray-700 rounded-xl p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-semibold text-white">AI Prospect Discovery</h3>
+            <p className="text-xs text-gray-400 mt-1">
+              Uses Anthropic API credits to search for new prospects. Disable to prevent API credit usage.
+            </p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+            <input
+              type="checkbox"
+              checked={settings.aiProspectDiscoveryEnabled ?? true}
+              onChange={e => setSettings(s => s ? { ...s, aiProspectDiscoveryEnabled: e.target.checked } : s)}
+              className="sr-only peer"
+            />
+            <div className="w-10 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600" />
+          </label>
+        </div>
+        {settings.aiProspectDiscoveryEnabled === false && (
+          <div className="mt-3 flex items-start gap-2 text-amber-400">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <p className="text-xs">Discovery is disabled. The Find Prospects button on the discovery page is grayed out.</p>
           </div>
         )}
       </div>

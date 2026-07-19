@@ -71,8 +71,7 @@ export async function GET() {
         max_tokens: 3000,
         system:     `You must respond with ONLY a valid JSON array. No markdown. No tables. No headers. No explanation. No code blocks. Just a raw JSON array starting with [ and ending with ]. Each element must be a JSON object with these exact keys: companyName, website, city, state, industry, estimatedEmployees, summary, painPoints (array of 3 strings), relayFitReasons (array of 3 strings), suggestedOutreachAngle, fitScore (integer 0-100). Do not return anything other than the JSON array.`,
         messages: [
-          { role: "user", content: `Based on your training knowledge, list 3 to 5 real ${HARDCODED_QUERY} that would be good prospects for Relay, an operations platform for multi-location businesses. Use companies from your training data. Return only the JSON array.` },
-          { role: "assistant", content: "[" },
+          { role: "user", content: `Based on your training knowledge, list 3 to 5 real ${HARDCODED_QUERY} that would be good prospects for Relay, an operations platform for multi-location businesses. Use companies from your training data. Your entire response must be only the JSON array — nothing before [, nothing after ].` },
         ],
       }),
       signal: AbortSignal.timeout(30_000),
@@ -83,11 +82,11 @@ export async function GET() {
       .filter((b): b is { type: "text"; text: string } => b.type === "text")
       .map(b => b.text)
 
-    // Try to parse the JSON array (prepend the "[" we sent as prefill)
+    // Try to parse the JSON array directly (no prefill, model outputs full array)
     let companiesParsed = 0
     for (const t of textBlocks) {
       try {
-        const arr = JSON.parse("[" + t)
+        const arr = JSON.parse(t)
         if (Array.isArray(arr)) { companiesParsed = arr.length; break }
       } catch { /* try next */ }
     }

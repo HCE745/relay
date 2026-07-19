@@ -203,7 +203,7 @@ Return real companies with multiple physical locations and operational complexit
 - suggestedOutreachAngle: one sentence on the best way to open the conversation
 - fitScore: integer 0-100 (higher = more locations + more operational complexity)
 
-Return only the JSON array.`
+Your entire response must be only the JSON array — nothing before [, nothing after ].`
 
     console.log("[discover] sending prompt to Anthropic (no web search, assistant prefill)")
     console.log("[discover] user prompt length:", userPrompt.length, "chars")
@@ -213,8 +213,7 @@ Return only the JSON array.`
       max_tokens: 6000,
       system:     systemPrompt,
       messages: [
-        { role: "user",      content: userPrompt },
-        { role: "assistant", content: "[" },   // prefill forces JSON array start
+        { role: "user", content: userPrompt },
       ],
     }
 
@@ -262,9 +261,8 @@ Return only the JSON array.`
     console.log("[discover] raw continuation length:", rawContinuation.length)
     console.log("[discover] raw continuation (first 1000 chars):\n", rawContinuation.slice(0, 1000))
 
-    // Parse: prepend "[" because we sent it as the assistant prefill
     let companies: DiscoveredCompany[] = []
-    const parsed = extractArray(rawContinuation, true)
+    const parsed = extractArray(rawContinuation, false)
     if (parsed && parsed.length > 0) {
       companies = parsed.map(p => normalise(p as unknown as Record<string, unknown>))
       console.log("[discover] JSON extraction succeeded:", companies.length, "companies")

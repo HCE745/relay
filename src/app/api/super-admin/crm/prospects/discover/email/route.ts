@@ -50,8 +50,7 @@ Return ONLY valid JSON: {"subject": "...", "body": "..."}`
         max_tokens: 800,
         system:     "You are a B2B cold email writer. Output only valid JSON with keys 'subject' and 'body'. No markdown. No explanation.",
         messages: [
-          { role: "user",      content: prompt },
-          { role: "assistant", content: "{" },
+          { role: "user", content: prompt },
         ],
       }),
       signal: AbortSignal.timeout(55_000),
@@ -65,18 +64,17 @@ Return ONLY valid JSON: {"subject": "...", "body": "..."}`
 
     const data = await res.json() as { content: { type: string; text?: string }[] }
     const rawText = data.content.filter(b => b.type === "text").at(-1)?.text?.trim() ?? ""
-    const fullJson = "{" + rawText
 
     try {
-      const parsed = JSON.parse(fullJson) as { subject?: string; body?: string }
+      const parsed = JSON.parse(rawText) as { subject?: string; body?: string }
       return NextResponse.json({
         subject: parsed.subject?.trim() ?? `Operational visibility for ${company.companyName}`,
         body:    parsed.body?.trim()    ?? "",
       })
     } catch {
-      // Regex fallback if JSON is slightly malformed (no /s flag for older TS targets)
-      const subMatch  = fullJson.match(/"subject"\s*:\s*"([^"]*)"/)
-      const bodyMatch = fullJson.match(/"body"\s*:\s*"([\s\S]*?)"(?:\s*[,}])/)
+      // Regex fallback if JSON is slightly malformed
+      const subMatch  = rawText.match(/"subject"\s*:\s*"([^"]*)"/)
+      const bodyMatch = rawText.match(/"body"\s*:\s*"([\s\S]*?)"(?:\s*[,}])/)
       return NextResponse.json({
         subject: subMatch?.[1]?.replace(/\\n/g, "\n").replace(/\\"/g, '"') ?? `Operational visibility for ${company.companyName}`,
         body:    bodyMatch?.[1]?.replace(/\\n/g, "\n").replace(/\\"/g, '"') ?? rawText,

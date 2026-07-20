@@ -4,10 +4,14 @@ import { withSentryConfig } from "@sentry/nextjs"
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
+      // Next.js can't route dot-prefixed segments, so we rewrite these well-known URLs
       {
-        // Claude.ai expects OAuth discovery at this dotted URL; Next.js can't route dots, so rewrite it
         source:      "/api/mcp/.well-known/oauth-authorization-server",
         destination: "/api/mcp/oauth-metadata",
+      },
+      {
+        source:      "/api/mcp/.well-known/oauth-protected-resource",
+        destination: "/api/mcp/oauth-protected-resource",
       },
     ]
   },

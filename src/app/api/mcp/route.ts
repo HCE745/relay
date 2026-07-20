@@ -1,5 +1,6 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
+import crypto from "crypto"
 import { prisma } from "@/lib/prisma"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -292,27 +293,55 @@ async function callTool(name: string, args: Record<string, unknown>) {
 
 // ─── Auth Middleware ──────────────────────────────────────────────────────────
 
+function verifyOAuthToken(token: string, key: string): boolean {
+  if (!token.startsWith("mcp.")) return false
+  const rest    = token.slice(4)
+  const lastDot = rest.lastIndexOf(".")
+  if (lastDot === -1) return false
+  const payload  = rest.slice(0, lastDot)
+  const sig      = rest.slice(lastDot + 1)
+  const expected = crypto.createHmac("sha256", key).update(payload).digest("hex")
+  try {
+    return crypto.timingSafeEqual(Buffer.from(sig, "hex"), Buffer.from(expected, "hex"))
+  } catch { return false }
+}
+
 function checkAuth(req: NextRequest): NextResponse | null {
   const mcpKey = process.env.MCP_API_KEY
   if (!mcpKey) return NextResponse.json({ error: "MCP_API_KEY not configured on server" }, { status: 500 })
   const auth = req.headers.get("authorization") ?? ""
-  if (auth !== `Bearer ${mcpKey}`) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  return null
+  if (!auth.startsWith("Bearer ")) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const token = auth.slice(7)
+  // Accept static MCP_API_KEY (backward compat for direct API access)
+  if (token === mcpKey) return null
+  // Accept OAuth-issued HMAC tokens
+  if (verifyOAuthToken(token, mcpKey)) return null
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 }
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
-// GET — server discovery / health check
+// GET — public manifest for MCP discovery; no auth required
 export async function GET(req: NextRequest) {
-  const authErr = checkAuth(req)
-  if (authErr) return authErr
+  const host  = req.headers.get("host") ?? "localhost"
+  const proto = host.startsWith("localhost") ? "http" : "https"
+  const base  = (process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "")) ?? `${proto}://${host}`
+  const server = `${base}/api/mcp`
 
   return NextResponse.json({
-    name:        "relay-crm",
-    version:     "1.0.0",
-    description: "Relay CRM MCP Server — query and update the Relay prospect database",
-    protocol:    "MCP/2024-11-05",
-    tools:       TOOLS.map(t => ({ name: t.name, description: t.description })),
+    name:            "relay-crm",
+    version:         "1.0.0",
+    description:     "Relay CRM MCP Server — query and update the Relay prospect database",
+    protocolVersion: "2024-11-05",
+    capabilities:    { tools: {} },
+    serverInfo:      { name: "relay-crm", version: "1.0.0" },
+    auth: {
+      type:             "oauth2",
+      authorization_url: `${server}/oauth/authorize`,
+      token_url:         `${server}/oauth/token`,
+      metadata_url:      `${server}/.well-known/oauth-authorization-server`,
+    },
+    tools: TOOLS.map(t => ({ name: t.name, description: t.description })),
   })
 }
 

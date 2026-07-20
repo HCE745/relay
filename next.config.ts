@@ -2,7 +2,15 @@ import type { NextConfig } from "next"
 import { withSentryConfig } from "@sentry/nextjs"
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        // Claude.ai expects OAuth discovery at this dotted URL; Next.js can't route dots, so rewrite it
+        source:      "/api/mcp/.well-known/oauth-authorization-server",
+        destination: "/api/mcp/oauth-metadata",
+      },
+    ]
+  },
 }
 
 export default withSentryConfig(nextConfig, {

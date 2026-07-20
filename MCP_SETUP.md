@@ -8,11 +8,13 @@ Connect Claude.ai to the Relay CRM so Claude can look up contacted prospects, ad
 |---|---|
 | **Server URL** | `https://app.getrelay.software/api/mcp` |
 | **Protocol** | MCP over HTTP (JSON-RPC 2.0, `2024-11-05`) |
-| **Auth** | Bearer token — `Authorization: Bearer <MCP_API_KEY>` |
+| **Auth** | OAuth 2.0 Authorization Code + PKCE |
 
 ---
 
 ## Step 1 — Set the API Key in Vercel
+
+The MCP API key is the password used during the OAuth login flow.
 
 1. Go to your [Vercel project settings → Environment Variables](https://vercel.com/dashboard)
 2. Add a new variable:
@@ -30,13 +32,26 @@ MCP_API_KEY="your-secret-key-here"
 
 ## Step 2 — Connect to Claude.ai
 
-1. Open [Claude.ai](https://claude.ai) and go to **Settings → Integrations** (or the MCP/Connectors section)
-2. Click **Add custom integration** (or equivalent)
+1. Open [Claude.ai](https://claude.ai) and go to **Settings → Integrations**
+2. Click **Add integration** (or the equivalent MCP connector option)
 3. Enter:
    - **Name:** `Relay CRM`
    - **Server URL:** `https://app.getrelay.software/api/mcp`
-   - **API Key / Bearer token:** your `MCP_API_KEY` value
-4. Save — Claude will ping the server to verify the connection
+4. Save — Claude.ai will automatically redirect to the Relay OAuth login page
+5. On the login page, enter your `MCP_API_KEY` value and click **Authorize Access**
+6. You'll be redirected back to Claude.ai — the integration is now connected
+
+---
+
+## OAuth Endpoints
+
+| Endpoint | URL |
+|---|---|
+| **Metadata** | `GET /api/mcp/.well-known/oauth-authorization-server` |
+| **Authorize** | `GET /api/mcp/oauth/authorize` |
+| **Token** | `POST /api/mcp/oauth/token` |
+
+The OAuth flow uses **Authorization Code + PKCE (S256)**. No client secret is required.
 
 ---
 
@@ -119,7 +134,8 @@ Once connected, you can have conversations like:
 
 ## Security
 
-- All requests require `Authorization: Bearer <MCP_API_KEY>`
-- Missing or wrong token → `401 Unauthorized`
-- The key is stored server-side only (Vercel env var) — never exposed to the browser
-- Rotate the key anytime by updating the Vercel env var and reconnecting in Claude.ai
+- All MCP requests require a valid Bearer token (either `MCP_API_KEY` directly or an OAuth-issued token)
+- OAuth tokens are HMAC-SHA256 signed with `MCP_API_KEY` — rotating the key invalidates all issued tokens
+- Authorization codes expire in 5 minutes and are single-use
+- Missing or invalid token → `401 Unauthorized`
+- Rotate the key anytime by updating the Vercel env var and reconnecting in Claude.ai (takes ~30 seconds)

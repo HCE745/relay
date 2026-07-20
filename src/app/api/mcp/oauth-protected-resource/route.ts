@@ -19,12 +19,15 @@ export async function GET(req: NextRequest) {
   const base  = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? `${proto}://${host}`
   const server = `${base}/api/mcp`
 
-  return NextResponse.json(
-    {
-      resource:                 server,
-      authorization_servers:    [server],
-      bearer_methods_supported: ["header"],
-    },
-    { headers: CORS },
-  )
+  const metadata = {
+    resource:                 server,
+    authorization_servers:    [server],
+    bearer_methods_supported: ["header"],
+  }
+
+  console.error("[mcp/oauth-protected-resource] NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL)
+  console.error("[mcp/oauth-protected-resource] resolved server:", server)
+  console.error("[mcp/oauth-protected-resource] returning:", JSON.stringify(metadata))
+
+  return NextResponse.json(metadata, { headers: CORS })
 }

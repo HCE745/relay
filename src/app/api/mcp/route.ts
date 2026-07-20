@@ -302,8 +302,14 @@ function verifyOAuthToken(token: string, key: string): boolean {
   const sig      = rest.slice(lastDot + 1)
   const expected = crypto.createHmac("sha256", key).update(payload).digest("hex")
   try {
-    return crypto.timingSafeEqual(Buffer.from(sig, "hex"), Buffer.from(expected, "hex"))
+    if (!crypto.timingSafeEqual(Buffer.from(sig, "hex"), Buffer.from(expected, "hex"))) return false
   } catch { return false }
+  // Check expiry encoded in the payload
+  try {
+    const claims = JSON.parse(Buffer.from(payload, "base64url").toString()) as { exp?: number }
+    if (typeof claims.exp === "number" && claims.exp < Date.now()) return false
+  } catch { return false }
+  return true
 }
 
 function checkAuth(req: NextRequest): NextResponse | null {

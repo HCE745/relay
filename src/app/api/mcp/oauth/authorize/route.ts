@@ -1,7 +1,7 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
 import crypto from "crypto"
-import { setPlatformConfig } from "@/lib/platform-config"
+import { getPlatformConfig, setPlatformConfig } from "@/lib/platform-config"
 
 export const dynamic = "force-dynamic"
 
@@ -11,6 +11,53 @@ interface AuthCodeData {
   code_challenge:        string
   code_challenge_method: string
   expiry:                number
+}
+
+interface ClientRecord {
+  client_secret:  string
+  issued_at:      number
+  redirect_uris?: string[]
+}
+
+// Resolve and validate redirect_uri for a given client_id.
+// Returns the URI to use, or an error string.
+async function resolveRedirectUri(
+  clientId: string,
+  requested: string,
+): Promise<{ uri: string } | { error: string }> {
+  if (!clientId) {
+    // No registered client — use whatever was passed
+    return requested ? { uri: requested } : { error: "redirect_uri is required" }
+  }
+
+  const raw = await getPlatformConfig(`mcp_client_${clientId}`)
+  if (!raw) {
+    console.error("[mcp/authorize] unknown client_id:", clientId)
+    return { error: `Unknown client_id: ${clientId}` }
+  }
+
+  let client: ClientRecord
+  try { client = JSON.parse(raw) as ClientRecord }
+  catch { return { error: "Malformed client record" } }
+
+  const registered = client.redirect_uris ?? []
+
+  if (registered.length === 0) {
+    // No registered URIs — accept any (allow PKCE-only flow)
+    return requested ? { uri: requested } : { error: "redirect_uri is required" }
+  }
+
+  if (!requested) {
+    // Use first registered URI when caller omits it
+    return { uri: registered[0] }
+  }
+
+  if (!registered.includes(requested)) {
+    console.error("[mcp/authorize] redirect_uri mismatch. got:", requested, "registered:", registered)
+    return { error: `redirect_uri not registered. Registered: ${registered.join(", ")}` }
+  }
+
+  return { uri: requested }
 }
 
 function escapeHtml(s: string): string {
@@ -83,40 +130,67 @@ button:hover{background:#4338ca}
 }
 
 export async function GET(req: NextRequest) {
-  const url                  = new URL(req.url)
-  const client_id            = url.searchParams.get("client_id")             ?? ""
-  const redirect_uri         = url.searchParams.get("redirect_uri")          ?? ""
-  const state                = url.searchParams.get("state")                  ?? ""
-  const code_challenge       = url.searchParams.get("code_challenge")         ?? ""
+  const url                   = new URL(req.url)
+  const client_id             = url.searchParams.get("client_id")             ?? ""
+  const requested_redirect    = url.searchParams.get("redirect_uri")          ?? ""
+  const state                 = url.searchParams.get("state")                 ?? ""
+  const code_challenge        = url.searchParams.get("code_challenge")        ?? ""
   const code_challenge_method = url.searchParams.get("code_challenge_method") ?? "S256"
+  const response_type         = url.searchParams.get("response_type")         ?? ""
 
-  if (!redirect_uri) {
-    return new NextResponse("Missing required parameter: redirect_uri", { status: 400 })
+  console.error("[mcp/authorize GET] params:", {
+    client_id, redirect_uri: requested_redirect, state,
+    code_challenge: code_challenge ? "(present)" : "(absent)",
+    code_challenge_method, response_type,
+  })
+
+  if (response_type && response_type !== "code") {
+    return new NextResponse(`Unsupported response_type: ${response_type}`, { status: 400 })
   }
 
-  const html = loginPage({ client_id, redirect_uri, state, code_challenge, code_challenge_method })
+  const resolved = await resolveRedirectUri(client_id, requested_redirect)
+  if ("error" in resolved) {
+    return new NextResponse(resolved.error, { status: 400 })
+  }
+
+  console.error("[mcp/authorize GET] resolved redirect_uri:", resolved.uri)
+
+  const html = loginPage({
+    client_id,
+    redirect_uri:          resolved.uri,
+    state,
+    code_challenge,
+    code_challenge_method,
+  })
   return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8" } })
 }
 
 export async function POST(req: NextRequest) {
   const form                  = await req.formData()
-  const apiKey               = (form.get("api_key")              as string) ?? ""
-  const client_id            = (form.get("client_id")            as string) ?? ""
-  const redirect_uri         = (form.get("redirect_uri")         as string) ?? ""
-  const state                = (form.get("state")                as string) ?? ""
-  const code_challenge       = (form.get("code_challenge")       as string) ?? ""
+  const apiKey               = (form.get("api_key")               as string) ?? ""
+  const client_id            = (form.get("client_id")             as string) ?? ""
+  const form_redirect_uri    = (form.get("redirect_uri")          as string) ?? ""
+  const state                = (form.get("state")                 as string) ?? ""
+  const code_challenge       = (form.get("code_challenge")        as string) ?? ""
   const code_challenge_method = (form.get("code_challenge_method") as string) ?? "S256"
 
-  if (!redirect_uri) {
-    return new NextResponse("Missing required parameter: redirect_uri", { status: 400 })
-  }
+  console.error("[mcp/authorize POST] client_id:", client_id, "redirect_uri:", form_redirect_uri)
 
   const mcpKey = process.env.MCP_API_KEY
   if (!mcpKey) {
     return new NextResponse("MCP_API_KEY is not configured on the server", { status: 500 })
   }
 
+  // Re-validate redirect_uri against registered client (prevents form tampering)
+  const resolved = await resolveRedirectUri(client_id, form_redirect_uri)
+  if ("error" in resolved) {
+    console.error("[mcp/authorize POST] redirect_uri error:", resolved.error)
+    return new NextResponse(resolved.error, { status: 400 })
+  }
+  const redirect_uri = resolved.uri
+
   if (apiKey !== mcpKey) {
+    console.error("[mcp/authorize POST] wrong api key")
     const html = loginPage({
       client_id, redirect_uri, state, code_challenge, code_challenge_method,
       error: "Invalid API key. Check your MCP_API_KEY value and try again.",
@@ -124,7 +198,7 @@ export async function POST(req: NextRequest) {
     return new NextResponse(html, { status: 401, headers: { "Content-Type": "text/html; charset=utf-8" } })
   }
 
-  // Issue a short-lived authorization code (5 minutes)
+  // Issue short-lived authorization code (5 minutes)
   const authCode = crypto.randomBytes(32).toString("base64url")
   const codeData: AuthCodeData = {
     redirect_uri,
@@ -135,7 +209,8 @@ export async function POST(req: NextRequest) {
   }
   await setPlatformConfig(`mcp_authcode_${authCode}`, JSON.stringify(codeData))
 
-  // Redirect back to Claude.ai with the code
+  console.error("[mcp/authorize POST] issued auth code, redirecting to:", redirect_uri)
+
   const dest = new URL(redirect_uri)
   dest.searchParams.set("code", authCode)
   if (state) dest.searchParams.set("state", state)

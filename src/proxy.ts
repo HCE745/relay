@@ -25,6 +25,8 @@ const PUBLIC_PATHS = [
   "/demo",
   "/tour",
   "/api/demo",
+  // MCP server — handles its own auth via OAuth + bearer tokens
+  "/api/mcp",
 ]
 
 // Authenticated but bypass onboarding/billing guards

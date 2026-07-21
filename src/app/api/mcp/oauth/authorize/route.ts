@@ -5,6 +5,17 @@ import { getPlatformConfig, setPlatformConfig } from "@/lib/platform-config"
 
 export const dynamic = "force-dynamic"
 
+const CORS = {
+  "Access-Control-Allow-Origin":  "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Max-Age":       "86400",
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS })
+}
+
 interface AuthCodeData {
   redirect_uri:          string
   client_id:             string

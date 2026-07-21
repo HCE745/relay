@@ -8,10 +8,11 @@ export const dynamic = "force-dynamic"
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 
 const CORS = {
-  "Access-Control-Allow-Origin":  "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
-  "Access-Control-Max-Age":       "86400",
+  "Access-Control-Allow-Origin":   "*",
+  "Access-Control-Allow-Methods":  "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers":  "Content-Type, Authorization, Accept, Mcp-Session-Id",
+  "Access-Control-Expose-Headers": "Mcp-Session-Id",
+  "Access-Control-Max-Age":        "86400",
 }
 
 export async function OPTIONS() {
@@ -474,7 +475,9 @@ export async function GET(req: NextRequest) {
 
 // POST — MCP JSON-RPC 2.0, Streamable HTTP transport (2025-03-26)
 export async function POST(req: NextRequest) {
+  const sessionId = req.headers.get("mcp-session-id") ?? ""
   console.error("[mcp/POST] --- incoming request ---")
+  console.error("[mcp/POST] Mcp-Session-Id:", sessionId || "(absent)")
   console.error("[mcp/POST] headers:", JSON.stringify(Object.fromEntries(req.headers)))
 
   const auth = checkAuth(req)
@@ -513,13 +516,17 @@ export async function POST(req: NextRequest) {
   switch (method) {
     case "initialize": {
       const clientVersion = (params as { protocolVersion?: string } | null)?.protocolVersion ?? "2025-11-25"
+      const newSessionId  = crypto.randomUUID()
       const result = {
         protocolVersion: clientVersion,
         capabilities:    { tools: {} },
         serverInfo:      { name: "relay-crm", version: "1.0.0" },
       }
-      console.error("[mcp/POST] <<< initialize: client sent version:", clientVersion, "echoing back")
-      return jsonOk(id, result)
+      console.error("[mcp/POST] <<< initialize: version:", clientVersion, "session:", newSessionId)
+      return NextResponse.json(
+        { jsonrpc: "2.0", id, result },
+        { headers: { ...CORS, "Mcp-Session-Id": newSessionId } },
+      )
     }
 
     case "tools/list": {

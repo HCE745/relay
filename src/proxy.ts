@@ -58,6 +58,15 @@ export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
   const vmParam = searchParams.get("videomode")
 
+  // ── MCP Dynamic Client Registration fallback ──────────────────────────────
+  // Claude.ai POSTs to /register (root path) for OAuth DCR. Rewrite it to the
+  // actual MCP registration endpoint before any route matching fires. GET is
+  // left alone so the user registration page continues to work normally.
+  if (pathname === "/register" && (request.method === "POST" || request.method === "OPTIONS")) {
+    console.error("[proxy] MCP DCR rewrite:", request.method, "/register → /api/mcp/oauth/register")
+    return NextResponse.rewrite(new URL("/api/mcp/oauth/register", request.url))
+  }
+
   // ── Global rate limit (500 req/min per IP) on all API routes ─────────────
   if (
     pathname.startsWith("/api/") &&

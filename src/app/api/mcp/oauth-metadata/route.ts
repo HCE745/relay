@@ -14,10 +14,18 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS })
 }
 
+function resolveBase(req: NextRequest): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")
+  }
+  // x-forwarded-host is the real public hostname in Vercel/reverse-proxy setups
+  const host  = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "localhost"
+  const proto = req.headers.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https")
+  return `${proto}://${host}`
+}
+
 export async function GET(req: NextRequest) {
-  const host  = req.headers.get("host") ?? "localhost"
-  const proto = host.startsWith("localhost") ? "http" : "https"
-  const base  = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? `${proto}://${host}`
+  const base   = resolveBase(req)
   const server = `${base}/api/mcp`
 
   const metadata = {
@@ -33,9 +41,10 @@ export async function GET(req: NextRequest) {
   }
 
   console.error("[mcp/oauth-metadata] NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL)
-  console.error("[mcp/oauth-metadata] host header:", host)
+  console.error("[mcp/oauth-metadata] x-forwarded-host:", req.headers.get("x-forwarded-host"))
+  console.error("[mcp/oauth-metadata] host:", req.headers.get("host"))
   console.error("[mcp/oauth-metadata] resolved base:", base)
-  console.error("[mcp/oauth-metadata] returning:", JSON.stringify(metadata))
+  console.error("[mcp/oauth-metadata] registration_endpoint:", metadata.registration_endpoint)
 
   return NextResponse.json(metadata, { headers: CORS })
 }

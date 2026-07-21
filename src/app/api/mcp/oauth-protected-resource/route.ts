@@ -14,10 +14,17 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS })
 }
 
+function resolveBase(req: NextRequest): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")
+  }
+  const host  = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "localhost"
+  const proto = req.headers.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https")
+  return `${proto}://${host}`
+}
+
 export async function GET(req: NextRequest) {
-  const host  = req.headers.get("host") ?? "localhost"
-  const proto = host.startsWith("localhost") ? "http" : "https"
-  const base  = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? `${proto}://${host}`
+  const base   = resolveBase(req)
   const server = `${base}/api/mcp`
 
   const metadata = {
@@ -26,8 +33,7 @@ export async function GET(req: NextRequest) {
     bearer_methods_supported: ["header"],
   }
 
-  console.error("[mcp/oauth-protected-resource] NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL)
-  console.error("[mcp/oauth-protected-resource] resolved server:", server)
+  console.error("[mcp/oauth-protected-resource] resolved base:", base)
   console.error("[mcp/oauth-protected-resource] returning:", JSON.stringify(metadata))
 
   return NextResponse.json(metadata, { headers: CORS })

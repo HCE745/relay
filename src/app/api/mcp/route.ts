@@ -41,22 +41,6 @@ function textContent(value: unknown, isError = false) {
   }
 }
 
-// MCP HTTP+SSE transport: wrap a JSON-RPC object in an SSE "message" event.
-// Used when the client sends Accept: text/event-stream.
-function sseOk(id: unknown, result: unknown): Response {
-  const payload = JSON.stringify({ jsonrpc: "2.0", id, result })
-  return new Response(`event: message\ndata: ${payload}\n\n`, {
-    headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", ...CORS },
-  })
-}
-
-function sseErr(id: unknown, code: number, message: string): Response {
-  const payload = JSON.stringify({ jsonrpc: "2.0", id, error: { code, message } })
-  return new Response(`event: message\ndata: ${payload}\n\n`, {
-    headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", ...CORS },
-  })
-}
-
 // ─── Tool Definitions ─────────────────────────────────────────────────────────
 
 const TOOLS = [
@@ -355,54 +339,10 @@ function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
-// GET — server manifest + SSE stream for MCP HTTP+SSE transport
+// GET — discovery manifest (no auth required, Streamable HTTP transport uses POST only)
 export async function GET(req: NextRequest) {
-  const accept = req.headers.get("accept") ?? ""
-  console.error("[mcp/GET] Accept:", accept, "| Authorization:", req.headers.get("authorization") ? "(present)" : "(absent)")
+  console.error("[mcp/GET] Accept:", req.headers.get("accept"), "| Authorization:", req.headers.get("authorization") ? "(present)" : "(absent)")
 
-  // MCP HTTP+SSE transport: client GETs to open a server-sent-events stream.
-  // Respond with a minimal SSE stream that sends one endpoint event and stays
-  // open so Claude.ai considers the connection established.
-  if (accept.includes("text/event-stream")) {
-    const auth = checkAuth(req)
-    if ("error" in auth) {
-      console.error("[mcp/GET SSE] auth failed")
-      return auth.error
-    }
-
-    console.error("[mcp/GET SSE] opening SSE stream")
-    const encoder = new TextEncoder()
-
-    const stream = new ReadableStream({
-      start(controller) {
-        // Send the endpoint URL so the client knows where to POST messages
-        controller.enqueue(encoder.encode(`event: endpoint\ndata: /api/mcp\n\n`))
-
-        // Keep alive with comment pings every 25 s (within Vercel's 30 s idle timeout)
-        const timer = setInterval(() => {
-          try { controller.enqueue(encoder.encode(`: ping\n\n`)) }
-          catch { clearInterval(timer) }
-        }, 25_000)
-
-        req.signal.addEventListener("abort", () => {
-          clearInterval(timer)
-          try { controller.close() } catch { /* already closed */ }
-        })
-      },
-    })
-
-    return new Response(stream, {
-      headers: {
-        "Content-Type":  "text/event-stream",
-        "Cache-Control": "no-cache, no-transform",
-        "Connection":    "keep-alive",
-        "X-Accel-Buffering": "no",
-        ...CORS,
-      },
-    })
-  }
-
-  // Plain GET — discovery manifest (no auth required)
   const host  = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "localhost"
   const proto = req.headers.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https")
   const base  = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? `${proto}://${host}`
@@ -412,7 +352,7 @@ export async function GET(req: NextRequest) {
     name:            "relay-crm",
     version:         "1.0.0",
     description:     "Relay CRM MCP Server — query and update the Relay prospect database",
-    protocolVersion: "2024-11-05",
+    protocolVersion: "2025-03-26",
     capabilities:    { tools: {} },
     serverInfo:      { name: "relay-crm", version: "1.0.0" },
     auth: {
@@ -425,7 +365,7 @@ export async function GET(req: NextRequest) {
   }, { headers: CORS })
 }
 
-// POST — MCP JSON-RPC 2.0 over HTTP (also supports SSE-wrapped responses)
+// POST — MCP JSON-RPC 2.0, Streamable HTTP transport (2025-03-26)
 export async function POST(req: NextRequest) {
   console.error("[mcp/POST] --- incoming request ---")
   console.error("[mcp/POST] headers:", JSON.stringify(Object.fromEntries(req.headers)))
@@ -436,19 +376,15 @@ export async function POST(req: NextRequest) {
     return auth.error
   }
 
-  // Whether the client wants SSE-wrapped responses (MCP HTTP+SSE transport)
-  const wantsSSE = (req.headers.get("accept") ?? "").includes("text/event-stream")
-  console.error("[mcp/POST] wantsSSE:", wantsSSE)
-
+  let rawBody: string
   let body: { jsonrpc?: string; id?: unknown; method?: string; params?: unknown }
   try {
-    body = await req.json() as typeof body
-    console.error("[mcp/POST] method:", body.method, "| id:", body.id)
+    rawBody = await req.text()
+    console.error("[mcp/POST] raw body:", rawBody)
+    body = JSON.parse(rawBody) as typeof body
   } catch {
     console.error("[mcp/POST] JSON parse error")
-    return wantsSSE
-      ? sseErr(null, -32700, "Parse error: invalid JSON")
-      : jsonErr(null, -32700, "Parse error: invalid JSON")
+    return jsonErr(null, -32700, "Parse error: invalid JSON")
   }
 
   const { method, params } = body
@@ -461,46 +397,46 @@ export async function POST(req: NextRequest) {
   }
 
   if (!method) {
-    return wantsSSE
-      ? sseErr(id, -32600, "Invalid request: missing method")
-      : jsonErr(id, -32600, "Invalid request: missing method")
+    return jsonErr(id, -32600, "Invalid request: missing method")
   }
 
-  const ok  = (result: unknown) => wantsSSE ? sseOk(id, result)  : jsonOk(id, result)
-  const err = (code: number, msg: string) => wantsSSE ? sseErr(id, code, msg) : jsonErr(id, code, msg)
-
-  console.error("[mcp/POST] handling method:", method)
+  console.error("[mcp/POST] handling method:", method, "| id:", id)
 
   switch (method) {
-    case "initialize":
-      return ok({
-        protocolVersion: "2024-11-05",
+    case "initialize": {
+      const result = {
+        protocolVersion: "2025-03-26",
         capabilities:    { tools: {} },
         serverInfo:      { name: "relay-crm", version: "1.0.0" },
-      })
+      }
+      console.error("[mcp/POST] initialize response:", JSON.stringify(result))
+      return jsonOk(id, result)
+    }
 
-    case "tools/list":
-      return ok({ tools: TOOLS })
+    case "tools/list": {
+      console.error("[mcp/POST] tools/list: returning", TOOLS.length, "tools")
+      return jsonOk(id, { tools: TOOLS })
+    }
 
     case "tools/call": {
       const p = params as { name?: string; arguments?: Record<string, unknown> }
-      if (!p?.name) return err(-32602, "Invalid params: missing tool name")
+      if (!p?.name) return jsonErr(id, -32602, "Invalid params: missing tool name")
       try {
         const result = await callTool(p.name, p.arguments ?? {})
         console.error("[mcp/POST] tool result for:", p.name, "isError:", result.isError)
-        return ok(result)
+        return jsonOk(id, result)
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e)
         console.error("[mcp/POST] tool error:", p.name, msg)
-        return ok(textContent(`Error executing ${p.name}: ${msg}`, true))
+        return jsonOk(id, textContent(`Error executing ${p.name}: ${msg}`, true))
       }
     }
 
     case "ping":
-      return ok({})
+      return jsonOk(id, {})
 
     default:
       console.error("[mcp/POST] unknown method:", method)
-      return err(-32601, `Method not found: ${method}`)
+      return jsonErr(id, -32601, `Method not found: ${method}`)
   }
 }

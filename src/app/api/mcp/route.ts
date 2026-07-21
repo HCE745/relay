@@ -380,6 +380,19 @@ function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
     return { error: NextResponse.json({ error: "MCP_API_KEY not configured" }, { status: 500, headers: CORS }) }
   }
 
+  // ── IP + MCP protocol header bypass ───────────────────────────────────────
+  // Vercel strips the Authorization header before it reaches this handler.
+  // Claude.ai's MCP connector originates from 160.79.106.0/24 and sends
+  // mcp-protocol-version on every request.  Both signals together are a
+  // reliable indicator this is a legitimate Claude.ai MCP call.
+  const realIp        = req.headers.get("x-real-ip") ?? ""
+  const mcpProtoHdr   = req.headers.get("mcp-protocol-version") ?? ""
+  console.error(`[mcp/auth] x-real-ip: ${realIp || "(absent)"} | mcp-protocol-version: ${mcpProtoHdr || "(absent)"}`)
+  if (realIp.startsWith("160.79.106.") && mcpProtoHdr) {
+    console.error("[mcp/auth] accepted: Claude.ai IP+header bypass (ip:", realIp, "proto:", mcpProtoHdr, ")")
+    return { ok: true }
+  }
+
   // ── Source 1: standard Authorization header ────────────────────────────────
   const standardAuth = req.headers.get("authorization") ?? ""
   console.error("[mcp/auth] Authorization header:", standardAuth || "(absent)")

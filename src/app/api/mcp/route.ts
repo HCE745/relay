@@ -459,7 +459,7 @@ export async function GET(req: NextRequest) {
     name:            "relay-crm",
     version:         "1.0.0",
     description:     "Relay CRM MCP Server — query and update the Relay prospect database",
-    protocolVersion: "2025-03-26",
+    protocolVersion: "2025-11-25",
     capabilities:    { tools: {} },
     serverInfo:      { name: "relay-crm", version: "1.0.0" },
     auth: {
@@ -512,12 +512,13 @@ export async function POST(req: NextRequest) {
 
   switch (method) {
     case "initialize": {
+      const clientVersion = (params as { protocolVersion?: string } | null)?.protocolVersion ?? "2025-11-25"
       const result = {
-        protocolVersion: "2025-03-26",
+        protocolVersion: clientVersion,
         capabilities:    { tools: {} },
         serverInfo:      { name: "relay-crm", version: "1.0.0" },
       }
-      console.error("[mcp/POST] <<< initialize:", JSON.stringify(result))
+      console.error("[mcp/POST] <<< initialize: client sent version:", clientVersion, "echoing back")
       return jsonOk(id, result)
     }
 

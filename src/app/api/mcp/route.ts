@@ -46,12 +46,13 @@ function textContent(value: unknown, isError = false) {
 
 const TOOLS = [
   {
-    name: "get_contacted_prospects",
+    name:        "get_contacted_prospects",
     description: "Returns all companies in the Relay CRM prospect database with their contact status and domain. Use this before suggesting new prospects to avoid duplicates.",
     inputSchema: { type: "object", properties: {}, required: [] },
+    annotations: { readOnlyHint: true, destructiveHint: false },
   },
   {
-    name: "add_prospect",
+    name:        "add_prospect",
     description: "Creates a new prospect record in the Relay CRM database.",
     inputSchema: {
       type: "object",
@@ -66,9 +67,10 @@ const TOOLS = [
       },
       required: ["companyName", "website"],
     },
+    annotations: { readOnlyHint: false, destructiveHint: false },
   },
   {
-    name: "log_email_sent",
+    name:        "log_email_sent",
     description: "Records that an outreach email was sent to a prospect. Creates the email log entry in the CRM and marks the prospect as contacted.",
     inputSchema: {
       type: "object",
@@ -82,9 +84,10 @@ const TOOLS = [
       },
       required: ["domain", "subject", "body"],
     },
+    annotations: { readOnlyHint: false, destructiveHint: false },
   },
   {
-    name: "get_follow_up_queue",
+    name:        "get_follow_up_queue",
     description: "Returns all prospects that have been contacted but have not replied and are due for a follow-up based on their last contact date.",
     inputSchema: {
       type: "object",
@@ -93,9 +96,10 @@ const TOOLS = [
       },
       required: [],
     },
+    annotations: { readOnlyHint: true, destructiveHint: false },
   },
   {
-    name: "search_prospects",
+    name:        "search_prospects",
     description: "Searches the Relay CRM prospect database by company name or website domain.",
     inputSchema: {
       type: "object",
@@ -104,6 +108,7 @@ const TOOLS = [
       },
       required: ["query"],
     },
+    annotations: { readOnlyHint: true, destructiveHint: false },
   },
 ]
 

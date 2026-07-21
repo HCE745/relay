@@ -386,25 +386,32 @@ function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
     return { error: NextResponse.json({ error: "MCP_API_KEY not configured" }, { status: 500, headers: CORS }) }
   }
 
-  // ── IP + MCP protocol header bypass ───────────────────────────────────────
-  // Vercel strips the Authorization header before it reaches this handler.
-  // Claude.ai's MCP connector originates from 160.79.106.0/24 and sends
-  // mcp-protocol-version on every request.  Both signals together are a
-  // reliable indicator this is a legitimate Claude.ai MCP call.
-  const realIp        = req.headers.get("x-real-ip") ?? ""
-  const mcpProtoHdr   = req.headers.get("mcp-protocol-version") ?? ""
+  // ── 1. Bearer token === MCP_API_KEY (any IP — Claude Code, direct API) ────
+  // Check this first so local/direct clients with the correct key are never
+  // blocked by IP restrictions.
+  const standardAuth  = req.headers.get("authorization") ?? ""
+  const standardToken = extractBearer(standardAuth)
+  console.error("[mcp/auth] Authorization header:", standardAuth || "(absent)")
+  if (standardToken === mcpKey) {
+    console.error("[mcp/auth] accepted: static key match from standard-header")
+    return { ok: true }
+  }
+
+  // ── 2. Claude.ai IP range + MCP protocol header bypass ────────────────────
+  // Vercel strips the Authorization header for Claude.ai requests.
+  // Claude.ai's connector originates from 160.79.106.0/24 and sends
+  // mcp-protocol-version on every request — both together identify it reliably.
+  const realIp      = req.headers.get("x-real-ip") ?? ""
+  const mcpProtoHdr = req.headers.get("mcp-protocol-version") ?? ""
   console.error(`[mcp/auth] x-real-ip: ${realIp || "(absent)"} | mcp-protocol-version: ${mcpProtoHdr || "(absent)"}`)
   if (realIp.startsWith("160.79.106.") && mcpProtoHdr) {
     console.error("[mcp/auth] accepted: Claude.ai IP+header bypass (ip:", realIp, "proto:", mcpProtoHdr, ")")
     return { ok: true }
   }
 
-  // ── Source 1: standard Authorization header ────────────────────────────────
-  const standardAuth = req.headers.get("authorization") ?? ""
-  console.error("[mcp/auth] Authorization header:", standardAuth || "(absent)")
-  const standardToken = extractBearer(standardAuth)
-
-  // ── Source 2: x-vercel-sc-headers ─────────────────────────────────────────
+  // ── 3. HMAC OAuth token or token recovered from other headers ─────────────
+  // Try all header sources: standard Authorization (HMAC token case),
+  // x-vercel-sc-headers, and forwarded header sig= field.
   const scRaw = req.headers.get("x-vercel-sc-headers")
   let scToken = ""
   if (scRaw) {
@@ -421,7 +428,6 @@ function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
     }
   }
 
-  // ── Source 3: forwarded header sig= field ─────────────────────────────────
   const forwardedRaw = req.headers.get("forwarded") ?? ""
   let forwardedToken = ""
   if (forwardedRaw) {
@@ -430,9 +436,6 @@ function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
     if (forwardedToken) console.error("[mcp/auth] forwarded token prefix:", forwardedToken.slice(0, 20))
   }
 
-  // Try all sources in priority order.  If the standard Authorization header
-  // is a Vercel-internal JWT (eyJ...) verifyOAuthToken logs the mismatch and
-  // we fall through to the forwarded-sig recovery path.
   for (const [source, token] of [
     ["standard-header",     standardToken],
     ["x-vercel-sc-headers", scToken],

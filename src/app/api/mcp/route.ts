@@ -306,34 +306,96 @@ async function callTool(name: string, args: Record<string, unknown>) {
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
-function verifyOAuthToken(token: string, key: string): boolean {
-  if (!token.startsWith("mcp.")) return false
+function verifyOAuthToken(token: string, key: string, source: string): boolean {
+  if (!token.startsWith("mcp.")) {
+    console.error(`[mcp/auth] ${source}: not mcp.{} format — starts with: ${token.slice(0, 12)}`)
+    return false
+  }
   const rest    = token.slice(4)
   const lastDot = rest.lastIndexOf(".")
-  if (lastDot === -1) return false
+  if (lastDot === -1) {
+    console.error(`[mcp/auth] ${source}: no payload.sig separator`)
+    return false
+  }
   const payload  = rest.slice(0, lastDot)
   const sig      = rest.slice(lastDot + 1)
+  console.error(`[mcp/auth] ${source}: payload prefix: ${payload.slice(0, 20)}, sig prefix: ${sig.slice(0, 16)}`)
+
   const expected = crypto.createHmac("sha256", key).update(payload).digest("hex")
   try {
-    if (!crypto.timingSafeEqual(Buffer.from(sig, "hex"), Buffer.from(expected, "hex"))) return false
-  } catch { return false }
+    if (!crypto.timingSafeEqual(Buffer.from(sig, "hex"), Buffer.from(expected, "hex"))) {
+      console.error(`[mcp/auth] ${source}: HMAC mismatch — expected prefix: ${expected.slice(0, 16)}`)
+      return false
+    }
+  } catch (e) {
+    console.error(`[mcp/auth] ${source}: timingSafeEqual error:`, e)
+    return false
+  }
+
   try {
-    const claims = JSON.parse(Buffer.from(payload, "base64url").toString()) as { exp?: number }
-    if (typeof claims.exp === "number" && claims.exp < Date.now()) return false
-  } catch { return false }
+    const claims = JSON.parse(Buffer.from(payload, "base64url").toString()) as { exp?: number; cid?: string }
+    console.error(`[mcp/auth] ${source}: claims:`, JSON.stringify(claims))
+    if (typeof claims.exp === "number" && claims.exp < Date.now()) {
+      console.error(`[mcp/auth] ${source}: token expired — exp: ${claims.exp}, now: ${Date.now()}`)
+      return false
+    }
+  } catch (e) {
+    console.error(`[mcp/auth] ${source}: payload decode error:`, e)
+    return false
+  }
+
+  console.error(`[mcp/auth] ${source}: HMAC OK, token valid`)
   return true
+}
+
+// Extract a bearer token from a raw Authorization header string.
+function extractBearer(header: string): string {
+  return header.startsWith("Bearer ") ? header.slice(7).trim() : ""
 }
 
 function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
   const mcpKey = process.env.MCP_API_KEY
   if (!mcpKey) {
+    console.error("[mcp/auth] MCP_API_KEY not set")
     return { error: NextResponse.json({ error: "MCP_API_KEY not configured" }, { status: 500, headers: CORS }) }
   }
-  const auth = req.headers.get("authorization") ?? ""
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : ""
-  console.error("[mcp] auth header present:", !!auth, "| token prefix:", token.slice(0, 8) || "(none)")
-  if (token === mcpKey) return { ok: true }
-  if (token && verifyOAuthToken(token, mcpKey)) return { ok: true }
+
+  // ── Source 1: standard Authorization header ────────────────────────────────
+  const standardAuth = req.headers.get("authorization") ?? ""
+  console.error("[mcp/auth] Authorization header:", standardAuth || "(absent)")
+  const standardToken = extractBearer(standardAuth)
+
+  // ── Source 2: x-vercel-sc-headers (Vercel may inject its own JWT here or
+  //    may override the Authorization header — log it so we can see what's
+  //    happening in the Vercel runtime) ───────────────────────────────────────
+  const scRaw = req.headers.get("x-vercel-sc-headers")
+  let scToken = ""
+  if (scRaw) {
+    console.error("[mcp/auth] x-vercel-sc-headers (truncated):", scRaw.slice(0, 500))
+    try {
+      const scHeaders = JSON.parse(scRaw) as Record<string, string>
+      const scAuth = scHeaders["authorization"] ?? scHeaders["Authorization"] ?? ""
+      if (scAuth) {
+        console.error("[mcp/auth] x-vercel-sc-headers authorization:", scAuth.slice(0, 80))
+        scToken = extractBearer(scAuth)
+      }
+    } catch {
+      console.error("[mcp/auth] could not parse x-vercel-sc-headers as JSON")
+    }
+  }
+
+  // Try standard header first, then x-vercel-sc-headers as fallback (in case
+  // Vercel replaced the incoming Authorization header with its own JWT).
+  for (const [source, token] of [["standard-header", standardToken], ["x-vercel-sc-headers", scToken]] as const) {
+    if (!token) continue
+    if (token === mcpKey) {
+      console.error(`[mcp/auth] accepted: static key match from ${source}`)
+      return { ok: true }
+    }
+    if (verifyOAuthToken(token, mcpKey, source)) return { ok: true }
+  }
+
+  console.error("[mcp/auth] all auth attempts failed")
   return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: CORS }) }
 }
 

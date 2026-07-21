@@ -65,6 +65,8 @@ Return exactly this JSON shape:
   "overallSuggestedAccountName": string or null,
   "isLikelyRecurring": boolean,
   "recurringReason": string or null,
+  "detectedTermMonths": integer or null,
+  "isLikelyAnnualOrTermContract": boolean,
   "confidence": "high" | "medium" | "low"
 }
 
@@ -77,6 +79,8 @@ Rules:
 - overallSuggestedAccountName: category name for the whole receipt even if id is null.
 - isLikelyRecurring: true for subscriptions, utilities, rent, recurring SaaS, insurance, etc.
 - recurringReason: short explanation when isLikelyRecurring is true, null otherwise.
+- detectedTermMonths: if the document mentions a contract or subscription term (e.g. "12-month contract", "annual plan", "1 year subscription", "24 months", "billed annually"), set this to the number of months. Examples: "annual" or "1-year" → 12, "2-year" → 24, "6-month" → 6. Set to null if no term is mentioned.
+- isLikelyAnnualOrTermContract: true if detectedTermMonths is not null, OR if the document clearly represents a lump-sum payment covering multiple months (annual software license, multi-month retainer, prepaid service contract, etc.). False otherwise.
 - confidence: "high" if clear; "medium" if some uncertain; "low" if poor quality.
 - lineItems: include individual line items when visible. Empty array [] if none.
 - For multi-page PDFs, combine all pages into one result.
@@ -377,6 +381,8 @@ export async function POST(req: NextRequest) {
     overallSuggestedAccountId: parsed.overallSuggestedAccountId ?? null,
     isLikelyRecurring: parsed.isLikelyRecurring ?? false,
     recurringReason: parsed.recurringReason ?? null,
+    detectedTermMonths: typeof parsed.detectedTermMonths === "number" ? parsed.detectedTermMonths : null,
+    isLikelyAnnualOrTermContract: parsed.isLikelyAnnualOrTermContract ?? false,
     confidence: parsed.confidence ?? "medium",
     receiptUrl,
     createdVendorName: createdVendorName ?? null,

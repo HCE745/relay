@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Trash2, AlertTriangle, CheckCircle2, RefreshCw, FileText, ExternalLink } from "lucide-react"
+import { Plus, Trash2, AlertTriangle, CheckCircle2, RefreshCw, FileText, ExternalLink, Calendar } from "lucide-react"
 import { ReceiptScanner } from "./ReceiptScanner"
 import type { ScanResult } from "@/lib/scan-types"
 
@@ -22,6 +22,7 @@ export type BillFormProps = {
   entityId: string
   vendors: Vendor[]
   expenseAccounts: Account[]
+  assetAccounts?: Account[]
   classes: Klass[]
   departments: Dept[]
   poPrefill?: POPrefill | null
@@ -51,7 +52,7 @@ function centsToStr(c: number | null) { return c != null ? (c / 100).toFixed(2) 
 const input = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
 const label = "block text-sm font-medium text-gray-700 mb-1"
 
-export function BillForm({ entityId, vendors, expenseAccounts, classes, departments, poPrefill }: BillFormProps) {
+export function BillForm({ entityId, vendors, expenseAccounts, assetAccounts = [], classes, departments, poPrefill }: BillFormProps) {
   const router = useRouter()
 
   // vendorList is the live vendor list — initialized from SSR prop, refreshed after each scan
@@ -82,6 +83,11 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
 
   const [isRecurring, setIsRecurring] = useState(false)
   const [recurringReason, setRecurringReason] = useState<string | null>(null)
+
+  const [isLikelyAnnualOrTermContract, setIsLikelyAnnualOrTermContract] = useState(false)
+  const [doAmortize, setDoAmortize] = useState(false)
+  const [amortizeMonths, setAmortizeMonths] = useState<string>("12")
+  const [prepaidAccountId, setPrepaidAccountId] = useState("")
 
   const [receiptLocalUrl, setReceiptLocalUrl] = useState<string | null>(null)
   const [receiptLocalIsPdf, setReceiptLocalIsPdf] = useState(false)
@@ -156,6 +162,17 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
 
     setIsRecurring(result.isLikelyRecurring ?? false)
     setRecurringReason(result.recurringReason ?? null)
+
+    if (result.isLikelyAnnualOrTermContract) {
+      setIsLikelyAnnualOrTermContract(true)
+      setDoAmortize(true)
+      if (result.detectedTermMonths) setAmortizeMonths(String(result.detectedTermMonths))
+      // Default prepaid account to first asset account with "prepaid" in name, or first asset
+      if (!prepaidAccountId && assetAccounts.length > 0) {
+        const prepaid = assetAccounts.find((a) => a.name.toLowerCase().includes("prepaid"))
+        setPrepaidAccountId(prepaid?.id ?? assetAccounts[0].id)
+      }
+    }
 
     // Step 1: Inject newly created vendor into the local list immediately from the
     // scan response. This makes the dropdown work even before the API refresh returns.
@@ -243,34 +260,90 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
     const realVendorId = vendorId && vendorId !== "_new_" ? vendorId : null
     if (!realVendorId && !newVendorName) { setError("Select a vendor"); return }
     if (lines.some((l) => !l.accountId)) { setError("Select an expense account for every line item"); return }
+    if (doAmortize && !prepaidAccountId) { setError("Select a prepaid asset account to amortize"); return }
+    if (doAmortize && (Number(amortizeMonths) < 1 || Number(amortizeMonths) > 360)) {
+      setError("Amortize months must be between 1 and 360"); return
+    }
     setSaving(true); setError("")
+
+    const billPayload = {
+      entityId,
+      vendorId: realVendorId || undefined,
+      newVendorName: !realVendorId ? newVendorName : undefined,
+      billNumber: billNumber || undefined,
+      date,
+      dueDate,
+      memo: memo || undefined,
+      receiptUrl: receiptUrl || undefined,
+      poId: poPrefill?.poId ?? undefined,
+    }
+
     try {
-      const res = await fetch("/api/bills", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          entityId,
-          vendorId: realVendorId || undefined,
-          newVendorName: !realVendorId ? newVendorName : undefined,
-          billNumber: billNumber || undefined,
-          date,
-          dueDate,
-          memo: memo || undefined,
-          receiptUrl: receiptUrl || undefined,
-          lines: lines.map((l) => ({
-            description: l.description || undefined,
-            accountId: l.accountId,
-            quantity: parseFloat(l.quantity) || 1,
-            unitPrice: dollarsToCents(l.unitPrice),
-            classId: l.classId || undefined,
-            departmentId: l.departmentId || undefined,
-          })),
-          poId: poPrefill?.poId ?? undefined,
-        }),
-      })
-      if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Failed to save") }
-      const bill = await res.json()
-      router.push(`/bills/${bill.id}`)
+      if (doAmortize && prepaidAccountId) {
+        // Save the expense account from the first line for the amortization schedule
+        const expenseAccountId = lines[0]?.accountId ?? ""
+
+        // Post bill with prepaid asset account replacing expense accounts (DR Prepaid / CR AP)
+        const billRes = await fetch("/api/bills", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...billPayload,
+            lines: lines.map((l) => ({
+              description: l.description || undefined,
+              accountId: prepaidAccountId,
+              quantity: parseFloat(l.quantity) || 1,
+              unitPrice: dollarsToCents(l.unitPrice),
+              classId: l.classId || undefined,
+              departmentId: l.departmentId || undefined,
+            })),
+          }),
+        })
+        if (!billRes.ok) { const d = await billRes.json(); throw new Error(d.error || "Failed to save bill") }
+        const bill = await billRes.json()
+
+        // Create amortization schedule (monthly: DR Expense / CR Prepaid Asset)
+        const vendorLabel = vendorList.find((v) => v.id === realVendorId)?.name ?? newVendorName ?? "Vendor"
+        const amortRes = await fetch("/api/amortization", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            entityId,
+            name: `${vendorLabel} — ${amortizeMonths}-month prepaid`,
+            type: "PREPAID_EXPENSE",
+            totalAmountCents: totalCents,
+            startDate: date,
+            months: Number(amortizeMonths),
+            bsAccountId: prepaidAccountId,
+            plAccountId: expenseAccountId,
+          }),
+        })
+        if (!amortRes.ok) {
+          const d = await amortRes.json()
+          throw new Error(d.error || "Bill saved but amortization schedule failed — check Amortization page")
+        }
+
+        router.push(`/bills/${bill.id}`)
+      } else {
+        const res = await fetch("/api/bills", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...billPayload,
+            lines: lines.map((l) => ({
+              description: l.description || undefined,
+              accountId: l.accountId,
+              quantity: parseFloat(l.quantity) || 1,
+              unitPrice: dollarsToCents(l.unitPrice),
+              classId: l.classId || undefined,
+              departmentId: l.departmentId || undefined,
+            })),
+          }),
+        })
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Failed to save") }
+        const bill = await res.json()
+        router.push(`/bills/${bill.id}`)
+      }
     } catch (e) {
       setError((e as Error).message)
       setSaving(false)
@@ -430,6 +503,67 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
               <p className="mt-1 ml-6 text-xs text-gray-500">{recurringReason}</p>
             )}
           </div>
+
+          {(isLikelyAnnualOrTermContract || doAmortize) && (
+            <div className="col-span-2 rounded-lg border border-indigo-200 bg-indigo-50 p-4 space-y-3">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={doAmortize}
+                  onChange={(e) => {
+                    setDoAmortize(e.target.checked)
+                    if (e.target.checked && !prepaidAccountId && assetAccounts.length > 0) {
+                      const prepaid = assetAccounts.find((a) => a.name.toLowerCase().includes("prepaid"))
+                      setPrepaidAccountId(prepaid?.id ?? assetAccounts[0].id)
+                    }
+                  }}
+                  className="w-4 h-4 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Calendar className="w-4 h-4 text-indigo-600" />
+                <span className="text-sm font-medium text-indigo-900">
+                  Amortize over{" "}
+                  <input
+                    type="number"
+                    min={1}
+                    max={360}
+                    value={amortizeMonths}
+                    onChange={(e) => setAmortizeMonths(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-block w-16 border border-indigo-300 rounded px-1.5 py-0.5 text-sm text-center bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 mx-1"
+                  />{" "}
+                  months
+                </span>
+              </label>
+
+              {doAmortize && (
+                <>
+                  {totalCents > 0 && Number(amortizeMonths) > 0 && (
+                    <p className="text-xs text-indigo-700 ml-6">
+                      Bill will post as <strong>DR Prepaid Asset / CR AP</strong> (${(totalCents / 100).toFixed(2)} total).
+                      Monthly amortization will expense <strong>${(totalCents / Number(amortizeMonths) / 100).toFixed(2)}/month</strong> over {amortizeMonths} months.
+                    </p>
+                  )}
+                  <div className="ml-6">
+                    <label className="block text-xs font-medium text-indigo-800 mb-1">Prepaid Asset Account *</label>
+                    {assetAccounts.length === 0 ? (
+                      <p className="text-xs text-red-600">No asset accounts found — add a Prepaid Asset account in Chart of Accounts first.</p>
+                    ) : (
+                      <select
+                        value={prepaidAccountId}
+                        onChange={(e) => setPrepaidAccountId(e.target.value)}
+                        className="border border-indigo-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[260px]"
+                      >
+                        <option value="">Select prepaid asset account…</option>
+                        {assetAccounts.map((a) => (
+                          <option key={a.id} value={a.id}>{a.code} – {a.name}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -525,7 +659,11 @@ export function BillForm({ entityId, vendors, expenseAccounts, classes, departme
           className="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
           {saving ? "Saving…" : "Enter Bill"}
         </button>
-        <p className="text-xs text-gray-400">Posts DR Expense / CR Accounts Payable immediately</p>
+        <p className="text-xs text-gray-400">
+          {doAmortize
+            ? `Posts DR Prepaid Asset / CR AP, then creates ${amortizeMonths}-month amortization schedule`
+            : "Posts DR Expense / CR Accounts Payable immediately"}
+        </p>
         <button type="button" onClick={() => router.back()} className="ml-auto px-4 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">
           Cancel
         </button>

@@ -1,3 +1,5 @@
+import Link from "next/link"
+import { FileText } from "lucide-react"
 import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 
@@ -33,6 +35,13 @@ export default async function ReconcilePage() {
           <h1 className="text-2xl font-bold text-gray-900">Reconciliation</h1>
           <p className="text-sm text-gray-500">{unmatchedTxns.length} unmatched transactions</p>
         </div>
+        <Link
+          href="/reconcile/statement"
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          <FileText className="w-4 h-4" />
+          Statement Scan
+        </Link>
       </div>
 
       {bankAccounts.length === 0 && (

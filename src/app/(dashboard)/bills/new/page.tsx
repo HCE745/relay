@@ -51,7 +51,7 @@ export default async function NewBillPage({
     }
   }
 
-  const [vendors, expenseAccounts, classes, departments] = await Promise.all([
+  const [vendors, expenseAccounts, assetAccounts, classes, departments] = await Promise.all([
     prisma.vendor.findMany({
       where: { tenantId, entityId, isActive: true },
       orderBy: { name: "asc" },
@@ -59,6 +59,11 @@ export default async function NewBillPage({
     }),
     prisma.account.findMany({
       where: { tenantId, entityId, type: "EXPENSE", isActive: true },
+      orderBy: { code: "asc" },
+      select: { id: true, code: true, name: true },
+    }),
+    prisma.account.findMany({
+      where: { tenantId, entityId, type: "ASSET", isActive: true },
       orderBy: { code: "asc" },
       select: { id: true, code: true, name: true },
     }),
@@ -79,6 +84,7 @@ export default async function NewBillPage({
       entityId={entityId}
       vendors={vendors}
       expenseAccounts={expenseAccounts}
+      assetAccounts={assetAccounts}
       classes={classes}
       departments={departments}
       poPrefill={poPrefill}

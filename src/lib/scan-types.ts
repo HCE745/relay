@@ -15,6 +15,8 @@ export type ScanResult = {
   overallSuggestedAccountId: string | null
   isLikelyRecurring: boolean
   recurringReason: string | null
+  detectedTermMonths: number | null
+  isLikelyAnnualOrTermContract: boolean
   confidence: "high" | "medium" | "low"
   // Vercel Blob URL set server-side if BLOB_READ_WRITE_TOKEN is configured; null otherwise
   receiptUrl: string | null

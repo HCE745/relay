@@ -1102,6 +1102,23 @@ model DepreciationEntry {
   @@map("hce_depreciation_entries")
 }
 
+// ─── STATEMENT SCANS ──────────────────────────────────────────────────────────
+
+model StatementScan {
+  id           String   @id @default(cuid())
+  tenantId     String
+  entityId     String
+  fileHash     String
+  processedAt  DateTime @default(now())
+  lineCount    Int      @default(0)
+  matchedCount Int      @default(0)
+
+  @@unique([tenantId, entityId, fileHash])
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_statement_scans")
+}
+
 // ─── SCENARIOS ────────────────────────────────────────────────────────────────
 
 enum ScenarioType {

@@ -1,11 +1,9 @@
 "use client"
-import { createContext, useContext, useCallback, useEffect, useState } from "react"
+import { createContext, useContext, useCallback, useState } from "react"
 import { Joyride, EVENTS, ACTIONS, STATUS } from "react-joyride"
 import type { EventData } from "react-joyride"
 import { usePathname, useRouter } from "next/navigation"
 import { TOUR_STEPS } from "@/components/tour/tour-steps"
-
-const SEEN_KEY = "hce-tour-seen"
 
 type TourCtx = { startTour: () => void }
 const TourContext = createContext<TourCtx>({ startTour: () => {} })
@@ -32,16 +30,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    if (!localStorage.getItem(SEEN_KEY)) {
-      const t = setTimeout(() => setRun(true), 900)
-      return () => clearTimeout(t)
-    }
-  }, [])
-
   const startTour = useCallback(() => {
-    localStorage.removeItem(SEEN_KEY)
     setStepIndex(0)
     setTimeout(() => setRun(true), 100)
   }, [])
@@ -77,14 +66,12 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
       const { action, index, status, type } = data
 
       if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
-        localStorage.setItem(SEEN_KEY, "1")
         setRun(false)
         setStepIndex(0)
         return
       }
 
       if (action === ACTIONS.CLOSE) {
-        localStorage.setItem(SEEN_KEY, "1")
         setRun(false)
         setStepIndex(0)
         return

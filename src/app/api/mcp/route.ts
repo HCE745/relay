@@ -353,6 +353,26 @@ function extractBearer(header: string): string {
   return header.startsWith("Bearer ") ? header.slice(7).trim() : ""
 }
 
+// Vercel replaces the incoming Authorization header with an internal JWT and
+// base64-encodes the original Authorization value in the 'forwarded' header's
+// sig= field.  Try both offset 0 (full base64) and offset 1 (skip a leading
+// version byte) since the field sometimes has a prefix byte before "Bearer ...".
+function extractTokenFromForwarded(forwardedHeader: string): string {
+  const m = forwardedHeader.match(/(?:^|[,;])\s*sig=([A-Za-z0-9+/=]+)/)
+  if (!m) return ""
+  const sigB64 = m[1]
+  console.error("[mcp/auth] forwarded sig (truncated):", sigB64.slice(0, 100))
+
+  for (const offset of [0, 1]) {
+    try {
+      const decoded = Buffer.from(sigB64.slice(offset), "base64").toString("utf8")
+      console.error(`[mcp/auth] forwarded sig decoded (offset=${offset}):`, JSON.stringify(decoded.slice(0, 120)))
+      if (decoded.startsWith("Bearer ")) return decoded.slice(7).trim()
+    } catch { /* ignore */ }
+  }
+  return ""
+}
+
 function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
   const mcpKey = process.env.MCP_API_KEY
   if (!mcpKey) {
@@ -365,9 +385,7 @@ function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
   console.error("[mcp/auth] Authorization header:", standardAuth || "(absent)")
   const standardToken = extractBearer(standardAuth)
 
-  // ── Source 2: x-vercel-sc-headers (Vercel may inject its own JWT here or
-  //    may override the Authorization header — log it so we can see what's
-  //    happening in the Vercel runtime) ───────────────────────────────────────
+  // ── Source 2: x-vercel-sc-headers ─────────────────────────────────────────
   const scRaw = req.headers.get("x-vercel-sc-headers")
   let scToken = ""
   if (scRaw) {
@@ -384,9 +402,23 @@ function checkAuth(req: NextRequest): { error: NextResponse } | { ok: true } {
     }
   }
 
-  // Try standard header first, then x-vercel-sc-headers as fallback (in case
-  // Vercel replaced the incoming Authorization header with its own JWT).
-  for (const [source, token] of [["standard-header", standardToken], ["x-vercel-sc-headers", scToken]] as const) {
+  // ── Source 3: forwarded header sig= field ─────────────────────────────────
+  const forwardedRaw = req.headers.get("forwarded") ?? ""
+  let forwardedToken = ""
+  if (forwardedRaw) {
+    console.error("[mcp/auth] forwarded header (truncated):", forwardedRaw.slice(0, 300))
+    forwardedToken = extractTokenFromForwarded(forwardedRaw)
+    if (forwardedToken) console.error("[mcp/auth] forwarded token prefix:", forwardedToken.slice(0, 20))
+  }
+
+  // Try all sources in priority order.  If the standard Authorization header
+  // is a Vercel-internal JWT (eyJ...) verifyOAuthToken logs the mismatch and
+  // we fall through to the forwarded-sig recovery path.
+  for (const [source, token] of [
+    ["standard-header",     standardToken],
+    ["x-vercel-sc-headers", scToken],
+    ["forwarded-sig",       forwardedToken],
+  ] as const) {
     if (!token) continue
     if (token === mcpKey) {
       console.error(`[mcp/auth] accepted: static key match from ${source}`)

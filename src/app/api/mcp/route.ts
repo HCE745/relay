@@ -63,7 +63,7 @@ const TOOLS = [
         summary:     { type: "string", description: "One-sentence description of the company" },
         fitScore:    { type: "number", description: "AI fit score 0–100 (higher = stronger prospect)" },
       },
-      required: ["companyName"],
+      required: ["companyName", "website"],
     },
   },
   {
@@ -79,7 +79,7 @@ const TOOLS = [
         body:       { type: "string", description: "Email body text (required)" },
         sentAt:     { type: "string", description: "ISO 8601 timestamp (defaults to now)" },
       },
-      required: ["subject", "body"],
+      required: ["domain", "subject", "body"],
     },
   },
   {
@@ -497,17 +497,18 @@ export async function POST(req: NextRequest) {
   const { method, params } = body
   const id = "id" in body ? body.id : undefined
 
-  // Notifications have no id — acknowledge and return
+  // Notifications (no id field) — must return 202 Accepted with no body
   if (!("id" in body)) {
-    console.error("[mcp/POST] notification (no id):", method)
-    return new NextResponse(null, { status: 204, headers: CORS })
+    console.error("[mcp/POST] notification method:", method, "→ 202")
+    return new NextResponse(null, { status: 202, headers: CORS })
   }
 
   if (!method) {
+    console.error("[mcp/POST] missing method field in body")
     return jsonErr(id, -32600, "Invalid request: missing method")
   }
 
-  console.error("[mcp/POST] handling method:", method, "| id:", id)
+  console.error("[mcp/POST] >>> method:", method, "| id:", id)
 
   switch (method) {
     case "initialize": {
@@ -516,34 +517,38 @@ export async function POST(req: NextRequest) {
         capabilities:    { tools: {} },
         serverInfo:      { name: "relay-crm", version: "1.0.0" },
       }
-      console.error("[mcp/POST] initialize response:", JSON.stringify(result))
+      console.error("[mcp/POST] <<< initialize:", JSON.stringify(result))
       return jsonOk(id, result)
     }
 
     case "tools/list": {
-      console.error("[mcp/POST] tools/list: returning", TOOLS.length, "tools")
+      const toolNames = TOOLS.map(t => t.name)
+      console.error("[mcp/POST] <<< tools/list:", TOOLS.length, "tools:", toolNames.join(", "))
+      console.error("[mcp/POST] tools/list full response:", JSON.stringify({ tools: TOOLS }))
       return jsonOk(id, { tools: TOOLS })
     }
 
     case "tools/call": {
       const p = params as { name?: string; arguments?: Record<string, unknown> }
       if (!p?.name) return jsonErr(id, -32602, "Invalid params: missing tool name")
+      console.error("[mcp/POST] >>> tools/call:", p.name, "args:", JSON.stringify(p.arguments ?? {}))
       try {
         const result = await callTool(p.name, p.arguments ?? {})
-        console.error("[mcp/POST] tool result for:", p.name, "isError:", result.isError)
+        console.error("[mcp/POST] <<< tools/call:", p.name, "isError:", result.isError)
         return jsonOk(id, result)
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e)
-        console.error("[mcp/POST] tool error:", p.name, msg)
+        console.error("[mcp/POST] <<< tools/call error:", p.name, msg)
         return jsonOk(id, textContent(`Error executing ${p.name}: ${msg}`, true))
       }
     }
 
     case "ping":
+      console.error("[mcp/POST] <<< ping")
       return jsonOk(id, {})
 
     default:
-      console.error("[mcp/POST] unknown method:", method)
+      console.error("[mcp/POST] <<< unknown method:", method, "→ -32601")
       return jsonErr(id, -32601, `Method not found: ${method}`)
   }
 }

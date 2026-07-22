@@ -293,7 +293,6 @@ export default async function ProspectsPage({ searchParams }: { searchParams: Se
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-400 transition-colors"
-                              onClick={e => e.stopPropagation()}
                             >
                               <Globe className="w-3 h-3" />
                               {p.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}

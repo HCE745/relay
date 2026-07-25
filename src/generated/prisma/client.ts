@@ -511,3 +511,13 @@ export type ProspectContact = Prisma.ProspectContactModel
  * 
  */
 export type ProspectNote = Prisma.ProspectNoteModel
+/**
+ * Model DemoAnalytics
+ * 
+ */
+export type DemoAnalytics = Prisma.DemoAnalyticsModel
+/**
+ * Model SalesUser
+ * 
+ */
+export type SalesUser = Prisma.SalesUserModel

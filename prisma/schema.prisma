@@ -2417,3 +2417,40 @@ model ProspectNote {
 
   @@index([prospectId])
 }
+
+// ── Demo / Tour Analytics ────────────────────────────────────────────────────
+
+model DemoAnalytics {
+  id                 String    @id @default(cuid())
+  fingerprint        String    // SHA-256 of IP + user-agent (anonymised)
+  page               String    // "demo" | "tour"
+  industrySelected   String?
+  packageSelected    String?
+  tourStepsCompleted Int[]
+  timeOnEachStep     Json      @default("{}")
+  clickedStartTrial  Boolean   @default(false)
+  clickedBookDemo    Boolean   @default(false)
+  clickedExplore     Boolean   @default(false)
+  sessionStart       DateTime  @default(now())
+  sessionEnd         DateTime?
+  convertedToSignup  Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+
+  @@index([fingerprint])
+  @@index([page])
+  @@index([createdAt])
+  @@index([page, createdAt])
+}
+
+// ── Sales Team (future) ───────────────────────────────────────────────────────
+
+model SalesUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("admin_sales") // "admin_sales" | "sales_rep"
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

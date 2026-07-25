@@ -144,7 +144,9 @@ export const ModelName = {
   DailyBriefingCache: 'DailyBriefingCache',
   Prospect: 'Prospect',
   ProspectContact: 'ProspectContact',
-  ProspectNote: 'ProspectNote'
+  ProspectNote: 'ProspectNote',
+  DemoAnalytics: 'DemoAnalytics',
+  SalesUser: 'SalesUser'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1915,6 +1917,40 @@ export const ProspectNoteScalarFieldEnum = {
 } as const
 
 export type ProspectNoteScalarFieldEnum = (typeof ProspectNoteScalarFieldEnum)[keyof typeof ProspectNoteScalarFieldEnum]
+
+
+export const DemoAnalyticsScalarFieldEnum = {
+  id: 'id',
+  fingerprint: 'fingerprint',
+  page: 'page',
+  industrySelected: 'industrySelected',
+  packageSelected: 'packageSelected',
+  tourStepsCompleted: 'tourStepsCompleted',
+  timeOnEachStep: 'timeOnEachStep',
+  clickedStartTrial: 'clickedStartTrial',
+  clickedBookDemo: 'clickedBookDemo',
+  clickedExplore: 'clickedExplore',
+  sessionStart: 'sessionStart',
+  sessionEnd: 'sessionEnd',
+  convertedToSignup: 'convertedToSignup',
+  createdAt: 'createdAt'
+} as const
+
+export type DemoAnalyticsScalarFieldEnum = (typeof DemoAnalyticsScalarFieldEnum)[keyof typeof DemoAnalyticsScalarFieldEnum]
+
+
+export const SalesUserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  name: 'name',
+  role: 'role',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SalesUserScalarFieldEnum = (typeof SalesUserScalarFieldEnum)[keyof typeof SalesUserScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -477,7 +477,9 @@ export const ModelName = {
   DailyBriefingCache: 'DailyBriefingCache',
   Prospect: 'Prospect',
   ProspectContact: 'ProspectContact',
-  ProspectNote: 'ProspectNote'
+  ProspectNote: 'ProspectNote',
+  DemoAnalytics: 'DemoAnalytics',
+  SalesUser: 'SalesUser'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -493,7 +495,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote"
+    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "salesUser"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -7453,6 +7455,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DemoAnalytics: {
+      payload: Prisma.$DemoAnalyticsPayload<ExtArgs>
+      fields: Prisma.DemoAnalyticsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DemoAnalyticsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DemoAnalyticsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>
+        }
+        findFirst: {
+          args: Prisma.DemoAnalyticsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DemoAnalyticsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>
+        }
+        findMany: {
+          args: Prisma.DemoAnalyticsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>[]
+        }
+        create: {
+          args: Prisma.DemoAnalyticsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>
+        }
+        createMany: {
+          args: Prisma.DemoAnalyticsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DemoAnalyticsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>[]
+        }
+        delete: {
+          args: Prisma.DemoAnalyticsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>
+        }
+        update: {
+          args: Prisma.DemoAnalyticsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>
+        }
+        deleteMany: {
+          args: Prisma.DemoAnalyticsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DemoAnalyticsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DemoAnalyticsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>[]
+        }
+        upsert: {
+          args: Prisma.DemoAnalyticsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DemoAnalyticsPayload>
+        }
+        aggregate: {
+          args: Prisma.DemoAnalyticsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDemoAnalytics>
+        }
+        groupBy: {
+          args: Prisma.DemoAnalyticsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DemoAnalyticsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DemoAnalyticsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DemoAnalyticsCountAggregateOutputType> | number
+        }
+      }
+    }
+    SalesUser: {
+      payload: Prisma.$SalesUserPayload<ExtArgs>
+      fields: Prisma.SalesUserFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SalesUserFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SalesUserFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>
+        }
+        findFirst: {
+          args: Prisma.SalesUserFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SalesUserFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>
+        }
+        findMany: {
+          args: Prisma.SalesUserFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>[]
+        }
+        create: {
+          args: Prisma.SalesUserCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>
+        }
+        createMany: {
+          args: Prisma.SalesUserCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SalesUserCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>[]
+        }
+        delete: {
+          args: Prisma.SalesUserDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>
+        }
+        update: {
+          args: Prisma.SalesUserUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>
+        }
+        deleteMany: {
+          args: Prisma.SalesUserDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SalesUserUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SalesUserUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>[]
+        }
+        upsert: {
+          args: Prisma.SalesUserUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesUserPayload>
+        }
+        aggregate: {
+          args: Prisma.SalesUserAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSalesUser>
+        }
+        groupBy: {
+          args: Prisma.SalesUserGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SalesUserGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SalesUserCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SalesUserCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -9246,6 +9396,40 @@ export const ProspectNoteScalarFieldEnum = {
 export type ProspectNoteScalarFieldEnum = (typeof ProspectNoteScalarFieldEnum)[keyof typeof ProspectNoteScalarFieldEnum]
 
 
+export const DemoAnalyticsScalarFieldEnum = {
+  id: 'id',
+  fingerprint: 'fingerprint',
+  page: 'page',
+  industrySelected: 'industrySelected',
+  packageSelected: 'packageSelected',
+  tourStepsCompleted: 'tourStepsCompleted',
+  timeOnEachStep: 'timeOnEachStep',
+  clickedStartTrial: 'clickedStartTrial',
+  clickedBookDemo: 'clickedBookDemo',
+  clickedExplore: 'clickedExplore',
+  sessionStart: 'sessionStart',
+  sessionEnd: 'sessionEnd',
+  convertedToSignup: 'convertedToSignup',
+  createdAt: 'createdAt'
+} as const
+
+export type DemoAnalyticsScalarFieldEnum = (typeof DemoAnalyticsScalarFieldEnum)[keyof typeof DemoAnalyticsScalarFieldEnum]
+
+
+export const SalesUserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  name: 'name',
+  role: 'role',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SalesUserScalarFieldEnum = (typeof SalesUserScalarFieldEnum)[keyof typeof SalesUserScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -9776,6 +9960,8 @@ export type GlobalOmitConfig = {
   prospect?: Prisma.ProspectOmit
   prospectContact?: Prisma.ProspectContactOmit
   prospectNote?: Prisma.ProspectNoteOmit
+  demoAnalytics?: Prisma.DemoAnalyticsOmit
+  salesUser?: Prisma.SalesUserOmit
 }
 
 /* Types for Logging */

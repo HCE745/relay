@@ -115,6 +115,14 @@ export async function proxy(request: NextRequest) {
     return applyVideoMode(NextResponse.next(), vmParam)
   }
 
+  // ── Sales section — super admin credentials for now ───────────────────────
+  if (pathname.startsWith("/sales") || pathname.startsWith("/api/sales")) {
+    if (!session.superAdmin) {
+      return NextResponse.redirect(new URL("/super-admin/login", request.url))
+    }
+    return applyVideoMode(NextResponse.next(), vmParam)
+  }
+
   // Super admins (not impersonating) must stay inside /super-admin
   if (session.superAdmin && !session.impersonatedBy) {
     return NextResponse.redirect(new URL("/super-admin", request.url))

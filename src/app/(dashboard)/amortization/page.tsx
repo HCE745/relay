@@ -1,42 +1,15 @@
 import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { Plus } from "lucide-react"
+import { Plus, CalendarClock } from "lucide-react"
+import { StatusBadge } from "@/components/ui/StatusBadge"
+import { EmptyState } from "@/components/ui/EmptyState"
 import { AmortizationListActions } from "./AmortizationListActions"
 
 export const dynamic = "force-dynamic"
 
-function statusBadge(status: string) {
-  const colors: Record<string, string> = {
-    ACTIVE: "bg-blue-100 text-blue-700",
-    COMPLETED: "bg-green-100 text-green-700",
-    VOIDED: "bg-gray-100 text-gray-400",
-  }
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[status] ?? "bg-gray-100"}`}>
-      {status}
-    </span>
-  )
-}
-
-function typeBadge(type: string) {
-  const labels: Record<string, string> = {
-    PREPAID_EXPENSE: "Prepaid",
-    DEFERRED_REVENUE: "Deferred Rev",
-  }
-  const colors: Record<string, string> = {
-    PREPAID_EXPENSE: "bg-orange-100 text-orange-700",
-    DEFERRED_REVENUE: "bg-purple-100 text-purple-700",
-  }
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[type] ?? "bg-gray-100"}`}>
-      {labels[type] ?? type}
-    </span>
-  )
-}
-
 function fmt(cents: number) {
-  return "$" + (cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })
+  return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" })
 }
 
 export default async function AmortizationPage() {
@@ -56,63 +29,72 @@ export default async function AmortizationPage() {
     .flatMap((s) => s.entries.filter((e) => !e.posted && e.periodDate <= today))
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Amortization Schedules</h1>
-        <div className="flex items-center gap-3">
+    <div className="p-6 max-w-7xl space-y-5">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Amortization Schedules</h1>
+          <p className="page-subtitle">
+            {schedules.length > 0
+              ? `${schedules.length} schedule${schedules.length !== 1 ? "s" : ""}${dueEntries.length > 0 ? ` · ${dueEntries.length} entr${dueEntries.length !== 1 ? "ies" : "y"} due` : ""}`
+              : "Spread prepaid expenses over their coverage period"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
           <AmortizationListActions dueEntries={dueEntries} />
-          <Link
-            href="/amortization/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 font-medium"
-          >
-            <Plus className="w-4 h-4" /> New Schedule
+          <Link href="/amortization/new" className="btn-primary">
+            <Plus className="w-3.5 h-3.5" /> New Schedule
           </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="card">
         <table className="data-table">
           <thead>
             <tr>
               <th>Name</th>
               <th>Type</th>
-              <th>Total</th>
-              <th>Months</th>
+              <th className="num">Total</th>
+              <th className="num">Months</th>
               <th>Start Date</th>
               <th>Progress</th>
               <th>Status</th>
-              <th></th>
             </tr>
           </thead>
           <tbody>
-            {schedules.length === 0 && (
-              <tr>
-                <td colSpan={8} className="text-center py-8 text-gray-400">
-                  No amortization schedules — create one to get started.
-                </td>
-              </tr>
-            )}
-            {schedules.map((s) => {
+            {schedules.length === 0 ? (
+              <EmptyState
+                icon={CalendarClock}
+                title="No amortization schedules"
+                description="Create a schedule to spread a prepaid expense (annual software, insurance, retainers) over its coverage months. Each month-end, post the entry to move cost from Prepaid Asset to Expense."
+                actions={[{ label: "New Schedule", href: "/amortization/new" }]}
+              />
+            ) : schedules.map((s) => {
               const posted = s.entries.filter((e) => e.posted).length
               const total = s.entries.length
+              const pct = total > 0 ? Math.round((posted / total) * 100) : 0
               return (
                 <tr key={s.id}>
                   <td className="font-medium">
-                    <Link href={`/amortization/${s.id}`} className="text-blue-600 hover:underline">
+                    <Link href={`/amortization/${s.id}`} className="text-blue-700 hover:text-blue-800">
                       {s.name}
                     </Link>
                   </td>
-                  <td>{typeBadge(s.type)}</td>
-                  <td className="font-mono text-sm">{fmt(s.totalAmountCents)}</td>
-                  <td className="text-gray-600 text-sm">{s.months}</td>
-                  <td className="text-gray-600 text-sm">{s.startDate.toISOString().slice(0, 10)}</td>
-                  <td className="text-sm text-gray-600">{posted} / {total}</td>
-                  <td>{statusBadge(s.status)}</td>
+                  <td><StatusBadge status={s.type} /></td>
+                  <td className="num fin">{fmt(s.totalAmountCents)}</td>
+                  <td className="num text-slate-500">{s.months}</td>
+                  <td className="fin text-slate-500">{s.startDate.toISOString().slice(0, 10)}</td>
                   <td>
-                    <Link href={`/amortization/${s.id}`} className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                      View
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-slate-100 rounded-full h-1.5 min-w-[4rem]">
+                        <div
+                          className="h-1.5 rounded-full bg-blue-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-slate-400 whitespace-nowrap">{posted}/{total}</span>
+                    </div>
                   </td>
+                  <td><StatusBadge status={s.status} /></td>
                 </tr>
               )
             })}

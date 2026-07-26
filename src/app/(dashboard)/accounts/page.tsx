@@ -2,9 +2,21 @@ import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import { getAccountBalance } from "@/lib/ledger"
 import Link from "next/link"
-import { Plus } from "lucide-react"
+import { Plus, BookOpen } from "lucide-react"
 
 export const dynamic = "force-dynamic"
+
+const TYPE_ORDER = ["ASSET", "LIABILITY", "EQUITY", "INCOME", "EXPENSE"]
+const TYPE_LABELS: Record<string, string> = {
+  ASSET: "Assets", LIABILITY: "Liabilities", EQUITY: "Equity",
+  INCOME: "Income", EXPENSE: "Expenses",
+}
+
+function fmtBalance(cents: number, normalBalance: string) {
+  const display = normalBalance === "DEBIT" ? cents : -cents
+  const s = (Math.abs(display) / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })
+  return { value: display < 0 ? `(${s})` : s, negative: display < 0 }
+}
 
 export default async function AccountsPage() {
   const { tenantId, entityId } = await getEntityContext()
@@ -18,65 +30,70 @@ export default async function AccountsPage() {
     accounts.map(async (acct) => ({
       ...acct,
       balance: await getAccountBalance(tenantId, entityId, acct.id),
-    })),
+    }))
   )
 
-  const groupedByType = withBalances.reduce(
-    (acc, acct) => {
-      if (!acc[acct.type]) acc[acct.type] = []
-      acc[acct.type].push(acct)
-      return acc
-    },
-    {} as Record<string, typeof withBalances>,
-  )
-
-  const typeOrder = ["ASSET", "LIABILITY", "EQUITY", "INCOME", "EXPENSE"]
-  const typeLabels: Record<string, string> = {
-    ASSET: "Assets", LIABILITY: "Liabilities", EQUITY: "Equity",
-    INCOME: "Income", EXPENSE: "Expenses",
-  }
-
-  function fmtBalance(cents: number, normalBalance: string) {
-    const display = normalBalance === "DEBIT" ? cents : -cents
-    const s = (Math.abs(display) / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })
-    return display < 0 ? `(${s})` : s
-  }
+  const grouped = withBalances.reduce((acc, a) => {
+    if (!acc[a.type]) acc[a.type] = []
+    acc[a.type].push(a)
+    return acc
+  }, {} as Record<string, typeof withBalances>)
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Chart of Accounts</h1>
-        <Link
-          href="/accounts/new"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Add Account
+    <div className="p-6 max-w-7xl space-y-5">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Chart of Accounts</h1>
+          <p className="page-subtitle">{accounts.length} account{accounts.length !== 1 ? "s" : ""}</p>
+        </div>
+        <Link href="/accounts/new" className="btn-primary">
+          <Plus className="w-3.5 h-3.5" /> Add Account
         </Link>
       </div>
 
-      {typeOrder.map((type) => {
-        const accts = groupedByType[type] ?? []
-        if (accts.length === 0) return null
+      {accounts.length === 0 && (
+        <div className="card">
+          <div className="empty-state">
+            <BookOpen className="empty-state-icon" />
+            <p className="empty-state-title">Chart of accounts is empty</p>
+            <p className="empty-state-desc">
+              Add accounts to categorize your transactions. Start with Assets, Liabilities, Equity, Income, and Expenses — or import from QuickBooks/Xero via Settings → Integrations.
+            </p>
+            <Link href="/accounts/new" className="btn-primary">Add Account</Link>
+          </div>
+        </div>
+      )}
+
+      {TYPE_ORDER.map((type) => {
+        const accts = grouped[type]
+        if (!accts || accts.length === 0) return null
         return (
-          <div key={type} className="bg-white rounded-xl border border-gray-200">
-            <div className="px-5 py-3 bg-gray-50 border-b border-gray-200 rounded-t-xl">
-              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">{typeLabels[type]}</h2>
+          <div key={type} className="card">
+            <div className="card-header">
+              <span className="card-header-title">{TYPE_LABELS[type]}</span>
+              <span className="text-xs text-slate-400">{accts.length} account{accts.length !== 1 ? "s" : ""}</span>
             </div>
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Code</th><th>Name</th><th>Subtype</th><th className="text-right">Balance</th>
+                  <th style={{ width: "6rem" }}>Code</th>
+                  <th>Name</th>
+                  <th>Subtype</th>
+                  <th className="num">Balance</th>
                 </tr>
               </thead>
               <tbody>
-                {accts.map((acct) => (
-                  <tr key={acct.id}>
-                    <td className="font-mono text-gray-500">{acct.code}</td>
-                    <td className="font-medium">{acct.name}</td>
-                    <td className="text-gray-400 text-xs">{acct.subtype ?? "—"}</td>
-                    <td className="text-right font-mono text-sm">{fmtBalance(acct.balance, acct.normalBalance)}</td>
-                  </tr>
-                ))}
+                {accts.map((acct) => {
+                  const bal = fmtBalance(acct.balance, acct.normalBalance)
+                  return (
+                    <tr key={acct.id}>
+                      <td className="fin text-slate-400 text-xs">{acct.code}</td>
+                      <td className="font-medium">{acct.name}</td>
+                      <td className="text-slate-400 text-xs">{acct.subtype ?? "—"}</td>
+                      <td className={`num fin text-sm ${bal.negative ? "text-red-600" : ""}`}>{bal.value}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

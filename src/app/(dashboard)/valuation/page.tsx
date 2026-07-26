@@ -6,12 +6,14 @@ export const dynamic = "force-dynamic"
 export default async function ValuationPageWrapper() {
   const { entityId, selectedEntity } = await getEntityContext()
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Business Valuation</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          {selectedEntity?.name} — indicative planning range, not a certified appraisal
-        </p>
+    <div className="p-6 max-w-5xl">
+      <div className="page-header mb-6">
+        <div>
+          <h1 className="page-title">Business Valuation</h1>
+          <p className="page-subtitle">
+            {selectedEntity?.name} — indicative planning range, not a certified appraisal
+          </p>
+        </div>
       </div>
       <ValuationPage
         entityId={entityId}

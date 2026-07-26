@@ -1,30 +1,17 @@
 import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { Plus } from "lucide-react"
+import { Plus, RefreshCw } from "lucide-react"
+import { StatusBadge } from "@/components/ui/StatusBadge"
+import { EmptyState } from "@/components/ui/EmptyState"
 import { RecurringActions } from "./RecurringActions"
 
 export const dynamic = "force-dynamic"
 
-function typeBadge(type: string) {
-  const colors: Record<string, string> = {
-    BILL: "bg-orange-100 text-orange-700",
-    INVOICE: "bg-blue-100 text-blue-700",
-    JOURNAL: "bg-purple-100 text-purple-700",
-  }
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[type] ?? "bg-gray-100 text-gray-600"}`}>
-      {type}
-    </span>
-  )
-}
-
-function activeBadge(active: boolean) {
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"}`}>
-      {active ? "Active" : "Paused"}
-    </span>
-  )
+const TYPE_BADGE: Record<string, string> = {
+  BILL: "badge-orange",
+  INVOICE: "badge-blue",
+  JOURNAL: "badge-purple",
 }
 
 export default async function RecurringPage() {
@@ -36,22 +23,28 @@ export default async function RecurringPage() {
     orderBy: { createdAt: "desc" },
   })
 
+  const due = templates.filter((t) => t.active && t.nextRunDate <= new Date())
+
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Recurring Entries</h1>
-        <div className="flex items-center gap-3">
-          <RecurringActions templates={templates.filter((t) => t.active && t.nextRunDate <= new Date())} />
-          <Link
-            href="/recurring/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 font-medium"
-          >
-            <Plus className="w-4 h-4" /> New Template
+    <div className="p-6 max-w-7xl space-y-5">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Recurring Entries</h1>
+          <p className="page-subtitle">
+            {templates.length > 0
+              ? `${templates.length} template${templates.length !== 1 ? "s" : ""}${due.length > 0 ? ` · ${due.length} due` : ""}`
+              : "Automate bills, invoices, and journal entries on a schedule"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <RecurringActions templates={due} />
+          <Link href="/recurring/new" className="btn-primary">
+            <Plus className="w-3.5 h-3.5" /> New Template
           </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="card">
         <table className="data-table">
           <thead>
             <tr>
@@ -59,35 +52,37 @@ export default async function RecurringPage() {
               <th>Type</th>
               <th>Frequency</th>
               <th>Next Run</th>
-              <th>Runs</th>
+              <th className="num">Runs</th>
               <th>Status</th>
-              <th></th>
             </tr>
           </thead>
           <tbody>
-            {templates.length === 0 && (
-              <tr>
-                <td colSpan={7} className="text-center py-8 text-gray-400">
-                  No recurring templates — create one to get started.
-                </td>
-              </tr>
-            )}
-            {templates.map((t) => (
+            {templates.length === 0 ? (
+              <EmptyState
+                icon={RefreshCw}
+                title="No recurring templates"
+                description="Create a template to automate bills, invoices, or journal entries on a daily, weekly, or monthly schedule."
+                actions={[{ label: "New Template", href: "/recurring/new" }]}
+              />
+            ) : templates.map((t) => (
               <tr key={t.id}>
                 <td className="font-medium">
-                  <Link href={`/recurring/${t.id}`} className="text-blue-600 hover:underline">
+                  <Link href={`/recurring/${t.id}`} className="text-blue-700 hover:text-blue-800">
                     {t.name}
                   </Link>
                 </td>
-                <td>{typeBadge(t.type)}</td>
-                <td className="text-gray-600 text-sm capitalize">{t.frequency.charAt(0) + t.frequency.slice(1).toLowerCase()}</td>
-                <td className="text-gray-600 text-sm">{t.nextRunDate.toISOString().slice(0, 10)}</td>
-                <td className="text-gray-600 text-sm">{t._count.runs}</td>
-                <td>{activeBadge(t.active)}</td>
                 <td>
-                  <Link href={`/recurring/${t.id}`} className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    View
-                  </Link>
+                  <span className={`badge ${TYPE_BADGE[t.type] ?? "badge-gray"}`}>
+                    {t.type.charAt(0) + t.type.slice(1).toLowerCase()}
+                  </span>
+                </td>
+                <td className="text-slate-600 capitalize">
+                  {t.frequency.charAt(0) + t.frequency.slice(1).toLowerCase()}
+                </td>
+                <td className="fin text-slate-500">{t.nextRunDate.toISOString().slice(0, 10)}</td>
+                <td className="num text-slate-500">{t._count.runs}</td>
+                <td>
+                  <StatusBadge status={t.active ? "ACTIVE" : "VOID"} label={t.active ? "Active" : "Paused"} />
                 </td>
               </tr>
             ))}

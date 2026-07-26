@@ -353,17 +353,17 @@ export function AuditTrail({ initialLogs, entityId }: Props) {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-6 max-w-7xl space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Audit Trail</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Read-only record of all accounting actions</p>
+          <h1 className="page-title">Audit Trail</h1>
+          <p className="page-subtitle">Read-only record of all accounting actions</p>
         </div>
         <button
           onClick={handleExport}
           disabled={exporting}
-          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-60 transition-colors"
+          className="btn-secondary"
         >
           <Download className="w-4 h-4" />
           {exporting ? "Exporting…" : "Export CSV"}

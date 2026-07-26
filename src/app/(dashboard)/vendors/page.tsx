@@ -1,7 +1,8 @@
 import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { Plus } from "lucide-react"
+import { Plus, Building2 } from "lucide-react"
+import { EmptyState } from "@/components/ui/EmptyState"
 
 export const dynamic = "force-dynamic"
 
@@ -14,29 +15,45 @@ export default async function VendorsPage() {
   })
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Vendors</h1>
-        <Link href="/vendors/new" className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
-          <Plus className="w-4 h-4" /> New Vendor
+    <div className="p-6 max-w-7xl space-y-5">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Vendors</h1>
+          <p className="page-subtitle">{vendors.length} vendor{vendors.length !== 1 ? "s" : ""}</p>
+        </div>
+        <Link href="/vendors/new" className="btn-primary">
+          <Plus className="w-3.5 h-3.5" /> New Vendor
         </Link>
       </div>
-      <div className="bg-white rounded-xl border border-gray-200">
+
+      <div className="card">
         <table className="data-table">
           <thead>
-            <tr><th>Name</th><th>Email</th><th>Terms</th><th>Tax ID</th><th>Bills</th></tr>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Payment Terms</th>
+              <th>Tax ID</th>
+              <th className="num">Bills</th>
+            </tr>
           </thead>
           <tbody>
-            {vendors.length === 0 && (
-              <tr><td colSpan={5} className="text-center py-8 text-gray-400">No vendors yet</td></tr>
-            )}
-            {vendors.map((v) => (
+            {vendors.length === 0 ? (
+              <EmptyState
+                icon={Building2}
+                title="No vendors yet"
+                description="Add the businesses you pay — rent, software, contractors, utilities. Vendors are attached to bills for accurate AP tracking."
+                actions={[{ label: "New Vendor", href: "/vendors/new" }]}
+              />
+            ) : vendors.map((v) => (
               <tr key={v.id}>
                 <td className="font-medium">{v.name}</td>
-                <td className="text-gray-500">{v.email ?? "—"}</td>
-                <td>{v.paymentTerms}</td>
-                <td className="font-mono text-xs text-gray-400">{v.taxId ?? "—"}</td>
-                <td>{v._count.bills}</td>
+                <td className="text-slate-500">{v.email ?? "—"}</td>
+                <td className="text-slate-500">{v.phone ?? "—"}</td>
+                <td className="text-slate-600">{v.paymentTerms}</td>
+                <td className="fin text-slate-400 text-xs">{v.taxId ?? "—"}</td>
+                <td className="num text-slate-600">{v._count.bills}</td>
               </tr>
             ))}
           </tbody>

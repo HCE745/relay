@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Plus, Trash2, AlertTriangle, CheckCircle2, RefreshCw, FileText, ExternalLink, Calendar } from "lucide-react"
 import { ReceiptScanner } from "./ReceiptScanner"
 import type { ScanResult } from "@/lib/scan-types"
@@ -323,6 +324,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, assetAccounts = [
           throw new Error(d.error || "Bill saved but amortization schedule failed — check Amortization page")
         }
 
+        toast.success("Bill saved")
         router.push(`/bills/${bill.id}`)
       } else {
         const res = await fetch("/api/bills", {
@@ -342,6 +344,7 @@ export function BillForm({ entityId, vendors, expenseAccounts, assetAccounts = [
         })
         if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Failed to save") }
         const bill = await res.json()
+        toast.success("Bill saved")
         router.push(`/bills/${bill.id}`)
       }
     } catch (e) {

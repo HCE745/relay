@@ -195,9 +195,9 @@ export function ReportViewer({
   const title = REPORTS.find((r) => r.id === selectedReport)?.label ?? "Report"
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+    <div className="p-6 max-w-7xl space-y-4">
+      <div className="page-header">
+        <h1 className="page-title">Reports</h1>
         {reportData && (
           <button
             onClick={() => {

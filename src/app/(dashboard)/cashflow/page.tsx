@@ -12,17 +12,18 @@ export default async function CashFlowPage() {
   try {
     initialData = await fetchForecast(tenantId, entityId, "weekly", 13, false)
   } catch (e) {
-    // Non-fatal: client will fetch on mount
     console.error("SSR cashflow fetch failed", e)
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Cash Flow Forecast</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {selectedEntity?.name ?? "Entity"} — projected cash position
-        </p>
+    <div className="p-6 max-w-7xl">
+      <div className="page-header mb-6">
+        <div>
+          <h1 className="page-title">Cash Flow Forecast</h1>
+          <p className="page-subtitle">
+            {selectedEntity?.name ?? "Entity"} — projected cash position
+          </p>
+        </div>
       </div>
       <CashFlowDashboard
         entityId={entityId}

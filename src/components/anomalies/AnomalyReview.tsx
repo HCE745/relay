@@ -99,21 +99,19 @@ export function AnomalyReview({ initialFlags, entityId }: Props) {
   ]
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 max-w-7xl space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Anomaly Review</h1>
+          <h1 className="page-title">Anomaly Review</h1>
           {lastScan && (
-            <p className="text-sm text-gray-500 mt-0.5">
-              Last scan: {fmt(lastScan)}
-            </p>
+            <p className="page-subtitle">Last scan: {fmt(lastScan)}</p>
           )}
         </div>
         <button
           onClick={handleScan}
           disabled={scanning}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 transition-colors"
+          className="btn-primary"
         >
           {scanning ? (
             <>

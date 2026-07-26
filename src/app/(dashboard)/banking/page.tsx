@@ -1,9 +1,16 @@
 import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { Plus, RefreshCw } from "lucide-react"
+import { Plus, CreditCard, Wifi } from "lucide-react"
+import { EmptyCard } from "@/components/ui/EmptyState"
+import { StatusBadge } from "@/components/ui/StatusBadge"
 
 export const dynamic = "force-dynamic"
+
+function fmtAmt(cents: number) {
+  const abs = (Math.abs(cents) / 100).toLocaleString("en-US", { style: "currency", currency: "USD" })
+  return cents < 0 ? abs : `-${abs}`
+}
 
 export default async function BankingPage() {
   const { tenantId, entityId } = await getEntityContext()
@@ -16,80 +23,94 @@ export default async function BankingPage() {
   const recentTxns = await prisma.bankTransaction.findMany({
     where: { tenantId, entityId },
     orderBy: { date: "desc" },
-    take: 20,
-    include: { bankAccount: true },
+    take: 25,
+    include: { bankAccount: { select: { name: true } } },
   })
 
-  function fmt(cents: number) {
-    const sign = cents < 0 ? "" : "-"
-    return sign + "$" + (Math.abs(cents) / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })
-  }
-
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Banking</h1>
-        <div className="flex gap-2">
-          <Link href="/banking/link" className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
-            <Plus className="w-4 h-4" /> Link Bank Account
-          </Link>
+    <div className="p-6 max-w-7xl space-y-5">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Banking</h1>
+          <p className="page-subtitle">
+            {bankAccounts.length > 0
+              ? `${bankAccounts.length} account${bankAccounts.length !== 1 ? "s" : ""} connected`
+              : "Connect accounts to sync transactions automatically"}
+          </p>
         </div>
+        <Link href="/banking/link" className="btn-primary">
+          <Plus className="w-3.5 h-3.5" /> Link Account
+        </Link>
       </div>
 
-      {/* Bank accounts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {bankAccounts.map((acct) => (
-          <div key={acct.id} className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-semibold text-gray-900">{acct.name}</span>
-              <button className="text-gray-400 hover:text-blue-600 transition-colors">
-                <RefreshCw className="w-4 h-4" />
-              </button>
+      {/* Bank account cards */}
+      {bankAccounts.length === 0 ? (
+        <div className="card">
+          <EmptyCard
+            icon={CreditCard}
+            title="No bank accounts linked"
+            description="Connect your bank or credit card via Plaid to automatically import transactions. Categorize them once and your books stay current."
+            actions={[{ label: "Link Account", href: "/banking/link" }]}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {bankAccounts.map((acct) => (
+            <div key={acct.id} className="card p-5">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <p className="font-semibold text-sm" style={{ color: "var(--text-base)" }}>{acct.name}</p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--text-faint)" }}>
+                    {acct._count.transactions} transactions
+                  </p>
+                </div>
+                {acct.plaidAccountId && (
+                  <Wifi className="w-4 h-4 text-green-500 flex-shrink-0" />
+                )}
+              </div>
+              {acct.lastSyncedAt && (
+                <p className="text-xs" style={{ color: "var(--text-faint)" }}>
+                  Synced {acct.lastSyncedAt.toISOString().slice(0, 10)}
+                </p>
+              )}
             </div>
-            <div className="text-xs text-gray-400">
-              {acct._count.transactions} transactions
-              {acct.lastSyncedAt && ` · synced ${acct.lastSyncedAt.toISOString().slice(0, 10)}`}
-            </div>
-            {acct.plaidAccountId && (
-              <div className="mt-2 text-xs text-green-600 font-medium">● Plaid connected</div>
-            )}
-          </div>
-        ))}
-        {bankAccounts.length === 0 && (
-          <div className="col-span-3 bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <p className="text-gray-400 text-sm">No bank accounts linked. Connect via Plaid to start syncing.</p>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* Transactions feed */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-900">Recent Transactions</h2>
+      {/* Transactions */}
+      <div className="card">
+        <div className="card-header">
+          <span className="card-header-title">Recent Transactions</span>
         </div>
         <table className="data-table">
           <thead>
             <tr>
-              <th>Date</th><th>Description</th><th>Account</th>
-              <th className="text-right">Amount</th><th>Status</th>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Account</th>
+              <th className="num">Amount</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            {recentTxns.length === 0 && (
-              <tr><td colSpan={5} className="text-center py-8 text-gray-400">No transactions</td></tr>
-            )}
-            {recentTxns.map((txn) => (
+            {recentTxns.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center py-10" style={{ color: "var(--text-faint)" }}>
+                  No transactions yet — link a bank account to start importing.
+                </td>
+              </tr>
+            ) : recentTxns.map((txn) => (
               <tr key={txn.id}>
-                <td className="text-gray-500">{txn.date.toISOString().slice(0, 10)}</td>
+                <td className="fin text-slate-500">{txn.date.toISOString().slice(0, 10)}</td>
                 <td className="font-medium">{txn.name}</td>
-                <td className="text-gray-400 text-xs">{txn.bankAccount.name}</td>
-                <td className="text-right font-mono">{fmt(txn.amount)}</td>
+                <td className="text-slate-400 text-xs">{txn.bankAccount.name}</td>
+                <td className="num fin">{fmtAmt(txn.amount)}</td>
                 <td>
-                  {txn.isMatched ? (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Matched</span>
-                  ) : (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Unmatched</span>
-                  )}
+                  <StatusBadge
+                    status={txn.isMatched ? "PAID" : "ENTERED"}
+                    label={txn.isMatched ? "Matched" : "Unmatched"}
+                  />
                 </td>
               </tr>
             ))}

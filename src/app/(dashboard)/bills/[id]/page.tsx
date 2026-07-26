@@ -4,25 +4,12 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, FileText, Image as ImageIcon } from "lucide-react"
 import { BillPaymentForm } from "@/components/bills/BillPaymentForm"
+import { StatusBadge } from "@/components/ui/StatusBadge"
 
 export const dynamic = "force-dynamic"
 
-function statusBadge(status: string) {
-  const colors: Record<string, string> = {
-    ENTERED: "bg-blue-100 text-blue-700",
-    PARTIAL: "bg-yellow-100 text-yellow-700",
-    PAID: "bg-green-100 text-green-700",
-    VOID: "bg-gray-100 text-gray-400",
-  }
-  return (
-    <span className={`px-3 py-1 rounded-full text-sm font-medium ${colors[status] ?? "bg-gray-100 text-gray-600"}`}>
-      {status}
-    </span>
-  )
-}
-
 function fmt(cents: number) {
-  return "$" + (cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })
+  return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" })
 }
 
 export default async function BillPage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,38 +30,34 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="p-6 max-w-5xl space-y-6">
+    <div className="p-6 max-w-5xl space-y-5">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/bills" className="text-gray-400 hover:text-gray-600 transition-colors">
-          <ArrowLeft className="w-5 h-5" />
+      <div className="flex items-center gap-3">
+        <Link href="/bills" className="hover:text-slate-600 transition-colors" style={{ color: "var(--text-faint)" }}>
+          <ArrowLeft className="w-4 h-4" />
         </Link>
-        <div className="flex-1 flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Bill {bill.billNumber ?? bill.id.slice(0, 8)}
-          </h1>
-          {statusBadge(bill.status)}
-        </div>
+        <h1 className="page-title flex-1">Bill {bill.billNumber ?? bill.id.slice(0, 8)}</h1>
+        <StatusBadge status={bill.status} />
       </div>
 
       {/* Meta */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="card p-6">
         <div className="grid grid-cols-3 gap-6 text-sm">
           <div>
-            <p className="text-gray-500 mb-1">Vendor</p>
-            <p className="font-semibold">{bill.vendor.name}</p>
+            <p className="text-xs font-medium mb-1" style={{ color: "var(--text-faint)" }}>Vendor</p>
+            <p className="font-semibold" style={{ color: "var(--text-base)" }}>{bill.vendor.name}</p>
           </div>
           <div>
-            <p className="text-gray-500 mb-1">Bill Date</p>
-            <p className="font-medium">{bill.date.toISOString().slice(0, 10)}</p>
+            <p className="text-xs font-medium mb-1" style={{ color: "var(--text-faint)" }}>Bill Date</p>
+            <p className="fin font-medium">{bill.date.toISOString().slice(0, 10)}</p>
           </div>
           <div>
-            <p className="text-gray-500 mb-1">Due Date</p>
-            <p className="font-medium">{bill.dueDate.toISOString().slice(0, 10)}</p>
+            <p className="text-xs font-medium mb-1" style={{ color: "var(--text-faint)" }}>Due Date</p>
+            <p className="fin font-medium">{bill.dueDate.toISOString().slice(0, 10)}</p>
           </div>
           {bill.memo && (
             <div className="col-span-3">
-              <p className="text-gray-500 mb-1">Memo</p>
+              <p className="text-xs font-medium mb-1" style={{ color: "var(--text-faint)" }}>Memo</p>
               <p className="font-medium">{bill.memo}</p>
             </div>
           )}
@@ -82,48 +65,47 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* Line items */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-5 py-3 bg-gray-50 border-b border-gray-200 rounded-t-xl">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Line Items</h2>
+      <div className="card">
+        <div className="card-header">
+          <span className="card-header-title">Line Items</span>
         </div>
         <table className="data-table">
           <thead>
             <tr>
               <th>Description</th>
               <th>Account</th>
-              <th className="text-right">Qty</th>
-              <th className="text-right">Unit Price</th>
-              <th className="text-right">Amount</th>
+              <th className="num">Qty</th>
+              <th className="num">Unit Price</th>
+              <th className="num">Amount</th>
             </tr>
           </thead>
           <tbody>
             {bill.lines.map((line) => (
               <tr key={line.id}>
                 <td>{line.description ?? "—"}</td>
-                <td className="text-gray-500 text-xs">{line.account?.code} {line.account?.name ?? "—"}</td>
-                <td className="text-right font-mono">{line.quantity}</td>
-                <td className="text-right font-mono">{fmt(line.unitPrice)}</td>
-                <td className="text-right font-mono">{fmt(line.amount)}</td>
+                <td className="text-slate-400 text-xs">{line.account?.code} {line.account?.name ?? "—"}</td>
+                <td className="num fin text-slate-500">{line.quantity}</td>
+                <td className="num fin">{fmt(line.unitPrice)}</td>
+                <td className="num fin">{fmt(line.amount)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-
-        <div className="px-5 py-4 border-t border-gray-100 flex flex-col items-end gap-1.5 text-sm">
+        <div className="px-5 py-4 border-t flex flex-col items-end gap-1.5 text-sm" style={{ borderColor: "var(--border)" }}>
           <div className="flex gap-16 font-semibold text-base">
             <span>Total</span>
-            <span className="font-mono w-28 text-right">{fmt(bill.total)}</span>
+            <span className="fin w-28 text-right">{fmt(bill.total)}</span>
           </div>
           {bill.amountPaid > 0 && (
             <div className="flex gap-16 text-green-700">
               <span>Paid</span>
-              <span className="font-mono w-28 text-right">({fmt(bill.amountPaid)})</span>
+              <span className="fin w-28 text-right">({fmt(bill.amountPaid)})</span>
             </div>
           )}
           {bill.amountDue > 0 && (
             <div className="flex gap-16 font-semibold text-red-600">
               <span>Balance Due</span>
-              <span className="font-mono w-28 text-right">{fmt(bill.amountDue)}</span>
+              <span className="fin w-28 text-right">{fmt(bill.amountDue)}</span>
             </div>
           )}
         </div>
@@ -131,24 +113,24 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
 
       {/* Payment history */}
       {bill.payments.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-5 py-3 bg-gray-50 border-b border-gray-200 rounded-t-xl">
-            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Payments</h2>
+        <div className="card">
+          <div className="card-header">
+            <span className="card-header-title">Payments</span>
           </div>
           <table className="data-table">
             <thead>
               <tr>
                 <th>Date</th>
                 <th>Memo</th>
-                <th className="text-right">Amount</th>
+                <th className="num">Amount</th>
               </tr>
             </thead>
             <tbody>
               {bill.payments.map((p) => (
                 <tr key={p.id}>
-                  <td>{p.date.toISOString().slice(0, 10)}</td>
-                  <td className="text-gray-500">{p.memo ?? "—"}</td>
-                  <td className="text-right font-mono text-green-700">{fmt(p.amount)}</td>
+                  <td className="fin text-slate-500">{p.date.toISOString().slice(0, 10)}</td>
+                  <td className="text-slate-500">{p.memo ?? "—"}</td>
+                  <td className="num fin text-green-700">{fmt(p.amount)}</td>
                 </tr>
               ))}
             </tbody>
@@ -158,40 +140,24 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
 
       {/* Receipt attachment */}
       {bill.receiptUrl && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Receipt</h2>
+        <div className="card p-6">
+          <h2 className="card-header-title mb-4">Receipt</h2>
           {bill.receiptUrl.endsWith(".pdf") ? (
             <div className="space-y-3">
-              <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: "600px" }}>
-                <iframe
-                  src={bill.receiptUrl}
-                  className="w-full h-full"
-                  title="Receipt PDF"
-                />
+              <div className="border rounded-lg overflow-hidden" style={{ height: "600px", borderColor: "var(--border)" }}>
+                <iframe src={bill.receiptUrl} className="w-full h-full" title="Receipt PDF" />
               </div>
-              <a
-                href={bill.receiptUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
+              <a href={bill.receiptUrl} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium" style={{ color: "var(--accent)" }}>
                 <FileText className="w-4 h-4" /> Open PDF in new tab
               </a>
             </div>
           ) : (
             <div className="space-y-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={bill.receiptUrl}
-                alt="Receipt"
-                className="max-w-md rounded-lg border border-gray-200"
-              />
-              <a
-                href={bill.receiptUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
+              <img src={bill.receiptUrl} alt="Receipt" className="max-w-md rounded-lg border" style={{ borderColor: "var(--border)" }} />
+              <a href={bill.receiptUrl} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium" style={{ color: "var(--accent)" }}>
                 <ImageIcon className="w-4 h-4" /> View full size
               </a>
             </div>
@@ -199,7 +165,7 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
         </div>
       )}
 
-      {/* Payment form (client component) */}
+      {/* Payment form */}
       {["ENTERED", "PARTIAL"].includes(bill.status) && (
         <BillPaymentForm billId={bill.id} amountDue={bill.amountDue} />
       )}

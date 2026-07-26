@@ -284,15 +284,12 @@ function ThreadDetail({ followUp, onBack, onIgnore, onSent }: {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const loadThread = useCallback(async () => {
-    if (!followUp.demoCallId) {
-      // No demoCall — fetch the single email by ID
-      setThreadEmails([])
-      setLoadingThread(false)
-      return
-    }
     setLoadingThread(true)
     try {
-      const res  = await fetch(`/api/super-admin/crm/emails?demoCallId=${followUp.demoCallId}`)
+      const param = followUp.demoCallId
+        ? `demoCallId=${followUp.demoCallId}`
+        : `contactEmail=${encodeURIComponent(followUp.contactEmail)}`
+      const res  = await fetch(`/api/super-admin/crm/emails?${param}`)
       const data = await res.json() as { emails: CrmEmail[] }
       const emails = data.emails ?? []
       setThreadEmails(emails)

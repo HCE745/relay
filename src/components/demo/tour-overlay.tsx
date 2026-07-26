@@ -467,14 +467,24 @@ export function TourOverlay() {
     let cancelled = false
 
     async function doFill() {
-      await new Promise(r => setTimeout(r, 600))
       if (cancelled) return
 
       const formData = step?.getFormData?.(industry)
       if (!formData) return
 
-      const titleEl = document.querySelector<HTMLInputElement>("input[name='title']")
-      const descEl  = document.querySelector<HTMLTextAreaElement>("textarea[name='description']")
+      // Wait for the form to actually render in the DOM (up to 8s).
+      // Next.js App Router updates `pathname` before the page tree mounts,
+      // so a fixed 600ms delay races against React rendering — use polling instead.
+      const titleEl = await waitForElement("input[name='title']", 8000) as HTMLInputElement | null
+      if (cancelled) return
+      if (!titleEl) {
+        // Form never appeared — still mark done so "Submit Issue" button shows
+        setFormFillDone(true)
+        return
+      }
+
+      await new Promise(r => setTimeout(r, 200))
+      if (cancelled) return
 
       // Set category first so routing rules fire with correct category
       if (formData.category) {
@@ -488,18 +498,17 @@ export function TourOverlay() {
         }
       }
 
-      if (titleEl) {
-        titleEl.focus()
-        await new Promise(r => setTimeout(r, 150))
-        if (cancelled) return
-        titleEl.value = formData.title
-        titleEl.dispatchEvent(new Event("input",  { bubbles: true }))
-        titleEl.dispatchEvent(new Event("change", { bubbles: true }))
-      }
+      titleEl.focus()
+      await new Promise(r => setTimeout(r, 150))
+      if (cancelled) return
+      titleEl.value = formData.title
+      titleEl.dispatchEvent(new Event("input",  { bubbles: true }))
+      titleEl.dispatchEvent(new Event("change", { bubbles: true }))
 
       await new Promise(r => setTimeout(r, 350))
       if (cancelled) return
 
+      const descEl = document.querySelector<HTMLTextAreaElement>("textarea[name='description']")
       if (descEl) {
         descEl.focus()
         await new Promise(r => setTimeout(r, 150))

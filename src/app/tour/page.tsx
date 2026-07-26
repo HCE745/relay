@@ -1,41 +1,80 @@
 "use client"
 
-import { Suspense, useState, useEffect } from "react"
+import { Suspense, useState, useEffect, useRef } from "react"
+import { useSearchParams } from "next/navigation"
 import { Loader2, AlertCircle, Lock } from "lucide-react"
 import { RelayWordmarkWhite } from "@/components/logo"
 
 const INDUSTRIES = [
-  { label: "Manufacturing",      emoji: "🏭" },
-  { label: "Warehousing",        emoji: "📦" },
-  { label: "Restaurant",         emoji: "🍽️" },
-  { label: "Retail",             emoji: "🛍️" },
-  { label: "Hospitality",        emoji: "🏨" },
-  { label: "Healthcare",         emoji: "🏥" },
-  { label: "Education",          emoji: "🎓" },
+  { label: "Manufacturing",       emoji: "🏭" },
+  { label: "Warehousing",         emoji: "📦" },
   { label: "Property Management", emoji: "🏢" },
-  { label: "Self-Storage",       emoji: "📦" },
+  { label: "Hospitality",         emoji: "🏨" },
+  { label: "Retail",              emoji: "🛍️" },
+  { label: "Car Wash",            emoji: "🚗" },
+  { label: "Healthcare",          emoji: "🏥" },
+  { label: "Construction",        emoji: "🏗️" },
+  { label: "Other",               emoji: "⚙️" },
 ]
 
+const SLUG_TO_INDUSTRY: Record<string, string> = {
+  "manufacturing":       "Manufacturing",
+  "warehousing":         "Warehousing",
+  "property-management": "Property Management",
+  "hospitality":         "Hospitality",
+  "retail":              "Retail",
+  "car-wash":            "Car Wash",
+  "healthcare":          "Healthcare",
+  "construction":        "Construction",
+  "other":               "Other",
+}
+
 type GateState = "checking" | "open" | "locked"
-type View      = "code" | "selecting"
+type View      = "code" | "selecting" | "autostart"
 
 function TourPageInner() {
-  const [gate, setGate]           = useState<GateState>("checking")
-  const [view, setView]           = useState<View>("selecting")
-  const [codeInput, setCodeInput] = useState("")
-  const [pendingCode, setPendingCode] = useState("")
-  const [codeError, setCodeError] = useState("")
-  const [starting, setStarting]   = useState<string | null>(null)
+  const searchParams   = useSearchParams()
+  const industrySlug   = searchParams.get("industry")
+  const preIndustry    = industrySlug ? (SLUG_TO_INDUSTRY[industrySlug] ?? null) : null
+
+  const [gate,       setGate]       = useState<GateState>("checking")
+  const [view,       setView]       = useState<View>("selecting")
+  const [codeInput,  setCodeInput]  = useState("")
+  const [pendingCode,setPendingCode]= useState("")
+  const [codeError,  setCodeError]  = useState("")
+  const [starting,   setStarting]   = useState<string | null>(null)
   const [startError, setStartError] = useState("")
+  const autoStarted = useRef(false)
 
   useEffect(() => {
     fetch("/api/demo/gate")
       .then(r => r.json())
       .then((d: { required: boolean }) => {
-        if (d.required) { setGate("locked"); setView("code") }
-        else            { setGate("open");   setView("selecting") }
+        if (d.required) {
+          setGate("locked")
+          setView("code")
+        } else {
+          setGate("open")
+          if (preIndustry && !autoStarted.current) {
+            autoStarted.current = true
+            setView("autostart")
+            void startTour(preIndustry)
+          } else {
+            setView("selecting")
+          }
+        }
       })
-      .catch(() => { setGate("open"); setView("selecting") })
+      .catch(() => {
+        setGate("open")
+        if (preIndustry && !autoStarted.current) {
+          autoStarted.current = true
+          setView("autostart")
+          void startTour(preIndustry)
+        } else {
+          setView("selecting")
+        }
+      })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function handleCodeContinue(e: React.FormEvent) {
@@ -43,7 +82,12 @@ function TourPageInner() {
     if (!codeInput.trim()) return
     setPendingCode(codeInput.trim())
     setCodeError("")
-    setView("selecting")
+    if (preIndustry) {
+      setView("autostart")
+      void startTour(preIndustry)
+    } else {
+      setView("selecting")
+    }
   }
 
   async function startTour(industry: string) {
@@ -70,10 +114,12 @@ function TourPageInner() {
     } catch {
       setStartError("Could not start the demo. Please try again.")
       setStarting(null)
+      setView("selecting")
     }
   }
 
-  if (gate === "checking") {
+  // Loading / autostart spinner
+  if (gate === "checking" || view === "autostart") {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-gray-600 animate-spin" />
@@ -128,7 +174,7 @@ function TourPageInner() {
     )
   }
 
-  // ── Industry selection — click to start tour immediately ─────────────────────
+  // ── Industry selection ────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-6">
       <div className="max-w-sm w-full text-center">

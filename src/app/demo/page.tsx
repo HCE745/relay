@@ -5,15 +5,15 @@ import { Loader2, AlertCircle, Lock, Map, Compass } from "lucide-react"
 import { RelayWordmarkWhite } from "@/components/logo"
 
 const INDUSTRIES = [
-  { label: "Manufacturing",      emoji: "🏭" },
-  { label: "Warehousing",        emoji: "📦" },
-  { label: "Restaurant",         emoji: "🍽️" },
-  { label: "Retail",             emoji: "🛍️" },
-  { label: "Hospitality",        emoji: "🏨" },
-  { label: "Healthcare",         emoji: "🏥" },
-  { label: "Education",          emoji: "🎓" },
+  { label: "Manufacturing",       emoji: "🏭" },
+  { label: "Warehousing",         emoji: "📦" },
   { label: "Property Management", emoji: "🏢" },
-  { label: "Self-Storage",       emoji: "📦" },
+  { label: "Hospitality",         emoji: "🏨" },
+  { label: "Retail",              emoji: "🛍️" },
+  { label: "Car Wash",            emoji: "🚗" },
+  { label: "Healthcare",          emoji: "🏥" },
+  { label: "Construction",        emoji: "🏗️" },
+  { label: "Other",               emoji: "⚙️" },
 ]
 
 type GateState = "checking" | "open" | "locked"

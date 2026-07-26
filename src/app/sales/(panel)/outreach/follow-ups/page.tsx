@@ -12,6 +12,18 @@ export default async function FollowUpsPage() {
   if (!session?.superAdmin) redirect("/super-admin/login")
 
   const now = new Date()
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+  // Retroactively apply reminders for sent emails older than 7 days with no reminder set
+  await prisma.crmEmail.updateMany({
+    where: {
+      direction:    "sent",
+      sentAt:       { lt: sevenDaysAgo },
+      followUpDate: null,
+      isDeleted:    false,
+    },
+    data: { followUpDate: now },
+  })
 
   const emails = await prisma.crmEmail.findMany({
     where: {
@@ -48,6 +60,7 @@ export default async function FollowUpsPage() {
       upcoming: { bg: "bg-gray-900 border-gray-800", badge: "bg-gray-800 text-gray-400", icon: "text-gray-400" },
     }
     const c = colors[urgency]
+    const daysSince = Math.floor((now.getTime() - email.sentAt.getTime()) / (1000 * 60 * 60 * 24))
 
     return (
       <div className={`border rounded-xl p-4 ${c.bg}`}>
@@ -60,7 +73,7 @@ export default async function FollowUpsPage() {
               <p className="text-sm font-semibold text-white truncate">{email.subject}</p>
             </div>
 
-            <div className="flex items-center gap-3 text-xs text-gray-400 mb-2">
+            <div className="flex items-center gap-3 text-xs text-gray-400 mb-1">
               {email.demoCall ? (
                 <>
                   <span className="flex items-center gap-1">
@@ -77,14 +90,16 @@ export default async function FollowUpsPage() {
               )}
             </div>
 
-            <div className="flex items-center gap-3 text-xs">
+            <div className="flex items-center gap-3 text-xs flex-wrap">
               <span className={`px-2 py-0.5 rounded-full font-medium ${c.badge}`}>
                 {urgency === "overdue"  ? `Overdue — due ${formatDistanceToNow(email.followUpDate!, { addSuffix: true })}` :
                  urgency === "today"    ? "Due today" :
                  isTomorrow(email.followUpDate!) ? "Due tomorrow" :
                  `Due ${format(email.followUpDate!, "MMM d")}`}
               </span>
-              <span className="text-gray-600">Sent {formatDistanceToNow(email.sentAt, { addSuffix: true })}</span>
+              <span className="text-gray-600">
+                {daysSince === 0 ? "Sent today" : `${daysSince}d since last contact`}
+              </span>
             </div>
           </div>
 

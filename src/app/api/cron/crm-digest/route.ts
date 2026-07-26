@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { sendEmail } from "@/lib/email"
-import { batchGenerateDueDrafts } from "@/lib/crm-ai"
 
 export async function POST(req: NextRequest) {
   const auth = req.headers.get("authorization")
@@ -62,10 +61,16 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  // ── Process follow-up queue: generate AI drafts for due follow-ups ────────────
-  const followUpResult = await batchGenerateDueDrafts().catch(err => {
-    console.error("[crm-digest] follow-up processing error:", err)
-    return { generated: 0, failed: 0, skipped: 0 }
+  // ── Apply retroactive follow-up reminders ────────────────────────────────────
+  // Any sent email older than 7 days with no reminder and no reply → mark overdue
+  await prisma.crmEmail.updateMany({
+    where: {
+      direction:     "sent",
+      sentAt:        { lt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
+      followUpDate:  null,
+      isDeleted:     false,
+    },
+    data: { followUpDate: now },
   })
 
   // Gather digest data
@@ -170,16 +175,9 @@ export async function POST(req: NextRequest) {
     <h3>Demos Scheduled Today</h3>
     <ul>${demosHtml}</ul>
 
-    <h3>Follow-Up Queue</h3>
-    <ul>
-      <li>Drafts generated today: <b>${followUpResult.generated}</b></li>
-      <li>Failed drafts: <b>${followUpResult.failed}</b></li>
-      <li>Skipped (stop conditions): <b>${followUpResult.skipped}</b></li>
-    </ul>
-    <p><a href="https://app.getrelay.software/super-admin/crm/follow-ups">Open Follow-Up Queue →</a></p>
-
-    <h3>Overdue Follow-ups (legacy)</h3>
+    <h3>Overdue Follow-up Reminders</h3>
     <ul>${overdueHtml}</ul>
+    <p><a href="https://app.getrelay.software/sales/outreach/follow-ups">Open Follow-Ups →</a></p>
 
     <h3>Trials Expiring in 7 Days</h3>
     <ul>${expiringHtml}</ul>
@@ -203,6 +201,5 @@ export async function POST(req: NextRequest) {
     ok:        true,
     expired:   expiredTrials.length,
     activated: trialStarted.length,
-    followUps: followUpResult,
   })
 }

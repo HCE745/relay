@@ -2,36 +2,21 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 import {
-  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, PhoneCall, Tag, Headphones, Megaphone, Mail, Gift, ClipboardList,
+  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, Tag, Headphones, Megaphone, Gift, ExternalLink,
 } from "lucide-react"
 
-type NavItem = { href: string; label: string; icon: React.ElementType; exact?: boolean; badge?: number }
+type NavItem = { href: string; label: string; icon: React.ElementType; exact?: boolean }
 type NavSection = { label?: string; items: NavItem[] }
 
-function buildSections(emailUnread: number): NavSection[] {
+function buildSections(): NavSection[] {
   return [
     {
       items: [
-        { href: "/super-admin",               label: "Overview",  icon: LayoutDashboard, exact: true },
-        { href: "/super-admin/organizations",  label: "Customers", icon: Building2 },
-      ],
-    },
-    {
-      label: "CRM",
-      items: [
-        { href: "/super-admin/crm",                label: "Dashboard",        icon: LayoutDashboard, exact: true },
-        { href: "/super-admin/crm/demo-calls",      label: "Demo Calls",       icon: PhoneCall },
-        { href: "/super-admin/crm/email",           label: "Email",            icon: Mail, badge: emailUnread },
-        { href: "/super-admin/crm/prospects",       label: "Prospects",        icon: Users },
-        { href: "/super-admin/crm/follow-ups",      label: "Follow-Ups",       icon: ClipboardList },
-        { href: "/super-admin/referrals",           label: "Referrals",        icon: Users },
-        { href: "/super-admin/referral-program",    label: "Referral Program", icon: Gift },
-        { href: "/super-admin/feature-requests",    label: "Feature Requests", icon: Lightbulb },
-        { href: "/super-admin/support",             label: "Support Inbox",    icon: Headphones },
-        { href: "/super-admin/crm/settings",        label: "Settings",         icon: Settings },
+        { href: "/super-admin",              label: "Overview",  icon: LayoutDashboard, exact: true },
+        { href: "/super-admin/organizations", label: "Customers", icon: Building2 },
       ],
     },
     {
@@ -41,10 +26,19 @@ function buildSections(emailUnread: number): NavSection[] {
         { href: "/super-admin/promotions",      label: "Promotions",      icon: Tag },
         { href: "/super-admin/users",           label: "SA Users",        icon: Users },
         { href: "/super-admin/bug-reports",     label: "Bug Reports",     icon: Bug },
+        { href: "/super-admin/feature-requests",label: "Feature Requests",icon: Lightbulb },
         { href: "/super-admin/audit",           label: "Audit Log",       icon: Activity },
         { href: "/super-admin/insights",        label: "Insights",        icon: TrendingUp },
         { href: "/super-admin/platform-health", label: "Platform Health", icon: HeartPulse },
         { href: "/super-admin/settings",        label: "Settings",        icon: Settings },
+      ],
+    },
+    {
+      label: "Sales Config",
+      items: [
+        { href: "/super-admin/support",          label: "Support Inbox",   icon: Headphones },
+        { href: "/super-admin/referral-program", label: "Referral Program",icon: Gift },
+        { href: "/super-admin/crm/settings",     label: "CRM Settings",    icon: Settings },
       ],
     },
   ]
@@ -54,33 +48,8 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
   const pathname           = usePathname()
   const router             = useRouter()
   const [open, setOpen]    = useState(false)
-  const [emailUnread, setEmailUnread] = useState(0)
 
-  // Fetch unread email count on mount and every 60s
-  useEffect(() => {
-    async function fetchUnread() {
-      try {
-        const res  = await fetch("/api/super-admin/crm/emails?unread=true")
-        const data = await res.json() as { count: number }
-        setEmailUnread(data.count ?? 0)
-      } catch { /* ignore */ }
-    }
-    void fetchUnread()
-    const id = setInterval(fetchUnread, 60_000)
-    return () => clearInterval(id)
-  }, [])
-
-  // Refresh unread when navigating away from the email page
-  useEffect(() => {
-    if (pathname !== "/super-admin/crm/email") {
-      fetch("/api/super-admin/crm/emails?unread=true")
-        .then(r => r.json())
-        .then(d => setEmailUnread((d as { count: number }).count ?? 0))
-        .catch(() => null)
-    }
-  }, [pathname])
-
-  const sections = buildSections(emailUnread)
+  const sections = buildSections()
 
   async function handleLogout() {
     await fetch("/api/super-admin/auth/logout", { method: "POST" })
@@ -124,6 +93,16 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
+        {/* Sales Dashboard shortcut */}
+        <Link
+          href="/sales"
+          onClick={close}
+          className="flex items-center gap-3 px-3 py-2 mb-3 rounded-lg text-sm font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-950/40 hover:bg-emerald-950/70 border border-emerald-900/50 transition-colors"
+        >
+          <ExternalLink className="w-4 h-4 flex-shrink-0" />
+          <span className="flex-1">Sales Dashboard</span>
+        </Link>
+
         {sections.map((section, si) => (
           <div key={si} className={si > 0 ? "mt-4" : ""}>
             {section.label && (
@@ -146,14 +125,6 @@ export function SuperAdminSidebar({ name, email }: { name: string; email: string
                 >
                   <item.icon className="w-4 h-4 flex-shrink-0" />
                   <span className="flex-1">{item.label}</span>
-                  {item.badge != null && item.badge > 0 && (
-                    <span className={cn(
-                      "inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold",
-                      isActive(item) ? "bg-white/20 text-white" : "bg-indigo-600 text-white",
-                    )}>
-                      {item.badge > 99 ? "99+" : item.badge}
-                    </span>
-                  )}
                 </Link>
               ))}
             </div>

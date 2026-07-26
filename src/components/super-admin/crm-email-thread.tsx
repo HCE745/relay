@@ -38,9 +38,10 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
   const [expanded,   setExpanded]   = useState<Record<string, boolean>>({})
   const [composing,  setComposing]  = useState(false)
   const [replyTo,    setReplyTo]    = useState<CrmEmail | null>(null)
-  const [followupId, setFollowupId] = useState<string | null>(null)
-  const [fpDate,     setFpDate]     = useState("")
-  const [savingFp,   setSavingFp]   = useState(false)
+  const [followupId,      setFollowupId]      = useState<string | null>(null)
+  const [customDays,      setCustomDays]      = useState("")
+  const [savingFp,        setSavingFp]        = useState(false)
+  const [showCustomInput, setShowCustomInput] = useState(false)
   const [syncingImap, setSyncingImap] = useState(false)
   const [syncMsg,    setSyncMsg]    = useState("")
 
@@ -63,17 +64,20 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
     setComposing(true)
   }
 
-  async function setFollowup(emailId: string) {
-    if (!fpDate) return
+  async function setFollowupInDays(emailId: string, days: number) {
     setSavingFp(true)
+    const due = new Date()
+    due.setDate(due.getDate() + days)
+    const dateStr = due.toISOString().split("T")[0]
     await fetch(`/api/super-admin/crm/emails/${emailId}`, {
       method:  "PATCH",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ action: "set_followup", followUpDate: fpDate }),
+      body:    JSON.stringify({ action: "set_followup", followUpDate: dateStr }),
     })
     setSavingFp(false)
     setFollowupId(null)
-    setFpDate("")
+    setCustomDays("")
+    setShowCustomInput(false)
     void load()
   }
 
@@ -242,34 +246,59 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
                         Reply
                       </button>
 
-                      {/* Follow-up */}
+                      {/* Follow-up reminder */}
                       {!hasFollowup ? (
                         followupId === email.id ? (
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="date"
-                              value={fpDate}
-                              onChange={e => setFpDate(e.target.value)}
-                              className="text-xs bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-white"
-                            />
-                            <button
-                              onClick={() => setFollowup(email.id)}
-                              disabled={savingFp}
-                              className="text-xs px-2.5 py-1.5 bg-yellow-700/60 hover:bg-yellow-700 text-yellow-200 rounded-lg transition-colors disabled:opacity-50"
-                            >
-                              {savingFp ? "Saving…" : "Set"}
-                            </button>
-                            <button onClick={() => setFollowupId(null)} className="text-gray-500 hover:text-white">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-xs text-gray-500 mr-1">Remind me in:</span>
+                            {[3, 5, 7, 14, 30].map(d => (
+                              <button
+                                key={d}
+                                onClick={() => setFollowupInDays(email.id, d)}
+                                disabled={savingFp}
+                                className="text-xs px-2.5 py-1.5 bg-yellow-900/40 hover:bg-yellow-800/60 border border-yellow-800/50 text-yellow-300 rounded-lg transition-colors disabled:opacity-50"
+                              >
+                                {d}d
+                              </button>
+                            ))}
+                            {showCustomInput ? (
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  min="1"
+                                  max="365"
+                                  value={customDays}
+                                  onChange={e => setCustomDays(e.target.value)}
+                                  placeholder="days"
+                                  className="w-16 text-xs bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-white"
+                                />
+                                <button
+                                  onClick={() => { const d = parseInt(customDays); if (d > 0) setFollowupInDays(email.id, d) }}
+                                  disabled={savingFp || !customDays}
+                                  className="text-xs px-2 py-1.5 bg-yellow-700/60 hover:bg-yellow-700 text-yellow-200 rounded-lg disabled:opacity-50"
+                                >
+                                  {savingFp ? "…" : "Set"}
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setShowCustomInput(true)}
+                                className="text-xs px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-400 rounded-lg transition-colors"
+                              >
+                                Custom
+                              </button>
+                            )}
+                            <button onClick={() => { setFollowupId(null); setShowCustomInput(false) }} className="text-gray-500 hover:text-white ml-1">
                               <X className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         ) : (
                           <button
-                            onClick={() => { setFollowupId(email.id); setFpDate("") }}
+                            onClick={() => { setFollowupId(email.id) }}
                             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
                           >
                             <Calendar className="w-3.5 h-3.5" />
-                            Set Follow-Up
+                            Set Reminder
                           </button>
                         )
                       ) : !followupDone ? (
@@ -278,12 +307,12 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
                           className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-green-900/40 hover:bg-green-900/70 text-green-400 hover:text-green-300 transition-colors"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          Mark Follow-Up Done
+                          Mark Done
                         </button>
                       ) : (
                         <span className="flex items-center gap-1.5 text-xs text-green-600 px-2">
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          Follow-up completed
+                          Reminder done
                         </span>
                       )}
 

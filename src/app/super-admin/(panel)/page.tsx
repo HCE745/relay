@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
-import { Building2, Users, Clock, CreditCard, TrendingUp, CalendarDays } from "lucide-react"
+import { Building2, Users, Clock, CreditCard, TrendingUp, CalendarDays, ExternalLink, Bell, Search } from "lucide-react"
 import Link from "next/link"
-import { formatDistanceToNow, format, startOfMonth, subMonths } from "date-fns"
+import { formatDistanceToNow, format, startOfMonth, subMonths, startOfWeek, endOfWeek } from "date-fns"
 import { TestingActions } from "./testing-actions"
 
 export const dynamic = "force-dynamic"
@@ -79,6 +79,19 @@ async function getStats() {
   const mrr = Math.round((activeOrgsRevenue._sum.monthlyTotalAfterDiscount ?? 0) * 100) / 100
   const arpu = payingCustomers > 0 ? Math.round(mrr / payingCustomers * 100) / 100 : 0
 
+  const now2 = new Date()
+  const weekStart = startOfWeek(now2)
+  const weekEnd   = endOfWeek(now2)
+  const [prospectsCount, followUpsDueToday, demosThisWeek] = await Promise.all([
+    prisma.prospect.count(),
+    prisma.crmEmail.count({
+      where: { followUpDate: { lte: now2 }, followUpDoneAt: null, isDeleted: false },
+    }),
+    prisma.demoCall.count({
+      where: { scheduledAt: { gte: weekStart, lte: weekEnd } },
+    }),
+  ])
+
   return {
     totalOrgs, activeTrials, payingCustomers, expiredTrials,
     totalUsers, newOrgsThisMonth, recentOrgs,
@@ -88,6 +101,9 @@ async function getStats() {
     arpu,
     newPayingThisMonth,
     churnedThisMonth,
+    prospectsCount,
+    followUpsDueToday,
+    demosThisWeek,
   }
 }
 
@@ -156,6 +172,39 @@ export default async function SuperAdminOverview() {
               <div className="text-xl font-bold text-white">{value}</div>
               <div className="text-xs text-gray-500 mt-0.5">{label}</div>
               <div className="text-[10px] text-gray-700 mt-0.5">{sub}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Sales Dashboard card */}
+      <div className="bg-gray-900 rounded-xl border border-emerald-900/40 mb-6 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-white font-semibold">Sales Dashboard</h2>
+          </div>
+          <Link
+            href="/sales"
+            className="flex items-center gap-1.5 text-xs bg-emerald-700/40 hover:bg-emerald-700/70 border border-emerald-700/60 text-emerald-400 hover:text-emerald-300 px-3 py-1.5 rounded-lg font-medium transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Go to Sales Dashboard
+          </Link>
+        </div>
+        <div className="grid grid-cols-3 divide-x divide-gray-800">
+          {[
+            { label: "Prospects",         value: stats.prospectsCount,    sub: "in database",   icon: Search, color: "text-blue-400" },
+            { label: "Follow-ups Due",    value: stats.followUpsDueToday, sub: "today",          icon: Bell,   color: stats.followUpsDueToday > 0 ? "text-orange-400" : "text-gray-500" },
+            { label: "Demos",             value: stats.demosThisWeek,     sub: "this week",      icon: CalendarDays, color: "text-indigo-400" },
+          ].map(({ label, value, sub, icon: Icon, color }) => (
+            <div key={label} className="px-6 py-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Icon className={`w-4 h-4 ${color}`} />
+                <span className="text-xs text-gray-500">{label}</span>
+              </div>
+              <div className="text-2xl font-bold text-white">{value}</div>
+              <div className="text-[11px] text-gray-600 mt-0.5">{sub}</div>
             </div>
           ))}
         </div>

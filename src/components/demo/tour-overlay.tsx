@@ -525,15 +525,21 @@ export function TourOverlay() {
     return () => { cancelled = true }
   }, [currentStep, isActive, formFillDone, isNavigating, pathname, industry]) // eslint-disable-line
 
-  // Auto-submit 2s after form is filled — fire-and-forget, advance step immediately
+  // Auto-submit after form is filled — delay matches audio duration so the narration
+  // finishes before advancing. Falls back to 8s when no audio duration is available.
+  // Only fires when auto-advance is ON; manual mode shows "Submit Issue" button.
   useEffect(() => {
     if (!isActive || step?.type !== "form-fill" || !formFillDone || isSubmitting || autoSubmittedRef.current) return
+    if (!autoAdvance) return
+    // audioDurationSec is already set by the time formFillDone fires (~1s into playback),
+    // so use the full duration — the extra ~1s of overlap is fine.
+    const delay = audioDurationSec !== null ? audioDurationSec * 1000 : 8000
     const t = setTimeout(() => {
       autoSubmittedRef.current = true
       void handleTourSubmit()
-    }, 2000)
+    }, delay)
     return () => clearTimeout(t)
-  }, [formFillDone, isActive, step?.type, isSubmitting]) // eslint-disable-line
+  }, [formFillDone, isActive, step?.type, isSubmitting, audioDurationSec, autoAdvance]) // eslint-disable-line
 
   // Auto-click benchmarks tab on the auto-click-benchmarks step
   useEffect(() => {
@@ -861,15 +867,15 @@ export function TourOverlay() {
           {cardInner}
         </div>
       ) : (
-        rect ? (
-          <div className="fixed z-[9001]" style={cardStyle(rect)}>
-            {cardInner}
-          </div>
-        ) : (
-          <div className="fixed z-[9001] bottom-4 right-4 w-[360px]">
-            {cardInner}
-          </div>
-        )
+        <div
+          className="fixed z-[9001]"
+          style={{
+            ...(rect ? cardStyle(rect) : { bottom: "1rem", right: "1rem", width: 360 }),
+            transition: "top 0.25s ease, left 0.25s ease, bottom 0.25s ease, right 0.25s ease",
+          }}
+        >
+          {cardInner}
+        </div>
       )}
     </>
   )

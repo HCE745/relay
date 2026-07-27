@@ -447,6 +447,15 @@ export function TourOverlay() {
     }
   }, [pathname, resolvedPath])
 
+  // Scroll to top whenever a step loads on the same page (prevents the issue detail
+  // page staying scrolled to the comments section across steps 5/6).
+  useEffect(() => {
+    if (!isActive || isNavigating) return
+    window.scrollTo({ top: 0, behavior: "instant" })
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [currentStep, isActive, isNavigating])
+
   // Fetch first asset ID as soon as tour starts (background, before step 6)
   useEffect(() => {
     if (!isActive || firstAssetId) return

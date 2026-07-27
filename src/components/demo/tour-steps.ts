@@ -231,7 +231,7 @@ export const TOUR_STEPS: TourStep[] = [
     getExplain: (industry) => {
       const c = ind(industry)
       const locationPhrase = c.location === "location" ? "many operations" : `a ${c.location}`
-      return `They start small — a missed handoff, an issue mentioned in passing but never documented, a repair scheduled but never confirmed. In ${locationPhrase}, that might mean a ${c.issueExamples[0]} that gets reported verbally during a shift change but never formally logged — and by the time it escalates, no one can trace when it started. Relay gives teams a shared system to make those problems visible and keep them moving toward resolution.`
+      return `They start small: a missed handoff, an issue mentioned in passing but never documented, a repair scheduled but never confirmed. In ${locationPhrase}, that might mean a ${c.issueExamples[0]} that gets reported verbally during a shift change but never formally logged, and by the time it escalates, no one can trace when it started. Relay gives teams a shared system to make those problems visible and keep them moving toward resolution.`
     },
   },
 
@@ -244,7 +244,7 @@ export const TOUR_STEPS: TourStep[] = [
     getTitle: () => "One view. No more chasing updates.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `When problems are tracked across texts, emails, radios, and memory, managers spend their time chasing updates instead of solving them. This dashboard gives ${c.workerPlural} and leadership a single view of what is open, what is overdue, and what needs attention right now — without calls, without digging through messages.`
+      return `When problems are tracked across texts, emails, radios, and memory, managers spend their time chasing updates instead of solving them. This dashboard gives ${c.workerPlural} and leadership a single view of what is open, what is overdue, and what needs attention right now, without calls and without digging through messages.`
     },
   },
 
@@ -259,7 +259,7 @@ export const TOUR_STEPS: TourStep[] = [
     getExplain: (industry) => {
       const c = ind(industry)
       const cap = c.workerPlural.charAt(0).toUpperCase() + c.workerPlural.slice(1)
-      return `${cap} notice problems before management does — but reporting usually depends on finding the right supervisor or hoping someone follows up. With Relay, anyone can document a ${c.issueExamples[0]} in seconds — with photos, location, and priority — and know the right person has been notified. Watch as we submit an example now.`
+      return `${cap} notice problems before management does, but reporting usually depends on finding the right supervisor or hoping someone follows up. With Relay, anyone can document a ${c.issueExamples[0]} in seconds, with photos, location, and priority, and know the right person has been notified. Watch as we submit an example now.`
     },
     getFormData: (industry) => ({
       title:       ind(industry).title,
@@ -271,10 +271,10 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Step 4: Automatic routing ─────────────────────────────────────────────
   {
     id: 4,
-    path: "SUBMITTED_ISSUE",
-    targetSelector: "[data-tour='issue-detail']",
-    cue: "The right person was notified before anyone made a call.",
-    getTitle: () => "Issues route themselves — no manager required.",
+    path: "/dashboard",
+    targetSelector: "[data-tour='kpi-cards']",
+    getCue: () => "It appeared in the dashboard immediately, already assigned.",
+    getTitle: () => "Issues route themselves. No manager required.",
     getExplain: () =>
       "Once reported, the issue does not sit in a queue waiting for someone to assign it. Relay routes it instantly to the right person based on location, department, and issue type. Response begins before anyone has to ask.",
   },
@@ -285,9 +285,9 @@ export const TOUR_STEPS: TourStep[] = [
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='issue-detail']",
     cue: "Every action from here will be tracked automatically.",
-    getTitle: () => "A complete record — from report to resolution.",
+    getTitle: () => "A complete record, from report to resolution.",
     getExplain: () =>
-      "When problems get resolved through verbal updates, the resolution disappears with them. Relay keeps a complete record of every action — who reported it, who owned it, every status change, every comment. When the same issue comes back, the full history is already there.",
+      "When problems get resolved through verbal updates, the resolution disappears with them. Relay keeps a complete record of every action: who reported it, who owned it, every status change, every comment. When the same issue comes back, the full history is already there.",
   },
 
   // ── Step 6: AI analysis ───────────────────────────────────────────────────
@@ -295,22 +295,22 @@ export const TOUR_STEPS: TourStep[] = [
     id: 6,
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='ai-panel']",
-    cue: "The AI has already analyzed this issue — before anyone opened it.",
+    cue: "The AI analyzed this issue before anyone opened it.",
     getTitle: () => "AI analyzes the issue before your team does.",
     getExplain: () =>
-      "Most issues get reviewed for the first time by the person resolving them — which means the same diagnostic steps happen over and over. Relay's AI suggests likely causes, recommended actions, and possible resolutions based on the description, the asset, and historical patterns. Your team still makes every decision — they just start from a better position.",
+      "Most issues get reviewed for the first time by the person resolving them, which means the same diagnostic steps happen over and over. Relay's AI suggests likely causes, recommended actions, and possible resolutions based on the description, the asset, and historical patterns. Your team still makes every decision, but from a better starting position.",
   },
 
   // ── Step 7: SOP connection ────────────────────────────────────────────────
   {
     id: 7,
-    path: "SUBMITTED_ISSUE",
-    targetSelector: "[data-tour='ai-panel']",
-    cue: "Relay flags when a procedure may have been missed.",
+    path: "/sops",
+    targetSelector: "[data-tour='sop-list']",
+    cue: "Relay flags when a reported issue may connect to one of these procedures.",
     getTitle: () => "Root cause, not just symptoms.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `Some problems are symptoms of a missed procedure. When a ${c.issueExamples[0]} occurs repeatedly in the same area, it may indicate a gap in how the standard process is being followed — not just a one-time failure. Relay can flag when a reported issue may be connected to an existing operating procedure, so teams address the root cause instead of simply closing the ticket.`
+      return `Some problems are symptoms of a missed procedure. When a ${c.issueExamples[0]} occurs repeatedly in the same area, it may indicate a gap in how the standard process is being followed, not a one-time failure. Relay can flag when a reported issue may be connected to an existing operating procedure, so teams address the root cause instead of simply closing the ticket.`
     },
   },
 
@@ -323,7 +323,7 @@ export const TOUR_STEPS: TourStep[] = [
     getTitle: () => "Every asset tells its own story.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `When the same ${c.assetRecurring} keeps generating issues, treating each incident as isolated misses the pattern. Relay tracks the full history of every asset — every issue reported, every repair completed, every recurring failure — so teams can see whether a problem needs another repair or a replacement before it causes unplanned downtime.`
+      return `When the same ${c.assetRecurring} keeps generating issues, treating each incident as isolated misses the pattern. Relay tracks the full history of every asset: every issue reported, every repair completed, every recurring failure, so teams can see whether a problem needs another repair or a replacement before it causes unplanned downtime.`
     },
   },
 
@@ -333,11 +333,11 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/analytics",
     targetSelector: "[data-tour='analytics-charts']",
     getCue: (industry) => `Every issue your ${ind(industry).workerPlural} resolve builds this over time.`,
-    getTitle: () => "Data in the moment — intelligence over time.",
+    getTitle: () => "Data in the moment. Intelligence over time.",
     getExplain: (industry) => {
       const c = ind(industry)
       const firstAsset = c.assetRecurring.split(" or ")[0]
-      return `Which department generates the most issues? Which ${firstAsset} has the worst resolution time? Where are problems recurring? Relay turns issue history into answers — without requiring anyone to build a report.`
+      return `Which department generates the most issues? Which ${firstAsset} has the worst resolution time? Where are problems recurring? Relay turns issue history into answers, without requiring anyone to build a report.`
     },
   },
 
@@ -350,7 +350,7 @@ export const TOUR_STEPS: TourStep[] = [
     cue: "See how your operation compares to similar organizations.",
     getTitle: () => "How does your operation compare?",
     getExplain: () =>
-      "Relay can benchmark your resolution times, issue volume, and response rates against anonymized data from similar organizations — so you know where you stand and where there is room to improve. Based on operational data from real use, not self-reported surveys.",
+      "Relay can benchmark your resolution times, issue volume, and response rates against anonymized data from similar organizations, so you know where you stand and where there is room to improve. Based on operational data from real use, not self-reported surveys.",
   },
 
   // ── Step 11: QR reporting ─────────────────────────────────────────────────
@@ -358,11 +358,11 @@ export const TOUR_STEPS: TourStep[] = [
     id: 11,
     path: "/qr-codes",
     targetSelector: "[data-tour='qr-list']",
-    cue: "Anyone can report a problem — no account, no app.",
+    cue: "Anyone can report a problem with no account and no app.",
     getTitle: () => "Report from anywhere in seconds.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `Place a Relay QR code anywhere — ${c.qrLocations}. Anyone can scan and report a problem in seconds without an account or an app. The report goes directly to the right team and is automatically linked to that location or asset.`
+      return `Place a Relay QR code anywhere: ${c.qrLocations}. Anyone can scan and report a problem in seconds without an account or an app. The report goes directly to the right team and is automatically linked to that location or asset.`
     },
   },
 
@@ -372,10 +372,10 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/vendors",
     targetSelector: "[data-tour='vendor-list'] > div:first-child",
     getCue: (industry) => `Your ${ind(industry).vendorType} stays connected to every issue.`,
-    getTitle: () => "Vendors connected to the work — not buried in email.",
+    getTitle: () => "Vendors connected to the work, not buried in email.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `When a problem requires an outside ${c.vendorType}, coordinating the response usually means phone calls, follow-up calls to confirm arrival, and hoping the right context made it through. Relay keeps vendor communication attached to the issue — so the full history travels with it and nothing gets lost between inboxes.`
+      return `When a problem requires an outside ${c.vendorType}, coordinating the response usually means phone calls, follow-up calls to confirm arrival, and hoping the right context made it through. Relay keeps vendor communication attached to the issue, so the full history travels with it and nothing gets lost between inboxes.`
     },
   },
 
@@ -388,7 +388,7 @@ export const TOUR_STEPS: TourStep[] = [
     getTitle: () => "Routine approvals run themselves.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `Replacing a ${c.purchaseExample} should not require the same process as a capital expenditure. Relay identifies the requested item, checks it against the approved catalog, and follows the organization's purchasing policy — approving routine requests automatically and escalating exceptions to the right approver.`
+      return `Replacing a ${c.purchaseExample} should not require the same process as a capital expenditure. Relay identifies the requested item, checks it against the approved catalog, and follows the organization's purchasing policy, approving routine requests automatically and escalating exceptions to the right approver.`
     },
   },
 
@@ -397,10 +397,10 @@ export const TOUR_STEPS: TourStep[] = [
     id: 14,
     path: "/dashboard",
     targetSelector: "[data-tour='kpi-cards']",
-    cue: "Leadership always knows — without having to ask for a report.",
+    cue: "Leadership always knows, without having to ask for a report.",
     getTitle: () => "Nothing stays stuck. Leadership always knows.",
     getExplain: () =>
-      "Some issues stay unresolved not because no one cares — but because the responsible person is overloaded or a deadline slips unnoticed. Relay escalates automatically when response or resolution timelines are missed, moving the issue to the next management level with a full history of what has happened. Leadership gets a real-time view across every location without needing to ask.",
+      "Some issues stay unresolved not because no one cares, but because the responsible person is overloaded or a deadline slips unnoticed. Relay escalates automatically when response or resolution timelines are missed, moving the issue to the next management level with a full history of what has happened. Leadership gets a real-time view across every location without needing to ask.",
   },
 
   // ── Step 15: Assignments ──────────────────────────────────────────────────
@@ -412,7 +412,7 @@ export const TOUR_STEPS: TourStep[] = [
     getTitle: () => "Every problem becomes a clear work order.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `When a ${c.issueExamples[0]} is reported, managers can create specific assignments for each person involved — shut down the equipment, contact the vendor, order the part. Every piece of work has a clear owner, a priority, a due date, and a direct link back to the issue that triggered it. Nothing gets lost, and nothing gets forgotten.`
+      return `When a ${c.issueExamples[0]} is reported, managers can create specific assignments for each person involved: shut down the equipment, contact the vendor, order the part. Every piece of work has a clear owner, a priority, a due date, and a direct link back to the issue that triggered it. Nothing gets lost, and nothing gets forgotten.`
     },
   },
 
@@ -425,7 +425,7 @@ export const TOUR_STEPS: TourStep[] = [
     getTitle: () => "One screen. No hunting. Just their work.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `A ${c.worker} starting a shift should not have to ask what needs to get done. When they open Relay, they see exactly what is assigned to them — what is due today, what is overdue, what is urgent. A clear answer to the only question that matters: what do I need to do right now?`
+      return `A ${c.worker} starting a shift should not have to ask what needs to get done. When they open Relay, they see exactly what is assigned to them: what is due today, what is overdue, what is urgent. A clear answer to the only question that matters: what do I need to do right now?`
     },
   },
 
@@ -434,10 +434,10 @@ export const TOUR_STEPS: TourStep[] = [
     id: 17,
     path: "/communications/announcements",
     targetSelector: "[data-tour='announcements-list']",
-    cue: "Critical information reaches the right people — and you know who got it.",
+    cue: "Critical information reaches the right people, and you know who got it.",
     getTitle: () => "Operational communications that leave no one in the dark.",
     getExplain: () =>
-      "When a safety update or process change needs to reach everyone, email and radio do not guarantee it arrived. Relay broadcasts operational announcements to the entire organization, a specific location, or a single department. For critical communications, Relay tracks acknowledgment in real time — so you always know who has seen the message and who has not.",
+      "When a safety update or process change needs to reach everyone, email and radio do not guarantee it arrived. Relay broadcasts operational announcements to the entire organization, a specific location, or a single department. For critical communications, Relay tracks acknowledgment in real time, so you always know who has seen the message and who has not.",
   },
 
   // ── Step 18: Role cycling ─────────────────────────────────────────────────
@@ -446,11 +446,11 @@ export const TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: "[data-tour='role-switcher']",
     type: "cycling-roles",
-    cue: "Every role gets exactly the view they need — nothing more.",
+    cue: "Every role gets exactly the view they need, nothing more.",
     getTitle: () => "Every role sees exactly what they need.",
     getExplain: (industry) => {
       const c = ind(industry)
-      return `A ${c.worker} needs to know what to report and where to check status. A supervisor needs their team's queue. A manager needs department-wide visibility. An administrator needs full control over configuration. Relay adapts to each role automatically — one system, every level of the organization.`
+      return `A ${c.worker} needs to know what to report and where to check status. A supervisor needs their team's queue. A manager needs department-wide visibility. An administrator needs full control over configuration. Relay adapts to each role automatically: one system, every level of the organization.`
     },
   },
 
@@ -463,7 +463,7 @@ export const TOUR_STEPS: TourStep[] = [
     cue: "Watch how everything adapts to each type of operation.",
     getTitle: () => "Pre-configured for your industry from day one.",
     getExplain: () =>
-      "Relay adapts to different types of operations — manufacturing plants, distribution centers, hospitality properties, retail locations, healthcare facilities, and more. The departments, terminology, issue categories, and workflows all reflect the selected environment — so the system feels like it was built for the operation it runs.",
+      "Relay adapts to different types of operations: manufacturing plants, distribution centers, hospitality properties, retail locations, healthcare facilities, and more. The departments, terminology, issue categories, and workflows all reflect the selected environment, so the system feels like it was built for the operation it runs.",
   },
 
   // ── Step 20: Package cycling ──────────────────────────────────────────────
@@ -493,7 +493,7 @@ export const TOUR_STEPS: TourStep[] = [
 ]
 
 export const ROLE_DEMOS = [
-  { label: "Employee",           color: "bg-gray-600",   desc: "Simple submit-and-track — report issues, see status updates, no extra clutter." },
+  { label: "Employee",           color: "bg-gray-600",   desc: "Simple submit-and-track: report issues, see status updates, no extra clutter." },
   { label: "Supervisor",         color: "bg-teal-600",   desc: "Team issue queue, department metrics, and first-level escalation management." },
   { label: "Department Manager", color: "bg-blue-600",   desc: "Full department analytics, escalations, team performance, and approval flows." },
   { label: "Plant Manager",      color: "bg-orange-600", desc: "Location-wide visibility, cross-department KPIs, and site-level approvals." },

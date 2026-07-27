@@ -305,7 +305,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: 7,
     path: "SUBMITTED_ISSUE",
-    targetSelector: "[data-tour='sop-panel']",
+    targetSelector: "[data-tour='ai-panel']",
     cue: "Relay flags when a procedure may have been missed.",
     getTitle: () => "Root cause, not just symptoms.",
     getExplain: (industry) => {

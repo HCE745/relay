@@ -29,19 +29,21 @@ interface CrmEmail {
   contactEmail:  string
   followUpDate:  string | null
   followUpDoneAt:string | null
+  stageNumber:   number | null
   demoCall:      { id: string; contactName: string; companyName: string } | null
 }
 
 interface Thread {
-  key:          string
-  subject:      string
-  contactName:  string
-  contactEmail: string
-  demoCallId:   string | null
-  demoCall:     CrmEmail["demoCall"]
-  emails:       CrmEmail[]
-  lastEmail:    CrmEmail
-  hasUnread:    boolean
+  key:              string
+  subject:          string
+  contactName:      string
+  contactEmail:     string
+  demoCallId:       string | null
+  demoCall:         CrmEmail["demoCall"]
+  emails:           CrmEmail[]
+  lastEmail:        CrmEmail
+  hasUnread:        boolean
+  lastSentStage:    number | null
 }
 
 interface Template {
@@ -101,16 +103,18 @@ function groupIntoThreads(emails: CrmEmail[]): Thread[] {
     const raw    = isSent ? last.toAddress : last.fromAddress
     const name   = dc?.contactName ?? parseDisplayName(raw)
     const email  = isSent ? last.toAddress : (last.contactEmail || last.fromAddress)
+    const lastSent = [...group].reverse().find(e => e.direction === "sent")
     threads.push({
       key,
-      subject:      stripRe(group[0]!.subject),
-      contactName:  name,
-      contactEmail: email,
-      demoCallId:   dc?.id ?? null,
-      demoCall:     dc,
-      emails:       group,
-      lastEmail:    last,
-      hasUnread:    group.some(e => e.direction === "received" && !e.isRead),
+      subject:       stripRe(group[0]!.subject),
+      contactName:   name,
+      contactEmail:  email,
+      demoCallId:    dc?.id ?? null,
+      demoCall:      dc,
+      emails:        group,
+      lastEmail:     last,
+      hasUnread:     group.some(e => e.direction === "received" && !e.isRead),
+      lastSentStage: lastSent?.stageNumber ?? null,
     })
   }
   threads.sort((a, b) => new Date(b.lastEmail.sentAt).getTime() - new Date(a.lastEmail.sentAt).getTime())
@@ -388,7 +392,14 @@ function ThreadRow({ thread, isSelected, onClick }: {
         <p className={cn("text-xs truncate mb-0.5", thread.hasUnread ? "text-gray-200" : "text-gray-500")}>
           {thread.subject || "(no subject)"}
         </p>
-        <p className="text-[11px] text-gray-600 truncate">{preview}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-[11px] text-gray-600 truncate flex-1">{preview}</p>
+          {thread.lastSentStage != null && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-500 shrink-0">
+              S{thread.lastSentStage}
+            </span>
+          )}
+        </div>
       </div>
 
       {thread.hasUnread && (

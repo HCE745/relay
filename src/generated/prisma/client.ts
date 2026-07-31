@@ -387,6 +387,11 @@ export type Referral = Prisma.ReferralModel
  */
 export type CrmEmail = Prisma.CrmEmailModel
 /**
+ * Model FollowUpStage
+ * 
+ */
+export type FollowUpStage = Prisma.FollowUpStageModel
+/**
  * Model CrmEmailTemplate
  * 
  */

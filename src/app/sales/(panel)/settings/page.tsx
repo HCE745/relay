@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { Settings, ExternalLink, Mail, Users, Bell } from "lucide-react"
+import { Settings, ExternalLink, Mail, Users, Bell, Layers } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -11,22 +11,32 @@ export default async function SettingsPage() {
 
   const settingsLinks = [
     {
-      label: "Email Configuration",
-      desc:  "IMAP/SMTP settings, connected inboxes",
-      href:  "/super-admin/crm/settings",
-      icon:  Mail,
+      label:    "Follow-Up Stages",
+      desc:     "Configure your outreach sequence stages and day offsets",
+      href:     "/sales/settings/stages",
+      icon:     Layers,
+      external: false,
     },
     {
-      label: "CRM Settings",
-      desc:  "Lead sources, call statuses, pipeline stages",
-      href:  "/super-admin/crm/settings",
-      icon:  Users,
+      label:    "Email Configuration",
+      desc:     "IMAP/SMTP settings, connected inboxes",
+      href:     "/super-admin/crm/settings",
+      icon:     Mail,
+      external: true,
     },
     {
-      label: "Notification Preferences",
-      desc:  "Digest emails, follow-up reminders",
-      href:  "/super-admin/crm/settings",
-      icon:  Bell,
+      label:    "CRM Settings",
+      desc:     "Lead sources, call statuses, pipeline stages",
+      href:     "/super-admin/crm/settings",
+      icon:     Users,
+      external: true,
+    },
+    {
+      label:    "Notification Preferences",
+      desc:     "Digest emails, follow-up reminders",
+      href:     "/super-admin/crm/settings",
+      icon:     Bell,
+      external: true,
     },
   ]
 
@@ -52,7 +62,7 @@ export default async function SettingsPage() {
               <p className="font-medium text-white group-hover:text-emerald-300 transition-colors">{link.label}</p>
               <p className="text-xs text-gray-500">{link.desc}</p>
             </div>
-            <ExternalLink className="w-4 h-4 text-gray-600 shrink-0" />
+            {link.external && <ExternalLink className="w-4 h-4 text-gray-600 shrink-0" />}
           </Link>
         ))}
       </div>

@@ -1832,6 +1832,7 @@ model CrmEmail {
   deletedByName  String?
   followUpDate   DateTime?
   followUpDoneAt DateTime?
+  stageNumber    Int?
   imapConfigId   String?
   createdAt      DateTime  @default(now())
 
@@ -1842,6 +1843,16 @@ model CrmEmail {
   @@index([contactEmail])
   @@index([threadId])
   @@index([sentAt])
+}
+
+model FollowUpStage {
+  id                String   @id @default(cuid())
+  stageNumber       Int      @unique
+  name              String
+  daysAfterPrevious Int      @default(0)
+  description       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model CrmEmailTemplate {

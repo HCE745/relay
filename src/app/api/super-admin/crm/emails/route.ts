@@ -180,6 +180,36 @@ export async function POST(req: NextRequest) {
       await prisma.crmEmail.update({ where: { id: email.id }, data: { threadId: email.id } })
     }
 
+    // Assign follow-up stage and calculate next followUpDate
+    try {
+      const allStages = await prisma.followUpStage.findMany({ orderBy: { stageNumber: "asc" } })
+      if (allStages.length > 0) {
+        const prevSent = await prisma.crmEmail.findFirst({
+          where: {
+            direction: "sent",
+            isDeleted:  false,
+            id:         { not: email.id },
+            ...(demoCallId
+              ? { demoCallId }
+              : { contactEmail: { equals: to, mode: "insensitive" as const } }),
+          },
+          orderBy: { sentAt: "desc" },
+          select:  { stageNumber: true },
+        })
+        const thisStageNum   = (prevSent?.stageNumber ?? -1) + 1
+        const nextStage      = allStages.find(s => s.stageNumber === thisStageNum + 1)
+        const followUpDateCalc = nextStage
+          ? new Date(Date.now() + nextStage.daysAfterPrevious * 24 * 60 * 60 * 1000)
+          : null
+        await prisma.crmEmail.update({
+          where: { id: email.id },
+          data:  { stageNumber: thisStageNum, followUpDate: followUpDateCalc },
+        })
+      }
+    } catch (stageErr) {
+      console.error("[crm-email] stage assignment failed:", stageErr)
+    }
+
     // Log CRM activity if demoCallId has an org
     if (demoCallId) {
       const call = await prisma.demoCall.findUnique({ where: { id: demoCallId }, select: { organizationId: true } })

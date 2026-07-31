@@ -453,6 +453,7 @@ export const ModelName = {
   ReferralProgram: 'ReferralProgram',
   Referral: 'Referral',
   CrmEmail: 'CrmEmail',
+  FollowUpStage: 'FollowUpStage',
   CrmEmailTemplate: 'CrmEmailTemplate',
   ImapConfig: 'ImapConfig',
   CrmSettings: 'CrmSettings',
@@ -495,7 +496,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "salesUser"
+    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "salesUser"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -5605,6 +5606,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FollowUpStage: {
+      payload: Prisma.$FollowUpStagePayload<ExtArgs>
+      fields: Prisma.FollowUpStageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FollowUpStageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FollowUpStageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>
+        }
+        findFirst: {
+          args: Prisma.FollowUpStageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FollowUpStageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>
+        }
+        findMany: {
+          args: Prisma.FollowUpStageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>[]
+        }
+        create: {
+          args: Prisma.FollowUpStageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>
+        }
+        createMany: {
+          args: Prisma.FollowUpStageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FollowUpStageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>[]
+        }
+        delete: {
+          args: Prisma.FollowUpStageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>
+        }
+        update: {
+          args: Prisma.FollowUpStageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>
+        }
+        deleteMany: {
+          args: Prisma.FollowUpStageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FollowUpStageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FollowUpStageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>[]
+        }
+        upsert: {
+          args: Prisma.FollowUpStageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpStagePayload>
+        }
+        aggregate: {
+          args: Prisma.FollowUpStageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFollowUpStage>
+        }
+        groupBy: {
+          args: Prisma.FollowUpStageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FollowUpStageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FollowUpStageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FollowUpStageCountAggregateOutputType> | number
+        }
+      }
+    }
     CrmEmailTemplate: {
       payload: Prisma.$CrmEmailTemplatePayload<ExtArgs>
       fields: Prisma.CrmEmailTemplateFieldRefs
@@ -8982,11 +9057,25 @@ export const CrmEmailScalarFieldEnum = {
   deletedByName: 'deletedByName',
   followUpDate: 'followUpDate',
   followUpDoneAt: 'followUpDoneAt',
+  stageNumber: 'stageNumber',
   imapConfigId: 'imapConfigId',
   createdAt: 'createdAt'
 } as const
 
 export type CrmEmailScalarFieldEnum = (typeof CrmEmailScalarFieldEnum)[keyof typeof CrmEmailScalarFieldEnum]
+
+
+export const FollowUpStageScalarFieldEnum = {
+  id: 'id',
+  stageNumber: 'stageNumber',
+  name: 'name',
+  daysAfterPrevious: 'daysAfterPrevious',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FollowUpStageScalarFieldEnum = (typeof FollowUpStageScalarFieldEnum)[keyof typeof FollowUpStageScalarFieldEnum]
 
 
 export const CrmEmailTemplateScalarFieldEnum = {
@@ -9935,6 +10024,7 @@ export type GlobalOmitConfig = {
   referralProgram?: Prisma.ReferralProgramOmit
   referral?: Prisma.ReferralOmit
   crmEmail?: Prisma.CrmEmailOmit
+  followUpStage?: Prisma.FollowUpStageOmit
   crmEmailTemplate?: Prisma.CrmEmailTemplateOmit
   imapConfig?: Prisma.ImapConfigOmit
   crmSettings?: Prisma.CrmSettingsOmit

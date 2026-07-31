@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
   Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
-  Bell, FileText, Calendar, TrendingUp,
+  Bell, FileText, Calendar, TrendingUp, Layers,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -49,6 +49,7 @@ function buildSections(followUpsDue: number): { label?: string; items: NavItem[]
       label: "Config",
       items: [
         { label: "Settings",        href: "/sales/settings",         icon: Settings },
+        { label: "Follow-Up Stages", href: "/sales/settings/stages", icon: Layers },
       ],
     },
   ]
@@ -81,7 +82,7 @@ export function SalesSidebar({ name, email }: { name: string; email: string }) {
 
   async function logout() {
     await fetch("/api/sales/auth/logout", { method: "POST" })
-    router.push("/super-admin/login")
+    router.push("/sales/login")
   }
 
   const sections = buildSections(followUpsDue)

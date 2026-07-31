@@ -120,6 +120,7 @@ export const ModelName = {
   ReferralProgram: 'ReferralProgram',
   Referral: 'Referral',
   CrmEmail: 'CrmEmail',
+  FollowUpStage: 'FollowUpStage',
   CrmEmailTemplate: 'CrmEmailTemplate',
   ImapConfig: 'ImapConfig',
   CrmSettings: 'CrmSettings',
@@ -1505,11 +1506,25 @@ export const CrmEmailScalarFieldEnum = {
   deletedByName: 'deletedByName',
   followUpDate: 'followUpDate',
   followUpDoneAt: 'followUpDoneAt',
+  stageNumber: 'stageNumber',
   imapConfigId: 'imapConfigId',
   createdAt: 'createdAt'
 } as const
 
 export type CrmEmailScalarFieldEnum = (typeof CrmEmailScalarFieldEnum)[keyof typeof CrmEmailScalarFieldEnum]
+
+
+export const FollowUpStageScalarFieldEnum = {
+  id: 'id',
+  stageNumber: 'stageNumber',
+  name: 'name',
+  daysAfterPrevious: 'daysAfterPrevious',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FollowUpStageScalarFieldEnum = (typeof FollowUpStageScalarFieldEnum)[keyof typeof FollowUpStageScalarFieldEnum]
 
 
 export const CrmEmailTemplateScalarFieldEnum = {

@@ -11,13 +11,18 @@ import { EmailActionMenu } from "@/components/crm/email-action-menu"
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FollowUp {
-  id:           string
-  contactEmail: string
-  subject:      string
-  sentAt:       string
-  followUpDate: string
-  demoCallId:   string | null
-  demoCall:     { id: string; contactName: string; companyName: string; contactEmail: string } | null
+  id:              string
+  contactEmail:    string
+  subject:         string
+  sentAt:          string
+  followUpDate:    string
+  stageNumber:     number
+  stageName:       string
+  dueStageNumber:  number
+  dueStageName:    string
+  sequenceComplete:boolean
+  demoCallId:      string | null
+  demoCall:        { id: string; contactName: string; companyName: string; contactEmail: string } | null
 }
 
 interface CrmEmail {
@@ -252,6 +257,14 @@ function FollowUpRow({ item, isSelected, onSelect, onIgnore }: {
           </span>
         </div>
         <p className="text-xs text-gray-400 truncate mb-0.5">{item.subject}</p>
+        {!item.sequenceComplete && (
+          <p className="text-[11px] text-emerald-500/70 mb-0.5 truncate">
+            → {item.dueStageName}
+          </p>
+        )}
+        {item.sequenceComplete && (
+          <p className="text-[11px] text-gray-600 mb-0.5">Sequence complete</p>
+        )}
         <div className="flex items-center gap-2 text-[11px] text-gray-600">
           {item.demoCall && (
             <span className="flex items-center gap-1">

@@ -1,8 +1,17 @@
 "use client"
 
-import { Suspense, useState, useEffect } from "react"
+import { Suspense, useState, useEffect, useRef } from "react"
 import { Loader2, AlertCircle, Lock, Map, Compass } from "lucide-react"
 import { RelayWordmarkWhite } from "@/components/logo"
+
+function track(payload: Record<string, unknown>) {
+  return fetch("/api/demo-analytics/track", {
+    method:    "POST",
+    headers:   { "Content-Type": "application/json" },
+    body:      JSON.stringify({ page: "demo", ...payload }),
+    keepalive: true,
+  }).catch(() => null)
+}
 
 const INDUSTRIES = [
   { label: "Manufacturing",       emoji: "🏭" },
@@ -28,6 +37,14 @@ function DemoPageInner() {
   const [selected, setSelected]     = useState("Manufacturing")
   const [starting, setStarting]     = useState<"tour" | "explore" | null>(null)
   const [startError, setStartError] = useState("")
+  const tracked = useRef(false)
+
+  // Record page visit once on mount
+  useEffect(() => {
+    if (tracked.current) return
+    tracked.current = true
+    void track({})
+  }, [])
 
   useEffect(() => {
     fetch("/api/demo/gate")
@@ -67,6 +84,11 @@ function DemoPageInner() {
         return
       }
       if (!res.ok) throw new Error()
+      // Track industry + CTA choice before navigating away
+      await track({
+        industrySelected:  selected,
+        clickedExplore:    type === "explore" ? true : undefined,
+      })
       window.location.href = type === "tour"
         ? "/dashboard?autoStartTour=1"
         : "/dashboard?skipWelcome=1"

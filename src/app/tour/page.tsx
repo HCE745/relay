@@ -5,6 +5,15 @@ import { useSearchParams } from "next/navigation"
 import { Loader2, AlertCircle, Lock } from "lucide-react"
 import { RelayWordmarkWhite } from "@/components/logo"
 
+function track(payload: Record<string, unknown>) {
+  return fetch("/api/demo-analytics/track", {
+    method:    "POST",
+    headers:   { "Content-Type": "application/json" },
+    body:      JSON.stringify({ page: "tour", ...payload }),
+    keepalive: true,
+  }).catch(() => null)
+}
+
 const INDUSTRIES = [
   { label: "Manufacturing",       emoji: "🏭" },
   { label: "Warehousing",         emoji: "📦" },
@@ -44,7 +53,15 @@ function TourPageInner() {
   const [codeError,  setCodeError]  = useState("")
   const [starting,   setStarting]   = useState<string | null>(null)
   const [startError, setStartError] = useState("")
-  const autoStarted = useRef(false)
+  const autoStarted  = useRef(false)
+  const tracked      = useRef(false)
+
+  // Record page visit once on mount
+  useEffect(() => {
+    if (tracked.current) return
+    tracked.current = true
+    void track({})
+  }, [])
 
   useEffect(() => {
     fetch("/api/demo/gate")
@@ -110,6 +127,8 @@ function TourPageInner() {
         return
       }
       if (!res.ok) throw new Error()
+      // Track industry before navigating away
+      await track({ industrySelected: industry })
       window.location.href = "/dashboard?autoStartTour=1"
     } catch {
       setStartError("Could not start the demo. Please try again.")

@@ -14,6 +14,7 @@ function fingerprint(req: NextRequest): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const fp   = fingerprint(req)
     const body = await req.json() as {
       page?:               string
       industrySelected?:   string
@@ -27,8 +28,8 @@ export async function POST(req: NextRequest) {
       convertedToSignup?:  boolean
     }
 
-    const fp  = fingerprint(req)
     const page = body.page ?? "demo"
+    console.log("[demo-analytics] track:", page, "fp:", fp.slice(0, 8), "industry:", body.industrySelected ?? "—")
 
     // Find existing session from today or create new one
     const existing = await prisma.demoAnalytics.findFirst({
@@ -88,7 +89,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ ok: true })
-  } catch {
+  } catch (err) {
+    console.error("[demo-analytics] track error:", err)
     return NextResponse.json({ ok: false }, { status: 500 })
   }
 }

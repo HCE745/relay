@@ -15,7 +15,7 @@ export default function SalesLoginPage() {
     e.preventDefault()
     setError(""); setLoading(true)
     try {
-      const res = await fetch("/api/super-admin/auth/login", {
+      const res = await fetch("/api/sales/login", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({ email, password }),

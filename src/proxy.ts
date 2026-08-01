@@ -21,6 +21,9 @@ const PUBLIC_PATHS = [
   // Super admin login page and all SA API routes (they self-guard internally)
   "/super-admin/login",
   "/api/super-admin",
+  // Sales login page + its dedicated API route
+  "/sales/login",
+  "/api/sales/login",
   // Demo system — unauthenticated start + self-guarded APIs
   "/demo",
   "/tour",
@@ -88,9 +91,11 @@ export async function proxy(request: NextRequest) {
   // ── Require a valid session for everything else ───────────────────────────
   const token = request.cookies.get("session")?.value
   if (!token) {
-    // Redirect unauthenticated super-admin panel requests to its own login
     if (pathname.startsWith("/super-admin")) {
       return NextResponse.redirect(new URL("/super-admin/login", request.url))
+    }
+    if (pathname.startsWith("/sales")) {
+      return NextResponse.redirect(new URL("/sales/login", request.url))
     }
     return NextResponse.redirect(new URL("/login", request.url))
   }
@@ -102,6 +107,9 @@ export async function proxy(request: NextRequest) {
   } catch {
     if (pathname.startsWith("/super-admin")) {
       return NextResponse.redirect(new URL("/super-admin/login", request.url))
+    }
+    if (pathname.startsWith("/sales")) {
+      return NextResponse.redirect(new URL("/sales/login", request.url))
     }
     return NextResponse.redirect(new URL("/login", request.url))
   }
@@ -118,7 +126,7 @@ export async function proxy(request: NextRequest) {
   // ── Sales section — super admin credentials for now ───────────────────────
   if (pathname.startsWith("/sales") || pathname.startsWith("/api/sales")) {
     if (!session.superAdmin) {
-      return NextResponse.redirect(new URL("/super-admin/login", request.url))
+      return NextResponse.redirect(new URL("/sales/login", request.url))
     }
     return applyVideoMode(NextResponse.next(), vmParam)
   }

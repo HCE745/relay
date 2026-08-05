@@ -78,7 +78,7 @@ export default async function ProspectsPage() {
                 return (
                   <tr key={p.id} className="hover:bg-gray-800/40 transition-colors group">
                     <td className="px-4 py-3">
-                      <Link href={`/super-admin/crm/prospects/${p.id}`} className="flex items-center gap-2">
+                      <Link href={`/sales/outreach/prospects/${p.id}`} className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-md bg-gray-800 flex items-center justify-center shrink-0">
                           <Building2 className="w-3 h-3 text-gray-500" />
                         </div>

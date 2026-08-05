@@ -101,53 +101,7 @@ export async function POST(req: NextRequest) {
       ? await prisma.imapConfig.findUnique({ where: { superAdminId: session.superAdminId } })
       : null
 
-    if (imapCfg) {
-      let smtpPassword: string
-      try {
-        smtpPassword = decryptField(imapCfg.encryptedPassword)
-      } catch {
-        return NextResponse.json({ error: "Failed to decrypt SMTP credentials — check IMAP_ENCRYPTION_KEY" }, { status: 500 })
-      }
-      console.log(`[crm-email] Sending via Titan SMTP (${imapCfg.smtpHost}:${imapCfg.smtpPort})`)
-      await sendViaTitanSmtp(
-        {
-          smtpHost:     imapCfg.smtpHost,
-          smtpPort:     imapCfg.smtpPort,
-          emailAddress: imapCfg.emailAddress,
-          password:     smtpPassword,
-          fromName:     "Will @ Relay",
-        },
-        { to, cc, subject, bodyHtml, bodyText, messageId, inReplyTo },
-      )
-    } else {
-      // Fallback: Resend
-      const RESEND_API_KEY = process.env.RESEND_API_KEY
-      if (!RESEND_API_KEY) {
-        console.error("[crm-email] No IMAP config and RESEND_API_KEY not set")
-        return NextResponse.json({ error: "No SMTP configuration found — add one in CRM Settings" }, { status: 500 })
-      }
-      const resendPayload: Record<string, unknown> = {
-        from:    "Will @ Relay <will@getrelay.software>",
-        to:      [to],
-        subject,
-        html:    bodyHtml,
-        text:    bodyText,
-        headers: { "Message-ID": messageId, ...(inReplyTo ? { "In-Reply-To": inReplyTo } : {}) },
-      }
-      if (cc) resendPayload.cc = [cc]
-      const sendRes = await fetch("https://api.resend.com/emails", {
-        method:  "POST",
-        headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-        body:    JSON.stringify(resendPayload),
-      })
-      if (!sendRes.ok) {
-        const err = await sendRes.text()
-        console.error("[crm-email] Resend rejected:", sendRes.status, err)
-        return NextResponse.json({ error: `Resend error: ${err}` }, { status: 502 })
-      }
-    }
-
-    // Determine threadId: use existing or self
+    // Determine threadId before creating record
     let resolvedThreadId = threadId ?? null
     if (!resolvedThreadId && inReplyTo) {
       const parent = await prisma.crmEmail.findUnique({ where: { messageId: inReplyTo } })
@@ -156,6 +110,7 @@ export async function POST(req: NextRequest) {
 
     const fromAddress = imapCfg ? imapCfg.emailAddress : "will@getrelay.software"
 
+    // Create the CrmEmail record first so we have an ID for the tracking pixel
     const email = await prisma.crmEmail.create({
       data: {
         demoCallId:   demoCallId ?? null,
@@ -178,6 +133,65 @@ export async function POST(req: NextRequest) {
     // If no parent, threadId = self
     if (!resolvedThreadId) {
       await prisma.crmEmail.update({ where: { id: email.id }, data: { threadId: email.id } })
+    }
+
+    // Append tracking pixel to the sent body (stored body stays clean — pixel is only in transit)
+    const trackingPixel = `<img src="https://app.getrelay.software/api/track/open/${email.id}" width="1" height="1" border="0" style="display:none" alt="" />`
+    const trackedHtml   = `${bodyHtml}${trackingPixel}`
+
+    // Send the email
+    if (imapCfg) {
+      let smtpPassword: string
+      try {
+        smtpPassword = decryptField(imapCfg.encryptedPassword)
+      } catch {
+        await prisma.crmEmail.delete({ where: { id: email.id } }).catch(() => null)
+        return NextResponse.json({ error: "Failed to decrypt SMTP credentials — check IMAP_ENCRYPTION_KEY" }, { status: 500 })
+      }
+      console.log(`[crm-email] Sending via Titan SMTP (${imapCfg.smtpHost}:${imapCfg.smtpPort})`)
+      try {
+        await sendViaTitanSmtp(
+          {
+            smtpHost:     imapCfg.smtpHost,
+            smtpPort:     imapCfg.smtpPort,
+            emailAddress: imapCfg.emailAddress,
+            password:     smtpPassword,
+            fromName:     "Will @ Relay",
+          },
+          { to, cc, subject, bodyHtml: trackedHtml, bodyText, messageId, inReplyTo },
+        )
+      } catch (sendErr) {
+        await prisma.crmEmail.delete({ where: { id: email.id } }).catch(() => null)
+        throw sendErr
+      }
+    } else {
+      // Fallback: Resend
+      const RESEND_API_KEY = process.env.RESEND_API_KEY
+      if (!RESEND_API_KEY) {
+        await prisma.crmEmail.delete({ where: { id: email.id } }).catch(() => null)
+        console.error("[crm-email] No IMAP config and RESEND_API_KEY not set")
+        return NextResponse.json({ error: "No SMTP configuration found — add one in CRM Settings" }, { status: 500 })
+      }
+      const resendPayload: Record<string, unknown> = {
+        from:    "Will @ Relay <will@getrelay.software>",
+        to:      [to],
+        subject,
+        html:    trackedHtml,
+        text:    bodyText,
+        headers: { "Message-ID": messageId, ...(inReplyTo ? { "In-Reply-To": inReplyTo } : {}) },
+      }
+      if (cc) resendPayload.cc = [cc]
+      const sendRes = await fetch("https://api.resend.com/emails", {
+        method:  "POST",
+        headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+        body:    JSON.stringify(resendPayload),
+      })
+      if (!sendRes.ok) {
+        await prisma.crmEmail.delete({ where: { id: email.id } }).catch(() => null)
+        const err = await sendRes.text()
+        console.error("[crm-email] Resend rejected:", sendRes.status, err)
+        return NextResponse.json({ error: `Resend error: ${err}` }, { status: 502 })
+      }
     }
 
     // Assign follow-up stage and calculate next followUpDate

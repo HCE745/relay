@@ -1507,6 +1507,9 @@ export const CrmEmailScalarFieldEnum = {
   followUpDate: 'followUpDate',
   followUpDoneAt: 'followUpDoneAt',
   stageNumber: 'stageNumber',
+  openedAt: 'openedAt',
+  openCount: 'openCount',
+  lastOpenedAt: 'lastOpenedAt',
   imapConfigId: 'imapConfigId',
   createdAt: 'createdAt'
 } as const

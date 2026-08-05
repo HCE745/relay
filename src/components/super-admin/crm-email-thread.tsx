@@ -3,25 +3,28 @@
 import { useState, useEffect, useCallback } from "react"
 import {
   Mail, ArrowDownLeft, ArrowUpRight, ChevronDown, ChevronUp, Reply,
-  Calendar, CheckCircle2, Clock, X, Archive,
+  Calendar, CheckCircle2, Clock, X, Archive, Eye, EyeOff,
 } from "lucide-react"
 import { CrmEmailCompose } from "@/components/super-admin/crm-email-compose"
 import { EmailActionMenu } from "@/components/crm/email-action-menu"
 
 interface CrmEmail {
-  id:            string
-  direction:     "sent" | "received"
-  fromAddress:   string
-  toAddress:     string
-  subject:       string
-  bodyHtml:      string
-  bodyText:      string
-  messageId:     string | null
-  sentAt:        string
-  source:        string
-  isArchived:    boolean
-  followUpDate:  string | null
+  id:             string
+  direction:      "sent" | "received"
+  fromAddress:    string
+  toAddress:      string
+  subject:        string
+  bodyHtml:       string
+  bodyText:       string
+  messageId:      string | null
+  sentAt:         string
+  source:         string
+  isArchived:     boolean
+  followUpDate:   string | null
   followUpDoneAt: string | null
+  openedAt:       string | null
+  openCount:      number
+  lastOpenedAt:   string | null
 }
 
 interface DemoCallCtx {
@@ -186,6 +189,22 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
                           <Archive className="w-2.5 h-2.5" />
                           Archived
                         </span>
+                      )}
+                      {isSent && (
+                        email.openedAt ? (
+                          <span
+                            className="text-[10px] flex items-center gap-1 px-1.5 py-0.5 rounded-full font-medium bg-emerald-900/40 text-emerald-400"
+                            title={`First opened ${new Date(email.openedAt).toLocaleString()}`}
+                          >
+                            <Eye className="w-2.5 h-2.5" />
+                            {email.openCount > 1 ? `Opened ${email.openCount}×` : "Opened"}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] flex items-center gap-1 text-gray-600">
+                            <EyeOff className="w-2.5 h-2.5" />
+                            Not opened
+                          </span>
+                        )
                       )}
                       {hasFollowup && !followupDone && (
                         <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${

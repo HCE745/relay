@@ -65,7 +65,7 @@ export default async function ProspectDetailPage({
   // Get emails sent to this prospect's contacts
   const contactEmails = prospect.contacts.map(c => c.email).filter(Boolean) as string[]
 
-  const [sentToProspect, receivedFromProspect] = await Promise.all([
+  const [sentToProspect, receivedFromProspect, totalOpens] = await Promise.all([
     contactEmails.length > 0
       ? prisma.crmEmail.count({
           where: {
@@ -83,6 +83,16 @@ export default async function ProspectDetailPage({
             isDeleted:   false,
           },
         })
+      : Promise.resolve(0),
+    contactEmails.length > 0
+      ? prisma.crmEmail.aggregate({
+          where: {
+            direction: "sent",
+            toAddress: { in: contactEmails },
+            isDeleted: false,
+          },
+          _sum: { openCount: true },
+        }).then(r => r._sum.openCount ?? 0)
       : Promise.resolve(0),
   ])
 
@@ -178,6 +188,12 @@ export default async function ProspectDetailPage({
             value={receivedFromProspect}
             sub={sentToProspect > 0 ? `${((receivedFromProspect / sentToProspect) * 100).toFixed(0)}% reply rate` : undefined}
             color={receivedFromProspect > 0 ? "text-emerald-400" : "text-gray-500"}
+          />
+          <KpiCard
+            label="Total Opens"
+            value={totalOpens}
+            sub={sentToProspect > 0 ? `${((totalOpens / sentToProspect) * 100).toFixed(0)}% open rate` : "track pixel required"}
+            color={totalOpens > 0 ? "text-blue-400" : "text-gray-500"}
           />
           {lastContact && (
             <KpiCard

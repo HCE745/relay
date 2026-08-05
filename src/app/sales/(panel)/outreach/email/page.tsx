@@ -5,32 +5,35 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import {
   Mail, Send, X, ChevronDown, Loader2, RefreshCw, ArrowLeft,
-  ArrowUpRight, ArrowDownLeft, Search, Calendar, CheckCircle2, Clock,
+  ArrowUpRight, ArrowDownLeft, Search, Calendar, CheckCircle2, Clock, Eye, EyeOff,
 } from "lucide-react"
 import { EmailActionMenu } from "@/components/crm/email-action-menu"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface CrmEmail {
-  id:            string
-  direction:     "sent" | "received"
-  fromAddress:   string
-  toAddress:     string
-  subject:       string
-  bodyHtml:      string
-  bodyText:      string
-  messageId:     string | null
-  inReplyTo:     string | null
-  threadId:      string | null
-  sentAt:        string
-  source:        string
-  isRead:        boolean
-  isArchived:    boolean
-  contactEmail:  string
-  followUpDate:  string | null
-  followUpDoneAt:string | null
-  stageNumber:   number | null
-  demoCall:      { id: string; contactName: string; companyName: string } | null
+  id:             string
+  direction:      "sent" | "received"
+  fromAddress:    string
+  toAddress:      string
+  subject:        string
+  bodyHtml:       string
+  bodyText:       string
+  messageId:      string | null
+  inReplyTo:      string | null
+  threadId:       string | null
+  sentAt:         string
+  source:         string
+  isRead:         boolean
+  isArchived:     boolean
+  contactEmail:   string
+  followUpDate:   string | null
+  followUpDoneAt: string | null
+  stageNumber:    number | null
+  openedAt:       string | null
+  openCount:      number
+  lastOpenedAt:   string | null
+  demoCall:       { id: string; contactName: string; companyName: string } | null
 }
 
 interface Thread {
@@ -44,6 +47,8 @@ interface Thread {
   lastEmail:        CrmEmail
   hasUnread:        boolean
   lastSentStage:    number | null
+  lastSentOpenedAt: string | null
+  lastSentOpenCount:number
 }
 
 interface Template {
@@ -106,15 +111,17 @@ function groupIntoThreads(emails: CrmEmail[]): Thread[] {
     const lastSent = [...group].reverse().find(e => e.direction === "sent")
     threads.push({
       key,
-      subject:       stripRe(group[0]!.subject),
-      contactName:   name,
-      contactEmail:  email,
-      demoCallId:    dc?.id ?? null,
-      demoCall:      dc,
-      emails:        group,
-      lastEmail:     last,
-      hasUnread:     group.some(e => e.direction === "received" && !e.isRead),
-      lastSentStage: lastSent?.stageNumber ?? null,
+      subject:          stripRe(group[0]!.subject),
+      contactName:      name,
+      contactEmail:     email,
+      demoCallId:       dc?.id ?? null,
+      demoCall:         dc,
+      emails:           group,
+      lastEmail:        last,
+      hasUnread:        group.some(e => e.direction === "received" && !e.isRead),
+      lastSentStage:    lastSent?.stageNumber ?? null,
+      lastSentOpenedAt: lastSent?.openedAt ?? null,
+      lastSentOpenCount:lastSent?.openCount ?? 0,
     })
   }
   threads.sort((a, b) => new Date(b.lastEmail.sentAt).getTime() - new Date(a.lastEmail.sentAt).getTime())
@@ -394,6 +401,17 @@ function ThreadRow({ thread, isSelected, onClick }: {
         </p>
         <div className="flex items-center gap-2">
           <p className="text-[11px] text-gray-600 truncate flex-1">{preview}</p>
+          {thread.lastSentOpenedAt ? (
+            <span
+              className="text-[10px] flex items-center gap-0.5 text-emerald-500 shrink-0"
+              title={`Opened ${thread.lastSentOpenCount > 1 ? `${thread.lastSentOpenCount}× · ` : ""}last ${new Date(thread.lastSentOpenedAt).toLocaleDateString()}`}
+            >
+              <Eye className="w-3 h-3" />
+              {thread.lastSentOpenCount > 1 ? thread.lastSentOpenCount : ""}
+            </span>
+          ) : thread.emails.some(e => e.direction === "sent") ? (
+            <span title="Not opened yet"><EyeOff className="w-3 h-3 text-gray-700 shrink-0" /></span>
+          ) : null}
           {thread.lastSentStage != null && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-500 shrink-0">
               S{thread.lastSentStage}
@@ -562,6 +580,22 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-green-900/30 text-green-500">
                         reminder done
                       </span>
+                    )}
+                    {isSent && (
+                      email.openedAt ? (
+                        <span
+                          className="text-[10px] flex items-center gap-1 px-1.5 py-0.5 rounded-full font-medium bg-emerald-900/40 text-emerald-400"
+                          title={`First opened ${new Date(email.openedAt).toLocaleString()}${email.openCount > 1 ? ` · last ${new Date(email.lastOpenedAt!).toLocaleString()}` : ""}`}
+                        >
+                          <Eye className="w-2.5 h-2.5" />
+                          {email.openCount > 1 ? `Opened ${email.openCount}×` : "Opened"}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] flex items-center gap-1 text-gray-600">
+                          <EyeOff className="w-2.5 h-2.5" />
+                          Not opened
+                        </span>
+                      )
                     )}
                     {!isOpen && (
                       <span className="text-xs text-gray-600 truncate max-w-48">{email.bodyText.slice(0, 60)}</span>

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
 import {
   AlertCircle, Clock, Mail, CheckCircle, Building2,
-  ArrowLeft, ArrowUpRight, ArrowDownLeft, Send, Loader2, X, Calendar,
+  ArrowLeft, ArrowUpRight, ArrowDownLeft, Send, Loader2, X, Calendar, Eye, EyeOff,
 } from "lucide-react"
 import { EmailActionMenu } from "@/components/crm/email-action-menu"
 
@@ -23,6 +23,10 @@ interface FollowUp {
   sequenceComplete:boolean
   demoCallId:      string | null
   demoCall:        { id: string; contactName: string; companyName: string; contactEmail: string } | null
+  openedAt:        string | null
+  openCount:       number
+  lastOpenedAt:    string | null
+  hasReply:        boolean
 }
 
 interface CrmEmail {
@@ -38,6 +42,9 @@ interface CrmEmail {
   isArchived:     boolean
   followUpDate:   string | null
   followUpDoneAt: string | null
+  openedAt:       string | null
+  openCount:      number
+  lastOpenedAt:   string | null
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -229,21 +236,25 @@ function FollowUpRow({ item, isSelected, onSelect, onIgnore }: {
   onSelect:   () => void
   onIgnore:   () => void
 }) {
-  const u      = urgency(item.followUpDate)
-  const styles = URGENCY_STYLES[u]
-  const ds     = daysSince(item.sentAt)
+  const u        = urgency(item.followUpDate)
+  const styles   = URGENCY_STYLES[u]
+  const ds       = daysSince(item.sentAt)
+  const isWarm   = !!item.openedAt && !item.hasReply
 
   return (
     <div
       onClick={onSelect}
       className={cn(
         "flex items-start gap-3 px-5 py-3.5 cursor-pointer border-b border-gray-800/60 border-l-2 transition-colors",
-        styles.row,
+        isWarm ? "border-l-amber-500" : styles.row,
         isSelected ? "bg-emerald-600/10" : "hover:bg-gray-800/40",
       )}
     >
       {/* Avatar */}
-      <div className="shrink-0 w-9 h-9 rounded-full bg-emerald-900/50 text-emerald-300 text-sm font-bold flex items-center justify-center">
+      <div className={cn(
+        "shrink-0 w-9 h-9 rounded-full text-sm font-bold flex items-center justify-center",
+        isWarm ? "bg-amber-900/40 text-amber-300" : "bg-emerald-900/50 text-emerald-300",
+      )}>
         {(item.demoCall?.contactName ?? item.contactEmail).charAt(0).toUpperCase()}
       </div>
 
@@ -265,7 +276,7 @@ function FollowUpRow({ item, isSelected, onSelect, onIgnore }: {
         {item.sequenceComplete && (
           <p className="text-[11px] text-gray-600 mb-0.5">Sequence complete</p>
         )}
-        <div className="flex items-center gap-2 text-[11px] text-gray-600">
+        <div className="flex items-center gap-3 text-[11px] text-gray-600 flex-wrap">
           {item.demoCall && (
             <span className="flex items-center gap-1">
               <Building2 className="w-3 h-3" />
@@ -273,6 +284,24 @@ function FollowUpRow({ item, isSelected, onSelect, onIgnore }: {
             </span>
           )}
           <span>{ds === 0 ? "Sent today" : `${ds}d since sent`}</span>
+          {isWarm && (
+            <span className="flex items-center gap-1 text-amber-400 font-medium">
+              <Eye className="w-3 h-3" />
+              Warm — opened{item.openCount > 1 ? ` ${item.openCount}×` : ""}, no reply
+            </span>
+          )}
+          {item.openedAt && item.hasReply && (
+            <span className="flex items-center gap-1 text-emerald-500">
+              <Eye className="w-3 h-3" />
+              Opened · replied
+            </span>
+          )}
+          {!item.openedAt && (
+            <span className="flex items-center gap-1">
+              <EyeOff className="w-3 h-3" />
+              Not opened
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -441,7 +470,7 @@ function ThreadDetail({ followUp, onBack, onIgnore, onSent }: {
                     {sender.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium text-gray-200">{sender}</span>
                       {isSent
                         ? <ArrowUpRight  className="w-3 h-3 text-emerald-400" />
@@ -450,6 +479,22 @@ function ThreadDetail({ followUp, onBack, onIgnore, onSent }: {
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-400 font-medium">
                           reminder on this
                         </span>
+                      )}
+                      {isSent && (
+                        email.openedAt ? (
+                          <span
+                            className="text-[10px] flex items-center gap-1 px-1.5 py-0.5 rounded-full font-medium bg-emerald-900/40 text-emerald-400"
+                            title={`First opened ${new Date(email.openedAt).toLocaleString()}`}
+                          >
+                            <Eye className="w-2.5 h-2.5" />
+                            {email.openCount > 1 ? `Opened ${email.openCount}×` : "Opened"}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] flex items-center gap-1 text-gray-600">
+                            <EyeOff className="w-2.5 h-2.5" />
+                            Not opened
+                          </span>
+                        )
                       )}
                       {!isOpen && (
                         <span className="text-xs text-gray-600 truncate max-w-48">{email.bodyText.slice(0, 60)}</span>

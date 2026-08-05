@@ -1833,6 +1833,9 @@ model CrmEmail {
   followUpDate   DateTime?
   followUpDoneAt DateTime?
   stageNumber    Int?
+  openedAt       DateTime?
+  openCount      Int       @default(0)
+  lastOpenedAt   DateTime?
   imapConfigId   String?
   createdAt      DateTime  @default(now())
 

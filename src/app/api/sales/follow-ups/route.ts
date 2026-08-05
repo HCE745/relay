@@ -40,17 +40,33 @@ export async function GET() {
       sentAt:       true,
       followUpDate: true,
       stageNumber:  true,
+      threadId:     true,
       demoCallId:   true,
+      openedAt:     true,
+      openCount:    true,
+      lastOpenedAt: true,
       demoCall: {
         select: { id: true, contactName: true, companyName: true, contactEmail: true },
       },
     },
   })
 
+  // Check which threads have received replies (warm lead = opened, no reply yet)
+  const threadIds = [...new Set(emails.map(e => e.threadId).filter(Boolean))] as string[]
+  const repliedThreadIds = new Set(
+    threadIds.length > 0
+      ? (await prisma.crmEmail.findMany({
+          where: { threadId: { in: threadIds }, direction: "received", isDeleted: false },
+          select: { threadId: true },
+        })).map(r => r.threadId).filter(Boolean) as string[]
+      : [],
+  )
+
   const enriched = emails.map(e => {
     const sn             = e.stageNumber ?? 0
     const dueStageNum    = sn + 1
     const sequenceComplete = dueStageNum > maxStageNum
+    const hasReply       = e.threadId ? repliedThreadIds.has(e.threadId) : false
     return {
       ...e,
       stageNumber:     sn,
@@ -58,6 +74,7 @@ export async function GET() {
       dueStageNumber:  dueStageNum,
       dueStageName:    sequenceComplete ? "Sequence Complete" : (stageMap[dueStageNum] ?? `Stage ${dueStageNum}`),
       sequenceComplete,
+      hasReply,
     }
   })
 

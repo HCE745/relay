@@ -282,6 +282,7 @@ export default async function SalesDashboardPage({
     // Engagement (period)
     sentPeriod,
     recvPeriod,
+    openedPeriod,
 
     // Pipeline
     newLeadsThisWeek,
@@ -330,6 +331,7 @@ export default async function SalesDashboardPage({
     // Engagement
     prisma.crmEmail.count({ where: { ...sentBase, ...(pGte ? { sentAt: pGte } : {}) } }),
     prisma.crmEmail.count({ where: { ...recvBase, ...(pGte ? { sentAt: pGte } : {}) } }),
+    prisma.crmEmail.count({ where: { ...sentBase, openedAt: { not: null }, ...(pGte ? { sentAt: pGte } : {}) } }),
 
     // Pipeline
     prisma.demoCall.count({ where: { createdAt: { gte: weekStart } } }),
@@ -389,6 +391,7 @@ export default async function SalesDashboardPage({
 
   // ── Derived metrics ─────────────────────────────────────────────────────────
   const replyRate      = pct(recvPeriod, sentPeriod)
+  const openRate       = pct(openedPeriod, sentPeriod)
   const invalidRate    = pct(invalidContacts, totalContacts)
   const dupRate        = pct(duplicateProspects, totalProspects)
   const avgPerDay      = sent30d > 0 ? (sent30d / 30).toFixed(1) : "—"
@@ -403,6 +406,7 @@ export default async function SalesDashboardPage({
     "Emails sent (period)": sentPeriod,
     "Replies received (period)": recvPeriod,
     "Reply rate": replyRate,
+    "Open rate": openRate,
     "Overdue follow-ups": acFollowUpOverdue,
     "Active in sequence": activeEnrollments,
     "Demos scheduled": demosScheduled,
@@ -594,11 +598,12 @@ export default async function SalesDashboardPage({
             <p className="text-2xl font-bold text-gray-600">N/A</p>
             <p className="text-[11px] text-gray-700 mt-0.5">Requires manual reply classification</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Tour Click Rate</p>
-            <p className="text-2xl font-bold text-gray-600">N/A</p>
-            <p className="text-[11px] text-gray-700 mt-0.5">Requires tour link click tracking</p>
-          </div>
+          <KpiCard
+            label="Open Rate"
+            value={sentPeriod > 0 ? openRate : "—"}
+            sub={`${openedPeriod} opens / ${sentPeriod} sent`}
+            color={sentPeriod > 0 && openedPeriod / sentPeriod > 0.3 ? "text-emerald-400" : "text-white"}
+          />
           <KpiCard
             label="Demo Rate"
             value={sentPeriod > 0 ? pct(demosScheduled + trialsActive + closedWon, sentPeriod, 2) : "—"}

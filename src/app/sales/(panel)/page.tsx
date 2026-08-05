@@ -24,7 +24,11 @@ interface AvgStage   { avg_stage: number | null }
 function periodStart(p: Period): Date | null {
   const now = new Date()
   if (p === "today")  return new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  if (p === "week")   { const d = new Date(now); d.setDate(now.getDate() - 7);   d.setHours(0,0,0,0); return d }
+  if (p === "week")   {
+    const dow = now.getDay()
+    const back = dow === 0 ? 6 : dow - 1
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate() - back)
+  }
   if (p === "month")  return new Date(now.getFullYear(), now.getMonth(), 1)
   if (p === "30d")    return new Date(now.getTime() - 30 * 864e5)
   return null
@@ -248,7 +252,10 @@ export default async function SalesDashboardPage({
   const now          = new Date()
   const todayStart   = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const todayEnd     = new Date(todayStart.getTime() + 864e5)
-  const weekStart    = new Date(now.getTime() - 7 * 864e5);  weekStart.setHours(0,0,0,0)
+  // Calendar week: Monday of the current week (Sun=0 → 6 days back, Mon=1 → 0 days back, …)
+  const dayOfWeek    = now.getDay()
+  const daysToMon    = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+  const weekStart    = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysToMon)
   const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1)
   const last30Start  = new Date(now.getTime() - 30 * 864e5)
 

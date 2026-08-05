@@ -22,6 +22,7 @@ function buildSections(followUpsDue: number): { label?: string; items: NavItem[]
   return [
     {
       items: [
+        { label: "Dashboard",       href: "/sales",                  icon: LayoutDashboard },
         { label: "Pipeline",        href: "/sales/pipeline",         icon: GitBranch },
         { label: "Leads",           href: "/sales/leads",            icon: Users },
         {
@@ -88,7 +89,7 @@ export function SalesSidebar({ name, email }: { name: string; email: string }) {
   const sections = buildSections(followUpsDue)
 
   function NavLink({ item, depth = 0 }: { item: NavItem; depth?: number }) {
-    const active = item.href === "/sales/outreach"
+    const active = item.href === "/sales" || item.href === "/sales/outreach"
       ? pathname === item.href
       : pathname.startsWith(item.href) && (depth > 0 || !item.children)
 

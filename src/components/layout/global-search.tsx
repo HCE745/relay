@@ -32,6 +32,7 @@ export function GlobalSearch() {
   const [results, setResults] = useState<SearchResults | null>(null)
   const [loading, setLoading] = useState(false)
   const [activeIdx, setActiveIdx] = useState(0)
+  const [nlFilters, setNlFilters] = useState<{ status?: string; category?: string; priority?: string; summary?: string } | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -47,6 +48,7 @@ export function GlobalSearch() {
     setQuery("")
     setResults(null)
     setActiveIdx(0)
+    setNlFilters(null)
   }, [])
 
   useEffect(() => {
@@ -70,18 +72,41 @@ export function GlobalSearch() {
     }
   }, [open, openSearch, close])
 
+  const NL_PATTERN = /^(show me|find|which|how many|when was|what are|list all|give me)\b/i
+
   useEffect(() => {
-    if (!query.trim()) { setResults(null); return }
+    if (!query.trim()) { setResults(null); setNlFilters(null); return }
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       setLoading(true)
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-        if (res.ok) setResults(await res.json())
+        if (NL_PATTERN.test(query.trim())) {
+          // Natural language mode
+          const nlRes = await fetch("/api/search/nl", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query }),
+          })
+          if (nlRes.ok) {
+            const { filters } = await nlRes.json() as { filters: { status?: string; category?: string; priority?: string; summary?: string } }
+            setNlFilters(filters)
+            const params = new URLSearchParams({ q: filters.summary ?? query })
+            if (filters.status)   params.set("status",   filters.status)
+            if (filters.category) params.set("category", filters.category)
+            if (filters.priority) params.set("priority", filters.priority)
+            const res = await fetch(`/api/search?${params}`)
+            if (res.ok) setResults(await res.json())
+          }
+        } else {
+          setNlFilters(null)
+          const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
+          if (res.ok) setResults(await res.json())
+        }
       } finally {
         setLoading(false)
       }
-    }, 250)
+    }, 350)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
 
   const allResults = results
@@ -124,6 +149,16 @@ export function GlobalSearch() {
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
+
+        {/* NL filter chips */}
+        {nlFilters && (
+          <div className="px-4 py-2 border-b border-gray-100 flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wide">Filtered by</span>
+            {nlFilters.status   && <span className="text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{nlFilters.status}</span>}
+            {nlFilters.category && <span className="text-[10px] font-medium bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">{nlFilters.category.replace(/_/g, " ")}</span>}
+            {nlFilters.priority && <span className="text-[10px] font-medium bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">{nlFilters.priority}</span>}
+          </div>
+        )}
 
         {/* Results */}
         {results && allResults.length === 0 && !loading && (

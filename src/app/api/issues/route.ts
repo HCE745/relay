@@ -8,6 +8,7 @@ import { matchSOPToIssue } from "@/lib/sop-matching"
 import { checkLimit, limiters } from "@/lib/ratelimit"
 import { dispatchInjuryNotifications } from "@/lib/injury-notifications"
 import { sendPushNotification } from "@/lib/push-notifications"
+import { checkDuplicateIssue, suggestIssueTitle } from "@/lib/ai-haiku"
 
 // ── AI category + priority inference ──────────────────────────────────────────
 
@@ -403,8 +404,21 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // ── AI Duplicate Detection + Title Suggestion (parallel, non-blocking) ──────
+  let duplicateWarning: { similarIssueId: string; similarIssueTitle: string; confidence: number } | null = null
+  let titleSuggestion: string | null = null
+
+  if (process.env.ANTHROPIC_API_KEY) {
+    const [dup, titleHint] = await Promise.all([
+      checkDuplicateIssue(session.organizationId, issue.id, title, description ?? "").catch(() => null),
+      suggestIssueTitle(session.organizationId, title, description ?? "").catch(() => null),
+    ])
+    duplicateWarning = dup
+    titleSuggestion  = titleHint
+  }
+
   return NextResponse.json(
-    { ...issue, autoRoutedTo, routingRuleName },
+    { ...issue, autoRoutedTo, routingRuleName, duplicateWarning, titleSuggestion },
     { status: 201 }
   )
 }

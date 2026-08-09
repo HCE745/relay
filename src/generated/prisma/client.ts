@@ -522,6 +522,11 @@ export type ProspectNote = Prisma.ProspectNoteModel
  */
 export type DemoAnalytics = Prisma.DemoAnalyticsModel
 /**
+ * Model AiCache
+ * 
+ */
+export type AiCache = Prisma.AiCacheModel
+/**
  * Model SalesUser
  * 
  */

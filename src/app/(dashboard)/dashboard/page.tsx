@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { WelcomeChecklist } from "@/components/dashboard/welcome-checklist"
 import { ReferralCard } from "@/components/dashboard/referral-card"
+import { OnboardingTip } from "@/components/dashboard/onboarding-tip"
 import { getActiveReferralProgram } from "@/lib/billing-credits-engine"
 import {
   AlertCircle,
@@ -408,6 +409,7 @@ export default async function DashboardPage() {
         {checklist && checklist.items.filter(i => !i.done).length > 0 && !session?.isDemo && (
           <WelcomeChecklist items={checklist.items} orgName={checklist.orgName} />
         )}
+        {checklist && !session?.isDemo && <OnboardingTip />}
         {referralCard && (
           <ReferralCard
             referralCode={referralCard.referralCode}

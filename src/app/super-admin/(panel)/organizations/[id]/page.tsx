@@ -18,6 +18,7 @@ import { CrmActivityTimeline } from "@/components/super-admin/crm-activity-timel
 import { CrmNonConversionForm } from "@/components/super-admin/crm-non-conversion-form"
 import { BillingCreditsSection } from "./billing-credits-section"
 import { BillingTimeline } from "./billing-timeline"
+import { HealthExplanation } from "./health-explanation"
 
 export const dynamic = "force-dynamic"
 
@@ -327,7 +328,18 @@ export default async function OrgDetailPage({
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-5 mb-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Health Score</h2>
-              <span className={`text-3xl font-bold ${healthColor}`}>{healthScore}</span>
+              <div className="flex items-center">
+                <span className={`text-3xl font-bold ${healthColor}`}>{healthScore}</span>
+                <HealthExplanation
+                  orgId={org.id}
+                  healthScore={healthScore}
+                  loginPts={loginPts}
+                  issuePts={issuePts}
+                  userPts={userPts}
+                  routingPts={routingPts}
+                  subPts={subPts}
+                />
+              </div>
             </div>
             <div className="w-full bg-gray-800 rounded-full h-2 mb-4 overflow-hidden">
               <div

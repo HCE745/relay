@@ -480,6 +480,7 @@ export const ModelName = {
   ProspectContact: 'ProspectContact',
   ProspectNote: 'ProspectNote',
   DemoAnalytics: 'DemoAnalytics',
+  AiCache: 'AiCache',
   SalesUser: 'SalesUser'
 } as const
 
@@ -496,7 +497,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "salesUser"
+    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "aiCache" | "salesUser"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -7604,6 +7605,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AiCache: {
+      payload: Prisma.$AiCachePayload<ExtArgs>
+      fields: Prisma.AiCacheFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AiCacheFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AiCacheFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>
+        }
+        findFirst: {
+          args: Prisma.AiCacheFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AiCacheFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>
+        }
+        findMany: {
+          args: Prisma.AiCacheFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>[]
+        }
+        create: {
+          args: Prisma.AiCacheCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>
+        }
+        createMany: {
+          args: Prisma.AiCacheCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AiCacheCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>[]
+        }
+        delete: {
+          args: Prisma.AiCacheDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>
+        }
+        update: {
+          args: Prisma.AiCacheUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>
+        }
+        deleteMany: {
+          args: Prisma.AiCacheDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AiCacheUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AiCacheUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>[]
+        }
+        upsert: {
+          args: Prisma.AiCacheUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiCachePayload>
+        }
+        aggregate: {
+          args: Prisma.AiCacheAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAiCache>
+        }
+        groupBy: {
+          args: Prisma.AiCacheGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AiCacheGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AiCacheCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AiCacheCountAggregateOutputType> | number
+        }
+      }
+    }
     SalesUser: {
       payload: Prisma.$SalesUserPayload<ExtArgs>
       fields: Prisma.SalesUserFieldRefs
@@ -9508,6 +9583,18 @@ export const DemoAnalyticsScalarFieldEnum = {
 export type DemoAnalyticsScalarFieldEnum = (typeof DemoAnalyticsScalarFieldEnum)[keyof typeof DemoAnalyticsScalarFieldEnum]
 
 
+export const AiCacheScalarFieldEnum = {
+  id: 'id',
+  orgId: 'orgId',
+  cacheKey: 'cacheKey',
+  result: 'result',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AiCacheScalarFieldEnum = (typeof AiCacheScalarFieldEnum)[keyof typeof AiCacheScalarFieldEnum]
+
+
 export const SalesUserScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -10054,6 +10141,7 @@ export type GlobalOmitConfig = {
   prospectContact?: Prisma.ProspectContactOmit
   prospectNote?: Prisma.ProspectNoteOmit
   demoAnalytics?: Prisma.DemoAnalyticsOmit
+  aiCache?: Prisma.AiCacheOmit
   salesUser?: Prisma.SalesUserOmit
 }
 

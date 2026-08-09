@@ -147,6 +147,7 @@ export const ModelName = {
   ProspectContact: 'ProspectContact',
   ProspectNote: 'ProspectNote',
   DemoAnalytics: 'DemoAnalytics',
+  AiCache: 'AiCache',
   SalesUser: 'SalesUser'
 } as const
 
@@ -1955,6 +1956,18 @@ export const DemoAnalyticsScalarFieldEnum = {
 } as const
 
 export type DemoAnalyticsScalarFieldEnum = (typeof DemoAnalyticsScalarFieldEnum)[keyof typeof DemoAnalyticsScalarFieldEnum]
+
+
+export const AiCacheScalarFieldEnum = {
+  id: 'id',
+  orgId: 'orgId',
+  cacheKey: 'cacheKey',
+  result: 'result',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AiCacheScalarFieldEnum = (typeof AiCacheScalarFieldEnum)[keyof typeof AiCacheScalarFieldEnum]
 
 
 export const SalesUserScalarFieldEnum = {

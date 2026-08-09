@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import {
   BookOpen, Upload, Plus, FileText, AlertTriangle, ChevronRight,
-  X, Check, Loader2, Pencil, Trash2, AlertCircle,
+  X, Check, Loader2, Pencil, Trash2, AlertCircle, Clock, Sparkles,
 } from "lucide-react"
 import { ISSUE_CATEGORY } from "@/lib/constants"
 import { Badge } from "@/components/ui/badge"
@@ -301,6 +301,26 @@ export function SopLibrary({ initialSops, departments, isAdminLevel }: Props) {
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [suggestingId, setSuggestingId]     = useState<string | null>(null)
+  const [suggestions, setSuggestions]       = useState<Record<string, string[]>>({})
+
+  function isStale(sop: SopCard): boolean {
+    const daysSince = (Date.now() - new Date(sop.updatedAt).getTime()) / 86_400_000
+    return daysSince > 90 && sop.linkedIssueCount >= 3
+  }
+
+  async function handleSuggestUpdates(sopId: string) {
+    setSuggestingId(sopId)
+    try {
+      const res = await fetch(`/api/sops/${sopId}/suggest-updates`, { method: "POST" })
+      if (res.ok) {
+        const d = await res.json() as { suggestions: string[] }
+        setSuggestions(prev => ({ ...prev, [sopId]: d.suggestions }))
+      }
+    } catch {/* non-critical */} finally {
+      setSuggestingId(null)
+    }
+  }
 
   async function handleUploadFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -476,6 +496,11 @@ export function SopLibrary({ initialSops, departments, isAdminLevel }: Props) {
                         {sop.department.name}
                       </span>
                     )}
+                    {isStale(sop) && (
+                      <span className="flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">
+                        <Clock className="w-2.5 h-2.5" /> Stale
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-4 text-xs text-gray-400">
                     {sop.linkedIssueCount > 0 ? (
@@ -491,10 +516,33 @@ export function SopLibrary({ initialSops, departments, isAdminLevel }: Props) {
                       <span className="text-blue-400">Uploaded</span>
                     )}
                   </div>
+                  {/* AI Suggestions panel */}
+                  {suggestions[sop.id] && (
+                    <div className="mt-2 p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs">
+                      <p className="font-medium text-blue-700 mb-1">Suggested updates:</p>
+                      <ul className="space-y-0.5">
+                        {suggestions[sop.id].map((s, i) => (
+                          <li key={i} className="text-blue-600 flex items-start gap-1">
+                            <span className="mt-0.5 shrink-0">•</span>{s}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </button>
 
                 {/* Actions */}
                 <div className="flex items-center gap-1 shrink-0">
+                  {isStale(sop) && isAdminLevel && (
+                    <button
+                      onClick={() => handleSuggestUpdates(sop.id)}
+                      disabled={suggestingId === sop.id}
+                      title="AI Suggest Updates"
+                      className="p-1.5 rounded-lg text-amber-400 hover:text-amber-600 hover:bg-amber-50 disabled:opacity-50"
+                    >
+                      {suggestingId === sop.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                    </button>
+                  )}
                   <button
                     onClick={() => router.push(`/sops/${sop.id}`)}
                     className="p-1.5 rounded-lg text-gray-300 hover:text-blue-600 hover:bg-blue-50"

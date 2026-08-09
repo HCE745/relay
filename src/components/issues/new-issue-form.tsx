@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { ISSUE_PRIORITY, ISSUE_CATEGORY, INJURY_SEVERITY, USER_ROLE } from "@/lib/constants"
-import { GitBranch, UserCheck, Loader2, Sparkles, AlertTriangle } from "lucide-react"
+import { GitBranch, UserCheck, Loader2, Sparkles, AlertTriangle, Copy, Lightbulb } from "lucide-react"
 import { MediaUpload, type UploadedFile } from "@/components/media-upload"
 import { TemplatePicker } from "@/components/issues/template-picker"
 import { PeoplePicker } from "@/components/ui/people-picker"
@@ -32,6 +32,12 @@ export function NewIssueForm({ locations, departments, assets, vendors, users, s
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // AI post-submit warnings
+  const [createdIssue, setCreatedIssue]         = useState<{ id: string } | null>(null)
+  const [duplicateWarning, setDuplicateWarning] = useState<{ similarIssueId: string; similarIssueTitle: string; confidence: number } | null>(null)
+  const [titleSuggestion, setTitleSuggestion]   = useState<string | null>(null)
+  const [acceptingTitle, setAcceptingTitle]       = useState(false)
 
   const [isInjuryMode, setIsInjuryMode] = useState(false)
   const [category, setCategory] = useState("")
@@ -219,7 +225,18 @@ export function NewIssueForm({ locations, departments, assets, vendors, users, s
         body: JSON.stringify(body),
       })
       if (res.ok) {
-        const issue = await res.json()
+        const issue = await res.json() as {
+          id: string
+          duplicateWarning?: { similarIssueId: string; similarIssueTitle: string; confidence: number } | null
+          titleSuggestion?: string | null
+        }
+        if (issue.duplicateWarning || issue.titleSuggestion) {
+          setCreatedIssue({ id: issue.id })
+          setDuplicateWarning(issue.duplicateWarning ?? null)
+          setTitleSuggestion(issue.titleSuggestion ?? null)
+          setLoading(false)
+          return
+        }
         router.push(`/issues/${issue.id}`)
         return
       }
@@ -230,6 +247,83 @@ export function NewIssueForm({ locations, departments, assets, vendors, users, s
     } finally {
       setLoading(false)
     }
+  }
+
+  async function acceptTitle() {
+    if (!createdIssue || !titleSuggestion) return
+    setAcceptingTitle(true)
+    try {
+      await fetch(`/api/issues/${createdIssue.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: titleSuggestion }),
+      })
+    } catch {/* best-effort */} finally {
+      setAcceptingTitle(false)
+    }
+    router.push(`/issues/${createdIssue.id}`)
+  }
+
+  // ── Post-submit AI warning screen ────────────────────────────────────────────
+  if (createdIssue) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <p className="text-sm font-semibold text-gray-700">Issue created — a few AI observations:</p>
+
+        {duplicateWarning && (
+          <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
+            <div className="flex items-start gap-2">
+              <Copy className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-amber-800">Possible duplicate ({Math.round(duplicateWarning.confidence * 100)}% match)</p>
+                <p className="text-sm text-amber-700 mt-0.5">
+                  Looks similar to: <span className="font-medium">&ldquo;{duplicateWarning.similarIssueTitle}&rdquo;</span>
+                </p>
+                <a
+                  href={`/issues/${duplicateWarning.similarIssueId}`}
+                  className="text-xs text-amber-600 underline underline-offset-2 mt-1 inline-block"
+                >
+                  View similar issue →
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {titleSuggestion && (
+          <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+            <div className="flex items-start gap-2">
+              <Lightbulb className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-blue-800">Suggested clearer title</p>
+                <p className="text-sm text-blue-700 mt-0.5 italic">&ldquo;{titleSuggestion}&rdquo;</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2 pt-1">
+          {titleSuggestion && (
+            <button
+              type="button"
+              onClick={acceptTitle}
+              disabled={acceptingTitle}
+              className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
+            >
+              {acceptingTitle ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+              Accept suggested title
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => router.push(`/issues/${createdIssue.id}`)}
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200"
+          >
+            {titleSuggestion ? "Keep original title" : "Continue to issue"} →
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -7,7 +7,7 @@ import {
 } from "recharts"
 import {
   TrendingUp, TrendingDown, Minus, AlertTriangle, Clock,
-  MapPin, Building2, BarChart2, RefreshCw, ChevronDown,
+  MapPin, Building2, BarChart2, RefreshCw, ChevronDown, Zap,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -128,6 +128,7 @@ export function AnalyticsClient({ role, defaultScope, locations, departments }: 
   const [benchmarks, setBenchmarks] = useState<BenchmarkData | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"overview" | "trends" | "benchmarks" | "insights">("overview")
+  const [anomalies, setAnomalies] = useState<string[]>([])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -144,6 +145,13 @@ export function AnalyticsClient({ role, defaultScope, locations, departments }: 
   }, [period, scope])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  useEffect(() => {
+    fetch("/api/analytics/anomalies")
+      .then(r => r.ok ? r.json() : { anomalies: [] })
+      .then((d: { anomalies: string[] }) => setAnomalies(d.anomalies ?? []))
+      .catch(() => {})
+  }, [])
 
   const openCount = data?.byStatus.find((s) => s.status === "OPEN")?.count ?? 0
   const resolvedCount = data?.byStatus.find((s) => s.status === "RESOLVED")?.count ?? 0
@@ -223,6 +231,24 @@ export function AnalyticsClient({ role, defaultScope, locations, departments }: 
           {/* ── OVERVIEW ── */}
           {activeTab === "overview" && (
             <div className="space-y-5">
+              {/* AI Anomaly Card */}
+              {anomalies.length > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-4 h-4 text-amber-600" />
+                    <span className="text-sm font-semibold text-amber-800">AI Anomaly Detection</span>
+                  </div>
+                  <ul className="space-y-1">
+                    {anomalies.map((a, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-sm text-amber-700">
+                        <span className="mt-1 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                        {a}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* Stat cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Total Issues" value={data.total} icon={BarChart2} color="blue" />

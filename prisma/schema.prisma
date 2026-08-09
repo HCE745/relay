@@ -2456,6 +2456,20 @@ model DemoAnalytics {
   @@index([page, createdAt])
 }
 
+// ── AI Feature Cache ─────────────────────────────────────────────────────────
+
+model AiCache {
+  id        String   @id @default(cuid())
+  orgId     String
+  cacheKey  String
+  result    String   @db.Text
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([orgId, cacheKey])
+  @@index([expiresAt])
+}
+
 // ── Sales Team (future) ───────────────────────────────────────────────────────
 
 model SalesUser {

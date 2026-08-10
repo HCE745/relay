@@ -53,13 +53,15 @@ export async function POST(req: NextRequest) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   })
-  // Restore user's theme preference so the first page render uses correct theme
-  res.cookies.set("hce-theme", user.themePreference ?? "contemporary", {
-    httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-  })
+  // Keep existing hce-theme cookie if present; set default on first login
+  if (!req.cookies.get("hce-theme")) {
+    res.cookies.set("hce-theme", "contemporary", {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    })
+  }
   return res
 }

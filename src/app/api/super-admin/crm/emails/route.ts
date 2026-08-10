@@ -195,10 +195,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Assign follow-up stage and calculate next followUpDate
+    // Count actual sent emails to this contact/demo (excluding this one) to determine stage.
+    // This correctly handles threads where earlier emails predate the follow-up system
+    // and therefore have stageNumber = null — chaining off prevSent.stageNumber would
+    // always reset to 0 whenever a null is in the chain.
     try {
       const allStages = await prisma.followUpStage.findMany({ orderBy: { stageNumber: "asc" } })
       if (allStages.length > 0) {
-        const prevSent = await prisma.crmEmail.findFirst({
+        const previousSentCount = await prisma.crmEmail.count({
           where: {
             direction: "sent",
             isDeleted:  false,
@@ -207,11 +211,9 @@ export async function POST(req: NextRequest) {
               ? { demoCallId }
               : { contactEmail: { equals: to, mode: "insensitive" as const } }),
           },
-          orderBy: { sentAt: "desc" },
-          select:  { stageNumber: true },
         })
-        const thisStageNum   = (prevSent?.stageNumber ?? -1) + 1
-        const nextStage      = allStages.find(s => s.stageNumber === thisStageNum + 1)
+        const thisStageNum     = previousSentCount  // 0 = first email, 1 = second, etc.
+        const nextStage        = allStages.find(s => s.stageNumber === thisStageNum + 1)
         const followUpDateCalc = nextStage
           ? new Date(Date.now() + nextStage.daysAfterPrevious * 24 * 60 * 60 * 1000)
           : null

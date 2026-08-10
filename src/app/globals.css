@@ -1,26 +1,39 @@
 @import "tailwindcss";
 
-/* ── HCE Books Design System ───────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   HCE BOOKS DESIGN SYSTEM  — Token-based two-theme engine
+   Theme 1: Contemporary (default)
+   Theme 2: Heritage
+   ══════════════════════════════════════════════════════════════════════════ */
 
-:root {
-  /* Brand palette */
+/* ──────────────────────────────────────────────────────────────────────────
+   THEME 1: CONTEMPORARY (default)
+   Matches the existing visual style exactly.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="contemporary"] {
+  /* Surface */
+  --background:   #F8FAFC;
+  --surface:      #FFFFFF;
+  --surface-raised: #F8FAFC;
+
+  /* Borders */
+  --border:       #E2E8F0;
+  --border-light: #F1F5F9;
+
+  /* Text */
+  --text-base:    #0F172A;
+  --text-muted:   #475569;
+  --text-faint:   #94A3B8;
+
+  /* Brand */
   --navy:         #0B1E3D;
   --navy-light:   #1E3A5F;
   --accent:       #1D4ED8;
   --accent-hover: #1E40AF;
 
-  /* Page chrome */
-  --background:   #F8FAFC;
-  --surface:      #FFFFFF;
-  --border:       #E2E8F0;
-  --border-light: #F1F5F9;
-
-  /* Typography */
-  --text-base:    #0F172A;
-  --text-muted:   #475569;
-  --text-faint:   #94A3B8;
-
-  /* Semantic */
+  /* Semantic - Contemporary: vibrant */
   --green:        #16A34A;
   --green-bg:     #F0FDF4;
   --green-border: #BBF7D0;
@@ -33,59 +46,183 @@
   --blue:         #1D4ED8;
   --blue-bg:      #EFF6FF;
   --blue-border:  #BFDBFE;
+  --indigo:       #4338CA;
+  --indigo-bg:    #EEF2FF;
+  --indigo-border:#C7D2FE;
+  --purple:       #7E22CE;
+  --purple-bg:    #FAF5FF;
+  --purple-border:#E9D5FF;
+  --orange:       #C2410C;
+  --orange-bg:    #FFF7ED;
+  --orange-border:#FED7AA;
 
   /* Sidebar */
-  --sidebar-width:      15rem;
   --sidebar-bg:         #0B1E3D;
   --sidebar-border:     rgba(255,255,255,0.06);
   --sidebar-text:       #94A3B8;
   --sidebar-text-hover: #E2E8F0;
-  --sidebar-active-bg:  rgba(29, 78, 216, 0.18);
+  --sidebar-active-bg:  rgba(29,78,216,0.18);
   --sidebar-active-txt: #93C5FD;
+  --sidebar-group-txt:  #3B5270;
 
-  /* Legacy aliases for Tailwind */
+  /* Typography */
+  --font-heading: var(--font-inter, "Inter", system-ui, sans-serif);
+  --font-body:    var(--font-inter, "Inter", system-ui, sans-serif);
+  --font-mono:    var(--font-ibm-mono, ui-monospace, "Cascadia Code", Menlo, monospace);
+
+  /* Geometry */
+  --radius-card:    0.625rem;
+  --radius-btn:     0.375rem;
+  --radius-badge:   0.25rem;
+  --radius-input:   0.4375rem;
+  --card-shadow:    none;
+
+  /* Legacy alias */
   --color-background: var(--background);
   --color-foreground: var(--text-base);
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   THEME 2: HERITAGE
+   Warm cream, burgundy accent, IBM Plex Serif headings.
+   Ornamental in key moments; hairline/precise everywhere else.
+   ────────────────────────────────────────────────────────────────────────── */
+
+[data-theme="heritage"] {
+  /* Surface — warm cream */
+  --background:   #F5F2EA;
+  --surface:      #FDFCF8;
+  --surface-raised: #F0EDE3;
+
+  /* Borders — ink-gray hairlines */
+  --border:       #C4BAA8;
+  --border-light: #DDD7CB;
+
+  /* Text — charcoal */
+  --text-base:    #1A1815;
+  --text-muted:   #4A4540;
+  --text-faint:   #8A8178;
+
+  /* Brand — dark charcoal sidebar, burgundy accent */
+  --navy:         #1A1815;
+  --navy-light:   #2C2822;
+  --accent:       #6B1F2A;
+  --accent-hover: #57192A;
+
+  /* Semantic — muted/desaturated to match cream palette */
+  --green:        #2D5A3D;
+  --green-bg:     #EFF5F1;
+  --green-border: #BDD4C4;
+  --red:          #8B2B2B;
+  --red-bg:       #F8EFEF;
+  --red-border:   #D4AEAE;
+  --amber:        #7A5C1E;
+  --amber-bg:     #F8F4E8;
+  --amber-border: #D4C49A;
+  --blue:         #1E3A5F;
+  --blue-bg:      #EEF2F6;
+  --blue-border:  #B8C8D8;
+  --indigo:       #3A4A7C;
+  --indigo-bg:    #EEF0F8;
+  --indigo-border:#BEC8DC;
+  --purple:       #5A3A6B;
+  --purple-bg:    #F4F0F8;
+  --purple-border:#C8B8D4;
+  --orange:       #8B5E2A;
+  --orange-bg:    #F8F2EC;
+  --orange-border:#D4B88A;
+
+  /* Sidebar — near-black charcoal, burgundy active */
+  --sidebar-bg:         #1A1815;
+  --sidebar-border:     rgba(255,255,255,0.06);
+  --sidebar-text:       #9B9287;
+  --sidebar-text-hover: #E8E0D0;
+  --sidebar-active-bg:  rgba(107,31,42,0.28);
+  --sidebar-active-txt: #C9908A;
+  --sidebar-group-txt:  #5A5248;
+
+  /* Typography — serif headings, clean body */
+  --font-heading: var(--font-ibm-serif, "Georgia", serif);
+  --font-body:    var(--font-inter, "Inter", system-ui, sans-serif);
+  --font-mono:    var(--font-ibm-mono, ui-monospace, Menlo, monospace);
+
+  /* Geometry — square, hairline */
+  --radius-card:    0;
+  --radius-btn:     2px;
+  --radius-badge:   2px;
+  --radius-input:   2px;
+  --card-shadow:    none;
+
+  --color-background: var(--background);
+  --color-foreground: var(--text-base);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Tailwind v4 theme extension — exposes CSS variable tokens as Tw utilities
+   ────────────────────────────────────────────────────────────────────────── */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--text-base);
+  --color-accent:     var(--accent);
+  --color-muted:      var(--text-muted);
+  --color-faint:      var(--text-faint);
+  --color-surface:    var(--surface);
+  --color-positive:   var(--green);
+  --color-negative:   var(--red);
+  --color-warning:    var(--amber);
+  --color-link:       var(--accent);
+  --color-border:     var(--border);
 }
 
-/* ── Base ─────────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   BASE
+   ────────────────────────────────────────────────────────────────────────── */
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
-  background: var(--background);
-  color: var(--text-base);
-  font-family: var(--font-inter, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  background:    var(--background);
+  color:         var(--text-base);
+  font-family:   var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size:     0.875rem;
+  line-height:   1.5;
 }
-
-/* ── Focus ────────────────────────────────────────────────── */
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline:        2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius:  3px;
 }
 
-/* ── Financial number formatting ──────────────────────────── */
-/* Apply to any amount / account-number / date cell */
+/* ──────────────────────────────────────────────────────────────────────────
+   SEMANTIC TEXT UTILITIES
+   ────────────────────────────────────────────────────────────────────────── */
+
+.text-link  { color: var(--accent); }
+.text-link:hover { color: var(--accent-hover); }
+.text-positive { color: var(--green); }
+.text-negative { color: var(--red); }
+.text-warning  { color: var(--amber); }
+.text-data-muted { color: var(--text-muted); }
+.text-data-faint { color: var(--text-faint); }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   FINANCIAL NUMBER FORMATTING
+   ────────────────────────────────────────────────────────────────────────── */
+
 .fin {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
   letter-spacing: 0.01em;
+  font-family: var(--font-mono);
 }
 
-/* ── Data Tables ──────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   DATA TABLES
+   ────────────────────────────────────────────────────────────────────────── */
 
 .data-table {
   width: 100%;
@@ -93,19 +230,19 @@ body {
 }
 
 .data-table thead th {
-  padding: 0.625rem 1rem;
-  text-align: left;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  background: var(--background);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
+  padding:         0.625rem 1rem;
+  text-align:      left;
+  font-family:     var(--font-heading);
+  font-size:       0.6875rem;
+  font-weight:     600;
+  letter-spacing:  0.07em;
+  text-transform:  uppercase;
+  color:           var(--text-muted);
+  background:      var(--background);
+  border-bottom:   1px solid var(--border);
+  white-space:     nowrap;
 }
 
-.data-table thead th.text-right { text-align: right; }
 .data-table thead th.num {
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -113,9 +250,9 @@ body {
 }
 
 .data-table tbody td {
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
-  color: var(--text-base);
+  padding:       0.625rem 1rem;
+  font-size:     0.875rem;
+  color:         var(--text-base);
   border-bottom: 1px solid var(--border-light);
   vertical-align: middle;
 }
@@ -125,245 +262,444 @@ body {
   text-align: right;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
+  font-family: var(--font-mono);
 }
 
-.data-table tbody td.muted { color: var(--text-muted); }
-.data-table tbody td.mono  { font-family: ui-monospace, "Cascadia Code", Menlo, monospace; font-size: 0.8125rem; }
-
 .data-table tbody tr:last-child td { border-bottom: none; }
-
 .data-table tbody tr:hover td { background: var(--background); }
 
-/* ── Sidebar ──────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   SIDEBAR
+   ────────────────────────────────────────────────────────────────────────── */
 
 .sidebar-group-label {
-  padding: 1rem 0.875rem 0.25rem;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #3B5270;
+  padding:         1rem 0.875rem 0.25rem;
+  font-size:       0.625rem;
+  font-weight:     700;
+  letter-spacing:  0.1em;
+  text-transform:  uppercase;
+  color:           var(--sidebar-group-txt);
 }
 
 .sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.4375rem 0.75rem;
-  border-radius: 0.375rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--sidebar-text);
-  transition: background 0.12s, color 0.12s;
-  line-height: 1.4;
+  display:        flex;
+  align-items:    center;
+  gap:            0.625rem;
+  padding:        0.4375rem 0.75rem;
+  border-radius:  var(--radius-btn);
+  font-size:      0.8125rem;
+  font-weight:    500;
+  color:          var(--sidebar-text);
+  transition:     background 0.12s, color 0.12s;
   text-decoration: none;
 }
 
 .sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--sidebar-text-hover);
+  background: rgba(255,255,255,0.06);
+  color:      var(--sidebar-text-hover);
 }
 
 .sidebar-item.active {
-  background: var(--sidebar-active-bg);
-  color: var(--sidebar-active-txt);
-  border-left: 2px solid var(--accent);
-  padding-left: calc(0.75rem - 2px);
+  background:    var(--sidebar-active-bg);
+  color:         var(--sidebar-active-txt);
+  border-left:   2px solid var(--accent);
+  padding-left:  calc(0.75rem - 2px);
 }
 
-/* ── Status badges ────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   STATUS BADGES
+   ────────────────────────────────────────────────────────────────────────── */
 
 .badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.1875rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  border: 1px solid transparent;
-  white-space: nowrap;
+  display:         inline-flex;
+  align-items:     center;
+  padding:         0.1875rem 0.5rem;
+  border-radius:   var(--radius-badge);
+  font-size:       0.6875rem;
+  font-weight:     600;
+  letter-spacing:  0.04em;
+  border:          1px solid transparent;
+  white-space:     nowrap;
 }
 
 .badge-green  { background: var(--green-bg);  color: var(--green);  border-color: var(--green-border); }
 .badge-red    { background: var(--red-bg);    color: var(--red);    border-color: var(--red-border); }
 .badge-amber  { background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-border); }
 .badge-blue   { background: var(--blue-bg);   color: var(--blue);   border-color: var(--blue-border); }
-.badge-gray   { background: #F1F5F9; color: #64748B; border-color: #E2E8F0; }
-.badge-indigo { background: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
-.badge-purple { background: #FAF5FF; color: #7E22CE; border-color: #E9D5FF; }
-.badge-orange { background: #FFF7ED; color: #C2410C; border-color: #FED7AA; }
+.badge-gray   { background: var(--surface-raised); color: var(--text-muted); border-color: var(--border); }
+.badge-indigo { background: var(--indigo-bg); color: var(--indigo); border-color: var(--indigo-border); }
+.badge-purple { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-border); }
+.badge-orange { background: var(--orange-bg); color: var(--orange); border-color: var(--orange-border); }
 
-/* ── Page layout helpers ──────────────────────────────────── */
-
-.page-root { @apply p-6 max-w-7xl; }
+/* ──────────────────────────────────────────────────────────────────────────
+   PAGE LAYOUT
+   ────────────────────────────────────────────────────────────────────────── */
 
 .page-header {
-  display: flex;
-  align-items: flex-start;
+  display:         flex;
+  align-items:     flex-start;
   justify-content: space-between;
-  margin-bottom: 1.25rem;
-  gap: 1rem;
+  margin-bottom:   1.25rem;
+  gap:             1rem;
 }
 
 .page-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-base);
+  font-family:   var(--font-heading);
+  font-size:     1.25rem;
+  font-weight:   600;
+  color:         var(--text-base);
   letter-spacing: -0.01em;
-  line-height: 1.3;
+  line-height:   1.3;
 }
 
 .page-subtitle {
-  font-size: 0.8125rem;
-  color: var(--text-muted);
-  margin-top: 0.125rem;
+  font-size:   0.8125rem;
+  color:       var(--text-muted);
+  margin-top:  0.125rem;
 }
 
-/* ── Card ─────────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   CARD
+   ────────────────────────────────────────────────────────────────────────── */
 
 .card {
-  background: var(--surface);
-  border-radius: 0.625rem;
-  border: 1px solid var(--border);
+  background:    var(--surface);
+  border-radius: var(--radius-card);
+  border:        1px solid var(--border);
+  box-shadow:    var(--card-shadow);
 }
 
 .card-header {
-  padding: 0.75rem 1.25rem;
-  background: var(--background);
+  padding:       0.75rem 1.25rem;
+  background:    var(--background);
   border-bottom: 1px solid var(--border);
-  border-radius: 0.625rem 0.625rem 0 0;
-  display: flex;
-  align-items: center;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  display:       flex;
+  align-items:   center;
   justify-content: space-between;
 }
 
 .card-header-title {
-  font-size: 0.6875rem;
-  font-weight: 700;
+  font-family:    var(--font-heading);
+  font-size:      0.6875rem;
+  font-weight:    700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color:          var(--text-muted);
 }
 
-/* ── Buttons ──────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   BUTTONS
+   ────────────────────────────────────────────────────────────────────────── */
 
 .btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.4375rem 1rem;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  border-radius: 0.375rem;
-  transition: background 0.12s;
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.375rem;
+  padding:         0.4375rem 1rem;
+  background:      var(--accent);
+  color:           #fff;
+  font-size:       0.8125rem;
+  font-weight:     500;
+  border-radius:   var(--radius-btn);
+  transition:      background 0.12s;
   text-decoration: none;
-  white-space: nowrap;
+  white-space:     nowrap;
+  border:          1px solid transparent;
+  cursor:          pointer;
 }
-.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:hover   { background: var(--accent-hover); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.4375rem 1rem;
-  background: var(--surface);
-  color: var(--text-base);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border);
-  transition: background 0.12s, border-color 0.12s;
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.375rem;
+  padding:         0.4375rem 1rem;
+  background:      var(--surface);
+  color:           var(--text-base);
+  font-size:       0.8125rem;
+  font-weight:     500;
+  border-radius:   var(--radius-btn);
+  border:          1px solid var(--border);
+  transition:      background 0.12s, border-color 0.12s;
   text-decoration: none;
-  white-space: nowrap;
+  white-space:     nowrap;
+  cursor:          pointer;
 }
-.btn-secondary:hover { background: var(--background); border-color: #CBD5E1; }
+.btn-secondary:hover    { background: var(--background); border-color: var(--text-faint); }
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── Filter tabs ──────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   FILTER TABS
+   ────────────────────────────────────────────────────────────────────────── */
 
 .filter-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1rem;
+  display:        flex;
+  border-bottom:  1px solid var(--border);
+  margin-bottom:  1rem;
 }
 
 .filter-tab {
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
+  padding:       0.5rem 1rem;
+  font-size:     0.8125rem;
+  font-weight:   500;
   border-bottom: 2px solid transparent;
-  color: var(--text-muted);
-  transition: color 0.12s, border-color 0.12s;
+  color:         var(--text-muted);
+  transition:    color 0.12s, border-color 0.12s;
   text-decoration: none;
-  white-space: nowrap;
+  white-space:   nowrap;
 }
 
 .filter-tab:hover { color: var(--text-base); }
 
 .filter-tab.active {
   border-bottom-color: var(--accent);
-  color: var(--accent);
+  color:               var(--accent);
 }
 
-/* ── Form inputs (shared across all forms) ────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   FORM INPUTS
+   ────────────────────────────────────────────────────────────────────────── */
 
 .field-input {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 0.4375rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  color: var(--text-base);
-  background: var(--surface);
-  transition: border-color 0.12s, box-shadow 0.12s;
+  width:        100%;
+  border:       1px solid var(--border);
+  border-radius: var(--radius-input);
+  padding:      0.5rem 0.75rem;
+  font-size:    0.875rem;
+  color:        var(--text-base);
+  background:   var(--surface);
+  transition:   border-color 0.12s, box-shadow 0.12s;
 }
 .field-input:focus {
-  outline: none;
+  outline:    none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 .field-input::placeholder { color: var(--text-faint); }
 
 .field-label {
-  display: block;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-muted);
+  display:       block;
+  font-family:   var(--font-heading);
+  font-size:     0.8125rem;
+  font-weight:   500;
+  color:         var(--text-muted);
   margin-bottom: 0.25rem;
 }
 
-/* ── Empty state ──────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   EMPTY STATE
+   ────────────────────────────────────────────────────────────────────────── */
 
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
   justify-content: center;
-  padding: 3.5rem 2rem;
-  text-align: center;
+  padding:         3.5rem 2rem;
+  text-align:      center;
 }
 
 .empty-state-icon {
-  width: 2.75rem;
-  height: 2.75rem;
-  color: #CBD5E1;
+  width:         2.75rem;
+  height:        2.75rem;
+  color:         var(--border);
   margin-bottom: 1rem;
 }
 
 .empty-state-title {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--text-base);
+  font-family:   var(--font-heading);
+  font-size:     0.9375rem;
+  font-weight:   600;
+  color:         var(--text-base);
   margin-bottom: 0.375rem;
 }
 
 .empty-state-desc {
-  font-size: 0.8125rem;
-  color: var(--text-muted);
-  max-width: 32rem;
-  line-height: 1.6;
+  font-size:     0.8125rem;
+  color:         var(--text-muted);
+  max-width:     32rem;
+  line-height:   1.6;
   margin-bottom: 1.25rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HERITAGE THEME — ORNAMENTAL TREATMENTS
+   "Rich" context: Dashboard, Reports, KPI panels, entity settings
+   "Clean" context: data tables, forms, everyday navigation (default above)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Rule-title-rule section header */
+[data-theme="heritage"] .heritage-rich-header {
+  display:       flex;
+  align-items:   center;
+  gap:           0.875rem;
+  font-family:   var(--font-heading);
+  font-size:     0.6875rem;
+  font-weight:   600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color:         var(--text-muted);
+}
+[data-theme="heritage"] .heritage-rich-header::before,
+[data-theme="heritage"] .heritage-rich-header::after {
+  content:      "";
+  flex:         1;
+  border-top:   1px solid var(--border);
+  display:      block;
+}
+
+/* Double-rule KPI frame */
+[data-theme="heritage"] .heritage-kpi-frame {
+  position:      relative;
+  border:        1px solid var(--border);
+  box-shadow:    inset 0 0 0 3px var(--surface), inset 0 0 0 4px var(--border);
+  padding:       1.25rem;
+  border-radius: 0;
+}
+
+/* Corner marks on rich cards */
+[data-theme="heritage"] .heritage-corner-mark {
+  position:  relative;
+  border:    1px solid var(--border);
+}
+[data-theme="heritage"] .heritage-corner-mark::before,
+[data-theme="heritage"] .heritage-corner-mark::after {
+  content:    "";
+  position:   absolute;
+  width:      0.5rem;
+  height:     0.5rem;
+  border-color: var(--accent);
+  border-style: solid;
+}
+[data-theme="heritage"] .heritage-corner-mark::before {
+  top:    -1px;
+  left:   -1px;
+  border-width: 2px 0 0 2px;
+}
+[data-theme="heritage"] .heritage-corner-mark::after {
+  bottom: -1px;
+  right:  -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Large metric display in Heritage */
+[data-theme="heritage"] .heritage-metric-value {
+  font-family:    var(--font-heading);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* Heritage page title — larger weight with serif */
+[data-theme="heritage"] .page-title {
+  font-weight:   700;
+  letter-spacing: 0.01em;
+}
+
+/* Heritage section title in cards */
+[data-theme="heritage"] .card-header-title {
+  font-size:      0.75rem;
+  letter-spacing: 0.1em;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HERITAGE THEME — TAILWIND CLASS OVERRIDES
+   Maps vibrant Contemporary Tailwind colors to muted Heritage tokens
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Link colors */
+[data-theme="heritage"] .text-blue-700,
+[data-theme="heritage"] .text-blue-600 {
+  color: var(--accent);
+}
+
+/* Positive amounts */
+[data-theme="heritage"] .text-green-700,
+[data-theme="heritage"] .text-green-600,
+[data-theme="heritage"] .text-green-500 {
+  color: var(--green);
+}
+
+/* Negative/overdue amounts */
+[data-theme="heritage"] .text-red-600,
+[data-theme="heritage"] .text-red-700 {
+  color: var(--red);
+}
+
+/* Amber/warning */
+[data-theme="heritage"] .text-amber-600,
+[data-theme="heritage"] .text-orange-600 {
+  color: var(--amber);
+}
+
+/* Secondary/muted text */
+[data-theme="heritage"] .text-slate-500,
+[data-theme="heritage"] .text-slate-400,
+[data-theme="heritage"] .text-gray-500,
+[data-theme="heritage"] .text-gray-400 {
+  color: var(--text-muted);
+}
+
+[data-theme="heritage"] .text-slate-600,
+[data-theme="heritage"] .text-gray-600 {
+  color: var(--text-muted);
+}
+
+/* Base text */
+[data-theme="heritage"] .text-gray-900,
+[data-theme="heritage"] .text-slate-900 {
+  color: var(--text-base);
+}
+
+/* White surfaces */
+[data-theme="heritage"] .bg-white {
+  background-color: var(--surface);
+}
+[data-theme="heritage"] .bg-gray-50,
+[data-theme="heritage"] .bg-slate-50,
+[data-theme="heritage"] .bg-slate-100 {
+  background-color: var(--background);
+}
+[data-theme="heritage"] .bg-gray-900 {
+  background-color: var(--navy);
+}
+
+/* Border colors */
+[data-theme="heritage"] .border-gray-200,
+[data-theme="heritage"] .border-gray-100,
+[data-theme="heritage"] .border-slate-200,
+[data-theme="heritage"] .border-gray-300 {
+  border-color: var(--border);
+}
+
+/* Blue accent backgrounds */
+[data-theme="heritage"] .bg-blue-50,
+[data-theme="heritage"] .bg-blue-100 {
+  background-color: var(--blue-bg);
+  border-color:     var(--blue-border);
+}
+[data-theme="heritage"] .text-blue-800,
+[data-theme="heritage"] .text-indigo-700 {
+  color: var(--blue);
+}
+
+/* Rounded corners → square in Heritage */
+[data-theme="heritage"] .rounded-xl,
+[data-theme="heritage"] .rounded-lg {
+  border-radius: 0;
+}
+[data-theme="heritage"] .rounded-full {
+  border-radius: var(--radius-badge);
+}
+[data-theme="heritage"] .rounded {
+  border-radius: var(--radius-badge);
+}
+
+/* Shadow removal */
+[data-theme="heritage"] .shadow-2xl,
+[data-theme="heritage"] .shadow-lg,
+[data-theme="heritage"] .shadow {
+  box-shadow: none;
+  border: 1px solid var(--border);
 }

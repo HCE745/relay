@@ -7,12 +7,14 @@ export default async function DashboardPage() {
   const { entityId, selectedEntity } = await getEntityContext()
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Controller Dashboard</h1>
-        {selectedEntity && (
-          <p className="text-sm text-gray-500 mt-0.5">{selectedEntity.name}</p>
-        )}
+    <div className="p-6 max-w-7xl">
+      <div className="page-header mb-6">
+        <div>
+          <h1 className="page-title">Controller Dashboard</h1>
+          {selectedEntity && (
+            <p className="page-subtitle">{selectedEntity.name}</p>
+          )}
+        </div>
       </div>
       <ControllerDashboard
         entityId={entityId}

@@ -1,8 +1,9 @@
 import { getEntityContext } from "@/lib/entity-context"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { Users, Calendar, Building2, Tag, LayoutGrid, ChevronRight } from "lucide-react"
+import { Users, Calendar, Building2, Tag, LayoutGrid, ChevronRight, Palette } from "lucide-react"
 import { StatusBadge } from "@/components/ui/StatusBadge"
+import { ThemeSelector } from "@/components/settings/ThemeSelector"
 import { canManageUsers } from "@/lib/permissions"
 
 export const dynamic = "force-dynamic"
@@ -30,6 +31,20 @@ export default async function SettingsPage() {
       <div className="page-header">
         <h1 className="page-title">Settings</h1>
       </div>
+
+      {/* Appearance */}
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Palette className="w-4 h-4" style={{ color: "var(--text-faint)" }} />
+          <h2 className="text-sm font-semibold" style={{ color: "var(--text-base)" }}>Appearance</h2>
+        </div>
+        <div className="card p-5">
+          <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
+            Choose a visual theme. Your selection is saved to your account and persists across sessions.
+          </p>
+          <ThemeSelector />
+        </div>
+      </section>
 
       {/* Entities */}
       <section className="space-y-3">

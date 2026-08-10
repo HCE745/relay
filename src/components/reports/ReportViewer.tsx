@@ -197,7 +197,7 @@ export function ReportViewer({
   return (
     <div className="p-6 max-w-7xl space-y-4">
       <div className="page-header">
-        <h1 className="page-title">Reports</h1>
+        <h1 className="page-title heritage-engraved">Reports</h1>
         {reportData && (
           <button
             onClick={() => {
@@ -253,7 +253,8 @@ export function ReportViewer({
       {reportData && (
         <div className="bg-white rounded-xl border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+            <div className="heritage-section-banner mb-3">{title}</div>
+            <h2 className="text-base font-semibold text-gray-900 heritage-engraved">{title}</h2>
             <p className="text-xs text-gray-400 mt-0.5">
               {reportData.entity}
               {reportData.consolidated ? " (Consolidated)" : ""}

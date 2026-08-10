@@ -29,7 +29,7 @@ export default async function SettingsPage() {
   return (
     <div className="p-6 max-w-5xl space-y-8">
       <div className="page-header">
-        <h1 className="page-title">Settings</h1>
+        <h1 className="page-title heritage-engraved">Settings</h1>
       </div>
 
       {/* Appearance */}
@@ -45,6 +45,9 @@ export default async function SettingsPage() {
           <ThemeSelector />
         </div>
       </section>
+
+      {/* Heritage-only section banner before entity config */}
+      <div className="heritage-section-banner">Organisation</div>
 
       {/* Entities */}
       <section className="space-y-3">

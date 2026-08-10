@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { AlertTriangle, RefreshCw, Sparkles, TrendingDown, TrendingUp, Loader2 } from "lucide-react"
+import { CornerFlourish } from "@/components/heritage/CornerFlourish"
+import { RadialTexture } from "@/components/heritage/RadialTexture"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -96,7 +98,11 @@ function KPICard({ label, mtd, ytd, inverted, link }: {
 }) {
   const mtdPositive = inverted ? mtd <= 0 : mtd >= 0
   return (
-    <Link href={link} className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors block">
+    <Link href={link} className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors block relative heritage-kpi-frame">
+      <CornerFlourish corner="tl" />
+      <CornerFlourish corner="tr" />
+      <CornerFlourish corner="br" />
+      <CornerFlourish corner="bl" />
       <p className="text-xs text-gray-400 uppercase tracking-wide">{label}</p>
       <p className={`text-xl font-bold font-mono mt-1 ${mtdPositive ? "text-gray-900" : "text-red-600"}`}>
         {mtd < 0 ? `(${fmt(Math.abs(mtd))})` : fmt(mtd)}
@@ -202,19 +208,29 @@ export function ControllerDashboard({ entityId, isConsolidationParent }: Props) 
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">{error}</div>}
 
+      {/* Heritage-only section banner */}
+      <div className="heritage-section-banner">Financial Position</div>
+
       {/* Top KPI row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {/* Cash */}
-        <Link href="/cashflow" className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors col-span-1">
-          <p className="text-xs text-gray-400 uppercase tracking-wide">Current Cash</p>
-          <p className={`text-xl font-bold font-mono mt-1 ${(data?.currentCashCents ?? 0) >= 0 ? "text-gray-900" : "text-red-600"}`}>
-            {data ? fmt(data.currentCashCents) : "—"}
-          </p>
-          {data?.runwayMonths !== undefined && data.runwayMonths !== null && (
-            <p className={`text-xs mt-0.5 ${data.runwayMonths < 6 ? "text-red-500" : "text-gray-400"}`}>
-              {data.runwayMonths}mo runway
+        {/* Cash — hero card with radial texture background */}
+        <Link href="/cashflow" className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors col-span-1 relative heritage-kpi-frame">
+          <CornerFlourish corner="tl" />
+          <CornerFlourish corner="tr" />
+          <CornerFlourish corner="br" />
+          <CornerFlourish corner="bl" />
+          <RadialTexture />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <p className="text-xs text-gray-400 uppercase tracking-wide">Current Cash</p>
+            <p className={`text-xl font-bold font-mono mt-1 ${(data?.currentCashCents ?? 0) >= 0 ? "text-gray-900" : "text-red-600"}`}>
+              {data ? fmt(data.currentCashCents) : "—"}
             </p>
-          )}
+            {data?.runwayMonths !== undefined && data.runwayMonths !== null && (
+              <p className={`text-xs mt-0.5 ${data.runwayMonths < 6 ? "text-red-500" : "text-gray-400"}`}>
+                {data.runwayMonths}mo runway
+              </p>
+            )}
+          </div>
         </Link>
 
         {/* Revenue */}
@@ -224,7 +240,11 @@ export function ControllerDashboard({ entityId, isConsolidationParent }: Props) 
         <KPICard label="Expenses" mtd={data?.expensesMTDCents ?? 0} ytd={data?.expensesYTDCents ?? 0} inverted link="/reports" />
 
         {/* Profit MTD */}
-        <Link href="/reports" className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors block">
+        <Link href="/reports" className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors block relative heritage-kpi-frame">
+          <CornerFlourish corner="tl" />
+          <CornerFlourish corner="tr" />
+          <CornerFlourish corner="br" />
+          <CornerFlourish corner="bl" />
           <p className="text-xs text-gray-400 uppercase tracking-wide">Net Profit MTD</p>
           <p className={`text-xl font-bold font-mono mt-1 ${(data?.profitMTDCents ?? 0) >= 0 ? "text-green-700" : "text-red-600"}`}>
             {data ? (data.profitMTDCents < 0 ? `(${fmt(Math.abs(data.profitMTDCents))})` : fmt(data.profitMTDCents)) : "—"}
@@ -235,7 +255,11 @@ export function ControllerDashboard({ entityId, isConsolidationParent }: Props) 
         </Link>
 
         {/* Reserve status */}
-        <div className={`rounded-xl border p-4 col-span-1 ${(data?.surplusOrShortfallCents ?? 0) >= 0 ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}`}>
+        <div className={`rounded-xl border p-4 col-span-1 relative heritage-kpi-frame ${(data?.surplusOrShortfallCents ?? 0) >= 0 ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}`}>
+          <CornerFlourish corner="tl" />
+          <CornerFlourish corner="tr" />
+          <CornerFlourish corner="br" />
+          <CornerFlourish corner="bl" />
           <p className="text-xs text-gray-500 uppercase tracking-wide">Reserve Status</p>
           <div className="flex items-center gap-1 mt-1">
             {(data?.surplusOrShortfallCents ?? 0) >= 0
@@ -249,7 +273,11 @@ export function ControllerDashboard({ entityId, isConsolidationParent }: Props) 
         </div>
 
         {/* Distributable */}
-        <Link href="/cashflow" className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors block">
+        <Link href="/cashflow" className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors block relative heritage-kpi-frame">
+          <CornerFlourish corner="tl" />
+          <CornerFlourish corner="tr" />
+          <CornerFlourish corner="br" />
+          <CornerFlourish corner="bl" />
           <p className="text-xs text-gray-400 uppercase tracking-wide">Distributable</p>
           <p className={`text-xl font-bold font-mono mt-1 ${(data?.distributableCents ?? 0) >= 0 ? "text-blue-700" : "text-red-600"}`}>
             {data ? (data.distributableCents < 0 ? `(${fmt(Math.abs(data.distributableCents))})` : fmt(data.distributableCents)) : "—"}
@@ -257,6 +285,9 @@ export function ControllerDashboard({ entityId, isConsolidationParent }: Props) 
           <p className="text-xs text-gray-400 mt-0.5">After reserve + 30d AP</p>
         </Link>
       </div>
+
+      {/* Heritage-only section banner */}
+      <div className="heritage-section-banner">Analysis</div>
 
       {/* Alerts + Budget side-by-side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -355,6 +386,9 @@ export function ControllerDashboard({ entityId, isConsolidationParent }: Props) 
         </div>
       </div>
 
+      {/* Heritage-only section banner */}
+      <div className="heritage-section-banner">Obligations</div>
+
       {/* AP Horizon summary */}
       {data && (
         <div className="bg-white rounded-xl border border-gray-200 p-5">
@@ -378,6 +412,9 @@ export function ControllerDashboard({ entityId, isConsolidationParent }: Props) 
           </p>
         </div>
       )}
+
+      {/* Heritage-only section banner */}
+      <div className="heritage-section-banner">Intelligence</div>
 
       {/* Daily Briefing */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">

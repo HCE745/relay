@@ -10,7 +10,7 @@ export default async function DashboardPage() {
     <div className="p-6 max-w-7xl">
       <div className="page-header mb-6">
         <div>
-          <h1 className="page-title">Controller Dashboard</h1>
+          <h1 className="page-title heritage-engraved">Controller Dashboard</h1>
           {selectedEntity && (
             <p className="page-subtitle">{selectedEntity.name}</p>
           )}

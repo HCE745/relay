@@ -603,6 +603,50 @@ body {
   letter-spacing: 0.1em;
 }
 
+/* ─── Heritage-only visibility gate ───────────────────────────────────────── */
+.heritage-only { display: none; }
+[data-theme="heritage"] .heritage-only { display: block; }
+
+/* ─── Heritage section banners — rule-title-rule dividers ─────────────────── */
+/* Hidden in Contemporary; appear as "——— TITLE ———" rules in Heritage.        */
+.heritage-section-banner { display: none; }
+[data-theme="heritage"] .heritage-section-banner {
+  display:        flex;
+  align-items:    center;
+  gap:            1rem;
+  font-family:    var(--font-heading);
+  font-size:      0.5625rem;
+  font-weight:    600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color:          var(--text-faint);
+  margin-block:   0.25rem;
+}
+[data-theme="heritage"] .heritage-section-banner::before,
+[data-theme="heritage"] .heritage-section-banner::after {
+  content:    "";
+  flex:       1;
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Engraved title treatment ────────────────────────────────────────────── */
+/* Multi-layer shadow: top-left highlight + bottom-right shadow = pressed-in   */
+[data-theme="heritage"] .heritage-engraved {
+  text-shadow:
+    -0.5px -0.5px 0 rgba(255, 255, 255, 0.55),
+    1px 1px 0 rgba(0, 0, 0, 0.35),
+    0 1.5px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* Inverse engraved — raised/embossed effect on the dark sidebar surface */
+[data-theme="heritage"] .heritage-engraved-inverse {
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.75),
+    0 -0.5px 0 rgba(220, 180, 160, 0.18),
+    0 0 8px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.04em;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    HERITAGE THEME — TAILWIND CLASS OVERRIDES
    Maps vibrant Contemporary Tailwind colors to muted Heritage tokens

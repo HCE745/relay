@@ -147,7 +147,7 @@ export function Sidebar({ entities, selectedEntityId, userName }: Props) {
             H
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-white leading-none">HCE Books</p>
+            <p className="text-sm font-semibold text-white leading-none heritage-engraved-inverse">HCE Books</p>
             <p className="text-xs mt-0.5 truncate" style={{ color: "#3B5270" }}>Accounting</p>
           </div>
         </div>

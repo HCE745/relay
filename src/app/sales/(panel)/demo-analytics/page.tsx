@@ -2,9 +2,11 @@ import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import { subDays, startOfDay, format } from "date-fns"
-import { BarChart2, Users, Clock, MousePointerClick, TrendingUp } from "lucide-react"
+import { BarChart2, Users, Clock, MousePointerClick, TrendingUp, Target } from "lucide-react"
 
 export const dynamic = "force-dynamic"
+
+const TOTAL_TOUR_STEPS = 21
 
 function StatCard({ label, value, sub, icon: Icon, color }: {
   label: string; value: string | number; sub?: string
@@ -24,106 +26,274 @@ function StatCard({ label, value, sub, icon: Icon, color }: {
   )
 }
 
+function formatActiveTime(seconds: number): string {
+  if (seconds < 60) return `${Math.round(seconds)}s`
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.round(seconds % 60)
+  return `${mins}m ${secs}s`
+}
+
 export default async function DemoAnalyticsPage() {
   const session = await getSession()
   if (!session?.superAdmin) redirect("/super-admin/login")
 
   const since30 = startOfDay(subDays(new Date(), 30))
+  const since14 = startOfDay(subDays(new Date(), 13))
 
-  const [all, recent, industries, ctaStats, conversions, dailyCounts] = await Promise.all([
-    // Total sessions
+  const [all, recent, industriesRaw, ctaStats, conversions, dailyCounts, tourSessions] = await Promise.all([
     prisma.demoAnalytics.count(),
-    // Last 30 days
     prisma.demoAnalytics.count({ where: { createdAt: { gte: since30 } } }),
-    // Industry breakdown
+    // Industry breakdown — include nulls so all sessions are accounted for
     prisma.demoAnalytics.groupBy({
-      by: ["industrySelected"],
-      where: { industrySelected: { not: null } },
+      by:    ["industrySelected"],
       _count: true,
-      orderBy: { _count: { industrySelected: "desc" } },
-      take: 10,
     }),
-    // CTA stats (last 30d) — boolean fields can't use _sum, count with where filters
     Promise.all([
       prisma.demoAnalytics.count({ where: { createdAt: { gte: since30 }, clickedStartTrial: true } }),
       prisma.demoAnalytics.count({ where: { createdAt: { gte: since30 }, clickedBookDemo:   true } }),
       prisma.demoAnalytics.count({ where: { createdAt: { gte: since30 }, clickedExplore:    true } }),
     ]),
-    // Conversions
     prisma.demoAnalytics.count({ where: { convertedToSignup: true, createdAt: { gte: since30 } } }),
-    // Daily counts — last 14 days
     prisma.$queryRaw<{ day: string; cnt: bigint }[]>`
       SELECT DATE_TRUNC('day', "createdAt")::date::text AS day, COUNT(*)::bigint AS cnt
       FROM "DemoAnalytics"
-      WHERE "createdAt" >= ${startOfDay(subDays(new Date(), 13))}
+      WHERE "createdAt" >= ${since14}
       GROUP BY 1
       ORDER BY 1
     `,
+    // Tour sessions for step analytics
+    prisma.demoAnalytics.findMany({
+      where:  { page: "tour", createdAt: { gte: since30 } },
+      select: { tourStepsCompleted: true, sessionStart: true, sessionEnd: true },
+    }),
   ])
 
   const [ctaStartTrial, ctaBookDemo, ctaExplore] = ctaStats
 
   const conversionRate = recent > 0 ? ((conversions / recent) * 100).toFixed(1) : "0"
 
-  // Build 14-day bar data
-  const dayMap = new Map(dailyCounts.map((d: { day: string; cnt: bigint }) => [d.day, Number(d.cnt)]))
+  // ── Industry breakdown (include null = not selected) ──────────────────────
+  const industries = industriesRaw
+    .map(r => ({
+      industry: r.industrySelected === null || r.industrySelected === ""
+        ? "Other / Not Selected"
+        : r.industrySelected,
+      count: r._count,
+      isOther: r.industrySelected === null || r.industrySelected === "",
+    }))
+    // merge "Other" (user-selected) and null into single "Other / Not Selected" bucket
+    .reduce<{ industry: string; count: number; isOther: boolean }[]>((acc, row) => {
+      if (row.isOther) {
+        const existing = acc.find(r => r.isOther)
+        if (existing) existing.count += row.count
+        else acc.push(row)
+      } else {
+        acc.push(row)
+      }
+      return acc
+    }, [])
+    .sort((a, b) => b.count - a.count)
+
+  // ── Daily chart (14 days) ─────────────────────────────────────────────────
+  const dayMap = new Map(dailyCounts.map(d => [d.day, Number(d.cnt)]))
   const days14 = Array.from({ length: 14 }, (_, i) => {
-    const d = subDays(new Date(), 13 - i)
+    const d   = subDays(new Date(), 13 - i)
     const key = format(d, "yyyy-MM-dd")
-    return { label: format(d, "MMM d"), count: dayMap.get(key) ?? 0 }
+    return { key, label: format(d, "MMM d"), count: dayMap.get(key) ?? 0 }
   })
-  const maxCount = Math.max(...days14.map((d: { count: number }) => d.count), 1)
+  const maxCount = Math.max(...days14.map(d => d.count), 1)
+
+  // ── Tour step analytics ───────────────────────────────────────────────────
+  const totalTourSessions = tourSessions.length
+
+  // Completion rate: sessions that reached the final tour step
+  const completedCount = tourSessions.filter(s =>
+    s.tourStepsCompleted.some(n => n >= TOTAL_TOUR_STEPS - 1)
+  ).length
+  const completionRate = totalTourSessions > 0
+    ? ((completedCount / totalTourSessions) * 100).toFixed(1)
+    : "0"
+
+  // Average active time
+  const sessionsWithTime = tourSessions.filter(s => s.sessionEnd != null)
+  const avgActiveTimeSec = sessionsWithTime.length > 0
+    ? sessionsWithTime.reduce((sum, s) => {
+        return sum + (s.sessionEnd!.getTime() - s.sessionStart.getTime()) / 1000
+      }, 0) / sessionsWithTime.length
+    : 0
+
+  // Step-by-step visitor counts
+  const stepCounts = Array.from({ length: TOTAL_TOUR_STEPS }, (_, i) => {
+    const step = i + 1
+    return { step, count: tourSessions.filter(s => s.tourStepsCompleted.includes(step)).length }
+  })
+  const maxStepCount = Math.max(...stepCounts.map(s => s.count), 1)
+
+  // Most common drop-off step (largest delta between step N and N+1)
+  let maxDropoffStep = 1
+  let maxDropoff = 0
+  for (let i = 0; i < stepCounts.length - 1; i++) {
+    const drop = stepCounts[i].count - stepCounts[i + 1].count
+    if (drop > maxDropoff) { maxDropoff = drop; maxDropoffStep = stepCounts[i].step }
+  }
 
   return (
-    <div className="p-6 max-w-6xl">
-      <div className="mb-6">
+    <div className="p-6 max-w-6xl space-y-6">
+      <div>
         <h1 className="text-2xl font-bold text-white">Demo Analytics</h1>
-        <p className="text-gray-400 text-sm mt-0.5">Visitor behaviour on /demo and /tour pages</p>
+        <p className="text-gray-400 text-sm mt-0.5">Visitor behaviour on /demo and /tour pages · last 30 days</p>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total Sessions"  value={all}              icon={Users}           color="bg-blue-900/40 text-blue-400"    />
-        <StatCard label="Last 30 Days"    value={recent}           icon={TrendingUp}       color="bg-emerald-900/40 text-emerald-400" />
-        <StatCard label="Conversion Rate" value={`${conversionRate}%`} sub="to signup"   icon={MousePointerClick} color="bg-purple-900/40 text-purple-400" />
-        <StatCard label="Start Trial CTAs" value={ctaStartTrial} sub="last 30d" icon={BarChart2} color="bg-orange-900/40 text-orange-400" />
+      {/* ── Top stat cards ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Total Sessions"      value={all}                   icon={Users}            color="bg-blue-900/40 text-blue-400" />
+        <StatCard label="Last 30 Days"        value={recent}                icon={TrendingUp}        color="bg-emerald-900/40 text-emerald-400" />
+        <StatCard label="Conversion Rate"     value={`${conversionRate}%`}  icon={MousePointerClick} color="bg-purple-900/40 text-purple-400" sub="to signup" />
+        <StatCard label="Start Trial CTAs"    value={ctaStartTrial}         icon={BarChart2}         color="bg-orange-900/40 text-orange-400" sub="last 30d" />
       </div>
 
-      {/* Daily chart */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
+      {/* ── Tour completion row ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="Tour Completion Rate"
+          value={totalTourSessions > 0 ? `${completionRate}%` : "—"}
+          sub={`${completedCount} of ${totalTourSessions} tour sessions`}
+          icon={Target}
+          color="bg-teal-900/40 text-teal-400"
+        />
+        <StatCard
+          label="Avg Active Time"
+          value={avgActiveTimeSec > 0 ? formatActiveTime(avgActiveTimeSec) : "—"}
+          sub="per tour session (last 30d)"
+          icon={Clock}
+          color="bg-indigo-900/40 text-indigo-400"
+        />
+        <StatCard
+          label="Most Common Drop-off"
+          value={maxDropoff > 0 ? `Step ${maxDropoffStep}` : "—"}
+          sub={maxDropoff > 0 ? `${maxDropoff} visitors left here` : "not enough data"}
+          icon={TrendingUp}
+          color="bg-red-900/40 text-red-400"
+        />
+        <StatCard
+          label="Tour Sessions (30d)"
+          value={totalTourSessions}
+          sub={`${all - totalTourSessions} demo-only sessions`}
+          icon={Users}
+          color="bg-cyan-900/40 text-cyan-400"
+        />
+      </div>
+
+      {/* ── Daily sessions chart ── */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <h2 className="text-sm font-semibold text-gray-300 mb-4">Daily Sessions — Last 14 Days</h2>
-        <div className="flex items-end gap-1.5 h-32">
+        <div className="flex items-end gap-1 h-32">
           {days14.map(day => (
-            <div key={day.label} className="flex-1 flex flex-col items-center gap-1">
+            <div key={day.key} className="flex-1 flex flex-col items-center gap-0" style={{ minWidth: 0 }}>
               <div
-                className="w-full bg-emerald-600/70 rounded-t-sm"
+                className="w-full bg-emerald-600/70 rounded-t-sm hover:bg-emerald-500 transition-colors"
+                title={`${day.label}: ${day.count} sessions`}
                 style={{ height: `${(day.count / maxCount) * 100}%`, minHeight: day.count > 0 ? "4px" : "0" }}
               />
-              <span className="text-[9px] text-gray-600 rotate-45 origin-left translate-x-1">{day.label.split(" ")[1]}</span>
+            </div>
+          ))}
+        </div>
+        {/* X-axis labels — show every other day to avoid crowding */}
+        <div className="flex gap-1 mt-1">
+          {days14.map((day, i) => (
+            <div key={day.key} className="flex-1 text-center" style={{ minWidth: 0 }}>
+              {i % 2 === 0 ? (
+                <span className="text-[9px] text-gray-600 block truncate">{day.label}</span>
+              ) : (
+                <span className="text-[9px] text-gray-800 block">·</span>
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Bottom row */}
+      {/* ── Step drop-off chart ── */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-sm font-semibold text-gray-300">Tour Step Drop-off</h2>
+          {maxDropoff > 0 && (
+            <span className="text-[11px] text-red-400 font-medium">
+              Biggest drop-off at Step {maxDropoffStep} (−{maxDropoff} visitors)
+            </span>
+          )}
+        </div>
+        <p className="text-[11px] text-gray-600 mb-4">
+          Number of tour sessions that reached each step — lower bars reveal where visitors leave
+        </p>
+        {totalTourSessions === 0 ? (
+          <p className="text-gray-600 text-sm">No tour sessions recorded in the last 30 days.</p>
+        ) : (
+          <>
+            <div className="flex items-end gap-0.5 h-28">
+              {stepCounts.map(sc => {
+                const isDropoffStep = sc.step === maxDropoffStep && maxDropoff > 0
+                return (
+                  <div
+                    key={sc.step}
+                    className="flex-1 flex flex-col items-center"
+                    style={{ minWidth: 0 }}
+                    title={`Step ${sc.step}: ${sc.count} sessions`}
+                  >
+                    <div
+                      className={`w-full rounded-t-sm transition-colors ${isDropoffStep ? "bg-red-500/70 hover:bg-red-500" : "bg-blue-600/60 hover:bg-blue-500"}`}
+                      style={{
+                        height:    `${(sc.count / maxStepCount) * 100}%`,
+                        minHeight: sc.count > 0 ? "3px" : "0",
+                      }}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+            {/* Step number labels */}
+            <div className="flex gap-0.5 mt-1">
+              {stepCounts.map(sc => (
+                <div key={sc.step} className="flex-1 text-center" style={{ minWidth: 0 }}>
+                  {sc.step % 3 === 1 ? (
+                    <span className="text-[9px] text-gray-600 block">{sc.step}</span>
+                  ) : (
+                    <span className="text-[9px] text-gray-800 block">·</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-gray-700 mt-1">Step number (1–{TOTAL_TOUR_STEPS})</p>
+          </>
+        )}
+      </div>
+
+      {/* ── Bottom row — Industry + CTA ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Industry breakdown */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-gray-300 mb-4">Industry Breakdown</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-gray-300">Industry Breakdown</h2>
+            <span className="text-[11px] text-gray-600">{all} total sessions</span>
+          </div>
           {industries.length === 0 ? (
-            <p className="text-gray-600 text-sm">No industry data yet</p>
+            <p className="text-gray-600 text-sm">No data yet</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {industries.map(row => {
-                const pct = Math.round((row._count / (all || 1)) * 100)
+                const pct = all > 0 ? Math.round((row.count / all) * 100) : 0
                 return (
-                  <div key={row.industrySelected ?? "unknown"}>
+                  <div key={row.industry}>
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-gray-300">{row.industrySelected ?? "Unknown"}</span>
-                      <span className="text-gray-500">{row._count} ({pct}%)</span>
+                      <span className={`${row.isOther ? "text-gray-500 italic" : "text-gray-300"}`}>
+                        {row.industry}
+                      </span>
+                      <span className="text-gray-500">{row.count} ({pct}%)</span>
                     </div>
                     <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-600/70 rounded-full" style={{ width: `${pct}%` }} />
+                      <div
+                        className={`h-full rounded-full ${row.isOther ? "bg-gray-600/60" : "bg-emerald-600/70"}`}
+                        style={{ width: `${pct}%` }}
+                      />
                     </div>
                   </div>
                 )
@@ -137,9 +307,9 @@ export default async function DemoAnalyticsPage() {
           <h2 className="text-sm font-semibold text-gray-300 mb-4">CTA Clicks — Last 30 Days</h2>
           <div className="space-y-3">
             {[
-              { label: "Start Trial",  value: ctaStartTrial, color: "bg-emerald-600" },
-              { label: "Book Demo",    value: ctaBookDemo,   color: "bg-blue-600" },
-              { label: "Explore",      value: ctaExplore,    color: "bg-purple-600" },
+              { label: "Start Trial", value: ctaStartTrial, color: "bg-emerald-600" },
+              { label: "Book Demo",   value: ctaBookDemo,   color: "bg-blue-600" },
+              { label: "Explore",     value: ctaExplore,    color: "bg-purple-600" },
             ].map(cta => {
               const total = ctaStartTrial + ctaBookDemo + ctaExplore
               const pct   = total > 0 ? Math.round((cta.value / total) * 100) : 0

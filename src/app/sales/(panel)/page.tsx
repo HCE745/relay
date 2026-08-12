@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   AlertCircle, Clock, Mail, FileText, Calendar, Users, TrendingUp,
   ArrowRight, CheckCircle2, Target, Zap, MessageSquare, BarChart2,
-  GitBranch, Bell, Sparkles,
+  GitBranch, Bell, Sparkles, MousePointer, Trophy,
 } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -313,6 +313,15 @@ export default async function SalesDashboardPage({
     funnelDemoSched,
     funnelTrial,
     funnelConverted,
+
+    // Link tracking
+    ltClicksAgg,
+    ltUniqueClicked,
+    ltTourStarts,
+    ltTourCompleted,
+    ltPricingViews,
+    ltDemoRequests,
+    ltTrialStarts,
   ] = await Promise.all([
     // Action center
     prisma.crmEmail.count({ where: { ...sentBase, followUpDate: { gte: todayStart, lt: todayEnd }, followUpDoneAt: null } }),
@@ -394,6 +403,15 @@ export default async function SalesDashboardPage({
     prisma.demoCall.count({ where: { callStatus: { in: ["Scheduled", "Demo Completed", "Trial Active", "Trial Expired", "Converted"] } } }),
     prisma.demoCall.count({ where: { callStatus: { in: ["Trial Active", "Trial Expired", "Converted"] } } }),
     prisma.demoCall.count({ where: { callStatus: "Converted" } }),
+
+    // Link tracking
+    prisma.linkClick.aggregate({ _sum: { clickCount: true }, where: { isBotSuspected: false } }).catch(() => ({ _sum: { clickCount: 0 } })),
+    prisma.linkClick.count({ where: { clickCount: { gt: 0 }, isBotSuspected: false } }).catch(() => 0),
+    prisma.linkTrackingEvent.count({ where: { eventType: "tour_started",   isBotSuspected: false } }).catch(() => 0),
+    prisma.linkTrackingEvent.count({ where: { eventType: "tour_completed", isBotSuspected: false } }).catch(() => 0),
+    prisma.linkTrackingEvent.count({ where: { eventType: "pricing_viewed", isBotSuspected: false } }).catch(() => 0),
+    prisma.linkTrackingEvent.count({ where: { eventType: "demo_requested", isBotSuspected: false } }).catch(() => 0),
+    prisma.linkTrackingEvent.count({ where: { eventType: "trial_started",  isBotSuspected: false } }).catch(() => 0),
   ])
 
   // ── Derived metrics ─────────────────────────────────────────────────────────
@@ -408,6 +426,12 @@ export default async function SalesDashboardPage({
   const bestStage      = stageRows.length > 0
     ? stageRows.reduce((best, r) => Number(r.reply_count) > Number(best.reply_count) ? r : best, stageRows[0])
     : null
+
+  const ltTotalClicks    = ltClicksAgg._sum.clickCount ?? 0
+  const ltClickRate      = pct(ltUniqueClicked, funnelEmails)
+  const ltTourStartRate  = pct(ltTourStarts, ltUniqueClicked)
+  const ltTourCompRate   = pct(ltTourCompleted, ltTourStarts)
+  const ltPricingRate    = pct(ltPricingViews, ltUniqueClicked)
 
   const aiMetrics = {
     "Emails sent (period)": sentPeriod,
@@ -706,7 +730,60 @@ export default async function SalesDashboardPage({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════════
-          SECTION 6 — AI INSIGHTS
+          SECTION 6 — LINK TRACKING & ENGAGEMENT
+      ══════════════════════════════════════════════════════════════════════════ */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <MousePointer className="w-4 h-4 text-emerald-400" />
+          <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Link Tracking &amp; Engagement</h2>
+          <span className="text-[10px] text-gray-600 px-2 py-0.5 bg-gray-800 rounded-full">All-time · confirmed clicks only</span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <KpiCard
+            label="Total Link Clicks"
+            value={ltTotalClicks}
+            sub={`${ltUniqueClicked} emails clicked`}
+            color={ltTotalClicks > 0 ? "text-emerald-400" : "text-gray-500"}
+          />
+          <KpiCard
+            label="Click Rate"
+            value={funnelEmails > 0 ? ltClickRate : "—"}
+            sub={`${ltUniqueClicked} / ${funnelEmails} emails`}
+            color={ltUniqueClicked > 0 ? "text-emerald-400" : "text-gray-500"}
+          />
+          <KpiCard
+            label="Pricing Views"
+            value={ltPricingViews}
+            sub={ltUniqueClicked > 0 ? `${ltPricingRate} of clickers` : "of clickers"}
+            color={ltPricingViews > 0 ? "text-amber-400" : "text-gray-500"}
+          />
+          <KpiCard
+            label="High-Intent Events"
+            value={ltDemoRequests + ltTrialStarts}
+            sub={`${ltDemoRequests} demo req · ${ltTrialStarts} trial starts`}
+            color={ltDemoRequests + ltTrialStarts > 0 ? "text-red-400" : "text-gray-500"}
+          />
+        </div>
+
+        {/* Tour engagement funnel */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+            <p className="text-xs font-semibold text-gray-400">Tour Engagement Funnel</p>
+          </div>
+          <p className="text-[11px] text-gray-600 mb-4">Prospects who clicked a link → started tour → completed tour → converted</p>
+          <Funnel rows={[
+            { label: "Clicked Link",   count: ltUniqueClicked },
+            { label: "Tour Started",   count: ltTourStarts },
+            { label: "Tour Completed", count: ltTourCompleted },
+            { label: "Demo Requested", count: ltDemoRequests },
+            { label: "Trial Started",  count: ltTrialStarts },
+          ]} />
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════════════
+          SECTION 7 — AI INSIGHTS
       ══════════════════════════════════════════════════════════════════════════ */}
       <div>
         <div className="flex items-center gap-2 mb-4">

@@ -522,6 +522,21 @@ export type ProspectNote = Prisma.ProspectNoteModel
  */
 export type DemoAnalytics = Prisma.DemoAnalyticsModel
 /**
+ * Model LinkClick
+ * 
+ */
+export type LinkClick = Prisma.LinkClickModel
+/**
+ * Model LinkTrackingEvent
+ * 
+ */
+export type LinkTrackingEvent = Prisma.LinkTrackingEventModel
+/**
+ * Model SalesSetting
+ * 
+ */
+export type SalesSetting = Prisma.SalesSettingModel
+/**
  * Model AiCache
  * 
  */

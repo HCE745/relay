@@ -194,10 +194,10 @@ export function CrmEmailThread({ demoCall }: { demoCall: DemoCallCtx }) {
                         email.openedAt ? (
                           <span
                             className="text-[10px] flex items-center gap-1 px-1.5 py-0.5 rounded-full font-medium bg-emerald-900/40 text-emerald-400"
-                            title={`First opened ${new Date(email.openedAt).toLocaleString()}`}
+                            title={`Estimated open — tracking pixel fired ${new Date(email.openedAt).toLocaleString()}${email.openCount > 1 ? ` (${email.openCount}×)` : ""}. May include email preview tools.`}
                           >
                             <Eye className="w-2.5 h-2.5" />
-                            {email.openCount > 1 ? `Opened ${email.openCount}×` : "Opened"}
+                            {email.openCount > 1 ? `Est. Open ${email.openCount}×` : "Est. Open"}
                           </span>
                         ) : (
                           <span className="text-[10px] flex items-center gap-1 text-gray-600">

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { computeEngagementScore, scoreLabel } from "@/lib/engagement-score"
 
 export const dynamic = "force-dynamic"
 
@@ -78,6 +79,59 @@ export async function GET() {
     sentCountsRaw.map(r => [r.threadId!, r._count.id])
   )
 
+  // Fetch engagement data for all prospects in the queue
+  const contactEmailsInQueue = [...new Set(emails.map(e => e.contactEmail).filter(Boolean))] as string[]
+  const [prospectContacts, emailLinkClicks] = await Promise.all([
+    contactEmailsInQueue.length > 0
+      ? prisma.prospectContact.findMany({
+          where:  { email: { in: contactEmailsInQueue } },
+          select: { email: true, prospectId: true },
+        })
+      : Promise.resolve([]),
+    emails.length > 0
+      ? prisma.linkClick.findMany({
+          where: {
+            crmEmailId: { in: emails.map(e => e.id) },
+          },
+          select: { crmEmailId: true, clickCount: true, isBotSuspected: true, token: true },
+        })
+      : Promise.resolve([]),
+  ])
+
+  // Map contact email → prospectId
+  const emailToProspectId = Object.fromEntries(
+    prospectContacts.map(pc => [pc.email!.toLowerCase(), pc.prospectId])
+  )
+
+  // Get all unique prospectIds, then fetch their tracking events
+  const prospectIdsInQueue = [...new Set(Object.values(emailToProspectId).filter(Boolean))] as string[]
+  const prospectLinkClicks = prospectIdsInQueue.length > 0
+    ? await prisma.linkClick.findMany({
+        where:   { prospectId: { in: prospectIdsInQueue } },
+        include: { events: { select: { eventType: true, isBotSuspected: true } } },
+      })
+    : []
+
+  // Build per-prospect engagement map
+  interface EngData { score: number; label: string; hasClick: boolean; tourSteps: number; tourComplete: boolean; pricingViewed: boolean; returned: boolean }
+  const prospectEngMap = new Map<string, EngData>()
+  for (const pid of prospectIdsInQueue) {
+    const clicks = prospectLinkClicks.filter(lc => lc.prospectId === pid)
+    const allEvs = clicks.flatMap(lc => lc.events)
+    const hasClick = clicks.some(lc => lc.clickCount > 0 && !lc.isBotSuspected)
+    const pixelOpens = 0  // will look up per email below
+    const score = computeEngagementScore(allEvs, pixelOpens, hasClick)
+    prospectEngMap.set(pid, {
+      score,
+      label:        scoreLabel(score),
+      hasClick,
+      tourSteps:    allEvs.filter(e => !e.isBotSuspected && e.eventType === "tour_step_completed").length,
+      tourComplete: allEvs.some(e => !e.isBotSuspected && e.eventType === "tour_completed"),
+      pricingViewed:allEvs.some(e => !e.isBotSuspected && e.eventType === "pricing_viewed"),
+      returned:     allEvs.some(e => !e.isBotSuspected && e.eventType === "returned_visit"),
+    })
+  }
+
   const enriched = emails.map(e => {
     // Use actual sent-email count in thread as the effective stage (0-indexed).
     // Fall back to stored stageNumber only if we have no thread data.
@@ -86,6 +140,8 @@ export async function GET() {
     const dueStageNum = sn + 1
     const sequenceComplete = dueStageNum > maxStageNum
     const hasReply       = e.threadId ? repliedThreadIds.has(e.threadId) : false
+    const pid    = emailToProspectId[e.contactEmail?.toLowerCase() ?? ""] ?? null
+    const eng    = pid ? (prospectEngMap.get(pid) ?? null) : null
     return {
       ...e,
       stageNumber:     sn,
@@ -94,6 +150,7 @@ export async function GET() {
       dueStageName:    sequenceComplete ? "Sequence Complete" : (stageMap[dueStageNum] ?? `Stage ${dueStageNum}`),
       sequenceComplete,
       hasReply,
+      engagement: eng,
     }
   })
 

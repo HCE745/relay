@@ -24,8 +24,10 @@ const PUBLIC_PATHS = [
   // Sales login page + its dedicated API route
   "/sales/login",
   "/api/sales/login",
-  // Open tracking pixel — must be reachable by email clients without login
+  // Open tracking pixel + click event recording — must be reachable without login
   "/api/track",
+  // Link click redirects — must be public so email recipients can follow tracked links
+  "/t/",
   // Demo system — unauthenticated start + self-guarded APIs
   "/demo",
   "/tour",

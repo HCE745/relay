@@ -480,6 +480,9 @@ export const ModelName = {
   ProspectContact: 'ProspectContact',
   ProspectNote: 'ProspectNote',
   DemoAnalytics: 'DemoAnalytics',
+  LinkClick: 'LinkClick',
+  LinkTrackingEvent: 'LinkTrackingEvent',
+  SalesSetting: 'SalesSetting',
   AiCache: 'AiCache',
   SalesUser: 'SalesUser'
 } as const
@@ -497,7 +500,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "aiCache" | "salesUser"
+    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "linkClick" | "linkTrackingEvent" | "salesSetting" | "aiCache" | "salesUser"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -7605,6 +7608,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LinkClick: {
+      payload: Prisma.$LinkClickPayload<ExtArgs>
+      fields: Prisma.LinkClickFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LinkClickFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LinkClickFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>
+        }
+        findFirst: {
+          args: Prisma.LinkClickFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LinkClickFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>
+        }
+        findMany: {
+          args: Prisma.LinkClickFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>[]
+        }
+        create: {
+          args: Prisma.LinkClickCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>
+        }
+        createMany: {
+          args: Prisma.LinkClickCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LinkClickCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>[]
+        }
+        delete: {
+          args: Prisma.LinkClickDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>
+        }
+        update: {
+          args: Prisma.LinkClickUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>
+        }
+        deleteMany: {
+          args: Prisma.LinkClickDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LinkClickUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LinkClickUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>[]
+        }
+        upsert: {
+          args: Prisma.LinkClickUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkClickPayload>
+        }
+        aggregate: {
+          args: Prisma.LinkClickAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLinkClick>
+        }
+        groupBy: {
+          args: Prisma.LinkClickGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LinkClickGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LinkClickCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LinkClickCountAggregateOutputType> | number
+        }
+      }
+    }
+    LinkTrackingEvent: {
+      payload: Prisma.$LinkTrackingEventPayload<ExtArgs>
+      fields: Prisma.LinkTrackingEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LinkTrackingEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LinkTrackingEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>
+        }
+        findFirst: {
+          args: Prisma.LinkTrackingEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LinkTrackingEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>
+        }
+        findMany: {
+          args: Prisma.LinkTrackingEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>[]
+        }
+        create: {
+          args: Prisma.LinkTrackingEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>
+        }
+        createMany: {
+          args: Prisma.LinkTrackingEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LinkTrackingEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>[]
+        }
+        delete: {
+          args: Prisma.LinkTrackingEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>
+        }
+        update: {
+          args: Prisma.LinkTrackingEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.LinkTrackingEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LinkTrackingEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LinkTrackingEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.LinkTrackingEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LinkTrackingEventPayload>
+        }
+        aggregate: {
+          args: Prisma.LinkTrackingEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLinkTrackingEvent>
+        }
+        groupBy: {
+          args: Prisma.LinkTrackingEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LinkTrackingEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LinkTrackingEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LinkTrackingEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    SalesSetting: {
+      payload: Prisma.$SalesSettingPayload<ExtArgs>
+      fields: Prisma.SalesSettingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SalesSettingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SalesSettingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>
+        }
+        findFirst: {
+          args: Prisma.SalesSettingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SalesSettingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>
+        }
+        findMany: {
+          args: Prisma.SalesSettingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>[]
+        }
+        create: {
+          args: Prisma.SalesSettingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>
+        }
+        createMany: {
+          args: Prisma.SalesSettingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SalesSettingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>[]
+        }
+        delete: {
+          args: Prisma.SalesSettingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>
+        }
+        update: {
+          args: Prisma.SalesSettingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>
+        }
+        deleteMany: {
+          args: Prisma.SalesSettingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SalesSettingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SalesSettingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>[]
+        }
+        upsert: {
+          args: Prisma.SalesSettingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SalesSettingPayload>
+        }
+        aggregate: {
+          args: Prisma.SalesSettingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSalesSetting>
+        }
+        groupBy: {
+          args: Prisma.SalesSettingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SalesSettingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SalesSettingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SalesSettingCountAggregateOutputType> | number
+        }
+      }
+    }
     AiCache: {
       payload: Prisma.$AiCachePayload<ExtArgs>
       fields: Prisma.AiCacheFieldRefs
@@ -9583,6 +9808,46 @@ export const DemoAnalyticsScalarFieldEnum = {
 export type DemoAnalyticsScalarFieldEnum = (typeof DemoAnalyticsScalarFieldEnum)[keyof typeof DemoAnalyticsScalarFieldEnum]
 
 
+export const LinkClickScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  crmEmailId: 'crmEmailId',
+  prospectId: 'prospectId',
+  destinationUrl: 'destinationUrl',
+  emailSentAt: 'emailSentAt',
+  createdAt: 'createdAt',
+  firstClickedAt: 'firstClickedAt',
+  clickCount: 'clickCount',
+  lastClickedAt: 'lastClickedAt',
+  isBotSuspected: 'isBotSuspected'
+} as const
+
+export type LinkClickScalarFieldEnum = (typeof LinkClickScalarFieldEnum)[keyof typeof LinkClickScalarFieldEnum]
+
+
+export const LinkTrackingEventScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  eventType: 'eventType',
+  eventData: 'eventData',
+  sessionId: 'sessionId',
+  activeTimeSeconds: 'activeTimeSeconds',
+  isBotSuspected: 'isBotSuspected',
+  createdAt: 'createdAt'
+} as const
+
+export type LinkTrackingEventScalarFieldEnum = (typeof LinkTrackingEventScalarFieldEnum)[keyof typeof LinkTrackingEventScalarFieldEnum]
+
+
+export const SalesSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SalesSettingScalarFieldEnum = (typeof SalesSettingScalarFieldEnum)[keyof typeof SalesSettingScalarFieldEnum]
+
+
 export const AiCacheScalarFieldEnum = {
   id: 'id',
   orgId: 'orgId',
@@ -10141,6 +10406,9 @@ export type GlobalOmitConfig = {
   prospectContact?: Prisma.ProspectContactOmit
   prospectNote?: Prisma.ProspectNoteOmit
   demoAnalytics?: Prisma.DemoAnalyticsOmit
+  linkClick?: Prisma.LinkClickOmit
+  linkTrackingEvent?: Prisma.LinkTrackingEventOmit
+  salesSetting?: Prisma.SalesSettingOmit
   aiCache?: Prisma.AiCacheOmit
   salesUser?: Prisma.SalesUserOmit
 }

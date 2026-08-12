@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { ChevronLeft, ChevronRight, X, ExternalLink, Check, Lock, Volume2, VolumeX, Play, Pause } from "lucide-react"
 import { useTour, TOTAL_TOUR_STEPS } from "./tour-context"
 import { TOUR_STEPS, ROLE_DEMOS, INDUSTRY_DEMOS, PACKAGE_DEMOS, ADDITIONAL_FEATURES } from "./tour-steps"
+import { fireTrackingEvent } from "./relay-tracker"
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
@@ -311,6 +312,10 @@ function CompletionOverlay({ industry, onClose }: { industry: string; onClose: (
   const step = TOUR_STEPS.find(s => s.id === TOTAL_TOUR_STEPS)!
   const calendlyUrl = "https://calendly.com/getrelay"
 
+  useEffect(() => {
+    fireTrackingEvent("tour_completed", { industry })
+  }, []) // eslint-disable-line
+
   return (
     <div className="fixed inset-0 z-[9000] bg-gray-950/95 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-gray-900 border border-gray-700 rounded-2xl p-8 text-center shadow-2xl">
@@ -330,6 +335,7 @@ function CompletionOverlay({ industry, onClose }: { industry: string; onClose: (
           </button>
           <a
             href="/register"
+            onClick={() => fireTrackingEvent("trial_started", { source: "tour_completion" })}
             className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
           >
             Start Free Trial — No Credit Card Required
@@ -339,6 +345,7 @@ function CompletionOverlay({ industry, onClose }: { industry: string; onClose: (
             href={calendlyUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => fireTrackingEvent("demo_requested", { source: "calendly" })}
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
           >
             Schedule Live Demo
@@ -389,7 +396,9 @@ export function TourOverlay() {
   const audioEnabledRef = useRef(audioEnabled)
   const nextStepFnRef = useRef(nextStep)
 
-  const prevStepRef = useRef(currentStep)
+  const prevStepRef       = useRef(currentStep)
+  const trackedStartRef   = useRef(false)
+  const trackedStepRef    = useRef(0)
 
   const step = TOUR_STEPS.find(s => s.id === currentStep)
 
@@ -418,6 +427,21 @@ export function TourOverlay() {
     document.addEventListener("keydown", handler)
     return () => document.removeEventListener("keydown", handler)
   }, [isActive, exitTour])
+
+  // Fire tour_started on first step
+  useEffect(() => {
+    if (isActive && currentStep === 1 && !trackedStartRef.current) {
+      trackedStartRef.current = true
+      fireTrackingEvent("tour_started", { step: 1 })
+    }
+  }, [isActive, currentStep])
+
+  // Fire tour_step_completed whenever we advance past a step
+  useEffect(() => {
+    if (!isActive || currentStep <= 1 || currentStep === trackedStepRef.current) return
+    trackedStepRef.current = currentStep
+    fireTrackingEvent("tour_step_completed", { step: currentStep - 1 })
+  }, [isActive, currentStep])
 
   // Reset per-step state when step changes
   useEffect(() => {

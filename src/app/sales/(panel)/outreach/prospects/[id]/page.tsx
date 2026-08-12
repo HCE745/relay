@@ -6,7 +6,9 @@ import { formatDistanceToNow, differenceInDays } from "date-fns"
 import {
   Building2, Mail, User, Star, ArrowLeft, ExternalLink, Globe,
   MapPin, Users, Tag, Clock, Send, MessageSquare, Calendar,
+  MousePointer, Zap, Eye, TrendingUp, CheckCircle2, Trophy,
 } from "lucide-react"
+import { computeEngagementScore, scoreLabel, scoreColor } from "@/lib/engagement-score"
 
 export const dynamic = "force-dynamic"
 
@@ -95,6 +97,66 @@ export default async function ProspectDetailPage({
         }).then(r => r._sum.openCount ?? 0)
       : Promise.resolve(0),
   ])
+
+  // Link tracking timeline
+  const linkClicks = await prisma.linkClick.findMany({
+    where:   { prospectId: prospect.id },
+    include: {
+      events:   { orderBy: { createdAt: "asc" } },
+      crmEmail: { select: { subject: true, sentAt: true } },
+    },
+    orderBy: { createdAt: "asc" },
+  })
+
+  const allEvents   = linkClicks.flatMap(lc => lc.events)
+  const hasRealClick = linkClicks.some(lc => lc.clickCount > 0 && !lc.isBotSuspected)
+  const engScore    = computeEngagementScore(allEvents, totalOpens, hasRealClick)
+  const engLabel    = scoreLabel(engScore)
+  const engColorCls = scoreColor(engScore)
+
+  // Build chronological timeline
+  interface TlEvent { at: Date; label: string; sub?: string; color: string; icon: "click" | "eye" | "tour" | "check" | "trophy" | "zap" }
+  const timeline: TlEvent[] = []
+
+  for (const lc of linkClicks) {
+    if (lc.firstClickedAt && !lc.isBotSuspected) {
+      timeline.push({
+        at:    lc.firstClickedAt,
+        label: "Link clicked",
+        sub:   lc.crmEmail?.subject ?? lc.destinationUrl.slice(0, 60),
+        color: "text-emerald-400",
+        icon:  "click",
+      })
+    }
+  }
+
+  const EVENT_META: Record<string, { label: string; color: string; icon: TlEvent["icon"] }> = {
+    tour_started:         { label: "Started product tour",    color: "text-blue-400",    icon: "zap" },
+    tour_step_completed:  { label: "Completed a tour step",   color: "text-blue-300",    icon: "check" },
+    tour_completed:       { label: "Completed full tour",     color: "text-emerald-400", icon: "trophy" },
+    pricing_viewed:       { label: "Viewed pricing page",     color: "text-amber-400",   icon: "eye" },
+    demo_requested:       { label: "Requested a live demo",   color: "text-red-400",     icon: "trophy" },
+    trial_started:        { label: "Started a free trial",    color: "text-purple-400",  icon: "trophy" },
+    returned_visit:       { label: "Returned to site",        color: "text-cyan-400",    icon: "zap" },
+    page_viewed:          { label: "Viewed a page",           color: "text-gray-500",    icon: "eye" },
+  }
+
+  for (const ev of allEvents) {
+    if (ev.isBotSuspected) continue
+    if (ev.eventType === "tour_step_completed") continue  // too noisy, skip individual steps
+    const meta = EVENT_META[ev.eventType]
+    if (!meta) continue
+    const data = ev.eventData as Record<string, unknown>
+    timeline.push({
+      at:    ev.createdAt,
+      label: meta.label,
+      sub:   typeof data.path === "string" ? data.path : undefined,
+      color: meta.color,
+      icon:  meta.icon,
+    })
+  }
+
+  timeline.sort((a, b) => a.at.getTime() - b.at.getTime())
 
   const lastContact = prospect.lastOutreachDate ?? prospect.lastReplyDate ?? null
   const daysSince   = lastContact ? differenceInDays(new Date(), lastContact) : null
@@ -190,11 +252,18 @@ export default async function ProspectDetailPage({
             color={receivedFromProspect > 0 ? "text-emerald-400" : "text-gray-500"}
           />
           <KpiCard
-            label="Total Opens"
+            label="Est. Opens"
             value={totalOpens}
-            sub={sentToProspect > 0 ? `${((totalOpens / sentToProspect) * 100).toFixed(0)}% open rate` : "track pixel required"}
+            sub={sentToProspect > 0 ? `${((totalOpens / sentToProspect) * 100).toFixed(0)}% est. open rate` : "pixel tracking"}
             color={totalOpens > 0 ? "text-blue-400" : "text-gray-500"}
           />
+          <div className="bg-gray-800/60 rounded-xl p-3.5">
+            <p className="text-[10px] text-gray-500 mb-1 uppercase tracking-wide">Engagement Score</p>
+            <p className={`text-xl font-bold text-white`}>{engScore}</p>
+            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${engColorCls}`}>
+              {engLabel}
+            </span>
+          </div>
           {lastContact && (
             <KpiCard
               label="Last Contact"
@@ -299,6 +368,48 @@ export default async function ProspectDetailPage({
           </div>
         </div>
       )}
+
+      {/* ── Engagement Timeline ── */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            Engagement Timeline
+          </h2>
+          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${engColorCls}`}>
+            {engLabel} · {engScore} pts
+          </span>
+        </div>
+        {timeline.length === 0 ? (
+          <div className="px-5 py-6 text-sm text-gray-600">
+            No tracked engagement yet. Link tracking fires automatically when emails are sent from the CRM.
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-800/60">
+            {timeline.map((ev, i) => {
+              const Icon = ev.icon === "click" ? MousePointer
+                : ev.icon === "eye"   ? Eye
+                : ev.icon === "tour"  ? TrendingUp
+                : ev.icon === "check" ? CheckCircle2
+                : ev.icon === "trophy"? Trophy
+                : Zap
+              return (
+                <div key={i} className="flex items-start gap-3 px-5 py-3">
+                  <div className={`mt-0.5 shrink-0 ${ev.color}`}>
+                    <Icon className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-medium ${ev.color}`}>{ev.label}</p>
+                    {ev.sub && <p className="text-[10px] text-gray-600 truncate">{ev.sub}</p>}
+                  </div>
+                  <p className="text-[10px] text-gray-600 shrink-0">
+                    {formatDistanceToNow(ev.at, { addSuffix: true })}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
 
       {/* ── Notes ── */}
       {prospect.notes.length > 0 && (

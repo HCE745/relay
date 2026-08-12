@@ -147,6 +147,9 @@ export const ModelName = {
   ProspectContact: 'ProspectContact',
   ProspectNote: 'ProspectNote',
   DemoAnalytics: 'DemoAnalytics',
+  LinkClick: 'LinkClick',
+  LinkTrackingEvent: 'LinkTrackingEvent',
+  SalesSetting: 'SalesSetting',
   AiCache: 'AiCache',
   SalesUser: 'SalesUser'
 } as const
@@ -1956,6 +1959,46 @@ export const DemoAnalyticsScalarFieldEnum = {
 } as const
 
 export type DemoAnalyticsScalarFieldEnum = (typeof DemoAnalyticsScalarFieldEnum)[keyof typeof DemoAnalyticsScalarFieldEnum]
+
+
+export const LinkClickScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  crmEmailId: 'crmEmailId',
+  prospectId: 'prospectId',
+  destinationUrl: 'destinationUrl',
+  emailSentAt: 'emailSentAt',
+  createdAt: 'createdAt',
+  firstClickedAt: 'firstClickedAt',
+  clickCount: 'clickCount',
+  lastClickedAt: 'lastClickedAt',
+  isBotSuspected: 'isBotSuspected'
+} as const
+
+export type LinkClickScalarFieldEnum = (typeof LinkClickScalarFieldEnum)[keyof typeof LinkClickScalarFieldEnum]
+
+
+export const LinkTrackingEventScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  eventType: 'eventType',
+  eventData: 'eventData',
+  sessionId: 'sessionId',
+  activeTimeSeconds: 'activeTimeSeconds',
+  isBotSuspected: 'isBotSuspected',
+  createdAt: 'createdAt'
+} as const
+
+export type LinkTrackingEventScalarFieldEnum = (typeof LinkTrackingEventScalarFieldEnum)[keyof typeof LinkTrackingEventScalarFieldEnum]
+
+
+export const SalesSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SalesSettingScalarFieldEnum = (typeof SalesSettingScalarFieldEnum)[keyof typeof SalesSettingScalarFieldEnum]
 
 
 export const AiCacheScalarFieldEnum = {

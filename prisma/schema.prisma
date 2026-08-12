@@ -1841,6 +1841,7 @@ model CrmEmail {
 
   demoCall   DemoCall?   @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
   imapConfig ImapConfig? @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
+  linkClicks LinkClick[]
 
   @@index([demoCallId])
   @@index([contactEmail])
@@ -2392,8 +2393,9 @@ model Prospect {
   createdAt              DateTime          @default(now())
   updatedAt              DateTime          @updatedAt
 
-  contacts ProspectContact[]
-  notes    ProspectNote[]
+  contacts   ProspectContact[]
+  notes      ProspectNote[]
+  linkClicks LinkClick[]
 
   @@index([aiFitScore])
   @@index([currentCrmStatus])
@@ -2454,6 +2456,51 @@ model DemoAnalytics {
   @@index([page])
   @@index([createdAt])
   @@index([page, createdAt])
+}
+
+// ── CRM Link Tracking ────────────────────────────────────────────────────────
+
+model LinkClick {
+  id             String    @id @default(cuid())
+  token          String    @unique @db.VarChar(16)
+  crmEmailId     String?
+  prospectId     String?
+  destinationUrl String    @db.Text
+  emailSentAt    DateTime?
+  createdAt      DateTime  @default(now())
+  firstClickedAt DateTime?
+  clickCount     Int       @default(0)
+  lastClickedAt  DateTime?
+  isBotSuspected Boolean   @default(false)
+
+  crmEmail CrmEmail?         @relation(fields: [crmEmailId], references: [id], onDelete: SetNull)
+  prospect Prospect?         @relation(fields: [prospectId], references: [id], onDelete: SetNull)
+  events   LinkTrackingEvent[]
+
+  @@index([crmEmailId])
+  @@index([prospectId])
+}
+
+model LinkTrackingEvent {
+  id                String   @id @default(cuid())
+  token             String
+  eventType         String   // link_clicked|tour_started|tour_step_completed|tour_completed|pricing_viewed|demo_requested|trial_started|page_viewed|returned_visit
+  eventData         Json     @default("{}")
+  sessionId         String   @default("")
+  activeTimeSeconds Int      @default(0)
+  isBotSuspected    Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  linkClick LinkClick @relation(fields: [token], references: [token], onDelete: Cascade)
+
+  @@index([token])
+  @@index([createdAt])
+}
+
+model SalesSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 // ── AI Feature Cache ─────────────────────────────────────────────────────────

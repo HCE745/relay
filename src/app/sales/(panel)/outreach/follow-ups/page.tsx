@@ -5,10 +5,21 @@ import { cn } from "@/lib/utils"
 import {
   AlertCircle, Clock, Mail, CheckCircle, Building2,
   ArrowLeft, ArrowUpRight, ArrowDownLeft, Send, Loader2, X, Calendar, Eye, EyeOff,
+  MousePointer, TrendingUp,
 } from "lucide-react"
 import { EmailActionMenu } from "@/components/crm/email-action-menu"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+interface EngagementData {
+  score:         number
+  label:         "Low" | "Medium" | "High" | "Hot"
+  hasClick:      boolean
+  tourSteps:     number
+  tourComplete:  boolean
+  pricingViewed: boolean
+  returned:      boolean
+}
 
 interface FollowUp {
   id:              string
@@ -27,6 +38,7 @@ interface FollowUp {
   openCount:       number
   lastOpenedAt:    string | null
   hasReply:        boolean
+  engagement:      EngagementData | null
 }
 
 interface CrmEmail {
@@ -302,6 +314,37 @@ function FollowUpRow({ item, isSelected, onSelect, onIgnore }: {
               Not opened
             </span>
           )}
+          {item.engagement?.hasClick && (
+            <span className="flex items-center gap-1 text-emerald-400 font-medium">
+              <MousePointer className="w-3 h-3" />
+              Clicked link
+            </span>
+          )}
+          {item.engagement?.pricingViewed && (
+            <span className="flex items-center gap-1 text-amber-400 font-medium">
+              💰 Viewed pricing
+            </span>
+          )}
+          {item.engagement?.tourComplete && (
+            <span className="flex items-center gap-1 text-purple-400 font-medium">
+              <TrendingUp className="w-3 h-3" />
+              Completed tour
+            </span>
+          )}
+          {!item.engagement?.tourComplete && (item.engagement?.tourSteps ?? 0) > 0 && (
+            <span className="flex items-center gap-1 text-blue-400">
+              <TrendingUp className="w-3 h-3" />
+              Tour {item.engagement!.tourSteps} steps
+            </span>
+          )}
+          {item.engagement && item.engagement.score >= 150 && (
+            <span className="flex items-center gap-1 text-red-400 font-bold">
+              🔥 Hot — {item.engagement.score} pts
+            </span>
+          )}
+          {item.engagement?.returned && (
+            <span className="text-cyan-400">↩ Returned</span>
+          )}
         </div>
       </div>
     </div>
@@ -484,10 +527,10 @@ function ThreadDetail({ followUp, onBack, onIgnore, onSent }: {
                         email.openedAt ? (
                           <span
                             className="text-[10px] flex items-center gap-1 px-1.5 py-0.5 rounded-full font-medium bg-emerald-900/40 text-emerald-400"
-                            title={`First opened ${new Date(email.openedAt).toLocaleString()}`}
+                            title={`Estimated open — pixel fired ${new Date(email.openedAt).toLocaleString()}. May include email preview tools.`}
                           >
                             <Eye className="w-2.5 h-2.5" />
-                            {email.openCount > 1 ? `Opened ${email.openCount}×` : "Opened"}
+                            {email.openCount > 1 ? `Est. Open ${email.openCount}×` : "Est. Open"}
                           </span>
                         ) : (
                           <span className="text-[10px] flex items-center gap-1 text-gray-600">

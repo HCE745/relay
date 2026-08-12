@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { randomBytes } from "crypto"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { htmlToText } from "@/lib/html-to-text"
@@ -135,9 +136,42 @@ export async function POST(req: NextRequest) {
       await prisma.crmEmail.update({ where: { id: email.id }, data: { threadId: email.id } })
     }
 
+    // Auto link-tracking: replace href URLs with tracked redirect URLs before sending
+    let processedHtml = bodyHtml
+    try {
+      const trackSetting = await prisma.salesSetting.findUnique({ where: { key: "link_tracking_enabled" } })
+      if (trackSetting?.value !== "false") {
+        const contact = await prisma.prospectContact.findFirst({
+          where: { email: { equals: to, mode: "insensitive" } },
+          select: { prospectId: true },
+        })
+        const prospectId = contact?.prospectId ?? null
+        const urlPattern = /href="(https?:\/\/[^"]+)"/gi
+        const tokenMap = new Map<string, string>()
+        for (const [, url] of bodyHtml.matchAll(urlPattern)) {
+          if (!url.includes("app.getrelay.software") && !tokenMap.has(url)) {
+            tokenMap.set(url, randomBytes(9).toString("base64url").slice(0, 12))
+          }
+        }
+        if (tokenMap.size > 0) {
+          await Promise.all([...tokenMap.entries()].map(([destinationUrl, token]) =>
+            prisma.linkClick.create({
+              data: { token, crmEmailId: email.id, prospectId, destinationUrl, emailSentAt: new Date() },
+            })
+          ))
+          processedHtml = bodyHtml.replace(urlPattern, (_full, url) => {
+            const token = tokenMap.get(url)
+            return token ? `href="https://app.getrelay.software/t/${token}"` : _full
+          })
+        }
+      }
+    } catch (linkErr) {
+      console.error("[crm-email] link tracking failed:", linkErr)
+    }
+
     // Append tracking pixel to the sent body (stored body stays clean — pixel is only in transit)
     const trackingPixel = `<img src="https://app.getrelay.software/api/track/open/${email.id}" width="1" height="1" border="0" style="display:none" alt="" />`
-    const trackedHtml   = `${bodyHtml}${trackingPixel}`
+    const trackedHtml   = `${processedHtml}${trackingPixel}`
 
     // Send the email
     if (imapCfg) {

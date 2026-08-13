@@ -575,153 +575,176 @@ export const ADDITIONAL_FEATURES = [
 
 export const CARWASH_TOUR_STEPS: TourStep[] = [
   // Step 1: Opening (cinematic)
+  // Narration 1: matches — no route/selector needed
   {
     id: 1,
     path: null,
     targetSelector: null,
     type: "cinematic",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-01.mp3",
     getTitle: () => "Your wash site is running. Something just broke.",
     getExplain: () =>
-      "A conveyor stalls. A vacuum jams. A customer scans a QR code to report that Bay 3 left their car half-rinsed. At a car wash, problems happen fast and the window to fix them without losing customers is short. Relay gives your team the tools to catch, track, and close every issue before it affects the next car in line.",
+      "Running a car wash means keeping equipment running, responding to customer problems, and staying ahead of maintenance. Relay puts all of that in one place so issues do not disappear into texts, calls, or memory.",
   },
 
   // Step 2: Wash Overview Dashboard
+  // Narration 2: matches — /dashboard + kpi-cards exists (Group C)
   {
     id: 2,
     path: "/dashboard",
     targetSelector: "[data-tour='kpi-cards']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-02.mp3",
     cue: "This is what your team sees every morning before the first car arrives.",
-    getTitle: () => "Every site at a glance — before the first car arrives.",
+    getTitle: () => "Your Wash Overview — everything that matters, immediately.",
     getExplain: () =>
-      "The Wash Overview shows exactly what matters: how many bays are operational, any active equipment breakdowns, customer reports that came in overnight, open maintenance tasks, and repeat failures that need attention. Managers get the full picture without calling anyone.",
+      "Your Wash Overview shows what matters immediately — which bays are operating, what equipment is down, customer reports today, and open maintenance. You can see where attention is needed without digging through the system.",
   },
 
-  // Step 3: Report a breakdown (form-fill)
+  // Step 3: QR Codes — customer scanning concept
+  // Narration 3: "Customers often notice equipment problems first. Relay lets them scan a QR code..."
+  // Truthful: /qr-codes admin page shows the codes customers scan; narration describes the customer-facing experience
   {
     id: 3,
+    path: "/qr-codes",
+    targetSelector: "[data-tour='qr-list']",
+    audioFile: "/demo-audio/carwash-step-03.mp3",
+    cue: "Customers can report a problem at any bay without an account or an app.",
+    getTitle: () => "Customers report problems the moment they notice them.",
+    getExplain: () =>
+      "Customers often notice equipment problems first. Relay lets them scan a QR code on a bay, vacuum, or other equipment and report the problem in seconds — no login and no app required.",
+  },
+
+  // Step 4: QR Codes — auto-identification detail
+  // Narration 4: "The QR code already identifies the wash, location, and equipment..."
+  // Truthful: stays on /qr-codes; narrates QR link-to-location/asset feature which exists
+  {
+    id: 4,
+    path: "/qr-codes",
+    targetSelector: "[data-tour='qr-list']",
+    audioFile: "/demo-audio/carwash-step-04.mp3",
+    cue: "Each code is already linked to a location or piece of equipment.",
+    getTitle: () => "The QR code does the work — customers just describe the problem.",
+    getExplain: () =>
+      "The QR code already identifies the wash, location, and equipment. The customer simply chooses what went wrong, adds details if needed, and submits the report directly to your operation.",
+  },
+
+  // Step 5: Form-fill — demo customer report submission
+  // Narration 5: "The report appears inside Relay with the equipment, site, time, and problem already attached."
+  // Truthful: form-fill submits a demo report; narration describes what appears after submission
+  {
+    id: 5,
     path: "/issues/new",
     targetSelector: "[data-tour='issue-form']",
     type: "form-fill",
-    audioFile: null,
-    cue: "Watch how quickly an attendant reports the Bay 2 conveyor stall.",
-    getTitle: () => "Any attendant can report a breakdown in seconds.",
+    audioFile: "/demo-audio/carwash-step-05.mp3",
+    cue: "Watch as we submit a demo customer report.",
+    getTitle: () => "The report appears in Relay immediately.",
     getExplain: () =>
-      "When Bay 2 conveyor stalls, every second the line is backed up costs revenue. With Relay, the attendant submits the issue from any device in seconds, with photos, location, and priority. The right technician is notified immediately — no radio calls, no delays waiting for a manager to relay the message.",
+      "The report appears inside Relay with the equipment, site, time, and problem already attached. Your team immediately knows what happened and where.",
     getFormData: () => ({
-      title:       "Bay 2 tunnel conveyor stalled",
-      description: "Tunnel conveyor stopped mid-cycle in Bay 2. Cars are backing up at the entrance. Attendant suspects a chain tension issue — chemical dosing pump also flagged low pressure this morning.",
+      title:       "Vacuum coin return jammed — Bay 4 island",
+      description: "Customer reports coin return stuck on vacuum. Machine accepted coins but did not return change and did not start. Bay 4 vacuum island.",
       category:    "EQUIPMENT_BREAKDOWN",
     }),
   },
 
-  // Step 4: Automatic routing
-  {
-    id: 4,
-    path: "/dashboard",
-    targetSelector: "[data-tour='kpi-cards']",
-    audioFile: null,
-    cue: "It appeared in the dashboard immediately, already routed to the right technician.",
-    getTitle: () => "Breakdowns route to the right technician automatically.",
-    getExplain: () =>
-      "Relay routes the issue to the correct technician the moment it is submitted, based on the issue type, the bay, and your routing rules. No manager needs to relay the message. By the time your technician walks over, they already know what is wrong and where.",
-  },
-
-  // Step 5: Issue detail
-  {
-    id: 5,
-    path: "SUBMITTED_ISSUE",
-    targetSelector: "[data-tour='issue-detail']",
-    audioFile: null,
-    cue: "Every action from report to resolution is tracked automatically.",
-    getTitle: () => "A complete record from the first report to the final fix.",
-    getExplain: () =>
-      "When the same conveyor stalls two weeks later, the full history is already there: who reported it, who fixed it last time, what the repair was, how long it took. Relay turns every breakdown into institutional knowledge instead of a forgotten verbal exchange.",
-  },
-
-  // Step 6: Equipment page
+  // Step 6: Issue detail — assignment
+  // Narration 6: "Assign the problem to the person responsible..."
+  // Truthful: issue detail page shows assignee, assignment controls, owner visibility
   {
     id: 6,
-    path: "/assets",
-    targetSelector: "[data-tour='asset-list']",
-    audioFile: null,
-    cue: "Every piece of equipment across your sites, with live status.",
-    getTitle: () => "All your equipment, tracked in one place.",
+    path: "SUBMITTED_ISSUE",
+    targetSelector: "[data-tour='issue-detail']",
+    audioFile: "/demo-audio/carwash-step-06.mp3",
+    cue: "Assign it to the person responsible for handling it.",
+    getTitle: () => "Every problem has a clear owner.",
     getExplain: () =>
-      "Relay tracks every asset across your wash sites: conveyors, dryers, vacuums, pay stations, chemical systems, RO units. Each piece of equipment shows its current status, open issues, and full service history. When a technician asks which pump has been repaired three times this year, the answer is one click away.",
+      "Assign the problem to the person responsible for handling it. Relay gives every issue a clear owner so managers can see what is being worked on and what still needs attention.",
   },
 
-  // Step 7: QR Codes
+  // Step 7: Issue detail — lifecycle (same page, different narration)
+  // Narration 7: "update status, add notes and photos, document the resolution"
+  // Truthful: issue detail page has status updates, comments, photo attachments — all implemented
   {
     id: 7,
-    path: "/qr-codes",
-    targetSelector: "[data-tour='qr-list']",
-    audioFile: null,
-    cue: "Customers can report a problem at any bay without an account or an app.",
-    getTitle: () => "Customers report problems the moment they notice them.",
+    path: "SUBMITTED_ISSUE",
+    targetSelector: "[data-tour='issue-detail']",
+    audioFile: "/demo-audio/carwash-step-07.mp3",
+    cue: "Status, notes, and photos all stay attached to the same record.",
+    getTitle: () => "One record, visible to everyone — no chasing updates.",
     getExplain: () =>
-      "Place a Relay QR code at every vacuum island, pay station, and bay entrance. Customers scan it, describe the problem, and submit in seconds without an account. The report arrives in your dashboard instantly, tagged to that location. Customer problems get caught in real time instead of as a bad review the next morning.",
+      "As the problem is handled, your team can update its status, add notes and photos, and document the resolution. Everyone sees the same record instead of chasing updates.",
   },
 
-  // Step 8: Customer Reports on Dashboard
+  // Step 8: Asset history
+  // Narration 8: "Each piece of equipment builds a history of its problems and repairs."
+  // Truthful: FIRST_ASSET → /assets/[id] → [data-tour='asset-history'] shows full issue history per asset
   {
     id: 8,
-    path: "/dashboard",
-    targetSelector: "[data-tour='carwash-customer-reports']",
-    audioFile: null,
-    cue: "Customer QR reports flow directly here — no email, no phone tag.",
-    getTitle: () => "Customer feedback without the phone call.",
+    path: "FIRST_ASSET",
+    targetSelector: "[data-tour='asset-history']",
+    audioFile: "/demo-audio/carwash-step-08.mp3",
+    getCue: () => "Every piece of equipment keeps its own history.",
+    getTitle: () => "Every piece of equipment builds its own record.",
     getExplain: () =>
-      "Every customer QR report appears here the moment it is submitted, with the location and problem description. Your team can respond, assign, and resolve from the same system they use for every other issue. Nothing falls through the cracks between a customer complaint and the staff member who can fix it.",
+      "Each piece of equipment builds a history of its problems and repairs. That makes recurring failures easier to spot and gives you context before the next service visit.",
   },
 
-  // Step 9: Equipment Status on Dashboard
+  // Step 9: Maintenance issues view
+  // Narration 9: "stay ahead of recurring maintenance instead of waiting for equipment to fail"
+  // Truthful: /issues?category=MAINTENANCE shows open maintenance tasks — keeping routine service visible
+  // Does NOT claim PM scheduling (not yet implemented)
   {
     id: 9,
-    path: "/dashboard",
-    targetSelector: "[data-tour='carwash-equipment-status']",
-    audioFile: null,
-    cue: "See the real-time status of every bay and major equipment group.",
-    getTitle: () => "Real-time equipment status across every bay.",
+    path: "/issues?category=MAINTENANCE",
+    targetSelector: "[data-tour='issue-list']",
+    audioFile: "/demo-audio/carwash-step-09.mp3",
+    cue: "Open maintenance tasks stay visible so nothing slips through.",
+    getTitle: () => "Stay ahead of maintenance — not behind it.",
     getExplain: () =>
-      "The Equipment Status grid shows the current state of every major asset at your site: operational, under maintenance, or out of service. Equipment with open issues is surfaced at the top. When a technician comes in for a shift, this is their starting point — no need to walk every bay to find out what is working.",
+      "Relay also helps you stay ahead of recurring maintenance instead of waiting for equipment to fail. Keep routine service visible and make sure required maintenance does not get forgotten.",
   },
 
   // Step 10: Locations
+  // Narration 10: "For operators with several washes..."
+  // Truthful: /locations + location-list shows sites with issue/asset counts
   {
     id: 10,
     path: "/locations",
     targetSelector: "[data-tour='location-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-10.mp3",
     cue: "Each wash site is its own location, with its own issues and equipment.",
-    getTitle: () => "Manage every site from one system.",
+    getTitle: () => "All your sites in one system.",
     getExplain: () =>
-      "Whether you run one location or seven, each wash site has its own issue queue, equipment list, and team. Relay lets you manage them all from a single dashboard while keeping site-level data organized and separate. When a problem is reported at Site 3, the team at Site 1 is not distracted.",
+      "For operators with several washes, Relay brings each location into one view. You can quickly see which sites have open issues and where equipment needs attention.",
   },
 
-  // Step 11: Analytics / Reports
+  // Step 11: Analytics
+  // Narration 11: "Over time, the history in Relay shows which equipment causes the most problems..."
+  // Truthful: /analytics shows issue trends, volume by category, resolution times
   {
     id: 11,
     path: "/analytics",
     targetSelector: "[data-tour='analytics-charts']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-11.mp3",
     cue: "Every issue your team resolves builds this over time.",
-    getTitle: () => "Know which equipment costs you the most.",
+    getTitle: () => "The data that makes better maintenance decisions.",
     getExplain: () =>
-      "Which bay generates the most breakdowns? Which piece of equipment has the worst resolution time? Are customer reports spiking at a particular location? Relay turns issue history into operational intelligence, so decisions about repairs, replacements, and staffing are based on data, not gut feel.",
+      "Over time, the history in Relay shows which equipment causes the most problems, where issues keep recurring, and how quickly they get resolved. That gives you better information for maintenance and replacement decisions.",
   },
 
   // Step 12: Completion
+  // Narration 12: "Wash Essentials for smaller operators, full Relay Wash Edition for larger"
+  // Note: "Relay Wash Edition" is user-provided terminology; product in code is "Full Relay"
   {
     id: 12,
     path: null,
     targetSelector: null,
     type: "completion",
-    audioFile: null,
-    getTitle: () => "That's Relay for Car Wash — every breakdown owned, every customer report tracked.",
+    audioFile: "/demo-audio/carwash-step-12.mp3",
+    getTitle: () => "That's Relay for Car Wash.",
     getExplain: () =>
-      "Relay gives car wash operators a shared system for every equipment failure, every customer complaint, and every maintenance task. Wash Essentials covers the core: QR reporting, equipment tracking, issues, and locations, built for car wash operations from day one. Full Relay adds vendor management, multi-site analytics, and advanced escalation workflows. Start a free trial or schedule a demo to see it in your operation.",
+      "Wash Essentials is designed for smaller car-wash operators that need a simple way to manage equipment problems, maintenance, and customer reports. Larger organizations can use Full Relay for advanced teams, workflows, routing, and operational coordination. Start a free trial or schedule a demo to see it in your operation.",
   },
 ]
 

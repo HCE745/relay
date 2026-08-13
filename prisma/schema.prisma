@@ -22,7 +22,8 @@ model Organization {
   stripeSubscriptionId  String?
   stripeCouponId        String?  // reusable founding-customer discount coupon
   subscriptionStatus    String     @default("trialing") // "trialing" | "active" | "past_due" | "canceled" | "suspended" | "expired" | "read_only"
-  plan                  String     @default("essentials") // "essentials" | "professional" | "custom" | "free" (legacy)
+  plan                  String     @default("essentials") // "essentials" | "professional" | "custom" | "free" (legacy) | "wash_essentials"
+  productLine           String     @default("RELAY_STANDARD") // "RELAY_STANDARD" | "WASH_ESSENTIALS"
   employeeLimit         Int?       // null = unlimited
   locationLimit         Int?       // null = unlimited
   // Checkout intent (pre-Stripe)
@@ -357,6 +358,7 @@ model Asset {
   purchaseDate   DateTime?
   warrantyExpiry DateTime?
   notes          String?
+  assetSubtype   String?   // car-wash operational taxonomy; see CARWASH_ASSET_TAXONOMY in src/lib/car-wash-config.ts
   organizationId String
   locationId     String?
   departmentId   String?
@@ -373,6 +375,7 @@ model Asset {
   purchaseRequests PurchaseRequest[]
   qrCodes         QrCode[]
   assignments     Assignment[]     @relation("AssetAssignments")
+  maintenanceSchedules MaintenanceSchedule[] @relation("AssetMaintenanceSchedules")
 }
 
 model Vendor {
@@ -822,6 +825,7 @@ model MaintenanceSchedule {
   recurrence     String    @default("once") // "once" | "weekly" | "monthly" | "quarterly" | "yearly"
   nextDueAt      DateTime
   locationId     String?
+  assetId        String?
   assignedToId   String?
   isActive       Boolean   @default(true)
   createdAt      DateTime  @default(now())
@@ -829,6 +833,7 @@ model MaintenanceSchedule {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   location     Location?    @relation(fields: [locationId], references: [id])
+  asset        Asset?       @relation("AssetMaintenanceSchedules", fields: [assetId], references: [id], onDelete: SetNull)
   assignedTo   User?        @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])

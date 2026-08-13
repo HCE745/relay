@@ -16,7 +16,8 @@ export type SessionPayload = {
   onboardingCompleted?: boolean
   trialEndsAt?: string        // ISO string; undefined = no trial restriction
   subscriptionStatus?: string // "trialing" | "active" | "expired" | "read_only"
-  plan?: string               // "essentials" | "professional" | "custom"
+  plan?: string               // "essentials" | "professional" | "custom" | "wash_essentials"
+  productLine?: string        // "RELAY_STANDARD" | "WASH_ESSENTIALS"
   // Super admin panel access
   superAdmin?: boolean        // true = this is a super admin session
   superAdminId?: string       // set on both SA sessions and impersonation sessions

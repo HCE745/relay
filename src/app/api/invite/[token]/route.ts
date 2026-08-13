@@ -91,7 +91,7 @@ export async function POST(
     // Re-issue session under the new org
     const org = await prisma.organization.findUnique({
       where: { id: invitation.organizationId },
-      select: { plan: true, subscriptionStatus: true, onboardingCompletedAt: true },
+      select: { plan: true, productLine: true, subscriptionStatus: true, onboardingCompletedAt: true },
     })
 
     await createSession({
@@ -101,6 +101,7 @@ export async function POST(
       role: invitation.role,
       organizationId: invitation.organizationId,
       plan: org?.plan,
+      productLine: org?.productLine,
       subscriptionStatus: org?.subscriptionStatus,
       onboardingCompleted: org?.onboardingCompletedAt != null,
     })

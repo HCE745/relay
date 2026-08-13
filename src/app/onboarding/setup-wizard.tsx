@@ -1061,6 +1061,7 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
   const [starting,    setStarting]    = useState(false)
   const [trialError,  setTrialError]  = useState("")
 
+  const isCarWash       = data.industry === "Car Wash"
   const employeeCount   = data.companySize       ? parseInt(data.companySize, 10)       || 10 : 10
   const locationCount   = data.numberOfLocations ? parseInt(data.numberOfLocations, 10) || 1  : 1
 
@@ -1082,9 +1083,14 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
     const params = new URLSearchParams({
       employees: String(employeeCount),
       locations: String(locationCount),
+      ...(isCarWash ? { industry: "car_wash" } : {}),
     })
     router.push(`/subscribe?${params.toString()}`)
   }
+
+  const trialFeatures = isCarWash
+    ? ["QR Customer Reporting", "Asset Tracking", "Issue Management", "Team Invites"]
+    : ["Issues & Assets", "Team Management", "Analytics", "Intelligence Modules"]
 
   return (
     <div className="max-w-xl mx-auto px-4 py-16">
@@ -1092,10 +1098,13 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
         <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
           <PartyPopper className="w-8 h-8 text-green-600" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Your Relay Workspace Is Ready</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          {isCarWash ? "Your Car Wash Workspace Is Ready" : "Your Relay Workspace Is Ready"}
+        </h1>
         <p className="text-gray-500 text-sm">
-          Your categories, locations, and team invites have been configured.
-          Choose how you&apos;d like to get started.
+          {isCarWash
+            ? "Your bays, locations, and team invites have been configured. Start your free trial to explore the full platform."
+            : "Your categories, locations, and team invites have been configured. Choose how you'd like to get started."}
         </p>
       </div>
 
@@ -1124,8 +1133,8 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
               : <ChevronRight className="w-5 h-5 shrink-0 mt-1" />
             }
           </div>
-          <div className="flex gap-3 mt-4">
-            {["Issues & Assets", "Team Management", "Analytics", "Intelligence Modules"].map((f) => (
+          <div className="flex flex-wrap gap-2 mt-4">
+            {trialFeatures.map((f) => (
               <span key={f} className="text-xs bg-white/20 text-white px-2 py-1 rounded-full">{f}</span>
             ))}
           </div>
@@ -1141,15 +1150,22 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
             <div>
               <p className="font-bold text-gray-900 text-lg">Subscribe Now</p>
               <p className="text-gray-500 text-sm mt-1">
-                Choose your plan and get started immediately. Essentials from $149/mo.
+                {isCarWash
+                  ? "Choose between Wash Essentials and Full Relay — Wash Edition."
+                  : "Choose your plan and get started immediately. Essentials from $149/mo."}
               </p>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400 shrink-0 mt-1" />
           </div>
-          <div className="flex gap-3 mt-4">
-            {["Essentials from $149/mo", "Professional from $299/mo"].map((f) => (
-              <span key={f} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{f}</span>
-            ))}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {isCarWash
+              ? ["Wash Essentials", "Full Relay — Wash Edition"].map((f) => (
+                  <span key={f} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{f}</span>
+                ))
+              : ["Essentials from $149/mo", "Professional from $299/mo"].map((f) => (
+                  <span key={f} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{f}</span>
+                ))
+            }
           </div>
         </button>
       </div>
@@ -1166,31 +1182,42 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
 export function SetupWizard({
   orgName,
   userId,
+  initialIndustry,
 }: {
   orgName: string
   userId: string
+  initialIndustry?: string
 }) {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [data, setData] = useState<WizardData>(() => defaultData(orgName))
+  const [data, setData] = useState<WizardData>(() => ({
+    ...defaultData(orgName),
+    ...(initialIndustry ? { industry: initialIndustry } : {}),
+  }))
   const [hydrated, setHydrated] = useState(false)
 
-  // Load persisted progress from localStorage
+  // Load persisted progress from localStorage (initialIndustry wins if localStorage has none)
   useEffect(() => {
     try {
       const raw = localStorage.getItem(storageKey(userId))
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<WizardData & { __step: number }>
-        setData(d => ({ ...d, ...parsed, __step: undefined } as WizardData))
+        setData(d => ({
+          ...d,
+          ...parsed,
+          // initialIndustry from URL takes precedence over stale localStorage
+          ...(initialIndustry && !parsed.industry ? { industry: initialIndustry } : {}),
+          __step: undefined,
+        } as WizardData))
         if (typeof parsed.__step === "number" && parsed.__step > 1) {
           setStep(parsed.__step)
         }
       }
     } catch { /* ignore */ }
     setHydrated(true)
-  }, [userId])
+  }, [userId, initialIndustry])
 
   // Persist progress on every change
   const persist = useCallback(() => {

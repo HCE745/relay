@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { MapPin, Building2, Camera, User, Mail, Phone, ChevronRight } from "lucide-react"
+import { MapPin, Building2, Camera, User, Mail, Phone, ChevronRight, CheckCircle2 } from "lucide-react"
+import { CARWASH_QR_PROBLEM_LABELS } from "@/lib/car-wash-config"
 
 interface QrCodeData {
   id: string
@@ -22,26 +23,33 @@ interface QrCodeData {
 }
 
 const MODE_PLACEHOLDERS: Record<string, string> = {
-  PUBLIC_ISSUE: "Describe the issue you're reporting…",
-  EMPLOYEE_REPORTING: "Describe what you observed…",
-  ASSET_REPORTING: "Describe the asset issue…",
-  VISITOR_FEEDBACK: "Share your feedback…",
-  SAFETY_REPORTING: "Describe the safety concern…",
+  PUBLIC_ISSUE:        "Describe the issue you're reporting…",
+  EMPLOYEE_REPORTING:  "Describe what you observed…",
+  ASSET_REPORTING:     "Describe the asset issue…",
+  VISITOR_FEEDBACK:    "Share your feedback…",
+  SAFETY_REPORTING:    "Describe the safety concern…",
 }
 
 const MODE_TITLE_PLACEHOLDERS: Record<string, string> = {
-  PUBLIC_ISSUE: "Brief title for this issue",
-  EMPLOYEE_REPORTING: "Brief summary",
-  ASSET_REPORTING: "Asset issue summary",
-  VISITOR_FEEDBACK: "Visitor Feedback",
-  SAFETY_REPORTING: "Safety concern summary",
+  PUBLIC_ISSUE:        "Brief title for this issue",
+  EMPLOYEE_REPORTING:  "Brief summary",
+  ASSET_REPORTING:     "Asset issue summary",
+  VISITOR_FEEDBACK:    "Visitor Feedback",
+  SAFETY_REPORTING:    "Safety concern summary",
 }
 
-export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
+export function QrReportForm({
+  qrCode,
+  isCarWash = false,
+}: {
+  qrCode: QrCodeData
+  isCarWash?: boolean
+}) {
   const isVisitorFeedback = qrCode.reportingMode === "VISITOR_FEEDBACK"
 
   const [title, setTitle] = useState(isVisitorFeedback ? "Visitor Feedback" : "")
   const [description, setDescription] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [reporterName, setReporterName] = useState("")
   const [reporterEmail, setReporterEmail] = useState("")
   const [reporterPhone, setReporterPhone] = useState("")
@@ -53,12 +61,34 @@ export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
 
   const locationStr = [qrCode.location?.name, qrCode.area].filter(Boolean).join(" · ")
 
+  // Build the list of car-wash categories to display, intersected with
+  // the QR code's allowedCategories (if configured) so admins can restrict.
+  const carWashCategories = isCarWash
+    ? (() => {
+        const filtered = qrCode.allowedCategories.filter(
+          (c) => Object.prototype.hasOwnProperty.call(CARWASH_QR_PROBLEM_LABELS, c),
+        )
+        return filtered.length > 0 ? filtered : Object.keys(CARWASH_QR_PROBLEM_LABELS)
+      })()
+    : []
+
+  function handleCategorySelect(cat: string) {
+    setSelectedCategory(cat)
+    setTitle(CARWASH_QR_PROBLEM_LABELS[cat] ?? cat)
+    if (error) setError("")
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
 
-    if (!title.trim()) { setError("Title is required"); return }
-    if (!description.trim()) { setError("Description is required"); return }
+    if (isCarWash) {
+      if (!selectedCategory) { setError("Please select what's wrong"); return }
+    } else {
+      if (!title.trim()) { setError("Title is required"); return }
+      if (!description.trim()) { setError("Description is required"); return }
+    }
+
     if (qrCode.requireContactInfo) {
       if (!reporterName.trim()) { setError("Your name is required"); return }
       if (!reporterEmail.trim()) { setError("Your email is required"); return }
@@ -67,9 +97,14 @@ export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
 
     setSubmitting(true)
     try {
+      const submittedTitle = title.trim() || (CARWASH_QR_PROBLEM_LABELS[selectedCategory ?? ""] ?? "Report")
+      // In car-wash mode description is optional; fall back to the category label
+      const submittedDescription = description.trim() || submittedTitle
+
       const formData = new FormData()
-      formData.append("title", title.trim())
-      formData.append("description", description.trim())
+      formData.append("title", submittedTitle)
+      formData.append("description", submittedDescription)
+      if (selectedCategory) formData.append("category", selectedCategory)
       if (reporterName.trim()) formData.append("reporterName", reporterName.trim())
       if (reporterEmail.trim()) formData.append("reporterEmail", reporterEmail.trim())
       if (reporterPhone.trim()) formData.append("reporterPhone", reporterPhone.trim())
@@ -138,6 +173,14 @@ export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
           {qrCode.description && (
             <p className="text-sm text-gray-400 mt-2">{qrCode.description}</p>
           )}
+          {/* Asset-specific prompt shown in the header so it's visible above the fold */}
+          {isCarWash && qrCode.asset && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <p className="text-base font-semibold text-gray-900">
+                What&apos;s wrong with {qrCode.asset.name}?
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -149,30 +192,71 @@ export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
           </div>
         )}
 
-        {/* Title */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            readOnly={isVisitorFeedback}
-            placeholder={MODE_TITLE_PLACEHOLDERS[qrCode.reportingMode] ?? "Brief title"}
-            className={`w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isVisitorFeedback ? "bg-gray-50 text-gray-500" : "bg-white"}`}
-          />
-        </div>
+        {/* Car-wash: large tap-target category selector */}
+        {isCarWash && (
+          <div>
+            {!qrCode.asset && (
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                What do you need help with? <span className="text-red-500">*</span>
+              </label>
+            )}
+            <div className="space-y-2">
+              {carWashCategories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => handleCategorySelect(cat)}
+                  className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border-2 text-left text-sm font-medium transition-all
+                    ${
+                      selectedCategory === cat
+                        ? "border-indigo-500 bg-indigo-50 text-indigo-900"
+                        : "border-gray-200 bg-white text-gray-800 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                >
+                  {CARWASH_QR_PROBLEM_LABELS[cat] ?? cat}
+                  {selectedCategory === cat && (
+                    <CheckCircle2 className="w-5 h-5 text-indigo-500 shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Standard title field — hidden for car-wash (title is auto-set from category) */}
+        {!isCarWash && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Title <span className="text-red-500">*</span>
+            </label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              readOnly={isVisitorFeedback}
+              placeholder={MODE_TITLE_PLACEHOLDERS[qrCode.reportingMode] ?? "Brief title"}
+              className={`w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isVisitorFeedback ? "bg-gray-50 text-gray-500" : "bg-white"}`}
+            />
+          </div>
+        )}
 
         {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Description <span className="text-red-500">*</span>
+            {isCarWash ? (
+              <>Tell us more <span className="text-gray-400 font-normal">(optional)</span></>
+            ) : (
+              <>Description <span className="text-red-500">*</span></>
+            )}
           </label>
           <textarea
             value={description}
-            onChange={e => setDescription(e.target.value)}
-            rows={5}
-            placeholder={MODE_PLACEHOLDERS[qrCode.reportingMode] ?? "Describe what you're reporting…"}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={isCarWash ? 3 : 5}
+            placeholder={
+              isCarWash
+                ? "Any additional details? (optional)"
+                : (MODE_PLACEHOLDERS[qrCode.reportingMode] ?? "Describe what you're reporting…")
+            }
             className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
           />
         </div>
@@ -192,7 +276,7 @@ export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
               </label>
               <input
                 value={reporterName}
-                onChange={e => setReporterName(e.target.value)}
+                onChange={(e) => setReporterName(e.target.value)}
                 placeholder="Your name"
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
@@ -206,7 +290,7 @@ export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
               <input
                 type="email"
                 value={reporterEmail}
-                onChange={e => setReporterEmail(e.target.value)}
+                onChange={(e) => setReporterEmail(e.target.value)}
                 placeholder="your@email.com"
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
@@ -219,7 +303,7 @@ export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
               <input
                 type="tel"
                 value={reporterPhone}
-                onChange={e => setReporterPhone(e.target.value)}
+                onChange={(e) => setReporterPhone(e.target.value)}
                 placeholder="+1 (555) 000-0000"
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
@@ -242,7 +326,7 @@ export function QrReportForm({ qrCode }: { qrCode: QrCodeData }) {
               type="file"
               accept="image/*"
               capture="environment"
-              onChange={e => {
+              onChange={(e) => {
                 const file = e.target.files?.[0] ?? null
                 setPhoto(file)
                 if (file && error) setError("")

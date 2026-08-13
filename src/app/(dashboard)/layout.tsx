@@ -18,7 +18,7 @@ import { cookies } from "next/headers"
 import { getAccessConfig, type PageAccessConfig } from "@/lib/page-access"
 import { setOrgContext } from "@/lib/sentry"
 import { Clock, AlertTriangle } from "lucide-react"
-import { isReadOnly } from "@/lib/pricing"
+import { isReadOnly, isWashEssentials } from "@/lib/pricing"
 import { ReadOnlyProvider } from "@/components/layout/read-only-context"
 import { TermsUpdateModal } from "@/components/legal/terms-update-modal"
 import { LegalFooter } from "@/components/legal/legal-footer"
@@ -38,6 +38,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         name: true,
         subscriptionStatus: true,
         plan: true,
+        productLine: true,
         industry: true,
         intelligenceModules: true,
         intelligenceSuiteEnabled: true,
@@ -79,7 +80,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const readOnly = isReadOnly(currentStatus)
 
   const storedConfig = (org?.pageAccessConfig ?? null) as PageAccessConfig | null
-  const allowedPageKeys = getAccessConfig(session.role, storedConfig)
+  const basePageKeys = getAccessConfig(session.role, storedConfig)
+
+  // Wash Essentials hides features that are out of scope for the car-wash product
+  const WASH_ESSENTIALS_HIDDEN: Set<string> = new Set([
+    "departments", "sops", "purchase-requests", "approval-intelligence",
+  ])
+  const allowedPageKeys = isWashEssentials(session.productLine)
+    ? basePageKeys.filter(k => !WASH_ESSENTIALS_HIDDEN.has(k))
+    : basePageKeys
   const cookieStore = await cookies()
   // relay-vd: set by /demo-video page for iframe recording
   // relay-vm: set by middleware when ?videomode=true is in the URL

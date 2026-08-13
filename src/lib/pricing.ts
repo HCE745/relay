@@ -218,6 +218,41 @@ export function isProfessional(plan: string) {
   return FULL_ACCESS_PLANS.has(plan)
 }
 
+// ─── Wash Essentials gating ───────────────────────────────────────────────────
+
+export function isWashEssentials(productLine: string | undefined | null): boolean {
+  return productLine === "WASH_ESSENTIALS"
+}
+
+// True when the org has access to features unlocked for both Professional and Wash Essentials
+// (QR codes, assets, vendors, basic analytics)
+export function hasWashOrProfessional(plan: string, productLine: string | undefined | null): boolean {
+  return isProfessional(plan) || isWashEssentials(productLine)
+}
+
+// Features blocked on Wash Essentials to prevent repurposing as general-purpose Relay.
+// Car-wash operational needs (assets, issues, maintenance, QR, vendors) are NOT blocked.
+export type WashEssentialsBlock =
+  | "arbitrary_departments"   // no generic department structure
+  | "workflow_builder"        // no generic automation builder
+  | "form_builder"            // no generic form builder
+  | "advanced_escalations"    // no custom escalation routing
+  | "api_webhooks"            // no external API/webhook access
+  | "regions"                 // no multi-region hierarchy
+  | "corporate_dashboard"     // no cross-org rollup dashboards
+  | "sops"                    // no custom SOP library
+  | "purchase_requests"       // out of scope for car-wash Essentials
+  | "approval_intelligence"   // advanced config capability
+  | "executive_briefings"     // out of scope for car-wash Essentials
+  | "custom_role_builder"     // no arbitrary permission set creation
+
+export function isBlockedOnWashEssentials(
+  feature: WashEssentialsBlock,
+  productLine: string | undefined | null,
+): boolean {
+  return isWashEssentials(productLine)
+}
+
 export function isProfessionalPlus(plan: string) {
   return plan === "professional_plus" || plan === "enterprise"
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { isWashEssentials } from "@/lib/pricing"
 
 export async function PUT(request: NextRequest) {
   const session = await getSession()
@@ -8,6 +9,15 @@ export async function PUT(request: NextRequest) {
   if (session.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const { name, industry } = await request.json()
+
+  // Wash Essentials orgs cannot change their industry — it is locked to Car Wash
+  if (isWashEssentials(session.productLine) && industry !== undefined && industry !== "Car Wash") {
+    return NextResponse.json(
+      { error: "Wash Essentials is configured for car-wash operations. Industry cannot be changed." },
+      { status: 403 },
+    )
+  }
+
   const org = await prisma.organization.update({
     where: { id: session.organizationId },
     data: { name: name || undefined, industry: industry || null },

@@ -30,6 +30,9 @@ const INDUSTRY_MAP: Record<string, string> = {
   property:        "real_estate",
   government:      "government",
   nonprofit:       "nonprofit",
+  "car wash":      "car_wash",
+  "car_wash":      "car_wash",
+  carwash:         "car_wash",
 }
 
 export function bucketIndustry(raw: string | null | undefined): string | null {

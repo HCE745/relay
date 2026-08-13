@@ -32,6 +32,7 @@ export type MaintenanceScheduleMinAggregateOutputType = {
   recurrence: string | null
   nextDueAt: Date | null
   locationId: string | null
+  assetId: string | null
   assignedToId: string | null
   isActive: boolean | null
   createdAt: Date | null
@@ -46,6 +47,7 @@ export type MaintenanceScheduleMaxAggregateOutputType = {
   recurrence: string | null
   nextDueAt: Date | null
   locationId: string | null
+  assetId: string | null
   assignedToId: string | null
   isActive: boolean | null
   createdAt: Date | null
@@ -60,6 +62,7 @@ export type MaintenanceScheduleCountAggregateOutputType = {
   recurrence: number
   nextDueAt: number
   locationId: number
+  assetId: number
   assignedToId: number
   isActive: number
   createdAt: number
@@ -76,6 +79,7 @@ export type MaintenanceScheduleMinAggregateInputType = {
   recurrence?: true
   nextDueAt?: true
   locationId?: true
+  assetId?: true
   assignedToId?: true
   isActive?: true
   createdAt?: true
@@ -90,6 +94,7 @@ export type MaintenanceScheduleMaxAggregateInputType = {
   recurrence?: true
   nextDueAt?: true
   locationId?: true
+  assetId?: true
   assignedToId?: true
   isActive?: true
   createdAt?: true
@@ -104,6 +109,7 @@ export type MaintenanceScheduleCountAggregateInputType = {
   recurrence?: true
   nextDueAt?: true
   locationId?: true
+  assetId?: true
   assignedToId?: true
   isActive?: true
   createdAt?: true
@@ -191,6 +197,7 @@ export type MaintenanceScheduleGroupByOutputType = {
   recurrence: string
   nextDueAt: Date
   locationId: string | null
+  assetId: string | null
   assignedToId: string | null
   isActive: boolean
   createdAt: Date
@@ -226,12 +233,14 @@ export type MaintenanceScheduleWhereInput = {
   recurrence?: Prisma.StringFilter<"MaintenanceSchedule"> | string
   nextDueAt?: Prisma.DateTimeFilter<"MaintenanceSchedule"> | Date | string
   locationId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
+  assetId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
   assignedToId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
   isActive?: Prisma.BoolFilter<"MaintenanceSchedule"> | boolean
   createdAt?: Prisma.DateTimeFilter<"MaintenanceSchedule"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MaintenanceSchedule"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   location?: Prisma.XOR<Prisma.LocationNullableScalarRelationFilter, Prisma.LocationWhereInput> | null
+  asset?: Prisma.XOR<Prisma.AssetNullableScalarRelationFilter, Prisma.AssetWhereInput> | null
   assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
@@ -243,12 +252,14 @@ export type MaintenanceScheduleOrderByWithRelationInput = {
   recurrence?: Prisma.SortOrder
   nextDueAt?: Prisma.SortOrder
   locationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  assetId?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
   location?: Prisma.LocationOrderByWithRelationInput
+  asset?: Prisma.AssetOrderByWithRelationInput
   assignedTo?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -263,12 +274,14 @@ export type MaintenanceScheduleWhereUniqueInput = Prisma.AtLeast<{
   recurrence?: Prisma.StringFilter<"MaintenanceSchedule"> | string
   nextDueAt?: Prisma.DateTimeFilter<"MaintenanceSchedule"> | Date | string
   locationId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
+  assetId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
   assignedToId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
   isActive?: Prisma.BoolFilter<"MaintenanceSchedule"> | boolean
   createdAt?: Prisma.DateTimeFilter<"MaintenanceSchedule"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MaintenanceSchedule"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   location?: Prisma.XOR<Prisma.LocationNullableScalarRelationFilter, Prisma.LocationWhereInput> | null
+  asset?: Prisma.XOR<Prisma.AssetNullableScalarRelationFilter, Prisma.AssetWhereInput> | null
   assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
@@ -280,6 +293,7 @@ export type MaintenanceScheduleOrderByWithAggregationInput = {
   recurrence?: Prisma.SortOrder
   nextDueAt?: Prisma.SortOrder
   locationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  assetId?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -300,6 +314,7 @@ export type MaintenanceScheduleScalarWhereWithAggregatesInput = {
   recurrence?: Prisma.StringWithAggregatesFilter<"MaintenanceSchedule"> | string
   nextDueAt?: Prisma.DateTimeWithAggregatesFilter<"MaintenanceSchedule"> | Date | string
   locationId?: Prisma.StringNullableWithAggregatesFilter<"MaintenanceSchedule"> | string | null
+  assetId?: Prisma.StringNullableWithAggregatesFilter<"MaintenanceSchedule"> | string | null
   assignedToId?: Prisma.StringNullableWithAggregatesFilter<"MaintenanceSchedule"> | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"MaintenanceSchedule"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MaintenanceSchedule"> | Date | string
@@ -317,6 +332,7 @@ export type MaintenanceScheduleCreateInput = {
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutMaintenanceSchedulesInput
   location?: Prisma.LocationCreateNestedOneWithoutMaintenanceSchedulesInput
+  asset?: Prisma.AssetCreateNestedOneWithoutMaintenanceSchedulesInput
   assignedTo?: Prisma.UserCreateNestedOneWithoutMaintenanceSchedulesInput
 }
 
@@ -328,6 +344,7 @@ export type MaintenanceScheduleUncheckedCreateInput = {
   recurrence?: string
   nextDueAt: Date | string
   locationId?: string | null
+  assetId?: string | null
   assignedToId?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -345,6 +362,7 @@ export type MaintenanceScheduleUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutMaintenanceSchedulesNestedInput
   location?: Prisma.LocationUpdateOneWithoutMaintenanceSchedulesNestedInput
+  asset?: Prisma.AssetUpdateOneWithoutMaintenanceSchedulesNestedInput
   assignedTo?: Prisma.UserUpdateOneWithoutMaintenanceSchedulesNestedInput
 }
 
@@ -356,6 +374,7 @@ export type MaintenanceScheduleUncheckedUpdateInput = {
   recurrence?: Prisma.StringFieldUpdateOperationsInput | string
   nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -370,6 +389,7 @@ export type MaintenanceScheduleCreateManyInput = {
   recurrence?: string
   nextDueAt: Date | string
   locationId?: string | null
+  assetId?: string | null
   assignedToId?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -395,6 +415,7 @@ export type MaintenanceScheduleUncheckedUpdateManyInput = {
   recurrence?: Prisma.StringFieldUpdateOperationsInput | string
   nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -419,6 +440,7 @@ export type MaintenanceScheduleCountOrderByAggregateInput = {
   recurrence?: Prisma.SortOrder
   nextDueAt?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
+  assetId?: Prisma.SortOrder
   assignedToId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -433,6 +455,7 @@ export type MaintenanceScheduleMaxOrderByAggregateInput = {
   recurrence?: Prisma.SortOrder
   nextDueAt?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
+  assetId?: Prisma.SortOrder
   assignedToId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -447,6 +470,7 @@ export type MaintenanceScheduleMinOrderByAggregateInput = {
   recurrence?: Prisma.SortOrder
   nextDueAt?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
+  assetId?: Prisma.SortOrder
   assignedToId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -579,6 +603,48 @@ export type MaintenanceScheduleUncheckedUpdateManyWithoutLocationNestedInput = {
   deleteMany?: Prisma.MaintenanceScheduleScalarWhereInput | Prisma.MaintenanceScheduleScalarWhereInput[]
 }
 
+export type MaintenanceScheduleCreateNestedManyWithoutAssetInput = {
+  create?: Prisma.XOR<Prisma.MaintenanceScheduleCreateWithoutAssetInput, Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput> | Prisma.MaintenanceScheduleCreateWithoutAssetInput[] | Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput[]
+  connectOrCreate?: Prisma.MaintenanceScheduleCreateOrConnectWithoutAssetInput | Prisma.MaintenanceScheduleCreateOrConnectWithoutAssetInput[]
+  createMany?: Prisma.MaintenanceScheduleCreateManyAssetInputEnvelope
+  connect?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+}
+
+export type MaintenanceScheduleUncheckedCreateNestedManyWithoutAssetInput = {
+  create?: Prisma.XOR<Prisma.MaintenanceScheduleCreateWithoutAssetInput, Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput> | Prisma.MaintenanceScheduleCreateWithoutAssetInput[] | Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput[]
+  connectOrCreate?: Prisma.MaintenanceScheduleCreateOrConnectWithoutAssetInput | Prisma.MaintenanceScheduleCreateOrConnectWithoutAssetInput[]
+  createMany?: Prisma.MaintenanceScheduleCreateManyAssetInputEnvelope
+  connect?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+}
+
+export type MaintenanceScheduleUpdateManyWithoutAssetNestedInput = {
+  create?: Prisma.XOR<Prisma.MaintenanceScheduleCreateWithoutAssetInput, Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput> | Prisma.MaintenanceScheduleCreateWithoutAssetInput[] | Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput[]
+  connectOrCreate?: Prisma.MaintenanceScheduleCreateOrConnectWithoutAssetInput | Prisma.MaintenanceScheduleCreateOrConnectWithoutAssetInput[]
+  upsert?: Prisma.MaintenanceScheduleUpsertWithWhereUniqueWithoutAssetInput | Prisma.MaintenanceScheduleUpsertWithWhereUniqueWithoutAssetInput[]
+  createMany?: Prisma.MaintenanceScheduleCreateManyAssetInputEnvelope
+  set?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+  disconnect?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+  delete?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+  connect?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+  update?: Prisma.MaintenanceScheduleUpdateWithWhereUniqueWithoutAssetInput | Prisma.MaintenanceScheduleUpdateWithWhereUniqueWithoutAssetInput[]
+  updateMany?: Prisma.MaintenanceScheduleUpdateManyWithWhereWithoutAssetInput | Prisma.MaintenanceScheduleUpdateManyWithWhereWithoutAssetInput[]
+  deleteMany?: Prisma.MaintenanceScheduleScalarWhereInput | Prisma.MaintenanceScheduleScalarWhereInput[]
+}
+
+export type MaintenanceScheduleUncheckedUpdateManyWithoutAssetNestedInput = {
+  create?: Prisma.XOR<Prisma.MaintenanceScheduleCreateWithoutAssetInput, Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput> | Prisma.MaintenanceScheduleCreateWithoutAssetInput[] | Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput[]
+  connectOrCreate?: Prisma.MaintenanceScheduleCreateOrConnectWithoutAssetInput | Prisma.MaintenanceScheduleCreateOrConnectWithoutAssetInput[]
+  upsert?: Prisma.MaintenanceScheduleUpsertWithWhereUniqueWithoutAssetInput | Prisma.MaintenanceScheduleUpsertWithWhereUniqueWithoutAssetInput[]
+  createMany?: Prisma.MaintenanceScheduleCreateManyAssetInputEnvelope
+  set?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+  disconnect?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+  delete?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+  connect?: Prisma.MaintenanceScheduleWhereUniqueInput | Prisma.MaintenanceScheduleWhereUniqueInput[]
+  update?: Prisma.MaintenanceScheduleUpdateWithWhereUniqueWithoutAssetInput | Prisma.MaintenanceScheduleUpdateWithWhereUniqueWithoutAssetInput[]
+  updateMany?: Prisma.MaintenanceScheduleUpdateManyWithWhereWithoutAssetInput | Prisma.MaintenanceScheduleUpdateManyWithWhereWithoutAssetInput[]
+  deleteMany?: Prisma.MaintenanceScheduleScalarWhereInput | Prisma.MaintenanceScheduleScalarWhereInput[]
+}
+
 export type MaintenanceScheduleCreateWithoutOrganizationInput = {
   id?: string
   title: string
@@ -589,6 +655,7 @@ export type MaintenanceScheduleCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   location?: Prisma.LocationCreateNestedOneWithoutMaintenanceSchedulesInput
+  asset?: Prisma.AssetCreateNestedOneWithoutMaintenanceSchedulesInput
   assignedTo?: Prisma.UserCreateNestedOneWithoutMaintenanceSchedulesInput
 }
 
@@ -599,6 +666,7 @@ export type MaintenanceScheduleUncheckedCreateWithoutOrganizationInput = {
   recurrence?: string
   nextDueAt: Date | string
   locationId?: string | null
+  assetId?: string | null
   assignedToId?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -642,6 +710,7 @@ export type MaintenanceScheduleScalarWhereInput = {
   recurrence?: Prisma.StringFilter<"MaintenanceSchedule"> | string
   nextDueAt?: Prisma.DateTimeFilter<"MaintenanceSchedule"> | Date | string
   locationId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
+  assetId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
   assignedToId?: Prisma.StringNullableFilter<"MaintenanceSchedule"> | string | null
   isActive?: Prisma.BoolFilter<"MaintenanceSchedule"> | boolean
   createdAt?: Prisma.DateTimeFilter<"MaintenanceSchedule"> | Date | string
@@ -659,6 +728,7 @@ export type MaintenanceScheduleCreateWithoutAssignedToInput = {
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutMaintenanceSchedulesInput
   location?: Prisma.LocationCreateNestedOneWithoutMaintenanceSchedulesInput
+  asset?: Prisma.AssetCreateNestedOneWithoutMaintenanceSchedulesInput
 }
 
 export type MaintenanceScheduleUncheckedCreateWithoutAssignedToInput = {
@@ -669,6 +739,7 @@ export type MaintenanceScheduleUncheckedCreateWithoutAssignedToInput = {
   recurrence?: string
   nextDueAt: Date | string
   locationId?: string | null
+  assetId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -710,6 +781,7 @@ export type MaintenanceScheduleCreateWithoutLocationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutMaintenanceSchedulesInput
+  asset?: Prisma.AssetCreateNestedOneWithoutMaintenanceSchedulesInput
   assignedTo?: Prisma.UserCreateNestedOneWithoutMaintenanceSchedulesInput
 }
 
@@ -720,6 +792,7 @@ export type MaintenanceScheduleUncheckedCreateWithoutLocationInput = {
   description?: string | null
   recurrence?: string
   nextDueAt: Date | string
+  assetId?: string | null
   assignedToId?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -752,6 +825,60 @@ export type MaintenanceScheduleUpdateManyWithWhereWithoutLocationInput = {
   data: Prisma.XOR<Prisma.MaintenanceScheduleUpdateManyMutationInput, Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutLocationInput>
 }
 
+export type MaintenanceScheduleCreateWithoutAssetInput = {
+  id?: string
+  title: string
+  description?: string | null
+  recurrence?: string
+  nextDueAt: Date | string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutMaintenanceSchedulesInput
+  location?: Prisma.LocationCreateNestedOneWithoutMaintenanceSchedulesInput
+  assignedTo?: Prisma.UserCreateNestedOneWithoutMaintenanceSchedulesInput
+}
+
+export type MaintenanceScheduleUncheckedCreateWithoutAssetInput = {
+  id?: string
+  organizationId: string
+  title: string
+  description?: string | null
+  recurrence?: string
+  nextDueAt: Date | string
+  locationId?: string | null
+  assignedToId?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MaintenanceScheduleCreateOrConnectWithoutAssetInput = {
+  where: Prisma.MaintenanceScheduleWhereUniqueInput
+  create: Prisma.XOR<Prisma.MaintenanceScheduleCreateWithoutAssetInput, Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput>
+}
+
+export type MaintenanceScheduleCreateManyAssetInputEnvelope = {
+  data: Prisma.MaintenanceScheduleCreateManyAssetInput | Prisma.MaintenanceScheduleCreateManyAssetInput[]
+  skipDuplicates?: boolean
+}
+
+export type MaintenanceScheduleUpsertWithWhereUniqueWithoutAssetInput = {
+  where: Prisma.MaintenanceScheduleWhereUniqueInput
+  update: Prisma.XOR<Prisma.MaintenanceScheduleUpdateWithoutAssetInput, Prisma.MaintenanceScheduleUncheckedUpdateWithoutAssetInput>
+  create: Prisma.XOR<Prisma.MaintenanceScheduleCreateWithoutAssetInput, Prisma.MaintenanceScheduleUncheckedCreateWithoutAssetInput>
+}
+
+export type MaintenanceScheduleUpdateWithWhereUniqueWithoutAssetInput = {
+  where: Prisma.MaintenanceScheduleWhereUniqueInput
+  data: Prisma.XOR<Prisma.MaintenanceScheduleUpdateWithoutAssetInput, Prisma.MaintenanceScheduleUncheckedUpdateWithoutAssetInput>
+}
+
+export type MaintenanceScheduleUpdateManyWithWhereWithoutAssetInput = {
+  where: Prisma.MaintenanceScheduleScalarWhereInput
+  data: Prisma.XOR<Prisma.MaintenanceScheduleUpdateManyMutationInput, Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssetInput>
+}
+
 export type MaintenanceScheduleCreateManyOrganizationInput = {
   id?: string
   title: string
@@ -759,6 +886,7 @@ export type MaintenanceScheduleCreateManyOrganizationInput = {
   recurrence?: string
   nextDueAt: Date | string
   locationId?: string | null
+  assetId?: string | null
   assignedToId?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -775,6 +903,7 @@ export type MaintenanceScheduleUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.LocationUpdateOneWithoutMaintenanceSchedulesNestedInput
+  asset?: Prisma.AssetUpdateOneWithoutMaintenanceSchedulesNestedInput
   assignedTo?: Prisma.UserUpdateOneWithoutMaintenanceSchedulesNestedInput
 }
 
@@ -785,6 +914,7 @@ export type MaintenanceScheduleUncheckedUpdateWithoutOrganizationInput = {
   recurrence?: Prisma.StringFieldUpdateOperationsInput | string
   nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -798,6 +928,7 @@ export type MaintenanceScheduleUncheckedUpdateManyWithoutOrganizationInput = {
   recurrence?: Prisma.StringFieldUpdateOperationsInput | string
   nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -812,6 +943,7 @@ export type MaintenanceScheduleCreateManyAssignedToInput = {
   recurrence?: string
   nextDueAt: Date | string
   locationId?: string | null
+  assetId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -828,6 +960,7 @@ export type MaintenanceScheduleUpdateWithoutAssignedToInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutMaintenanceSchedulesNestedInput
   location?: Prisma.LocationUpdateOneWithoutMaintenanceSchedulesNestedInput
+  asset?: Prisma.AssetUpdateOneWithoutMaintenanceSchedulesNestedInput
 }
 
 export type MaintenanceScheduleUncheckedUpdateWithoutAssignedToInput = {
@@ -838,6 +971,7 @@ export type MaintenanceScheduleUncheckedUpdateWithoutAssignedToInput = {
   recurrence?: Prisma.StringFieldUpdateOperationsInput | string
   nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -851,6 +985,7 @@ export type MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToInput = {
   recurrence?: Prisma.StringFieldUpdateOperationsInput | string
   nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -863,6 +998,7 @@ export type MaintenanceScheduleCreateManyLocationInput = {
   description?: string | null
   recurrence?: string
   nextDueAt: Date | string
+  assetId?: string | null
   assignedToId?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -879,6 +1015,7 @@ export type MaintenanceScheduleUpdateWithoutLocationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutMaintenanceSchedulesNestedInput
+  asset?: Prisma.AssetUpdateOneWithoutMaintenanceSchedulesNestedInput
   assignedTo?: Prisma.UserUpdateOneWithoutMaintenanceSchedulesNestedInput
 }
 
@@ -889,6 +1026,7 @@ export type MaintenanceScheduleUncheckedUpdateWithoutLocationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recurrence?: Prisma.StringFieldUpdateOperationsInput | string
   nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -902,6 +1040,63 @@ export type MaintenanceScheduleUncheckedUpdateManyWithoutLocationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recurrence?: Prisma.StringFieldUpdateOperationsInput | string
   nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MaintenanceScheduleCreateManyAssetInput = {
+  id?: string
+  organizationId: string
+  title: string
+  description?: string | null
+  recurrence?: string
+  nextDueAt: Date | string
+  locationId?: string | null
+  assignedToId?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MaintenanceScheduleUpdateWithoutAssetInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recurrence?: Prisma.StringFieldUpdateOperationsInput | string
+  nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutMaintenanceSchedulesNestedInput
+  location?: Prisma.LocationUpdateOneWithoutMaintenanceSchedulesNestedInput
+  assignedTo?: Prisma.UserUpdateOneWithoutMaintenanceSchedulesNestedInput
+}
+
+export type MaintenanceScheduleUncheckedUpdateWithoutAssetInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recurrence?: Prisma.StringFieldUpdateOperationsInput | string
+  nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MaintenanceScheduleUncheckedUpdateManyWithoutAssetInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recurrence?: Prisma.StringFieldUpdateOperationsInput | string
+  nextDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -918,12 +1113,14 @@ export type MaintenanceScheduleSelect<ExtArgs extends runtime.Types.Extensions.I
   recurrence?: boolean
   nextDueAt?: boolean
   locationId?: boolean
+  assetId?: boolean
   assignedToId?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   location?: boolean | Prisma.MaintenanceSchedule$locationArgs<ExtArgs>
+  asset?: boolean | Prisma.MaintenanceSchedule$assetArgs<ExtArgs>
   assignedTo?: boolean | Prisma.MaintenanceSchedule$assignedToArgs<ExtArgs>
 }, ExtArgs["result"]["maintenanceSchedule"]>
 
@@ -935,12 +1132,14 @@ export type MaintenanceScheduleSelectCreateManyAndReturn<ExtArgs extends runtime
   recurrence?: boolean
   nextDueAt?: boolean
   locationId?: boolean
+  assetId?: boolean
   assignedToId?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   location?: boolean | Prisma.MaintenanceSchedule$locationArgs<ExtArgs>
+  asset?: boolean | Prisma.MaintenanceSchedule$assetArgs<ExtArgs>
   assignedTo?: boolean | Prisma.MaintenanceSchedule$assignedToArgs<ExtArgs>
 }, ExtArgs["result"]["maintenanceSchedule"]>
 
@@ -952,12 +1151,14 @@ export type MaintenanceScheduleSelectUpdateManyAndReturn<ExtArgs extends runtime
   recurrence?: boolean
   nextDueAt?: boolean
   locationId?: boolean
+  assetId?: boolean
   assignedToId?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   location?: boolean | Prisma.MaintenanceSchedule$locationArgs<ExtArgs>
+  asset?: boolean | Prisma.MaintenanceSchedule$assetArgs<ExtArgs>
   assignedTo?: boolean | Prisma.MaintenanceSchedule$assignedToArgs<ExtArgs>
 }, ExtArgs["result"]["maintenanceSchedule"]>
 
@@ -969,26 +1170,30 @@ export type MaintenanceScheduleSelectScalar = {
   recurrence?: boolean
   nextDueAt?: boolean
   locationId?: boolean
+  assetId?: boolean
   assignedToId?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MaintenanceScheduleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "title" | "description" | "recurrence" | "nextDueAt" | "locationId" | "assignedToId" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["maintenanceSchedule"]>
+export type MaintenanceScheduleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "title" | "description" | "recurrence" | "nextDueAt" | "locationId" | "assetId" | "assignedToId" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["maintenanceSchedule"]>
 export type MaintenanceScheduleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   location?: boolean | Prisma.MaintenanceSchedule$locationArgs<ExtArgs>
+  asset?: boolean | Prisma.MaintenanceSchedule$assetArgs<ExtArgs>
   assignedTo?: boolean | Prisma.MaintenanceSchedule$assignedToArgs<ExtArgs>
 }
 export type MaintenanceScheduleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   location?: boolean | Prisma.MaintenanceSchedule$locationArgs<ExtArgs>
+  asset?: boolean | Prisma.MaintenanceSchedule$assetArgs<ExtArgs>
   assignedTo?: boolean | Prisma.MaintenanceSchedule$assignedToArgs<ExtArgs>
 }
 export type MaintenanceScheduleIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   location?: boolean | Prisma.MaintenanceSchedule$locationArgs<ExtArgs>
+  asset?: boolean | Prisma.MaintenanceSchedule$assetArgs<ExtArgs>
   assignedTo?: boolean | Prisma.MaintenanceSchedule$assignedToArgs<ExtArgs>
 }
 
@@ -997,6 +1202,7 @@ export type $MaintenanceSchedulePayload<ExtArgs extends runtime.Types.Extensions
   objects: {
     organization: Prisma.$OrganizationPayload<ExtArgs>
     location: Prisma.$LocationPayload<ExtArgs> | null
+    asset: Prisma.$AssetPayload<ExtArgs> | null
     assignedTo: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1007,6 +1213,7 @@ export type $MaintenanceSchedulePayload<ExtArgs extends runtime.Types.Extensions
     recurrence: string
     nextDueAt: Date
     locationId: string | null
+    assetId: string | null
     assignedToId: string | null
     isActive: boolean
     createdAt: Date
@@ -1407,6 +1614,7 @@ export interface Prisma__MaintenanceScheduleClient<T, Null = never, ExtArgs exte
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   location<T extends Prisma.MaintenanceSchedule$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MaintenanceSchedule$locationArgs<ExtArgs>>): Prisma.Prisma__LocationClient<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  asset<T extends Prisma.MaintenanceSchedule$assetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MaintenanceSchedule$assetArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignedTo<T extends Prisma.MaintenanceSchedule$assignedToArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MaintenanceSchedule$assignedToArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1444,6 +1652,7 @@ export interface MaintenanceScheduleFieldRefs {
   readonly recurrence: Prisma.FieldRef<"MaintenanceSchedule", 'String'>
   readonly nextDueAt: Prisma.FieldRef<"MaintenanceSchedule", 'DateTime'>
   readonly locationId: Prisma.FieldRef<"MaintenanceSchedule", 'String'>
+  readonly assetId: Prisma.FieldRef<"MaintenanceSchedule", 'String'>
   readonly assignedToId: Prisma.FieldRef<"MaintenanceSchedule", 'String'>
   readonly isActive: Prisma.FieldRef<"MaintenanceSchedule", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"MaintenanceSchedule", 'DateTime'>
@@ -1865,6 +2074,25 @@ export type MaintenanceSchedule$locationArgs<ExtArgs extends runtime.Types.Exten
    */
   include?: Prisma.LocationInclude<ExtArgs> | null
   where?: Prisma.LocationWhereInput
+}
+
+/**
+ * MaintenanceSchedule.asset
+ */
+export type MaintenanceSchedule$assetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Asset
+   */
+  select?: Prisma.AssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Asset
+   */
+  omit?: Prisma.AssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssetInclude<ExtArgs> | null
+  where?: Prisma.AssetWhereInput
 }
 
 /**

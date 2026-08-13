@@ -72,6 +72,7 @@ export type OrganizationMinAggregateOutputType = {
   stripeCouponId: string | null
   subscriptionStatus: string | null
   plan: string | null
+  productLine: string | null
   employeeLimit: number | null
   locationLimit: number | null
   checkoutIntentStatus: string | null
@@ -187,6 +188,7 @@ export type OrganizationMaxAggregateOutputType = {
   stripeCouponId: string | null
   subscriptionStatus: string | null
   plan: string | null
+  productLine: string | null
   employeeLimit: number | null
   locationLimit: number | null
   checkoutIntentStatus: string | null
@@ -302,6 +304,7 @@ export type OrganizationCountAggregateOutputType = {
   stripeCouponId: number
   subscriptionStatus: number
   plan: number
+  productLine: number
   employeeLimit: number
   locationLimit: number
   checkoutIntentStatus: number
@@ -452,6 +455,7 @@ export type OrganizationMinAggregateInputType = {
   stripeCouponId?: true
   subscriptionStatus?: true
   plan?: true
+  productLine?: true
   employeeLimit?: true
   locationLimit?: true
   checkoutIntentStatus?: true
@@ -567,6 +571,7 @@ export type OrganizationMaxAggregateInputType = {
   stripeCouponId?: true
   subscriptionStatus?: true
   plan?: true
+  productLine?: true
   employeeLimit?: true
   locationLimit?: true
   checkoutIntentStatus?: true
@@ -682,6 +687,7 @@ export type OrganizationCountAggregateInputType = {
   stripeCouponId?: true
   subscriptionStatus?: true
   plan?: true
+  productLine?: true
   employeeLimit?: true
   locationLimit?: true
   checkoutIntentStatus?: true
@@ -887,6 +893,7 @@ export type OrganizationGroupByOutputType = {
   stripeCouponId: string | null
   subscriptionStatus: string
   plan: string
+  productLine: string
   employeeLimit: number | null
   locationLimit: number | null
   checkoutIntentStatus: string | null
@@ -1028,6 +1035,7 @@ export type OrganizationWhereInput = {
   stripeCouponId?: Prisma.StringNullableFilter<"Organization"> | string | null
   subscriptionStatus?: Prisma.StringFilter<"Organization"> | string
   plan?: Prisma.StringFilter<"Organization"> | string
+  productLine?: Prisma.StringFilter<"Organization"> | string
   employeeLimit?: Prisma.IntNullableFilter<"Organization"> | number | null
   locationLimit?: Prisma.IntNullableFilter<"Organization"> | number | null
   checkoutIntentStatus?: Prisma.StringNullableFilter<"Organization"> | string | null
@@ -1199,6 +1207,7 @@ export type OrganizationOrderByWithRelationInput = {
   stripeCouponId?: Prisma.SortOrderInput | Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  productLine?: Prisma.SortOrder
   employeeLimit?: Prisma.SortOrderInput | Prisma.SortOrder
   locationLimit?: Prisma.SortOrderInput | Prisma.SortOrder
   checkoutIntentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1374,6 +1383,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   stripeCouponId?: Prisma.StringNullableFilter<"Organization"> | string | null
   subscriptionStatus?: Prisma.StringFilter<"Organization"> | string
   plan?: Prisma.StringFilter<"Organization"> | string
+  productLine?: Prisma.StringFilter<"Organization"> | string
   employeeLimit?: Prisma.IntNullableFilter<"Organization"> | number | null
   locationLimit?: Prisma.IntNullableFilter<"Organization"> | number | null
   checkoutIntentStatus?: Prisma.StringNullableFilter<"Organization"> | string | null
@@ -1544,6 +1554,7 @@ export type OrganizationOrderByWithAggregationInput = {
   stripeCouponId?: Prisma.SortOrderInput | Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  productLine?: Prisma.SortOrder
   employeeLimit?: Prisma.SortOrderInput | Prisma.SortOrder
   locationLimit?: Prisma.SortOrderInput | Prisma.SortOrder
   checkoutIntentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1670,6 +1681,7 @@ export type OrganizationScalarWhereWithAggregatesInput = {
   stripeCouponId?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
   subscriptionStatus?: Prisma.StringWithAggregatesFilter<"Organization"> | string
   plan?: Prisma.StringWithAggregatesFilter<"Organization"> | string
+  productLine?: Prisma.StringWithAggregatesFilter<"Organization"> | string
   employeeLimit?: Prisma.IntNullableWithAggregatesFilter<"Organization"> | number | null
   locationLimit?: Prisma.IntNullableWithAggregatesFilter<"Organization"> | number | null
   checkoutIntentStatus?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
@@ -1788,6 +1800,7 @@ export type OrganizationCreateInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -1959,6 +1972,7 @@ export type OrganizationUncheckedCreateInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -2130,6 +2144,7 @@ export type OrganizationUpdateInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2301,6 +2316,7 @@ export type OrganizationUncheckedUpdateInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2472,6 +2488,7 @@ export type OrganizationCreateManyInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -2590,6 +2607,7 @@ export type OrganizationUpdateManyMutationInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2708,6 +2726,7 @@ export type OrganizationUncheckedUpdateManyInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2834,6 +2853,7 @@ export type OrganizationCountOrderByAggregateInput = {
   stripeCouponId?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  productLine?: Prisma.SortOrder
   employeeLimit?: Prisma.SortOrder
   locationLimit?: Prisma.SortOrder
   checkoutIntentStatus?: Prisma.SortOrder
@@ -2967,6 +2987,7 @@ export type OrganizationMaxOrderByAggregateInput = {
   stripeCouponId?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  productLine?: Prisma.SortOrder
   employeeLimit?: Prisma.SortOrder
   locationLimit?: Prisma.SortOrder
   checkoutIntentStatus?: Prisma.SortOrder
@@ -3082,6 +3103,7 @@ export type OrganizationMinOrderByAggregateInput = {
   stripeCouponId?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
   plan?: Prisma.SortOrder
+  productLine?: Prisma.SortOrder
   employeeLimit?: Prisma.SortOrder
   locationLimit?: Prisma.SortOrder
   checkoutIntentStatus?: Prisma.SortOrder
@@ -4025,6 +4047,7 @@ export type OrganizationCreateWithoutUsersInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -4195,6 +4218,7 @@ export type OrganizationUncheckedCreateWithoutUsersInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -4381,6 +4405,7 @@ export type OrganizationUpdateWithoutUsersInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4551,6 +4576,7 @@ export type OrganizationUncheckedUpdateWithoutUsersInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4721,6 +4747,7 @@ export type OrganizationCreateWithoutLocationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -4891,6 +4918,7 @@ export type OrganizationUncheckedCreateWithoutLocationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -5077,6 +5105,7 @@ export type OrganizationUpdateWithoutLocationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5247,6 +5276,7 @@ export type OrganizationUncheckedUpdateWithoutLocationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5417,6 +5447,7 @@ export type OrganizationCreateWithoutDepartmentsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -5587,6 +5618,7 @@ export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -5773,6 +5805,7 @@ export type OrganizationUpdateWithoutDepartmentsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5943,6 +5976,7 @@ export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6113,6 +6147,7 @@ export type OrganizationCreateWithoutAssetsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -6283,6 +6318,7 @@ export type OrganizationUncheckedCreateWithoutAssetsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -6469,6 +6505,7 @@ export type OrganizationUpdateWithoutAssetsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6639,6 +6676,7 @@ export type OrganizationUncheckedUpdateWithoutAssetsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6809,6 +6847,7 @@ export type OrganizationCreateWithoutVendorsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -6979,6 +7018,7 @@ export type OrganizationUncheckedCreateWithoutVendorsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -7165,6 +7205,7 @@ export type OrganizationUpdateWithoutVendorsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7335,6 +7376,7 @@ export type OrganizationUncheckedUpdateWithoutVendorsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7505,6 +7547,7 @@ export type OrganizationCreateWithoutIssuesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -7675,6 +7718,7 @@ export type OrganizationUncheckedCreateWithoutIssuesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -7861,6 +7905,7 @@ export type OrganizationUpdateWithoutIssuesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8031,6 +8076,7 @@ export type OrganizationUncheckedUpdateWithoutIssuesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8201,6 +8247,7 @@ export type OrganizationCreateWithoutEscalationPoliciesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -8371,6 +8418,7 @@ export type OrganizationUncheckedCreateWithoutEscalationPoliciesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -8557,6 +8605,7 @@ export type OrganizationUpdateWithoutEscalationPoliciesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8727,6 +8776,7 @@ export type OrganizationUncheckedUpdateWithoutEscalationPoliciesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8897,6 +8947,7 @@ export type OrganizationCreateWithoutNotificationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -9067,6 +9118,7 @@ export type OrganizationUncheckedCreateWithoutNotificationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -9253,6 +9305,7 @@ export type OrganizationUpdateWithoutNotificationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9423,6 +9476,7 @@ export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9593,6 +9647,7 @@ export type OrganizationCreateWithoutRoutingRulesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -9763,6 +9818,7 @@ export type OrganizationUncheckedCreateWithoutRoutingRulesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -9949,6 +10005,7 @@ export type OrganizationUpdateWithoutRoutingRulesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10119,6 +10176,7 @@ export type OrganizationUncheckedUpdateWithoutRoutingRulesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10289,6 +10347,7 @@ export type OrganizationCreateWithoutSuggestionsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -10459,6 +10518,7 @@ export type OrganizationUncheckedCreateWithoutSuggestionsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -10645,6 +10705,7 @@ export type OrganizationUpdateWithoutSuggestionsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10815,6 +10876,7 @@ export type OrganizationUncheckedUpdateWithoutSuggestionsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10985,6 +11047,7 @@ export type OrganizationCreateWithoutEmailTemplatesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -11155,6 +11218,7 @@ export type OrganizationUncheckedCreateWithoutEmailTemplatesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -11341,6 +11405,7 @@ export type OrganizationUpdateWithoutEmailTemplatesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11511,6 +11576,7 @@ export type OrganizationUncheckedUpdateWithoutEmailTemplatesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11681,6 +11747,7 @@ export type OrganizationCreateWithoutInvitationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -11851,6 +11918,7 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -12037,6 +12105,7 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12207,6 +12276,7 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12377,6 +12447,7 @@ export type OrganizationCreateWithoutOrgNotesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -12547,6 +12618,7 @@ export type OrganizationUncheckedCreateWithoutOrgNotesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -12733,6 +12805,7 @@ export type OrganizationUpdateWithoutOrgNotesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12903,6 +12976,7 @@ export type OrganizationUncheckedUpdateWithoutOrgNotesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13073,6 +13147,7 @@ export type OrganizationCreateWithoutImpersonationLogsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -13243,6 +13318,7 @@ export type OrganizationUncheckedCreateWithoutImpersonationLogsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -13429,6 +13505,7 @@ export type OrganizationUpdateWithoutImpersonationLogsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13599,6 +13676,7 @@ export type OrganizationUncheckedUpdateWithoutImpersonationLogsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13769,6 +13847,7 @@ export type OrganizationCreateWithoutAuditLogsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -13939,6 +14018,7 @@ export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -14125,6 +14205,7 @@ export type OrganizationUpdateWithoutAuditLogsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14295,6 +14376,7 @@ export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14465,6 +14547,7 @@ export type OrganizationCreateWithoutEmployeeTypesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -14635,6 +14718,7 @@ export type OrganizationUncheckedCreateWithoutEmployeeTypesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -14821,6 +14905,7 @@ export type OrganizationUpdateWithoutEmployeeTypesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14991,6 +15076,7 @@ export type OrganizationUncheckedUpdateWithoutEmployeeTypesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15161,6 +15247,7 @@ export type OrganizationCreateWithoutIssueTemplatesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -15331,6 +15418,7 @@ export type OrganizationUncheckedCreateWithoutIssueTemplatesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -15517,6 +15605,7 @@ export type OrganizationUpdateWithoutIssueTemplatesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15687,6 +15776,7 @@ export type OrganizationUncheckedUpdateWithoutIssueTemplatesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15857,6 +15947,7 @@ export type OrganizationCreateWithoutMaintenanceSchedulesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -16027,6 +16118,7 @@ export type OrganizationUncheckedCreateWithoutMaintenanceSchedulesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -16213,6 +16305,7 @@ export type OrganizationUpdateWithoutMaintenanceSchedulesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16383,6 +16476,7 @@ export type OrganizationUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16553,6 +16647,7 @@ export type OrganizationCreateWithoutAnalyticsSnapshotsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -16723,6 +16818,7 @@ export type OrganizationUncheckedCreateWithoutAnalyticsSnapshotsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -16909,6 +17005,7 @@ export type OrganizationUpdateWithoutAnalyticsSnapshotsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17079,6 +17176,7 @@ export type OrganizationUncheckedUpdateWithoutAnalyticsSnapshotsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17249,6 +17347,7 @@ export type OrganizationCreateWithoutSopsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -17419,6 +17518,7 @@ export type OrganizationUncheckedCreateWithoutSopsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -17605,6 +17705,7 @@ export type OrganizationUpdateWithoutSopsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17775,6 +17876,7 @@ export type OrganizationUncheckedUpdateWithoutSopsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17945,6 +18047,7 @@ export type OrganizationCreateWithoutPurchaseRequestsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -18115,6 +18218,7 @@ export type OrganizationUncheckedCreateWithoutPurchaseRequestsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -18301,6 +18405,7 @@ export type OrganizationUpdateWithoutPurchaseRequestsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18471,6 +18576,7 @@ export type OrganizationUncheckedUpdateWithoutPurchaseRequestsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18641,6 +18747,7 @@ export type OrganizationCreateWithoutApprovedCatalogItemsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -18811,6 +18918,7 @@ export type OrganizationUncheckedCreateWithoutApprovedCatalogItemsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -18997,6 +19105,7 @@ export type OrganizationUpdateWithoutApprovedCatalogItemsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19167,6 +19276,7 @@ export type OrganizationUncheckedUpdateWithoutApprovedCatalogItemsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19337,6 +19447,7 @@ export type OrganizationCreateWithoutApprovalPoliciesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -19507,6 +19618,7 @@ export type OrganizationUncheckedCreateWithoutApprovalPoliciesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -19693,6 +19805,7 @@ export type OrganizationUpdateWithoutApprovalPoliciesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19863,6 +19976,7 @@ export type OrganizationUncheckedUpdateWithoutApprovalPoliciesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20033,6 +20147,7 @@ export type OrganizationCreateWithoutInjuryReportsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -20203,6 +20318,7 @@ export type OrganizationUncheckedCreateWithoutInjuryReportsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -20389,6 +20505,7 @@ export type OrganizationUpdateWithoutInjuryReportsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20559,6 +20676,7 @@ export type OrganizationUncheckedUpdateWithoutInjuryReportsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20729,6 +20847,7 @@ export type OrganizationCreateWithoutBugReportsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -20899,6 +21018,7 @@ export type OrganizationUncheckedCreateWithoutBugReportsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -21085,6 +21205,7 @@ export type OrganizationUpdateWithoutBugReportsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21255,6 +21376,7 @@ export type OrganizationUncheckedUpdateWithoutBugReportsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21425,6 +21547,7 @@ export type OrganizationCreateWithoutFeatureRequestsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -21595,6 +21718,7 @@ export type OrganizationUncheckedCreateWithoutFeatureRequestsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -21781,6 +21905,7 @@ export type OrganizationUpdateWithoutFeatureRequestsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21951,6 +22076,7 @@ export type OrganizationUncheckedUpdateWithoutFeatureRequestsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22121,6 +22247,7 @@ export type OrganizationCreateWithoutRegionsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -22291,6 +22418,7 @@ export type OrganizationUncheckedCreateWithoutRegionsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -22477,6 +22605,7 @@ export type OrganizationUpdateWithoutRegionsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22647,6 +22776,7 @@ export type OrganizationUncheckedUpdateWithoutRegionsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22817,6 +22947,7 @@ export type OrganizationCreateWithoutEscalationChainsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -22987,6 +23118,7 @@ export type OrganizationUncheckedCreateWithoutEscalationChainsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -23173,6 +23305,7 @@ export type OrganizationUpdateWithoutEscalationChainsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -23343,6 +23476,7 @@ export type OrganizationUncheckedUpdateWithoutEscalationChainsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -23513,6 +23647,7 @@ export type OrganizationCreateWithoutApiKeysInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -23683,6 +23818,7 @@ export type OrganizationUncheckedCreateWithoutApiKeysInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -23869,6 +24005,7 @@ export type OrganizationUpdateWithoutApiKeysInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -24039,6 +24176,7 @@ export type OrganizationUncheckedUpdateWithoutApiKeysInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -24209,6 +24347,7 @@ export type OrganizationCreateWithoutWebhookEndpointsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -24379,6 +24518,7 @@ export type OrganizationUncheckedCreateWithoutWebhookEndpointsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -24565,6 +24705,7 @@ export type OrganizationUpdateWithoutWebhookEndpointsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -24735,6 +24876,7 @@ export type OrganizationUncheckedUpdateWithoutWebhookEndpointsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -24905,6 +25047,7 @@ export type OrganizationCreateWithoutSsoConfigInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -25075,6 +25218,7 @@ export type OrganizationUncheckedCreateWithoutSsoConfigInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -25261,6 +25405,7 @@ export type OrganizationUpdateWithoutSsoConfigInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -25431,6 +25576,7 @@ export type OrganizationUncheckedUpdateWithoutSsoConfigInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -25601,6 +25747,7 @@ export type OrganizationCreateWithoutOrgRelationshipsAsAInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -25771,6 +25918,7 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsAInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -25946,6 +26094,7 @@ export type OrganizationCreateWithoutOrgRelationshipsAsBInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -26116,6 +26265,7 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsBInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -26302,6 +26452,7 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsAInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26472,6 +26623,7 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsAInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26653,6 +26805,7 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsBInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26823,6 +26976,7 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsBInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -26993,6 +27147,7 @@ export type OrganizationCreateWithoutQrCodesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -27163,6 +27318,7 @@ export type OrganizationUncheckedCreateWithoutQrCodesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -27349,6 +27505,7 @@ export type OrganizationUpdateWithoutQrCodesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -27519,6 +27676,7 @@ export type OrganizationUncheckedUpdateWithoutQrCodesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -27689,6 +27847,7 @@ export type OrganizationCreateWithoutUserOrgMembershipsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -27859,6 +28018,7 @@ export type OrganizationUncheckedCreateWithoutUserOrgMembershipsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -28045,6 +28205,7 @@ export type OrganizationUpdateWithoutUserOrgMembershipsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -28215,6 +28376,7 @@ export type OrganizationUncheckedUpdateWithoutUserOrgMembershipsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -28385,6 +28547,7 @@ export type OrganizationCreateWithoutExecutiveBriefingsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -28555,6 +28718,7 @@ export type OrganizationUncheckedCreateWithoutExecutiveBriefingsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -28741,6 +28905,7 @@ export type OrganizationUpdateWithoutExecutiveBriefingsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -28911,6 +29076,7 @@ export type OrganizationUncheckedUpdateWithoutExecutiveBriefingsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -29081,6 +29247,7 @@ export type OrganizationCreateWithoutHealthScoresInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -29251,6 +29418,7 @@ export type OrganizationUncheckedCreateWithoutHealthScoresInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -29437,6 +29605,7 @@ export type OrganizationUpdateWithoutHealthScoresInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -29607,6 +29776,7 @@ export type OrganizationUncheckedUpdateWithoutHealthScoresInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -29777,6 +29947,7 @@ export type OrganizationCreateWithoutTrendAlertsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -29947,6 +30118,7 @@ export type OrganizationUncheckedCreateWithoutTrendAlertsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -30133,6 +30305,7 @@ export type OrganizationUpdateWithoutTrendAlertsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -30303,6 +30476,7 @@ export type OrganizationUncheckedUpdateWithoutTrendAlertsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -30473,6 +30647,7 @@ export type OrganizationCreateWithoutExecutiveGoalsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -30643,6 +30818,7 @@ export type OrganizationUncheckedCreateWithoutExecutiveGoalsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -30829,6 +31005,7 @@ export type OrganizationUpdateWithoutExecutiveGoalsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -30999,6 +31176,7 @@ export type OrganizationUncheckedUpdateWithoutExecutiveGoalsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -31169,6 +31347,7 @@ export type OrganizationCreateWithoutLegalAcceptancesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -31339,6 +31518,7 @@ export type OrganizationUncheckedCreateWithoutLegalAcceptancesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -31525,6 +31705,7 @@ export type OrganizationUpdateWithoutLegalAcceptancesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -31695,6 +31876,7 @@ export type OrganizationUncheckedUpdateWithoutLegalAcceptancesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -31865,6 +32047,7 @@ export type OrganizationCreateWithoutDemoCallsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -32035,6 +32218,7 @@ export type OrganizationUncheckedCreateWithoutDemoCallsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -32221,6 +32405,7 @@ export type OrganizationUpdateWithoutDemoCallsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -32391,6 +32576,7 @@ export type OrganizationUncheckedUpdateWithoutDemoCallsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -32561,6 +32747,7 @@ export type OrganizationCreateWithoutNonConversionReasonsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -32731,6 +32918,7 @@ export type OrganizationUncheckedCreateWithoutNonConversionReasonsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -32917,6 +33105,7 @@ export type OrganizationUpdateWithoutNonConversionReasonsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -33087,6 +33276,7 @@ export type OrganizationUncheckedUpdateWithoutNonConversionReasonsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -33257,6 +33447,7 @@ export type OrganizationCreateWithoutCrmNotesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -33427,6 +33618,7 @@ export type OrganizationUncheckedCreateWithoutCrmNotesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -33613,6 +33805,7 @@ export type OrganizationUpdateWithoutCrmNotesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -33783,6 +33976,7 @@ export type OrganizationUncheckedUpdateWithoutCrmNotesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -33953,6 +34147,7 @@ export type OrganizationCreateWithoutCrmActivitiesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -34123,6 +34318,7 @@ export type OrganizationUncheckedCreateWithoutCrmActivitiesInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -34309,6 +34505,7 @@ export type OrganizationUpdateWithoutCrmActivitiesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -34479,6 +34676,7 @@ export type OrganizationUncheckedUpdateWithoutCrmActivitiesInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -34649,6 +34847,7 @@ export type OrganizationCreateWithoutBillingCreditsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -34819,6 +35018,7 @@ export type OrganizationUncheckedCreateWithoutBillingCreditsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -35005,6 +35205,7 @@ export type OrganizationUpdateWithoutBillingCreditsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -35175,6 +35376,7 @@ export type OrganizationUncheckedUpdateWithoutBillingCreditsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -35345,6 +35547,7 @@ export type OrganizationCreateWithoutReferralsMadeInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -35515,6 +35718,7 @@ export type OrganizationUncheckedCreateWithoutReferralsMadeInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -35690,6 +35894,7 @@ export type OrganizationCreateWithoutReferralReceivedInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -35860,6 +36065,7 @@ export type OrganizationUncheckedCreateWithoutReferralReceivedInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -36046,6 +36252,7 @@ export type OrganizationUpdateWithoutReferralsMadeInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -36216,6 +36423,7 @@ export type OrganizationUncheckedUpdateWithoutReferralsMadeInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -36397,6 +36605,7 @@ export type OrganizationUpdateWithoutReferralReceivedInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -36567,6 +36776,7 @@ export type OrganizationUncheckedUpdateWithoutReferralReceivedInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -36737,6 +36947,7 @@ export type OrganizationCreateWithoutConversationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -36907,6 +37118,7 @@ export type OrganizationUncheckedCreateWithoutConversationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -37093,6 +37305,7 @@ export type OrganizationUpdateWithoutConversationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -37263,6 +37476,7 @@ export type OrganizationUncheckedUpdateWithoutConversationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -37433,6 +37647,7 @@ export type OrganizationCreateWithoutSupportConversationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -37603,6 +37818,7 @@ export type OrganizationUncheckedCreateWithoutSupportConversationsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -37789,6 +38005,7 @@ export type OrganizationUpdateWithoutSupportConversationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -37959,6 +38176,7 @@ export type OrganizationUncheckedUpdateWithoutSupportConversationsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -38129,6 +38347,7 @@ export type OrganizationCreateWithoutBroadcastsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -38299,6 +38518,7 @@ export type OrganizationUncheckedCreateWithoutBroadcastsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -38485,6 +38705,7 @@ export type OrganizationUpdateWithoutBroadcastsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -38655,6 +38876,7 @@ export type OrganizationUncheckedUpdateWithoutBroadcastsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -38825,6 +39047,7 @@ export type OrganizationCreateWithoutAssignmentsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -38995,6 +39218,7 @@ export type OrganizationUncheckedCreateWithoutAssignmentsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -39181,6 +39405,7 @@ export type OrganizationUpdateWithoutAssignmentsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -39351,6 +39576,7 @@ export type OrganizationUncheckedUpdateWithoutAssignmentsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -39521,6 +39747,7 @@ export type OrganizationCreateWithoutAnnouncementsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -39691,6 +39918,7 @@ export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -39877,6 +40105,7 @@ export type OrganizationUpdateWithoutAnnouncementsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -40047,6 +40276,7 @@ export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -40217,6 +40447,7 @@ export type OrganizationCreateWithoutEmergencyBroadcastsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -40387,6 +40618,7 @@ export type OrganizationUncheckedCreateWithoutEmergencyBroadcastsInput = {
   stripeCouponId?: string | null
   subscriptionStatus?: string
   plan?: string
+  productLine?: string
   employeeLimit?: number | null
   locationLimit?: number | null
   checkoutIntentStatus?: string | null
@@ -40573,6 +40805,7 @@ export type OrganizationUpdateWithoutEmergencyBroadcastsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -40743,6 +40976,7 @@ export type OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput = {
   stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
   employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -41394,6 +41628,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   stripeCouponId?: boolean
   subscriptionStatus?: boolean
   plan?: boolean
+  productLine?: boolean
   employeeLimit?: boolean
   locationLimit?: boolean
   checkoutIntentStatus?: boolean
@@ -41566,6 +41801,7 @@ export type OrganizationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   stripeCouponId?: boolean
   subscriptionStatus?: boolean
   plan?: boolean
+  productLine?: boolean
   employeeLimit?: boolean
   locationLimit?: boolean
   checkoutIntentStatus?: boolean
@@ -41684,6 +41920,7 @@ export type OrganizationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   stripeCouponId?: boolean
   subscriptionStatus?: boolean
   plan?: boolean
+  productLine?: boolean
   employeeLimit?: boolean
   locationLimit?: boolean
   checkoutIntentStatus?: boolean
@@ -41802,6 +42039,7 @@ export type OrganizationSelectScalar = {
   stripeCouponId?: boolean
   subscriptionStatus?: boolean
   plan?: boolean
+  productLine?: boolean
   employeeLimit?: boolean
   locationLimit?: boolean
   checkoutIntentStatus?: boolean
@@ -41904,7 +42142,7 @@ export type OrganizationSelectScalar = {
   referralLink?: boolean
 }
 
-export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logo" | "industry" | "companySize" | "numberOfLocations" | "onboardingCompletedAt" | "trialStartDate" | "trialEndsAt" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeCouponId" | "subscriptionStatus" | "plan" | "employeeLimit" | "locationLimit" | "checkoutIntentStatus" | "intelligenceSuiteEnabled" | "monthlyBasePrice" | "monthlyScalingCost" | "monthlyModulesCost" | "monthlyTotalBeforeDiscount" | "monthlyTotalAfterDiscount" | "discountPercent" | "discountExpiresAt" | "discountLabel" | "suspendedAt" | "isDemo" | "demoExpiresAt" | "aiSuggestionsAvailable" | "aiSuggestionsPolicy" | "aiSuggestionsAudience" | "purchaseRequestEnabled" | "purchaseRequestItemLimit" | "purchaseRequestMonthlyLimit" | "approval_intelligence_enabled" | "ai_suggest_unmatched_items" | "ai_confidence_threshold" | "injuryAlertEmails" | "sopMatchSensitivity" | "billingFrequency" | "currentPrice" | "priceLockedUntil" | "intelligenceModules" | "createdAt" | "updatedAt" | "pageAccessConfig" | "regions_enabled" | "corporate_dashboard_enabled" | "cross_location_analytics_enabled" | "advanced_escalations_enabled" | "api_webhooks_enabled" | "sso_foundation_enabled" | "shared_facility_enabled" | "qr_codes_enabled" | "external_collaborators_enabled" | "multi_org_enabled" | "executive_briefings_enabled" | "health_scores_enabled" | "trend_detection_enabled" | "executive_goals_enabled" | "wc_personal_inbox" | "wc_individual_assignments" | "wc_basic_notifications" | "wc_basic_announcements" | "wc_company_announcements" | "wc_personal_reminders" | "wc_push_notifications" | "wc_email_notifications" | "wc_inapp_notifications" | "wc_basic_daily_briefing" | "wc_announcement_history_readonly" | "wc_department_announcements" | "wc_team_announcements" | "wc_shift_announcements" | "wc_emergency_broadcasts" | "wc_assignment_management" | "wc_assignment_comments" | "wc_assignment_attachments" | "wc_assignment_history" | "wc_announcement_acknowledgements" | "wc_ai_daily_briefing" | "wc_manager_announcement_dashboard" | "wc_supervisor_tools" | "wc_communication_search" | "wc_inbox_filters" | "wc_notification_preferences" | "wc_department_communication_permissions" | "wc_multi_location_announcements" | "wc_regional_announcements" | "wc_executive_announcements" | "wc_org_wide_broadcasts" | "wc_cross_location_communication" | "wc_communication_analytics" | "wc_announcement_reporting" | "wc_read_rate_analytics" | "wc_executive_communication_dashboard" | "wc_ai_communication_summaries" | "wc_ai_announcement_drafting" | "wc_org_wide_assignment_management" | "wc_cross_location_assignment_visibility" | "wc_advanced_notification_rules" | "wc_executive_daily_briefings" | "wc_sms_gateway" | "wc_custom_notification_providers" | "wc_custom_escalation_policies" | "wc_compliance_logging" | "wc_advanced_audit_history" | "wc_api_access_communications" | "wc_white_label_communications" | "wc_enterprise_communication_controls" | "lifecycleStatus" | "referralCode" | "referralLink", ExtArgs["result"]["organization"]>
+export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logo" | "industry" | "companySize" | "numberOfLocations" | "onboardingCompletedAt" | "trialStartDate" | "trialEndsAt" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeCouponId" | "subscriptionStatus" | "plan" | "productLine" | "employeeLimit" | "locationLimit" | "checkoutIntentStatus" | "intelligenceSuiteEnabled" | "monthlyBasePrice" | "monthlyScalingCost" | "monthlyModulesCost" | "monthlyTotalBeforeDiscount" | "monthlyTotalAfterDiscount" | "discountPercent" | "discountExpiresAt" | "discountLabel" | "suspendedAt" | "isDemo" | "demoExpiresAt" | "aiSuggestionsAvailable" | "aiSuggestionsPolicy" | "aiSuggestionsAudience" | "purchaseRequestEnabled" | "purchaseRequestItemLimit" | "purchaseRequestMonthlyLimit" | "approval_intelligence_enabled" | "ai_suggest_unmatched_items" | "ai_confidence_threshold" | "injuryAlertEmails" | "sopMatchSensitivity" | "billingFrequency" | "currentPrice" | "priceLockedUntil" | "intelligenceModules" | "createdAt" | "updatedAt" | "pageAccessConfig" | "regions_enabled" | "corporate_dashboard_enabled" | "cross_location_analytics_enabled" | "advanced_escalations_enabled" | "api_webhooks_enabled" | "sso_foundation_enabled" | "shared_facility_enabled" | "qr_codes_enabled" | "external_collaborators_enabled" | "multi_org_enabled" | "executive_briefings_enabled" | "health_scores_enabled" | "trend_detection_enabled" | "executive_goals_enabled" | "wc_personal_inbox" | "wc_individual_assignments" | "wc_basic_notifications" | "wc_basic_announcements" | "wc_company_announcements" | "wc_personal_reminders" | "wc_push_notifications" | "wc_email_notifications" | "wc_inapp_notifications" | "wc_basic_daily_briefing" | "wc_announcement_history_readonly" | "wc_department_announcements" | "wc_team_announcements" | "wc_shift_announcements" | "wc_emergency_broadcasts" | "wc_assignment_management" | "wc_assignment_comments" | "wc_assignment_attachments" | "wc_assignment_history" | "wc_announcement_acknowledgements" | "wc_ai_daily_briefing" | "wc_manager_announcement_dashboard" | "wc_supervisor_tools" | "wc_communication_search" | "wc_inbox_filters" | "wc_notification_preferences" | "wc_department_communication_permissions" | "wc_multi_location_announcements" | "wc_regional_announcements" | "wc_executive_announcements" | "wc_org_wide_broadcasts" | "wc_cross_location_communication" | "wc_communication_analytics" | "wc_announcement_reporting" | "wc_read_rate_analytics" | "wc_executive_communication_dashboard" | "wc_ai_communication_summaries" | "wc_ai_announcement_drafting" | "wc_org_wide_assignment_management" | "wc_cross_location_assignment_visibility" | "wc_advanced_notification_rules" | "wc_executive_daily_briefings" | "wc_sms_gateway" | "wc_custom_notification_providers" | "wc_custom_escalation_policies" | "wc_compliance_logging" | "wc_advanced_audit_history" | "wc_api_access_communications" | "wc_white_label_communications" | "wc_enterprise_communication_controls" | "lifecycleStatus" | "referralCode" | "referralLink", ExtArgs["result"]["organization"]>
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Organization$usersArgs<ExtArgs>
   locations?: boolean | Prisma.Organization$locationsArgs<ExtArgs>
@@ -42037,6 +42275,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     stripeCouponId: string | null
     subscriptionStatus: string
     plan: string
+    productLine: string
     employeeLimit: number | null
     locationLimit: number | null
     checkoutIntentStatus: string | null
@@ -42628,6 +42867,7 @@ export interface OrganizationFieldRefs {
   readonly stripeCouponId: Prisma.FieldRef<"Organization", 'String'>
   readonly subscriptionStatus: Prisma.FieldRef<"Organization", 'String'>
   readonly plan: Prisma.FieldRef<"Organization", 'String'>
+  readonly productLine: Prisma.FieldRef<"Organization", 'String'>
   readonly employeeLimit: Prisma.FieldRef<"Organization", 'Int'>
   readonly locationLimit: Prisma.FieldRef<"Organization", 'Int'>
   readonly checkoutIntentStatus: Prisma.FieldRef<"Organization", 'String'>

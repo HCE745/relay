@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { AssetDialog } from "@/components/assets/asset-dialog"
 import { PlanGateContent } from "@/components/layout/plan-gate"
-import { isProfessional } from "@/lib/pricing"
+import { hasWashOrProfessional } from "@/lib/pricing"
 
 export const dynamic = "force-dynamic"
 
@@ -17,7 +17,7 @@ export default async function AssetsPage() {
   if (!session) redirect("/login")
   const orgId = session.organizationId
 
-  if (!isProfessional(session.plan ?? "essentials")) {
+  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
       <div>
         <Header title="Assets" />

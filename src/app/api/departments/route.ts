@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { isWashEssentials } from "@/lib/pricing"
 
 export async function GET() {
   const session = await getSession()
@@ -19,6 +20,14 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  if (isWashEssentials(session.productLine)) {
+    return NextResponse.json(
+      { error: "Custom departments are not available in Wash Essentials." },
+      { status: 403 },
+    )
+  }
+
   const body = await request.json()
   const { name, locationId } = body
   if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 })

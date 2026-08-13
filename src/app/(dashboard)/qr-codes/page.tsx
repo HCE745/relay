@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
-import { isProfessional } from "@/lib/pricing"
+import { hasWashOrProfessional } from "@/lib/pricing"
 import { PlanGateContent } from "@/components/layout/plan-gate"
 import { QrCodesClient } from "./qr-codes-client"
 
@@ -13,7 +13,7 @@ export default async function QrCodesPage() {
   if (!session) redirect("/login")
   if (!["ADMIN", "MANAGER"].includes(session.role)) redirect("/dashboard")
 
-  if (!isProfessional(session.plan ?? "essentials")) {
+  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
       <div>
         <Header title="QR Codes" />

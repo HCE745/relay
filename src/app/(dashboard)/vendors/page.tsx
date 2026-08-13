@@ -3,7 +3,7 @@ import { Header } from "@/components/layout/header"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { PlanGateContent } from "@/components/layout/plan-gate"
-import { isProfessional } from "@/lib/pricing"
+import { hasWashOrProfessional } from "@/lib/pricing"
 
 export const dynamic = "force-dynamic"
 import { Plus, Wrench, Mail, Phone } from "lucide-react"
@@ -15,7 +15,7 @@ export default async function VendorsPage() {
   const session = await getSession()
   if (!session) redirect("/login")
 
-  if (!isProfessional(session.plan ?? "essentials")) {
+  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
       <div>
         <Header title="Vendors" />

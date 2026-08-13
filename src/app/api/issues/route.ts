@@ -14,7 +14,7 @@ import { checkDuplicateIssue, suggestIssueTitle } from "@/lib/ai-haiku"
 
 const VALID_CATEGORIES = [
   "INJURY", "EQUIPMENT_BREAKDOWN", "MAINTENANCE", "SAFETY", "SUPPLY_SHORTAGE",
-  "CUSTOMER_COMPLAINT", "FACILITY", "VEHICLE", "EMPLOYEE", "GENERAL",
+  "CUSTOMER_COMPLAINT", "CUSTOMER_REPORT", "FACILITY", "VEHICLE", "EMPLOYEE", "GENERAL",
 ] as const
 
 const VALID_PRIORITIES = ["CRITICAL", "HIGH", "MEDIUM", "LOW"] as const

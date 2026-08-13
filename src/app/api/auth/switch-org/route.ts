@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
     where: { id: organizationId },
     select: {
       plan: true,
+      productLine: true,
       subscriptionStatus: true,
       onboardingCompletedAt: true,
     },
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest) {
     role: targetRole!,
     organizationId,
     plan: org.plan,
+    productLine: org.productLine,
     subscriptionStatus: org.subscriptionStatus,
     onboardingCompleted: org.onboardingCompletedAt != null,
     // Preserve super admin fields if present

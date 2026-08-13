@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { isWashEssentials } from "@/lib/pricing"
+import { CARWASH_ASSET_SUBTYPES } from "@/lib/car-wash-config"
 
 export async function GET(request: NextRequest) {
   const session = await getSession()
@@ -37,9 +39,19 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json()
-  const { name, assetTag, type, manufacturer, model, serialNumber, purchaseDate, warrantyExpiry, notes, locationId, departmentId, vendorId } = body
+  const { name, assetTag, type, assetSubtype, manufacturer, model, serialNumber, purchaseDate, warrantyExpiry, notes, locationId, departmentId, vendorId } = body
 
   if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 })
+
+  // Wash Essentials: asset subtype must be within the car-wash operational taxonomy
+  if (isWashEssentials(session.productLine)) {
+    if (assetSubtype && !CARWASH_ASSET_SUBTYPES.includes(assetSubtype)) {
+      return NextResponse.json(
+        { error: "This asset type is not available in Wash Essentials. Use a car-wash operational asset type." },
+        { status: 400 },
+      )
+    }
+  }
 
   const asset = await prisma.asset.create({
     data: {
@@ -47,6 +59,7 @@ export async function POST(request: NextRequest) {
       assetTag: assetTag || null,
       type: type ?? "EQUIPMENT",
       status: "OPERATIONAL",
+      assetSubtype: assetSubtype || null,
       manufacturer: manufacturer || null,
       model: model || null,
       serialNumber: serialNumber || null,

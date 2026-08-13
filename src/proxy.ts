@@ -31,6 +31,7 @@ const PUBLIC_PATHS = [
   // Demo system — unauthenticated start + self-guarded APIs
   "/demo",
   "/tour",
+  "/tour-wash",
   "/api/demo",
   // MCP server — handles its own auth via OAuth + bearer tokens
   "/api/mcp",

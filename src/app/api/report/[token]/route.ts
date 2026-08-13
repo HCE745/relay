@@ -43,6 +43,7 @@ export async function POST(
   let reporterPhone: string | null = null
   let photoUrls: string[] = []
   let photoAttached = false
+  let overrideCategory: string | null = null
 
   const contentType = req.headers.get("content-type") ?? ""
 
@@ -60,6 +61,8 @@ export async function POST(
       // File storage not wired — photo received but not persisted to URL.
       // photoUrls stays empty; photoAttached=true satisfies requirePhoto.
     }
+    const submittedCategory = (formData.get("category") as string | null)?.trim() || null
+    if (submittedCategory) overrideCategory = submittedCategory
   } else {
     const body = await req.json() as {
       title?: string
@@ -68,6 +71,7 @@ export async function POST(
       reporterEmail?: string
       reporterPhone?: string
       photoUrls?: string[]
+      category?: string
     }
     title        = body.title?.trim() ?? null
     description  = body.description?.trim() ?? null
@@ -76,6 +80,7 @@ export async function POST(
     reporterPhone = body.reporterPhone?.trim() || null
     photoUrls     = body.photoUrls ?? []
     photoAttached = photoUrls.length > 0
+    if (body.category?.trim()) overrideCategory = body.category.trim()
   }
 
   if (!title)       return NextResponse.json({ error: "Title is required" },       { status: 400 })
@@ -112,7 +117,7 @@ export async function POST(
     })
 
     if (orgAdmin) {
-      const category = qrCode.defaultCategory ?? "GENERAL"
+      const category = overrideCategory ?? qrCode.defaultCategory ?? "GENERAL"
 
       // Determine assignee: MANUAL routing takes priority if assigned person is active
       const manualAssigneeId =

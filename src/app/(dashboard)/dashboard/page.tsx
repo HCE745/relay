@@ -20,6 +20,7 @@ import {
   Shield,
   Wrench,
   Building2,
+  QrCode,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { PRIORITY_COLOR, STATUS_COLOR, ISSUE_STATUS, ISSUE_PRIORITY, ISSUE_CATEGORY } from "@/lib/constants"
@@ -84,6 +85,10 @@ async function getDashboardData(orgId: string) {
     resolvedThisWeek,
     newToday,
     resolvedToday,
+    orgRow,
+    customerReportsToday,
+    openEquipmentIssues,
+    operationalAssets,
   ] = await Promise.all([
     prisma.issue.count({ where: { organizationId: orgId } }),
     prisma.issue.count({ where: { organizationId: orgId, status: "OPEN" } }),
@@ -118,12 +123,18 @@ async function getDashboardData(orgId: string) {
     prisma.issue.count({ where: { organizationId: orgId, status: { in: ["RESOLVED", "CLOSED"] }, updatedAt: { gte: weekAgo } } }),
     prisma.issue.count({ where: { organizationId: orgId, createdAt: { gte: todayStart } } }),
     prisma.issue.count({ where: { organizationId: orgId, status: { in: ["RESOLVED", "CLOSED"] }, updatedAt: { gte: todayStart } } }),
+    prisma.organization.findUnique({ where: { id: orgId }, select: { industry: true } }),
+    prisma.issue.count({ where: { organizationId: orgId, category: "CUSTOMER_REPORT", createdAt: { gte: todayStart } } }),
+    prisma.issue.count({ where: { organizationId: orgId, category: "EQUIPMENT_BREAKDOWN", status: { notIn: ["RESOLVED", "CLOSED"] } } }),
+    prisma.asset.count({ where: { organizationId: orgId, status: "OPERATIONAL" } }),
   ])
 
   return {
     totalIssues, openIssues, escalatedIssues, resolvedIssues, criticalIssues,
     totalAssets, recentIssues, issuesByCategory, openIssuesByCategory,
     newThisWeek, resolvedThisWeek, newToday, resolvedToday,
+    industry: orgRow?.industry ?? null,
+    customerReportsToday, openEquipmentIssues, operationalAssets,
   }
 }
 
@@ -603,6 +614,58 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Car Wash Spotlight ────────────────────────────────────────── */}
+        {data.industry === "Car Wash" && (
+          <div className="grid grid-cols-3 gap-3">
+            <Link
+              href="/issues?category=CUSTOMER_REPORT"
+              className="rounded-xl border border-purple-200 border-l-4 border-l-purple-500 p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
+              style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.05) 0%, white 60%)" }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <QrCode className="w-4 h-4 text-purple-500" />
+                <span className="text-[11px] font-bold text-purple-500 uppercase tracking-wide">Customer Reports</span>
+              </div>
+              <div className="text-3xl font-black text-gray-900 leading-none">{data.customerReportsToday}</div>
+              <div className="text-xs text-gray-400 mt-1.5">Today via QR</div>
+            </Link>
+            <Link
+              href="/issues?category=EQUIPMENT_BREAKDOWN&status=OPEN"
+              className={`rounded-xl border border-l-4 p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 ${
+                data.openEquipmentIssues > 0
+                  ? "border-orange-200 border-l-orange-500"
+                  : "border-gray-200 border-l-gray-300"
+              }`}
+              style={{ background: data.openEquipmentIssues > 0
+                ? "linear-gradient(135deg, rgba(249,115,22,0.05) 0%, white 60%)"
+                : "linear-gradient(135deg, rgba(100,116,139,0.03) 0%, white 60%)" }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Wrench className={`w-4 h-4 ${data.openEquipmentIssues > 0 ? "text-orange-500" : "text-gray-400"}`} />
+                <span className={`text-[11px] font-bold uppercase tracking-wide ${data.openEquipmentIssues > 0 ? "text-orange-500" : "text-gray-400"}`}>Equipment Down</span>
+              </div>
+              <div className={`text-3xl font-black leading-none ${data.openEquipmentIssues > 0 ? "text-orange-600" : "text-gray-900"}`}>
+                {data.openEquipmentIssues}
+              </div>
+              <div className="text-xs text-gray-400 mt-1.5">Open breakdowns</div>
+            </Link>
+            <Link
+              href="/assets"
+              className="rounded-xl border border-emerald-200 border-l-4 border-l-emerald-500 p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
+              style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.05) 0%, white 60%)" }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Package className="w-4 h-4 text-emerald-500" />
+                <span className="text-[11px] font-bold text-emerald-500 uppercase tracking-wide">Bays & Assets</span>
+              </div>
+              <div className="text-3xl font-black text-gray-900 leading-none">
+                {data.operationalAssets}<span className="text-lg text-gray-400 font-bold">/{data.totalAssets}</span>
+              </div>
+              <div className="text-xs text-gray-400 mt-1.5">Operational</div>
+            </Link>
+          </div>
+        )}
 
         {/* ── KPI Cards ─────────────────────────────────────────────────── */}
         <div data-tour="kpi-cards" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">

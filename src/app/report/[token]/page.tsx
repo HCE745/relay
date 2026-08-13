@@ -16,7 +16,7 @@ export default async function ReportPage({
       location: { select: { id: true, name: true } },
       department: { select: { id: true, name: true } },
       asset: { select: { id: true, name: true } },
-      organization: { select: { id: true, name: true } },
+      organization: { select: { id: true, name: true, industry: true } },
     },
   })
 
@@ -38,8 +38,11 @@ export default async function ReportPage({
     )
   }
 
+  const isCarWash = qrCode.organization.industry === "Car Wash"
+
   return (
     <QrReportForm
+      isCarWash={isCarWash}
       qrCode={{
         id: qrCode.id,
         token: qrCode.token,

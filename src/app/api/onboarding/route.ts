@@ -215,6 +215,10 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 6. Refresh session ───────────────────────────────────────────────────
+  const refreshedOrg = await prisma.organization.findUnique({
+    where:  { id: orgId },
+    select: { plan: true, productLine: true },
+  })
   await createSession({
     userId:              session.userId,
     email:               session.email,
@@ -224,7 +228,8 @@ export async function POST(request: NextRequest) {
     onboardingCompleted: true,
     trialEndsAt:         session.trialEndsAt,
     subscriptionStatus:  session.subscriptionStatus,
-    plan:                session.plan,
+    plan:                refreshedOrg?.plan ?? session.plan,
+    productLine:         refreshedOrg?.productLine ?? session.productLine,
   })
 
   return NextResponse.json({ success: true })

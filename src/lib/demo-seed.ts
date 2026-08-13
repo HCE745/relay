@@ -425,11 +425,41 @@ function genericIssues(companyType: string): IssueSeed[] {
 
 // ─── Issue map by industry key ─────────────────────────────────────────────
 
+const CARWASH_ISSUES: IssueSeed[] = [
+  // Recurring asset issues — Bay 3 (asset idx 2)
+  { title: "Bay 3 (Automatic) — not advancing through wash cycle",    desc: "Automatic bay gets stuck mid-cycle. Customer reported via QR. Bay taken offline.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 0, days: 2,   status: "OPEN",        asset: 2 },
+  { title: "Bay 3 — conveyor drive belt slipping",                    desc: "Belt slipping on drive motor. Bay offline until repaired.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 0, days: 28,  status: "RESOLVED",    asset: 2, resolved: { days: 2, method: "Replaced drive belt and tensioner", rootCause: "Belt worn — over 4 years old", category: "Replaced", time: "4_8_hours", cost: 320 } },
+  { title: "Bay 3 — dryer not reaching operating temperature",        desc: "Dryer heating element failing. Customers leaving wet.", cat: "EQUIPMENT_BREAKDOWN", pri: "MEDIUM", loc: 0, days: 65,  status: "RESOLVED",    asset: 2, resolved: { days: 3, method: "Replaced heating element", rootCause: "Element degraded from calcium buildup", category: "Replaced", time: "1_2_days", cost: 180 } },
+  // Bay 2 issues
+  { title: "Bay 2 — losing water pressure during peak hours",         desc: "Bay 2 high-pressure drops noticeably when all bays running. Customer complaints.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 0, days: 4,   status: "IN_PROGRESS", asset: 1 },
+  { title: "Bay 2 — nozzle clogged, foam not dispensing",            desc: "Foam soap nozzle blocked. Customer reported bay not foaming properly.", cat: "MAINTENANCE",        pri: "MEDIUM", loc: 0, days: 18,  status: "RESOLVED",    asset: 1, resolved: { days: 0, method: "Cleaned and flushed soap nozzle", rootCause: "Mineral deposits from hard water", category: "Repaired", time: "under_1_hour", cost: 0 } },
+  // Vacuum issues
+  { title: "Vacuum 2 — weak suction, canister full",                  desc: "Customer reported vacuum not working. Canister overflowing.", cat: "EQUIPMENT_BREAKDOWN", pri: "MEDIUM", loc: 0, days: 1,   status: "RESOLVED",    asset: 4, resolved: { days: 0, method: "Emptied canister and cleared filter", rootCause: "Canister not emptied on schedule", category: "Repaired", time: "under_1_hour", cost: 0 } },
+  { title: "Vacuum 2 — coin mechanism jammed",                        desc: "Coin jam in vacuum station 2. Customers cannot start.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 0, days: 8,   status: "RESOLVED",    asset: 4, resolved: { days: 0, method: "Cleared coin jam and cleaned mechanism", rootCause: "Foreign object in coin slot", category: "Repaired", time: "under_1_hour", cost: 0 } },
+  // Customer reports via QR
+  { title: "Bay 1 — customer report: rinse cycle not completing",     desc: "Anonymous customer report via QR: Bay 1 rinse stopped early. Customer had to leave soapy.", cat: "CUSTOMER_REPORT", pri: "HIGH",   loc: 0, days: 0,   status: "OPEN" },
+  { title: "Vacuum station — customer report: hose cracked",          desc: "Customer report via QR: vacuum hose split near end. Cannot use.", cat: "CUSTOMER_REPORT", pri: "MEDIUM", loc: 0, days: 3,   status: "IN_PROGRESS" },
+  { title: "Pay station — customer report: card reader not working",  desc: "Customer report via QR: pay station rejected 3 credit cards in a row.", cat: "CUSTOMER_REPORT", pri: "HIGH",   loc: 0, days: 6,   status: "RESOLVED", resolved: { days: 0, method: "Reset card reader module and cleared error", rootCause: "Temp spike caused reader to lock up", category: "Repaired", time: "under_1_hour", cost: 0 } },
+  // RO / water system
+  { title: "RO system — TDS reading elevated, membranes due",         desc: "Total dissolved solids above threshold. Spot-free rinse quality degraded. Membranes overdue.", cat: "MAINTENANCE",        pri: "HIGH",   loc: 0, days: 12,  status: "IN_PROGRESS", asset: 9 },
+  { title: "RO system — pressure drop across pre-filter",             desc: "Pre-filter pressure differential higher than spec. Filter replacement overdue.", cat: "MAINTENANCE",        pri: "MEDIUM", loc: 0, days: 45,  status: "RESOLVED",    asset: 9, resolved: { days: 0, method: "Replaced pre-filters on both housings", rootCause: "Filter reached end of service life", category: "Replaced", time: "under_1_hour", cost: 75 } },
+  // General maintenance / safety
+  { title: "Pump room floor — oil drip from high-pressure pump",      desc: "Minor oil leak from pump fitting. Floor area slippery. Housekeeping barrier placed.", cat: "SAFETY",             pri: "HIGH",   loc: 0, days: 3,   status: "IN_PROGRESS" },
+  { title: "Bay door 2 — closes too slowly, safety sensor concern",   desc: "Bay 2 entry door slow to close. Sensor triggering inconsistently.", cat: "SAFETY",             pri: "HIGH",   loc: 0, days: 7,   status: "RESOLVED", resolved: { days: 1, method: "Adjusted door close speed and re-calibrated sensor", rootCause: "Pneumatic closer pressure drifted", category: "Repaired", time: "1_4_hours", cost: 40 } },
+  { title: "Exterior lighting — 2 poles out near vacuum area",        desc: "Two light poles not working in evening. Safety and visibility concern at vacuum stations.", cat: "FACILITY",           pri: "HIGH",   loc: 0, days: 5,   status: "OPEN" },
+  { title: "Chemical dosing — soap concentration too low",            desc: "Bay soap concentration dropping. Possible chemical pump issue or dilution error.", cat: "MAINTENANCE",        pri: "HIGH",   loc: 0, days: 2,   status: "RESOLVED", resolved: { days: 0, method: "Recalibrated chemical pump and checked dilution ratio", rootCause: "Pump calibration drifted after cleaning", category: "Repaired", time: "under_1_hour", cost: 0 } },
+  { title: "Monthly pump lubrication overdue — all bays",             desc: "Monthly PM for pump lubrication on all bays is 2 weeks past due.", cat: "MAINTENANCE",        pri: "MEDIUM", loc: 0, days: 14,  status: "RESOLVED", resolved: { days: 0, method: "Completed lubrication PM on all bay pumps", rootCause: "PM not assigned after technician schedule change", category: "Training/Process Fix", time: "1_4_hours", cost: 20 } },
+  // South location issues
+  { title: "South — Bay 1 wand hose leaking at coupling",             desc: "Customer wand hose leaking from coupling under pressure. Bay offline.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 1, days: 2,   status: "OPEN",        asset: 10 },
+  { title: "South — vacuum station: 2 of 3 units not working",        desc: "2 of 3 vacuums at south location have no power. Breaker issue.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 1, days: 1,   status: "RESOLVED", resolved: { days: 0, method: "Reset tripped breaker and checked GFCI outlets", rootCause: "Overloaded circuit on vacuum circuit", category: "Repaired", time: "under_1_hour", cost: 0 } },
+]
+
 function getIssueSeeds(industryKey: string): IssueSeed[] {
   switch (industryKey) {
     case "manufacturing": return MFG_ISSUES
     case "warehousing":   return WH_ISSUES
     case "hospitality":   return HOSP_ISSUES
+    case "car_wash":      return CARWASH_ISSUES
     default:              return genericIssues(getTemplate(
       INDUSTRY_TEMPLATES.find(t => t.key === industryKey)?.label ?? "Operations"
     ).demoCompanyName.split(" ")[0])
@@ -443,6 +473,7 @@ interface AssetSeed {
   type: "EQUIPMENT" | "VEHICLE" | "FACILITY" | "TOOL" | "IT"
   status: "OPERATIONAL" | "NEEDS_MAINTENANCE" | "OUT_OF_SERVICE"
   locIdx: number
+  assetSubtype?: string
 }
 
 function getAssets(industryKey: string): AssetSeed[] {
@@ -473,6 +504,23 @@ function getAssets(industryKey: string): AssetSeed[] {
         { name: "Kitchen Exhaust Hood",       type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 2 },
         { name: "Ice Machine — Main Kitchen", type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 2 },
       ]
+    case "car_wash":
+      return [
+        { name: "Bay 1 (Self-Service)",     type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "SELF_SERVICE_BAY" },
+        { name: "Bay 2 (Self-Service)",     type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0, assetSubtype: "SELF_SERVICE_BAY" },
+        { name: "Bay 3 (Automatic)",        type: "EQUIPMENT", status: "OUT_OF_SERVICE",    locIdx: 0, assetSubtype: "AUTOMATIC_BAY" },
+        { name: "Vacuum 1",                 type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "VACUUM" },
+        { name: "Vacuum 2",                 type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0, assetSubtype: "VACUUM" },
+        { name: "Vacuum 3",                 type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "VACUUM" },
+        { name: "Pay Station",              type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "PAY_STATION" },
+        { name: "Bill Changer",             type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "CHANGER" },
+        { name: "High-Pressure Pump",       type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "PUMP" },
+        { name: "RO Water System",          type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0, assetSubtype: "RO_SYSTEM" },
+        { name: "Bay 1 (Self-Service)",     type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 1, assetSubtype: "SELF_SERVICE_BAY" },
+        { name: "Bay 2 (Automatic)",        type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 1, assetSubtype: "AUTOMATIC_BAY" },
+        { name: "Vacuum 1",                 type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 1, assetSubtype: "VACUUM" },
+        { name: "Maintenance Van",          type: "VEHICLE",   status: "OPERATIONAL",       locIdx: 0, assetSubtype: "VEHICLE" },
+      ]
     default:
       return [
         { name: "HVAC Unit A",              type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0 },
@@ -485,12 +533,13 @@ function getAssets(industryKey: string): AssetSeed[] {
 
 // ─── Main: create + reset ─────────────────────────────────────────────────────
 
-export type DemoPackage = "essentials" | "professional" | "professional_plus"
+export type DemoPackage = "essentials" | "professional" | "professional_plus" | "wash_essentials"
 
 const PACKAGE_PLAN: Record<DemoPackage, string> = {
   essentials:        "essentials",
   professional:      "pro",
   professional_plus: "professional_plus",
+  wash_essentials:   "wash_essentials",
 }
 
 export async function createDemoOrg(industry?: string, pkg: DemoPackage = "professional") {
@@ -500,20 +549,25 @@ export async function createDemoOrg(industry?: string, pkg: DemoPackage = "profe
   const expiresAt     = new Date(Date.now() + DEMO_TTL_MS)
   const isPlusOrAbove = pkg === "professional_plus"
 
+  const isWashEssentialsPkg = pkg === "wash_essentials"
+
   const org = await prisma.organization.create({
     data: {
       name:                   template.demoCompanyName,
       slug,
       industry:               industryLabel,
+      productLine:            isWashEssentialsPkg ? "WASH_ESSENTIALS" : "RELAY_STANDARD",
       isDemo:                 true,
       demoExpiresAt:          expiresAt,
       onboardingCompletedAt:  new Date(),
       subscriptionStatus:     "active",
       plan:                   PACKAGE_PLAN[pkg],
       aiSuggestionsAvailable: true,
-      purchaseRequestEnabled: true,
-      companySize:            "250",
-      // Feature flags — enabled for Professional Plus+
+      purchaseRequestEnabled: !isWashEssentialsPkg,
+      companySize:            isWashEssentialsPkg ? "10" : "250",
+      locationLimit:          isWashEssentialsPkg ? 7 : null,
+      qr_codes_enabled:       true,
+      // Feature flags — enabled for Professional Plus+ only
       regions_enabled:                  isPlusOrAbove,
       corporate_dashboard_enabled:      isPlusOrAbove,
       cross_location_analytics_enabled: isPlusOrAbove,
@@ -724,6 +778,7 @@ async function seedDemoContent(orgId: string, adminUserId: string, industryLabel
           status:         a.status,
           locationId:     locationIds[a.locIdx] ?? locationIds[0],
           organizationId: orgId,
+          ...(a.assetSubtype ? { assetSubtype: a.assetSubtype } : {}),
         },
       })
     )

@@ -808,6 +808,78 @@ Reactive maintenance is more expensive and disruptive than preventive maintenanc
     ],
   },
   {
+    key: "car_wash",
+    label: "Car Wash",
+    demoCompanyName: "Clearview Car Wash",
+    departments: ["Operations", "Maintenance", "Customer Service"],
+    issueTypeLabels: ["Maintenance", "Operations", "Customer Complaints", "Safety", "Facilities"],
+    demoLocations: [
+      { name: "Main Wash — North Location", locationType: "Service Facility" },
+      { name: "South Location",             locationType: "Service Facility" },
+    ],
+    demoVendors: [
+      { name: "WashTech Equipment Services", specialty: "Wash Equipment Repair" },
+      { name: "AquaPure Water Systems",      specialty: "RO / Water Treatment" },
+      { name: "ChemPro Solutions",           specialty: "Chemical Supplies" },
+    ],
+    demoSOPs: [
+      {
+        title: "Bay Equipment Pre-Opening Inspection",
+        description: "Daily inspection checklist for all wash bays before opening to customers.",
+        category: "MAINTENANCE",
+        assetType: "EQUIPMENT",
+        version: "1.0",
+        content: `## 1. Purpose
+Ensure all wash bay equipment is safe and operational before the first customer of the day. This inspection must be completed and signed off by the opening manager before any bay is activated.
+
+## 2. Wash Bay Inspection — Each Bay
+- **2.1 Equipment function test**: Run a short wash cycle in each bay to confirm wand, high-pressure nozzle, foamer, and rinse are all operational.
+- **2.2 Coin/card acceptor**: Test the coin mechanism or card reader with a test transaction. Confirm display shows correct prompts.
+- **2.3 Water temperature**: Verify wash water is reaching minimum operating temperature per your chemical vendor's spec.
+- **2.4 Drainage**: Confirm floor drains are clear and water is draining without pooling.
+- **2.5 Visual check**: Inspect bay walls, floor, and equipment for damage, loose fittings, or hazards. Address before opening.
+
+## 3. Vacuum Station Inspection
+- **3.1 Suction test**: Test each vacuum nozzle for adequate suction. A vacuum with weak suction must be taken offline until repaired.
+- **3.2 Canister check**: Empty vacuum waste containers if more than half full. A full canister reduces suction.
+- **3.3 Cord and nozzle**: Inspect vacuum hose and cord for damage. Frayed cords must be removed from service.
+
+## 4. Pay Station and Change Machine
+- **4.1 Cash level**: Verify change machine has adequate coin/bill supply for the day.
+- **4.2 Receipt paper**: Confirm pay station has receipt paper installed if applicable.
+- **4.3 Error codes**: Clear any error codes from the previous day and verify no active faults.
+
+## 5. Sign-Off
+The opening manager must sign and date the inspection log. Any item that is out of service must be tagged and a work order submitted before the shift begins.`,
+      },
+      {
+        title: "Customer QR Report Response Procedure",
+        description: "How to respond when a customer submits a report via a bay or vacuum QR code.",
+        category: "MAINTENANCE",
+        assetType: null,
+        version: "1.0",
+        content: `## 1. Purpose
+QR codes posted at bays and vacuum stations allow customers to report equipment problems instantly. This procedure ensures every customer report is acknowledged and acted on promptly.
+
+## 2. Receiving a Customer Report
+- **2.1 Notification**: A customer report creates an issue in Relay automatically. Staff will receive a notification on their device or via the dashboard.
+- **2.2 Priority**: Customer-submitted reports default to MEDIUM priority. If the report indicates safety or a fully non-functional bay, escalate to HIGH immediately.
+- **2.3 Response time target**: Acknowledge (assign the issue) within 15 minutes during open hours. Resolve or take the equipment offline within 1 hour.
+
+## 3. Assessment and Action
+- **3.1 Verify the report**: A staff member must physically inspect the reported bay or vacuum within 15 minutes.
+- **3.2 Minor issue**: If the issue can be fixed on the spot (e.g., add soap, unclog nozzle), resolve it immediately and close the report with a note.
+- **3.3 Equipment failure**: If the bay or vacuum cannot be quickly repaired, place an OUT OF SERVICE sign on the equipment and create a maintenance work order.
+- **3.4 Customer follow-up**: If the customer left contact information, a manager should follow up to acknowledge their report. Customers who report issues are your best source of quality feedback.
+
+## 4. Closing the Report
+- Add a resolution note describing what was found and what was done.
+- Link the report to the relevant equipment (asset) in Relay.
+- If a repeat failure on the same equipment, flag for preventive maintenance review.`,
+      },
+    ],
+  },
+  {
     key: "other",
     label: "Other",
     demoCompanyName: "Demo Operations Co.",
@@ -887,6 +959,9 @@ const LABEL_ALIASES: Record<string, string> = {
   "Education":          "education",
   "Property Management": "property",
   "Self-Storage":       "property",
+  "Car Wash":           "car_wash",
+  "car-wash":           "car_wash",
+  "Carwash":            "car_wash",
 }
 
 export function getTemplate(label: string): IndustryTemplate {

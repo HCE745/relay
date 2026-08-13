@@ -46,7 +46,7 @@ export default async function LocationsPage() {
       />
 
       <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-tour="location-list">
           {locations.length === 0 ? (
             <div className="col-span-full py-16 text-center bg-white rounded-xl border border-gray-200">
               <MapPin className="w-10 h-10 text-gray-300 mx-auto mb-3" />

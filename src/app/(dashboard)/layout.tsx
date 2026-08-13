@@ -124,6 +124,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <Sidebar
         allowedPageKeys={allowedPageKeys}
         showRouting={showRouting}
+        industry={org?.industry ?? undefined}
         corporateDashboardEnabled={org?.corporate_dashboard_enabled ?? false}
         regionsEnabled={org?.regions_enabled ?? false}
         apiWebhooksEnabled={org?.api_webhooks_enabled ?? false}
@@ -138,6 +139,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <MobileNav
         allowedPageKeys={allowedPageKeys}
         showRouting={showRouting}
+        industry={org?.industry ?? undefined}
         corporateDashboardEnabled={org?.corporate_dashboard_enabled ?? false}
         regionsEnabled={org?.regions_enabled ?? false}
         userName={session.name ?? ""}

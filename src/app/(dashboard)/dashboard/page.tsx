@@ -21,7 +21,9 @@ import {
   Wrench,
   Building2,
   QrCode,
+  Droplets,
 } from "lucide-react"
+import { CARWASH_ASSET_TAXONOMY } from "@/lib/car-wash-config"
 import { Badge } from "@/components/ui/badge"
 import { PRIORITY_COLOR, STATUS_COLOR, ISSUE_STATUS, ISSUE_PRIORITY, ISSUE_CATEGORY } from "@/lib/constants"
 import { formatDistanceToNow } from "date-fns"
@@ -89,6 +91,10 @@ async function getDashboardData(orgId: string) {
     customerReportsToday,
     openEquipmentIssues,
     operationalAssets,
+    openMaintenanceIssues,
+    repeatFailureCount,
+    recentCustomerReports,
+    recentEquipmentAssetsRaw,
   ] = await Promise.all([
     prisma.issue.count({ where: { organizationId: orgId } }),
     prisma.issue.count({ where: { organizationId: orgId, status: "OPEN" } }),
@@ -127,7 +133,37 @@ async function getDashboardData(orgId: string) {
     prisma.issue.count({ where: { organizationId: orgId, category: "CUSTOMER_REPORT", createdAt: { gte: todayStart } } }),
     prisma.issue.count({ where: { organizationId: orgId, category: "EQUIPMENT_BREAKDOWN", status: { notIn: ["RESOLVED", "CLOSED"] } } }),
     prisma.asset.count({ where: { organizationId: orgId, status: "OPERATIONAL" } }),
+    prisma.issue.count({ where: { organizationId: orgId, category: "MAINTENANCE", status: { notIn: ["RESOLVED", "CLOSED"] } } }),
+    prisma.issue.groupBy({
+      by: ["assetId"],
+      where: { organizationId: orgId, category: "EQUIPMENT_BREAKDOWN", status: { notIn: ["RESOLVED", "CLOSED"] }, assetId: { not: null } },
+      _count: { id: true },
+    }).then(groups => groups.filter(g => g._count.id > 1).length),
+    prisma.issue.findMany({
+      where: { organizationId: orgId, category: "CUSTOMER_REPORT" },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: { location: { select: { name: true } } },
+    }),
+    prisma.asset.findMany({
+      where: { organizationId: orgId },
+      orderBy: { updatedAt: "desc" },
+      take: 20,
+      select: {
+        id: true, name: true, status: true, assetSubtype: true,
+        location: { select: { name: true } },
+        issues: { where: { status: { notIn: ["RESOLVED", "CLOSED"] } }, select: { id: true, category: true } },
+      },
+    }),
   ])
+
+  const STATUS_PRIORITY: Record<string, number> = { MAINTENANCE: 0, OUT_OF_SERVICE: 1, INACTIVE: 2, OPERATIONAL: 3 }
+  const sortedEquipmentAssets = [...recentEquipmentAssetsRaw].sort((a, b) => {
+    const aHasIssues = a.issues.length > 0 ? 0 : 1
+    const bHasIssues = b.issues.length > 0 ? 0 : 1
+    if (aHasIssues !== bHasIssues) return aHasIssues - bHasIssues
+    return (STATUS_PRIORITY[a.status] ?? 4) - (STATUS_PRIORITY[b.status] ?? 4)
+  }).slice(0, 8)
 
   return {
     totalIssues, openIssues, escalatedIssues, resolvedIssues, criticalIssues,
@@ -135,6 +171,8 @@ async function getDashboardData(orgId: string) {
     newThisWeek, resolvedThisWeek, newToday, resolvedToday,
     industry: orgRow?.industry ?? null,
     customerReportsToday, openEquipmentIssues, operationalAssets,
+    openMaintenanceIssues, repeatFailureCount, recentCustomerReports,
+    equipmentAssets: sortedEquipmentAssets,
   }
 }
 
@@ -316,6 +354,8 @@ export default async function DashboardPage() {
     getChecklistData(session?.organizationId ?? ""),
     canSeeReferrals ? getReferralCardData(session?.organizationId ?? "") : Promise.resolve(null),
   ])
+
+  const isCarWash = data.industry === "Car Wash"
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"
@@ -615,199 +655,318 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* ── Car Wash Spotlight ────────────────────────────────────────── */}
-        {data.industry === "Car Wash" && (
-          <div className="grid grid-cols-3 gap-3">
-            <Link
-              href="/issues?category=CUSTOMER_REPORT"
-              className="rounded-xl border border-purple-200 border-l-4 border-l-purple-500 p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
-              style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.05) 0%, white 60%)" }}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <QrCode className="w-4 h-4 text-purple-500" />
-                <span className="text-[11px] font-bold text-purple-500 uppercase tracking-wide">Customer Reports</span>
-              </div>
-              <div className="text-3xl font-black text-gray-900 leading-none">{data.customerReportsToday}</div>
-              <div className="text-xs text-gray-400 mt-1.5">Today via QR</div>
-            </Link>
-            <Link
-              href="/issues?category=EQUIPMENT_BREAKDOWN&status=OPEN"
-              className={`rounded-xl border border-l-4 p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 ${
-                data.openEquipmentIssues > 0
-                  ? "border-orange-200 border-l-orange-500"
-                  : "border-gray-200 border-l-gray-300"
-              }`}
-              style={{ background: data.openEquipmentIssues > 0
-                ? "linear-gradient(135deg, rgba(249,115,22,0.05) 0%, white 60%)"
-                : "linear-gradient(135deg, rgba(100,116,139,0.03) 0%, white 60%)" }}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <Wrench className={`w-4 h-4 ${data.openEquipmentIssues > 0 ? "text-orange-500" : "text-gray-400"}`} />
-                <span className={`text-[11px] font-bold uppercase tracking-wide ${data.openEquipmentIssues > 0 ? "text-orange-500" : "text-gray-400"}`}>Equipment Down</span>
-              </div>
-              <div className={`text-3xl font-black leading-none ${data.openEquipmentIssues > 0 ? "text-orange-600" : "text-gray-900"}`}>
-                {data.openEquipmentIssues}
-              </div>
-              <div className="text-xs text-gray-400 mt-1.5">Open breakdowns</div>
-            </Link>
-            <Link
-              href="/assets"
-              className="rounded-xl border border-emerald-200 border-l-4 border-l-emerald-500 p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
-              style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.05) 0%, white 60%)" }}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <Package className="w-4 h-4 text-emerald-500" />
-                <span className="text-[11px] font-bold text-emerald-500 uppercase tracking-wide">Bays & Assets</span>
-              </div>
-              <div className="text-3xl font-black text-gray-900 leading-none">
-                {data.operationalAssets}<span className="text-lg text-gray-400 font-bold">/{data.totalAssets}</span>
-              </div>
-              <div className="text-xs text-gray-400 mt-1.5">Operational</div>
-            </Link>
-          </div>
-        )}
-
-        {/* ── KPI Cards ─────────────────────────────────────────────────── */}
-        <div data-tour="kpi-cards" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {stats.map(({ label, value, icon: Icon, iconColor, iconBg, accentBorder, bgTint, href, secondary, secondaryColor, trend: kpiTrend }) => (
-            <Link
-              key={label}
-              href={href}
-              className={`rounded-xl border border-gray-200 border-l-4 ${accentBorder} p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150`}
-              style={{ background: `linear-gradient(135deg, ${bgTint} 0%, white 60%)` }}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className={`w-9 h-9 ${iconBg} rounded-full flex items-center justify-center`}>
-                  <Icon className={`w-[18px] h-[18px] ${iconColor}`} />
-                </div>
-                {kpiTrend && (
-                  <span className={`text-xs font-bold ${kpiTrend.cls}`}>
-                    {kpiTrend.sign}{kpiTrend.val !== null ? ` ${kpiTrend.val}` : ""}
-                  </span>
-                )}
-              </div>
-              <div className="text-3xl font-black text-gray-900 leading-none">{value}</div>
-              <div className="text-[13px] font-medium text-gray-600 mt-1">{label}</div>
-              <div className={`text-[11px] mt-1.5 ${secondaryColor}`}>{secondary}</div>
-            </Link>
-          ))}
-        </div>
-
-        {/* ── Recent Issues (60%) + Category Chart (40%) ───────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          {/* Recent Issues */}
-          <div className="lg:col-span-3 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="font-bold text-gray-900">Recent Issues</h2>
-              <Link href="/issues" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium">
-                View all <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+        {/* ── Car Wash Dashboard / Generic KPI + Charts ─────────────────── */}
+        {isCarWash ? (
+          <>
+            {/* Car Wash KPI Cards */}
+            <div data-tour="kpi-cards" className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {[
+                {
+                  label: "Bays Operational", href: "/assets",
+                  iconEl: <Droplets className="w-[18px] h-[18px] text-emerald-600" />,
+                  iconBg: "bg-emerald-100", accentBorder: "border-l-emerald-500", bgTint: "rgba(16,185,129,0.05)",
+                  value: <>{data.operationalAssets}<span className="text-lg text-gray-400 font-bold ml-0.5">/{data.totalAssets}</span></>,
+                  secondary: "Currently operational", secondaryColor: "text-gray-400",
+                },
+                {
+                  label: "Equipment Down", href: "/issues?category=EQUIPMENT_BREAKDOWN&status=OPEN",
+                  iconEl: <Wrench className={`w-[18px] h-[18px] ${data.openEquipmentIssues > 0 ? "text-orange-600" : "text-gray-400"}`} />,
+                  iconBg: data.openEquipmentIssues > 0 ? "bg-orange-100" : "bg-gray-100",
+                  accentBorder: data.openEquipmentIssues > 0 ? "border-l-orange-500" : "border-l-gray-300",
+                  bgTint: data.openEquipmentIssues > 0 ? "rgba(249,115,22,0.05)" : "rgba(100,116,139,0.03)",
+                  value: <span className={data.openEquipmentIssues > 0 ? "text-orange-600" : ""}>{data.openEquipmentIssues}</span>,
+                  secondary: "Open breakdowns", secondaryColor: data.openEquipmentIssues > 0 ? "text-orange-500 font-medium" : "text-gray-400",
+                },
+                {
+                  label: "Customer Reports", href: "/issues?category=CUSTOMER_REPORT",
+                  iconEl: <QrCode className="w-[18px] h-[18px] text-purple-600" />,
+                  iconBg: "bg-purple-100", accentBorder: "border-l-purple-500", bgTint: "rgba(168,85,247,0.05)",
+                  value: <>{data.customerReportsToday}</>,
+                  secondary: "Today via QR", secondaryColor: "text-gray-400",
+                },
+                {
+                  label: "Open Maintenance", href: "/issues?category=MAINTENANCE",
+                  iconEl: <Wrench className={`w-[18px] h-[18px] ${data.openMaintenanceIssues > 0 ? "text-amber-600" : "text-gray-400"}`} />,
+                  iconBg: data.openMaintenanceIssues > 0 ? "bg-amber-100" : "bg-gray-100",
+                  accentBorder: data.openMaintenanceIssues > 0 ? "border-l-amber-500" : "border-l-gray-300",
+                  bgTint: data.openMaintenanceIssues > 0 ? "rgba(245,158,11,0.05)" : "rgba(100,116,139,0.03)",
+                  value: <>{data.openMaintenanceIssues}</>,
+                  secondary: "Pending maintenance", secondaryColor: "text-gray-400",
+                },
+                {
+                  label: "Repeat Equipment Issues", href: "/issues?category=EQUIPMENT_BREAKDOWN",
+                  iconEl: <AlertTriangle className={`w-[18px] h-[18px] ${data.repeatFailureCount > 0 ? "text-red-600" : "text-gray-400"}`} />,
+                  iconBg: data.repeatFailureCount > 0 ? "bg-red-100" : "bg-gray-100",
+                  accentBorder: data.repeatFailureCount > 0 ? "border-l-red-500" : "border-l-gray-300",
+                  bgTint: data.repeatFailureCount > 0 ? "rgba(239,68,68,0.05)" : "rgba(100,116,139,0.03)",
+                  value: <>{data.repeatFailureCount}</>,
+                  secondary: "Assets with multiple open", secondaryColor: data.repeatFailureCount > 0 ? "text-red-500 font-medium" : "text-gray-400",
+                },
+                {
+                  label: "Open Issues", href: "/issues?status=OPEN",
+                  iconEl: <AlertCircle className="w-[18px] h-[18px] text-blue-600" />,
+                  iconBg: "bg-blue-100", accentBorder: "border-l-blue-500", bgTint: "rgba(59,130,246,0.05)",
+                  value: <>{data.openIssues}</>,
+                  secondary: `${data.newThisWeek} new this week`, secondaryColor: data.newThisWeek > 0 ? "text-amber-600" : "text-gray-400",
+                },
+              ].map(({ label, href, iconEl, iconBg, accentBorder, bgTint, value, secondary, secondaryColor }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className={`rounded-xl border border-gray-200 border-l-4 ${accentBorder} p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150`}
+                  style={{ background: `linear-gradient(135deg, ${bgTint} 0%, white 60%)` }}
+                >
+                  <div className={`w-9 h-9 ${iconBg} rounded-full flex items-center justify-center mb-3`}>
+                    {iconEl}
+                  </div>
+                  <div className="text-3xl font-black text-gray-900 leading-none">{value}</div>
+                  <div className="text-[13px] font-medium text-gray-600 mt-1">{label}</div>
+                  <div className={`text-[11px] mt-1.5 ${secondaryColor}`}>{secondary}</div>
+                </Link>
+              ))}
             </div>
-            <div className="divide-y divide-gray-50">
-              {data.recentIssues.length === 0 ? (
-                <div className="px-6 py-12 text-center">
-                  <AlertCircle className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">No issues yet</p>
+
+            {/* Equipment Status Grid */}
+            <div data-tour="carwash-equipment-status" className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-900">Equipment Status</h2>
+                <Link href="/assets" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium">
+                  All equipment <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              {data.equipmentAssets.length === 0 ? (
+                <div className="px-6 py-10 text-center">
+                  <Package className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">No equipment tracked yet</p>
                 </div>
               ) : (
-                data.recentIssues.map((issue) => {
-                  const waiting = getWaiting(issue.createdAt, issue.status)
-                  const assigneeInitial = issue.assignedTo?.name?.charAt(0).toUpperCase()
-                  const firstImg = issue.attachments[0]?.url ?? null
-                  const catBg  = CATEGORY_ICON_BG[issue.category]  ?? "bg-gray-100"
-                  const catClr = CATEGORY_ICON_CLR[issue.category] ?? "text-gray-400"
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+                  {data.equipmentAssets.map((asset) => {
+                    const statusConfig = {
+                      OPERATIONAL:    { label: "Operational",    bg: "bg-emerald-100", text: "text-emerald-700" },
+                      MAINTENANCE:    { label: "Maintenance",    bg: "bg-amber-100",   text: "text-amber-700"   },
+                      INACTIVE:       { label: "Inactive",       bg: "bg-gray-100",    text: "text-gray-600"    },
+                      OUT_OF_SERVICE: { label: "Out of Service", bg: "bg-red-100",     text: "text-red-700"     },
+                    }[asset.status] ?? { label: asset.status, bg: "bg-gray-100", text: "text-gray-600" }
+                    const subtypeLabel = asset.assetSubtype
+                      ? (CARWASH_ASSET_TAXONOMY[asset.assetSubtype as keyof typeof CARWASH_ASSET_TAXONOMY] ?? asset.assetSubtype)
+                      : null
+                    const openIssueCount = asset.issues.length
 
-                  return (
+                    return (
+                      <Link
+                        key={asset.id}
+                        href={`/assets/${asset.id}`}
+                        className="px-4 py-3.5 hover:bg-gray-50/70 transition-colors flex flex-col gap-1.5"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-sm font-semibold text-gray-900 leading-tight truncate">{asset.name}</span>
+                          {openIssueCount > 0 && (
+                            <span className="shrink-0 bg-orange-100 text-orange-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                              {openIssueCount} issue{openIssueCount > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
+                        {subtypeLabel && <span className="text-[11px] text-gray-400">{subtypeLabel}</span>}
+                        <span className={`self-start text-[11px] font-semibold px-2 py-0.5 rounded-full ${statusConfig.bg} ${statusConfig.text}`}>
+                          {statusConfig.label}
+                        </span>
+                        {asset.location && (
+                          <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />{asset.location.name}
+                          </span>
+                        )}
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Recent Customer QR Reports */}
+            <div data-tour="carwash-customer-reports" className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-900">Recent Customer Reports</h2>
+                <Link href="/issues?category=CUSTOMER_REPORT" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium">
+                  View all <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <div className="divide-y divide-gray-50">
+                {data.recentCustomerReports.length === 0 ? (
+                  <div className="px-6 py-10 text-center">
+                    <QrCode className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                    <p className="text-sm text-gray-400">No customer reports yet — set up a QR code to start collecting feedback</p>
+                  </div>
+                ) : (
+                  data.recentCustomerReports.map((issue) => (
                     <Link
                       key={issue.id}
                       href={`/issues/${issue.id}`}
-                      className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50/80 transition-all duration-150"
+                      className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50/80 transition-colors"
                     >
-                      {/* Thumbnail */}
-                      <div className="shrink-0">
-                        {firstImg ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={firstImg} alt="" className="w-8 h-8 rounded-lg object-cover border border-gray-100" />
-                        ) : (
-                          <div className={`w-8 h-8 rounded-lg ${catBg} flex items-center justify-center border border-gray-100`}>
-                            <AlertCircle className={`w-4 h-4 ${catClr}`} />
-                          </div>
-                        )}
+                      <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center border border-purple-100 shrink-0">
+                        <QrCode className="w-4 h-4 text-purple-500" />
                       </div>
-
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-sm font-semibold text-gray-900 truncate max-w-[200px]">{issue.title}</span>
-                          <Badge className={`${PRIORITY_COLOR[issue.priority]} text-[10px] px-1.5 py-0 border`}>
-                            {ISSUE_PRIORITY[issue.priority as keyof typeof ISSUE_PRIORITY] ?? issue.priority}
-                          </Badge>
-                          <Badge className={`${STATUS_COLOR[issue.status]} text-[10px] px-1.5 py-0 border`}>
-                            {ISSUE_STATUS[issue.status as keyof typeof ISSUE_STATUS] ?? issue.status}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs text-gray-400 flex-wrap">
+                        <div className="text-sm font-semibold text-gray-900 truncate">{issue.title}</div>
+                        <div className="flex items-center gap-2.5 text-xs text-gray-400 mt-0.5 flex-wrap">
                           <span>{formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}</span>
                           {issue.location && (
                             <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{issue.location.name}</span>
                           )}
                         </div>
                       </div>
-
-                      <div className="shrink-0 flex flex-col items-end gap-1.5">
-                        {assigneeInitial && (
-                          <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <span className="text-[10px] font-bold text-indigo-700">{assigneeInitial}</span>
-                          </div>
-                        )}
-                        {waiting && (
-                          <span className={`text-[11px] whitespace-nowrap ${waiting.cls}`}>{waiting.label}</span>
-                        )}
-                      </div>
+                      <Badge className={`${STATUS_COLOR[issue.status]} text-[10px] px-1.5 py-0 border shrink-0`}>
+                        {ISSUE_STATUS[issue.status as keyof typeof ISSUE_STATUS] ?? issue.status}
+                      </Badge>
                     </Link>
-                  )
-                })
-              )}
+                  ))
+                )}
+              </div>
             </div>
-          </div>
-
-          {/* Category Chart */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h2 className="font-bold text-gray-900">By Category</h2>
-              <span className="text-xs text-gray-400 font-medium">{data.totalIssues} total</span>
-            </div>
-            <div className="px-5 py-4 space-y-4">
-              {data.issuesByCategory.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-6">No data yet</p>
-              ) : (
-                data.issuesByCategory.slice(0, 8).map((item) => {
-                  const total = data.totalIssues || 1
-                  const pct = Math.round((item._count.id / total) * 100)
-                  const barHex = CATEGORY_COLOR_HEX[item.category] ?? "#94a3b8"
-                  const label = ISSUE_CATEGORY[item.category as keyof typeof ISSUE_CATEGORY] ?? item.category
-
-                  return (
-                    <div key={item.category}>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-[13px] font-semibold text-gray-900 truncate max-w-[130px]">{label}</span>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className="text-xs font-bold" style={{ color: barHex }}>{pct}%</span>
-                          <span className="text-[13px] font-black text-gray-900 w-5 text-right">{item._count.id}</span>
-                        </div>
-                      </div>
-                      <div className="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden">
-                        <div
-                          className="h-3.5 rounded-full transition-all duration-300"
-                          style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: barHex }}
-                        />
-                      </div>
+          </>
+        ) : (
+          <>
+            {/* ── Generic KPI Cards ───────────────────────────────────── */}
+            <div data-tour="kpi-cards" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              {stats.map(({ label, value, icon: Icon, iconColor, iconBg, accentBorder, bgTint, href, secondary, secondaryColor, trend: kpiTrend }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className={`rounded-xl border border-gray-200 border-l-4 ${accentBorder} p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150`}
+                  style={{ background: `linear-gradient(135deg, ${bgTint} 0%, white 60%)` }}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`w-9 h-9 ${iconBg} rounded-full flex items-center justify-center`}>
+                      <Icon className={`w-[18px] h-[18px] ${iconColor}`} />
                     </div>
-                  )
-                })
-              )}
+                    {kpiTrend && (
+                      <span className={`text-xs font-bold ${kpiTrend.cls}`}>
+                        {kpiTrend.sign}{kpiTrend.val !== null ? ` ${kpiTrend.val}` : ""}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-3xl font-black text-gray-900 leading-none">{value}</div>
+                  <div className="text-[13px] font-medium text-gray-600 mt-1">{label}</div>
+                  <div className={`text-[11px] mt-1.5 ${secondaryColor}`}>{secondary}</div>
+                </Link>
+              ))}
             </div>
-          </div>
-        </div>
+
+            {/* ── Recent Issues (60%) + Category Chart (40%) ───────────── */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+              {/* Recent Issues */}
+              <div className="lg:col-span-3 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                  <h2 className="font-bold text-gray-900">Recent Issues</h2>
+                  <Link href="/issues" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium">
+                    View all <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {data.recentIssues.length === 0 ? (
+                    <div className="px-6 py-12 text-center">
+                      <AlertCircle className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                      <p className="text-sm text-gray-400">No issues yet</p>
+                    </div>
+                  ) : (
+                    data.recentIssues.map((issue) => {
+                      const waiting = getWaiting(issue.createdAt, issue.status)
+                      const assigneeInitial = issue.assignedTo?.name?.charAt(0).toUpperCase()
+                      const firstImg = issue.attachments[0]?.url ?? null
+                      const catBg  = CATEGORY_ICON_BG[issue.category]  ?? "bg-gray-100"
+                      const catClr = CATEGORY_ICON_CLR[issue.category] ?? "text-gray-400"
+
+                      return (
+                        <Link
+                          key={issue.id}
+                          href={`/issues/${issue.id}`}
+                          className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50/80 transition-all duration-150"
+                        >
+                          <div className="shrink-0">
+                            {firstImg ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={firstImg} alt="" className="w-8 h-8 rounded-lg object-cover border border-gray-100" />
+                            ) : (
+                              <div className={`w-8 h-8 rounded-lg ${catBg} flex items-center justify-center border border-gray-100`}>
+                                <AlertCircle className={`w-4 h-4 ${catClr}`} />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <span className="text-sm font-semibold text-gray-900 truncate max-w-[200px]">{issue.title}</span>
+                              <Badge className={`${PRIORITY_COLOR[issue.priority]} text-[10px] px-1.5 py-0 border`}>
+                                {ISSUE_PRIORITY[issue.priority as keyof typeof ISSUE_PRIORITY] ?? issue.priority}
+                              </Badge>
+                              <Badge className={`${STATUS_COLOR[issue.status]} text-[10px] px-1.5 py-0 border`}>
+                                {ISSUE_STATUS[issue.status as keyof typeof ISSUE_STATUS] ?? issue.status}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-xs text-gray-400 flex-wrap">
+                              <span>{formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}</span>
+                              {issue.location && (
+                                <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{issue.location.name}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="shrink-0 flex flex-col items-end gap-1.5">
+                            {assigneeInitial && (
+                              <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <span className="text-[10px] font-bold text-indigo-700">{assigneeInitial}</span>
+                              </div>
+                            )}
+                            {waiting && (
+                              <span className={`text-[11px] whitespace-nowrap ${waiting.cls}`}>{waiting.label}</span>
+                            )}
+                          </div>
+                        </Link>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Category Chart */}
+              <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                  <h2 className="font-bold text-gray-900">By Category</h2>
+                  <span className="text-xs text-gray-400 font-medium">{data.totalIssues} total</span>
+                </div>
+                <div className="px-5 py-4 space-y-4">
+                  {data.issuesByCategory.length === 0 ? (
+                    <p className="text-sm text-gray-400 text-center py-6">No data yet</p>
+                  ) : (
+                    data.issuesByCategory.slice(0, 8).map((item) => {
+                      const total = data.totalIssues || 1
+                      const pct = Math.round((item._count.id / total) * 100)
+                      const barHex = CATEGORY_COLOR_HEX[item.category] ?? "#94a3b8"
+                      const label = ISSUE_CATEGORY[item.category as keyof typeof ISSUE_CATEGORY] ?? item.category
+
+                      return (
+                        <div key={item.category}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-[13px] font-semibold text-gray-900 truncate max-w-[130px]">{label}</span>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <span className="text-xs font-bold" style={{ color: barHex }}>{pct}%</span>
+                              <span className="text-[13px] font-black text-gray-900 w-5 text-right">{item._count.id}</span>
+                            </div>
+                          </div>
+                          <div className="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden">
+                            <div
+                              className="h-3.5 rounded-full transition-all duration-300"
+                              style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: barHex }}
+                            />
+                          </div>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

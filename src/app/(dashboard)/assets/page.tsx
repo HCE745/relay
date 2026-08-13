@@ -3,12 +3,13 @@ import { Header } from "@/components/layout/header"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { ASSET_TYPE, ASSET_STATUS, ASSET_STATUS_COLOR } from "@/lib/constants"
-import { Plus, Package, ChevronRight, Download } from "lucide-react"
+import { Plus, Package, ChevronRight, Download, Wrench, AlertTriangle, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { AssetDialog } from "@/components/assets/asset-dialog"
 import { PlanGateContent } from "@/components/layout/plan-gate"
 import { hasWashOrProfessional } from "@/lib/pricing"
+import { CARWASH_ASSET_TAXONOMY } from "@/lib/car-wash-config"
 
 export const dynamic = "force-dynamic"
 
@@ -17,16 +18,7 @@ export default async function AssetsPage() {
   if (!session) redirect("/login")
   const orgId = session.organizationId
 
-  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
-    return (
-      <div>
-        <Header title="Assets" />
-        <PlanGateContent feature="assets" />
-      </div>
-    )
-  }
-
-  const [assets, locations, departments, vendors] = await Promise.all([
+  const [assets, locations, departments, vendors, org] = await Promise.all([
     prisma.asset.findMany({
       where: { organizationId: orgId },
       orderBy: { name: "asc" },
@@ -34,13 +26,26 @@ export default async function AssetsPage() {
         location: { select: { name: true } },
         department: { select: { name: true } },
         vendor: { select: { name: true } },
-        _count: { select: { issues: true } },
+        _count: { select: { issues: { where: { status: { notIn: ["RESOLVED", "CLOSED"] } } } } },
       },
     }),
     prisma.location.findMany({ where: { organizationId: orgId }, orderBy: { name: "asc" } }),
     prisma.department.findMany({ where: { organizationId: orgId }, orderBy: { name: "asc" } }),
     prisma.vendor.findMany({ where: { organizationId: orgId, isActive: true }, orderBy: { name: "asc" } }),
+    prisma.organization.findUnique({ where: { id: orgId }, select: { industry: true } }),
   ])
+
+  const isCarWash = org?.industry === "Car Wash"
+  const pageTitle = isCarWash ? "Equipment" : "Assets"
+
+  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
+    return (
+      <div>
+        <Header title={pageTitle} />
+        <PlanGateContent feature="assets" />
+      </div>
+    )
+  }
 
   const operational = assets.filter((a) => a.status === "OPERATIONAL").length
   const maintenance = assets.filter((a) => a.status === "MAINTENANCE").length
@@ -49,7 +54,7 @@ export default async function AssetsPage() {
   return (
     <div>
       <Header
-        title="Assets"
+        title={pageTitle}
         actions={
           <>
             <a href="/api/export/assets" download className="flex items-center gap-1.5 px-3 py-2 border border-gray-300 text-gray-600 text-sm rounded-lg hover:bg-gray-50 transition-colors">
@@ -59,7 +64,7 @@ export default async function AssetsPage() {
             <AssetDialog locations={locations} departments={departments} vendors={vendors}>
               <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
                 <Plus className="w-4 h-4" />
-                Add Asset
+                {isCarWash ? "Add Equipment" : "Add Asset"}
               </button>
             </AssetDialog>
           </>
@@ -68,7 +73,7 @@ export default async function AssetsPage() {
 
       {/* Mobile page title */}
       <div className="md:hidden px-4 pt-4 pb-2">
-        <h1 className="text-lg font-bold text-gray-900">Assets</h1>
+        <h1 className="text-lg font-bold text-gray-900">{pageTitle}</h1>
       </div>
 
       <div className="px-3 md:px-6 py-2 md:py-6 space-y-4 md:space-y-6">
@@ -91,6 +96,70 @@ export default async function AssetsPage() {
           </div>
         </div>
 
+        {/* ── Car Wash Equipment Card Grid ────────────────────────────── */}
+        {isCarWash && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden" data-tour="asset-list">
+            {assets.length === 0 ? (
+              <div className="py-16 text-center">
+                <Package className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm">No equipment registered yet</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 divide-y sm:divide-y-0 gap-px bg-gray-100">
+                {assets.map((asset) => {
+                  const statusConfig = {
+                    OPERATIONAL:    { label: "Operational",    bg: "bg-emerald-100", text: "text-emerald-700", dot: "bg-emerald-500" },
+                    MAINTENANCE:    { label: "Maintenance",    bg: "bg-amber-100",   text: "text-amber-700",   dot: "bg-amber-500"   },
+                    INACTIVE:       { label: "Inactive",       bg: "bg-gray-100",    text: "text-gray-600",    dot: "bg-gray-400"    },
+                    OUT_OF_SERVICE: { label: "Out of Service", bg: "bg-red-100",     text: "text-red-700",     dot: "bg-red-500"     },
+                  }[asset.status] ?? { label: asset.status, bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400" }
+                  const subtypeLabel = asset.assetSubtype
+                    ? (CARWASH_ASSET_TAXONOMY[asset.assetSubtype as keyof typeof CARWASH_ASSET_TAXONOMY] ?? asset.assetSubtype)
+                    : null
+                  const openCount = asset._count.issues
+
+                  return (
+                    <Link
+                      key={asset.id}
+                      href={`/assets/${asset.id}`}
+                      className="bg-white p-4 hover:bg-gray-50/80 transition-colors flex flex-col gap-2"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="font-semibold text-gray-900 text-sm leading-tight">{asset.name}</div>
+                          {subtypeLabel && <div className="text-[11px] text-gray-400 mt-0.5">{subtypeLabel}</div>}
+                        </div>
+                        {openCount > 0 && (
+                          <span className="shrink-0 flex items-center gap-1 bg-orange-100 text-orange-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                            <AlertTriangle className="w-3 h-3" />
+                            {openCount}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full ${statusConfig.bg} ${statusConfig.text}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
+                          {statusConfig.label}
+                        </span>
+                        {asset.location && (
+                          <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />{asset.location.name}
+                          </span>
+                        )}
+                      </div>
+                      {asset.model && (
+                        <div className="text-[11px] text-gray-400 truncate">{asset.manufacturer} {asset.model}</div>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Generic Asset List (non-Car Wash) ───────────────────────── */}
+        {!isCarWash && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden" data-tour="asset-list">
           {assets.length === 0 ? (
             <div className="py-16 text-center">
@@ -190,6 +259,7 @@ export default async function AssetsPage() {
             </>
           )}
         </div>
+        )}
       </div>
     </div>
   )

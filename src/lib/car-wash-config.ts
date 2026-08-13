@@ -96,3 +96,27 @@ export const CARWASH_DEFAULT_PM_SCHEDULES = [
   { title: "Quarterly RO membrane inspection",     recurrence: "quarterly" as const },
   { title: "Quarterly chemical system calibration",recurrence: "quarterly" as const },
 ] as const
+
+// Terminology overrides for Car Wash industry (generic label → car-wash label)
+export const carWashTerminology: Record<string, string> = {
+  Assets:          "Equipment",
+  Asset:           "Equipment",
+  "Asset History": "Equipment Service History",
+  Facility:        "Wash Site",
+  Facilities:      "Wash Sites",
+  "Add Asset":     "Add Equipment",
+}
+
+// User-facing labels for car-wash issue categories (internal key → display label)
+export const carWashIssueLabels: Record<string, string> = {
+  EQUIPMENT_BREAKDOWN: "Equipment Down",
+  CUSTOMER_REPORT:     "Customer Report",
+  MAINTENANCE:         "Maintenance Needed",
+  SAFETY:              "Safety Issue",
+  FACILITY:            "Facility Problem",
+  GENERAL:             "Other Wash Issue",
+  QUALITY:             "Wash Quality",
+  CUSTOMER_COMPLAINT:  "Payment Problem",
+  SUPPLY_SHORTAGE:     "Supplies / Chemicals",
+  CLEANLINESS:         "Cleanliness",
+}

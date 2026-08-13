@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback } from "react"
+import { getNumTourSteps } from "./tour-steps"
 
 export const TOTAL_TOUR_STEPS = 21
 
@@ -65,12 +66,13 @@ export function TourProvider({ children, initialIndustry = "Manufacturing" }: { 
 
   const nextStep = useCallback(() => {
     setState(prev => {
-      if (prev.currentStep >= TOTAL_TOUR_STEPS) {
+      const total = getNumTourSteps(industry)
+      if (prev.currentStep >= total) {
         return { ...prev, isActive: false, lastExitedStep: null }
       }
       return { ...prev, currentStep: prev.currentStep + 1 }
     })
-  }, [])
+  }, [industry])
 
   const prevStep = useCallback(() => {
     setState(prev => {

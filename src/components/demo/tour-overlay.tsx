@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { ChevronLeft, ChevronRight, X, ExternalLink, Check, Lock, Volume2, VolumeX, Play, Pause } from "lucide-react"
 import { useTour, TOTAL_TOUR_STEPS } from "./tour-context"
-import { TOUR_STEPS, ROLE_DEMOS, INDUSTRY_DEMOS, PACKAGE_DEMOS, ADDITIONAL_FEATURES } from "./tour-steps"
+import { TOUR_STEPS, ROLE_DEMOS, INDUSTRY_DEMOS, PACKAGE_DEMOS, ADDITIONAL_FEATURES, getActiveTourSteps, getNumTourSteps } from "./tour-steps"
 import { fireTrackingEvent } from "./relay-tracker"
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
@@ -309,7 +309,8 @@ function CinematicIntro({
 
 function CompletionOverlay({ industry, onClose }: { industry: string; onClose: () => void }) {
   const router = useRouter()
-  const step = TOUR_STEPS.find(s => s.id === TOTAL_TOUR_STEPS)!
+  const numSteps = getNumTourSteps(industry)
+  const step = getActiveTourSteps(industry).find(s => s.id === numSteps)!
   const calendlyUrl = "https://calendly.com/getrelay"
 
   useEffect(() => {
@@ -400,7 +401,7 @@ export function TourOverlay() {
   const trackedStartRef   = useRef(false)
   const trackedStepRef    = useRef(0)
 
-  const step = TOUR_STEPS.find(s => s.id === currentStep)
+  const step = getActiveTourSteps(industry).find(s => s.id === currentStep)
 
   // Resolve dynamic paths
   const resolvedPath = !step ? null
@@ -652,9 +653,10 @@ export function TourOverlay() {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; audioRef.current = null }
 
     if (!audioEnabled) return
+    if (step?.audioFile === null) return  // audio explicitly disabled for this step
 
     const stepNum = String(currentStep).padStart(2, "0")
-    const src = `/demo-audio/step-${stepNum}.mp3`
+    const src = step?.audioFile ?? `/demo-audio/step-${stepNum}.mp3`
     console.log(`[tour] loading audio ${src}`)
     localAudio = new Audio(src)
     audioRef.current = localAudio

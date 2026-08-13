@@ -42,14 +42,24 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
   if (!session) redirect("/login")
   const params = await searchParams
 
-  const [issues, users] = await Promise.all([
+  const [issues, users, org] = await Promise.all([
     getIssues(session.organizationId, params),
     prisma.user.findMany({
       where: { organizationId: session.organizationId, isActive: true },
       orderBy: { name: "asc" },
       select: { id: true, name: true, role: true },
     }),
+    prisma.organization.findUnique({ where: { id: session.organizationId }, select: { industry: true } }),
   ])
+
+  const isCarWash = org?.industry === "Car Wash"
+  const pageTitle = isCarWash
+    ? params.category === "CUSTOMER_REPORT"
+      ? "Customer Reports"
+      : params.category === "MAINTENANCE"
+      ? "Maintenance"
+      : "Issues"
+    : "Issues"
 
   const currentFilters: Record<string, string> = {}
   if (params.status)   currentFilters.status   = params.status
@@ -59,10 +69,10 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
 
   return (
     <div>
-      <Header title="Issues" />
+      <Header title={pageTitle} />
 
       <div className="md:hidden flex items-center justify-between px-4 pt-4 pb-2">
-        <h1 className="text-lg font-bold text-gray-900">Issues</h1>
+        <h1 className="text-lg font-bold text-gray-900">{pageTitle}</h1>
         <Link href="/issues/new" className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg">
           <Plus className="w-4 h-4" />
           Report

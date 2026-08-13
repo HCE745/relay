@@ -33,6 +33,7 @@ import {
   Clock,
   Radio,
   ClipboardCheck,
+  Droplets,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { logout } from "@/lib/auth-actions"
@@ -77,11 +78,28 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "team",                href: "/team",                label: "Team",                  icon: Users,           section: "ADMINISTRATION" },
 ]
 
+// Car Wash–specific navigation — replaces ALL_NAV_ITEMS when industry === "Car Wash"
+// Filtered views for Customer Reports and Maintenance replace the generic Issues item.
+// "Equipment" replaces "Assets" for car-wash terminology.
+const CARWASH_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: React.ElementType }> = [
+  { key: "dashboard",  href: "/dashboard",                       label: "Wash Overview",    icon: Droplets },
+  { key: "issues",     href: "/issues?category=CUSTOMER_REPORT", label: "Customer Reports", icon: ClipboardList },
+  { key: "issues",     href: "/issues",                          label: "Issues",            icon: AlertCircle },
+  { key: "issues",     href: "/issues?category=MAINTENANCE",     label: "Maintenance",       icon: Wrench },
+  { key: "assets",     href: "/assets",                          label: "Equipment",         icon: Package },
+  { key: "qr-codes",  href: "/qr-codes",                        label: "QR Codes",          icon: QrCode },
+  { key: "locations",  href: "/locations",                       label: "Locations",         icon: MapPin },
+  { key: "vendors",    href: "/vendors",                         label: "Vendors",           icon: Building2 },
+  { key: "team",       href: "/team",                            label: "Team",              icon: Users },
+  { key: "analytics",  href: "/analytics",                       label: "Reports",           icon: BarChart2 },
+]
+
 const SECTION_ORDER = ["MAIN", "OPERATIONS", "INTELLIGENCE", "ADMINISTRATION"]
 
 interface SidebarProps {
   allowedPageKeys: PageKey[]
   showRouting: boolean
+  industry?: string
   corporateDashboardEnabled?: boolean
   regionsEnabled?: boolean
   apiWebhooksEnabled?: boolean
@@ -95,6 +113,7 @@ interface SidebarProps {
 export function Sidebar({
   allowedPageKeys,
   showRouting,
+  industry,
   corporateDashboardEnabled,
   regionsEnabled,
   apiWebhooksEnabled,
@@ -106,6 +125,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname()
   const allowedSet = new Set(allowedPageKeys)
+  const isCarWash = industry === "Car Wash"
   const [recentItems, setRecentItems] = useState<RecentlyViewedItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
 
@@ -135,11 +155,13 @@ export function Sidebar({
     return () => window.removeEventListener("storage", load)
   }, [])
 
-  const visibleNavItems = ALL_NAV_ITEMS.filter(item => {
-    if (!allowedSet.has(item.key)) return false
-    if ((item.key === "corporate-dashboard" || item.key === "regional-dashboard") && !corporateDashboardEnabled) return false
-    return true
-  })
+  const visibleNavItems = isCarWash
+    ? CARWASH_NAV_ITEMS.filter(item => allowedSet.has(item.key))
+    : ALL_NAV_ITEMS.filter(item => {
+        if (!allowedSet.has(item.key)) return false
+        if ((item.key === "corporate-dashboard" || item.key === "regional-dashboard") && !corporateDashboardEnabled) return false
+        return true
+      })
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/")
 
@@ -191,23 +213,29 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 px-2 py-3 overflow-y-auto">
-        {SECTION_ORDER.map(section => {
-          const items = visibleNavItems.filter(i => i.section === section)
-          const extras = sectionExtras[section] ?? []
-          if (items.length === 0 && extras.length === 0) return null
+        {isCarWash ? (
+          <div className="mb-4 space-y-0.5">
+            {visibleNavItems.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
+          </div>
+        ) : (
+          SECTION_ORDER.map(section => {
+            const items = (visibleNavItems as Array<{ key: PageKey; href: string; label: string; icon: React.ElementType; section: string }>).filter(i => i.section === section)
+            const extras = sectionExtras[section] ?? []
+            if (items.length === 0 && extras.length === 0) return null
 
-          return (
-            <div key={section} className="mb-4">
-              <p className="text-[10px] font-bold tracking-widest text-gray-600 uppercase px-4 mb-1 mt-1">
-                {section}
-              </p>
-              <div className="space-y-0.5">
-                {items.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
-                {extras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
+            return (
+              <div key={section} className="mb-4">
+                <p className="text-[10px] font-bold tracking-widest text-gray-600 uppercase px-4 mb-1 mt-1">
+                  {section}
+                </p>
+                <div className="space-y-0.5">
+                  {items.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
+                  {extras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })
+        )}
 
         {/* Settings + Notifications in Admin section at bottom */}
         <div className="mb-4">

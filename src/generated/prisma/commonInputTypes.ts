@@ -644,6 +644,17 @@ export type EnumVisibilityRunTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel> | $Enums.VisibilityRunType
 }
 
+export type DecimalFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
 export type EnumVisibilityProviderWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.VisibilityProvider | Prisma.EnumVisibilityProviderFieldRefInput<$PrismaModel>
   in?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
@@ -664,34 +675,6 @@ export type EnumVisibilityRunTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel>
 }
 
-export type EnumVisibilityRunStatusFilter<$PrismaModel = never> = {
-  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel> | $Enums.VisibilityRunStatus
-}
-
-export type DecimalFilter<$PrismaModel = never> = {
-  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
-  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
-  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedDecimalFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
-export type EnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityRunStatus
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
-}
-
 export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -706,6 +689,23 @@ export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedDecimalFilter<$PrismaModel>
   _min?: Prisma.NestedDecimalFilter<$PrismaModel>
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
+}
+
+export type EnumVisibilityRunStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel> | $Enums.VisibilityRunStatus
+}
+
+export type EnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityRunStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
 }
 
 export type EnumVisibilityModeFilter<$PrismaModel = never> = {
@@ -1309,6 +1309,17 @@ export type NestedEnumVisibilityRunTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel> | $Enums.VisibilityRunType
 }
 
+export type NestedDecimalFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
 export type NestedEnumVisibilityProviderWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.VisibilityProvider | Prisma.EnumVisibilityProviderFieldRefInput<$PrismaModel>
   in?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
@@ -1329,34 +1340,6 @@ export type NestedEnumVisibilityRunTypeWithAggregatesFilter<$PrismaModel = never
   _max?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel>
 }
 
-export type NestedEnumVisibilityRunStatusFilter<$PrismaModel = never> = {
-  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel> | $Enums.VisibilityRunStatus
-}
-
-export type NestedDecimalFilter<$PrismaModel = never> = {
-  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
-  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
-  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedDecimalFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
-export type NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityRunStatus
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
-}
-
 export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -1371,6 +1354,23 @@ export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedDecimalFilter<$PrismaModel>
   _min?: Prisma.NestedDecimalFilter<$PrismaModel>
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
+}
+
+export type NestedEnumVisibilityRunStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel> | $Enums.VisibilityRunStatus
+}
+
+export type NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityRunStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumVisibilityModeFilter<$PrismaModel = never> = {

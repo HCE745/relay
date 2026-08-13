@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { callWithWebSearch, callForAnalysis } from "@/lib/visibility-engine"
+import { callWithWebSearch, callForAnalysis, computeCheckCost, parseRelayMention } from "@/lib/visibility-engine"
 
 export const dynamic = "force-dynamic"
 export const maxDuration = 300
@@ -16,25 +16,34 @@ export async function GET() {
     const freq = settings.autoFrequency
     const daysSinceLast = (now.getTime() - settings.lastAutoRunAt.getTime()) / 86_400_000
     const minDays = freq === "weekly" ? 7 : freq === "biweekly" ? 14 : 30
-    if (daysSinceLast < minDays) {
-      return NextResponse.json({ skipped: "frequency not met" })
-    }
+    if (daysSinceLast < minDays) return NextResponse.json({ skipped: "frequency not met" })
   }
 
-  const prompts = await prisma.visibilityPrompt.findMany({ where: { isActive: true } })
-  const competitors = await prisma.visibilityCompetitor.findMany()
+  const model      = settings.visibilityCheckModel ?? "claude-haiku-4-5-20251001"
+  const providers  = (settings.autoProviders as string[]) ?? ["anthropic"]
+  const [prompts, competitors] = await Promise.all([
+    prisma.visibilityPrompt.findMany({ where: { isActive: true } }),
+    prisma.visibilityCompetitor.findMany(),
+  ])
 
-  const runId = `auto_${Date.now()}`
-  const providers = (settings.autoProviders as string[]) ?? ["anthropic"]
+  const runId            = `auto_${Date.now()}`
+  const competitorNames  = competitors.map(c => c.name)
 
   await prisma.visibilityRun.create({
-    data: { runId, status: "running", providersUsed: providers, runType: "automatic" },
+    data: {
+      runId,
+      status:              "running",
+      providersUsed:       providers,
+      competitorsSnapshot: competitorNames as never,
+      runType:             "automatic",
+    },
   })
 
   type CheckRow = { promptText: string; relayMentioned: boolean; competitorsMentioned: string[] }
   const allChecks: CheckRow[] = []
   let mentionedCount = 0
-  let totalChecks = 0
+  let totalChecks    = 0
+  let totalCost      = 0
 
   const BATCH = 4
   for (let i = 0; i < prompts.length; i += BATCH) {
@@ -42,36 +51,64 @@ export async function GET() {
     await Promise.all(batch.map(async (prompt) => {
       for (const provider of providers) {
         if (provider !== "anthropic") continue
-        let text = ""
-        let sources: string[] = []
-        try {
-          const r = await callWithWebSearch(prompt.promptText)
-          text = r.text; sources = r.sources
-        } catch { text = "[Error]" }
 
-        const lower = text.toLowerCase()
-        const relayMentioned = lower.includes("relay") || lower.includes("getrelay")
-        let relayPosition: number | null = null
-        if (relayMentioned) {
-          const paras = text.split(/\n+/)
-          for (let j = 0; j < paras.length; j++) {
-            if (paras[j].toLowerCase().includes("relay")) { relayPosition = j + 1; break }
-          }
+        let providerStatus = "success"
+        let errorMessage: string | null = null
+        let rawResponse = ""
+        let sources: string[] = []
+        let searchCount = 0
+        let inputTokens = 0
+        let outputTokens = 0
+
+        try {
+          const r  = await callWithWebSearch(prompt.promptText, model)
+          rawResponse  = r.text
+          sources      = r.sources
+          searchCount  = r.searchCount
+          inputTokens  = r.inputTokens
+          outputTokens = r.outputTokens
+        } catch (err) {
+          providerStatus = "failed"
+          errorMessage   = err instanceof Error ? err.message : "Unknown error"
+          rawResponse    = `[Error: ${errorMessage}]`
         }
-        const competitorsMentioned = competitors.filter(c => lower.includes(c.name.toLowerCase())).map(c => c.name)
+
+        const cost   = computeCheckCost(inputTokens, outputTokens, searchCount)
+        const lower  = rawResponse.toLowerCase()
+        const parsed = parseRelayMention(rawResponse, sources)
+
+        const competitorsMentioned = competitors
+          .filter(c => lower.includes(c.name.toLowerCase()))
+          .map(c => c.name)
 
         await prisma.visibilityCheck.create({
           data: {
-            runId, promptId: prompt.id, provider: "anthropic",
-            relayMentioned, relayPosition,
+            runId,
+            promptId:             prompt.id,
+            provider:             "anthropic",
+            relayMentioned:       parsed.relayMentioned,
+            mentionOrder:         parsed.mentionOrder,
+            prominenceScore:      parsed.prominenceScore,
             competitorsMentioned: competitorsMentioned as never,
-            sourcesCited: sources as never,
-            rawResponse: text, runType: "automatic",
+            sourcesCited:         sources as never,
+            citationToRelay:      parsed.citationToRelay,
+            relayCitedUrls:       parsed.relayCitedUrls as never,
+            rawResponse,
+            runType:              "automatic",
+            searchCount,
+            inputTokens,
+            outputTokens,
+            estimatedCostUsd:     cost,
+            errorMessage,
+            providerStatus,
+            iterationNumber:      1,
           },
         })
-        allChecks.push({ promptText: prompt.promptText, relayMentioned, competitorsMentioned })
-        if (relayMentioned) mentionedCount++
+
+        allChecks.push({ promptText: prompt.promptText, relayMentioned: parsed.relayMentioned, competitorsMentioned })
+        if (parsed.relayMentioned) mentionedCount++
         totalChecks++
+        totalCost += cost
       }
     }))
   }
@@ -86,7 +123,8 @@ export async function GET() {
     ).join("\n\n")
     const raw = await callForAnalysis(
       `Marketing analyst for Relay (getrelay.software). AI visibility results:\n\n${summary}\n\n` +
-      `Score: ${score.toFixed(1)}%. Respond with JSON only: {"analysis":"...","recommendations":["...","...","..."]}`
+      `Score: ${score.toFixed(1)}%. Respond with JSON only: {"analysis":"...","recommendations":["...","...","..."]}`,
+      model,
     )
     const parsed = JSON.parse(raw.replace(/```json\n?|\n?```/g, "").trim()) as { analysis?: string; recommendations?: string[] }
     aiAnalysis        = parsed.analysis        ?? aiAnalysis
@@ -97,16 +135,20 @@ export async function GET() {
     prisma.visibilityRun.update({
       where: { runId },
       data: {
-        status: "completed", promptsChecked: totalChecks,
-        relayVisibilityScore: score, completedAt: new Date(),
-        aiAnalysis, aiRecommendations: aiRecommendations as never,
+        status:               "completed",
+        promptsChecked:       totalChecks,
+        relayVisibilityScore: score,
+        totalEstimatedCostUsd: totalCost,
+        completedAt:          new Date(),
+        aiAnalysis,
+        aiRecommendations:    aiRecommendations as never,
       },
     }),
     prisma.visibilitySetting.update({
       where: { id: settings.id },
-      data: { lastAutoRunAt: new Date() },
+      data:  { lastAutoRunAt: new Date() },
     }),
   ])
 
-  return NextResponse.json({ runId, score, totalChecks, mentionedCount })
+  return NextResponse.json({ runId, score, totalChecks, mentionedCount, totalCost })
 }

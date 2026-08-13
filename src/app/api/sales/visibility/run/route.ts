@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
-import { callWithWebSearch, callForAnalysis } from "@/lib/visibility-engine"
+import { callWithWebSearch, callForAnalysis, computeCheckCost, parseRelayMention } from "@/lib/visibility-engine"
 
 export const dynamic = "force-dynamic"
 export const maxDuration = 120
+
+async function getModel(): Promise<string> {
+  const s = await prisma.visibilitySetting.findFirst({ select: { visibilityCheckModel: true } })
+  return s?.visibilityCheckModel ?? "claude-haiku-4-5-20251001"
+}
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
@@ -15,31 +20,36 @@ export async function POST(req: NextRequest) {
 
   if (!promptIds.length) return NextResponse.json({ error: "No prompts selected" }, { status: 400 })
 
-  const runId = `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-
-  await prisma.visibilityRun.create({
-    data: {
-      runId,
-      status:       "running",
-      providersUsed: providers,
-      runType:      "manual",
-    },
-  })
-
-  const [prompts, competitors] = await Promise.all([
+  const [model, prompts, competitors] = await Promise.all([
+    getModel(),
     prisma.visibilityPrompt.findMany({ where: { id: { in: promptIds }, isActive: true } }),
     prisma.visibilityCompetitor.findMany(),
   ])
 
+  const runId = `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  const competitorNames = competitors.map(c => c.name)
+
+  await prisma.visibilityRun.create({
+    data: {
+      runId,
+      status:              "running",
+      providersUsed:       providers,
+      competitorsSnapshot: competitorNames as never,
+      runType:             "manual",
+    },
+  })
+
   type CheckRow = {
-    promptText: string
-    relayMentioned: boolean
+    promptText:           string
+    relayMentioned:       boolean
     competitorsMentioned: string[]
-    rawResponse: string
+    rawResponse:          string
+    cost:                 number
   }
   const allChecks: CheckRow[] = []
   let mentionedCount = 0
-  let totalChecks = 0
+  let totalChecks    = 0
+  let totalCost      = 0
 
   try {
     const BATCH = 4
@@ -49,30 +59,30 @@ export async function POST(req: NextRequest) {
         for (const provider of providers) {
           if (provider !== "anthropic") continue
 
-          let text = ""
+          let providerStatus = "success"
+          let errorMessage: string | null = null
+          let rawResponse = ""
           let sources: string[] = []
+          let searchCount = 0
+          let inputTokens = 0
+          let outputTokens = 0
+
           try {
-            const r = await callWithWebSearch(prompt.promptText)
-            text    = r.text
-            sources = r.sources
+            const r  = await callWithWebSearch(prompt.promptText, model)
+            rawResponse  = r.text
+            sources      = r.sources
+            searchCount  = r.searchCount
+            inputTokens  = r.inputTokens
+            outputTokens = r.outputTokens
           } catch (err) {
-            text = `[Error: ${err instanceof Error ? err.message : "Unknown"}]`
+            providerStatus = "failed"
+            errorMessage   = err instanceof Error ? err.message : "Unknown error"
+            rawResponse    = `[Error: ${errorMessage}]`
           }
 
-          const lower = text.toLowerCase()
-          const relayMentioned = lower.includes("relay") || lower.includes("getrelay")
-
-          let relayPosition: number | null = null
-          if (relayMentioned) {
-            const paras = text.split(/\n+/)
-            for (let j = 0; j < paras.length; j++) {
-              const pl = paras[j].toLowerCase()
-              if (pl.includes("relay") || pl.includes("getrelay")) {
-                relayPosition = j + 1
-                break
-              }
-            }
-          }
+          const cost   = computeCheckCost(inputTokens, outputTokens, searchCount)
+          const lower  = rawResponse.toLowerCase()
+          const parsed = parseRelayMention(rawResponse, sources)
 
           const competitorsMentioned = competitors
             .filter(c => lower.includes(c.name.toLowerCase()))
@@ -83,25 +93,41 @@ export async function POST(req: NextRequest) {
               runId,
               promptId:             prompt.id,
               provider:             "anthropic",
-              relayMentioned,
-              relayPosition,
+              relayMentioned:       parsed.relayMentioned,
+              mentionOrder:         parsed.mentionOrder,
+              prominenceScore:      parsed.prominenceScore,
               competitorsMentioned: competitorsMentioned as never,
               sourcesCited:         sources as never,
-              rawResponse:          text,
+              citationToRelay:      parsed.citationToRelay,
+              relayCitedUrls:       parsed.relayCitedUrls as never,
+              rawResponse,
               runType:              "manual",
+              searchCount,
+              inputTokens,
+              outputTokens,
+              estimatedCostUsd:     cost,
+              errorMessage,
+              providerStatus,
+              iterationNumber:      1,
             },
           })
 
-          allChecks.push({ promptText: prompt.promptText, relayMentioned, competitorsMentioned, rawResponse: text })
-          if (relayMentioned) mentionedCount++
+          allChecks.push({
+            promptText:           prompt.promptText,
+            relayMentioned:       parsed.relayMentioned,
+            competitorsMentioned,
+            rawResponse,
+            cost,
+          })
+          if (parsed.relayMentioned) mentionedCount++
           totalChecks++
+          totalCost += cost
         }
       }))
     }
 
     const score = totalChecks > 0 ? (mentionedCount / totalChecks) * 100 : 0
 
-    // Generate AI recommendations
     let aiAnalysis = ""
     let aiRecommendations: string[] = []
     try {
@@ -115,11 +141,12 @@ export async function POST(req: NextRequest) {
         `${summary}\n\n` +
         `Visibility score: ${score.toFixed(1)}% (Relay mentioned in ${mentionedCount} of ${totalChecks} checks).\n\n` +
         `Provide a brief assessment and 3 specific actionable recommendations to improve Relay's AI visibility. ` +
-        `Respond with valid JSON only (no markdown): {"analysis":"...","recommendations":["...","...","..."]}`
+        `Respond with valid JSON only (no markdown): {"analysis":"...","recommendations":["...","...","..."]}`,
+        model,
       )
 
       const cleaned = raw.replace(/```json\n?|\n?```/g, "").trim()
-      const parsed = JSON.parse(cleaned) as { analysis?: string; recommendations?: string[] }
+      const parsed  = JSON.parse(cleaned) as { analysis?: string; recommendations?: string[] }
       aiAnalysis        = parsed.analysis        ?? ""
       aiRecommendations = parsed.recommendations ?? []
     } catch {
@@ -133,13 +160,14 @@ export async function POST(req: NextRequest) {
         status:               "completed",
         promptsChecked:       totalChecks,
         relayVisibilityScore: score,
+        totalEstimatedCostUsd: totalCost,
         completedAt:          new Date(),
         aiAnalysis,
         aiRecommendations:    aiRecommendations as never,
       },
     })
 
-    return NextResponse.json({ runId, score, totalChecks, mentionedCount })
+    return NextResponse.json({ runId, score, totalChecks, mentionedCount, totalCost })
   } catch {
     await prisma.visibilityRun.update({
       where: { runId },

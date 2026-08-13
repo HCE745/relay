@@ -10277,11 +10277,21 @@ export const VisibilityCheckScalarFieldEnum = {
   promptId: 'promptId',
   provider: 'provider',
   relayMentioned: 'relayMentioned',
-  relayPosition: 'relayPosition',
+  mentionOrder: 'mentionOrder',
+  prominenceScore: 'prominenceScore',
   competitorsMentioned: 'competitorsMentioned',
   sourcesCited: 'sourcesCited',
+  citationToRelay: 'citationToRelay',
+  relayCitedUrls: 'relayCitedUrls',
   rawResponse: 'rawResponse',
   runType: 'runType',
+  searchCount: 'searchCount',
+  inputTokens: 'inputTokens',
+  outputTokens: 'outputTokens',
+  estimatedCostUsd: 'estimatedCostUsd',
+  errorMessage: 'errorMessage',
+  providerStatus: 'providerStatus',
+  iterationNumber: 'iterationNumber',
   createdAt: 'createdAt'
 } as const
 
@@ -10295,6 +10305,8 @@ export const VisibilityRunScalarFieldEnum = {
   promptsChecked: 'promptsChecked',
   providersUsed: 'providersUsed',
   relayVisibilityScore: 'relayVisibilityScore',
+  totalEstimatedCostUsd: 'totalEstimatedCostUsd',
+  competitorsSnapshot: 'competitorsSnapshot',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
   aiAnalysis: 'aiAnalysis',
@@ -10311,6 +10323,7 @@ export const VisibilitySettingScalarFieldEnum = {
   autoFrequency: 'autoFrequency',
   autoProviders: 'autoProviders',
   maxMonthlyBudgetUsd: 'maxMonthlyBudgetUsd',
+  visibilityCheckModel: 'visibilityCheckModel',
   lastAutoRunAt: 'lastAutoRunAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -10689,20 +10702,6 @@ export type ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel> = FieldRefInput
 
 
 /**
- * Reference to a field of type 'VisibilityRunStatus'
- */
-export type EnumVisibilityRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityRunStatus'>
-    
-
-
-/**
- * Reference to a field of type 'VisibilityRunStatus[]'
- */
-export type ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityRunStatus[]'>
-    
-
-
-/**
  * Reference to a field of type 'Decimal'
  */
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -10713,6 +10712,20 @@ export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
  * Reference to a field of type 'Decimal[]'
  */
 export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityRunStatus'
+ */
+export type EnumVisibilityRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityRunStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityRunStatus[]'
+ */
+export type ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityRunStatus[]'>
     
 
 

@@ -142,7 +142,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ runId:
                 categoryLabel={CATEGORY_LABELS[cat] ?? cat}
                 categoryColor={CATEGORY_COLORS[cat] ?? "bg-gray-700 text-gray-300"}
                 relayMentioned={check.relayMentioned}
-                relayPosition={check.relayPosition}
+                relayPosition={check.mentionOrder}
                 competitors={compMentioned}
                 sources={sources}
                 rawResponse={check.rawResponse}

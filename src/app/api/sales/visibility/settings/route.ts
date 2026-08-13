@@ -28,15 +28,17 @@ export async function PUT(req: NextRequest) {
     autoFrequency?: string
     autoProviders?: string[]
     maxMonthlyBudgetUsd?: number
+    visibilityCheckModel?: string
   }
 
   const updated = await prisma.visibilitySetting.update({
     where: { id: settings.id },
     data: {
-      ...(body.mode               !== undefined ? { mode:               body.mode as never }               : {}),
-      ...(body.autoFrequency      !== undefined ? { autoFrequency:      body.autoFrequency as never }      : {}),
-      ...(body.autoProviders      !== undefined ? { autoProviders:      body.autoProviders as never }      : {}),
-      ...(body.maxMonthlyBudgetUsd !== undefined ? { maxMonthlyBudgetUsd: body.maxMonthlyBudgetUsd }       : {}),
+      ...(body.mode                !== undefined ? { mode:                body.mode as never }               : {}),
+      ...(body.autoFrequency       !== undefined ? { autoFrequency:       body.autoFrequency as never }      : {}),
+      ...(body.autoProviders       !== undefined ? { autoProviders:       body.autoProviders as never }      : {}),
+      ...(body.maxMonthlyBudgetUsd !== undefined ? { maxMonthlyBudgetUsd: body.maxMonthlyBudgetUsd }         : {}),
+      ...(body.visibilityCheckModel !== undefined ? { visibilityCheckModel: body.visibilityCheckModel }      : {}),
     },
   })
 

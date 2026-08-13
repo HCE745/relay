@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { format } from "date-fns"
 import Link from "next/link"
-import { Eye, Target, Clock, BarChart2, ChevronRight, TrendingUp, AlertCircle } from "lucide-react"
+import { Eye, Target, Clock, BarChart2, ChevronRight, TrendingUp, AlertCircle, DollarSign, Link2, Share2, Trophy } from "lucide-react"
 import { RunModal } from "./RunModal"
 
 export const dynamic = "force-dynamic"
@@ -71,10 +71,26 @@ export default async function MarketingIntelligencePage() {
     }
   }
 
-  const [runs, competitors, allChecks] = await Promise.all([
+  // Calendar month start for spend calculation
+  const now          = new Date()
+  const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1)
+
+  const [runs, competitors, allChecks, monthlySpend] = await Promise.all([
     prisma.visibilityRun.findMany({ orderBy: { startedAt: "desc" }, take: 20 }),
     prisma.visibilityCompetitor.findMany({ orderBy: { name: "asc" } }),
-    prisma.visibilityCheck.findMany({ select: { relayMentioned: true, competitorsMentioned: true } }),
+    prisma.visibilityCheck.findMany({
+      select: {
+        relayMentioned:       true,
+        competitorsMentioned: true,
+        citationToRelay:      true,
+        estimatedCostUsd:     true,
+        createdAt:            true,
+      },
+    }),
+    prisma.visibilityCheck.aggregate({
+      _sum: { estimatedCostUsd: true },
+      where: { createdAt: { gte: monthStart } },
+    }),
   ])
 
   const lastRun       = runs[0] ?? null
@@ -83,22 +99,44 @@ export default async function MarketingIntelligencePage() {
     ? Number(lastRun.relayVisibilityScore)
     : null
 
-  // Competitor frequency across all checks
+  // Core counts
+  const totalChecksAll = allChecks.length
+  let relayTotal       = 0
+  let citationTotal    = 0
+  let totalCompMentions = 0
   const competitorFreq: Record<string, number> = {}
-  let relayTotal = 0
+
   for (const check of allChecks) {
     if (check.relayMentioned) relayTotal++
+    if (check.citationToRelay) citationTotal++
     const names = (check.competitorsMentioned as string[]) ?? []
+    totalCompMentions += names.length
     for (const name of names) {
       competitorFreq[name] = (competitorFreq[name] ?? 0) + 1
     }
   }
 
-  const totalChecksAll = allChecks.length
-  const relayFreq = totalChecksAll > 0 ? Math.round((relayTotal / totalChecksAll) * 100) : 0
+  const relayFreq    = totalChecksAll > 0 ? Math.round((relayTotal / totalChecksAll) * 100) : 0
+  const citationRate = totalChecksAll > 0 ? ((citationTotal / totalChecksAll) * 100).toFixed(1) : "0"
 
-  // Top opportunity: prompt category where Relay mentions are lowest
-  const catScores: Record<string, { mentioned: number; total: number }> = {}
+  // Share of voice: relay mentions / (relay + all competitor) mentions
+  const totalAllMentions = relayTotal + totalCompMentions
+  const shareOfMentions  = totalAllMentions > 0
+    ? Math.round((relayTotal / totalAllMentions) * 100)
+    : 0
+
+  // Won vs never mentioned
+  const promptsWon           = relayTotal
+  const promptsNeverMentioned = totalChecksAll - relayTotal
+
+  // Top competitor by raw frequency
+  const topCompetitor = Object.entries(competitorFreq).sort((a, b) => b[1] - a[1])[0] ?? null
+  const topCompPct    = topCompetitor && totalChecksAll > 0
+    ? Math.round((topCompetitor[1] / totalChecksAll) * 100)
+    : 0
+
+  // Monthly API spend
+  const monthlySpendUsd = Number(monthlySpend._sum.estimatedCostUsd ?? 0)
 
   return (
     <div className="p-6 max-w-5xl space-y-6">
@@ -160,9 +198,57 @@ export default async function MarketingIntelligencePage() {
             </div>
           </div>
           <p className="text-3xl font-bold text-white">
-            {runs.filter(r => new Date(r.startedAt) > new Date(Date.now() - 30 * 86_400_000)).length}
+            {runs.filter(r => new Date(r.startedAt) >= monthStart).length}
           </p>
-          <p className="text-xs text-gray-500 mt-1">last 30 days</p>
+          <p className="text-xs text-gray-500 mt-1">this calendar month</p>
+        </div>
+      </div>
+
+      {/* Enhanced metrics row */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs text-gray-400">Citation Rate</p>
+            <Link2 className="w-3.5 h-3.5 text-blue-400" />
+          </div>
+          <p className="text-2xl font-bold text-white">{totalChecksAll > 0 ? `${citationRate}%` : "—"}</p>
+          <p className="text-[11px] text-gray-600 mt-0.5">getrelay.software cited</p>
+        </div>
+
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs text-gray-400">Share of Mentions</p>
+            <Share2 className="w-3.5 h-3.5 text-purple-400" />
+          </div>
+          <p className="text-2xl font-bold text-white">{totalAllMentions > 0 ? `${shareOfMentions}%` : "—"}</p>
+          <p className="text-[11px] text-gray-600 mt-0.5">vs all competitors</p>
+        </div>
+
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs text-gray-400">Prompts Won</p>
+            <Trophy className="w-3.5 h-3.5 text-emerald-400" />
+          </div>
+          <p className="text-2xl font-bold text-white">{promptsWon}</p>
+          <p className="text-[11px] text-gray-600 mt-0.5">{promptsNeverMentioned} never mentioned</p>
+        </div>
+
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs text-gray-400">Top Competitor</p>
+            <TrendingUp className="w-3.5 h-3.5 text-red-400" />
+          </div>
+          <p className="text-2xl font-bold text-white truncate">{topCompetitor ? topCompetitor[0] : "—"}</p>
+          <p className="text-[11px] text-gray-600 mt-0.5">{topCompetitor ? `${topCompPct}% mention rate` : "no data yet"}</p>
+        </div>
+
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs text-gray-400">API Spend (month)</p>
+            <DollarSign className="w-3.5 h-3.5 text-yellow-400" />
+          </div>
+          <p className="text-2xl font-bold text-white">${monthlySpendUsd.toFixed(3)}</p>
+          <p className="text-[11px] text-gray-600 mt-0.5">current calendar month</p>
         </div>
       </div>
 

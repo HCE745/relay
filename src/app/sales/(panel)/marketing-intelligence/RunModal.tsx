@@ -87,7 +87,10 @@ export function RunModal({ onClose }: { onClose?: () => void }) {
   }
 
   const categories = [...new Set(prompts.map(p => p.category))]
-  const estimatedCost = (selected.size * 0.01).toFixed(2)
+  // Cost estimate: 2 searches × $0.01 + ~2000 tokens at haiku rates ($3/$15 per M)
+  // Low = 1 search + 1000 tokens, High = 3 searches + 4000 tokens
+  const costLow  = (selected.size * (0.01 + (1000 / 1_000_000 * 3.00) + (1000 / 1_000_000 * 15.00))).toFixed(2)
+  const costHigh = (selected.size * (0.03 + (2000 / 1_000_000 * 3.00) + (4000 / 1_000_000 * 15.00))).toFixed(2)
 
   if (!open) {
     return (
@@ -206,8 +209,9 @@ export function RunModal({ onClose }: { onClose?: () => void }) {
           )}
           <div className="flex items-center justify-between">
             <div className="text-xs text-gray-500">
-              <span className="text-gray-300">{selected.size} prompts</span> × $0.01 ≈{" "}
-              <span className="text-emerald-400 font-medium">${estimatedCost}</span>
+              <span className="text-gray-300">{selected.size} prompts</span> · est.{" "}
+              <span className="text-emerald-400 font-medium">${costLow}–${costHigh}</span>
+              <span className="text-gray-600 ml-1">(2 searches + tokens)</span>
             </div>
             <div className="flex gap-2">
               <button

@@ -4,13 +4,20 @@ import { useState, useEffect, useCallback } from "react"
 import { Loader2, Save, Play } from "lucide-react"
 import { useRouter } from "next/navigation"
 
+const KNOWN_MODELS = [
+  { id: "claude-haiku-4-5-20251001", label: "claude-haiku-4-5 (default, cheapest)" },
+  { id: "claude-sonnet-4-5-20251022", label: "claude-sonnet-4-5 (better quality, higher cost)" },
+  { id: "claude-opus-4-5-20251101", label: "claude-opus-4-5 (highest quality, most expensive)" },
+]
+
 interface Settings {
-  id:                  string
-  mode:                "manual" | "automatic"
-  autoFrequency:       "weekly" | "biweekly" | "monthly"
-  autoProviders:       string[]
-  maxMonthlyBudgetUsd: number
-  lastAutoRunAt:       string | null
+  id:                   string
+  mode:                 "manual" | "automatic"
+  autoFrequency:        "weekly" | "biweekly" | "monthly"
+  autoProviders:        string[]
+  maxMonthlyBudgetUsd:  number
+  visibilityCheckModel: string
+  lastAutoRunAt:        string | null
 }
 
 export default function VisibilitySettingsPage() {
@@ -43,10 +50,11 @@ export default function VisibilitySettingsPage() {
         method:  "PUT",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
-          mode:               settings.mode,
-          autoFrequency:      settings.autoFrequency,
-          autoProviders:      settings.autoProviders,
+          mode:                settings.mode,
+          autoFrequency:       settings.autoFrequency,
+          autoProviders:       settings.autoProviders,
           maxMonthlyBudgetUsd: Number(settings.maxMonthlyBudgetUsd),
+          visibilityCheckModel: settings.visibilityCheckModel,
         }),
       })
       if (!res.ok) { setError("Save failed"); return }
@@ -167,6 +175,27 @@ export default function VisibilitySettingsPage() {
             )}
           </div>
         )}
+
+        {/* Model */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-gray-300 mb-1">AI Model</h2>
+          <p className="text-xs text-gray-500 mb-3">Model used when calling Anthropic for visibility checks.</p>
+          <select
+            value={settings.visibilityCheckModel}
+            onChange={e => update("visibilityCheckModel", e.target.value)}
+            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500"
+          >
+            {KNOWN_MODELS.map(m => (
+              <option key={m.id} value={m.id}>{m.label}</option>
+            ))}
+            {!KNOWN_MODELS.find(m => m.id === settings.visibilityCheckModel) && (
+              <option value={settings.visibilityCheckModel}>{settings.visibilityCheckModel}</option>
+            )}
+          </select>
+          <p className="text-[11px] text-gray-600 mt-2">
+            Custom model IDs are accepted. Changing takes effect on the next run.
+          </p>
+        </div>
 
         {/* Run now */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">

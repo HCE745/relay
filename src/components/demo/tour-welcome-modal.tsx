@@ -6,6 +6,7 @@ import { useTour } from "./tour-context"
 import { RelayWordmarkWhite } from "@/components/logo"
 
 const INDUSTRIES = [
+  { label: "Car Wash",           emoji: "🚗" },
   { label: "Manufacturing",      emoji: "🏭" },
   { label: "Warehousing",        emoji: "📦" },
   { label: "Restaurant",         emoji: "🍽️" },

@@ -2529,3 +2529,99 @@ model SalesUser {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+// ── AI Visibility Tracker ─────────────────────────────────────────────────────
+
+enum VisibilityPromptCategory {
+  brand
+  competitor
+  use_case
+  industry
+  pain_point
+}
+
+enum VisibilityProvider {
+  anthropic
+  openai
+  perplexity
+}
+
+enum VisibilityRunStatus {
+  running
+  completed
+  failed
+}
+
+enum VisibilityRunType {
+  manual
+  automatic
+}
+
+enum VisibilityMode {
+  manual
+  automatic
+}
+
+enum VisibilityFrequency {
+  weekly
+  biweekly
+  monthly
+}
+
+model VisibilityPrompt {
+  id         String                   @id @default(cuid())
+  promptText String                   @db.Text
+  category   VisibilityPromptCategory
+  isActive   Boolean                  @default(true)
+  createdAt  DateTime                 @default(now())
+  updatedAt  DateTime                 @updatedAt
+}
+
+model VisibilityCompetitor {
+  id        String   @id @default(cuid())
+  name      String
+  website   String?
+  createdAt DateTime @default(now())
+}
+
+model VisibilityCheck {
+  id                   String             @id @default(cuid())
+  runId                String
+  promptId             String
+  provider             VisibilityProvider
+  relayMentioned       Boolean
+  relayPosition        Int?
+  competitorsMentioned Json               @default("[]")
+  sourcesCited         Json               @default("[]")
+  rawResponse          String             @db.Text
+  runType              VisibilityRunType  @default(manual)
+  createdAt            DateTime           @default(now())
+
+  @@index([runId])
+  @@index([promptId])
+}
+
+model VisibilityRun {
+  id                   String              @id @default(cuid())
+  runId                String              @unique
+  status               VisibilityRunStatus @default(running)
+  promptsChecked       Int                 @default(0)
+  providersUsed        Json                @default("[]")
+  relayVisibilityScore Decimal             @default(0) @db.Decimal(5, 2)
+  startedAt            DateTime            @default(now())
+  completedAt          DateTime?
+  aiAnalysis           String?             @db.Text
+  aiRecommendations    Json                @default("[]")
+  runType              VisibilityRunType   @default(manual)
+}
+
+model VisibilitySetting {
+  id                  String              @id @default(cuid())
+  mode                VisibilityMode      @default(manual)
+  autoFrequency       VisibilityFrequency @default(weekly)
+  autoProviders       Json                @default("[\"anthropic\"]")
+  maxMonthlyBudgetUsd Decimal             @default(10.00) @db.Decimal(8, 2)
+  lastAutoRunAt       DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+}

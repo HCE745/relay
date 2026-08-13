@@ -522,3 +522,28 @@ export type AiCache = Prisma.AiCacheModel
  * 
  */
 export type SalesUser = Prisma.SalesUserModel
+/**
+ * Model VisibilityPrompt
+ * 
+ */
+export type VisibilityPrompt = Prisma.VisibilityPromptModel
+/**
+ * Model VisibilityCompetitor
+ * 
+ */
+export type VisibilityCompetitor = Prisma.VisibilityCompetitorModel
+/**
+ * Model VisibilityCheck
+ * 
+ */
+export type VisibilityCheck = Prisma.VisibilityCheckModel
+/**
+ * Model VisibilityRun
+ * 
+ */
+export type VisibilityRun = Prisma.VisibilityRunModel
+/**
+ * Model VisibilitySetting
+ * 
+ */
+export type VisibilitySetting = Prisma.VisibilitySettingModel

@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
   Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
-  Bell, FileText, Calendar, TrendingUp, Layers,
+  Bell, FileText, Calendar, TrendingUp, Layers, Eye,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -44,6 +44,12 @@ function buildSections(followUpsDue: number): { label?: string; items: NavItem[]
       items: [
         { label: "Demo Analytics",  href: "/sales/demo-analytics",   icon: BarChart2 },
         { label: "Sales Analytics", href: "/sales/sales-analytics",  icon: TrendingUp },
+      ],
+    },
+    {
+      label: "Intelligence",
+      items: [
+        { label: "Marketing Intelligence", href: "/sales/marketing-intelligence", icon: Eye },
       ],
     },
     {

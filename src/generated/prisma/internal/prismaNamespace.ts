@@ -484,7 +484,12 @@ export const ModelName = {
   LinkTrackingEvent: 'LinkTrackingEvent',
   SalesSetting: 'SalesSetting',
   AiCache: 'AiCache',
-  SalesUser: 'SalesUser'
+  SalesUser: 'SalesUser',
+  VisibilityPrompt: 'VisibilityPrompt',
+  VisibilityCompetitor: 'VisibilityCompetitor',
+  VisibilityCheck: 'VisibilityCheck',
+  VisibilityRun: 'VisibilityRun',
+  VisibilitySetting: 'VisibilitySetting'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -500,7 +505,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "linkClick" | "linkTrackingEvent" | "salesSetting" | "aiCache" | "salesUser"
+    modelProps: "organization" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "linkClick" | "linkTrackingEvent" | "salesSetting" | "aiCache" | "salesUser" | "visibilityPrompt" | "visibilityCompetitor" | "visibilityCheck" | "visibilityRun" | "visibilitySetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -7978,6 +7983,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VisibilityPrompt: {
+      payload: Prisma.$VisibilityPromptPayload<ExtArgs>
+      fields: Prisma.VisibilityPromptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VisibilityPromptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VisibilityPromptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>
+        }
+        findFirst: {
+          args: Prisma.VisibilityPromptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VisibilityPromptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>
+        }
+        findMany: {
+          args: Prisma.VisibilityPromptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>[]
+        }
+        create: {
+          args: Prisma.VisibilityPromptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>
+        }
+        createMany: {
+          args: Prisma.VisibilityPromptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VisibilityPromptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>[]
+        }
+        delete: {
+          args: Prisma.VisibilityPromptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>
+        }
+        update: {
+          args: Prisma.VisibilityPromptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>
+        }
+        deleteMany: {
+          args: Prisma.VisibilityPromptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VisibilityPromptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VisibilityPromptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>[]
+        }
+        upsert: {
+          args: Prisma.VisibilityPromptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityPromptPayload>
+        }
+        aggregate: {
+          args: Prisma.VisibilityPromptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVisibilityPrompt>
+        }
+        groupBy: {
+          args: Prisma.VisibilityPromptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilityPromptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VisibilityPromptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilityPromptCountAggregateOutputType> | number
+        }
+      }
+    }
+    VisibilityCompetitor: {
+      payload: Prisma.$VisibilityCompetitorPayload<ExtArgs>
+      fields: Prisma.VisibilityCompetitorFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VisibilityCompetitorFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VisibilityCompetitorFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>
+        }
+        findFirst: {
+          args: Prisma.VisibilityCompetitorFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VisibilityCompetitorFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>
+        }
+        findMany: {
+          args: Prisma.VisibilityCompetitorFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>[]
+        }
+        create: {
+          args: Prisma.VisibilityCompetitorCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>
+        }
+        createMany: {
+          args: Prisma.VisibilityCompetitorCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VisibilityCompetitorCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>[]
+        }
+        delete: {
+          args: Prisma.VisibilityCompetitorDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>
+        }
+        update: {
+          args: Prisma.VisibilityCompetitorUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>
+        }
+        deleteMany: {
+          args: Prisma.VisibilityCompetitorDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VisibilityCompetitorUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VisibilityCompetitorUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>[]
+        }
+        upsert: {
+          args: Prisma.VisibilityCompetitorUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCompetitorPayload>
+        }
+        aggregate: {
+          args: Prisma.VisibilityCompetitorAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVisibilityCompetitor>
+        }
+        groupBy: {
+          args: Prisma.VisibilityCompetitorGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilityCompetitorGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VisibilityCompetitorCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilityCompetitorCountAggregateOutputType> | number
+        }
+      }
+    }
+    VisibilityCheck: {
+      payload: Prisma.$VisibilityCheckPayload<ExtArgs>
+      fields: Prisma.VisibilityCheckFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VisibilityCheckFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VisibilityCheckFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>
+        }
+        findFirst: {
+          args: Prisma.VisibilityCheckFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VisibilityCheckFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>
+        }
+        findMany: {
+          args: Prisma.VisibilityCheckFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>[]
+        }
+        create: {
+          args: Prisma.VisibilityCheckCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>
+        }
+        createMany: {
+          args: Prisma.VisibilityCheckCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VisibilityCheckCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>[]
+        }
+        delete: {
+          args: Prisma.VisibilityCheckDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>
+        }
+        update: {
+          args: Prisma.VisibilityCheckUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>
+        }
+        deleteMany: {
+          args: Prisma.VisibilityCheckDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VisibilityCheckUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VisibilityCheckUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>[]
+        }
+        upsert: {
+          args: Prisma.VisibilityCheckUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityCheckPayload>
+        }
+        aggregate: {
+          args: Prisma.VisibilityCheckAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVisibilityCheck>
+        }
+        groupBy: {
+          args: Prisma.VisibilityCheckGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilityCheckGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VisibilityCheckCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilityCheckCountAggregateOutputType> | number
+        }
+      }
+    }
+    VisibilityRun: {
+      payload: Prisma.$VisibilityRunPayload<ExtArgs>
+      fields: Prisma.VisibilityRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VisibilityRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VisibilityRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>
+        }
+        findFirst: {
+          args: Prisma.VisibilityRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VisibilityRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>
+        }
+        findMany: {
+          args: Prisma.VisibilityRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>[]
+        }
+        create: {
+          args: Prisma.VisibilityRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>
+        }
+        createMany: {
+          args: Prisma.VisibilityRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VisibilityRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>[]
+        }
+        delete: {
+          args: Prisma.VisibilityRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>
+        }
+        update: {
+          args: Prisma.VisibilityRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.VisibilityRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VisibilityRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VisibilityRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.VisibilityRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilityRunPayload>
+        }
+        aggregate: {
+          args: Prisma.VisibilityRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVisibilityRun>
+        }
+        groupBy: {
+          args: Prisma.VisibilityRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilityRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VisibilityRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilityRunCountAggregateOutputType> | number
+        }
+      }
+    }
+    VisibilitySetting: {
+      payload: Prisma.$VisibilitySettingPayload<ExtArgs>
+      fields: Prisma.VisibilitySettingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VisibilitySettingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VisibilitySettingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>
+        }
+        findFirst: {
+          args: Prisma.VisibilitySettingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VisibilitySettingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>
+        }
+        findMany: {
+          args: Prisma.VisibilitySettingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>[]
+        }
+        create: {
+          args: Prisma.VisibilitySettingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>
+        }
+        createMany: {
+          args: Prisma.VisibilitySettingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VisibilitySettingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>[]
+        }
+        delete: {
+          args: Prisma.VisibilitySettingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>
+        }
+        update: {
+          args: Prisma.VisibilitySettingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>
+        }
+        deleteMany: {
+          args: Prisma.VisibilitySettingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VisibilitySettingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VisibilitySettingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>[]
+        }
+        upsert: {
+          args: Prisma.VisibilitySettingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VisibilitySettingPayload>
+        }
+        aggregate: {
+          args: Prisma.VisibilitySettingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVisibilitySetting>
+        }
+        groupBy: {
+          args: Prisma.VisibilitySettingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilitySettingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VisibilitySettingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VisibilitySettingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -9874,6 +10249,76 @@ export const SalesUserScalarFieldEnum = {
 export type SalesUserScalarFieldEnum = (typeof SalesUserScalarFieldEnum)[keyof typeof SalesUserScalarFieldEnum]
 
 
+export const VisibilityPromptScalarFieldEnum = {
+  id: 'id',
+  promptText: 'promptText',
+  category: 'category',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VisibilityPromptScalarFieldEnum = (typeof VisibilityPromptScalarFieldEnum)[keyof typeof VisibilityPromptScalarFieldEnum]
+
+
+export const VisibilityCompetitorScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  website: 'website',
+  createdAt: 'createdAt'
+} as const
+
+export type VisibilityCompetitorScalarFieldEnum = (typeof VisibilityCompetitorScalarFieldEnum)[keyof typeof VisibilityCompetitorScalarFieldEnum]
+
+
+export const VisibilityCheckScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  promptId: 'promptId',
+  provider: 'provider',
+  relayMentioned: 'relayMentioned',
+  relayPosition: 'relayPosition',
+  competitorsMentioned: 'competitorsMentioned',
+  sourcesCited: 'sourcesCited',
+  rawResponse: 'rawResponse',
+  runType: 'runType',
+  createdAt: 'createdAt'
+} as const
+
+export type VisibilityCheckScalarFieldEnum = (typeof VisibilityCheckScalarFieldEnum)[keyof typeof VisibilityCheckScalarFieldEnum]
+
+
+export const VisibilityRunScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  status: 'status',
+  promptsChecked: 'promptsChecked',
+  providersUsed: 'providersUsed',
+  relayVisibilityScore: 'relayVisibilityScore',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  aiAnalysis: 'aiAnalysis',
+  aiRecommendations: 'aiRecommendations',
+  runType: 'runType'
+} as const
+
+export type VisibilityRunScalarFieldEnum = (typeof VisibilityRunScalarFieldEnum)[keyof typeof VisibilityRunScalarFieldEnum]
+
+
+export const VisibilitySettingScalarFieldEnum = {
+  id: 'id',
+  mode: 'mode',
+  autoFrequency: 'autoFrequency',
+  autoProviders: 'autoProviders',
+  maxMonthlyBudgetUsd: 'maxMonthlyBudgetUsd',
+  lastAutoRunAt: 'lastAutoRunAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VisibilitySettingScalarFieldEnum = (typeof VisibilitySettingScalarFieldEnum)[keyof typeof VisibilitySettingScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -10200,6 +10645,104 @@ export type EnumEmailConfidenceLevelFieldRefInput<$PrismaModel> = FieldRefInputT
 export type ListEnumEmailConfidenceLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailConfidenceLevel[]'>
     
 
+
+/**
+ * Reference to a field of type 'VisibilityPromptCategory'
+ */
+export type EnumVisibilityPromptCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityPromptCategory'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityPromptCategory[]'
+ */
+export type ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityPromptCategory[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityProvider'
+ */
+export type EnumVisibilityProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityProvider'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityProvider[]'
+ */
+export type ListEnumVisibilityProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityProvider[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityRunType'
+ */
+export type EnumVisibilityRunTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityRunType'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityRunType[]'
+ */
+export type ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityRunType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityRunStatus'
+ */
+export type EnumVisibilityRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityRunStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityRunStatus[]'
+ */
+export type ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityRunStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityMode'
+ */
+export type EnumVisibilityModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityMode'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityMode[]'
+ */
+export type ListEnumVisibilityModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityMode[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityFrequency'
+ */
+export type EnumVisibilityFrequencyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityFrequency'>
+    
+
+
+/**
+ * Reference to a field of type 'VisibilityFrequency[]'
+ */
+export type ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisibilityFrequency[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -10411,6 +10954,11 @@ export type GlobalOmitConfig = {
   salesSetting?: Prisma.SalesSettingOmit
   aiCache?: Prisma.AiCacheOmit
   salesUser?: Prisma.SalesUserOmit
+  visibilityPrompt?: Prisma.VisibilityPromptOmit
+  visibilityCompetitor?: Prisma.VisibilityCompetitorOmit
+  visibilityCheck?: Prisma.VisibilityCheckOmit
+  visibilityRun?: Prisma.VisibilityRunOmit
+  visibilitySetting?: Prisma.VisibilitySettingOmit
 }
 
 /* Types for Logging */

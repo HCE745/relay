@@ -171,3 +171,57 @@ export const EmailConfidenceLevel = {
 } as const
 
 export type EmailConfidenceLevel = (typeof EmailConfidenceLevel)[keyof typeof EmailConfidenceLevel]
+
+
+export const VisibilityPromptCategory = {
+  brand: 'brand',
+  competitor: 'competitor',
+  use_case: 'use_case',
+  industry: 'industry',
+  pain_point: 'pain_point'
+} as const
+
+export type VisibilityPromptCategory = (typeof VisibilityPromptCategory)[keyof typeof VisibilityPromptCategory]
+
+
+export const VisibilityProvider = {
+  anthropic: 'anthropic',
+  openai: 'openai',
+  perplexity: 'perplexity'
+} as const
+
+export type VisibilityProvider = (typeof VisibilityProvider)[keyof typeof VisibilityProvider]
+
+
+export const VisibilityRunStatus = {
+  running: 'running',
+  completed: 'completed',
+  failed: 'failed'
+} as const
+
+export type VisibilityRunStatus = (typeof VisibilityRunStatus)[keyof typeof VisibilityRunStatus]
+
+
+export const VisibilityRunType = {
+  manual: 'manual',
+  automatic: 'automatic'
+} as const
+
+export type VisibilityRunType = (typeof VisibilityRunType)[keyof typeof VisibilityRunType]
+
+
+export const VisibilityMode = {
+  manual: 'manual',
+  automatic: 'automatic'
+} as const
+
+export type VisibilityMode = (typeof VisibilityMode)[keyof typeof VisibilityMode]
+
+
+export const VisibilityFrequency = {
+  weekly: 'weekly',
+  biweekly: 'biweekly',
+  monthly: 'monthly'
+} as const
+
+export type VisibilityFrequency = (typeof VisibilityFrequency)[keyof typeof VisibilityFrequency]

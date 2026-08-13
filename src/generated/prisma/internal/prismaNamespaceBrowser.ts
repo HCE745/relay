@@ -151,7 +151,12 @@ export const ModelName = {
   LinkTrackingEvent: 'LinkTrackingEvent',
   SalesSetting: 'SalesSetting',
   AiCache: 'AiCache',
-  SalesUser: 'SalesUser'
+  SalesUser: 'SalesUser',
+  VisibilityPrompt: 'VisibilityPrompt',
+  VisibilityCompetitor: 'VisibilityCompetitor',
+  VisibilityCheck: 'VisibilityCheck',
+  VisibilityRun: 'VisibilityRun',
+  VisibilitySetting: 'VisibilitySetting'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -2025,6 +2030,76 @@ export const SalesUserScalarFieldEnum = {
 } as const
 
 export type SalesUserScalarFieldEnum = (typeof SalesUserScalarFieldEnum)[keyof typeof SalesUserScalarFieldEnum]
+
+
+export const VisibilityPromptScalarFieldEnum = {
+  id: 'id',
+  promptText: 'promptText',
+  category: 'category',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VisibilityPromptScalarFieldEnum = (typeof VisibilityPromptScalarFieldEnum)[keyof typeof VisibilityPromptScalarFieldEnum]
+
+
+export const VisibilityCompetitorScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  website: 'website',
+  createdAt: 'createdAt'
+} as const
+
+export type VisibilityCompetitorScalarFieldEnum = (typeof VisibilityCompetitorScalarFieldEnum)[keyof typeof VisibilityCompetitorScalarFieldEnum]
+
+
+export const VisibilityCheckScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  promptId: 'promptId',
+  provider: 'provider',
+  relayMentioned: 'relayMentioned',
+  relayPosition: 'relayPosition',
+  competitorsMentioned: 'competitorsMentioned',
+  sourcesCited: 'sourcesCited',
+  rawResponse: 'rawResponse',
+  runType: 'runType',
+  createdAt: 'createdAt'
+} as const
+
+export type VisibilityCheckScalarFieldEnum = (typeof VisibilityCheckScalarFieldEnum)[keyof typeof VisibilityCheckScalarFieldEnum]
+
+
+export const VisibilityRunScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  status: 'status',
+  promptsChecked: 'promptsChecked',
+  providersUsed: 'providersUsed',
+  relayVisibilityScore: 'relayVisibilityScore',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  aiAnalysis: 'aiAnalysis',
+  aiRecommendations: 'aiRecommendations',
+  runType: 'runType'
+} as const
+
+export type VisibilityRunScalarFieldEnum = (typeof VisibilityRunScalarFieldEnum)[keyof typeof VisibilityRunScalarFieldEnum]
+
+
+export const VisibilitySettingScalarFieldEnum = {
+  id: 'id',
+  mode: 'mode',
+  autoFrequency: 'autoFrequency',
+  autoProviders: 'autoProviders',
+  maxMonthlyBudgetUsd: 'maxMonthlyBudgetUsd',
+  lastAutoRunAt: 'lastAutoRunAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VisibilitySettingScalarFieldEnum = (typeof VisibilitySettingScalarFieldEnum)[keyof typeof VisibilitySettingScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -613,6 +613,135 @@ export type EnumEmailConfidenceLevelNullableWithAggregatesFilter<$PrismaModel = 
   _max?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel>
 }
 
+export type EnumVisibilityPromptCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityPromptCategory | Prisma.EnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityPromptCategory[] | Prisma.ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityPromptCategory[] | Prisma.ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityPromptCategoryFilter<$PrismaModel> | $Enums.VisibilityPromptCategory
+}
+
+export type EnumVisibilityPromptCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityPromptCategory | Prisma.EnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityPromptCategory[] | Prisma.ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityPromptCategory[] | Prisma.ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityPromptCategoryWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityPromptCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityPromptCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityPromptCategoryFilter<$PrismaModel>
+}
+
+export type EnumVisibilityProviderFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityProvider | Prisma.EnumVisibilityProviderFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityProviderFilter<$PrismaModel> | $Enums.VisibilityProvider
+}
+
+export type EnumVisibilityRunTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunType | Prisma.EnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunType[] | Prisma.ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunType[] | Prisma.ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel> | $Enums.VisibilityRunType
+}
+
+export type EnumVisibilityProviderWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityProvider | Prisma.EnumVisibilityProviderFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityProviderWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityProvider
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityProviderFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityProviderFilter<$PrismaModel>
+}
+
+export type EnumVisibilityRunTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunType | Prisma.EnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunType[] | Prisma.ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunType[] | Prisma.ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunTypeWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityRunType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel>
+}
+
+export type EnumVisibilityRunStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel> | $Enums.VisibilityRunStatus
+}
+
+export type DecimalFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type EnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityRunStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
+}
+
+export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalWithAggregatesFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedDecimalFilter<$PrismaModel>
+  _sum?: Prisma.NestedDecimalFilter<$PrismaModel>
+  _min?: Prisma.NestedDecimalFilter<$PrismaModel>
+  _max?: Prisma.NestedDecimalFilter<$PrismaModel>
+}
+
+export type EnumVisibilityModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityMode | Prisma.EnumVisibilityModeFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityMode[] | Prisma.ListEnumVisibilityModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityMode[] | Prisma.ListEnumVisibilityModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityModeFilter<$PrismaModel> | $Enums.VisibilityMode
+}
+
+export type EnumVisibilityFrequencyFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityFrequency | Prisma.EnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityFrequency[] | Prisma.ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityFrequency[] | Prisma.ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityFrequencyFilter<$PrismaModel> | $Enums.VisibilityFrequency
+}
+
+export type EnumVisibilityModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityMode | Prisma.EnumVisibilityModeFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityMode[] | Prisma.ListEnumVisibilityModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityMode[] | Prisma.ListEnumVisibilityModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityModeWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityModeFilter<$PrismaModel>
+}
+
+export type EnumVisibilityFrequencyWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityFrequency | Prisma.EnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityFrequency[] | Prisma.ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityFrequency[] | Prisma.ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityFrequencyWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityFrequency
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityFrequencyFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityFrequencyFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1147,6 +1276,135 @@ export type NestedEnumEmailConfidenceLevelNullableWithAggregatesFilter<$PrismaMo
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumEmailConfidenceLevelNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumVisibilityPromptCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityPromptCategory | Prisma.EnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityPromptCategory[] | Prisma.ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityPromptCategory[] | Prisma.ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityPromptCategoryFilter<$PrismaModel> | $Enums.VisibilityPromptCategory
+}
+
+export type NestedEnumVisibilityPromptCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityPromptCategory | Prisma.EnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityPromptCategory[] | Prisma.ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityPromptCategory[] | Prisma.ListEnumVisibilityPromptCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityPromptCategoryWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityPromptCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityPromptCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityPromptCategoryFilter<$PrismaModel>
+}
+
+export type NestedEnumVisibilityProviderFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityProvider | Prisma.EnumVisibilityProviderFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityProviderFilter<$PrismaModel> | $Enums.VisibilityProvider
+}
+
+export type NestedEnumVisibilityRunTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunType | Prisma.EnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunType[] | Prisma.ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunType[] | Prisma.ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel> | $Enums.VisibilityRunType
+}
+
+export type NestedEnumVisibilityProviderWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityProvider | Prisma.EnumVisibilityProviderFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityProvider[] | Prisma.ListEnumVisibilityProviderFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityProviderWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityProvider
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityProviderFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityProviderFilter<$PrismaModel>
+}
+
+export type NestedEnumVisibilityRunTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunType | Prisma.EnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunType[] | Prisma.ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunType[] | Prisma.ListEnumVisibilityRunTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunTypeWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityRunType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityRunTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumVisibilityRunStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel> | $Enums.VisibilityRunStatus
+}
+
+export type NestedDecimalFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityRunStatus | Prisma.EnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityRunStatus[] | Prisma.ListEnumVisibilityRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityRunStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityRunStatusFilter<$PrismaModel>
+}
+
+export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalWithAggregatesFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedDecimalFilter<$PrismaModel>
+  _sum?: Prisma.NestedDecimalFilter<$PrismaModel>
+  _min?: Prisma.NestedDecimalFilter<$PrismaModel>
+  _max?: Prisma.NestedDecimalFilter<$PrismaModel>
+}
+
+export type NestedEnumVisibilityModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityMode | Prisma.EnumVisibilityModeFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityMode[] | Prisma.ListEnumVisibilityModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityMode[] | Prisma.ListEnumVisibilityModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityModeFilter<$PrismaModel> | $Enums.VisibilityMode
+}
+
+export type NestedEnumVisibilityFrequencyFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityFrequency | Prisma.EnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityFrequency[] | Prisma.ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityFrequency[] | Prisma.ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityFrequencyFilter<$PrismaModel> | $Enums.VisibilityFrequency
+}
+
+export type NestedEnumVisibilityModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityMode | Prisma.EnumVisibilityModeFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityMode[] | Prisma.ListEnumVisibilityModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityMode[] | Prisma.ListEnumVisibilityModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityModeWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityModeFilter<$PrismaModel>
+}
+
+export type NestedEnumVisibilityFrequencyWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VisibilityFrequency | Prisma.EnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  in?: $Enums.VisibilityFrequency[] | Prisma.ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VisibilityFrequency[] | Prisma.ListEnumVisibilityFrequencyFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVisibilityFrequencyWithAggregatesFilter<$PrismaModel> | $Enums.VisibilityFrequency
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVisibilityFrequencyFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVisibilityFrequencyFilter<$PrismaModel>
 }
 
 

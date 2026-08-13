@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Loader2, Plus, Pencil, Trash2, Check, X, GitBranch } from "lucide-react"
+import { Loader2, Plus, Pencil, Trash2, Check, X, GitBranch, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Stage {
@@ -26,8 +26,10 @@ export default function StagesPage() {
   const [saving,   setSaving]   = useState(false)
   const [error,    setError]    = useState("")
 
-  const [editForm, setEditForm] = useState({ name: "", daysAfterPrevious: 0, description: "" })
-  const [addForm,  setAddForm]  = useState({ name: "", daysAfterPrevious: 7, description: "" })
+  const [editForm,      setEditForm]      = useState({ name: "", daysAfterPrevious: 0, description: "" })
+  const [addForm,       setAddForm]       = useState({ name: "", daysAfterPrevious: 7, description: "" })
+  const [backfilling,   setBackfilling]   = useState(false)
+  const [backfillMsg,   setBackfillMsg]   = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -96,6 +98,25 @@ export default function StagesPage() {
     }
   }
 
+  async function runBackfill() {
+    if (!confirm("This will recalculate stage numbers for all sent emails based on send order per contact. Continue?")) return
+    setBackfilling(true)
+    setBackfillMsg(null)
+    try {
+      const res  = await fetch("/api/sales/stages/backfill", { method: "POST" })
+      const data = await res.json() as { updated?: number; total?: number; error?: string }
+      if (!res.ok || data.error) {
+        setBackfillMsg(`Error: ${data.error ?? "Backfill failed"}`)
+      } else {
+        setBackfillMsg(`Done — updated ${data.updated} of ${data.total} emails.`)
+      }
+    } catch {
+      setBackfillMsg("Network error — please try again")
+    } finally {
+      setBackfilling(false)
+    }
+  }
+
   return (
     <div className="p-6 max-w-2xl">
       <div className="flex items-center justify-between mb-6">
@@ -105,7 +126,28 @@ export default function StagesPage() {
             Configure your outreach sequence. When an email is sent, Relay automatically schedules the next follow-up.
           </p>
         </div>
+        <button
+          onClick={() => void runBackfill()}
+          disabled={backfilling}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 text-xs font-medium rounded-lg border border-gray-700 transition-colors"
+          title="Recalculate stage numbers for all emails based on actual send order"
+        >
+          {backfilling
+            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            : <RefreshCw className="w-3.5 h-3.5" />}
+          Recalculate Stages
+        </button>
       </div>
+
+      {backfillMsg && (
+        <div className={`mb-4 px-4 py-3 rounded-xl text-sm border ${
+          backfillMsg.startsWith("Error")
+            ? "bg-red-900/30 border-red-800 text-red-400"
+            : "bg-emerald-900/20 border-emerald-800/60 text-emerald-400"
+        }`}>
+          {backfillMsg}
+        </div>
+      )}
 
       {error && (
         <div className="mb-4 px-4 py-3 bg-red-900/30 border border-red-800 rounded-xl text-red-400 text-sm">

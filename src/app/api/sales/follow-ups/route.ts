@@ -53,11 +53,13 @@ export async function GET() {
   })
 
   // Check which threads have received replies (warm lead = opened, no reply yet)
-  const threadIds = [...new Set(emails.map(e => e.threadId).filter(Boolean))] as string[]
+  const threadIds       = [...new Set(emails.map(e => e.threadId).filter(Boolean))] as string[]
+  // Unique contact emails in the queue — used for true per-prospect sent count
+  const contactEmailsRaw = [...new Set(emails.map(e => e.contactEmail).filter(Boolean))] as string[]
 
-  // Count sent emails per thread to determine the true stage — this handles threads where
-  // earlier emails were sent before the follow-up system existed (stageNumber was null),
-  // which caused chaining to reset stage to 0 regardless of how many emails were in the thread.
+  // Count ALL sent emails per contact email (not just within a thread) so we can
+  // correctly determine each prospect's stage, including emails sent before the
+  // stage-tracking feature existed.
   const [repliedRaw, sentCountsRaw] = await Promise.all([
     threadIds.length > 0
       ? prisma.crmEmail.findMany({
@@ -65,18 +67,23 @@ export async function GET() {
           select: { threadId: true },
         })
       : Promise.resolve([]),
-    threadIds.length > 0
+    contactEmailsRaw.length > 0
       ? prisma.crmEmail.groupBy({
-          by:    ["threadId"],
-          where: { threadId: { in: threadIds }, direction: "sent", isDeleted: false },
+          by:    ["contactEmail"],
+          where: {
+            contactEmail: { in: contactEmailsRaw },
+            direction:    "sent",
+            isDeleted:    false,
+          },
           _count: { id: true },
         })
       : Promise.resolve([]),
   ])
 
-  const repliedThreadIds  = new Set(repliedRaw.map(r => r.threadId).filter(Boolean) as string[])
-  const threadSentCounts  = Object.fromEntries(
-    sentCountsRaw.map(r => [r.threadId!, r._count.id])
+  const repliedThreadIds = new Set(repliedRaw.map(r => r.threadId).filter(Boolean) as string[])
+  // Keyed by lowercased email for case-insensitive lookup
+  const contactSentCounts = Object.fromEntries(
+    sentCountsRaw.map(r => [(r.contactEmail ?? "").toLowerCase(), r._count.id])
   )
 
   // Fetch engagement data for all prospects in the queue
@@ -133,10 +140,12 @@ export async function GET() {
   }
 
   const enriched = emails.map(e => {
-    // Use actual sent-email count in thread as the effective stage (0-indexed).
-    // Fall back to stored stageNumber only if we have no thread data.
-    const actualCount = e.threadId ? (threadSentCounts[e.threadId] ?? null) : null
-    const sn          = actualCount !== null ? actualCount - 1 : (e.stageNumber ?? 0)
+    // Stage = total sent emails to this contact - 1 (0-indexed).
+    // Counting all sent emails per contactEmail (not just the current thread) gives
+    // the correct stage for prospects emailed before stage tracking was introduced.
+    const contactKey  = (e.contactEmail ?? "").toLowerCase()
+    const totalSent   = contactSentCounts[contactKey] ?? null
+    const sn          = totalSent !== null ? totalSent - 1 : (e.stageNumber ?? 0)
     const dueStageNum = sn + 1
     const sequenceComplete = dueStageNum > maxStageNum
     const hasReply       = e.threadId ? repliedThreadIds.has(e.threadId) : false

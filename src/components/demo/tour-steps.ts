@@ -587,12 +587,12 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
       "Running a car wash means keeping equipment running, responding to customer problems, and staying ahead of maintenance. Relay puts all of that in one place so issues do not disappear into texts, calls, or memory.",
   },
 
-  // Step 2: Wash Overview Dashboard
-  // Narration 2: matches — /dashboard + kpi-cards exists (Group C)
+  // Step 2: Equipment status on dashboard
+  // data-tour="carwash-equipment-status" confirmed exists on dashboard page
   {
     id: 2,
     path: "/dashboard",
-    targetSelector: "[data-tour='kpi-cards']",
+    targetSelector: "[data-tour='carwash-equipment-status']",
     audioFile: "/demo-audio/carwash-step-02.mp3",
     cue: "This is what your team sees every morning before the first car arrives.",
     getTitle: () => "Your Wash Overview — everything that matters, immediately.",
@@ -600,23 +600,21 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
       "Your Wash Overview shows what matters immediately — which bays are operating, what equipment is down, customer reports today, and open maintenance. You can see where attention is needed without digging through the system.",
   },
 
-  // Step 3: QR Codes — customer scanning concept
-  // Narration 3: "Customers often notice equipment problems first. Relay lets them scan a QR code..."
-  // Truthful: /qr-codes admin page shows the codes customers scan; narration describes the customer-facing experience
+  // Step 3: Customer reports panel on dashboard
+  // data-tour="carwash-customer-reports" confirmed exists on dashboard page
   {
     id: 3,
-    path: "/qr-codes",
-    targetSelector: "[data-tour='qr-list']",
+    path: "/dashboard",
+    targetSelector: "[data-tour='carwash-customer-reports']",
     audioFile: "/demo-audio/carwash-step-03.mp3",
     cue: "Customers can report a problem at any bay without an account or an app.",
-    getTitle: () => "Customers report problems the moment they notice them.",
+    getTitle: () => "Customer reports flow directly here.",
     getExplain: () =>
       "Customers often notice equipment problems first. Relay lets them scan a QR code on a bay, vacuum, or other equipment and report the problem in seconds — no login and no app required.",
   },
 
-  // Step 4: QR Codes — auto-identification detail
-  // Narration 4: "The QR code already identifies the wash, location, and equipment..."
-  // Truthful: stays on /qr-codes; narrates QR link-to-location/asset feature which exists
+  // Step 4: QR codes page — admin view of scannable codes
+  // data-tour="qr-list" confirmed exists on /qr-codes page
   {
     id: 4,
     path: "/qr-codes",
@@ -628,24 +626,17 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
       "The QR code already identifies the wash, location, and equipment. The customer simply chooses what went wrong, adds details if needed, and submits the report directly to your operation.",
   },
 
-  // Step 5: Form-fill — demo customer report submission
-  // Narration 5: "The report appears inside Relay with the equipment, site, time, and problem already attached."
-  // Truthful: form-fill submits a demo report; narration describes what appears after submission
+  // Step 5: Issues list — report appears in Relay
+  // data-tour="issue-list" confirmed exists on /issues page
   {
     id: 5,
-    path: "/issues/new",
-    targetSelector: "[data-tour='issue-form']",
-    type: "form-fill",
+    path: "/issues",
+    targetSelector: "[data-tour='issue-list']",
     audioFile: "/demo-audio/carwash-step-05.mp3",
-    cue: "Watch as we submit a demo customer report.",
+    cue: "Every report your team receives shows up here.",
     getTitle: () => "The report appears in Relay immediately.",
     getExplain: () =>
       "The report appears inside Relay with the equipment, site, time, and problem already attached. Your team immediately knows what happened and where.",
-    getFormData: () => ({
-      title:       "Vacuum coin return jammed — Bay 4 island",
-      description: "Customer reports coin return stuck on vacuum. Machine accepted coins but did not return change and did not start. Bay 4 vacuum island.",
-      category:    "EQUIPMENT_BREAKDOWN",
-    }),
   },
 
   // Step 6: Issue detail header — assignment
@@ -717,13 +708,11 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
       "For operators with several washes, Relay brings each location into one view. You can quickly see which sites have open issues and where equipment needs attention.",
   },
 
-  // Step 11: Analytics
-  // Narration 11: "Over time, the history in Relay shows which equipment causes the most problems..."
-  // Truthful: /analytics shows issue trends, volume by category, resolution times
+  // Step 11: Analytics — data-tour="analytics-header" added to analytics page outer div
   {
     id: 11,
     path: "/analytics",
-    targetSelector: "[data-tour='analytics-charts']",
+    targetSelector: "[data-tour='analytics-header']",
     audioFile: "/demo-audio/carwash-step-11.mp3",
     cue: "Every issue your team resolves builds this over time.",
     getTitle: () => "The data that makes better maintenance decisions.",

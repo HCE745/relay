@@ -59,7 +59,7 @@ export default async function AnalyticsPage() {
   })
 
   return (
-    <div>
+    <div data-tour="analytics-header">
       <Header
         title="Analytics"
         actions={

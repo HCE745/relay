@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { ChevronLeft, ChevronRight, X, ExternalLink, Check, Lock, Volume2, VolumeX, Play, Pause } from "lucide-react"
-import { useTour, TOTAL_TOUR_STEPS } from "./tour-context"
+import { useTour } from "./tour-context"
 import { TOUR_STEPS, ROLE_DEMOS, INDUSTRY_DEMOS, PACKAGE_DEMOS, ADDITIONAL_FEATURES, getActiveTourSteps, getNumTourSteps } from "./tour-steps"
 import { fireTrackingEvent } from "./relay-tracker"
 
@@ -274,7 +274,7 @@ function CinematicIntro({
       <div className="max-w-lg w-full text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-full mb-8">
           <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
-          <span className="text-xs text-blue-300 font-medium">Interactive Demo — Step 1 of {TOTAL_TOUR_STEPS}</span>
+          <span className="text-xs text-blue-300 font-medium">Interactive Demo — Step 1 of {getNumTourSteps(industry)}</span>
         </div>
 
         <h1 className="text-3xl font-bold text-white mb-5 leading-tight">
@@ -777,7 +777,7 @@ export function TourOverlay() {
     <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
       <ProgressBar
         step={currentStep}
-        total={TOTAL_TOUR_STEPS}
+        total={getNumTourSteps(industry)}
         onTakeControl={exitTour}
         audioDurationSec={audioDurationSec}
       />
@@ -896,7 +896,7 @@ export function TourOverlay() {
             disabled={isNavigating}
             className="flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors min-h-[40px]"
           >
-            {currentStep === TOTAL_TOUR_STEPS - 1 ? "Finish" : "Next"}
+            {currentStep === getNumTourSteps(industry) - 1 ? "Finish" : "Next"}
             <ChevronRight className="w-4 h-4" />
           </button>
         )}

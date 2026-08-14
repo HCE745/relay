@@ -648,13 +648,12 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     }),
   },
 
-  // Step 6: Issue detail — assignment
-  // Narration 6: "Assign the problem to the person responsible..."
-  // Truthful: issue detail page shows assignee, assignment controls, owner visibility
+  // Step 6: Issue detail header — assignment
+  // Uses FIRST_ISSUE (pre-seeded issue with assignee) so the assignee field is populated
   {
     id: 6,
-    path: "SUBMITTED_ISSUE",
-    targetSelector: "[data-tour='issue-detail']",
+    path: "FIRST_ISSUE",
+    targetSelector: "[data-tour='issue-detail-header']",
     audioFile: "/demo-audio/carwash-step-06.mp3",
     cue: "Assign it to the person responsible for handling it.",
     getTitle: () => "Every problem has a clear owner.",
@@ -662,13 +661,12 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
       "Assign the problem to the person responsible for handling it. Relay gives every issue a clear owner so managers can see what is being worked on and what still needs attention.",
   },
 
-  // Step 7: Issue detail — lifecycle (same page, different narration)
-  // Narration 7: "update status, add notes and photos, document the resolution"
-  // Truthful: issue detail page has status updates, comments, photo attachments — all implemented
+  // Step 7: Issue detail header — lifecycle
+  // Same FIRST_ISSUE page, different narration — targets header not comments
   {
     id: 7,
-    path: "SUBMITTED_ISSUE",
-    targetSelector: "[data-tour='issue-detail']",
+    path: "FIRST_ISSUE",
+    targetSelector: "[data-tour='issue-detail-header']",
     audioFile: "/demo-audio/carwash-step-07.mp3",
     cue: "Status, notes, and photos all stay attached to the same record.",
     getTitle: () => "One record, visible to everyone — no chasing updates.",

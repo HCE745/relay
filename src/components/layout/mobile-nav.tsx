@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { logout } from "@/lib/auth-actions"
@@ -120,6 +120,7 @@ interface MobileNavProps {
 export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, userName, orgName }: MobileNavProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const touchRef = useRef<{ startX: number; startY: number; edgeSwipe: boolean } | null>(null)
 
   // Close drawer on route change
@@ -189,6 +190,29 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
   const pageTitle = getPageTitle(pathname)
 
   function isActive(href: string) {
+    const qIdx = href.indexOf("?")
+    if (qIdx !== -1) {
+      const hrefPath = href.slice(0, qIdx)
+      if (pathname !== hrefPath) return false
+      const hrefParams = new URLSearchParams(href.slice(qIdx + 1))
+      for (const [k, v] of hrefParams) {
+        if (searchParams.get(k) !== v) return false
+      }
+      return true
+    }
+    if (isCarWash) {
+      const hasSpecificMatch = CARWASH_NAV_ITEMS.some(item => {
+        const iqIdx = item.href.indexOf("?")
+        if (iqIdx === -1 || item.href.slice(0, iqIdx) !== href) return false
+        if (pathname !== href) return false
+        const itemParams = new URLSearchParams(item.href.slice(iqIdx + 1))
+        for (const [k, v] of itemParams) {
+          if (searchParams.get(k) !== v) return false
+        }
+        return true
+      })
+      if (hasSpecificMatch) return false
+    }
     return pathname === href || (href !== "/dashboard" && pathname.startsWith(href + "/"))
   }
 

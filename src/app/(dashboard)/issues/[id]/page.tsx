@@ -145,7 +145,7 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
 
       <div className="p-6 max-w-5xl" data-tour="issue-detail">
         {/* Issue Header */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4" data-tour="issue-detail-header">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap mb-2">

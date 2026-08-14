@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import {
   LayoutDashboard,
@@ -124,6 +124,7 @@ export function Sidebar({
   trendDetectionEnabled,
 }: SidebarProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const allowedSet = new Set(allowedPageKeys)
   const isCarWash = industry === "Car Wash"
   const [recentItems, setRecentItems] = useState<RecentlyViewedItem[]>([])
@@ -163,7 +164,34 @@ export function Sidebar({
         return true
       })
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/")
+  const isActive = (href: string) => {
+    const qIdx = href.indexOf("?")
+    if (qIdx !== -1) {
+      // href has query params — must match both pathname and every param in the href
+      const hrefPath = href.slice(0, qIdx)
+      if (pathname !== hrefPath) return false
+      const hrefParams = new URLSearchParams(href.slice(qIdx + 1))
+      for (const [k, v] of hrefParams) {
+        if (searchParams.get(k) !== v) return false
+      }
+      return true
+    }
+    // Plain href — but don't activate if a more-specific Car Wash item with query params matches
+    if (isCarWash) {
+      const hasSpecificMatch = CARWASH_NAV_ITEMS.some(item => {
+        const iqIdx = item.href.indexOf("?")
+        if (iqIdx === -1 || item.href.slice(0, iqIdx) !== href) return false
+        if (pathname !== href) return false
+        const itemParams = new URLSearchParams(item.href.slice(iqIdx + 1))
+        for (const [k, v] of itemParams) {
+          if (searchParams.get(k) !== v) return false
+        }
+        return true
+      })
+      if (hasSpecificMatch) return false
+    }
+    return pathname === href || pathname.startsWith(href + "/")
+  }
 
   const navLink = (href: string, label: string, Icon: React.ElementType, extra?: React.ReactNode) => (
     <div key={href} className="relative">

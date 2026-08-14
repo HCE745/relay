@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { ChevronLeft, ChevronRight, X, ExternalLink, Check, Lock, Volume2, VolumeX, Play, Pause } from "lucide-react"
 import { useTour, TOTAL_TOUR_STEPS } from "./tour-context"
 import { TOUR_STEPS, ROLE_DEMOS, INDUSTRY_DEMOS, PACKAGE_DEMOS, ADDITIONAL_FEATURES, getActiveTourSteps, getNumTourSteps } from "./tour-steps"
@@ -364,11 +364,12 @@ export function TourOverlay() {
   const tour = useTour()
   const {
     isActive, currentStep, nextStep, prevStep, exitTour, skipTour, industry,
-    submittedIssueId, firstAssetId,
-    setSubmittedIssueId, setFirstAssetId,
+    submittedIssueId, firstAssetId, firstIssueId,
+    setSubmittedIssueId, setFirstAssetId, setFirstIssueId,
   } = tour
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const [isMobile, setIsMobile] = useState(false)
   const [isNavigating, setIsNavigating] = useState(false)
@@ -407,7 +408,21 @@ export function TourOverlay() {
   const resolvedPath = !step ? null
     : step.path === "SUBMITTED_ISSUE" ? (submittedIssueId ? `/issues/${submittedIssueId}` : null)
     : step.path === "FIRST_ASSET"     ? (firstAssetId    ? `/assets/${firstAssetId}`  : null)
+    : step.path === "FIRST_ISSUE"     ? (firstIssueId    ? `/issues/${firstIssueId}`   : null)
     : step.path
+
+  // Check if current location matches a resolved path (handles query params)
+  function pathMatches(resolved: string): boolean {
+    const qIdx = resolved.indexOf("?")
+    if (qIdx === -1) return pathname === resolved
+    const targetPath = resolved.slice(0, qIdx)
+    if (pathname !== targetPath) return false
+    const targetParams = new URLSearchParams(resolved.slice(qIdx + 1))
+    for (const [k, v] of targetParams) {
+      if (searchParams.get(k) !== v) return false
+    }
+    return true
+  }
 
   const stepKey = `${currentStep}-${resolvedPath ?? "cur"}`
 
@@ -460,17 +475,17 @@ export function TourOverlay() {
   useEffect(() => {
     if (!isActive || !step) return
     if (!resolvedPath) { setIsNavigating(false); return }
-    if (pathname === resolvedPath) { setIsNavigating(false); return }
+    if (pathMatches(resolvedPath)) { setIsNavigating(false); return }
     setIsNavigating(true)
     router.push(resolvedPath)
   }, [currentStep, resolvedPath]) // eslint-disable-line
 
   // Clear navigating once path matches
   useEffect(() => {
-    if (!resolvedPath || pathname === resolvedPath) {
+    if (!resolvedPath || pathMatches(resolvedPath)) {
       setIsNavigating(false)
     }
-  }, [pathname, resolvedPath])
+  }, [pathname, searchParams, resolvedPath]) // eslint-disable-line
 
   // Scroll to top whenever a step loads on the same page (prevents the issue detail
   // page staying scrolled to the comments section across steps 5/6).
@@ -492,6 +507,18 @@ export function TourOverlay() {
       })
       .catch(() => {})
   }, [isActive, firstAssetId]) // eslint-disable-line
+
+  // Fetch first issue ID at tour start — used for FIRST_ISSUE path resolution (Car Wash steps 6-7)
+  useEffect(() => {
+    if (!isActive || firstIssueId) return
+    fetch("/api/issues")
+      .then(r => r.json() as Promise<Array<{ id: string }>>)
+      .then(data => {
+        const issues = Array.isArray(data) ? data : []
+        if (issues[0]?.id) setFirstIssueId(issues[0].id)
+      })
+      .catch(() => {})
+  }, [isActive, firstIssueId]) // eslint-disable-line
 
   // Auto-fill form on form-fill step
   useEffect(() => {
@@ -888,11 +915,11 @@ export function TourOverlay() {
             width: rect.width + 16,
             height: rect.height + 16,
             borderRadius: 12,
-            boxShadow: "0 0 0 9999px rgba(0,0,0,0.72), 0 0 0 2px rgba(59,130,246,0.7)",
+            boxShadow: "0 0 0 9999px rgba(0,0,0,0.45), 0 0 0 2px rgba(59,130,246,0.7)",
           }}
         />
       ) : (
-        <div className="fixed inset-0 z-[9000] bg-black/60 pointer-events-none" />
+        <div className="fixed inset-0 z-[9000] bg-black/40 pointer-events-none" />
       )}
 
       <div className="fixed inset-0 z-[8999]" onClick={exitTour} title="Exit tour" />

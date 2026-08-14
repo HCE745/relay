@@ -36,16 +36,33 @@ function cardStyle(rect: Rect): React.CSSProperties {
   const vh = window.innerHeight
   const est = 380
 
+  const centeredTop  = Math.max(pad, Math.min(rect.top + rect.height / 2 - est / 2, vh - est - pad))
+  const centeredLeft = Math.max(pad, Math.min(rect.left + rect.width / 2 - cardW / 2, vw - cardW - pad))
+
+  // Prefer sides when there's room
   if (rect.left + rect.width + pad + cardW <= vw) {
-    return { position: "fixed", top: Math.max(pad, Math.min(rect.top + rect.height / 2 - est / 2, vh - est - pad)), left: rect.left + rect.width + pad, width: cardW }
+    return { position: "fixed", top: centeredTop, left: rect.left + rect.width + pad, width: cardW }
   }
   if (rect.left - pad - cardW >= 0) {
-    return { position: "fixed", top: Math.max(pad, Math.min(rect.top + rect.height / 2 - est / 2, vh - est - pad)), left: rect.left - pad - cardW, width: cardW }
+    return { position: "fixed", top: centeredTop, left: rect.left - pad - cardW, width: cardW }
   }
-  if (rect.top + rect.height + pad + est <= vh) {
-    return { position: "fixed", top: rect.top + rect.height + pad, left: Math.max(pad, Math.min(rect.left + rect.width / 2 - cardW / 2, vw - cardW - pad)), width: cardW }
+
+  // Element spans most of the width — use upper/lower half logic so the card
+  // never overlaps the highlighted element (which would hide the spotlight cutout).
+  const elementMidY = rect.top + rect.height / 2
+  if (elementMidY <= vh / 2) {
+    // Upper half: prefer below, fall back to pinned near-bottom (never top — that covers the element)
+    if (rect.top + rect.height + pad + est <= vh) {
+      return { position: "fixed", top: rect.top + rect.height + pad, left: centeredLeft, width: cardW }
+    }
+    return { position: "fixed", top: vh - est - pad, left: centeredLeft, width: cardW }
+  } else {
+    // Lower half: prefer above, fall back to pinned near-top
+    if (rect.top - pad - est >= pad) {
+      return { position: "fixed", top: rect.top - pad - est, left: centeredLeft, width: cardW }
+    }
+    return { position: "fixed", top: pad, left: centeredLeft, width: cardW }
   }
-  return { position: "fixed", top: Math.max(pad, rect.top - pad - est), left: Math.max(pad, Math.min(rect.left + rect.width / 2 - cardW / 2, vw - cardW - pad)), width: cardW }
 }
 
 function timeRemainingLabel(step: number, total: number): string | null {

@@ -22,13 +22,6 @@ function waitForElement(selector: string, timeout = 8000): Promise<Element | nul
   })
 }
 
-function scrollIntoViewIfNeeded(el: Element) {
-  const rect = el.getBoundingClientRect()
-  if (rect.top < 0 || rect.bottom > window.innerHeight) {
-    el.scrollIntoView({ behavior: "smooth", block: "nearest" })
-  }
-}
-
 interface Rect { top: number; left: number; width: number; height: number }
 
 function getRect(el: Element): Rect {
@@ -68,18 +61,26 @@ function useSpotlightRect(selector: string | null, stepKey: string) {
   const [rect, setRect] = useState<Rect | null>(null)
 
   useEffect(() => {
-    if (!selector) { setRect(null); return }
+    // Clear any previous spotlight immediately so the old position doesn't linger
+    setRect(null)
+    if (!selector) return
     let cancelled = false
 
     waitForElement(selector, 8000).then(el => {
-      if (cancelled || !el) { setRect(null); return }
-      scrollIntoViewIfNeeded(el)
-      setRect(getRect(el))
+      if (cancelled || !el) return
+      // Scroll element to top of viewport — works with the dashboard's inner <main>
+      // scrollable container, not just window. Wait 500ms for animation to land.
+      el.scrollIntoView({ behavior: "smooth", block: "start" })
+      setTimeout(() => {
+        if (cancelled) return
+        setRect(getRect(el))
+      }, 500)
     })
 
     return () => { cancelled = true }
   }, [selector, stepKey])
 
+  // Keep spotlight rect in sync as the user scrolls or resizes after it appears
   useEffect(() => {
     if (!selector) return
     function update() {
@@ -487,13 +488,18 @@ export function TourOverlay() {
     }
   }, [pathname, searchParams, resolvedPath]) // eslint-disable-line
 
-  // Scroll to top whenever a step loads on the same page (prevents the issue detail
-  // page staying scrolled to the comments section across steps 5/6).
+  // Scroll to top on each step. The dashboard layout scrolls a <main> element,
+  // not the window, so window.scrollTo does nothing — target <main> directly.
   useEffect(() => {
     if (!isActive || isNavigating) return
-    window.scrollTo({ top: 0, behavior: "instant" })
-    document.documentElement.scrollTop = 0
-    document.body.scrollTop = 0
+    const main = document.querySelector("main")
+    if (main) {
+      main.scrollTop = 0
+    } else {
+      window.scrollTo({ top: 0, behavior: "instant" })
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+    }
   }, [currentStep, isActive, isNavigating])
 
   // Fetch first asset ID as soon as tour starts (background, before step 6)

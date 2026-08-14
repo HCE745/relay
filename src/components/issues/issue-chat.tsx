@@ -214,7 +214,7 @@ export function IssueChat({ issueId, currentUserId, currentUserName }: Props) {
   const [showEmoji,    setShowEmoji]    = useState(false)
   const [replyTo,      setReplyTo]      = useState<Message | null>(null)
   const lastMsgTime = useRef<string | null>(null)
-  const bottomRef   = useRef<HTMLDivElement>(null)
+  const msgsRef     = useRef<HTMLDivElement>(null)
   const inputRef    = useRef<HTMLTextAreaElement>(null)
   const fileRef     = useRef<HTMLInputElement>(null)
   const typingRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -255,7 +255,11 @@ export function IssueChat({ issueId, currentUserId, currentUserName }: Props) {
     return () => clearInterval(iv)
   }, [convId, fetchMessages])
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }) }, [messages, typingNames])
+  // Scroll within the chat's own container only — never use scrollIntoView which
+  // propagates up through <main> and scrolls the entire issue detail page down.
+  useEffect(() => {
+    if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight
+  }, [messages, typingNames])
 
   async function handleSend(e?: React.FormEvent) {
     e?.preventDefault()
@@ -273,7 +277,7 @@ export function IssueChat({ issueId, currentUserId, currentUserName }: Props) {
       if (j.message) {
         setMessages(prev => [...prev, j.message!])
         lastMsgTime.current = j.message.createdAt
-        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50)
+        setTimeout(() => { if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight }, 50)
       }
     } catch { /* ignore */ }
     finally { setSending(false); inputRef.current?.focus() }
@@ -353,7 +357,7 @@ export function IssueChat({ issueId, currentUserId, currentUserName }: Props) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+      <div ref={msgsRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <p className="text-sm text-gray-400">Internal team discussion for this issue</p>
@@ -389,7 +393,6 @@ export function IssueChat({ issueId, currentUserId, currentUserName }: Props) {
             </span>
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
       {/* Composer */}

@@ -6,7 +6,7 @@ export function getPriceId(key: string): string {
   const map: Record<string, string | undefined> = {
     // Base plans
     wash_essentials:           process.env.STRIPE_PRICE_WASH_ESSENTIALS,
-    we_additional_location:    process.env.STRIPE_PRICE_WE_ADDITIONAL_LOCATION,
+    we_additional_location:    process.env.STRIPE_PRICE_WASH_ESSENTIALS_LOCATION,
     essentials:                process.env.STRIPE_PRICE_ESSENTIALS,
     professional:              process.env.STRIPE_PRICE_PROFESSIONAL,
     professional_plus:         process.env.STRIPE_PRICE_PROFESSIONAL_PLUS,

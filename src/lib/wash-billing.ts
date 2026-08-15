@@ -19,7 +19,7 @@ export async function syncWashEssentialsLocationBilling(
 ): Promise<string | null> {
   if (!stripe) return "Payment service not configured."
 
-  const priceId = process.env.STRIPE_PRICE_WE_ADDITIONAL_LOCATION
+  const priceId = process.env.STRIPE_PRICE_WASH_ESSENTIALS_LOCATION
   if (!priceId) return "Additional-location Stripe price is not configured."
 
   try {

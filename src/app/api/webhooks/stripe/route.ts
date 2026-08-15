@@ -66,9 +66,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     select: { lifecycleStatus: true, plan: true },
   })
 
-  // Derive productLine from the plan that checkout-intent persisted before redirecting
-  // to Stripe. This is the authoritative source — the client never sends productLine.
-  const productLine = org?.plan === "wash_essentials" ? "WASH_ESSENTIALS" : "RELAY_STANDARD"
+  // Derive productLine: prefer session metadata (set by checkout-intent), fall back to DB plan.
+  const productLine =
+    session.metadata?.productLine === "WASH_ESSENTIALS" || org?.plan === "wash_essentials"
+      ? "WASH_ESSENTIALS"
+      : "RELAY_STANDARD"
 
   await prisma.organization.update({
     where: { id: orgId },
@@ -181,6 +183,32 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   }
   const newStatus = statusMap[subscription.status]
   if (!newStatus) return
+
+  // For Wash Essentials subscriptions: sync locationLimit from the per-location add-on line item.
+  // subscription.metadata is set by checkout-intent (subscription_data.metadata).
+  const weLocationPriceId = process.env.STRIPE_PRICE_WASH_ESSENTIALS_LOCATION
+  const isWeSubscription  = subscription.metadata?.productLine === "WASH_ESSENTIALS"
+
+  if (isWeSubscription && weLocationPriceId) {
+    // subscription.items.data[].price is expanded in webhook payloads
+    const locationItem = subscription.items.data.find(
+      item => (item.price as Stripe.Price).id === weLocationPriceId,
+    )
+    const additionalCount = locationItem?.quantity ?? 0
+    const newLocationLimit = additionalCount + 1  // 1 base location is always included
+
+    const org = await prisma.organization.findFirst({
+      where:  { stripeCustomerId: customerId },
+      select: { id: true },
+    })
+    if (org) {
+      await prisma.organization.update({
+        where: { id: org.id },
+        data:  { subscriptionStatus: newStatus, locationLimit: newLocationLimit },
+      })
+      return
+    }
+  }
 
   await prisma.organization.updateMany({
     where: { stripeCustomerId: customerId },

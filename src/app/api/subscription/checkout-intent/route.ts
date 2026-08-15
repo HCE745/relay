@@ -117,13 +117,33 @@ export async function POST(req: NextRequest) {
       intelligenceSuite,
     })
 
+    const isWashEssentials = body.plan === "wash_essentials"
+
     // Create Stripe Checkout Session
     const checkoutSession = await stripe.checkout.sessions.create({
       mode:     "subscription",
       customer: customerId,
       line_items: lineItems,
       ...(couponId ? { discounts: [{ coupon: couponId }] } : { allow_promotion_codes: true }),
-      metadata:    { organizationId: org.id },
+      // Session-level metadata for checkout.session.completed webhook
+      metadata: {
+        organizationId: org.id,
+        ...(isWashEssentials ? {
+          productLine:   "WASH_ESSENTIALS",
+          industry:      "CAR_WASH",
+          locationCount: String(body.locationCount),
+        } : {}),
+      },
+      // Subscription-level metadata for customer.subscription.updated webhook
+      ...(isWashEssentials ? {
+        subscription_data: {
+          metadata: {
+            organizationId: org.id,
+            productLine:    "WASH_ESSENTIALS",
+            locationCount:  String(body.locationCount),
+          },
+        },
+      } : {}),
       success_url: `${APP_URL}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${APP_URL}/subscribe`,
     })

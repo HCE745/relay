@@ -10,7 +10,9 @@ import {
 } from "lucide-react"
 import {
   PLANS, INTELLIGENCE_MODULES, INTELLIGENCE_SUITE_PRICE,
-  calculatePrice, isProfessional, isReadOnly, isTrial, type PlanKey, type ModuleId,
+  calculatePrice, isProfessional, isReadOnly, isTrial, isWashEssentials,
+  WASH_ESSENTIALS_MAX_LOCATIONS,
+  type PlanKey, type ModuleId,
 } from "@/lib/pricing"
 import { format, formatDistanceToNowStrict } from "date-fns"
 
@@ -56,6 +58,7 @@ export default async function SubscriptionSettingsPage() {
     select: {
       name:              true,
       plan:              true,
+      productLine:       true,
       subscriptionStatus: true,
       trialStartDate:    true,
       trialEndsAt:       true,
@@ -94,13 +97,22 @@ export default async function SubscriptionSettingsPage() {
   const trialEnd    = org.trialEndsAt ? new Date(org.trialEndsAt) : null
   const daysLeft    = trialEnd ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : null
 
+  const isWE = isWashEssentials(org.productLine)
+
   // Usage vs subscription coverage
   const actualUsers     = org._count.users
   const actualLocations = org._count.locations
   const coveredUsers    = org.employeeLimit ?? (plan ? PLANS[plan].includedEmployees : 0)
   const coveredLocations = org.locationLimit ?? (plan ? PLANS[plan].includedLocations : 0)
-  const usersOverLimit  = coveredUsers > 0 && actualUsers > coveredUsers
-  const locsOverLimit   = coveredLocations > 0 && actualLocations > coveredLocations
+  const usersOverLimit  = !isWE && coveredUsers > 0 && actualUsers > coveredUsers
+  const locsOverLimit   = !isWE && coveredLocations > 0 && actualLocations > coveredLocations
+
+  // Wash Essentials live pricing from actual location count (authoritative at display time)
+  const weAdditional = isWE ? Math.max(0, actualLocations - 1) : 0
+  const weBase       = 40
+  const weTotal      = isWE ? weBase + weAdditional * 10 : 0
+  const weDiscount   = isWE && org.discountPercent ? Math.round(weTotal * (org.discountPercent / 100)) : 0
+  const weFinal      = weTotal - weDiscount
 
   // Live pricing for over-limit warning
   const overLimitPricing = (usersOverLimit || locsOverLimit) && plan
@@ -135,12 +147,48 @@ export default async function SubscriptionSettingsPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Stat label="Plan"   value={planLabel} />
-            <Stat label="Status" value={STATUS_LABEL[status] ?? status} />
-            <Stat label="Employees" value={`${org.employeeLimit ?? "—"} covered`} />
-            <Stat label="Locations" value={`${org.locationLimit ?? "—"} covered`} />
-          </div>
+          {isWE ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Stat label="Plan"   value={planLabel} />
+                <Stat label="Status" value={STATUS_LABEL[status] ?? status} />
+              </div>
+              {/* Location usage progress for Wash Essentials */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    Locations
+                  </p>
+                  <p className="text-xs font-semibold text-gray-700">
+                    {actualLocations} / {WASH_ESSENTIALS_MAX_LOCATIONS}
+                  </p>
+                </div>
+                <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      actualLocations >= WASH_ESSENTIALS_MAX_LOCATIONS
+                        ? "bg-orange-400"
+                        : "bg-blue-500"
+                    }`}
+                    style={{ width: `${Math.round((actualLocations / WASH_ESSENTIALS_MAX_LOCATIONS) * 100)}%` }}
+                  />
+                </div>
+                {actualLocations >= WASH_ESSENTIALS_MAX_LOCATIONS && (
+                  <p className="text-xs text-orange-600 mt-1 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    At the Wash Essentials limit. Upgrade to add more locations.
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <Stat label="Plan"   value={planLabel} />
+              <Stat label="Status" value={STATUS_LABEL[status] ?? status} />
+              <Stat label="Employees" value={`${org.employeeLimit ?? "—"} covered`} />
+              <Stat label="Locations" value={`${org.locationLimit ?? "—"} covered`} />
+            </div>
+          )}
 
           {/* Trial info */}
           {trialing && trialEnd && (
@@ -192,7 +240,42 @@ export default async function SubscriptionSettingsPage() {
         </div>
 
         {/* Pricing breakdown */}
-        {org.monthlyTotalBeforeDiscount != null && (
+        {isWE ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-blue-600" />
+              Monthly pricing
+            </h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Wash Essentials base (1 location included)</span>
+                <span className="text-gray-900">${weBase}/mo</span>
+              </div>
+              {weAdditional > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">+{weAdditional} additional location{weAdditional !== 1 ? "s" : ""}</span>
+                  <span className="text-gray-900">+${weAdditional * 10}/mo</span>
+                </div>
+              )}
+              {weDiscount > 0 && (
+                <div className="flex justify-between text-green-700">
+                  <span>
+                    {org.discountLabel ?? "Discount"} ({org.discountPercent}% off
+                    {org.discountExpiresAt && `, until ${format(new Date(org.discountExpiresAt), "MMM yyyy")}`})
+                  </span>
+                  <span>−${weDiscount}/mo</span>
+                </div>
+              )}
+              <div className="border-t border-gray-100 pt-2 flex justify-between font-bold">
+                <span className="text-gray-900">Monthly total</span>
+                <span className="text-gray-900">${weFinal}/mo</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">
+              Billing updates automatically when you add or remove locations.
+            </p>
+          </div>
+        ) : org.monthlyTotalBeforeDiscount != null ? (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-blue-600" />
@@ -234,10 +317,10 @@ export default async function SubscriptionSettingsPage() {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
 
-        {/* Modules */}
-        {professional && (
+        {/* Modules — not available for Wash Essentials */}
+        {!isWE && professional && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Zap className="w-4 h-4 text-indigo-600" />
@@ -282,23 +365,38 @@ export default async function SubscriptionSettingsPage() {
 
         {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/subscribe"
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-colors"
-          >
-            {org.subscriptionStatus === "active" ? "Change Plan" : "Subscribe Now"}
-            <ChevronRight className="w-4 h-4" />
-          </Link>
-          {!professional && (
-            <Link
-              href="/subscribe?highlight=modules"
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 hover:border-blue-400 text-gray-700 font-semibold rounded-xl text-sm transition-colors"
-            >
-              <Zap className="w-4 h-4 text-indigo-600" />
-              Add Modules
-            </Link>
+          {isWE ? (
+            <>
+              <Link
+                href="/settings/subscription/upgrade"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-colors"
+              >
+                Upgrade to Full Relay
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+              <ManageBillingButton hasStripeCustomer={!!org.stripeCustomerId} />
+            </>
+          ) : (
+            <>
+              <Link
+                href="/subscribe"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-colors"
+              >
+                {org.subscriptionStatus === "active" ? "Change Plan" : "Subscribe Now"}
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+              {!professional && (
+                <Link
+                  href="/subscribe?highlight=modules"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 hover:border-blue-400 text-gray-700 font-semibold rounded-xl text-sm transition-colors"
+                >
+                  <Zap className="w-4 h-4 text-indigo-600" />
+                  Add Modules
+                </Link>
+              )}
+              <ManageBillingButton hasStripeCustomer={!!org.stripeCustomerId} />
+            </>
           )}
-          <ManageBillingButton hasStripeCustomer={!!org.stripeCustomerId} />
         </div>
 
         {/* Coverage info */}
@@ -307,22 +405,26 @@ export default async function SubscriptionSettingsPage() {
             <Users className="w-4 h-4 text-blue-600" />
             Current usage
           </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-              <Users className="w-4 h-4 text-gray-400" />
-              <div>
-                <p className="text-xs text-gray-500">Users</p>
-                <p className={`text-sm font-semibold ${usersOverLimit ? "text-amber-600" : "text-gray-900"}`}>
-                  {actualUsers} {org.employeeLimit ? `/ ${org.employeeLimit}` : ""}
-                </p>
+          <div className={`grid gap-4 ${isWE ? "grid-cols-1" : "grid-cols-2"}`}>
+            {!isWE && (
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+                <Users className="w-4 h-4 text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-500">Users</p>
+                  <p className={`text-sm font-semibold ${usersOverLimit ? "text-amber-600" : "text-gray-900"}`}>
+                    {actualUsers} {org.employeeLimit ? `/ ${org.employeeLimit}` : ""}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
             <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
               <MapPin className="w-4 h-4 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-500">Locations</p>
                 <p className={`text-sm font-semibold ${locsOverLimit ? "text-amber-600" : "text-gray-900"}`}>
-                  {actualLocations} {org.locationLimit ? `/ ${org.locationLimit}` : ""}
+                  {isWE
+                    ? `${actualLocations} / ${WASH_ESSENTIALS_MAX_LOCATIONS}`
+                    : `${actualLocations}${org.locationLimit ? ` / ${org.locationLimit}` : ""}`}
                 </p>
               </div>
             </div>

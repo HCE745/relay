@@ -23,6 +23,7 @@ export async function POST(
 
   const body = await req.json() as {
     plan?: string
+    productLine?: string
     employeeCount?: number
     locationCount?: number
     intelligenceModules?: string[]
@@ -177,7 +178,10 @@ export async function POST(
 
   // Build DB update
   const dbData: Record<string, unknown> = {}
-  if (body.plan !== undefined) dbData.plan = body.plan
+  if (body.plan !== undefined) {
+    dbData.plan = body.plan
+    dbData.productLine = body.productLine ?? (body.plan === "wash_essentials" ? "WASH_ESSENTIALS" : "RELAY_STANDARD")
+  }
   if (body.billingFrequency !== undefined) dbData.billingFrequency = body.billingFrequency
   if ("currentPrice" in body) dbData.currentPrice = body.currentPrice ?? null
   if ("priceLockedUntil" in body) {

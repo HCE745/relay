@@ -14,6 +14,7 @@ const PLAN_OPTIONS = [
   { value: "professional",      label: "Professional ($299/mo)" },
   { value: "professional_plus", label: "Professional Plus ($999/mo)" },
   { value: "enterprise",        label: "Enterprise (custom)" },
+  { value: "wash_essentials",   label: "Wash Essentials ($40/mo)" },
 ]
 
 const STATUS_OPTIONS = [
@@ -34,7 +35,7 @@ const INTELLIGENCE_MODULES = [
   { id: "purchase_intelligence" as ModuleId, label: "Purchase Intelligence" },
 ]
 
-const PLAN_KEYS = new Set(["essentials", "professional", "professional_plus"])
+const PLAN_KEYS = new Set(["essentials", "professional", "professional_plus", "wash_essentials"])
 
 function bandLabel(plan: string, count: number): string {
   if (!PLAN_KEYS.has(plan)) return String(count)
@@ -70,6 +71,8 @@ interface PricingData {
   discountLabel:     string | null
   // Checkout intent
   checkoutIntentStatus: string | null
+  // Product line
+  productLine: string | null
 }
 
 interface ChangeItem { label: string; from: string; to: string }
@@ -468,16 +471,12 @@ export function OrgPricing({ pricing }: { pricing: PricingData }) {
               <p className="text-white text-sm capitalize">{pricing.subscriptionStatus}</p>
             </div>
             <div>
-              <p className="text-gray-500 text-[11px] font-medium uppercase tracking-wide mb-1">Billing</p>
-              <p className="text-white text-sm capitalize">{pricing.billingFrequency}</p>
+              <p className="text-gray-500 text-[11px] font-medium uppercase tracking-wide mb-1">Product Line</p>
+              <p className="text-white text-sm">{pricing.productLine ?? <span className="text-gray-500">—</span>}</p>
             </div>
             <div>
-              <p className="text-gray-500 text-[11px] font-medium uppercase tracking-wide mb-1">Custom Price</p>
-              <p className="text-white text-sm">
-                {pricing.currentPrice != null
-                  ? `$${pricing.currentPrice.toLocaleString()} / ${pricing.billingFrequency === "annual" ? "yr" : "mo"}`
-                  : <span className="text-gray-500">Standard</span>}
-              </p>
+              <p className="text-gray-500 text-[11px] font-medium uppercase tracking-wide mb-1">Billing</p>
+              <p className="text-white text-sm capitalize">{pricing.billingFrequency}</p>
             </div>
           </div>
 

@@ -40,6 +40,18 @@ const PUBLIC_PATHS = [
 // Authenticated but bypass onboarding/billing guards
 const ONBOARDING_PATHS = ["/onboarding",  "/api/onboarding"]
 const BILLING_PATHS    = ["/billing",     "/api/billing"]
+
+// Paths not included in the Wash Essentials product line
+const WASH_ESSENTIALS_BLOCKED = [
+  "/departments",
+  "/sops",
+  "/purchase-requests",
+  "/vendors",
+  "/api/departments",
+  "/api/sops",
+  "/api/purchase-requests",
+  "/api/vendors",
+]
 // Super admin API routes guard themselves; middleware just lets them through
 const SA_API_PATHS     = ["/api/super-admin"]
 
@@ -170,6 +182,14 @@ export async function proxy(request: NextRequest) {
 
   if (trialExpired) {
     return NextResponse.redirect(new URL("/billing", request.url))
+  }
+
+  // ── Wash Essentials path guard ────────────────────────────────────────────
+  if (
+    session.productLine === "WASH_ESSENTIALS" &&
+    WASH_ESSENTIALS_BLOCKED.some((p) => pathname.startsWith(p))
+  ) {
+    return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
   return applyVideoMode(NextResponse.next(), vmParam)

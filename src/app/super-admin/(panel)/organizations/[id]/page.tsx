@@ -180,6 +180,8 @@ export default async function OrgDetailPage({
     discountLabel:     org.discountLabel     ?? null,
     // Checkout intent
     checkoutIntentStatus: org.checkoutIntentStatus ?? null,
+    // Product line
+    productLine: org.productLine ?? null,
   }
 
   const tabLink = (t: string) =>

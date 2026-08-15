@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import {
   Check, ChevronRight, AlertTriangle, Zap, Building2,
-  Users, MapPin, Loader2, Star, Lock, Phone,
+  Users, MapPin, Loader2, Star, Lock, Phone, Droplets,
 } from "lucide-react"
 import { RelayWordmark } from "@/components/logo"
 import {
@@ -197,6 +197,7 @@ function PriceRow({ label, amount, positive }: { label: string; amount: number; 
 
 export function SubscriptionSelector({
   orgName,
+  isCarWash,
   initialPlan,
   initialEmployeeCount,
   initialLocationCount,
@@ -208,6 +209,7 @@ export function SubscriptionSelector({
   highlightSection,
 }: {
   orgName:              string
+  isCarWash:            boolean
   initialPlan:          PlanKey
   initialEmployeeCount: number
   initialLocationCount: number
@@ -229,6 +231,38 @@ export function SubscriptionSelector({
   const [suitePurchased, setSuitePurchased] = useState(initialSuite)
   const [saving, setSaving] = useState(false)
   const [error,  setError]  = useState("")
+
+  // ── Wash Essentials independent state ────────────────────────────────────────
+  const washInitialCount = Math.min(7, Math.max(1, initialLocationCount))
+  const [washLocationCount, setWashLocationCount] = useState(washInitialCount)
+  const [washSaving, setWashSaving] = useState(false)
+  const [washError,  setWashError]  = useState("")
+
+  const washAdditional     = Math.max(0, washLocationCount - 1)
+  const washBase           = 40
+  const washTotal          = washBase + washAdditional * 10
+  const washDiscountAmount = discountPercent ? Math.round(washTotal * (discountPercent / 100)) : 0
+  const washFinal          = washTotal - washDiscountAmount
+
+  async function handleWashCheckout() {
+    setWashSaving(true)
+    setWashError("")
+    try {
+      const res = await fetch("/api/subscription/checkout-intent", {
+        method:  "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ plan: "wash_essentials", locationCount: washLocationCount }),
+      })
+      const j = await res.json().catch(() => ({})) as { checkoutUrl?: string; error?: string }
+      if (!res.ok) { setWashError(j.error ?? "Failed to start checkout. Please try again."); return }
+      if (j.checkoutUrl) { window.location.href = j.checkoutUrl; return }
+      setWashError("Unexpected response from server. Please try again.")
+    } catch {
+      setWashError("Network error. Please try again.")
+    } finally {
+      setWashSaving(false)
+    }
+  }
 
   const isEnterprise = tier === "enterprise"
   const isPlan       = !isEnterprise
@@ -328,6 +362,114 @@ export function SubscriptionSelector({
         <h1 className="text-3xl font-bold text-gray-900">Choose your Relay plan</h1>
         <p className="text-gray-500 mt-1">{orgName}</p>
       </div>
+
+      {/* ── Wash Essentials ──────────────────────────────────────────────────── */}
+      {isCarWash && (
+        <div className="bg-blue-50 border-2 border-blue-400 rounded-2xl p-6 mb-8">
+          <div className="flex items-start gap-3 mb-5">
+            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
+              <Droplets className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="font-bold text-gray-900 text-lg">Wash Essentials</h2>
+                <span className="text-xs font-bold uppercase tracking-wide px-2 py-0.5 bg-blue-600 text-white rounded-full">
+                  Car Wash
+                </span>
+              </div>
+              <p className="text-sm text-gray-500 mt-0.5">
+                Purpose-built for car wash operations · 1–7 locations
+              </p>
+            </div>
+          </div>
+
+          {/* Location stepper */}
+          <div className="bg-white rounded-xl border border-blue-200 p-4 mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin className="w-4 h-4 text-blue-600" />
+              <span className="font-semibold text-gray-900 text-sm">Locations</span>
+              <span className="text-xs text-gray-500">1 included · +$10/mo each · max 7</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setWashLocationCount(n => Math.max(1, n - 1))}
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                −
+              </button>
+              <span className="text-xl font-bold text-gray-900 w-8 text-center">{washLocationCount}</span>
+              <button
+                type="button"
+                onClick={() => setWashLocationCount(n => Math.min(7, n + 1))}
+                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                +
+              </button>
+              <span className="text-sm text-gray-500">
+                location{washLocationCount !== 1 ? "s" : ""}
+                {washAdditional > 0 && (
+                  <span className="text-gray-400"> · {washAdditional} additional @ +$10/mo each</span>
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* Price breakdown */}
+          <div className="bg-white rounded-xl border border-blue-200 p-4 mb-4 space-y-1">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Wash Essentials base</span>
+              <span className="text-gray-900">${washBase}/mo</span>
+            </div>
+            {washAdditional > 0 && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">+{washAdditional} additional location{washAdditional !== 1 ? "s" : ""}</span>
+                <span className="text-gray-900">+${washAdditional * 10}/mo</span>
+              </div>
+            )}
+            {washDiscountAmount > 0 && (
+              <div className="flex items-center justify-between text-sm text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">
+                <div>
+                  <span className="font-medium">{discountLabel ?? "Discount"}</span>
+                  <span className="text-xs ml-2 text-green-600">({discountPercent}% off)</span>
+                </div>
+                <span className="font-semibold">−${washDiscountAmount}/mo</span>
+              </div>
+            )}
+            <div className="border-t border-gray-100 pt-2 flex items-center justify-between">
+              <span className="font-bold text-gray-900">Monthly total</span>
+              <span className="text-2xl font-bold text-gray-900">${washFinal}/mo</span>
+            </div>
+          </div>
+
+          {washError && <p className="text-red-600 text-sm mb-3">{washError}</p>}
+
+          <button
+            type="button"
+            onClick={handleWashCheckout}
+            disabled={washSaving}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-xl transition-colors"
+          >
+            {washSaving
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
+              : <>Subscribe to Wash Essentials <ChevronRight className="w-4 h-4" /></>
+            }
+          </button>
+          <p className="text-xs text-gray-400 text-center mt-2">
+            Secured by Stripe · upgrade to Full Relay anytime
+          </p>
+        </div>
+      )}
+
+      {isCarWash && (
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide whitespace-nowrap">
+            or choose Full Relay — Wash Edition
+          </span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+      )}
 
       {/* Plan tier cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">

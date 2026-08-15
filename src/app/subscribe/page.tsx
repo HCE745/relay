@@ -20,6 +20,7 @@ export default async function SubscribePage({
     select: {
       name:              true,
       plan:              true,
+      industry:          true,
       employeeLimit:     true,
       locationLimit:     true,
       companySize:       true,
@@ -44,6 +45,7 @@ export default async function SubscribePage({
     <div className="min-h-screen bg-gray-50">
       <SubscriptionSelector
         orgName={org.name}
+        isCarWash={org.industry === "Car Wash"}
         initialPlan={(["essentials", "professional", "professional_plus"] as const).includes(org.plan as "essentials" | "professional" | "professional_plus") ? org.plan as "essentials" | "professional" | "professional_plus" : "essentials"}
         initialEmployeeCount={employeeCount}
         initialLocationCount={locationCount}

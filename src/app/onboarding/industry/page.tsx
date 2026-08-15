@@ -74,8 +74,13 @@ export default function OnboardingIndustryPage() {
 
   function proceed() {
     if (!selected) return
-    // Pass the selected industry as a query param; the wizard reads it to pre-fill Step 1.
-    router.push(`/onboarding?industry=${encodeURIComponent(selected)}`)
+    if (selected === "Car Wash") {
+      // Car Wash users choose between Wash Essentials and Full Relay before the wizard.
+      router.push(`/onboarding/packages?industry=${encodeURIComponent(selected)}`)
+    } else {
+      // Pass the selected industry as a query param; the wizard reads it to pre-fill Step 1.
+      router.push(`/onboarding?industry=${encodeURIComponent(selected)}`)
+    }
   }
 
   return (

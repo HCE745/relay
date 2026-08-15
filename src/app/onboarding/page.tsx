@@ -7,13 +7,13 @@ export const dynamic = "force-dynamic"
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ industry?: string }>
+  searchParams: Promise<{ industry?: string; plan?: string }>
 }) {
   const session = await getSession()
   if (!session) redirect("/login")
   if (session.onboardingCompleted !== false) redirect("/dashboard")
 
-  const { industry } = await searchParams
+  const { industry, plan } = await searchParams
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -21,6 +21,7 @@ export default async function OnboardingPage({
         orgName={session.name}
         userId={session.userId}
         initialIndustry={industry}
+        initialPlan={plan}
       />
     </div>
   )

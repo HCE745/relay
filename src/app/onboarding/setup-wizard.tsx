@@ -84,6 +84,9 @@ interface WizardData {
   industryOther: string
   companySize: string
   numberOfLocations: string
+  // Non-empty only when user selected Wash Essentials on /onboarding/packages.
+  // Sent to api/onboarding to scope the trial productLine from day 1.
+  packagePlan: string
   issueTypes: string[]
   issueTypeOther: string
   locations: LocationEntry[]
@@ -103,6 +106,7 @@ function defaultData(orgName: string): WizardData {
     industryOther: "",
     companySize: "",
     numberOfLocations: "",
+    packagePlan: "",
     issueTypes: [],
     issueTypeOther: "",
     locations: [{ id: uid(), name: "", address: "", locationType: "" }],
@@ -1183,10 +1187,12 @@ export function SetupWizard({
   orgName,
   userId,
   initialIndustry,
+  initialPlan,
 }: {
   orgName: string
   userId: string
   initialIndustry?: string
+  initialPlan?: string
 }) {
   const router = useRouter()
   const [step, setStep] = useState(1)
@@ -1195,6 +1201,7 @@ export function SetupWizard({
   const [data, setData] = useState<WizardData>(() => ({
     ...defaultData(orgName),
     ...(initialIndustry ? { industry: initialIndustry } : {}),
+    ...(initialPlan     ? { packagePlan: initialPlan }  : {}),
   }))
   const [hydrated, setHydrated] = useState(false)
 
@@ -1207,8 +1214,9 @@ export function SetupWizard({
         setData(d => ({
           ...d,
           ...parsed,
-          // initialIndustry from URL takes precedence over stale localStorage
-          ...(initialIndustry && !parsed.industry ? { industry: initialIndustry } : {}),
+          // URL params take precedence over stale localStorage values
+          ...(initialIndustry && !parsed.industry    ? { industry:    initialIndustry } : {}),
+          ...(initialPlan     && !parsed.packagePlan ? { packagePlan: initialPlan }     : {}),
           __step: undefined,
         } as WizardData))
         if (typeof parsed.__step === "number" && parsed.__step > 1) {
@@ -1217,7 +1225,7 @@ export function SetupWizard({
       }
     } catch { /* ignore */ }
     setHydrated(true)
-  }, [userId, initialIndustry])
+  }, [userId, initialIndustry, initialPlan])
 
   // Persist progress on every change
   const persist = useCallback(() => {

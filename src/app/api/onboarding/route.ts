@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
     industry,
     companySize,
     numberOfLocations,
+    packagePlan,
     issueTypes = [],
     locations = [],
     employeeTypeDefs = [],
@@ -52,6 +53,10 @@ export async function POST(request: NextRequest) {
     industry?: string
     companySize?: string
     numberOfLocations?: string
+    // Set only for Car Wash users who chose Wash Essentials on the packages page.
+    // Determines trial productLine from day 1 so the org is never granted access
+    // beyond its selected package, even during the free trial.
+    packagePlan?: string
     issueTypes?: string[]
     locations?: Array<{ name: string; address?: string; locationType?: string }>
     employeeTypeDefs?: Array<{
@@ -71,14 +76,23 @@ export async function POST(request: NextRequest) {
   const orgId = session.organizationId
 
   // ── 1. Update organization ───────────────────────────────────────────────
+  // Validate packagePlan: only "wash_essentials" for Car Wash orgs is accepted;
+  // any other value is ignored so the server never sets an unexpected plan.
+  const isValidWashEssentialsPlan =
+    packagePlan === "wash_essentials" && industry === "Car Wash"
+
   await prisma.organization.update({
     where: { id: orgId },
     data: {
-      name:                 companyName?.trim() || undefined,
-      companySize:          companySize          || null,
-      industry:             industry             || null,
-      numberOfLocations:    numberOfLocations    || null,
+      name:                  companyName?.trim() || undefined,
+      companySize:           companySize          || null,
+      industry:              industry             || null,
+      numberOfLocations:     numberOfLocations    || null,
       onboardingCompletedAt: new Date(),
+      // Set plan+productLine from day 1 so trial access matches the chosen package.
+      ...(isValidWashEssentialsPlan
+        ? { plan: "wash_essentials", productLine: "WASH_ESSENTIALS" }
+        : {}),
     },
   })
 

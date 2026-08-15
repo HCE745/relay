@@ -17,23 +17,29 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json() as {
-    plan:              PlanKey
-    employeeCount:     number
-    locationCount:     number
-    selectedModuleIds: ModuleId[]
-    intelligenceSuite: boolean  // always true for professional_plus
+    plan:               PlanKey
+    locationCount:      number
+    // Employee-count and module fields are not used by Wash Essentials but are
+    // required for standard Relay plans — default to zero/empty when omitted.
+    employeeCount?:     number
+    selectedModuleIds?: ModuleId[]
+    intelligenceSuite?: boolean
   }
 
+  const employeeCount     = body.employeeCount     ?? 0
+  const selectedModuleIds = body.selectedModuleIds ?? []
   // Professional Plus always gets the Intelligence Suite
-  if (body.plan === "professional_plus") {
-    body.intelligenceSuite = true
-  }
+  const intelligenceSuite = body.plan === "professional_plus"
+    ? true
+    : (body.intelligenceSuite ?? false)
 
   const org = await prisma.organization.findUnique({
     where: { id: session.organizationId },
     select: {
       id:                true,
       name:              true,
+      industry:          true,
+      productLine:       true,
       discountPercent:   true,
       discountExpiresAt: true,
       stripeCustomerId:  true,
@@ -42,6 +48,21 @@ export async function POST(req: NextRequest) {
   })
 
   if (!org) return NextResponse.json({ error: "Organization not found" }, { status: 404 })
+
+  // Server-side product validation: Wash Essentials is exclusively for Car Wash orgs.
+  // ?industry=car_wash on the subscribe page is a UI hint only — the server is authoritative.
+  if (body.plan === "wash_essentials" && org.industry !== "Car Wash") {
+    return NextResponse.json(
+      { error: "Wash Essentials is only available for Car Wash operations." },
+      { status: 400 },
+    )
+  }
+
+  // Derive the productLine that matches the chosen plan.
+  // Non-Wash-Essentials plans always produce RELAY_STANDARD so an upgrade
+  // from Wash Essentials is handled correctly here without a separate route.
+  const newProductLine =
+    body.plan === "wash_essentials" ? "WASH_ESSENTIALS" : "RELAY_STANDARD"
 
   try {
     // Create or reuse Stripe customer
@@ -90,10 +111,10 @@ export async function POST(req: NextRequest) {
     // Build line items from pricing selections
     const lineItems = buildLineItems({
       plan:              body.plan,
-      employeeCount:     body.employeeCount,
+      employeeCount,
       locationCount:     body.locationCount,
-      selectedModuleIds: body.selectedModuleIds,
-      intelligenceSuite: body.intelligenceSuite,
+      selectedModuleIds,
+      intelligenceSuite,
     })
 
     // Create Stripe Checkout Session
@@ -107,13 +128,13 @@ export async function POST(req: NextRequest) {
       cancel_url:  `${APP_URL}/subscribe`,
     })
 
-    // Persist pricing intent to DB
+    // Persist pricing intent + productLine to DB
     const pricing = calculatePrice({
       plan:              body.plan,
-      employeeCount:     body.employeeCount,
+      employeeCount,
       locationCount:     body.locationCount,
-      selectedModuleIds: body.selectedModuleIds,
-      intelligenceSuite: body.intelligenceSuite,
+      selectedModuleIds,
+      intelligenceSuite,
       discountPercent:   org.discountPercent ?? undefined,
     })
 
@@ -121,12 +142,13 @@ export async function POST(req: NextRequest) {
       where: { id: org.id },
       data: {
         plan:                       body.plan,
-        employeeLimit:              body.employeeCount,
+        productLine:                newProductLine,
+        employeeLimit:              employeeCount,
         locationLimit:              body.locationCount,
-        intelligenceModules:        body.intelligenceSuite
+        intelligenceModules:        intelligenceSuite
           ? ["issue_intelligence", "sop_intelligence", "asset_intelligence", "benchmark_intelligence", "purchase_intelligence"]
-          : body.selectedModuleIds,
-        intelligenceSuiteEnabled:   body.intelligenceSuite,
+          : selectedModuleIds,
+        intelligenceSuiteEnabled:   intelligenceSuite,
         monthlyBasePrice:           pricing.basePrice,
         monthlyScalingCost:         pricing.employeeScaling + pricing.locationScaling,
         monthlyModulesCost:         pricing.moduleCost,
@@ -136,7 +158,10 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    await createSession({ ...session, plan: body.plan })
+    // Refresh session so feature gating reflects the new plan/productLine immediately.
+    // This is important for Wash Essentials: the customer should see the correct
+    // product experience without needing to log out and back in.
+    await createSession({ ...session, plan: body.plan, productLine: newProductLine })
 
     return NextResponse.json({ checkoutUrl: checkoutSession.url })
   } catch (err) {

@@ -81,7 +81,7 @@ export default async function SubscriptionSettingsPage() {
   if (!org) redirect("/dashboard")
 
   const status      = org.subscriptionStatus ?? "trialing"
-  const plan        = (["essentials", "professional", "professional_plus"] as const).includes(org.plan as PlanKey)
+  const plan        = (["essentials", "professional", "professional_plus", "wash_essentials"] as const).includes(org.plan as PlanKey)
     ? org.plan as PlanKey : null
   const planLabel   = plan ? PLANS[plan].label : org.plan
   const readOnly    = isReadOnly(status)

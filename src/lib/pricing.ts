@@ -1,6 +1,18 @@
 // Relay subscription pricing — all amounts in USD/month.
 
+// Wash Essentials location cap — centrally configurable, checked by API and UI.
+export const WASH_ESSENTIALS_MAX_LOCATIONS = 7
+
 export const PLANS = {
+  wash_essentials: {
+    label:                   "Wash Essentials",
+    basePrice:               40,
+    includedLocations:       1,
+    maxLocations:            WASH_ESSENTIALS_MAX_LOCATIONS,
+    includedEmployees:       0,
+    maxEmployees:            0,
+    additionalLocationPrice: 10,
+  },
   essentials: {
     label:                   "Relay Essentials",
     basePrice:               149,
@@ -109,6 +121,28 @@ export interface PricingResult {
 }
 
 export function calculatePrice(input: PricingInput): PricingResult {
+  // Wash Essentials: location-based pricing only — no employee scaling or modules.
+  if (input.plan === "wash_essentials") {
+    const cfg   = PLANS.wash_essentials
+    const extra = Math.max(0, input.locationCount - cfg.includedLocations)
+    const locationScaling     = extra * cfg.additionalLocationPrice
+    const totalBeforeDiscount = cfg.basePrice + locationScaling
+    const discountAmount      = input.discountPercent
+      ? Math.round(totalBeforeDiscount * (input.discountPercent / 100))
+      : 0
+    return {
+      basePrice:           cfg.basePrice,
+      locationScaling,
+      employeeScaling:     0,
+      moduleCost:          0,
+      totalBeforeDiscount,
+      discountAmount,
+      totalAfterDiscount:  totalBeforeDiscount - discountAmount,
+      contactSales:        false,
+      employeeBandLabel:   "N/A",
+    }
+  }
+
   const planCfg = PLANS[input.plan]
   const band    = getEmployeeBand(input.employeeCount, input.plan)
 

@@ -5,6 +5,8 @@ import { PLANS, PRO_EMPLOYEE_BANDS, PP_EMPLOYEE_BANDS } from "./pricing"
 export function getPriceId(key: string): string {
   const map: Record<string, string | undefined> = {
     // Base plans
+    wash_essentials:           process.env.STRIPE_PRICE_WASH_ESSENTIALS,
+    we_additional_location:    process.env.STRIPE_PRICE_WE_ADDITIONAL_LOCATION,
     essentials:                process.env.STRIPE_PRICE_ESSENTIALS,
     professional:              process.env.STRIPE_PRICE_PROFESSIONAL,
     professional_plus:         process.env.STRIPE_PRICE_PROFESSIONAL_PLUS,
@@ -72,6 +74,15 @@ export function buildLineItems({
 
   // Base plan
   items.push({ price: getPriceId(plan), quantity: 1 })
+
+  // Wash Essentials: base + per-additional-location add-on. No employee scaling or modules.
+  if (plan === "wash_essentials") {
+    const extra = Math.max(0, locationCount - PLANS.wash_essentials.includedLocations)
+    if (extra > 0) {
+      items.push({ price: getPriceId("we_additional_location"), quantity: extra })
+    }
+    return items
+  }
 
   if (plan === "professional") {
     // Employee band scaling

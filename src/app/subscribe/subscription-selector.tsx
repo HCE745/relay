@@ -65,6 +65,15 @@ const ENTERPRISE_FEATURES = [
   "Volume discounts",
 ]
 
+const WASH_ESSENTIALS_FEATURES = [
+  "Issue Reporting & Tracking",
+  "Automatic Routing & Assignments",
+  "1–7 Locations ($10/mo each after 1st)",
+  "Team Roles & Permissions",
+  "Mobile App (PWA)",
+  "Public QR Reporting",
+]
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 type Tier = PlanKey | "enterprise"
@@ -89,6 +98,7 @@ function PlanCard({
     professional:      PROFESSIONAL_FEATURES,
     professional_plus: PP_FEATURES,
     enterprise:        ENTERPRISE_FEATURES,
+    wash_essentials:   WASH_ESSENTIALS_FEATURES,
   }[tier]
 
   return (

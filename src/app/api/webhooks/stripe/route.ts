@@ -66,12 +66,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     select: { lifecycleStatus: true, plan: true },
   })
 
+  // Derive productLine from the plan that checkout-intent persisted before redirecting
+  // to Stripe. This is the authoritative source — the client never sends productLine.
+  const productLine = org?.plan === "wash_essentials" ? "WASH_ESSENTIALS" : "RELAY_STANDARD"
+
   await prisma.organization.update({
     where: { id: orgId },
     data: {
       subscriptionStatus:   "active",
       checkoutIntentStatus: "completed",
       stripeSubscriptionId: (session.subscription as string | null) ?? undefined,
+      productLine,
     },
   })
 

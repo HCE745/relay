@@ -11,9 +11,9 @@ export async function POST(request: NextRequest) {
 
   if (existing?.isDemo && !existing.superAdmin) {
     const requestedIndustry = body.industry?.trim()
-    // Always reset to Professional Plus (full feature set) on every demo start
-    await resetDemoOrg(existing.organizationId, existing.userId, requestedIndustry, "professional_plus")
-    // Re-issue JWT so plan-gated pages see professional_plus immediately
+    const isCarWash = requestedIndustry === "Car Wash"
+    const pkg = isCarWash ? "wash_essentials" : "professional_plus"
+    await resetDemoOrg(existing.organizationId, existing.userId, requestedIndustry, pkg)
     await createSession({
       userId:              existing.userId,
       email:               existing.email,
@@ -22,7 +22,8 @@ export async function POST(request: NextRequest) {
       organizationId:      existing.organizationId,
       onboardingCompleted: true,
       subscriptionStatus:  "active",
-      plan:                "professional_plus",
+      plan:                isCarWash ? "wash_essentials" : "professional_plus",
+      productLine:         isCarWash ? "WASH_ESSENTIALS" : undefined,
       isDemo:              true,
     })
     return NextResponse.json({ ok: true })
@@ -41,9 +42,10 @@ export async function POST(request: NextRequest) {
 
   await cleanupExpiredDemos()
 
-  // Start as Professional Plus — shows the full feature set by default
   const industry = body.industry?.trim() || undefined
-  const { org, user } = await createDemoOrg(industry, "professional_plus")
+  const isCarWash = industry === "Car Wash"
+  const pkg = isCarWash ? "wash_essentials" : "professional_plus"
+  const { org, user } = await createDemoOrg(industry, pkg)
 
   await createSession({
     userId:              user.id,
@@ -53,7 +55,8 @@ export async function POST(request: NextRequest) {
     organizationId:      org.id,
     onboardingCompleted: true,
     subscriptionStatus:  "active",
-    plan:                "professional_plus",
+    plan:                isCarWash ? "wash_essentials" : "professional_plus",
+    productLine:         isCarWash ? "WASH_ESSENTIALS" : undefined,
     isDemo:              true,
   })
 

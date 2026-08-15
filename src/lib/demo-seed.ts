@@ -663,13 +663,18 @@ export async function resetDemoOrg(orgId: string, adminUserId: string, industry?
   // Regions are safe to delete once all locations and users are gone
   await prisma.region.deleteMany({ where: { organizationId: orgId } })
 
+  const isWashEssentialsPkg = pkg === "wash_essentials"
+
   // ── Update org: reset plan and feature flags ──────────────────────────────
   await prisma.organization.update({
     where: { id: orgId },
     data: {
       name:                             template.demoCompanyName,
       industry:                         industryLabel,
-      companySize:                      "250",
+      productLine:                      isWashEssentialsPkg ? "WASH_ESSENTIALS" : "RELAY_STANDARD",
+      companySize:                      isWashEssentialsPkg ? "10" : "250",
+      locationLimit:                    isWashEssentialsPkg ? 7 : null,
+      purchaseRequestEnabled:           !isWashEssentialsPkg,
       plan:                             PACKAGE_PLAN[pkg],
       regions_enabled:                  isPlusOrAbove,
       corporate_dashboard_enabled:      isPlusOrAbove,

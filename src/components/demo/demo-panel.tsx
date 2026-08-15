@@ -6,7 +6,8 @@ import {
   Zap, ChevronUp, ChevronDown, RefreshCw, Loader2, Check, X, Keyboard, Map, Share2,
 } from "lucide-react"
 import { INDUSTRY_LABELS } from "@/lib/industry-templates"
-import { useTour, TOTAL_TOUR_STEPS } from "./tour-context"
+import { useTour } from "./tour-context"
+import { getNumTourSteps } from "./tour-steps"
 
 type DemoPkg = "essentials" | "professional" | "professional_plus"
 
@@ -67,6 +68,7 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
   const [localModules, setLocalModules] = useState<string[]>(intelligenceModules)
 
   const panelRef = useRef<HTMLDivElement>(null)
+  const isCarWashDemo = currentIndustry === "Car Wash"
   const currentPkg = PLAN_TO_PKG[plan] ?? "professional_plus"
 
   // Ctrl+Shift+D — hide/show panel entirely
@@ -110,7 +112,7 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
 
   const allModulesActive  = ALL_MODULES.every(m => localModules.includes(m.id))
   const modulesChanged    = JSON.stringify([...localModules].sort()) !== JSON.stringify([...intelligenceModules].sort())
-  const showModules       = currentPkg !== "essentials"
+  const showModules       = currentPkg !== "essentials" && !isCarWashDemo
   const activeRole        = ROLES.find(r => r.value === currentRole)
 
   function flash(msg: string) {
@@ -300,7 +302,7 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
               {resumePrompt ? (
                 <div className="space-y-1.5">
                   <p className="text-xs text-gray-400 mb-2">
-                    You exited on step {tour.lastExitedStep} of {TOTAL_TOUR_STEPS}.
+                    You exited on step {tour.lastExitedStep} of {getNumTourSteps(tour.industry)}.
                   </p>
                   <button
                     onClick={() => { setResumePrompt(false); tour.startTour(tour.lastExitedStep ?? 1) }}
@@ -327,7 +329,7 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
                   className="w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium rounded-xl transition-colors flex items-center justify-center gap-2 min-h-[44px]"
                 >
                   <X className="w-3.5 h-3.5" />
-                  Exit Tour (Step {tour.currentStep}/{TOTAL_TOUR_STEPS})
+                  Exit Tour (Step {tour.currentStep}/{getNumTourSteps(tour.industry)})
                 </button>
               ) : (
                 <button
@@ -347,7 +349,8 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
               )}
             </div>
 
-            {/* Package selector */}
+            {/* Package selector — hidden for Car Wash (WE is a distinct product, not a tier) */}
+            {!isCarWashDemo && (
             <div data-tour="package-selector">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Package</p>
               <div className="flex flex-col gap-1.5">
@@ -377,6 +380,7 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
                 })}
               </div>
             </div>
+            )}
 
             {/* Intelligence Modules (Professional and Professional Plus only) */}
             {showModules && (
@@ -567,7 +571,7 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
         )}
         {tour.isActive && (
           <span className="text-xs px-1.5 py-0.5 rounded-md bg-blue-700 text-blue-200">
-            Tour {tour.currentStep}/{TOTAL_TOUR_STEPS}
+            Tour {tour.currentStep}/{getNumTourSteps(tour.industry)}
           </span>
         )}
         {open ? <ChevronDown className="w-3.5 h-3.5 ml-0.5" /> : <ChevronUp className="w-3.5 h-3.5 ml-0.5" />}

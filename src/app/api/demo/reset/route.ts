@@ -7,6 +7,7 @@ const PLAN_TO_PKG: Record<string, DemoPackage> = {
   professional_plus: "professional_plus",
   pro:               "professional",
   essentials:        "essentials",
+  wash_essentials:   "wash_essentials",
 }
 
 export async function POST(request: NextRequest) {
@@ -23,8 +24,11 @@ export async function POST(request: NextRequest) {
     // body is optional
   }
 
-  // Preserve the user's current package choice when resetting data
-  const pkg = PLAN_TO_PKG[session.plan ?? "professional_plus"] ?? "professional_plus"
+  // Car Wash industry always uses wash_essentials package; all others preserve current package
+  const isCarWash = (industry ?? "") === "Car Wash" || (!industry && (session.plan === "wash_essentials"))
+  const pkg: DemoPackage = isCarWash
+    ? "wash_essentials"
+    : (PLAN_TO_PKG[session.plan ?? "professional_plus"] ?? "professional_plus")
   await resetDemoOrg(session.organizationId, session.userId, industry, pkg)
 
   // Re-issue JWT so plan-gated pages reflect the reset package correctly
@@ -37,6 +41,7 @@ export async function POST(request: NextRequest) {
     onboardingCompleted: true,
     subscriptionStatus:  "active",
     plan:                pkg === "professional" ? "pro" : pkg,
+    productLine:         isCarWash ? "WASH_ESSENTIALS" : undefined,
     isDemo:              true,
   })
 

@@ -158,6 +158,7 @@ interface IssueSeed {
   sopIdx?: number        // index into template.demoSOPs array
   sopViolation?: boolean // true = flagged possible violation
   sopViolationNote?: string
+  areaDetail?: string    // free-text sub-location (Floor / Unit / Suite) for PM issues
 }
 
 // ─── User seeds (15 demo users per industry, same names/roles) ───────────────
@@ -454,12 +455,53 @@ const CARWASH_ISSUES: IssueSeed[] = [
   { title: "South — vacuum station: 2 of 3 units not working",        desc: "2 of 3 vacuums at south location have no power. Breaker issue.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 1, days: 1,   status: "RESOLVED", resolved: { days: 0, method: "Reset tripped breaker and checked GFCI outlets", rootCause: "Overloaded circuit on vacuum circuit", category: "Repaired", time: "under_1_hour", cost: 0 } },
 ]
 
+// ─── Property Management issues ───────────────────────────────────────────────
+// locIdx mapping:
+//   0 = Riverside Apartments (top-level property)
+//   1 = North Commerce Center
+//   2 = Main Street Retail Center
+//   3 = Building A (child of Riverside Apartments, pushed at seed time)
+//   4 = Building B (child of Riverside Apartments, pushed at seed time)
+// assetIdx mapping matches PROPERTY_ASSETS order (0–14)
+const PROPERTY_ISSUES: IssueSeed[] = [
+  // ── Tenant requests via QR (TENANT_REQUEST) ────────────────────────────────
+  { title: "Unit 4B — water coming through ceiling near bathroom", desc: "Tenant in unit 4B reported water dripping through the ceiling above the bathroom. Leak appears to be from the unit above.", cat: "TENANT_REQUEST", pri: "CRITICAL", loc: 4, days: 0,  status: "OPEN",        areaDetail: "Unit 4B", escalated: true, lvl: 1 },
+  { title: "Unit 204 — HVAC not cooling, temp above 80°F",        desc: "Tenant reports the A/C has not cooled the unit in two days. Indoor temp reading 83°F.", cat: "TENANT_REQUEST", pri: "HIGH",     loc: 4, days: 1,  status: "IN_PROGRESS", areaDetail: "Unit 204", asset: 1 },
+  { title: "Unit 107 — hot water not working",                     desc: "No hot water in unit since this morning. Tenant has young children and is requesting urgent service.", cat: "TENANT_REQUEST", pri: "HIGH",   loc: 3, days: 2,  status: "OPEN",        areaDetail: "Unit 107" },
+  { title: "Unit 312 — garbage disposal not working",              desc: "Disposal hums but won't spin. Tenant has tried the reset button.", cat: "TENANT_REQUEST", pri: "LOW",    loc: 4, days: 3,  status: "RESOLVED",    areaDetail: "Unit 312", resolved: { days: 1, method: "Reset and cleared jam", rootCause: "Food obstruction in disposal", category: "Repaired", time: "under_1_hour", cost: 0 } },
+  { title: "Unit 211 — sliding door off track",                    desc: "Balcony sliding door jumped off the track. Tenant cannot fully open or close it.", cat: "TENANT_REQUEST", pri: "MEDIUM", loc: 4, days: 4,  status: "RESOLVED",    areaDetail: "Unit 211", resolved: { days: 0, method: "Re-seated door on rollers and adjusted track", rootCause: "Worn roller clips", category: "Repaired", time: "under_1_hour", cost: 20 } },
+  { title: "Unit 118 — bedroom window won't lock",                 desc: "Window latch broken. Tenant concerned about security.", cat: "TENANT_REQUEST", pri: "MEDIUM", loc: 3, days: 5,  status: "IN_PROGRESS", areaDetail: "Unit 118" },
+  { title: "2nd Floor — hallway light out (Building B)",           desc: "Two overhead lights in the 2nd floor hallway are out. Area is dark.", cat: "TENANT_REQUEST", pri: "LOW",    loc: 4, days: 6,  status: "RESOLVED",    areaDetail: "2nd Floor Hallway", resolved: { days: 0, method: "Replaced bulbs", rootCause: "End of bulb life", category: "Replaced", time: "under_1_hour", cost: 15 } },
+
+  // ── Maintenance (MAINTENANCE) ──────────────────────────────────────────────
+  { title: "Building B — HVAC Unit filters overdue for replacement",   desc: "Monthly HVAC filter inspection revealed filters at 90% capacity. Replacement scheduled.", cat: "MAINTENANCE", pri: "MEDIUM", loc: 4, days: 3,  status: "IN_PROGRESS", asset: 1 },
+  { title: "Building A — boiler pressure reading below normal",         desc: "Boiler pressure gauge reading 12 PSI vs. target 18 PSI. System operational but flagged.", cat: "MAINTENANCE", pri: "HIGH",   loc: 3, days: 2,  status: "OPEN",        asset: 2 },
+  { title: "Building A — elevator annual safety inspection due",        desc: "Annual elevator inspection is overdue by 2 weeks. Contacting licensed inspector.", cat: "MAINTENANCE", pri: "HIGH",   loc: 3, days: 5,  status: "IN_PROGRESS", asset: 4, sopIdx: 0 },
+  { title: "Riverside Apartments — laundry room drain slow",            desc: "Laundry room floor drain in the common laundry area backing up. Slow drain with standing water.", cat: "MAINTENANCE", pri: "MEDIUM", loc: 0, days: 4,  status: "RESOLVED",    asset: 11, resolved: { days: 1, method: "Snaked drain — removed lint clog", rootCause: "Lint buildup from filter-less machines", category: "Repaired", time: "1_4_hours", cost: 80 } },
+  { title: "Building B — roof drain clogged after storm",              desc: "Standing water on roof following last night's storm. Drain appears blocked by debris.", cat: "MAINTENANCE", pri: "HIGH",   loc: 4, days: 1,  status: "RESOLVED",    resolved: { days: 0, method: "Cleared drain of leaf and debris buildup", rootCause: "No debris cover on drain", category: "Repaired", time: "under_1_hour", cost: 40 } },
+  { title: "North Commerce Center — HVAC quarterly filter inspection",  desc: "Q2 HVAC filter inspection completed. Filters replaced on all 4 rooftop units.", cat: "MAINTENANCE", pri: "LOW",    loc: 1, days: 14, status: "RESOLVED",    resolved: { days: 0, method: "Replaced filters on all 4 RTU units", rootCause: "Scheduled maintenance", category: "Replaced", time: "1_4_hours", cost: 220 } },
+
+  // ── Equipment breakdowns (EQUIPMENT_BREAKDOWN) ────────────────────────────
+  { title: "Building B — HVAC Unit tripped breaker, not starting",     desc: "HVAC unit for Building B threw the breaker last night. Unit not starting on reset. Contractor called.", cat: "EQUIPMENT_BREAKDOWN", pri: "CRITICAL", loc: 4, days: 1,  status: "IN_PROGRESS", asset: 1 },
+  { title: "Building A — elevator stops between floors intermittently", desc: "Residents reporting elevator stopping between floor 2 and 3. Incident logged twice this week.", cat: "EQUIPMENT_BREAKDOWN", pri: "CRITICAL", loc: 3, days: 2,  status: "OPEN",        asset: 4 },
+  { title: "Riverside Apartments — parking gate stuck open",            desc: "Entry gate arm is stuck in the open position since 8 PM. Security concern overnight.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 0, days: 0,  status: "RESOLVED",    asset: 12, resolved: { days: 0, method: "Reset gate controller; arm returned to operation", rootCause: "Vehicle tripped jam sensor, controller locked up", category: "Repaired", time: "under_1_hour", cost: 0 } },
+  { title: "Building B — electrical panel breaker tripping repeatedly", desc: "Circuit breaker in Building B main panel tripping 2–3 times per day on the 3rd floor circuit.", cat: "EQUIPMENT_BREAKDOWN", pri: "HIGH",   loc: 4, days: 3,  status: "IN_PROGRESS", asset: 14 },
+
+  // ── Safety (SAFETY) ───────────────────────────────────────────────────────
+  { title: "Building A — fire suppression inspection finding",          desc: "Annual fire suppression inspection flagged a corroded head in the stairwell. Repair required within 30 days.", cat: "SAFETY",             pri: "HIGH",   loc: 3, days: 7,  status: "IN_PROGRESS", asset: 6, sopIdx: 1, sopViolation: true, sopViolationNote: "Possible SOP Violation: Annual fire suppression test (§ 5.1) overdue — corroded head may indicate missed inspection cycle" },
+
+  // ── Building / Facility (FACILITY) ───────────────────────────────────────
+  { title: "Main Street Retail — exterior lighting outage (east side)", desc: "Four exterior lights on the east facade of the retail center are out. Tenant safety concern in parking area.", cat: "FACILITY",           pri: "HIGH",   loc: 2, days: 3,  status: "OPEN" },
+  { title: "North Commerce Center — lobby ceiling tile water stain",    desc: "Water stain appeared on two lobby ceiling tiles following last week's rain. No active drip.", cat: "FACILITY",           pri: "MEDIUM", loc: 1, days: 5,  status: "RESOLVED",    resolved: { days: 3, method: "Roof patched by Summit Roofing; tiles replaced", rootCause: "Flashing separation at HVAC curb", category: "Repaired", time: "1_2_days", cost: 1200 } },
+]
+
 function getIssueSeeds(industryKey: string): IssueSeed[] {
   switch (industryKey) {
     case "manufacturing": return MFG_ISSUES
     case "warehousing":   return WH_ISSUES
     case "hospitality":   return HOSP_ISSUES
     case "car_wash":      return CARWASH_ISSUES
+    case "property":      return PROPERTY_ISSUES
     default:              return genericIssues(getTemplate(
       INDUSTRY_TEMPLATES.find(t => t.key === industryKey)?.label ?? "Operations"
     ).demoCompanyName.split(" ")[0])
@@ -475,6 +517,29 @@ interface AssetSeed {
   locIdx: number
   assetSubtype?: string
 }
+
+// ─── Property Management assets ───────────────────────────────────────────────
+// locIdx 3 = Building A (child of Riverside Apartments)
+// locIdx 4 = Building B (child of Riverside Apartments)
+// locIdx 0 = Riverside Apartments (common/top-level)
+// locIdx 1 = North Commerce Center
+const PROPERTY_ASSETS: AssetSeed[] = [
+  { name: "HVAC Unit - Building A",             type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 3, assetSubtype: "HVAC_UNIT" },
+  { name: "HVAC Unit - Building B",             type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 4, assetSubtype: "HVAC_UNIT" },
+  { name: "Boiler - Building A",                type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 3, assetSubtype: "BOILER" },
+  { name: "Boiler - Building B",                type: "EQUIPMENT", status: "OPERATIONAL",        locIdx: 4, assetSubtype: "BOILER" },
+  { name: "Elevator - Building A",              type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 3, assetSubtype: "ELEVATOR" },
+  { name: "Elevator - Building B",              type: "EQUIPMENT", status: "OPERATIONAL",        locIdx: 4, assetSubtype: "ELEVATOR" },
+  { name: "Fire Suppression - Building A",      type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 3, assetSubtype: "FIRE_SUPPRESSION" },
+  { name: "Fire Suppression - Building B",      type: "EQUIPMENT", status: "OPERATIONAL",        locIdx: 4, assetSubtype: "FIRE_SUPPRESSION" },
+  { name: "Access Control - Building A",        type: "EQUIPMENT", status: "OPERATIONAL",        locIdx: 3, assetSubtype: "ACCESS_CONTROL" },
+  { name: "Access Control - Building B",        type: "EQUIPMENT", status: "OPERATIONAL",        locIdx: 4, assetSubtype: "ACCESS_CONTROL" },
+  { name: "Roof System - Building A",           type: "FACILITY",  status: "OPERATIONAL",        locIdx: 3, assetSubtype: "ROOF_SYSTEM" },
+  { name: "Laundry Equipment - Common Area",    type: "EQUIPMENT", status: "OPERATIONAL",        locIdx: 0, assetSubtype: "LAUNDRY_EQUIPMENT" },
+  { name: "Parking Gate - Riverside",           type: "EQUIPMENT", status: "OPERATIONAL",        locIdx: 0, assetSubtype: "PARKING_GATE" },
+  { name: "Property Maintenance Vehicle",       type: "VEHICLE",   status: "OPERATIONAL",        locIdx: 0, assetSubtype: "VEHICLE" },
+  { name: "Electrical Panel - Building B",      type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 4, assetSubtype: "ELECTRICAL_PANEL" },
+]
 
 function getAssets(industryKey: string): AssetSeed[] {
   switch (industryKey) {
@@ -504,6 +569,7 @@ function getAssets(industryKey: string): AssetSeed[] {
         { name: "Kitchen Exhaust Hood",       type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 2 },
         { name: "Ice Machine — Main Kitchen", type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 2 },
       ]
+    case "property":  return PROPERTY_ASSETS
     case "car_wash":
       return [
         { name: "Bay 1 (Self-Service)",     type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "SELF_SERVICE_BAY" },
@@ -734,6 +800,22 @@ async function seedDemoContent(orgId: string, adminUserId: string, industryLabel
   )
   const locationIds = locationRecords.map(l => l.id)
 
+  // For Property Management: create Building A and Building B as child locations of
+  // Riverside Apartments (locationIds[0]) so assets and issues can be linked to the
+  // correct building tier. These are pushed onto locationIds at indices 3 and 4.
+  if (industryKey === "property") {
+    const [buildingA, buildingB] = await Promise.all([
+      prisma.location.create({
+        data: { name: "Building A", locationType: "Building", organizationId: orgId, isActive: true, parentId: locationIds[0] },
+      }),
+      prisma.location.create({
+        data: { name: "Building B", locationType: "Building", organizationId: orgId, isActive: true, parentId: locationIds[0] },
+      }),
+    ])
+    locationIds.push(buildingA.id)  // index 3
+    locationIds.push(buildingB.id)  // index 4
+  }
+
   // ── Departments ───────────────────────────────────────────────────────────
   const deptRecords = await Promise.all(
     template.departments.map(name =>
@@ -873,6 +955,7 @@ async function seedDemoContent(orgId: string, adminUserId: string, industryLabel
       isEscalated:    false,
       escalationLevel:0,
       createdAt,
+      ...(s.areaDetail ? { areaDetail: s.areaDetail } : {}),
       ...resolvedFields,
       ...sopFields,
     }
@@ -912,6 +995,7 @@ async function seedDemoContent(orgId: string, adminUserId: string, industryLabel
         escalationLevel:2,
         lastEscalatedAt:ago(escalatedSeed.days - 1),
         createdAt:      escCreatedAt,
+        ...(escalatedSeed.areaDetail ? { areaDetail: escalatedSeed.areaDetail } : {}),
         ...escSopFields,
       },
     })

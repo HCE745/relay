@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { MapPin, Building2, Camera, User, Mail, Phone, ChevronRight, CheckCircle2 } from "lucide-react"
 import { CARWASH_QR_PROBLEM_LABELS } from "@/lib/car-wash-config"
+import { PM_QR_PROBLEM_LABELS } from "@/lib/property-management-config"
 
 interface QrCodeData {
   id: string
@@ -41,9 +42,11 @@ const MODE_TITLE_PLACEHOLDERS: Record<string, string> = {
 export function QrReportForm({
   qrCode,
   isCarWash = false,
+  isPropMgmt = false,
 }: {
   qrCode: QrCodeData
   isCarWash?: boolean
+  isPropMgmt?: boolean
 }) {
   const isVisitorFeedback = qrCode.reportingMode === "VISITOR_FEEDBACK"
 
@@ -61,20 +64,24 @@ export function QrReportForm({
 
   const locationStr = [qrCode.location?.name, qrCode.area].filter(Boolean).join(" · ")
 
-  // Build the list of car-wash categories to display, intersected with
+  // Determine which problem label map to use for industry-specific QR forms.
+  const industryQrLabels = isPropMgmt ? PM_QR_PROBLEM_LABELS : CARWASH_QR_PROBLEM_LABELS
+  const useIndustryCategories = isCarWash || isPropMgmt
+
+  // Build the list of industry-specific categories to display, intersected with
   // the QR code's allowedCategories (if configured) so admins can restrict.
-  const carWashCategories = isCarWash
+  const industryCategories = useIndustryCategories
     ? (() => {
         const filtered = qrCode.allowedCategories.filter(
-          (c) => Object.prototype.hasOwnProperty.call(CARWASH_QR_PROBLEM_LABELS, c),
+          (c) => Object.prototype.hasOwnProperty.call(industryQrLabels, c),
         )
-        return filtered.length > 0 ? filtered : Object.keys(CARWASH_QR_PROBLEM_LABELS)
+        return filtered.length > 0 ? filtered : Object.keys(industryQrLabels)
       })()
     : []
 
   function handleCategorySelect(cat: string) {
     setSelectedCategory(cat)
-    setTitle(CARWASH_QR_PROBLEM_LABELS[cat] ?? cat)
+    setTitle(industryQrLabels[cat] ?? cat)
     if (error) setError("")
   }
 
@@ -82,7 +89,7 @@ export function QrReportForm({
     e.preventDefault()
     setError("")
 
-    if (isCarWash) {
+    if (useIndustryCategories) {
       if (!selectedCategory) { setError("Please select what's wrong"); return }
     } else {
       if (!title.trim()) { setError("Title is required"); return }
@@ -97,7 +104,7 @@ export function QrReportForm({
 
     setSubmitting(true)
     try {
-      const submittedTitle = title.trim() || (CARWASH_QR_PROBLEM_LABELS[selectedCategory ?? ""] ?? "Report")
+      const submittedTitle = title.trim() || (industryQrLabels[selectedCategory ?? ""] ?? "Report")
       // In car-wash mode description is optional; fall back to the category label
       const submittedDescription = description.trim() || submittedTitle
 
@@ -174,7 +181,7 @@ export function QrReportForm({
             <p className="text-sm text-gray-400 mt-2">{qrCode.description}</p>
           )}
           {/* Asset-specific prompt shown in the header so it's visible above the fold */}
-          {isCarWash && qrCode.asset && (
+          {useIndustryCategories && qrCode.asset && (
             <div className="mt-3 pt-3 border-t border-gray-100">
               <p className="text-base font-semibold text-gray-900">
                 What&apos;s wrong with {qrCode.asset.name}?
@@ -192,8 +199,8 @@ export function QrReportForm({
           </div>
         )}
 
-        {/* Car-wash: large tap-target category selector */}
-        {isCarWash && (
+        {/* Industry-specific: large tap-target category selector (Car Wash + Property Management) */}
+        {useIndustryCategories && (
           <div>
             {!qrCode.asset && (
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -201,7 +208,7 @@ export function QrReportForm({
               </label>
             )}
             <div className="space-y-2">
-              {carWashCategories.map((cat) => (
+              {industryCategories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
@@ -213,7 +220,7 @@ export function QrReportForm({
                         : "border-gray-200 bg-white text-gray-800 hover:border-gray-300 hover:bg-gray-50"
                     }`}
                 >
-                  {CARWASH_QR_PROBLEM_LABELS[cat] ?? cat}
+                  {industryQrLabels[cat] ?? cat}
                   {selectedCategory === cat && (
                     <CheckCircle2 className="w-5 h-5 text-indigo-500 shrink-0" />
                   )}
@@ -223,8 +230,8 @@ export function QrReportForm({
           </div>
         )}
 
-        {/* Standard title field — hidden for car-wash (title is auto-set from category) */}
-        {!isCarWash && (
+        {/* Standard title field — hidden when category auto-sets the title */}
+        {!useIndustryCategories && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Title <span className="text-red-500">*</span>
@@ -242,7 +249,7 @@ export function QrReportForm({
         {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            {isCarWash ? (
+            {useIndustryCategories ? (
               <>Tell us more <span className="text-gray-400 font-normal">(optional)</span></>
             ) : (
               <>Description <span className="text-red-500">*</span></>
@@ -251,9 +258,9 @@ export function QrReportForm({
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            rows={isCarWash ? 3 : 5}
+            rows={useIndustryCategories ? 3 : 5}
             placeholder={
-              isCarWash
+              useIndustryCategories
                 ? "Any additional details? (optional)"
                 : (MODE_PLACEHOLDERS[qrCode.reportingMode] ?? "Describe what you're reporting…")
             }

@@ -353,7 +353,7 @@ function CompletionOverlay({ industry, onClose }: { industry: string; onClose: (
             Continue Exploring Demo
           </button>
           <a
-            href={industry === "Car Wash" ? "/register?industry=car_wash" : "/register"}
+            href={industry === "Car Wash" ? "/register?industry=car_wash" : industry === "Property Management" ? "/register?industry=property_management" : "/register"}
             onClick={() => fireTrackingEvent("trial_started", { source: "tour_completion" })}
             className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
           >

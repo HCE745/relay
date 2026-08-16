@@ -22,8 +22,12 @@ import {
   Building2,
   QrCode,
   Droplets,
+  MessageSquare,
+  UserX,
+  Home,
 } from "lucide-react"
 import { CARWASH_ASSET_TAXONOMY } from "@/lib/car-wash-config"
+import { PM_ASSET_TAXONOMY } from "@/lib/property-management-config"
 import { Badge } from "@/components/ui/badge"
 import { PRIORITY_COLOR, STATUS_COLOR, ISSUE_STATUS, ISSUE_PRIORITY, ISSUE_CATEGORY } from "@/lib/constants"
 import { formatDistanceToNow } from "date-fns"
@@ -95,6 +99,11 @@ async function getDashboardData(orgId: string) {
     repeatFailureCount,
     recentCustomerReports,
     recentEquipmentAssetsRaw,
+    highPriorityIssues,
+    tenantRequestsToday,
+    unassignedIssues,
+    propertiesWithOpenIssuesRaw,
+    recentTenantRequests,
   ] = await Promise.all([
     prisma.issue.count({ where: { organizationId: orgId } }),
     prisma.issue.count({ where: { organizationId: orgId, status: "OPEN" } }),
@@ -155,6 +164,17 @@ async function getDashboardData(orgId: string) {
         issues: { where: { status: { notIn: ["RESOLVED", "CLOSED"] } }, select: { id: true, category: true } },
       },
     }),
+    // PM-specific counts
+    prisma.issue.count({ where: { organizationId: orgId, priority: { in: ["CRITICAL", "HIGH"] }, status: { notIn: ["RESOLVED", "CLOSED"] } } }),
+    prisma.issue.count({ where: { organizationId: orgId, category: "TENANT_REQUEST", createdAt: { gte: todayStart } } }),
+    prisma.issue.count({ where: { organizationId: orgId, assignedToId: null, status: { notIn: ["RESOLVED", "CLOSED"] } } }),
+    prisma.issue.findMany({ where: { organizationId: orgId, status: { notIn: ["RESOLVED", "CLOSED"] }, locationId: { not: null } }, select: { locationId: true }, distinct: ["locationId"] }),
+    prisma.issue.findMany({
+      where: { organizationId: orgId, category: "TENANT_REQUEST" },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: { location: { select: { name: true } }, assignedTo: { select: { name: true } } },
+    }),
   ])
 
   const STATUS_PRIORITY: Record<string, number> = { MAINTENANCE: 0, OUT_OF_SERVICE: 1, INACTIVE: 2, OPERATIONAL: 3 }
@@ -173,6 +193,9 @@ async function getDashboardData(orgId: string) {
     customerReportsToday, openEquipmentIssues, operationalAssets,
     openMaintenanceIssues, repeatFailureCount, recentCustomerReports,
     equipmentAssets: sortedEquipmentAssets,
+    highPriorityIssues, tenantRequestsToday, unassignedIssues,
+    propertiesWithOpenIssues: propertiesWithOpenIssuesRaw.length,
+    recentTenantRequests,
   }
 }
 
@@ -356,6 +379,7 @@ export default async function DashboardPage() {
   ])
 
   const isCarWash = data.industry === "Car Wash"
+  const isPropertyMgmt = data.industry === "Property Management"
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"
@@ -813,6 +837,179 @@ export default async function DashboardPage() {
                           <span>{formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}</span>
                           {issue.location && (
                             <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{issue.location.name}</span>
+                          )}
+                        </div>
+                      </div>
+                      <Badge className={`${STATUS_COLOR[issue.status]} text-[10px] px-1.5 py-0 border shrink-0`}>
+                        {ISSUE_STATUS[issue.status as keyof typeof ISSUE_STATUS] ?? issue.status}
+                      </Badge>
+                    </Link>
+                  ))
+                )}
+              </div>
+            </div>
+          </>
+        ) : isPropertyMgmt ? (
+          <>
+            {/* PM KPI Cards */}
+            <div data-tour="pm-kpi-cards" className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {[
+                {
+                  label: "Open Property Issues", href: "/issues?status=OPEN",
+                  iconEl: <AlertCircle className="w-[18px] h-[18px] text-blue-600" />,
+                  iconBg: "bg-blue-100", accentBorder: "border-l-blue-500", bgTint: "rgba(59,130,246,0.05)",
+                  value: <>{data.openIssues}</>,
+                  secondary: `${data.newThisWeek} new this week`, secondaryColor: data.newThisWeek > 0 ? "text-amber-600" : "text-gray-400",
+                },
+                {
+                  label: "Tenant Requests Today", href: "/issues?category=TENANT_REQUEST",
+                  iconEl: <MessageSquare className="w-[18px] h-[18px] text-purple-600" />,
+                  iconBg: "bg-purple-100", accentBorder: "border-l-purple-500", bgTint: "rgba(168,85,247,0.05)",
+                  value: <>{data.tenantRequestsToday}</>,
+                  secondary: "Submitted today via QR", secondaryColor: "text-gray-400",
+                },
+                {
+                  label: "Open Maintenance", href: "/issues?category=MAINTENANCE",
+                  iconEl: <Wrench className={`w-[18px] h-[18px] ${data.openMaintenanceIssues > 0 ? "text-amber-600" : "text-gray-400"}`} />,
+                  iconBg: data.openMaintenanceIssues > 0 ? "bg-amber-100" : "bg-gray-100",
+                  accentBorder: data.openMaintenanceIssues > 0 ? "border-l-amber-500" : "border-l-gray-300",
+                  bgTint: data.openMaintenanceIssues > 0 ? "rgba(245,158,11,0.05)" : "rgba(100,116,139,0.03)",
+                  value: <>{data.openMaintenanceIssues}</>,
+                  secondary: "Active work items", secondaryColor: "text-gray-400",
+                },
+                {
+                  label: "Equipment Down", href: "/assets",
+                  iconEl: <Package className={`w-[18px] h-[18px] ${data.totalAssets - data.operationalAssets > 0 ? "text-orange-600" : "text-gray-400"}`} />,
+                  iconBg: data.totalAssets - data.operationalAssets > 0 ? "bg-orange-100" : "bg-gray-100",
+                  accentBorder: data.totalAssets - data.operationalAssets > 0 ? "border-l-orange-500" : "border-l-gray-300",
+                  bgTint: data.totalAssets - data.operationalAssets > 0 ? "rgba(249,115,22,0.05)" : "rgba(100,116,139,0.03)",
+                  value: <span className={data.totalAssets - data.operationalAssets > 0 ? "text-orange-600" : ""}>{data.totalAssets - data.operationalAssets}</span>,
+                  secondary: `${data.operationalAssets} of ${data.totalAssets} operational`, secondaryColor: "text-gray-400",
+                },
+                {
+                  label: "High-Priority Issues", href: "/issues?priority=HIGH",
+                  iconEl: <AlertTriangle className={`w-[18px] h-[18px] ${data.highPriorityIssues > 0 ? "text-red-600" : "text-gray-400"}`} />,
+                  iconBg: data.highPriorityIssues > 0 ? "bg-red-100" : "bg-gray-100",
+                  accentBorder: data.highPriorityIssues > 0 ? "border-l-red-500" : "border-l-gray-300",
+                  bgTint: data.highPriorityIssues > 0 ? "rgba(239,68,68,0.05)" : "rgba(100,116,139,0.03)",
+                  value: <span className={data.highPriorityIssues > 0 ? "text-red-600" : ""}>{data.highPriorityIssues}</span>,
+                  secondary: "Critical + high open", secondaryColor: data.highPriorityIssues > 0 ? "text-red-500 font-medium" : "text-gray-400",
+                },
+                {
+                  label: "Unassigned Issues", href: "/issues?status=OPEN",
+                  iconEl: <UserX className={`w-[18px] h-[18px] ${data.unassignedIssues > 0 ? "text-slate-600" : "text-gray-400"}`} />,
+                  iconBg: data.unassignedIssues > 0 ? "bg-slate-100" : "bg-gray-100",
+                  accentBorder: data.unassignedIssues > 0 ? "border-l-slate-500" : "border-l-gray-300",
+                  bgTint: "rgba(100,116,139,0.04)",
+                  value: <>{data.unassignedIssues}</>,
+                  secondary: "Need assignment", secondaryColor: data.unassignedIssues > 0 ? "text-amber-600" : "text-gray-400",
+                },
+              ].map(({ label, href, iconEl, iconBg, accentBorder, bgTint, value, secondary, secondaryColor }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className={`rounded-xl border border-gray-200 border-l-4 ${accentBorder} p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150`}
+                  style={{ background: `linear-gradient(135deg, ${bgTint} 0%, white 60%)` }}
+                >
+                  <div className={`w-9 h-9 ${iconBg} rounded-full flex items-center justify-center mb-3`}>
+                    {iconEl}
+                  </div>
+                  <div className="text-3xl font-black text-gray-900 leading-none">{value}</div>
+                  <div className="text-[13px] font-medium text-gray-600 mt-1">{label}</div>
+                  <div className={`text-[11px] mt-1.5 ${secondaryColor}`}>{secondary}</div>
+                </Link>
+              ))}
+            </div>
+
+            {/* PM Equipment Status Grid */}
+            <div data-tour="pm-equipment-status" className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-900">Equipment Status</h2>
+                <Link href="/assets" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium">
+                  All equipment <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              {data.equipmentAssets.length === 0 ? (
+                <div className="px-6 py-10 text-center">
+                  <Package className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">No equipment tracked yet</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+                  {data.equipmentAssets.map((asset) => {
+                    const statusConfig = {
+                      OPERATIONAL:    { label: "Operational",    bg: "bg-emerald-100", text: "text-emerald-700" },
+                      MAINTENANCE:    { label: "Maintenance",    bg: "bg-amber-100",   text: "text-amber-700"   },
+                      INACTIVE:       { label: "Inactive",       bg: "bg-gray-100",    text: "text-gray-600"    },
+                      OUT_OF_SERVICE: { label: "Out of Service", bg: "bg-red-100",     text: "text-red-700"     },
+                    }[asset.status] ?? { label: asset.status, bg: "bg-gray-100", text: "text-gray-600" }
+                    const subtypeLabel = asset.assetSubtype
+                      ? (PM_ASSET_TAXONOMY[asset.assetSubtype as keyof typeof PM_ASSET_TAXONOMY] ?? asset.assetSubtype)
+                      : null
+                    const openIssueCount = asset.issues.length
+                    return (
+                      <Link
+                        key={asset.id}
+                        href={`/assets/${asset.id}`}
+                        className="px-4 py-3.5 hover:bg-gray-50/70 transition-colors flex flex-col gap-1.5"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-sm font-semibold text-gray-900 leading-tight truncate">{asset.name}</span>
+                          {openIssueCount > 0 && (
+                            <span className="shrink-0 bg-orange-100 text-orange-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                              {openIssueCount} issue{openIssueCount > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
+                        {subtypeLabel && <span className="text-[11px] text-gray-400">{subtypeLabel}</span>}
+                        <span className={`self-start text-[11px] font-semibold px-2 py-0.5 rounded-full ${statusConfig.bg} ${statusConfig.text}`}>
+                          {statusConfig.label}
+                        </span>
+                        {asset.location && (
+                          <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                            <Home className="w-3 h-3" />{asset.location.name}
+                          </span>
+                        )}
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Recent Tenant Requests */}
+            <div data-tour="pm-tenant-requests" className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-900">Recent Tenant Requests</h2>
+                <Link href="/issues?category=TENANT_REQUEST" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium">
+                  View all <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <div className="divide-y divide-gray-50">
+                {data.recentTenantRequests.length === 0 ? (
+                  <div className="px-6 py-10 text-center">
+                    <QrCode className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                    <p className="text-sm text-gray-400">No tenant requests yet — set up a QR code in common areas to start collecting requests</p>
+                  </div>
+                ) : (
+                  data.recentTenantRequests.map((issue) => (
+                    <Link
+                      key={issue.id}
+                      href={`/issues/${issue.id}`}
+                      className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50/80 transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center border border-purple-100 shrink-0">
+                        <MessageSquare className="w-4 h-4 text-purple-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-gray-900 truncate">{issue.title}</div>
+                        <div className="flex items-center gap-2.5 text-xs text-gray-400 mt-0.5 flex-wrap">
+                          <span>{formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}</span>
+                          {issue.location && (
+                            <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{issue.location.name}</span>
+                          )}
+                          {issue.assignedTo && (
+                            <span className="text-blue-500">→ {issue.assignedTo.name}</span>
                           )}
                         </div>
                       </div>

@@ -10,6 +10,7 @@ import { AssetDialog } from "@/components/assets/asset-dialog"
 import { PlanGateContent } from "@/components/layout/plan-gate"
 import { hasWashOrProfessional } from "@/lib/pricing"
 import { CARWASH_ASSET_TAXONOMY } from "@/lib/car-wash-config"
+import { PM_ASSET_TAXONOMY } from "@/lib/property-management-config"
 
 export const dynamic = "force-dynamic"
 
@@ -36,7 +37,8 @@ export default async function AssetsPage() {
   ])
 
   const isCarWash = org?.industry === "Car Wash"
-  const pageTitle = isCarWash ? "Equipment" : "Assets"
+  const isPropMgmt = org?.industry === "Property Management"
+  const pageTitle = (isCarWash || isPropMgmt) ? "Equipment" : "Assets"
 
   if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
@@ -64,7 +66,7 @@ export default async function AssetsPage() {
             <AssetDialog locations={locations} departments={departments} vendors={vendors}>
               <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
                 <Plus className="w-4 h-4" />
-                {isCarWash ? "Add Equipment" : "Add Asset"}
+                {(isCarWash || isPropMgmt) ? "Add Equipment" : "Add Asset"}
               </button>
             </AssetDialog>
           </>
@@ -96,8 +98,8 @@ export default async function AssetsPage() {
           </div>
         </div>
 
-        {/* ── Car Wash Equipment Card Grid ────────────────────────────── */}
-        {isCarWash && (
+        {/* ── Car Wash / Property Management Equipment Card Grid ──────── */}
+        {(isCarWash || isPropMgmt) && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden" data-tour="asset-list">
             {assets.length === 0 ? (
               <div className="py-16 text-center">
@@ -114,7 +116,11 @@ export default async function AssetsPage() {
                     OUT_OF_SERVICE: { label: "Out of Service", bg: "bg-red-100",     text: "text-red-700",     dot: "bg-red-500"     },
                   }[asset.status] ?? { label: asset.status, bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400" }
                   const subtypeLabel = asset.assetSubtype
-                    ? (CARWASH_ASSET_TAXONOMY[asset.assetSubtype as keyof typeof CARWASH_ASSET_TAXONOMY] ?? asset.assetSubtype)
+                    ? (
+                        isPropMgmt
+                          ? (PM_ASSET_TAXONOMY[asset.assetSubtype as keyof typeof PM_ASSET_TAXONOMY] ?? asset.assetSubtype)
+                          : (CARWASH_ASSET_TAXONOMY[asset.assetSubtype as keyof typeof CARWASH_ASSET_TAXONOMY] ?? asset.assetSubtype)
+                      )
                     : null
                   const openCount = asset._count.issues
 
@@ -158,8 +164,8 @@ export default async function AssetsPage() {
           </div>
         )}
 
-        {/* ── Generic Asset List (non-Car Wash) ───────────────────────── */}
-        {!isCarWash && (
+        {/* ── Generic Asset List ──────────────────────────────────────── */}
+        {!isCarWash && !isPropMgmt && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden" data-tour="asset-list">
           {assets.length === 0 ? (
             <div className="py-16 text-center">

@@ -6,16 +6,16 @@ import { useTour } from "./tour-context"
 import { RelayWordmarkWhite } from "@/components/logo"
 
 const INDUSTRIES = [
-  { label: "Car Wash",           emoji: "🚗" },
-  { label: "Manufacturing",      emoji: "🏭" },
-  { label: "Warehousing",        emoji: "📦" },
-  { label: "Restaurant",         emoji: "🍽️" },
-  { label: "Retail",             emoji: "🛍️" },
-  { label: "Hospitality",        emoji: "🏨" },
-  { label: "Healthcare",         emoji: "🏥" },
-  { label: "Education",          emoji: "🎓" },
+  { label: "Car Wash",            emoji: "🚗" },
   { label: "Property Management", emoji: "🏢" },
-  { label: "Self-Storage",       emoji: "📦" },
+  { label: "Manufacturing",       emoji: "🏭" },
+  { label: "Warehousing",         emoji: "📦" },
+  { label: "Restaurant",          emoji: "🍽️" },
+  { label: "Retail",              emoji: "🛍️" },
+  { label: "Hospitality",         emoji: "🏨" },
+  { label: "Healthcare",          emoji: "🏥" },
+  { label: "Education",           emoji: "🎓" },
+  { label: "Self-Storage",        emoji: "📦" },
 ]
 
 export function TourWelcomeModal() {

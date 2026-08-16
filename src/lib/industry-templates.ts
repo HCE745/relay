@@ -434,18 +434,20 @@ Grease buildup in kitchen exhaust systems is the leading cause of commercial kit
   {
     key: "property",
     label: "Property & Facility Management",
-    demoCompanyName: "Apex Property Management",
-    departments: ["Maintenance", "Leasing", "Operations", "Landscaping"],
-    issueTypeLabels: ["Maintenance", "Facilities", "Customer Complaints", "Safety", "Operations"],
+    demoCompanyName: "Riverside Property Group",
+    departments: ["Maintenance", "Leasing", "Facilities", "Security"],
+    issueTypeLabels: ["Maintenance", "Tenant Request", "Building Issue", "Safety", "Equipment Failure"],
     demoLocations: [
-      { name: "Oakwood Apartment Complex",    locationType: "Service Facility" },
-      { name: "Riverside Commercial Park",    locationType: "Office" },
-      { name: "Westside Self-Storage",        locationType: "Warehouse" },
+      { name: "Riverside Apartments",       locationType: "Residential" },
+      { name: "North Commerce Center",      locationType: "Office" },
+      { name: "Main Street Retail Center",  locationType: "Retail" },
     ],
     demoVendors: [
-      { name: "AllTrade Contractors",   specialty: "General Repairs" },
-      { name: "CoolZone HVAC",          specialty: "HVAC Services" },
-      { name: "ElectraFix Electrical",  specialty: "Electrical" },
+      { name: "Summit Roofing Solutions",   specialty: "Roofing & Waterproofing" },
+      { name: "CoolZone HVAC",              specialty: "HVAC Services" },
+      { name: "Reliable Plumbing Co.",      specialty: "Plumbing & Drain" },
+      { name: "ElectraFix Electrical",      specialty: "Electrical" },
+      { name: "AllTrade Contractors",       specialty: "General Repairs" },
     ],
     demoSOPs: [
       {
@@ -500,6 +502,58 @@ Proactive HVAC maintenance reduces emergency calls, extends equipment life, and 
 
 ## 5. Annual Full Inspection
 Annual HVAC inspections must be performed by a licensed HVAC technician and must include: refrigerant level check, electrical connection inspection, blower motor lubrication, heat exchanger inspection (gas units), and a written inspection report. Retain inspection reports for a minimum of 3 years.`,
+      },
+      {
+        title: "Contractor Access and Work Authorization Procedure",
+        description: "Required steps for authorizing and managing external contractor access to managed properties.",
+        category: "SAFETY",
+        assetType: null,
+        version: "1.3",
+        content: `## 1. Purpose
+This procedure ensures that all contractor work on managed properties is properly authorized, coordinated, and documented to protect residents, property, and management liability.
+
+## 2. Pre-Authorization Requirements
+- **2.1 Approved Vendor List**: Only contractors on the approved vendor list may perform work without individual manager approval. Emergency repairs may use any licensed contractor with retroactive documentation.
+- **2.2 Insurance Verification**: Verify current Certificate of Insurance (COI) before authorizing any contractor who has not worked for the property within the last 12 months. Minimum required: $1M general liability, $500K workers' compensation.
+- **2.3 Scope of Work**: A written scope of work or proposal must be on file before work begins for any job estimated over $500.
+
+## 3. Resident Notification
+- **3.1 Common Area Work**: Post notice at building entrances and affected common areas at least 48 hours before work begins. Include: contractor name, work type, expected duration, and contact for questions.
+- **3.2 Unit-Affecting Work**: For work that affects individual units (water shutoffs, elevator outages, noise-generating trades), provide written notice per the Work Order Safety Entry Procedure.
+
+## 4. During Work
+- **4.1 Key and Access Control**: Issue a keyed property access card or escort the contractor. Do not leave contractors unescorted in occupied residential areas without prior resident notification.
+- **4.2 Relay Issue Link**: All contractor work must be linked to the originating Relay issue. The contractor's arrival time, scope performed, and departure time must be logged in the issue before closing.
+
+## 5. Completion and Close-Out
+At work completion, confirm: all work areas cleaned and restored, all access credentials returned, any follow-up items documented in Relay, and an invoice or receipt on file. Do not close the Relay issue until all close-out steps are complete.`,
+      },
+      {
+        title: "Vendor Response Time Standards",
+        description: "Required response and resolution timeframes for contractors by issue priority and category.",
+        category: "MAINTENANCE",
+        assetType: null,
+        version: "1.0",
+        content: `## 1. Purpose
+Consistent vendor response time standards ensure that tenant-impacting issues are resolved quickly and that management has clear criteria for evaluating contractor performance.
+
+## 2. Emergency Response (Life-Safety or Habitability)
+- **Target Response**: On-site within 2 hours of dispatch
+- **Applies to**: Active water leak causing property damage, total loss of heat (below 50°F outside), complete loss of electricity to a unit, gas odor, fire suppression system trigger, elevator entrapment
+- **Escalation**: If vendor cannot meet 2-hour target, notify Property Manager immediately and engage backup vendor
+
+## 3. Urgent Response (Significant Tenant Impact)
+- **Target Response**: On-site within 24 hours
+- **Applies to**: HVAC not cooling (above 85°F outside), hot water outage, partial loss of electricity, security camera outage, access control malfunction, roof leak with active drip
+- **Escalation**: Notify tenant of ETA within 4 hours of receiving the issue
+
+## 4. Routine Maintenance
+- **Target Scheduling**: Scheduled within 5 business days
+- **Applies to**: Appliance repairs, minor plumbing (slow drain, running toilet), door hardware, landscaping, cosmetic repairs, painting
+- **Tenant Communication**: Confirm appointment with tenant at least 24 hours in advance per the Work Order Safety Entry Procedure
+
+## 5. Vendor Performance Tracking
+Log all vendor dispatch times and arrival times in Relay. Monthly vendor performance reports should be reviewed for response time compliance. Vendors failing to meet standards on more than 20% of dispatches in any rolling 90-day period must be reviewed by the Property Manager.`,
       },
     ],
   },

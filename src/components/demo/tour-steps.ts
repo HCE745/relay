@@ -735,8 +735,158 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
   },
 ]
 
+// ─── Property Management tour (12 steps) ──────────────────────────────────
+
+export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
+  // Step 1: Opening (cinematic)
+  {
+    id: 1,
+    path: null,
+    targetSelector: null,
+    type: "cinematic",
+    audioFile: "/demo-audio/pm-step-01.mp3",
+    getTitle: () => "A tenant just called. There's water coming through the ceiling.",
+    getExplain: () =>
+      "Managing properties means handling tenant issues, coordinating contractors, tracking equipment, and keeping every building running — across multiple properties at once. Relay puts all of it in one place so nothing falls through the cracks.",
+  },
+
+  // Step 2: Property Overview dashboard
+  {
+    id: 2,
+    path: "/dashboard",
+    targetSelector: "[data-tour='pm-kpi-cards']",
+    audioFile: "/demo-audio/pm-step-02.mp3",
+    cue: "This is what your property team sees every morning.",
+    getTitle: () => "Your Property Overview — everything that matters, immediately.",
+    getExplain: () =>
+      "Your Property Overview shows what matters at a glance — open property issues, tenant requests today, active maintenance work, and equipment that needs attention. You can see where to focus without opening a single email or spreadsheet.",
+  },
+
+  // Step 3: Tenant requests panel
+  {
+    id: 3,
+    path: "/dashboard",
+    targetSelector: "[data-tour='pm-tenant-requests']",
+    audioFile: "/demo-audio/pm-step-03.mp3",
+    cue: "Tenant requests come in directly — no phone tag required.",
+    getTitle: () => "Tenant requests flow directly to your team.",
+    getExplain: () =>
+      "Tenants scan a QR code in their unit, the lobby, or a common area and describe the problem in seconds. The request goes directly to the right team, attached to the right property, with no calls to chase it down.",
+  },
+
+  // Step 4: QR codes page
+  {
+    id: 4,
+    path: "/qr-codes",
+    targetSelector: "[data-tour='qr-list']",
+    audioFile: "/demo-audio/pm-step-04.mp3",
+    cue: "Each code is already linked to a building, floor, or common area.",
+    getTitle: () => "The QR code handles the routing — tenants just describe the issue.",
+    getExplain: () =>
+      "Place a Relay QR code at the building entrance, each floor maintenance closet, the laundry room, or the parking structure. The code already identifies the property and location — tenants choose what went wrong and submit, with no account or app required.",
+  },
+
+  // Step 5: Issues list — request appears
+  {
+    id: 5,
+    path: "/issues",
+    targetSelector: "[data-tour='issue-list']",
+    audioFile: "/demo-audio/pm-step-05.mp3",
+    cue: "Every request your team receives shows up here.",
+    getTitle: () => "The request appears in Relay immediately.",
+    getExplain: () =>
+      "The request appears inside Relay with the property, location, time, and description already attached. Your team immediately knows what came in and where it needs to go.",
+  },
+
+  // Step 6: Issue detail — ownership
+  {
+    id: 6,
+    path: "FIRST_ISSUE",
+    targetSelector: "[data-tour='issue-detail-header']",
+    audioFile: "/demo-audio/pm-step-06.mp3",
+    cue: "Assign it to the right technician or contractor immediately.",
+    getTitle: () => "Every problem has a clear owner.",
+    getExplain: () =>
+      "Assign the issue to a maintenance technician, schedule a contractor, or flag it for follow-up. Relay gives every problem a clear owner so managers always know what is being handled and what is still waiting.",
+  },
+
+  // Step 7: Maintenance queue — active work, no scheduling claim
+  {
+    id: 7,
+    path: "/issues?category=MAINTENANCE",
+    targetSelector: "[data-tour='issue-list']",
+    audioFile: "/demo-audio/pm-step-07.mp3",
+    cue: "Open maintenance work stays visible so nothing slips through.",
+    getTitle: () => "Maintenance queue — active work always in view.",
+    getExplain: () =>
+      "Active maintenance work across all properties is visible in one queue. Your team can see what is open, what is in progress, and what is waiting on a part or a contractor — without digging through emails or asking around.",
+  },
+
+  // Step 8: Asset history
+  {
+    id: 8,
+    path: "FIRST_ASSET",
+    targetSelector: "[data-tour='asset-history']",
+    audioFile: "/demo-audio/pm-step-08.mp3",
+    getCue: () => "Every piece of equipment keeps its own service history.",
+    getTitle: () => "Every piece of equipment builds its own record.",
+    getExplain: () =>
+      "Each HVAC unit, boiler, elevator, and fire suppression system builds a history of its problems and service visits. When a contractor arrives, the full history is already there — so they spend less time diagnosing and more time fixing.",
+  },
+
+  // Step 9: Properties / hierarchy
+  {
+    id: 9,
+    path: "/locations",
+    targetSelector: "[data-tour='location-list']",
+    audioFile: "/demo-audio/pm-step-09.mp3",
+    cue: "Each property is its own location, with its own buildings, issues, and equipment.",
+    getTitle: () => "All your properties in one system.",
+    getExplain: () =>
+      "Relay organizes your portfolio into properties and buildings so every issue, asset, and QR code is tied to the right location. You can quickly see which properties have open issues and where attention is needed across your entire portfolio.",
+  },
+
+  // Step 10: Analytics / reports
+  {
+    id: 10,
+    path: "/analytics",
+    targetSelector: "[data-tour='analytics-header']",
+    audioFile: "/demo-audio/pm-step-10.mp3",
+    cue: "Every issue your team resolves builds this over time.",
+    getTitle: () => "The data that drives better property decisions.",
+    getExplain: () =>
+      "Over time, the history in Relay shows which properties generate the most issues, which equipment keeps failing, and how quickly your team resolves problems. That gives you better information for maintenance decisions, vendor evaluation, and capital planning.",
+  },
+
+  // Step 11: Contractor coordination
+  {
+    id: 11,
+    path: "/vendors",
+    targetSelector: "[data-tour='vendor-list'] > div:first-child",
+    audioFile: "/demo-audio/pm-step-11.mp3",
+    cue: "Your roofing contractor, plumber, and HVAC vendor are all connected to the work.",
+    getTitle: () => "Contractors connected to the work — not buried in email.",
+    getExplain: () =>
+      "When a problem requires an outside roofing contractor or plumber, coordinating the response usually means phone calls, follow-up calls, and hoping the right context made it through. Relay keeps contractor communication attached to the issue so the full history travels with it and nothing gets lost between inboxes.",
+  },
+
+  // Step 12: Completion
+  {
+    id: 12,
+    path: null,
+    targetSelector: null,
+    type: "completion",
+    audioFile: "/demo-audio/pm-step-12.mp3",
+    getTitle: () => "That's Relay for Property Management.",
+    getExplain: () =>
+      "Relay helps property management teams replace scattered communication with a shared operational system. Tenants have a clear way to report problems. Maintenance staff have clear assignments. Managers have visibility across every property. That means faster contractor response, better tenant communication, and a complete record of every issue across your portfolio. Start a free trial or schedule a demo to see it in your operation.",
+  },
+]
+
 export function getActiveTourSteps(industry: string): TourStep[] {
-  return industry === "Car Wash" ? CARWASH_TOUR_STEPS : TOUR_STEPS
+  if (industry === "Car Wash") return CARWASH_TOUR_STEPS
+  if (industry === "Property Management") return PROPERTY_MANAGEMENT_TOUR_STEPS
+  return TOUR_STEPS
 }
 
 export function getNumTourSteps(industry: string): number {

@@ -327,9 +327,27 @@ function CinematicIntro({
 
 function CompletionOverlay({ industry, onClose }: { industry: string; onClose: () => void }) {
   const router = useRouter()
+  const { plan } = useTour()
   const numSteps = getNumTourSteps(industry)
   const step = getActiveTourSteps(industry).find(s => s.id === numSteps)!
   const calendlyUrl = "https://calendly.com/getrelay"
+
+  const isCarWash        = industry === "Car Wash"
+  const isWashEssentials = isCarWash && plan === "wash_essentials"
+
+  const trialHref = isCarWash
+    ? isWashEssentials
+      ? "/register?industry=car_wash&plan=wash_essentials"
+      : "/register?industry=car_wash"
+    : industry === "Property Management"
+      ? "/register?industry=property_management"
+      : "/register"
+
+  const trialLabel = isCarWash
+    ? isWashEssentials
+      ? "Start Wash Essentials Free Trial"
+      : "Start Full Relay Free Trial"
+    : "Start Free Trial — No Credit Card Required"
 
   useEffect(() => {
     fireTrackingEvent("tour_completed", { industry })
@@ -353,11 +371,11 @@ function CompletionOverlay({ industry, onClose }: { industry: string; onClose: (
             Continue Exploring Demo
           </button>
           <a
-            href={industry === "Car Wash" ? "/register?industry=car_wash" : industry === "Property Management" ? "/register?industry=property_management" : "/register"}
+            href={trialHref}
             onClick={() => fireTrackingEvent("trial_started", { source: "tour_completion" })}
             className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
           >
-            Start Free Trial — No Credit Card Required
+            {trialLabel}
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
           <a

@@ -10,6 +10,7 @@ import { useTour } from "./tour-context"
 import { getNumTourSteps } from "./tour-steps"
 
 type DemoPkg = "essentials" | "professional" | "professional_plus"
+type DemoCarWashPkg = "wash_essentials" | "full_relay"
 
 const PLAN_TO_PKG: Record<string, DemoPkg> = {
   essentials:        "essentials",
@@ -21,6 +22,11 @@ const PACKAGES: { id: DemoPkg; label: string; activeColor: string }[] = [
   { id: "essentials",        label: "Essentials",        activeColor: "bg-gray-600 hover:bg-gray-500" },
   { id: "professional",      label: "Professional",      activeColor: "bg-blue-600 hover:bg-blue-500" },
   { id: "professional_plus", label: "Professional Plus", activeColor: "bg-purple-600 hover:bg-purple-500" },
+]
+
+const CARWASH_PACKAGES: { id: DemoCarWashPkg; label: string; activeColor: string }[] = [
+  { id: "wash_essentials", label: "Wash Essentials",         activeColor: "bg-blue-600 hover:bg-blue-500"   },
+  { id: "full_relay",      label: "Full Relay Wash Edition", activeColor: "bg-purple-600 hover:bg-purple-500" },
 ]
 
 const ROLES = [
@@ -68,8 +74,9 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
   const [localModules, setLocalModules] = useState<string[]>(intelligenceModules)
 
   const panelRef = useRef<HTMLDivElement>(null)
-  const isCarWashDemo = currentIndustry === "Car Wash"
-  const currentPkg = PLAN_TO_PKG[plan] ?? "professional_plus"
+  const isCarWashDemo    = currentIndustry === "Car Wash"
+  const currentPkg       = PLAN_TO_PKG[plan] ?? "professional_plus"
+  const currentCarWashPkg: DemoCarWashPkg = plan === "wash_essentials" ? "wash_essentials" : "full_relay"
 
   // Ctrl+Shift+D — hide/show panel entirely
   // Ctrl+Shift+T — toggle tour
@@ -139,6 +146,27 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({ package: pkg, modules: localModules }),
+      })
+      if (!res.ok) {
+        flash("Failed to switch package — please try again")
+        setBusy(null)
+        return
+      }
+      window.location.assign(window.location.href)
+    } catch {
+      flash("Network error — please try again")
+      setBusy(null)
+    }
+  }
+
+  async function switchCarWashPackage(pkg: DemoCarWashPkg) {
+    if (pkg === currentCarWashPkg || busy) return
+    setBusy(`cwpkg-${pkg}`)
+    try {
+      const res = await fetch("/api/demo/car-wash-package", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ package: pkg }),
       })
       if (!res.ok) {
         flash("Failed to switch package — please try again")
@@ -348,6 +376,39 @@ export function DemoPanel({ currentRole, plan, intelligenceModules, currentIndus
                 </button>
               )}
             </div>
+
+            {/* Car Wash package selector — Wash Essentials vs Full Relay Wash Edition */}
+            {isCarWashDemo && (
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Package</p>
+              <div className="flex flex-col gap-1.5">
+                {CARWASH_PACKAGES.map(({ id, label, activeColor }) => {
+                  const isActive = id === currentCarWashPkg
+                  const isBusy   = busy === `cwpkg-${id}`
+                  return (
+                    <button
+                      key={id}
+                      onClick={() => switchCarWashPackage(id)}
+                      disabled={isActive || !!busy}
+                      className={`
+                        flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium
+                        transition-all min-h-[40px]
+                        ${isActive
+                          ? `${activeColor} text-white ring-2 ring-white/30 ring-offset-1 ring-offset-gray-900`
+                          : "bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-40"}
+                      `}
+                    >
+                      <span>{label}</span>
+                      <span className="flex items-center gap-1">
+                        {isBusy && <Loader2 className="w-3 h-3 animate-spin" />}
+                        {isActive && !isBusy && <Check className="w-3.5 h-3.5" />}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            )}
 
             {/* Package selector — hidden for Car Wash (WE is a distinct product, not a tier) */}
             {!isCarWashDemo && (

@@ -15,7 +15,7 @@ interface Props {
 
 export function DemoTourHost({ currentRole, plan, intelligenceModules, initialIndustry }: Props) {
   return (
-    <TourProvider initialIndustry={initialIndustry}>
+    <TourProvider initialIndustry={initialIndustry} initialPlan={plan}>
       <RelayTracker />
       <DemoPanel
         currentRole={currentRole}

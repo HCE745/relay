@@ -17,6 +17,7 @@ interface TourState {
 
 interface TourContextValue extends TourState {
   industry: string
+  plan: string
   startTour: (fromStep?: number) => void
   exitTour: () => void
   nextStep: () => void
@@ -37,7 +38,7 @@ export function useTour() {
   return ctx
 }
 
-export function TourProvider({ children, initialIndustry = "Manufacturing" }: { children: React.ReactNode; initialIndustry?: string }) {
+export function TourProvider({ children, initialIndustry = "Manufacturing", initialPlan = "" }: { children: React.ReactNode; initialIndustry?: string; initialPlan?: string }) {
   const [state, setState] = useState<TourState>(() => {
     const base: TourState = {
       isActive: false,
@@ -55,6 +56,7 @@ export function TourProvider({ children, initialIndustry = "Manufacturing" }: { 
     return base
   })
   const [industry, setIndustryState] = useState(initialIndustry)
+  const plan = initialPlan
 
   const startTour = useCallback((fromStep = 1) => {
     setState(prev => ({ ...prev, isActive: true, currentStep: fromStep, lastExitedStep: null }))
@@ -109,6 +111,7 @@ export function TourProvider({ children, initialIndustry = "Manufacturing" }: { 
     <TourContext.Provider value={{
       ...state,
       industry,
+      plan,
       startTour,
       exitTour,
       nextStep,

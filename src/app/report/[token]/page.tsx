@@ -40,11 +40,13 @@ export default async function ReportPage({
 
   const isCarWash = qrCode.organization.industry === "Car Wash"
   const isPropMgmt = qrCode.organization.industry === "Property Management"
+  const isManufacturing = qrCode.organization.industry === "Manufacturing"
 
   return (
     <QrReportForm
       isCarWash={isCarWash}
       isPropMgmt={isPropMgmt}
+      isManufacturing={isManufacturing}
       qrCode={{
         id: qrCode.id,
         token: qrCode.token,

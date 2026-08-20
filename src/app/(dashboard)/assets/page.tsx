@@ -11,6 +11,7 @@ import { PlanGateContent } from "@/components/layout/plan-gate"
 import { hasWashOrProfessional } from "@/lib/pricing"
 import { CARWASH_ASSET_TAXONOMY } from "@/lib/car-wash-config"
 import { PM_ASSET_TAXONOMY } from "@/lib/property-management-config"
+import { MFG_ASSET_TAXONOMY } from "@/lib/manufacturing-config"
 
 export const dynamic = "force-dynamic"
 
@@ -38,7 +39,8 @@ export default async function AssetsPage() {
 
   const isCarWash = org?.industry === "Car Wash"
   const isPropMgmt = org?.industry === "Property Management"
-  const pageTitle = (isCarWash || isPropMgmt) ? "Equipment" : "Assets"
+  const isManufacturing = org?.industry === "Manufacturing"
+  const pageTitle = isManufacturing ? "Machines & Equipment" : (isCarWash || isPropMgmt) ? "Equipment" : "Assets"
 
   if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
@@ -66,7 +68,7 @@ export default async function AssetsPage() {
             <AssetDialog locations={locations} departments={departments} vendors={vendors}>
               <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
                 <Plus className="w-4 h-4" />
-                {(isCarWash || isPropMgmt) ? "Add Equipment" : "Add Asset"}
+                {isManufacturing ? "Add Machine" : (isCarWash || isPropMgmt) ? "Add Equipment" : "Add Asset"}
               </button>
             </AssetDialog>
           </>
@@ -98,8 +100,8 @@ export default async function AssetsPage() {
           </div>
         </div>
 
-        {/* ── Car Wash / Property Management Equipment Card Grid ──────── */}
-        {(isCarWash || isPropMgmt) && (
+        {/* ── Car Wash / Property Management / Manufacturing Equipment Card Grid ──── */}
+        {(isCarWash || isPropMgmt || isManufacturing) && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden" data-tour="asset-list">
             {assets.length === 0 ? (
               <div className="py-16 text-center">
@@ -119,6 +121,8 @@ export default async function AssetsPage() {
                     ? (
                         isPropMgmt
                           ? (PM_ASSET_TAXONOMY[asset.assetSubtype as keyof typeof PM_ASSET_TAXONOMY] ?? asset.assetSubtype)
+                          : isManufacturing
+                          ? (MFG_ASSET_TAXONOMY[asset.assetSubtype] ?? asset.assetSubtype)
                           : (CARWASH_ASSET_TAXONOMY[asset.assetSubtype as keyof typeof CARWASH_ASSET_TAXONOMY] ?? asset.assetSubtype)
                       )
                     : null
@@ -165,7 +169,7 @@ export default async function AssetsPage() {
         )}
 
         {/* ── Generic Asset List ──────────────────────────────────────── */}
-        {!isCarWash && !isPropMgmt && (
+        {!isCarWash && !isPropMgmt && !isManufacturing && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden" data-tour="asset-list">
           {assets.length === 0 ? (
             <div className="py-16 text-center">

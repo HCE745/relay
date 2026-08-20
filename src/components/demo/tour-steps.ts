@@ -883,9 +883,164 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
   },
 ]
 
+// ─── Manufacturing tour (12 steps, all audioFile: null) ───────────────────────
+
+export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
+  // Step 1: Opening (cinematic)
+  {
+    id: 1,
+    path: null,
+    targetSelector: null,
+    type: "cinematic",
+    audioFile: null,
+    getTitle: () => "A machine just went down. Production is halted.",
+    getExplain: () =>
+      "Running a manufacturing facility means keeping equipment online, coordinating maintenance, tracking safety issues, and knowing what's happening across every plant and line. Relay puts all of it in one place so problems get resolved instead of getting lost.",
+  },
+
+  // Step 2: Plant Overview dashboard KPIs
+  {
+    id: 2,
+    path: "/dashboard",
+    targetSelector: "[data-tour='kpi-cards']",
+    audioFile: null,
+    cue: "This is what your team sees the moment they start a shift.",
+    getTitle: () => "Your Plant Overview — the whole operation at a glance.",
+    getExplain: () =>
+      "Your Plant Overview shows the critical numbers immediately — equipment down, open safety issues, pending maintenance, machine availability, and high-priority items. You can see where attention is needed before your team even starts the shift.",
+  },
+
+  // Step 3: Machine Status
+  {
+    id: 3,
+    path: "/dashboard",
+    targetSelector: "[data-tour='mfg-machine-status']",
+    audioFile: null,
+    cue: "Every machine your plant tracks appears here — operational, down, or in maintenance.",
+    getTitle: () => "Machine status — all equipment visible immediately.",
+    getExplain: () =>
+      "The Machine Status board shows every piece of tracked equipment and its current state — operational, needs maintenance, or out of service. When an issue is open against a machine, it shows the count so your team knows which assets are currently affected.",
+  },
+
+  // Step 4: Recent Equipment Issues
+  {
+    id: 4,
+    path: "/dashboard",
+    targetSelector: "[data-tour='mfg-recent-breakdowns']",
+    audioFile: null,
+    cue: "Every equipment breakdown lands here the moment it's reported.",
+    getTitle: () => "Equipment issues logged the moment they happen.",
+    getExplain: () =>
+      "Equipment breakdowns get reported immediately — through the app, a QR code on the machine, or your team directly. Every issue is time-stamped and linked to the specific asset, so nothing disappears into a text or verbal handoff.",
+  },
+
+  // Step 5: Report an Issue (form-fill)
+  {
+    id: 5,
+    path: "/issues/new",
+    targetSelector: "[data-tour='issue-form']",
+    audioFile: null,
+    type: "form-fill",
+    cue: "This is how any team member reports a problem — from a machine breakdown to a safety concern.",
+    getTitle: () => "Any operator can report a problem in seconds.",
+    getExplain: () =>
+      "Whether it's a machine making an unusual noise, a safety hazard, or a quality defect, any team member can log it immediately from their phone or a shared device. The issue is categorized, prioritized, and routed to the right team without any phone calls.",
+    getFormData: () => ({
+      title: "CNC Machine #3 — spindle vibration at high RPM",
+      description: "Spindle vibrating noticeably above 8,000 RPM. Surface finish on current job is borderline. Reducing to 6,000 RPM for now. Needs inspection before next precision run.",
+      category: "EQUIPMENT_BREAKDOWN",
+    }),
+  },
+
+  // Step 6: Issue list / assignment
+  {
+    id: 6,
+    path: "/issues",
+    targetSelector: "[data-tour='issue-list']",
+    audioFile: null,
+    cue: "Every issue is now tracked — no more verbal handoffs or lost texts.",
+    getTitle: () => "Every issue tracked, assigned, and resolved.",
+    getExplain: () =>
+      "Once reported, issues can be assigned to the right maintenance tech or team, set to in-progress, and resolved with full resolution details. Every step is logged so nothing gets dropped and you can see the full history of every problem.",
+  },
+
+  // Step 7: QR code on machine
+  {
+    id: 7,
+    path: "/qr-codes",
+    targetSelector: "[data-tour='qr-code-list']",
+    audioFile: null,
+    cue: "Each machine can have its own QR code so operators report problems without leaving the floor.",
+    getTitle: () => "QR codes on machines — operators report without leaving the line.",
+    getExplain: () =>
+      "Attach a QR code to each machine. Operators scan it and tap what's wrong — machine not running, strange noise, quality issue, safety hazard. The report goes directly into Relay linked to that specific asset, with no app login required.",
+  },
+
+  // Step 8: Asset / machine detail
+  {
+    id: 8,
+    path: "/assets",
+    targetSelector: "[data-tour='asset-list']",
+    audioFile: null,
+    cue: "Every machine builds its own maintenance history.",
+    getTitle: () => "Every machine keeps its own record.",
+    getExplain: () =>
+      "Each CNC machine, press, robot, conveyor, and utility system builds a history of every breakdown, maintenance visit, and resolution. When something goes wrong, the full history is there — so your team spends less time diagnosing and more time fixing.",
+  },
+
+  // Step 9: Locations / plants
+  {
+    id: 9,
+    path: "/locations",
+    targetSelector: "[data-tour='location-list']",
+    audioFile: null,
+    cue: "Each plant is its own location, with its own lines, areas, and equipment.",
+    getTitle: () => "All your plants in one system.",
+    getExplain: () =>
+      "Relay organizes your operation into plants, areas, and lines so every issue, machine, and QR code is tied to the right location. Managers can see which plant has the most open issues and where to focus maintenance resources.",
+  },
+
+  // Step 10: Analytics / reports
+  {
+    id: 10,
+    path: "/analytics",
+    targetSelector: "[data-tour='analytics-header']",
+    audioFile: null,
+    cue: "Every resolved issue builds this over time.",
+    getTitle: () => "The data that drives better maintenance decisions.",
+    getExplain: () =>
+      "Over time, the history in Relay shows which equipment fails most often, which categories of issues take longest to resolve, and where recurring breakdowns concentrate. That gives you better information for maintenance schedules, capital equipment decisions, and supplier evaluation.",
+  },
+
+  // Step 11: SOPs / safety
+  {
+    id: 11,
+    path: "/sops",
+    targetSelector: "[data-tour='sop-list']",
+    audioFile: null,
+    cue: "LOTO procedures, inspection checklists, and safety SOPs are all here — linked to the work.",
+    getTitle: () => "SOPs attached to the work — not buried in a binder.",
+    getExplain: () =>
+      "Safety procedures, LOTO checklists, and maintenance SOPs live inside Relay where your team actually works. When an issue is flagged for a possible SOP violation, the relevant procedure is visible right alongside the issue so supervisors can address it immediately.",
+  },
+
+  // Step 12: Completion
+  {
+    id: 12,
+    path: null,
+    targetSelector: null,
+    type: "completion",
+    audioFile: null,
+    getTitle: () => "That's Relay for Manufacturing.",
+    getExplain: () =>
+      "Relay helps manufacturing teams replace scattered communication with a shared operational system. Equipment problems are logged the moment they happen. Maintenance staff have clear assignments. Managers have visibility across every plant. That means faster response to breakdowns, fewer dropped issues, and a complete maintenance history for every machine. Start a free trial or schedule a demo to see it in your operation.",
+  },
+]
+
 export function getActiveTourSteps(industry: string): TourStep[] {
   if (industry === "Car Wash") return CARWASH_TOUR_STEPS
   if (industry === "Property Management") return PROPERTY_MANAGEMENT_TOUR_STEPS
+  if (industry === "Manufacturing") return MANUFACTURING_TOUR_STEPS
   return TOUR_STEPS
 }
 

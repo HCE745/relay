@@ -545,13 +545,18 @@ function getAssets(industryKey: string): AssetSeed[] {
   switch (industryKey) {
     case "manufacturing":
       return [
-        { name: "Conveyor Belt Line 3",       type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0 },
-        { name: "Hydraulic Press Station 4",   type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0 },
-        { name: "CNC Machine Center #2",       type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0 },
-        { name: "Air Compressor System",       type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0 },
-        { name: "Forklift Unit B",             type: "VEHICLE",   status: "OPERATIONAL",       locIdx: 1 },
-        { name: "HVAC Unit — Plant Building",  type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0 },
-        { name: "Company Van #2",              type: "VEHICLE",   status: "NEEDS_MAINTENANCE", locIdx: 2 },
+        { name: "Conveyor Belt Line 3",        type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0, assetSubtype: "CONVEYOR" },
+        { name: "Hydraulic Press Station 4",   type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0, assetSubtype: "BRAKE_PRESS" },
+        { name: "CNC Machine Center #2",       type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "CNC_MILL" },
+        { name: "Air Compressor System",       type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "COMPRESSOR" },
+        { name: "Forklift Unit B",             type: "VEHICLE",   status: "OPERATIONAL",       locIdx: 1, assetSubtype: "FORKLIFT" },
+        { name: "Laser Cutter #2",             type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 0, assetSubtype: "LASER_CUTTER" },
+        { name: "Welding Robot Station 5",     type: "EQUIPMENT", status: "OPERATIONAL",       locIdx: 1, assetSubtype: "ROBOT" },
+        { name: "Overhead Crane — Bay A",      type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0, assetSubtype: "CRANE" },
+        { name: "CMM Station",                 type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0, assetSubtype: "CMM" },
+        { name: "HVAC Unit — Machining Plant", type: "EQUIPMENT", status: "NEEDS_MAINTENANCE", locIdx: 0, assetSubtype: "HVAC" },
+        { name: "Forklift Unit C",             type: "VEHICLE",   status: "OPERATIONAL",       locIdx: 1, assetSubtype: "FORKLIFT" },
+        { name: "Company Van #2",              type: "VEHICLE",   status: "NEEDS_MAINTENANCE", locIdx: 4, assetSubtype: "VEHICLE" },
       ]
     case "warehousing":
       return [

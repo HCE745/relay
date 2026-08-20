@@ -4,6 +4,7 @@ import { useState } from "react"
 import { MapPin, Building2, Camera, User, Mail, Phone, ChevronRight, CheckCircle2 } from "lucide-react"
 import { CARWASH_QR_PROBLEM_LABELS } from "@/lib/car-wash-config"
 import { PM_QR_PROBLEM_LABELS } from "@/lib/property-management-config"
+import { MFG_QR_PROBLEM_LABELS, MFG_QR_DEFAULT_CATEGORIES } from "@/lib/manufacturing-config"
 
 interface QrCodeData {
   id: string
@@ -43,10 +44,12 @@ export function QrReportForm({
   qrCode,
   isCarWash = false,
   isPropMgmt = false,
+  isManufacturing = false,
 }: {
   qrCode: QrCodeData
   isCarWash?: boolean
   isPropMgmt?: boolean
+  isManufacturing?: boolean
 }) {
   const isVisitorFeedback = qrCode.reportingMode === "VISITOR_FEEDBACK"
 
@@ -65,8 +68,11 @@ export function QrReportForm({
   const locationStr = [qrCode.location?.name, qrCode.area].filter(Boolean).join(" · ")
 
   // Determine which problem label map to use for industry-specific QR forms.
-  const industryQrLabels = isPropMgmt ? PM_QR_PROBLEM_LABELS : CARWASH_QR_PROBLEM_LABELS
+  // Manufacturing uses a flat string array (not a category→label Record), so we handle it separately.
   const useIndustryCategories = isCarWash || isPropMgmt
+  const industryQrLabels: Record<string, string> = isPropMgmt
+    ? PM_QR_PROBLEM_LABELS
+    : CARWASH_QR_PROBLEM_LABELS
 
   // Build the list of industry-specific categories to display, intersected with
   // the QR code's allowedCategories (if configured) so admins can restrict.
@@ -79,9 +85,18 @@ export function QrReportForm({
       })()
     : []
 
+  // Manufacturing uses a flat string array of operator-facing problem descriptions.
+  const mfgLabels = MFG_QR_PROBLEM_LABELS as readonly string[]
+
   function handleCategorySelect(cat: string) {
     setSelectedCategory(cat)
     setTitle(industryQrLabels[cat] ?? cat)
+    if (error) setError("")
+  }
+
+  function handleMfgLabelSelect(label: string) {
+    setSelectedCategory(MFG_QR_DEFAULT_CATEGORIES[label] ?? "EQUIPMENT_BREAKDOWN")
+    setTitle(label)
     if (error) setError("")
   }
 
@@ -181,7 +196,7 @@ export function QrReportForm({
             <p className="text-sm text-gray-400 mt-2">{qrCode.description}</p>
           )}
           {/* Asset-specific prompt shown in the header so it's visible above the fold */}
-          {useIndustryCategories && qrCode.asset && (
+          {(useIndustryCategories || isManufacturing) && qrCode.asset && (
             <div className="mt-3 pt-3 border-t border-gray-100">
               <p className="text-base font-semibold text-gray-900">
                 What&apos;s wrong with {qrCode.asset.name}?
@@ -196,6 +211,37 @@ export function QrReportForm({
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
             <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        {/* Manufacturing: large tap-target problem selector */}
+        {isManufacturing && (
+          <div>
+            {!qrCode.asset && (
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                What&apos;s the problem? <span className="text-red-500">*</span>
+              </label>
+            )}
+            <div className="space-y-2">
+              {mfgLabels.map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => handleMfgLabelSelect(label)}
+                  className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border-2 text-left text-sm font-medium transition-all
+                    ${
+                      title === label
+                        ? "border-indigo-500 bg-indigo-50 text-indigo-900"
+                        : "border-gray-200 bg-white text-gray-800 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                >
+                  {label}
+                  {title === label && (
+                    <CheckCircle2 className="w-5 h-5 text-indigo-500 shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -231,7 +277,7 @@ export function QrReportForm({
         )}
 
         {/* Standard title field — hidden when category auto-sets the title */}
-        {!useIndustryCategories && (
+        {!useIndustryCategories && !isManufacturing && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Title <span className="text-red-500">*</span>
@@ -249,7 +295,7 @@ export function QrReportForm({
         {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            {useIndustryCategories ? (
+            {(useIndustryCategories || isManufacturing) ? (
               <>Tell us more <span className="text-gray-400 font-normal">(optional)</span></>
             ) : (
               <>Description <span className="text-red-500">*</span></>
@@ -258,9 +304,9 @@ export function QrReportForm({
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            rows={useIndustryCategories ? 3 : 5}
+            rows={(useIndustryCategories || isManufacturing) ? 3 : 5}
             placeholder={
-              useIndustryCategories
+              (useIndustryCategories || isManufacturing)
                 ? "Any additional details? (optional)"
                 : (MODE_PLACEHOLDERS[qrCode.reportingMode] ?? "Describe what you're reporting…")
             }

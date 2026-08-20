@@ -28,12 +28,11 @@ import {
   ShoppingCart,
   ClipboardCheck,
   Radio,
-  Droplets,
-  QrCode,
 } from "lucide-react"
 import type { PageKey } from "@/lib/page-access"
 import { RelayIconWhite, RelayWordmarkWhite } from "@/components/logo"
 import { SupportButton } from "@/components/support/support-button"
+import { getIndustryNavItems, CARWASH_NAV_ITEMS } from "@/lib/workspace-config"
 
 const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: React.ElementType }> = [
   { key: "dashboard",       href: "/dashboard",       label: "Dashboard",      icon: LayoutDashboard },
@@ -51,19 +50,6 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "analytics",       href: "/analytics",         label: "Analytics",      icon: BarChart2 },
   { key: "sops",            href: "/sops",              label: "SOPs",           icon: BookOpen },
   { key: "purchase-requests", href: "/purchase-requests", label: "Purchases",   icon: ShoppingCart },
-]
-
-const CARWASH_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: React.ElementType }> = [
-  { key: "dashboard",  href: "/dashboard",                       label: "Wash Overview",    icon: Droplets },
-  { key: "issues",     href: "/issues?category=CUSTOMER_REPORT", label: "Customer Reports", icon: ClipboardList },
-  { key: "issues",     href: "/issues",                          label: "Issues",            icon: AlertCircle },
-  { key: "issues",     href: "/issues?category=MAINTENANCE",     label: "Maintenance",       icon: Wrench },
-  { key: "assets",     href: "/assets",                          label: "Equipment",         icon: Package },
-  { key: "qr-codes",  href: "/qr-codes",                        label: "QR Codes",          icon: QrCode },
-  { key: "locations",  href: "/locations",                       label: "Locations",         icon: MapPin },
-  { key: "vendors",    href: "/vendors",                         label: "Vendors",           icon: Building2 },
-  { key: "team",       href: "/team",                            label: "Team",              icon: Users },
-  { key: "analytics",  href: "/analytics",                       label: "Reports",           icon: BarChart2 },
 ]
 
 // Ordered prefix→title pairs (most-specific first)
@@ -178,9 +164,9 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
   }, [drawerOpen])
 
   const allowedSet = new Set(allowedPageKeys)
-  const isCarWash = industry === "Car Wash"
-  const visibleItems = isCarWash
-    ? CARWASH_NAV_ITEMS.filter(i => allowedSet.has(i.key))
+  const industryNavItems = getIndustryNavItems(industry ?? "")
+  const visibleItems = industryNavItems
+    ? industryNavItems.filter(i => allowedSet.has(i.key))
     : ALL_NAV_ITEMS.filter((i) => {
         if (!allowedSet.has(i.key)) return false
         if (i.key === "corporate-dashboard" && !corporateDashboardEnabled) return false
@@ -200,8 +186,8 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
       }
       return true
     }
-    if (isCarWash) {
-      const hasSpecificMatch = CARWASH_NAV_ITEMS.some(item => {
+    if (industryNavItems) {
+      const hasSpecificMatch = industryNavItems.some(item => {
         const iqIdx = item.href.indexOf("?")
         if (iqIdx === -1 || item.href.slice(0, iqIdx) !== href) return false
         if (pathname !== href) return false

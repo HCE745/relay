@@ -334,6 +334,7 @@ function CompletionOverlay({ industry, onClose }: { industry: string; onClose: (
 
   const isCarWash        = industry === "Car Wash"
   const isWashEssentials = isCarWash && plan === "wash_essentials"
+  const isManufacturing  = industry === "Manufacturing"
 
   const trialHref = isCarWash
     ? isWashEssentials
@@ -341,13 +342,17 @@ function CompletionOverlay({ industry, onClose }: { industry: string; onClose: (
       : "/register?industry=car_wash"
     : industry === "Property Management"
       ? "/register?industry=property_management"
-      : "/register"
+      : isManufacturing
+        ? "/register?industry=manufacturing"
+        : "/register"
 
   const trialLabel = isCarWash
     ? isWashEssentials
       ? "Start Wash Essentials Free Trial"
       : "Start Full Relay Free Trial"
-    : "Start Free Trial — No Credit Card Required"
+    : isManufacturing
+      ? "Start Free Trial — No Credit Card Required"
+      : "Start Free Trial — No Credit Card Required"
 
   useEffect(() => {
     fireTrackingEvent("tour_completed", { industry })

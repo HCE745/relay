@@ -33,15 +33,13 @@ import {
   Clock,
   Radio,
   ClipboardCheck,
-  Droplets,
-  MessageSquare,
-  HardHat,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { logout } from "@/lib/auth-actions"
 import type { PageKey } from "@/lib/page-access"
 import { RelayWordmarkWhite } from "@/components/logo"
 import type { RecentlyViewedItem } from "@/components/layout/recently-viewed-tracker"
+import { CARWASH_NAV_ITEMS, PROPERTY_NAV_ITEMS, MANUFACTURING_NAV_ITEMS, getIndustryNavItems, isIndustryNavFlat } from "@/lib/workspace-config"
 
 const STATUS_BADGE: Record<string, string> = {
   OPEN:        "bg-blue-500",
@@ -80,38 +78,6 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "team",                href: "/team",                label: "Team",                  icon: Users,           section: "ADMINISTRATION" },
 ]
 
-// Car Wash–specific navigation — replaces ALL_NAV_ITEMS when industry === "Car Wash"
-// Filtered views for Customer Reports and Maintenance replace the generic Issues item.
-// "Equipment" replaces "Assets" for car-wash terminology.
-const CARWASH_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: React.ElementType }> = [
-  { key: "dashboard",  href: "/dashboard",                       label: "Wash Overview",    icon: Droplets },
-  { key: "issues",     href: "/issues?category=CUSTOMER_REPORT", label: "Customer Reports", icon: ClipboardList },
-  { key: "issues",     href: "/issues",                          label: "Issues",            icon: AlertCircle },
-  { key: "issues",     href: "/issues?category=MAINTENANCE",     label: "Maintenance",       icon: Wrench },
-  { key: "assets",     href: "/assets",                          label: "Equipment",         icon: Package },
-  { key: "qr-codes",  href: "/qr-codes",                        label: "QR Codes",          icon: QrCode },
-  { key: "locations",  href: "/locations",                       label: "Locations",         icon: MapPin },
-  { key: "vendors",    href: "/vendors",                         label: "Vendors",           icon: Building2 },
-  { key: "team",       href: "/team",                            label: "Team",              icon: Users },
-  { key: "analytics",  href: "/analytics",                       label: "Reports",           icon: BarChart2 },
-]
-
-// Property Management–specific navigation — replaces ALL_NAV_ITEMS when industry === "Property Management"
-// Multiple issues entries provide filtered views: Tenant Requests, Issues, Maintenance.
-const PROPERTY_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: React.ElementType }> = [
-  { key: "dashboard",  href: "/dashboard",                          label: "Property Overview", icon: LayoutDashboard },
-  { key: "issues",     href: "/issues?category=TENANT_REQUEST",     label: "Tenant Requests",   icon: MessageSquare   },
-  { key: "issues",     href: "/issues",                             label: "Property Issues",   icon: AlertCircle     },
-  { key: "issues",     href: "/issues?category=MAINTENANCE",        label: "Maintenance",       icon: Wrench          },
-  { key: "assets",     href: "/assets",                             label: "Equipment",         icon: Package         },
-  { key: "locations",  href: "/locations",                          label: "Properties",        icon: MapPin          },
-  { key: "qr-codes",   href: "/qr-codes",                           label: "QR Codes",          icon: QrCode          },
-  { key: "vendors",    href: "/vendors",                            label: "Contractors",       icon: HardHat         },
-  { key: "sops",       href: "/sops",                               label: "SOPs",              icon: BookOpen        },
-  { key: "team",       href: "/team",                               label: "Team",              icon: Users           },
-  { key: "analytics",  href: "/analytics",                          label: "Reports",           icon: BarChart2       },
-]
-
 const SECTION_ORDER = ["MAIN", "OPERATIONS", "INTELLIGENCE", "ADMINISTRATION"]
 
 interface SidebarProps {
@@ -144,8 +110,8 @@ export function Sidebar({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const allowedSet = new Set(allowedPageKeys)
-  const isCarWash = industry === "Car Wash"
-  const isPropMgmt = industry === "Property Management"
+  const industryNavItems = getIndustryNavItems(industry ?? "")
+  const isFlat = isIndustryNavFlat(industry ?? "")
   const [recentItems, setRecentItems] = useState<RecentlyViewedItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
 
@@ -175,10 +141,8 @@ export function Sidebar({
     return () => window.removeEventListener("storage", load)
   }, [])
 
-  const visibleNavItems = isCarWash
-    ? CARWASH_NAV_ITEMS.filter(item => allowedSet.has(item.key))
-    : isPropMgmt
-    ? PROPERTY_NAV_ITEMS.filter(item => allowedSet.has(item.key))
+  const visibleNavItems = industryNavItems
+    ? industryNavItems.filter(item => allowedSet.has(item.key))
     : ALL_NAV_ITEMS.filter(item => {
         if (!allowedSet.has(item.key)) return false
         if ((item.key === "corporate-dashboard" || item.key === "regional-dashboard") && !corporateDashboardEnabled) return false
@@ -198,7 +162,6 @@ export function Sidebar({
       return true
     }
     // Plain href — but don't activate if a more-specific industry item with query params matches
-    const industryNavItems = isCarWash ? CARWASH_NAV_ITEMS : isPropMgmt ? PROPERTY_NAV_ITEMS : null
     if (industryNavItems) {
       const hasSpecificMatch = industryNavItems.some(item => {
         const iqIdx = item.href.indexOf("?")
@@ -263,7 +226,7 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 px-2 py-3 overflow-y-auto">
-        {(isCarWash || isPropMgmt) ? (
+        {isFlat ? (
           <div className="mb-4 space-y-0.5">
             {visibleNavItems.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
           </div>

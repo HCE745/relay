@@ -25,11 +25,13 @@ export const INDUSTRY_TEMPLATES: IndustryTemplate[] = [
   {
     key: "manufacturing",
     label: "Manufacturing",
-    demoCompanyName: "Acme Manufacturing",
-    departments: ["Production", "Maintenance", "Quality Control", "Safety", "Shipping"],
+    demoCompanyName: "Midwest Precision Manufacturing",
+    departments: ["Production", "Maintenance", "Quality Control", "Safety", "Engineering", "Shipping & Receiving", "Procurement"],
     issueTypeLabels: ["Maintenance", "Safety", "Quality Control", "Operations", "Facilities"],
     demoLocations: [
-      { name: "Main Plant",              locationType: "Plant" },
+      { name: "Machining Plant",         locationType: "Plant" },
+      { name: "Fabrication & Welding",   locationType: "Plant" },
+      { name: "Assembly Plant",          locationType: "Plant" },
       { name: "Distribution Warehouse",  locationType: "Warehouse" },
       { name: "Corporate Office",        locationType: "Office" },
     ],
@@ -37,6 +39,7 @@ export const INDUSTRY_TEMPLATES: IndustryTemplate[] = [
       { name: "ProMech Industrial Services", specialty: "Equipment Repair" },
       { name: "SafeGuard Compliance",        specialty: "Safety & Compliance" },
       { name: "Precision Parts Supply",      specialty: "Parts & Components" },
+      { name: "Great Lakes HVAC & Cooling",  specialty: "HVAC & Cooling Systems" },
     ],
     demoSOPs: [
       {

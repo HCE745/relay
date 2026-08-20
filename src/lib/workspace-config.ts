@@ -101,7 +101,7 @@ export type TermKey =
 
 export type TerminologyMap = Partial<Record<TermKey, string>>
 
-const PLATFORM_DEFAULTS: Record<TermKey, string> = {
+export const PLATFORM_DEFAULTS: Record<TermKey, string> = {
   issueSingular:      "Issue",
   issuePlural:        "Issues",
   assetSingular:      "Asset",

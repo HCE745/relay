@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Organization: 'Organization',
+  WorkspaceChangeLog: 'WorkspaceChangeLog',
   User: 'User',
   PasswordResetToken: 'PasswordResetToken',
   Location: 'Location',
@@ -225,6 +226,8 @@ export const OrganizationScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   pageAccessConfig: 'pageAccessConfig',
+  navigationConfig: 'navigationConfig',
+  terminologyConfig: 'terminologyConfig',
   regions_enabled: 'regions_enabled',
   corporate_dashboard_enabled: 'corporate_dashboard_enabled',
   cross_location_analytics_enabled: 'cross_location_analytics_enabled',
@@ -295,6 +298,19 @@ export const OrganizationScalarFieldEnum = {
 } as const
 
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
+
+
+export const WorkspaceChangeLogScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  changedBy: 'changedBy',
+  changedAt: 'changedAt',
+  changeType: 'changeType',
+  before: 'before',
+  after: 'after'
+} as const
+
+export type WorkspaceChangeLogScalarFieldEnum = (typeof WorkspaceChangeLogScalarFieldEnum)[keyof typeof WorkspaceChangeLogScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {

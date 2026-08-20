@@ -52,6 +52,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         executive_briefings_enabled: true,
         executive_goals_enabled: true,
         trend_detection_enabled: true,
+        navigationConfig: true,
       },
     }),
     prisma.userSettings.findUnique({
@@ -74,6 +75,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     )
 
   if (org?.name) setOrgContext(session.organizationId, org.name)
+
+  const navLabelOverrides = ((org?.navigationConfig ?? {}) as { labelOverrides?: Record<string, string> }).labelOverrides ?? {}
 
   // Use DB status as source of truth (fresher than JWT for expired/read_only)
   const currentStatus = org?.subscriptionStatus ?? session.subscriptionStatus ?? "trialing"
@@ -133,6 +136,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         executiveBriefingsEnabled={org?.executive_briefings_enabled ?? false}
         executiveGoalsEnabled={org?.executive_goals_enabled ?? false}
         trendDetectionEnabled={org?.trend_detection_enabled ?? false}
+        navLabelOverrides={navLabelOverrides}
       />
 
       {/* Mobile: top bar + slide-out drawer + bottom tab bar */}
@@ -144,6 +148,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         regionsEnabled={org?.regions_enabled ?? false}
         userName={session.name ?? ""}
         orgName={org?.name ?? ""}
+        navLabelOverrides={navLabelOverrides}
       />
 
       {/* Content area: right of sidebar on desktop, full-width on mobile */}

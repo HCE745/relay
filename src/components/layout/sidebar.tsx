@@ -92,6 +92,7 @@ interface SidebarProps {
   executiveBriefingsEnabled?: boolean
   executiveGoalsEnabled?: boolean
   trendDetectionEnabled?: boolean
+  navLabelOverrides?: Record<string, string>
 }
 
 export function Sidebar({
@@ -106,6 +107,7 @@ export function Sidebar({
   executiveBriefingsEnabled,
   executiveGoalsEnabled,
   trendDetectionEnabled,
+  navLabelOverrides,
 }: SidebarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -228,7 +230,9 @@ export function Sidebar({
       <nav className="flex-1 px-2 py-3 overflow-y-auto">
         {isFlat ? (
           <div className="mb-4 space-y-0.5">
-            {visibleNavItems.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
+            {visibleNavItems.map(({ href, label, icon: Icon }) =>
+              navLink(href, navLabelOverrides?.[href] ?? label, Icon)
+            )}
           </div>
         ) : (
           SECTION_ORDER.map(section => {

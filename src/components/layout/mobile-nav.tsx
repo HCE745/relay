@@ -101,9 +101,10 @@ interface MobileNavProps {
   regionsEnabled?: boolean
   userName?: string
   orgName?: string
+  navLabelOverrides?: Record<string, string>
 }
 
-export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, userName, orgName }: MobileNavProps) {
+export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, userName, orgName, navLabelOverrides }: MobileNavProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -293,7 +294,7 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
                 )}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
-                {label}
+                {navLabelOverrides?.[href] ?? label}
               </Link>
             ))}
           </nav>

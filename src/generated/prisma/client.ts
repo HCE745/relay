@@ -47,6 +47,11 @@ export { Prisma }
  */
 export type Organization = Prisma.OrganizationModel
 /**
+ * Model WorkspaceChangeLog
+ * 
+ */
+export type WorkspaceChangeLog = Prisma.WorkspaceChangeLogModel
+/**
  * Model User
  * 
  */

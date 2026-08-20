@@ -65,6 +65,8 @@ model Organization {
   updatedAt DateTime @updatedAt
 
   pageAccessConfig   Json?
+  navigationConfig   Json?
+  terminologyConfig  Json?
 
   // ── Professional Plus feature flags (controlled by Super Admin, default false) ─
   regions_enabled                   Boolean @default(false)
@@ -200,6 +202,20 @@ model Organization {
   assignments           Assignment[]
   announcements         Announcement[]
   emergencyBroadcasts   EmergencyBroadcast[]
+  workspaceChangeLogs   WorkspaceChangeLog[]
+}
+
+model WorkspaceChangeLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  changedBy      String?
+  changedAt      DateTime     @default(now())
+  changeType     String
+  before         Json?
+  after          Json?
+
+  @@index([organizationId, changedAt(sort: Desc)])
 }
 
 model User {

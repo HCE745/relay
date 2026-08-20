@@ -15,7 +15,7 @@ import { IssueTemplatesManager } from "@/components/settings/issue-templates-man
 import { NotificationPrefsForm } from "@/components/settings/notification-prefs-form"
 import { DEFAULT_ACCESS, type PageAccessConfig, type PageKey } from "@/lib/page-access"
 import Link from "next/link"
-import { Users, GitBranch, CreditCard } from "lucide-react"
+import { Users, GitBranch, CreditCard, Sliders } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -134,6 +134,25 @@ export default async function SettingsPage() {
               <div>
                 <p className="font-medium text-gray-900 text-sm">Employee Types</p>
                 <p className="text-xs text-gray-500">Define role presets with default permissions and page access</p>
+              </div>
+            </div>
+            <span className="text-gray-400 text-sm">→</span>
+          </Link>
+        )}
+
+        {/* Workspace Customization — ADMIN only */}
+        {isAdmin && (
+          <Link
+            href="/settings/workspace"
+            className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-300 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                <Sliders className="w-4.5 h-4.5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900 text-sm">Workspace</p>
+                <p className="text-xs text-gray-500">Customize navigation labels and terminology across your workspace</p>
               </div>
             </div>
             <span className="text-gray-400 text-sm">→</span>

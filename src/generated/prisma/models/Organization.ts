@@ -338,6 +338,8 @@ export type OrganizationCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   pageAccessConfig: number
+  navigationConfig: number
+  terminologyConfig: number
   regions_enabled: number
   corporate_dashboard_enabled: number
   cross_location_analytics_enabled: number
@@ -721,6 +723,8 @@ export type OrganizationCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   pageAccessConfig?: true
+  navigationConfig?: true
+  terminologyConfig?: true
   regions_enabled?: true
   corporate_dashboard_enabled?: true
   cross_location_analytics_enabled?: true
@@ -927,6 +931,8 @@ export type OrganizationGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   pageAccessConfig: runtime.JsonValue | null
+  navigationConfig: runtime.JsonValue | null
+  terminologyConfig: runtime.JsonValue | null
   regions_enabled: boolean
   corporate_dashboard_enabled: boolean
   cross_location_analytics_enabled: boolean
@@ -1069,6 +1075,8 @@ export type OrganizationWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   pageAccessConfig?: Prisma.JsonNullableFilter<"Organization">
+  navigationConfig?: Prisma.JsonNullableFilter<"Organization">
+  terminologyConfig?: Prisma.JsonNullableFilter<"Organization">
   regions_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   corporate_dashboard_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   cross_location_analytics_enabled?: Prisma.BoolFilter<"Organization"> | boolean
@@ -1189,6 +1197,7 @@ export type OrganizationWhereInput = {
   assignments?: Prisma.AssignmentListRelationFilter
   announcements?: Prisma.AnnouncementListRelationFilter
   emergencyBroadcasts?: Prisma.EmergencyBroadcastListRelationFilter
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogListRelationFilter
 }
 
 export type OrganizationOrderByWithRelationInput = {
@@ -1241,6 +1250,8 @@ export type OrganizationOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pageAccessConfig?: Prisma.SortOrderInput | Prisma.SortOrder
+  navigationConfig?: Prisma.SortOrderInput | Prisma.SortOrder
+  terminologyConfig?: Prisma.SortOrderInput | Prisma.SortOrder
   regions_enabled?: Prisma.SortOrder
   corporate_dashboard_enabled?: Prisma.SortOrder
   cross_location_analytics_enabled?: Prisma.SortOrder
@@ -1361,6 +1372,7 @@ export type OrganizationOrderByWithRelationInput = {
   assignments?: Prisma.AssignmentOrderByRelationAggregateInput
   announcements?: Prisma.AnnouncementOrderByRelationAggregateInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastOrderByRelationAggregateInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogOrderByRelationAggregateInput
 }
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -1417,6 +1429,8 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   pageAccessConfig?: Prisma.JsonNullableFilter<"Organization">
+  navigationConfig?: Prisma.JsonNullableFilter<"Organization">
+  terminologyConfig?: Prisma.JsonNullableFilter<"Organization">
   regions_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   corporate_dashboard_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   cross_location_analytics_enabled?: Prisma.BoolFilter<"Organization"> | boolean
@@ -1536,6 +1550,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   assignments?: Prisma.AssignmentListRelationFilter
   announcements?: Prisma.AnnouncementListRelationFilter
   emergencyBroadcasts?: Prisma.EmergencyBroadcastListRelationFilter
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogListRelationFilter
 }, "id" | "slug" | "referralCode">
 
 export type OrganizationOrderByWithAggregationInput = {
@@ -1588,6 +1603,8 @@ export type OrganizationOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pageAccessConfig?: Prisma.SortOrderInput | Prisma.SortOrder
+  navigationConfig?: Prisma.SortOrderInput | Prisma.SortOrder
+  terminologyConfig?: Prisma.SortOrderInput | Prisma.SortOrder
   regions_enabled?: Prisma.SortOrder
   corporate_dashboard_enabled?: Prisma.SortOrder
   cross_location_analytics_enabled?: Prisma.SortOrder
@@ -1715,6 +1732,8 @@ export type OrganizationScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Organization"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Organization"> | Date | string
   pageAccessConfig?: Prisma.JsonNullableWithAggregatesFilter<"Organization">
+  navigationConfig?: Prisma.JsonNullableWithAggregatesFilter<"Organization">
+  terminologyConfig?: Prisma.JsonNullableWithAggregatesFilter<"Organization">
   regions_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   corporate_dashboard_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   cross_location_analytics_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
@@ -1834,6 +1853,8 @@ export type OrganizationCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -1954,6 +1975,7 @@ export type OrganizationCreateInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateInput = {
@@ -2006,6 +2028,8 @@ export type OrganizationUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -2126,6 +2150,7 @@ export type OrganizationUncheckedCreateInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUpdateInput = {
@@ -2178,6 +2203,8 @@ export type OrganizationUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2298,6 +2325,7 @@ export type OrganizationUpdateInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateInput = {
@@ -2350,6 +2378,8 @@ export type OrganizationUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2470,6 +2500,7 @@ export type OrganizationUncheckedUpdateInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateManyInput = {
@@ -2522,6 +2553,8 @@ export type OrganizationCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -2641,6 +2674,8 @@ export type OrganizationUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2760,6 +2795,8 @@ export type OrganizationUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2887,6 +2924,8 @@ export type OrganizationCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pageAccessConfig?: Prisma.SortOrder
+  navigationConfig?: Prisma.SortOrder
+  terminologyConfig?: Prisma.SortOrder
   regions_enabled?: Prisma.SortOrder
   corporate_dashboard_enabled?: Prisma.SortOrder
   cross_location_analytics_enabled?: Prisma.SortOrder
@@ -3279,6 +3318,20 @@ export type OrganizationUpdateintelligenceModulesInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type OrganizationCreateNestedOneWithoutWorkspaceChangeLogsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutWorkspaceChangeLogsInput, Prisma.OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutWorkspaceChangeLogsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutWorkspaceChangeLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutWorkspaceChangeLogsInput, Prisma.OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutWorkspaceChangeLogsInput
+  upsert?: Prisma.OrganizationUpsertWithoutWorkspaceChangeLogsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutWorkspaceChangeLogsInput, Prisma.OrganizationUpdateWithoutWorkspaceChangeLogsInput>, Prisma.OrganizationUncheckedUpdateWithoutWorkspaceChangeLogsInput>
 }
 
 export type OrganizationCreateNestedOneWithoutUsersInput = {
@@ -4031,6 +4084,718 @@ export type OrganizationUpdateOneRequiredWithoutEmergencyBroadcastsNestedInput =
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutEmergencyBroadcastsInput, Prisma.OrganizationUpdateWithoutEmergencyBroadcastsInput>, Prisma.OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput>
 }
 
+export type OrganizationCreateWithoutWorkspaceChangeLogsInput = {
+  id?: string
+  name: string
+  slug: string
+  logo?: string | null
+  industry?: string | null
+  companySize?: string | null
+  numberOfLocations?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialStartDate?: Date | string | null
+  trialEndsAt?: Date | string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeCouponId?: string | null
+  subscriptionStatus?: string
+  plan?: string
+  productLine?: string
+  employeeLimit?: number | null
+  locationLimit?: number | null
+  checkoutIntentStatus?: string | null
+  intelligenceSuiteEnabled?: boolean
+  monthlyBasePrice?: number | null
+  monthlyScalingCost?: number | null
+  monthlyModulesCost?: number | null
+  monthlyTotalBeforeDiscount?: number | null
+  monthlyTotalAfterDiscount?: number | null
+  discountPercent?: number | null
+  discountExpiresAt?: Date | string | null
+  discountLabel?: string | null
+  suspendedAt?: Date | string | null
+  isDemo?: boolean
+  demoExpiresAt?: Date | string | null
+  aiSuggestionsAvailable?: boolean
+  aiSuggestionsPolicy?: string
+  aiSuggestionsAudience?: string
+  purchaseRequestEnabled?: boolean
+  purchaseRequestItemLimit?: number | null
+  purchaseRequestMonthlyLimit?: number | null
+  approval_intelligence_enabled?: boolean
+  ai_suggest_unmatched_items?: boolean
+  ai_confidence_threshold?: number
+  injuryAlertEmails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sopMatchSensitivity?: string
+  billingFrequency?: string
+  currentPrice?: number | null
+  priceLockedUntil?: Date | string | null
+  intelligenceModules?: Prisma.OrganizationCreateintelligenceModulesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  regions_enabled?: boolean
+  corporate_dashboard_enabled?: boolean
+  cross_location_analytics_enabled?: boolean
+  advanced_escalations_enabled?: boolean
+  api_webhooks_enabled?: boolean
+  sso_foundation_enabled?: boolean
+  shared_facility_enabled?: boolean
+  qr_codes_enabled?: boolean
+  external_collaborators_enabled?: boolean
+  multi_org_enabled?: boolean
+  executive_briefings_enabled?: boolean
+  health_scores_enabled?: boolean
+  trend_detection_enabled?: boolean
+  executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
+  lifecycleStatus?: string
+  referralCode?: string | null
+  referralLink?: string | null
+  users?: Prisma.UserCreateNestedManyWithoutOrganizationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutOrganizationInput
+  regions?: Prisma.RegionCreateNestedManyWithoutOrganizationInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutOrganizationInput
+  assets?: Prisma.AssetCreateNestedManyWithoutOrganizationInput
+  vendors?: Prisma.VendorCreateNestedManyWithoutOrganizationInput
+  issues?: Prisma.IssueCreateNestedManyWithoutOrganizationInput
+  escalationPolicies?: Prisma.EscalationPolicyCreateNestedManyWithoutOrganizationInput
+  escalationChains?: Prisma.EscalationChainCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutOrganizationInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutOrganizationInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutOrganizationInput
+  emailTemplates?: Prisma.EmailTemplateCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  impersonationLogs?: Prisma.ImpersonationLogCreateNestedManyWithoutOrganizationInput
+  auditLogs?: Prisma.SuperAdminAuditLogCreateNestedManyWithoutOrganizationInput
+  orgNotes?: Prisma.OrgNoteCreateNestedManyWithoutOrganizationInput
+  analyticsSnapshots?: Prisma.AnalyticsSnapshotCreateNestedManyWithoutOrganizationInput
+  employeeTypes?: Prisma.EmployeeTypeCreateNestedManyWithoutOrganizationInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutOrganizationInput
+  sops?: Prisma.SOPCreateNestedManyWithoutOrganizationInput
+  purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutOrganizationInput
+  approvedCatalogItems?: Prisma.ApprovedCatalogItemCreateNestedManyWithoutOrganizationInput
+  approvalPolicies?: Prisma.ApprovalPolicyCreateNestedManyWithoutOrganizationInput
+  injuryReports?: Prisma.InjuryReportCreateNestedManyWithoutOrganizationInput
+  issueTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutOrganizationInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutOrganizationInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutOrganizationInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOrganizationInput
+  webhookEndpoints?: Prisma.WebhookEndpointCreateNestedManyWithoutOrganizationInput
+  ssoConfig?: Prisma.SSOConfigCreateNestedOneWithoutOrganizationInput
+  orgRelationshipsAsA?: Prisma.OrganizationRelationshipCreateNestedManyWithoutOrgAInput
+  orgRelationshipsAsB?: Prisma.OrganizationRelationshipCreateNestedManyWithoutOrgBInput
+  qrCodes?: Prisma.QrCodeCreateNestedManyWithoutOrganizationInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutOrganizationInput
+  executiveBriefings?: Prisma.ExecutiveBriefingCreateNestedManyWithoutOrganizationInput
+  healthScores?: Prisma.HealthScoreCreateNestedManyWithoutOrganizationInput
+  trendAlerts?: Prisma.TrendAlertCreateNestedManyWithoutOrganizationInput
+  executiveGoals?: Prisma.ExecutiveGoalCreateNestedManyWithoutOrganizationInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutOrganizationInput
+  demoCalls?: Prisma.DemoCallCreateNestedManyWithoutOrganizationInput
+  nonConversionReasons?: Prisma.NonConversionReasonCreateNestedManyWithoutOrganizationInput
+  crmNotes?: Prisma.CrmNoteCreateNestedManyWithoutOrganizationInput
+  crmActivities?: Prisma.CrmActivityCreateNestedManyWithoutOrganizationInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerOrgInput
+  referralReceived?: Prisma.ReferralCreateNestedOneWithoutReferredOrgInput
+  billingCredits?: Prisma.BillingCreditCreateNestedManyWithoutOrgInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  supportConversations?: Prisma.SupportConversationCreateNestedManyWithoutOrganizationInput
+  broadcasts?: Prisma.BroadcastCreateNestedManyWithoutTargetOrgInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
+  emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput = {
+  id?: string
+  name: string
+  slug: string
+  logo?: string | null
+  industry?: string | null
+  companySize?: string | null
+  numberOfLocations?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialStartDate?: Date | string | null
+  trialEndsAt?: Date | string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeCouponId?: string | null
+  subscriptionStatus?: string
+  plan?: string
+  productLine?: string
+  employeeLimit?: number | null
+  locationLimit?: number | null
+  checkoutIntentStatus?: string | null
+  intelligenceSuiteEnabled?: boolean
+  monthlyBasePrice?: number | null
+  monthlyScalingCost?: number | null
+  monthlyModulesCost?: number | null
+  monthlyTotalBeforeDiscount?: number | null
+  monthlyTotalAfterDiscount?: number | null
+  discountPercent?: number | null
+  discountExpiresAt?: Date | string | null
+  discountLabel?: string | null
+  suspendedAt?: Date | string | null
+  isDemo?: boolean
+  demoExpiresAt?: Date | string | null
+  aiSuggestionsAvailable?: boolean
+  aiSuggestionsPolicy?: string
+  aiSuggestionsAudience?: string
+  purchaseRequestEnabled?: boolean
+  purchaseRequestItemLimit?: number | null
+  purchaseRequestMonthlyLimit?: number | null
+  approval_intelligence_enabled?: boolean
+  ai_suggest_unmatched_items?: boolean
+  ai_confidence_threshold?: number
+  injuryAlertEmails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sopMatchSensitivity?: string
+  billingFrequency?: string
+  currentPrice?: number | null
+  priceLockedUntil?: Date | string | null
+  intelligenceModules?: Prisma.OrganizationCreateintelligenceModulesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  regions_enabled?: boolean
+  corporate_dashboard_enabled?: boolean
+  cross_location_analytics_enabled?: boolean
+  advanced_escalations_enabled?: boolean
+  api_webhooks_enabled?: boolean
+  sso_foundation_enabled?: boolean
+  shared_facility_enabled?: boolean
+  qr_codes_enabled?: boolean
+  external_collaborators_enabled?: boolean
+  multi_org_enabled?: boolean
+  executive_briefings_enabled?: boolean
+  health_scores_enabled?: boolean
+  trend_detection_enabled?: boolean
+  executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
+  lifecycleStatus?: string
+  referralCode?: string | null
+  referralLink?: string | null
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutOrganizationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutOrganizationInput
+  regions?: Prisma.RegionUncheckedCreateNestedManyWithoutOrganizationInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutOrganizationInput
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutOrganizationInput
+  vendors?: Prisma.VendorUncheckedCreateNestedManyWithoutOrganizationInput
+  issues?: Prisma.IssueUncheckedCreateNestedManyWithoutOrganizationInput
+  escalationPolicies?: Prisma.EscalationPolicyUncheckedCreateNestedManyWithoutOrganizationInput
+  escalationChains?: Prisma.EscalationChainUncheckedCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutOrganizationInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutOrganizationInput
+  emailTemplates?: Prisma.EmailTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  impersonationLogs?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutOrganizationInput
+  auditLogs?: Prisma.SuperAdminAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+  orgNotes?: Prisma.OrgNoteUncheckedCreateNestedManyWithoutOrganizationInput
+  analyticsSnapshots?: Prisma.AnalyticsSnapshotUncheckedCreateNestedManyWithoutOrganizationInput
+  employeeTypes?: Prisma.EmployeeTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutOrganizationInput
+  sops?: Prisma.SOPUncheckedCreateNestedManyWithoutOrganizationInput
+  purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  approvedCatalogItems?: Prisma.ApprovedCatalogItemUncheckedCreateNestedManyWithoutOrganizationInput
+  approvalPolicies?: Prisma.ApprovalPolicyUncheckedCreateNestedManyWithoutOrganizationInput
+  injuryReports?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutOrganizationInput
+  issueTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutOrganizationInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOrganizationInput
+  webhookEndpoints?: Prisma.WebhookEndpointUncheckedCreateNestedManyWithoutOrganizationInput
+  ssoConfig?: Prisma.SSOConfigUncheckedCreateNestedOneWithoutOrganizationInput
+  orgRelationshipsAsA?: Prisma.OrganizationRelationshipUncheckedCreateNestedManyWithoutOrgAInput
+  orgRelationshipsAsB?: Prisma.OrganizationRelationshipUncheckedCreateNestedManyWithoutOrgBInput
+  qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutOrganizationInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutOrganizationInput
+  executiveBriefings?: Prisma.ExecutiveBriefingUncheckedCreateNestedManyWithoutOrganizationInput
+  healthScores?: Prisma.HealthScoreUncheckedCreateNestedManyWithoutOrganizationInput
+  trendAlerts?: Prisma.TrendAlertUncheckedCreateNestedManyWithoutOrganizationInput
+  executiveGoals?: Prisma.ExecutiveGoalUncheckedCreateNestedManyWithoutOrganizationInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutOrganizationInput
+  demoCalls?: Prisma.DemoCallUncheckedCreateNestedManyWithoutOrganizationInput
+  nonConversionReasons?: Prisma.NonConversionReasonUncheckedCreateNestedManyWithoutOrganizationInput
+  crmNotes?: Prisma.CrmNoteUncheckedCreateNestedManyWithoutOrganizationInput
+  crmActivities?: Prisma.CrmActivityUncheckedCreateNestedManyWithoutOrganizationInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerOrgInput
+  referralReceived?: Prisma.ReferralUncheckedCreateNestedOneWithoutReferredOrgInput
+  billingCredits?: Prisma.BillingCreditUncheckedCreateNestedManyWithoutOrgInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  supportConversations?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  broadcasts?: Prisma.BroadcastUncheckedCreateNestedManyWithoutTargetOrgInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
+  emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutWorkspaceChangeLogsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutWorkspaceChangeLogsInput, Prisma.OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput>
+}
+
+export type OrganizationUpsertWithoutWorkspaceChangeLogsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutWorkspaceChangeLogsInput, Prisma.OrganizationUncheckedUpdateWithoutWorkspaceChangeLogsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutWorkspaceChangeLogsInput, Prisma.OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutWorkspaceChangeLogsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutWorkspaceChangeLogsInput, Prisma.OrganizationUncheckedUpdateWithoutWorkspaceChangeLogsInput>
+}
+
+export type OrganizationUpdateWithoutWorkspaceChangeLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfLocations?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intelligenceSuiteEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyBasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyScalingCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyModulesCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyTotalBeforeDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyTotalAfterDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  discountPercent?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  discountExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  discountLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDemo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  demoExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiSuggestionsAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiSuggestionsPolicy?: Prisma.StringFieldUpdateOperationsInput | string
+  aiSuggestionsAudience?: Prisma.StringFieldUpdateOperationsInput | string
+  purchaseRequestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  purchaseRequestItemLimit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  purchaseRequestMonthlyLimit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approval_intelligence_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ai_suggest_unmatched_items?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ai_confidence_threshold?: Prisma.FloatFieldUpdateOperationsInput | number
+  injuryAlertEmails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sopMatchSensitivity?: Prisma.StringFieldUpdateOperationsInput | string
+  billingFrequency?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  priceLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  intelligenceModules?: Prisma.OrganizationUpdateintelligenceModulesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  advanced_escalations_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  api_webhooks_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sso_foundation_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shared_facility_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  qr_codes_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  external_collaborators_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  multi_org_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executive_briefings_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  users?: Prisma.UserUpdateManyWithoutOrganizationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutOrganizationNestedInput
+  regions?: Prisma.RegionUpdateManyWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutOrganizationNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutOrganizationNestedInput
+  vendors?: Prisma.VendorUpdateManyWithoutOrganizationNestedInput
+  issues?: Prisma.IssueUpdateManyWithoutOrganizationNestedInput
+  escalationPolicies?: Prisma.EscalationPolicyUpdateManyWithoutOrganizationNestedInput
+  escalationChains?: Prisma.EscalationChainUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutOrganizationNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutOrganizationNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutOrganizationNestedInput
+  emailTemplates?: Prisma.EmailTemplateUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  impersonationLogs?: Prisma.ImpersonationLogUpdateManyWithoutOrganizationNestedInput
+  auditLogs?: Prisma.SuperAdminAuditLogUpdateManyWithoutOrganizationNestedInput
+  orgNotes?: Prisma.OrgNoteUpdateManyWithoutOrganizationNestedInput
+  analyticsSnapshots?: Prisma.AnalyticsSnapshotUpdateManyWithoutOrganizationNestedInput
+  employeeTypes?: Prisma.EmployeeTypeUpdateManyWithoutOrganizationNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutOrganizationNestedInput
+  sops?: Prisma.SOPUpdateManyWithoutOrganizationNestedInput
+  purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutOrganizationNestedInput
+  approvedCatalogItems?: Prisma.ApprovedCatalogItemUpdateManyWithoutOrganizationNestedInput
+  approvalPolicies?: Prisma.ApprovalPolicyUpdateManyWithoutOrganizationNestedInput
+  injuryReports?: Prisma.InjuryReportUpdateManyWithoutOrganizationNestedInput
+  issueTemplates?: Prisma.IssueTemplateUpdateManyWithoutOrganizationNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutOrganizationNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutOrganizationNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOrganizationNestedInput
+  webhookEndpoints?: Prisma.WebhookEndpointUpdateManyWithoutOrganizationNestedInput
+  ssoConfig?: Prisma.SSOConfigUpdateOneWithoutOrganizationNestedInput
+  orgRelationshipsAsA?: Prisma.OrganizationRelationshipUpdateManyWithoutOrgANestedInput
+  orgRelationshipsAsB?: Prisma.OrganizationRelationshipUpdateManyWithoutOrgBNestedInput
+  qrCodes?: Prisma.QrCodeUpdateManyWithoutOrganizationNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutOrganizationNestedInput
+  executiveBriefings?: Prisma.ExecutiveBriefingUpdateManyWithoutOrganizationNestedInput
+  healthScores?: Prisma.HealthScoreUpdateManyWithoutOrganizationNestedInput
+  trendAlerts?: Prisma.TrendAlertUpdateManyWithoutOrganizationNestedInput
+  executiveGoals?: Prisma.ExecutiveGoalUpdateManyWithoutOrganizationNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutOrganizationNestedInput
+  demoCalls?: Prisma.DemoCallUpdateManyWithoutOrganizationNestedInput
+  nonConversionReasons?: Prisma.NonConversionReasonUpdateManyWithoutOrganizationNestedInput
+  crmNotes?: Prisma.CrmNoteUpdateManyWithoutOrganizationNestedInput
+  crmActivities?: Prisma.CrmActivityUpdateManyWithoutOrganizationNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerOrgNestedInput
+  referralReceived?: Prisma.ReferralUpdateOneWithoutReferredOrgNestedInput
+  billingCredits?: Prisma.BillingCreditUpdateManyWithoutOrgNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  supportConversations?: Prisma.SupportConversationUpdateManyWithoutOrganizationNestedInput
+  broadcasts?: Prisma.BroadcastUpdateManyWithoutTargetOrgNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
+  emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutWorkspaceChangeLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfLocations?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intelligenceSuiteEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyBasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyScalingCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyModulesCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyTotalBeforeDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyTotalAfterDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  discountPercent?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  discountExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  discountLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDemo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  demoExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiSuggestionsAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiSuggestionsPolicy?: Prisma.StringFieldUpdateOperationsInput | string
+  aiSuggestionsAudience?: Prisma.StringFieldUpdateOperationsInput | string
+  purchaseRequestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  purchaseRequestItemLimit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  purchaseRequestMonthlyLimit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approval_intelligence_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ai_suggest_unmatched_items?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ai_confidence_threshold?: Prisma.FloatFieldUpdateOperationsInput | number
+  injuryAlertEmails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sopMatchSensitivity?: Prisma.StringFieldUpdateOperationsInput | string
+  billingFrequency?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  priceLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  intelligenceModules?: Prisma.OrganizationUpdateintelligenceModulesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  advanced_escalations_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  api_webhooks_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sso_foundation_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shared_facility_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  qr_codes_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  external_collaborators_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  multi_org_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executive_briefings_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  users?: Prisma.UserUncheckedUpdateManyWithoutOrganizationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutOrganizationNestedInput
+  regions?: Prisma.RegionUncheckedUpdateManyWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutOrganizationNestedInput
+  vendors?: Prisma.VendorUncheckedUpdateManyWithoutOrganizationNestedInput
+  issues?: Prisma.IssueUncheckedUpdateManyWithoutOrganizationNestedInput
+  escalationPolicies?: Prisma.EscalationPolicyUncheckedUpdateManyWithoutOrganizationNestedInput
+  escalationChains?: Prisma.EscalationChainUncheckedUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutOrganizationNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutOrganizationNestedInput
+  emailTemplates?: Prisma.EmailTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  impersonationLogs?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  auditLogs?: Prisma.SuperAdminAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  orgNotes?: Prisma.OrgNoteUncheckedUpdateManyWithoutOrganizationNestedInput
+  analyticsSnapshots?: Prisma.AnalyticsSnapshotUncheckedUpdateManyWithoutOrganizationNestedInput
+  employeeTypes?: Prisma.EmployeeTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutOrganizationNestedInput
+  sops?: Prisma.SOPUncheckedUpdateManyWithoutOrganizationNestedInput
+  purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  approvedCatalogItems?: Prisma.ApprovedCatalogItemUncheckedUpdateManyWithoutOrganizationNestedInput
+  approvalPolicies?: Prisma.ApprovalPolicyUncheckedUpdateManyWithoutOrganizationNestedInput
+  injuryReports?: Prisma.InjuryReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  issueTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOrganizationNestedInput
+  webhookEndpoints?: Prisma.WebhookEndpointUncheckedUpdateManyWithoutOrganizationNestedInput
+  ssoConfig?: Prisma.SSOConfigUncheckedUpdateOneWithoutOrganizationNestedInput
+  orgRelationshipsAsA?: Prisma.OrganizationRelationshipUncheckedUpdateManyWithoutOrgANestedInput
+  orgRelationshipsAsB?: Prisma.OrganizationRelationshipUncheckedUpdateManyWithoutOrgBNestedInput
+  qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutOrganizationNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutOrganizationNestedInput
+  executiveBriefings?: Prisma.ExecutiveBriefingUncheckedUpdateManyWithoutOrganizationNestedInput
+  healthScores?: Prisma.HealthScoreUncheckedUpdateManyWithoutOrganizationNestedInput
+  trendAlerts?: Prisma.TrendAlertUncheckedUpdateManyWithoutOrganizationNestedInput
+  executiveGoals?: Prisma.ExecutiveGoalUncheckedUpdateManyWithoutOrganizationNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutOrganizationNestedInput
+  demoCalls?: Prisma.DemoCallUncheckedUpdateManyWithoutOrganizationNestedInput
+  nonConversionReasons?: Prisma.NonConversionReasonUncheckedUpdateManyWithoutOrganizationNestedInput
+  crmNotes?: Prisma.CrmNoteUncheckedUpdateManyWithoutOrganizationNestedInput
+  crmActivities?: Prisma.CrmActivityUncheckedUpdateManyWithoutOrganizationNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerOrgNestedInput
+  referralReceived?: Prisma.ReferralUncheckedUpdateOneWithoutReferredOrgNestedInput
+  billingCredits?: Prisma.BillingCreditUncheckedUpdateManyWithoutOrgNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  supportConversations?: Prisma.SupportConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  broadcasts?: Prisma.BroadcastUncheckedUpdateManyWithoutTargetOrgNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
+  emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
 export type OrganizationCreateWithoutUsersInput = {
   id?: string
   name: string
@@ -4081,6 +4846,8 @@ export type OrganizationCreateWithoutUsersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -4200,6 +4967,7 @@ export type OrganizationCreateWithoutUsersInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutUsersInput = {
@@ -4252,6 +5020,8 @@ export type OrganizationUncheckedCreateWithoutUsersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -4371,6 +5141,7 @@ export type OrganizationUncheckedCreateWithoutUsersInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutUsersInput = {
@@ -4439,6 +5210,8 @@ export type OrganizationUpdateWithoutUsersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4558,6 +5331,7 @@ export type OrganizationUpdateWithoutUsersInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutUsersInput = {
@@ -4610,6 +5384,8 @@ export type OrganizationUncheckedUpdateWithoutUsersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4729,6 +5505,7 @@ export type OrganizationUncheckedUpdateWithoutUsersInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutLocationsInput = {
@@ -4781,6 +5558,8 @@ export type OrganizationCreateWithoutLocationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -4900,6 +5679,7 @@ export type OrganizationCreateWithoutLocationsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutLocationsInput = {
@@ -4952,6 +5732,8 @@ export type OrganizationUncheckedCreateWithoutLocationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -5071,6 +5853,7 @@ export type OrganizationUncheckedCreateWithoutLocationsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutLocationsInput = {
@@ -5139,6 +5922,8 @@ export type OrganizationUpdateWithoutLocationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5258,6 +6043,7 @@ export type OrganizationUpdateWithoutLocationsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutLocationsInput = {
@@ -5310,6 +6096,8 @@ export type OrganizationUncheckedUpdateWithoutLocationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5429,6 +6217,7 @@ export type OrganizationUncheckedUpdateWithoutLocationsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutDepartmentsInput = {
@@ -5481,6 +6270,8 @@ export type OrganizationCreateWithoutDepartmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -5600,6 +6391,7 @@ export type OrganizationCreateWithoutDepartmentsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
@@ -5652,6 +6444,8 @@ export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -5771,6 +6565,7 @@ export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutDepartmentsInput = {
@@ -5839,6 +6634,8 @@ export type OrganizationUpdateWithoutDepartmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5958,6 +6755,7 @@ export type OrganizationUpdateWithoutDepartmentsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
@@ -6010,6 +6808,8 @@ export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6129,6 +6929,7 @@ export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAssetsInput = {
@@ -6181,6 +6982,8 @@ export type OrganizationCreateWithoutAssetsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -6300,6 +7103,7 @@ export type OrganizationCreateWithoutAssetsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAssetsInput = {
@@ -6352,6 +7156,8 @@ export type OrganizationUncheckedCreateWithoutAssetsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -6471,6 +7277,7 @@ export type OrganizationUncheckedCreateWithoutAssetsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAssetsInput = {
@@ -6539,6 +7346,8 @@ export type OrganizationUpdateWithoutAssetsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6658,6 +7467,7 @@ export type OrganizationUpdateWithoutAssetsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAssetsInput = {
@@ -6710,6 +7520,8 @@ export type OrganizationUncheckedUpdateWithoutAssetsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6829,6 +7641,7 @@ export type OrganizationUncheckedUpdateWithoutAssetsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutVendorsInput = {
@@ -6881,6 +7694,8 @@ export type OrganizationCreateWithoutVendorsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -7000,6 +7815,7 @@ export type OrganizationCreateWithoutVendorsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutVendorsInput = {
@@ -7052,6 +7868,8 @@ export type OrganizationUncheckedCreateWithoutVendorsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -7171,6 +7989,7 @@ export type OrganizationUncheckedCreateWithoutVendorsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutVendorsInput = {
@@ -7239,6 +8058,8 @@ export type OrganizationUpdateWithoutVendorsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7358,6 +8179,7 @@ export type OrganizationUpdateWithoutVendorsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutVendorsInput = {
@@ -7410,6 +8232,8 @@ export type OrganizationUncheckedUpdateWithoutVendorsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7529,6 +8353,7 @@ export type OrganizationUncheckedUpdateWithoutVendorsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutIssuesInput = {
@@ -7581,6 +8406,8 @@ export type OrganizationCreateWithoutIssuesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -7700,6 +8527,7 @@ export type OrganizationCreateWithoutIssuesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutIssuesInput = {
@@ -7752,6 +8580,8 @@ export type OrganizationUncheckedCreateWithoutIssuesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -7871,6 +8701,7 @@ export type OrganizationUncheckedCreateWithoutIssuesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutIssuesInput = {
@@ -7939,6 +8770,8 @@ export type OrganizationUpdateWithoutIssuesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8058,6 +8891,7 @@ export type OrganizationUpdateWithoutIssuesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutIssuesInput = {
@@ -8110,6 +8944,8 @@ export type OrganizationUncheckedUpdateWithoutIssuesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8229,6 +9065,7 @@ export type OrganizationUncheckedUpdateWithoutIssuesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEscalationPoliciesInput = {
@@ -8281,6 +9118,8 @@ export type OrganizationCreateWithoutEscalationPoliciesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -8400,6 +9239,7 @@ export type OrganizationCreateWithoutEscalationPoliciesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEscalationPoliciesInput = {
@@ -8452,6 +9292,8 @@ export type OrganizationUncheckedCreateWithoutEscalationPoliciesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -8571,6 +9413,7 @@ export type OrganizationUncheckedCreateWithoutEscalationPoliciesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEscalationPoliciesInput = {
@@ -8639,6 +9482,8 @@ export type OrganizationUpdateWithoutEscalationPoliciesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8758,6 +9603,7 @@ export type OrganizationUpdateWithoutEscalationPoliciesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEscalationPoliciesInput = {
@@ -8810,6 +9656,8 @@ export type OrganizationUncheckedUpdateWithoutEscalationPoliciesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8929,6 +9777,7 @@ export type OrganizationUncheckedUpdateWithoutEscalationPoliciesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutNotificationsInput = {
@@ -8981,6 +9830,8 @@ export type OrganizationCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -9100,6 +9951,7 @@ export type OrganizationCreateWithoutNotificationsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutNotificationsInput = {
@@ -9152,6 +10004,8 @@ export type OrganizationUncheckedCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -9271,6 +10125,7 @@ export type OrganizationUncheckedCreateWithoutNotificationsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutNotificationsInput = {
@@ -9339,6 +10194,8 @@ export type OrganizationUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9458,6 +10315,7 @@ export type OrganizationUpdateWithoutNotificationsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
@@ -9510,6 +10368,8 @@ export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9629,6 +10489,7 @@ export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutRoutingRulesInput = {
@@ -9681,6 +10542,8 @@ export type OrganizationCreateWithoutRoutingRulesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -9800,6 +10663,7 @@ export type OrganizationCreateWithoutRoutingRulesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutRoutingRulesInput = {
@@ -9852,6 +10716,8 @@ export type OrganizationUncheckedCreateWithoutRoutingRulesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -9971,6 +10837,7 @@ export type OrganizationUncheckedCreateWithoutRoutingRulesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutRoutingRulesInput = {
@@ -10039,6 +10906,8 @@ export type OrganizationUpdateWithoutRoutingRulesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10158,6 +11027,7 @@ export type OrganizationUpdateWithoutRoutingRulesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutRoutingRulesInput = {
@@ -10210,6 +11080,8 @@ export type OrganizationUncheckedUpdateWithoutRoutingRulesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10329,6 +11201,7 @@ export type OrganizationUncheckedUpdateWithoutRoutingRulesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSuggestionsInput = {
@@ -10381,6 +11254,8 @@ export type OrganizationCreateWithoutSuggestionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -10500,6 +11375,7 @@ export type OrganizationCreateWithoutSuggestionsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSuggestionsInput = {
@@ -10552,6 +11428,8 @@ export type OrganizationUncheckedCreateWithoutSuggestionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -10671,6 +11549,7 @@ export type OrganizationUncheckedCreateWithoutSuggestionsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSuggestionsInput = {
@@ -10739,6 +11618,8 @@ export type OrganizationUpdateWithoutSuggestionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10858,6 +11739,7 @@ export type OrganizationUpdateWithoutSuggestionsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSuggestionsInput = {
@@ -10910,6 +11792,8 @@ export type OrganizationUncheckedUpdateWithoutSuggestionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11029,6 +11913,7 @@ export type OrganizationUncheckedUpdateWithoutSuggestionsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEmailTemplatesInput = {
@@ -11081,6 +11966,8 @@ export type OrganizationCreateWithoutEmailTemplatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -11200,6 +12087,7 @@ export type OrganizationCreateWithoutEmailTemplatesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEmailTemplatesInput = {
@@ -11252,6 +12140,8 @@ export type OrganizationUncheckedCreateWithoutEmailTemplatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -11371,6 +12261,7 @@ export type OrganizationUncheckedCreateWithoutEmailTemplatesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEmailTemplatesInput = {
@@ -11439,6 +12330,8 @@ export type OrganizationUpdateWithoutEmailTemplatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11558,6 +12451,7 @@ export type OrganizationUpdateWithoutEmailTemplatesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEmailTemplatesInput = {
@@ -11610,6 +12504,8 @@ export type OrganizationUncheckedUpdateWithoutEmailTemplatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11729,6 +12625,7 @@ export type OrganizationUncheckedUpdateWithoutEmailTemplatesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutInvitationsInput = {
@@ -11781,6 +12678,8 @@ export type OrganizationCreateWithoutInvitationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -11900,6 +12799,7 @@ export type OrganizationCreateWithoutInvitationsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutInvitationsInput = {
@@ -11952,6 +12852,8 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -12071,6 +12973,7 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutInvitationsInput = {
@@ -12139,6 +13042,8 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12258,6 +13163,7 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
@@ -12310,6 +13216,8 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12429,6 +13337,7 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutOrgNotesInput = {
@@ -12481,6 +13390,8 @@ export type OrganizationCreateWithoutOrgNotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -12600,6 +13511,7 @@ export type OrganizationCreateWithoutOrgNotesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutOrgNotesInput = {
@@ -12652,6 +13564,8 @@ export type OrganizationUncheckedCreateWithoutOrgNotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -12771,6 +13685,7 @@ export type OrganizationUncheckedCreateWithoutOrgNotesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutOrgNotesInput = {
@@ -12839,6 +13754,8 @@ export type OrganizationUpdateWithoutOrgNotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12958,6 +13875,7 @@ export type OrganizationUpdateWithoutOrgNotesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutOrgNotesInput = {
@@ -13010,6 +13928,8 @@ export type OrganizationUncheckedUpdateWithoutOrgNotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13129,6 +14049,7 @@ export type OrganizationUncheckedUpdateWithoutOrgNotesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutImpersonationLogsInput = {
@@ -13181,6 +14102,8 @@ export type OrganizationCreateWithoutImpersonationLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -13300,6 +14223,7 @@ export type OrganizationCreateWithoutImpersonationLogsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutImpersonationLogsInput = {
@@ -13352,6 +14276,8 @@ export type OrganizationUncheckedCreateWithoutImpersonationLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -13471,6 +14397,7 @@ export type OrganizationUncheckedCreateWithoutImpersonationLogsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutImpersonationLogsInput = {
@@ -13539,6 +14466,8 @@ export type OrganizationUpdateWithoutImpersonationLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13658,6 +14587,7 @@ export type OrganizationUpdateWithoutImpersonationLogsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutImpersonationLogsInput = {
@@ -13710,6 +14640,8 @@ export type OrganizationUncheckedUpdateWithoutImpersonationLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13829,6 +14761,7 @@ export type OrganizationUncheckedUpdateWithoutImpersonationLogsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAuditLogsInput = {
@@ -13881,6 +14814,8 @@ export type OrganizationCreateWithoutAuditLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -14000,6 +14935,7 @@ export type OrganizationCreateWithoutAuditLogsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
@@ -14052,6 +14988,8 @@ export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -14171,6 +15109,7 @@ export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAuditLogsInput = {
@@ -14239,6 +15178,8 @@ export type OrganizationUpdateWithoutAuditLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14358,6 +15299,7 @@ export type OrganizationUpdateWithoutAuditLogsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
@@ -14410,6 +15352,8 @@ export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14529,6 +15473,7 @@ export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEmployeeTypesInput = {
@@ -14581,6 +15526,8 @@ export type OrganizationCreateWithoutEmployeeTypesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -14700,6 +15647,7 @@ export type OrganizationCreateWithoutEmployeeTypesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEmployeeTypesInput = {
@@ -14752,6 +15700,8 @@ export type OrganizationUncheckedCreateWithoutEmployeeTypesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -14871,6 +15821,7 @@ export type OrganizationUncheckedCreateWithoutEmployeeTypesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEmployeeTypesInput = {
@@ -14939,6 +15890,8 @@ export type OrganizationUpdateWithoutEmployeeTypesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15058,6 +16011,7 @@ export type OrganizationUpdateWithoutEmployeeTypesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEmployeeTypesInput = {
@@ -15110,6 +16064,8 @@ export type OrganizationUncheckedUpdateWithoutEmployeeTypesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15229,6 +16185,7 @@ export type OrganizationUncheckedUpdateWithoutEmployeeTypesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutIssueTemplatesInput = {
@@ -15281,6 +16238,8 @@ export type OrganizationCreateWithoutIssueTemplatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -15400,6 +16359,7 @@ export type OrganizationCreateWithoutIssueTemplatesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutIssueTemplatesInput = {
@@ -15452,6 +16412,8 @@ export type OrganizationUncheckedCreateWithoutIssueTemplatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -15571,6 +16533,7 @@ export type OrganizationUncheckedCreateWithoutIssueTemplatesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutIssueTemplatesInput = {
@@ -15639,6 +16602,8 @@ export type OrganizationUpdateWithoutIssueTemplatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15758,6 +16723,7 @@ export type OrganizationUpdateWithoutIssueTemplatesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutIssueTemplatesInput = {
@@ -15810,6 +16776,8 @@ export type OrganizationUncheckedUpdateWithoutIssueTemplatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15929,6 +16897,7 @@ export type OrganizationUncheckedUpdateWithoutIssueTemplatesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutMaintenanceSchedulesInput = {
@@ -15981,6 +16950,8 @@ export type OrganizationCreateWithoutMaintenanceSchedulesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -16100,6 +17071,7 @@ export type OrganizationCreateWithoutMaintenanceSchedulesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutMaintenanceSchedulesInput = {
@@ -16152,6 +17124,8 @@ export type OrganizationUncheckedCreateWithoutMaintenanceSchedulesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -16271,6 +17245,7 @@ export type OrganizationUncheckedCreateWithoutMaintenanceSchedulesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutMaintenanceSchedulesInput = {
@@ -16339,6 +17314,8 @@ export type OrganizationUpdateWithoutMaintenanceSchedulesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -16458,6 +17435,7 @@ export type OrganizationUpdateWithoutMaintenanceSchedulesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutMaintenanceSchedulesInput = {
@@ -16510,6 +17488,8 @@ export type OrganizationUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -16629,6 +17609,7 @@ export type OrganizationUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAnalyticsSnapshotsInput = {
@@ -16681,6 +17662,8 @@ export type OrganizationCreateWithoutAnalyticsSnapshotsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -16800,6 +17783,7 @@ export type OrganizationCreateWithoutAnalyticsSnapshotsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAnalyticsSnapshotsInput = {
@@ -16852,6 +17836,8 @@ export type OrganizationUncheckedCreateWithoutAnalyticsSnapshotsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -16971,6 +17957,7 @@ export type OrganizationUncheckedCreateWithoutAnalyticsSnapshotsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAnalyticsSnapshotsInput = {
@@ -17039,6 +18026,8 @@ export type OrganizationUpdateWithoutAnalyticsSnapshotsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -17158,6 +18147,7 @@ export type OrganizationUpdateWithoutAnalyticsSnapshotsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAnalyticsSnapshotsInput = {
@@ -17210,6 +18200,8 @@ export type OrganizationUncheckedUpdateWithoutAnalyticsSnapshotsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -17329,6 +18321,7 @@ export type OrganizationUncheckedUpdateWithoutAnalyticsSnapshotsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSopsInput = {
@@ -17381,6 +18374,8 @@ export type OrganizationCreateWithoutSopsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -17500,6 +18495,7 @@ export type OrganizationCreateWithoutSopsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSopsInput = {
@@ -17552,6 +18548,8 @@ export type OrganizationUncheckedCreateWithoutSopsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -17671,6 +18669,7 @@ export type OrganizationUncheckedCreateWithoutSopsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSopsInput = {
@@ -17739,6 +18738,8 @@ export type OrganizationUpdateWithoutSopsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -17858,6 +18859,7 @@ export type OrganizationUpdateWithoutSopsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSopsInput = {
@@ -17910,6 +18912,8 @@ export type OrganizationUncheckedUpdateWithoutSopsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -18029,6 +19033,7 @@ export type OrganizationUncheckedUpdateWithoutSopsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutPurchaseRequestsInput = {
@@ -18081,6 +19086,8 @@ export type OrganizationCreateWithoutPurchaseRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -18200,6 +19207,7 @@ export type OrganizationCreateWithoutPurchaseRequestsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutPurchaseRequestsInput = {
@@ -18252,6 +19260,8 @@ export type OrganizationUncheckedCreateWithoutPurchaseRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -18371,6 +19381,7 @@ export type OrganizationUncheckedCreateWithoutPurchaseRequestsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutPurchaseRequestsInput = {
@@ -18439,6 +19450,8 @@ export type OrganizationUpdateWithoutPurchaseRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -18558,6 +19571,7 @@ export type OrganizationUpdateWithoutPurchaseRequestsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutPurchaseRequestsInput = {
@@ -18610,6 +19624,8 @@ export type OrganizationUncheckedUpdateWithoutPurchaseRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -18729,6 +19745,7 @@ export type OrganizationUncheckedUpdateWithoutPurchaseRequestsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutApprovedCatalogItemsInput = {
@@ -18781,6 +19798,8 @@ export type OrganizationCreateWithoutApprovedCatalogItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -18900,6 +19919,7 @@ export type OrganizationCreateWithoutApprovedCatalogItemsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutApprovedCatalogItemsInput = {
@@ -18952,6 +19972,8 @@ export type OrganizationUncheckedCreateWithoutApprovedCatalogItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -19071,6 +20093,7 @@ export type OrganizationUncheckedCreateWithoutApprovedCatalogItemsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutApprovedCatalogItemsInput = {
@@ -19139,6 +20162,8 @@ export type OrganizationUpdateWithoutApprovedCatalogItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -19258,6 +20283,7 @@ export type OrganizationUpdateWithoutApprovedCatalogItemsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutApprovedCatalogItemsInput = {
@@ -19310,6 +20336,8 @@ export type OrganizationUncheckedUpdateWithoutApprovedCatalogItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -19429,6 +20457,7 @@ export type OrganizationUncheckedUpdateWithoutApprovedCatalogItemsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutApprovalPoliciesInput = {
@@ -19481,6 +20510,8 @@ export type OrganizationCreateWithoutApprovalPoliciesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -19600,6 +20631,7 @@ export type OrganizationCreateWithoutApprovalPoliciesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutApprovalPoliciesInput = {
@@ -19652,6 +20684,8 @@ export type OrganizationUncheckedCreateWithoutApprovalPoliciesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -19771,6 +20805,7 @@ export type OrganizationUncheckedCreateWithoutApprovalPoliciesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutApprovalPoliciesInput = {
@@ -19839,6 +20874,8 @@ export type OrganizationUpdateWithoutApprovalPoliciesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -19958,6 +20995,7 @@ export type OrganizationUpdateWithoutApprovalPoliciesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutApprovalPoliciesInput = {
@@ -20010,6 +21048,8 @@ export type OrganizationUncheckedUpdateWithoutApprovalPoliciesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -20129,6 +21169,7 @@ export type OrganizationUncheckedUpdateWithoutApprovalPoliciesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutInjuryReportsInput = {
@@ -20181,6 +21222,8 @@ export type OrganizationCreateWithoutInjuryReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -20300,6 +21343,7 @@ export type OrganizationCreateWithoutInjuryReportsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutInjuryReportsInput = {
@@ -20352,6 +21396,8 @@ export type OrganizationUncheckedCreateWithoutInjuryReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -20471,6 +21517,7 @@ export type OrganizationUncheckedCreateWithoutInjuryReportsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutInjuryReportsInput = {
@@ -20539,6 +21586,8 @@ export type OrganizationUpdateWithoutInjuryReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -20658,6 +21707,7 @@ export type OrganizationUpdateWithoutInjuryReportsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutInjuryReportsInput = {
@@ -20710,6 +21760,8 @@ export type OrganizationUncheckedUpdateWithoutInjuryReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -20829,6 +21881,7 @@ export type OrganizationUncheckedUpdateWithoutInjuryReportsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutBugReportsInput = {
@@ -20881,6 +21934,8 @@ export type OrganizationCreateWithoutBugReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -21000,6 +22055,7 @@ export type OrganizationCreateWithoutBugReportsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutBugReportsInput = {
@@ -21052,6 +22108,8 @@ export type OrganizationUncheckedCreateWithoutBugReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -21171,6 +22229,7 @@ export type OrganizationUncheckedCreateWithoutBugReportsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutBugReportsInput = {
@@ -21239,6 +22298,8 @@ export type OrganizationUpdateWithoutBugReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -21358,6 +22419,7 @@ export type OrganizationUpdateWithoutBugReportsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutBugReportsInput = {
@@ -21410,6 +22472,8 @@ export type OrganizationUncheckedUpdateWithoutBugReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -21529,6 +22593,7 @@ export type OrganizationUncheckedUpdateWithoutBugReportsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutFeatureRequestsInput = {
@@ -21581,6 +22646,8 @@ export type OrganizationCreateWithoutFeatureRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -21700,6 +22767,7 @@ export type OrganizationCreateWithoutFeatureRequestsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutFeatureRequestsInput = {
@@ -21752,6 +22820,8 @@ export type OrganizationUncheckedCreateWithoutFeatureRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -21871,6 +22941,7 @@ export type OrganizationUncheckedCreateWithoutFeatureRequestsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutFeatureRequestsInput = {
@@ -21939,6 +23010,8 @@ export type OrganizationUpdateWithoutFeatureRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -22058,6 +23131,7 @@ export type OrganizationUpdateWithoutFeatureRequestsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutFeatureRequestsInput = {
@@ -22110,6 +23184,8 @@ export type OrganizationUncheckedUpdateWithoutFeatureRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -22229,6 +23305,7 @@ export type OrganizationUncheckedUpdateWithoutFeatureRequestsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutRegionsInput = {
@@ -22281,6 +23358,8 @@ export type OrganizationCreateWithoutRegionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -22400,6 +23479,7 @@ export type OrganizationCreateWithoutRegionsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutRegionsInput = {
@@ -22452,6 +23532,8 @@ export type OrganizationUncheckedCreateWithoutRegionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -22571,6 +23653,7 @@ export type OrganizationUncheckedCreateWithoutRegionsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutRegionsInput = {
@@ -22639,6 +23722,8 @@ export type OrganizationUpdateWithoutRegionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -22758,6 +23843,7 @@ export type OrganizationUpdateWithoutRegionsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutRegionsInput = {
@@ -22810,6 +23896,8 @@ export type OrganizationUncheckedUpdateWithoutRegionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -22929,6 +24017,7 @@ export type OrganizationUncheckedUpdateWithoutRegionsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEscalationChainsInput = {
@@ -22981,6 +24070,8 @@ export type OrganizationCreateWithoutEscalationChainsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -23100,6 +24191,7 @@ export type OrganizationCreateWithoutEscalationChainsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEscalationChainsInput = {
@@ -23152,6 +24244,8 @@ export type OrganizationUncheckedCreateWithoutEscalationChainsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -23271,6 +24365,7 @@ export type OrganizationUncheckedCreateWithoutEscalationChainsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEscalationChainsInput = {
@@ -23339,6 +24434,8 @@ export type OrganizationUpdateWithoutEscalationChainsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -23458,6 +24555,7 @@ export type OrganizationUpdateWithoutEscalationChainsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEscalationChainsInput = {
@@ -23510,6 +24608,8 @@ export type OrganizationUncheckedUpdateWithoutEscalationChainsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -23629,6 +24729,7 @@ export type OrganizationUncheckedUpdateWithoutEscalationChainsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutApiKeysInput = {
@@ -23681,6 +24782,8 @@ export type OrganizationCreateWithoutApiKeysInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -23800,6 +24903,7 @@ export type OrganizationCreateWithoutApiKeysInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutApiKeysInput = {
@@ -23852,6 +24956,8 @@ export type OrganizationUncheckedCreateWithoutApiKeysInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -23971,6 +25077,7 @@ export type OrganizationUncheckedCreateWithoutApiKeysInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutApiKeysInput = {
@@ -24039,6 +25146,8 @@ export type OrganizationUpdateWithoutApiKeysInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -24158,6 +25267,7 @@ export type OrganizationUpdateWithoutApiKeysInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutApiKeysInput = {
@@ -24210,6 +25320,8 @@ export type OrganizationUncheckedUpdateWithoutApiKeysInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -24329,6 +25441,7 @@ export type OrganizationUncheckedUpdateWithoutApiKeysInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutWebhookEndpointsInput = {
@@ -24381,6 +25494,8 @@ export type OrganizationCreateWithoutWebhookEndpointsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -24500,6 +25615,7 @@ export type OrganizationCreateWithoutWebhookEndpointsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutWebhookEndpointsInput = {
@@ -24552,6 +25668,8 @@ export type OrganizationUncheckedCreateWithoutWebhookEndpointsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -24671,6 +25789,7 @@ export type OrganizationUncheckedCreateWithoutWebhookEndpointsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutWebhookEndpointsInput = {
@@ -24739,6 +25858,8 @@ export type OrganizationUpdateWithoutWebhookEndpointsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -24858,6 +25979,7 @@ export type OrganizationUpdateWithoutWebhookEndpointsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutWebhookEndpointsInput = {
@@ -24910,6 +26032,8 @@ export type OrganizationUncheckedUpdateWithoutWebhookEndpointsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -25029,6 +26153,7 @@ export type OrganizationUncheckedUpdateWithoutWebhookEndpointsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSsoConfigInput = {
@@ -25081,6 +26206,8 @@ export type OrganizationCreateWithoutSsoConfigInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -25200,6 +26327,7 @@ export type OrganizationCreateWithoutSsoConfigInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSsoConfigInput = {
@@ -25252,6 +26380,8 @@ export type OrganizationUncheckedCreateWithoutSsoConfigInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -25371,6 +26501,7 @@ export type OrganizationUncheckedCreateWithoutSsoConfigInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSsoConfigInput = {
@@ -25439,6 +26570,8 @@ export type OrganizationUpdateWithoutSsoConfigInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -25558,6 +26691,7 @@ export type OrganizationUpdateWithoutSsoConfigInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSsoConfigInput = {
@@ -25610,6 +26744,8 @@ export type OrganizationUncheckedUpdateWithoutSsoConfigInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -25729,6 +26865,7 @@ export type OrganizationUncheckedUpdateWithoutSsoConfigInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutOrgRelationshipsAsAInput = {
@@ -25781,6 +26918,8 @@ export type OrganizationCreateWithoutOrgRelationshipsAsAInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -25900,6 +27039,7 @@ export type OrganizationCreateWithoutOrgRelationshipsAsAInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsAInput = {
@@ -25952,6 +27092,8 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsAInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -26071,6 +27213,7 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsAInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutOrgRelationshipsAsAInput = {
@@ -26128,6 +27271,8 @@ export type OrganizationCreateWithoutOrgRelationshipsAsBInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -26247,6 +27392,7 @@ export type OrganizationCreateWithoutOrgRelationshipsAsBInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsBInput = {
@@ -26299,6 +27445,8 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsBInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -26418,6 +27566,7 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsBInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutOrgRelationshipsAsBInput = {
@@ -26486,6 +27635,8 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsAInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -26605,6 +27756,7 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsAInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsAInput = {
@@ -26657,6 +27809,8 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsAInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -26776,6 +27930,7 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsAInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUpsertWithoutOrgRelationshipsAsBInput = {
@@ -26839,6 +27994,8 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsBInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -26958,6 +28115,7 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsBInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsBInput = {
@@ -27010,6 +28168,8 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsBInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -27129,6 +28289,7 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsBInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutQrCodesInput = {
@@ -27181,6 +28342,8 @@ export type OrganizationCreateWithoutQrCodesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -27300,6 +28463,7 @@ export type OrganizationCreateWithoutQrCodesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutQrCodesInput = {
@@ -27352,6 +28516,8 @@ export type OrganizationUncheckedCreateWithoutQrCodesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -27471,6 +28637,7 @@ export type OrganizationUncheckedCreateWithoutQrCodesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutQrCodesInput = {
@@ -27539,6 +28706,8 @@ export type OrganizationUpdateWithoutQrCodesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -27658,6 +28827,7 @@ export type OrganizationUpdateWithoutQrCodesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutQrCodesInput = {
@@ -27710,6 +28880,8 @@ export type OrganizationUncheckedUpdateWithoutQrCodesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -27829,6 +29001,7 @@ export type OrganizationUncheckedUpdateWithoutQrCodesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutUserOrgMembershipsInput = {
@@ -27881,6 +29054,8 @@ export type OrganizationCreateWithoutUserOrgMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -28000,6 +29175,7 @@ export type OrganizationCreateWithoutUserOrgMembershipsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutUserOrgMembershipsInput = {
@@ -28052,6 +29228,8 @@ export type OrganizationUncheckedCreateWithoutUserOrgMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -28171,6 +29349,7 @@ export type OrganizationUncheckedCreateWithoutUserOrgMembershipsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutUserOrgMembershipsInput = {
@@ -28239,6 +29418,8 @@ export type OrganizationUpdateWithoutUserOrgMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -28358,6 +29539,7 @@ export type OrganizationUpdateWithoutUserOrgMembershipsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutUserOrgMembershipsInput = {
@@ -28410,6 +29592,8 @@ export type OrganizationUncheckedUpdateWithoutUserOrgMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -28529,6 +29713,7 @@ export type OrganizationUncheckedUpdateWithoutUserOrgMembershipsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutExecutiveBriefingsInput = {
@@ -28581,6 +29766,8 @@ export type OrganizationCreateWithoutExecutiveBriefingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -28700,6 +29887,7 @@ export type OrganizationCreateWithoutExecutiveBriefingsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutExecutiveBriefingsInput = {
@@ -28752,6 +29940,8 @@ export type OrganizationUncheckedCreateWithoutExecutiveBriefingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -28871,6 +30061,7 @@ export type OrganizationUncheckedCreateWithoutExecutiveBriefingsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutExecutiveBriefingsInput = {
@@ -28939,6 +30130,8 @@ export type OrganizationUpdateWithoutExecutiveBriefingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -29058,6 +30251,7 @@ export type OrganizationUpdateWithoutExecutiveBriefingsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutExecutiveBriefingsInput = {
@@ -29110,6 +30304,8 @@ export type OrganizationUncheckedUpdateWithoutExecutiveBriefingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -29229,6 +30425,7 @@ export type OrganizationUncheckedUpdateWithoutExecutiveBriefingsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutHealthScoresInput = {
@@ -29281,6 +30478,8 @@ export type OrganizationCreateWithoutHealthScoresInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -29400,6 +30599,7 @@ export type OrganizationCreateWithoutHealthScoresInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutHealthScoresInput = {
@@ -29452,6 +30652,8 @@ export type OrganizationUncheckedCreateWithoutHealthScoresInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -29571,6 +30773,7 @@ export type OrganizationUncheckedCreateWithoutHealthScoresInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutHealthScoresInput = {
@@ -29639,6 +30842,8 @@ export type OrganizationUpdateWithoutHealthScoresInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -29758,6 +30963,7 @@ export type OrganizationUpdateWithoutHealthScoresInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutHealthScoresInput = {
@@ -29810,6 +31016,8 @@ export type OrganizationUncheckedUpdateWithoutHealthScoresInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -29929,6 +31137,7 @@ export type OrganizationUncheckedUpdateWithoutHealthScoresInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutTrendAlertsInput = {
@@ -29981,6 +31190,8 @@ export type OrganizationCreateWithoutTrendAlertsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -30100,6 +31311,7 @@ export type OrganizationCreateWithoutTrendAlertsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutTrendAlertsInput = {
@@ -30152,6 +31364,8 @@ export type OrganizationUncheckedCreateWithoutTrendAlertsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -30271,6 +31485,7 @@ export type OrganizationUncheckedCreateWithoutTrendAlertsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutTrendAlertsInput = {
@@ -30339,6 +31554,8 @@ export type OrganizationUpdateWithoutTrendAlertsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -30458,6 +31675,7 @@ export type OrganizationUpdateWithoutTrendAlertsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutTrendAlertsInput = {
@@ -30510,6 +31728,8 @@ export type OrganizationUncheckedUpdateWithoutTrendAlertsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -30629,6 +31849,7 @@ export type OrganizationUncheckedUpdateWithoutTrendAlertsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutExecutiveGoalsInput = {
@@ -30681,6 +31902,8 @@ export type OrganizationCreateWithoutExecutiveGoalsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -30800,6 +32023,7 @@ export type OrganizationCreateWithoutExecutiveGoalsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutExecutiveGoalsInput = {
@@ -30852,6 +32076,8 @@ export type OrganizationUncheckedCreateWithoutExecutiveGoalsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -30971,6 +32197,7 @@ export type OrganizationUncheckedCreateWithoutExecutiveGoalsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutExecutiveGoalsInput = {
@@ -31039,6 +32266,8 @@ export type OrganizationUpdateWithoutExecutiveGoalsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -31158,6 +32387,7 @@ export type OrganizationUpdateWithoutExecutiveGoalsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutExecutiveGoalsInput = {
@@ -31210,6 +32440,8 @@ export type OrganizationUncheckedUpdateWithoutExecutiveGoalsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -31329,6 +32561,7 @@ export type OrganizationUncheckedUpdateWithoutExecutiveGoalsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutLegalAcceptancesInput = {
@@ -31381,6 +32614,8 @@ export type OrganizationCreateWithoutLegalAcceptancesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -31500,6 +32735,7 @@ export type OrganizationCreateWithoutLegalAcceptancesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutLegalAcceptancesInput = {
@@ -31552,6 +32788,8 @@ export type OrganizationUncheckedCreateWithoutLegalAcceptancesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -31671,6 +32909,7 @@ export type OrganizationUncheckedCreateWithoutLegalAcceptancesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutLegalAcceptancesInput = {
@@ -31739,6 +32978,8 @@ export type OrganizationUpdateWithoutLegalAcceptancesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -31858,6 +33099,7 @@ export type OrganizationUpdateWithoutLegalAcceptancesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutLegalAcceptancesInput = {
@@ -31910,6 +33152,8 @@ export type OrganizationUncheckedUpdateWithoutLegalAcceptancesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -32029,6 +33273,7 @@ export type OrganizationUncheckedUpdateWithoutLegalAcceptancesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutDemoCallsInput = {
@@ -32081,6 +33326,8 @@ export type OrganizationCreateWithoutDemoCallsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -32200,6 +33447,7 @@ export type OrganizationCreateWithoutDemoCallsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutDemoCallsInput = {
@@ -32252,6 +33500,8 @@ export type OrganizationUncheckedCreateWithoutDemoCallsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -32371,6 +33621,7 @@ export type OrganizationUncheckedCreateWithoutDemoCallsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutDemoCallsInput = {
@@ -32439,6 +33690,8 @@ export type OrganizationUpdateWithoutDemoCallsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -32558,6 +33811,7 @@ export type OrganizationUpdateWithoutDemoCallsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutDemoCallsInput = {
@@ -32610,6 +33864,8 @@ export type OrganizationUncheckedUpdateWithoutDemoCallsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -32729,6 +33985,7 @@ export type OrganizationUncheckedUpdateWithoutDemoCallsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutNonConversionReasonsInput = {
@@ -32781,6 +34038,8 @@ export type OrganizationCreateWithoutNonConversionReasonsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -32900,6 +34159,7 @@ export type OrganizationCreateWithoutNonConversionReasonsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutNonConversionReasonsInput = {
@@ -32952,6 +34212,8 @@ export type OrganizationUncheckedCreateWithoutNonConversionReasonsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -33071,6 +34333,7 @@ export type OrganizationUncheckedCreateWithoutNonConversionReasonsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutNonConversionReasonsInput = {
@@ -33139,6 +34402,8 @@ export type OrganizationUpdateWithoutNonConversionReasonsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -33258,6 +34523,7 @@ export type OrganizationUpdateWithoutNonConversionReasonsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutNonConversionReasonsInput = {
@@ -33310,6 +34576,8 @@ export type OrganizationUncheckedUpdateWithoutNonConversionReasonsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -33429,6 +34697,7 @@ export type OrganizationUncheckedUpdateWithoutNonConversionReasonsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutCrmNotesInput = {
@@ -33481,6 +34750,8 @@ export type OrganizationCreateWithoutCrmNotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -33600,6 +34871,7 @@ export type OrganizationCreateWithoutCrmNotesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutCrmNotesInput = {
@@ -33652,6 +34924,8 @@ export type OrganizationUncheckedCreateWithoutCrmNotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -33771,6 +35045,7 @@ export type OrganizationUncheckedCreateWithoutCrmNotesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutCrmNotesInput = {
@@ -33839,6 +35114,8 @@ export type OrganizationUpdateWithoutCrmNotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -33958,6 +35235,7 @@ export type OrganizationUpdateWithoutCrmNotesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutCrmNotesInput = {
@@ -34010,6 +35288,8 @@ export type OrganizationUncheckedUpdateWithoutCrmNotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -34129,6 +35409,7 @@ export type OrganizationUncheckedUpdateWithoutCrmNotesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutCrmActivitiesInput = {
@@ -34181,6 +35462,8 @@ export type OrganizationCreateWithoutCrmActivitiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -34300,6 +35583,7 @@ export type OrganizationCreateWithoutCrmActivitiesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutCrmActivitiesInput = {
@@ -34352,6 +35636,8 @@ export type OrganizationUncheckedCreateWithoutCrmActivitiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -34471,6 +35757,7 @@ export type OrganizationUncheckedCreateWithoutCrmActivitiesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutCrmActivitiesInput = {
@@ -34539,6 +35826,8 @@ export type OrganizationUpdateWithoutCrmActivitiesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -34658,6 +35947,7 @@ export type OrganizationUpdateWithoutCrmActivitiesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutCrmActivitiesInput = {
@@ -34710,6 +36000,8 @@ export type OrganizationUncheckedUpdateWithoutCrmActivitiesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -34829,6 +36121,7 @@ export type OrganizationUncheckedUpdateWithoutCrmActivitiesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutBillingCreditsInput = {
@@ -34881,6 +36174,8 @@ export type OrganizationCreateWithoutBillingCreditsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -35000,6 +36295,7 @@ export type OrganizationCreateWithoutBillingCreditsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutBillingCreditsInput = {
@@ -35052,6 +36348,8 @@ export type OrganizationUncheckedCreateWithoutBillingCreditsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -35171,6 +36469,7 @@ export type OrganizationUncheckedCreateWithoutBillingCreditsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutBillingCreditsInput = {
@@ -35239,6 +36538,8 @@ export type OrganizationUpdateWithoutBillingCreditsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -35358,6 +36659,7 @@ export type OrganizationUpdateWithoutBillingCreditsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutBillingCreditsInput = {
@@ -35410,6 +36712,8 @@ export type OrganizationUncheckedUpdateWithoutBillingCreditsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -35529,6 +36833,7 @@ export type OrganizationUncheckedUpdateWithoutBillingCreditsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutReferralsMadeInput = {
@@ -35581,6 +36886,8 @@ export type OrganizationCreateWithoutReferralsMadeInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -35700,6 +37007,7 @@ export type OrganizationCreateWithoutReferralsMadeInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutReferralsMadeInput = {
@@ -35752,6 +37060,8 @@ export type OrganizationUncheckedCreateWithoutReferralsMadeInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -35871,6 +37181,7 @@ export type OrganizationUncheckedCreateWithoutReferralsMadeInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutReferralsMadeInput = {
@@ -35928,6 +37239,8 @@ export type OrganizationCreateWithoutReferralReceivedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -36047,6 +37360,7 @@ export type OrganizationCreateWithoutReferralReceivedInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutReferralReceivedInput = {
@@ -36099,6 +37413,8 @@ export type OrganizationUncheckedCreateWithoutReferralReceivedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -36218,6 +37534,7 @@ export type OrganizationUncheckedCreateWithoutReferralReceivedInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutReferralReceivedInput = {
@@ -36286,6 +37603,8 @@ export type OrganizationUpdateWithoutReferralsMadeInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -36405,6 +37724,7 @@ export type OrganizationUpdateWithoutReferralsMadeInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutReferralsMadeInput = {
@@ -36457,6 +37777,8 @@ export type OrganizationUncheckedUpdateWithoutReferralsMadeInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -36576,6 +37898,7 @@ export type OrganizationUncheckedUpdateWithoutReferralsMadeInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUpsertWithoutReferralReceivedInput = {
@@ -36639,6 +37962,8 @@ export type OrganizationUpdateWithoutReferralReceivedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -36758,6 +38083,7 @@ export type OrganizationUpdateWithoutReferralReceivedInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutReferralReceivedInput = {
@@ -36810,6 +38136,8 @@ export type OrganizationUncheckedUpdateWithoutReferralReceivedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -36929,6 +38257,7 @@ export type OrganizationUncheckedUpdateWithoutReferralReceivedInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutConversationsInput = {
@@ -36981,6 +38310,8 @@ export type OrganizationCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -37100,6 +38431,7 @@ export type OrganizationCreateWithoutConversationsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutConversationsInput = {
@@ -37152,6 +38484,8 @@ export type OrganizationUncheckedCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -37271,6 +38605,7 @@ export type OrganizationUncheckedCreateWithoutConversationsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutConversationsInput = {
@@ -37339,6 +38674,8 @@ export type OrganizationUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -37458,6 +38795,7 @@ export type OrganizationUpdateWithoutConversationsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutConversationsInput = {
@@ -37510,6 +38848,8 @@ export type OrganizationUncheckedUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -37629,6 +38969,7 @@ export type OrganizationUncheckedUpdateWithoutConversationsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSupportConversationsInput = {
@@ -37681,6 +39022,8 @@ export type OrganizationCreateWithoutSupportConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -37800,6 +39143,7 @@ export type OrganizationCreateWithoutSupportConversationsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSupportConversationsInput = {
@@ -37852,6 +39196,8 @@ export type OrganizationUncheckedCreateWithoutSupportConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -37971,6 +39317,7 @@ export type OrganizationUncheckedCreateWithoutSupportConversationsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSupportConversationsInput = {
@@ -38039,6 +39386,8 @@ export type OrganizationUpdateWithoutSupportConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -38158,6 +39507,7 @@ export type OrganizationUpdateWithoutSupportConversationsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSupportConversationsInput = {
@@ -38210,6 +39560,8 @@ export type OrganizationUncheckedUpdateWithoutSupportConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -38329,6 +39681,7 @@ export type OrganizationUncheckedUpdateWithoutSupportConversationsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutBroadcastsInput = {
@@ -38381,6 +39734,8 @@ export type OrganizationCreateWithoutBroadcastsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -38500,6 +39855,7 @@ export type OrganizationCreateWithoutBroadcastsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutBroadcastsInput = {
@@ -38552,6 +39908,8 @@ export type OrganizationUncheckedCreateWithoutBroadcastsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -38671,6 +40029,7 @@ export type OrganizationUncheckedCreateWithoutBroadcastsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutBroadcastsInput = {
@@ -38739,6 +40098,8 @@ export type OrganizationUpdateWithoutBroadcastsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -38858,6 +40219,7 @@ export type OrganizationUpdateWithoutBroadcastsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutBroadcastsInput = {
@@ -38910,6 +40272,8 @@ export type OrganizationUncheckedUpdateWithoutBroadcastsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -39029,6 +40393,7 @@ export type OrganizationUncheckedUpdateWithoutBroadcastsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAssignmentsInput = {
@@ -39081,6 +40446,8 @@ export type OrganizationCreateWithoutAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -39200,6 +40567,7 @@ export type OrganizationCreateWithoutAssignmentsInput = {
   broadcasts?: Prisma.BroadcastCreateNestedManyWithoutTargetOrgInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAssignmentsInput = {
@@ -39252,6 +40620,8 @@ export type OrganizationUncheckedCreateWithoutAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -39371,6 +40741,7 @@ export type OrganizationUncheckedCreateWithoutAssignmentsInput = {
   broadcasts?: Prisma.BroadcastUncheckedCreateNestedManyWithoutTargetOrgInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAssignmentsInput = {
@@ -39439,6 +40810,8 @@ export type OrganizationUpdateWithoutAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -39558,6 +40931,7 @@ export type OrganizationUpdateWithoutAssignmentsInput = {
   broadcasts?: Prisma.BroadcastUpdateManyWithoutTargetOrgNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAssignmentsInput = {
@@ -39610,6 +40984,8 @@ export type OrganizationUncheckedUpdateWithoutAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -39729,6 +41105,7 @@ export type OrganizationUncheckedUpdateWithoutAssignmentsInput = {
   broadcasts?: Prisma.BroadcastUncheckedUpdateManyWithoutTargetOrgNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAnnouncementsInput = {
@@ -39781,6 +41158,8 @@ export type OrganizationCreateWithoutAnnouncementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -39900,6 +41279,7 @@ export type OrganizationCreateWithoutAnnouncementsInput = {
   broadcasts?: Prisma.BroadcastCreateNestedManyWithoutTargetOrgInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
@@ -39952,6 +41332,8 @@ export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -40071,6 +41453,7 @@ export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
   broadcasts?: Prisma.BroadcastUncheckedCreateNestedManyWithoutTargetOrgInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAnnouncementsInput = {
@@ -40139,6 +41522,8 @@ export type OrganizationUpdateWithoutAnnouncementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -40258,6 +41643,7 @@ export type OrganizationUpdateWithoutAnnouncementsInput = {
   broadcasts?: Prisma.BroadcastUpdateManyWithoutTargetOrgNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
@@ -40310,6 +41696,8 @@ export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -40429,6 +41817,7 @@ export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
   broadcasts?: Prisma.BroadcastUncheckedUpdateManyWithoutTargetOrgNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEmergencyBroadcastsInput = {
@@ -40481,6 +41870,8 @@ export type OrganizationCreateWithoutEmergencyBroadcastsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -40600,6 +41991,7 @@ export type OrganizationCreateWithoutEmergencyBroadcastsInput = {
   broadcasts?: Prisma.BroadcastCreateNestedManyWithoutTargetOrgInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEmergencyBroadcastsInput = {
@@ -40652,6 +42044,8 @@ export type OrganizationUncheckedCreateWithoutEmergencyBroadcastsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -40771,6 +42165,7 @@ export type OrganizationUncheckedCreateWithoutEmergencyBroadcastsInput = {
   broadcasts?: Prisma.BroadcastUncheckedCreateNestedManyWithoutTargetOrgInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEmergencyBroadcastsInput = {
@@ -40839,6 +42234,8 @@ export type OrganizationUpdateWithoutEmergencyBroadcastsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -40958,6 +42355,7 @@ export type OrganizationUpdateWithoutEmergencyBroadcastsInput = {
   broadcasts?: Prisma.BroadcastUpdateManyWithoutTargetOrgNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput = {
@@ -41010,6 +42408,8 @@ export type OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -41129,6 +42529,7 @@ export type OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput = {
   broadcasts?: Prisma.BroadcastUncheckedUpdateManyWithoutTargetOrgNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 
@@ -41188,6 +42589,7 @@ export type OrganizationCountOutputType = {
   assignments: number
   announcements: number
   emergencyBroadcasts: number
+  workspaceChangeLogs: number
 }
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -41242,6 +42644,7 @@ export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   assignments?: boolean | OrganizationCountOutputTypeCountAssignmentsArgs
   announcements?: boolean | OrganizationCountOutputTypeCountAnnouncementsArgs
   emergencyBroadcasts?: boolean | OrganizationCountOutputTypeCountEmergencyBroadcastsArgs
+  workspaceChangeLogs?: boolean | OrganizationCountOutputTypeCountWorkspaceChangeLogsArgs
 }
 
 /**
@@ -41611,6 +43014,13 @@ export type OrganizationCountOutputTypeCountEmergencyBroadcastsArgs<ExtArgs exte
   where?: Prisma.EmergencyBroadcastWhereInput
 }
 
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountWorkspaceChangeLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkspaceChangeLogWhereInput
+}
+
 
 export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -41662,6 +43072,8 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   createdAt?: boolean
   updatedAt?: boolean
   pageAccessConfig?: boolean
+  navigationConfig?: boolean
+  terminologyConfig?: boolean
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -41782,6 +43194,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   assignments?: boolean | Prisma.Organization$assignmentsArgs<ExtArgs>
   announcements?: boolean | Prisma.Organization$announcementsArgs<ExtArgs>
   emergencyBroadcasts?: boolean | Prisma.Organization$emergencyBroadcastsArgs<ExtArgs>
+  workspaceChangeLogs?: boolean | Prisma.Organization$workspaceChangeLogsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organization"]>
 
@@ -41835,6 +43248,8 @@ export type OrganizationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   createdAt?: boolean
   updatedAt?: boolean
   pageAccessConfig?: boolean
+  navigationConfig?: boolean
+  terminologyConfig?: boolean
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -41954,6 +43369,8 @@ export type OrganizationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   createdAt?: boolean
   updatedAt?: boolean
   pageAccessConfig?: boolean
+  navigationConfig?: boolean
+  terminologyConfig?: boolean
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -42073,6 +43490,8 @@ export type OrganizationSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   pageAccessConfig?: boolean
+  navigationConfig?: boolean
+  terminologyConfig?: boolean
   regions_enabled?: boolean
   corporate_dashboard_enabled?: boolean
   cross_location_analytics_enabled?: boolean
@@ -42142,7 +43561,7 @@ export type OrganizationSelectScalar = {
   referralLink?: boolean
 }
 
-export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logo" | "industry" | "companySize" | "numberOfLocations" | "onboardingCompletedAt" | "trialStartDate" | "trialEndsAt" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeCouponId" | "subscriptionStatus" | "plan" | "productLine" | "employeeLimit" | "locationLimit" | "checkoutIntentStatus" | "intelligenceSuiteEnabled" | "monthlyBasePrice" | "monthlyScalingCost" | "monthlyModulesCost" | "monthlyTotalBeforeDiscount" | "monthlyTotalAfterDiscount" | "discountPercent" | "discountExpiresAt" | "discountLabel" | "suspendedAt" | "isDemo" | "demoExpiresAt" | "aiSuggestionsAvailable" | "aiSuggestionsPolicy" | "aiSuggestionsAudience" | "purchaseRequestEnabled" | "purchaseRequestItemLimit" | "purchaseRequestMonthlyLimit" | "approval_intelligence_enabled" | "ai_suggest_unmatched_items" | "ai_confidence_threshold" | "injuryAlertEmails" | "sopMatchSensitivity" | "billingFrequency" | "currentPrice" | "priceLockedUntil" | "intelligenceModules" | "createdAt" | "updatedAt" | "pageAccessConfig" | "regions_enabled" | "corporate_dashboard_enabled" | "cross_location_analytics_enabled" | "advanced_escalations_enabled" | "api_webhooks_enabled" | "sso_foundation_enabled" | "shared_facility_enabled" | "qr_codes_enabled" | "external_collaborators_enabled" | "multi_org_enabled" | "executive_briefings_enabled" | "health_scores_enabled" | "trend_detection_enabled" | "executive_goals_enabled" | "wc_personal_inbox" | "wc_individual_assignments" | "wc_basic_notifications" | "wc_basic_announcements" | "wc_company_announcements" | "wc_personal_reminders" | "wc_push_notifications" | "wc_email_notifications" | "wc_inapp_notifications" | "wc_basic_daily_briefing" | "wc_announcement_history_readonly" | "wc_department_announcements" | "wc_team_announcements" | "wc_shift_announcements" | "wc_emergency_broadcasts" | "wc_assignment_management" | "wc_assignment_comments" | "wc_assignment_attachments" | "wc_assignment_history" | "wc_announcement_acknowledgements" | "wc_ai_daily_briefing" | "wc_manager_announcement_dashboard" | "wc_supervisor_tools" | "wc_communication_search" | "wc_inbox_filters" | "wc_notification_preferences" | "wc_department_communication_permissions" | "wc_multi_location_announcements" | "wc_regional_announcements" | "wc_executive_announcements" | "wc_org_wide_broadcasts" | "wc_cross_location_communication" | "wc_communication_analytics" | "wc_announcement_reporting" | "wc_read_rate_analytics" | "wc_executive_communication_dashboard" | "wc_ai_communication_summaries" | "wc_ai_announcement_drafting" | "wc_org_wide_assignment_management" | "wc_cross_location_assignment_visibility" | "wc_advanced_notification_rules" | "wc_executive_daily_briefings" | "wc_sms_gateway" | "wc_custom_notification_providers" | "wc_custom_escalation_policies" | "wc_compliance_logging" | "wc_advanced_audit_history" | "wc_api_access_communications" | "wc_white_label_communications" | "wc_enterprise_communication_controls" | "lifecycleStatus" | "referralCode" | "referralLink", ExtArgs["result"]["organization"]>
+export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logo" | "industry" | "companySize" | "numberOfLocations" | "onboardingCompletedAt" | "trialStartDate" | "trialEndsAt" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeCouponId" | "subscriptionStatus" | "plan" | "productLine" | "employeeLimit" | "locationLimit" | "checkoutIntentStatus" | "intelligenceSuiteEnabled" | "monthlyBasePrice" | "monthlyScalingCost" | "monthlyModulesCost" | "monthlyTotalBeforeDiscount" | "monthlyTotalAfterDiscount" | "discountPercent" | "discountExpiresAt" | "discountLabel" | "suspendedAt" | "isDemo" | "demoExpiresAt" | "aiSuggestionsAvailable" | "aiSuggestionsPolicy" | "aiSuggestionsAudience" | "purchaseRequestEnabled" | "purchaseRequestItemLimit" | "purchaseRequestMonthlyLimit" | "approval_intelligence_enabled" | "ai_suggest_unmatched_items" | "ai_confidence_threshold" | "injuryAlertEmails" | "sopMatchSensitivity" | "billingFrequency" | "currentPrice" | "priceLockedUntil" | "intelligenceModules" | "createdAt" | "updatedAt" | "pageAccessConfig" | "navigationConfig" | "terminologyConfig" | "regions_enabled" | "corporate_dashboard_enabled" | "cross_location_analytics_enabled" | "advanced_escalations_enabled" | "api_webhooks_enabled" | "sso_foundation_enabled" | "shared_facility_enabled" | "qr_codes_enabled" | "external_collaborators_enabled" | "multi_org_enabled" | "executive_briefings_enabled" | "health_scores_enabled" | "trend_detection_enabled" | "executive_goals_enabled" | "wc_personal_inbox" | "wc_individual_assignments" | "wc_basic_notifications" | "wc_basic_announcements" | "wc_company_announcements" | "wc_personal_reminders" | "wc_push_notifications" | "wc_email_notifications" | "wc_inapp_notifications" | "wc_basic_daily_briefing" | "wc_announcement_history_readonly" | "wc_department_announcements" | "wc_team_announcements" | "wc_shift_announcements" | "wc_emergency_broadcasts" | "wc_assignment_management" | "wc_assignment_comments" | "wc_assignment_attachments" | "wc_assignment_history" | "wc_announcement_acknowledgements" | "wc_ai_daily_briefing" | "wc_manager_announcement_dashboard" | "wc_supervisor_tools" | "wc_communication_search" | "wc_inbox_filters" | "wc_notification_preferences" | "wc_department_communication_permissions" | "wc_multi_location_announcements" | "wc_regional_announcements" | "wc_executive_announcements" | "wc_org_wide_broadcasts" | "wc_cross_location_communication" | "wc_communication_analytics" | "wc_announcement_reporting" | "wc_read_rate_analytics" | "wc_executive_communication_dashboard" | "wc_ai_communication_summaries" | "wc_ai_announcement_drafting" | "wc_org_wide_assignment_management" | "wc_cross_location_assignment_visibility" | "wc_advanced_notification_rules" | "wc_executive_daily_briefings" | "wc_sms_gateway" | "wc_custom_notification_providers" | "wc_custom_escalation_policies" | "wc_compliance_logging" | "wc_advanced_audit_history" | "wc_api_access_communications" | "wc_white_label_communications" | "wc_enterprise_communication_controls" | "lifecycleStatus" | "referralCode" | "referralLink", ExtArgs["result"]["organization"]>
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Organization$usersArgs<ExtArgs>
   locations?: boolean | Prisma.Organization$locationsArgs<ExtArgs>
@@ -42197,6 +43616,7 @@ export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   assignments?: boolean | Prisma.Organization$assignmentsArgs<ExtArgs>
   announcements?: boolean | Prisma.Organization$announcementsArgs<ExtArgs>
   emergencyBroadcasts?: boolean | Prisma.Organization$emergencyBroadcastsArgs<ExtArgs>
+  workspaceChangeLogs?: boolean | Prisma.Organization$workspaceChangeLogsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -42258,6 +43678,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     assignments: Prisma.$AssignmentPayload<ExtArgs>[]
     announcements: Prisma.$AnnouncementPayload<ExtArgs>[]
     emergencyBroadcasts: Prisma.$EmergencyBroadcastPayload<ExtArgs>[]
+    workspaceChangeLogs: Prisma.$WorkspaceChangeLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -42309,6 +43730,8 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     createdAt: Date
     updatedAt: Date
     pageAccessConfig: runtime.JsonValue | null
+    navigationConfig: runtime.JsonValue | null
+    terminologyConfig: runtime.JsonValue | null
     regions_enabled: boolean
     corporate_dashboard_enabled: boolean
     cross_location_analytics_enabled: boolean
@@ -42823,6 +44246,7 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   assignments<T extends Prisma.Organization$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   announcements<T extends Prisma.Organization$announcementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$announcementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emergencyBroadcasts<T extends Prisma.Organization$emergencyBroadcastsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$emergencyBroadcastsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  workspaceChangeLogs<T extends Prisma.Organization$workspaceChangeLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$workspaceChangeLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceChangeLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -42901,6 +44325,8 @@ export interface OrganizationFieldRefs {
   readonly createdAt: Prisma.FieldRef<"Organization", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Organization", 'DateTime'>
   readonly pageAccessConfig: Prisma.FieldRef<"Organization", 'Json'>
+  readonly navigationConfig: Prisma.FieldRef<"Organization", 'Json'>
+  readonly terminologyConfig: Prisma.FieldRef<"Organization", 'Json'>
   readonly regions_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly corporate_dashboard_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly cross_location_analytics_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
@@ -44620,6 +46046,30 @@ export type Organization$emergencyBroadcastsArgs<ExtArgs extends runtime.Types.E
   take?: number
   skip?: number
   distinct?: Prisma.EmergencyBroadcastScalarFieldEnum | Prisma.EmergencyBroadcastScalarFieldEnum[]
+}
+
+/**
+ * Organization.workspaceChangeLogs
+ */
+export type Organization$workspaceChangeLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkspaceChangeLog
+   */
+  select?: Prisma.WorkspaceChangeLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkspaceChangeLog
+   */
+  omit?: Prisma.WorkspaceChangeLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceChangeLogInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceChangeLogWhereInput
+  orderBy?: Prisma.WorkspaceChangeLogOrderByWithRelationInput | Prisma.WorkspaceChangeLogOrderByWithRelationInput[]
+  cursor?: Prisma.WorkspaceChangeLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkspaceChangeLogScalarFieldEnum | Prisma.WorkspaceChangeLogScalarFieldEnum[]
 }
 
 /**

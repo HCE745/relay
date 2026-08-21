@@ -1495,14 +1495,6 @@ export type IssueUncheckedUpdateManyWithoutVendorNestedInput = {
   deleteMany?: Prisma.IssueScalarWhereInput | Prisma.IssueScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type IssueCreateNestedOneWithoutCommentsInput = {
   create?: Prisma.XOR<Prisma.IssueCreateWithoutCommentsInput, Prisma.IssueUncheckedCreateWithoutCommentsInput>
   connectOrCreate?: Prisma.IssueCreateOrConnectWithoutCommentsInput

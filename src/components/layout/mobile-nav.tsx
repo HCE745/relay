@@ -33,6 +33,7 @@ import type { PageKey } from "@/lib/page-access"
 import { RelayIconWhite, RelayWordmarkWhite } from "@/components/logo"
 import { SupportButton } from "@/components/support/support-button"
 import { getIndustryNavItems, CARWASH_NAV_ITEMS } from "@/lib/workspace-config"
+import { resolveViewIcon, type CustomViewSidebarItem } from "@/lib/custom-view-config"
 
 const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: React.ElementType }> = [
   { key: "dashboard",       href: "/dashboard",       label: "Dashboard",      icon: LayoutDashboard },
@@ -102,9 +103,10 @@ interface MobileNavProps {
   userName?: string
   orgName?: string
   navLabelOverrides?: Record<string, string>
+  customViewItems?: CustomViewSidebarItem[]
 }
 
-export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, userName, orgName, navLabelOverrides }: MobileNavProps) {
+export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, userName, orgName, navLabelOverrides, customViewItems = [] }: MobileNavProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -164,7 +166,7 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
     }
   }, [drawerOpen])
 
-  const allowedSet = new Set(allowedPageKeys)
+  const allowedSet       = new Set(allowedPageKeys)
   const industryNavItems = getIndustryNavItems(industry ?? "")
   const visibleItems = industryNavItems
     ? industryNavItems.filter(i => allowedSet.has(i.key))
@@ -297,6 +299,25 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
                 {navLabelOverrides?.[href] ?? label}
               </Link>
             ))}
+            {allowedSet.has("issues") && customViewItems.map(view => {
+              const Icon = resolveViewIcon(view.icon)
+              const href = `/issues?view=${view.id}`
+              return (
+                <Link
+                  key={view.id}
+                  href={href}
+                  className={cn(
+                    "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                    isActive(href)
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                  )}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {view.name}
+                </Link>
+              )
+            })}
           </nav>
 
           {/* Footer */}

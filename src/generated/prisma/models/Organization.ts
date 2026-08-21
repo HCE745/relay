@@ -1198,6 +1198,7 @@ export type OrganizationWhereInput = {
   announcements?: Prisma.AnnouncementListRelationFilter
   emergencyBroadcasts?: Prisma.EmergencyBroadcastListRelationFilter
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogListRelationFilter
+  customViews?: Prisma.CustomViewListRelationFilter
 }
 
 export type OrganizationOrderByWithRelationInput = {
@@ -1373,6 +1374,7 @@ export type OrganizationOrderByWithRelationInput = {
   announcements?: Prisma.AnnouncementOrderByRelationAggregateInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastOrderByRelationAggregateInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogOrderByRelationAggregateInput
+  customViews?: Prisma.CustomViewOrderByRelationAggregateInput
 }
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -1551,6 +1553,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   announcements?: Prisma.AnnouncementListRelationFilter
   emergencyBroadcasts?: Prisma.EmergencyBroadcastListRelationFilter
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogListRelationFilter
+  customViews?: Prisma.CustomViewListRelationFilter
 }, "id" | "slug" | "referralCode">
 
 export type OrganizationOrderByWithAggregationInput = {
@@ -1976,6 +1979,7 @@ export type OrganizationCreateInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateInput = {
@@ -2151,6 +2155,7 @@ export type OrganizationUncheckedCreateInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUpdateInput = {
@@ -2326,6 +2331,7 @@ export type OrganizationUpdateInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateInput = {
@@ -2501,6 +2507,7 @@ export type OrganizationUncheckedUpdateInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateManyInput = {
@@ -3320,6 +3327,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type OrganizationCreateNestedOneWithoutCustomViewsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutCustomViewsInput, Prisma.OrganizationUncheckedCreateWithoutCustomViewsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutCustomViewsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutCustomViewsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutCustomViewsInput, Prisma.OrganizationUncheckedCreateWithoutCustomViewsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutCustomViewsInput
+  upsert?: Prisma.OrganizationUpsertWithoutCustomViewsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutCustomViewsInput, Prisma.OrganizationUpdateWithoutCustomViewsInput>, Prisma.OrganizationUncheckedUpdateWithoutCustomViewsInput>
+}
+
 export type OrganizationCreateNestedOneWithoutWorkspaceChangeLogsInput = {
   create?: Prisma.XOR<Prisma.OrganizationCreateWithoutWorkspaceChangeLogsInput, Prisma.OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput>
   connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutWorkspaceChangeLogsInput
@@ -4084,6 +4105,722 @@ export type OrganizationUpdateOneRequiredWithoutEmergencyBroadcastsNestedInput =
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutEmergencyBroadcastsInput, Prisma.OrganizationUpdateWithoutEmergencyBroadcastsInput>, Prisma.OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput>
 }
 
+export type OrganizationCreateWithoutCustomViewsInput = {
+  id?: string
+  name: string
+  slug: string
+  logo?: string | null
+  industry?: string | null
+  companySize?: string | null
+  numberOfLocations?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialStartDate?: Date | string | null
+  trialEndsAt?: Date | string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeCouponId?: string | null
+  subscriptionStatus?: string
+  plan?: string
+  productLine?: string
+  employeeLimit?: number | null
+  locationLimit?: number | null
+  checkoutIntentStatus?: string | null
+  intelligenceSuiteEnabled?: boolean
+  monthlyBasePrice?: number | null
+  monthlyScalingCost?: number | null
+  monthlyModulesCost?: number | null
+  monthlyTotalBeforeDiscount?: number | null
+  monthlyTotalAfterDiscount?: number | null
+  discountPercent?: number | null
+  discountExpiresAt?: Date | string | null
+  discountLabel?: string | null
+  suspendedAt?: Date | string | null
+  isDemo?: boolean
+  demoExpiresAt?: Date | string | null
+  aiSuggestionsAvailable?: boolean
+  aiSuggestionsPolicy?: string
+  aiSuggestionsAudience?: string
+  purchaseRequestEnabled?: boolean
+  purchaseRequestItemLimit?: number | null
+  purchaseRequestMonthlyLimit?: number | null
+  approval_intelligence_enabled?: boolean
+  ai_suggest_unmatched_items?: boolean
+  ai_confidence_threshold?: number
+  injuryAlertEmails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sopMatchSensitivity?: string
+  billingFrequency?: string
+  currentPrice?: number | null
+  priceLockedUntil?: Date | string | null
+  intelligenceModules?: Prisma.OrganizationCreateintelligenceModulesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  regions_enabled?: boolean
+  corporate_dashboard_enabled?: boolean
+  cross_location_analytics_enabled?: boolean
+  advanced_escalations_enabled?: boolean
+  api_webhooks_enabled?: boolean
+  sso_foundation_enabled?: boolean
+  shared_facility_enabled?: boolean
+  qr_codes_enabled?: boolean
+  external_collaborators_enabled?: boolean
+  multi_org_enabled?: boolean
+  executive_briefings_enabled?: boolean
+  health_scores_enabled?: boolean
+  trend_detection_enabled?: boolean
+  executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
+  lifecycleStatus?: string
+  referralCode?: string | null
+  referralLink?: string | null
+  users?: Prisma.UserCreateNestedManyWithoutOrganizationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutOrganizationInput
+  regions?: Prisma.RegionCreateNestedManyWithoutOrganizationInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutOrganizationInput
+  assets?: Prisma.AssetCreateNestedManyWithoutOrganizationInput
+  vendors?: Prisma.VendorCreateNestedManyWithoutOrganizationInput
+  issues?: Prisma.IssueCreateNestedManyWithoutOrganizationInput
+  escalationPolicies?: Prisma.EscalationPolicyCreateNestedManyWithoutOrganizationInput
+  escalationChains?: Prisma.EscalationChainCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutOrganizationInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutOrganizationInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutOrganizationInput
+  emailTemplates?: Prisma.EmailTemplateCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  impersonationLogs?: Prisma.ImpersonationLogCreateNestedManyWithoutOrganizationInput
+  auditLogs?: Prisma.SuperAdminAuditLogCreateNestedManyWithoutOrganizationInput
+  orgNotes?: Prisma.OrgNoteCreateNestedManyWithoutOrganizationInput
+  analyticsSnapshots?: Prisma.AnalyticsSnapshotCreateNestedManyWithoutOrganizationInput
+  employeeTypes?: Prisma.EmployeeTypeCreateNestedManyWithoutOrganizationInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutOrganizationInput
+  sops?: Prisma.SOPCreateNestedManyWithoutOrganizationInput
+  purchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutOrganizationInput
+  approvedCatalogItems?: Prisma.ApprovedCatalogItemCreateNestedManyWithoutOrganizationInput
+  approvalPolicies?: Prisma.ApprovalPolicyCreateNestedManyWithoutOrganizationInput
+  injuryReports?: Prisma.InjuryReportCreateNestedManyWithoutOrganizationInput
+  issueTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutOrganizationInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutOrganizationInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutOrganizationInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOrganizationInput
+  webhookEndpoints?: Prisma.WebhookEndpointCreateNestedManyWithoutOrganizationInput
+  ssoConfig?: Prisma.SSOConfigCreateNestedOneWithoutOrganizationInput
+  orgRelationshipsAsA?: Prisma.OrganizationRelationshipCreateNestedManyWithoutOrgAInput
+  orgRelationshipsAsB?: Prisma.OrganizationRelationshipCreateNestedManyWithoutOrgBInput
+  qrCodes?: Prisma.QrCodeCreateNestedManyWithoutOrganizationInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutOrganizationInput
+  executiveBriefings?: Prisma.ExecutiveBriefingCreateNestedManyWithoutOrganizationInput
+  healthScores?: Prisma.HealthScoreCreateNestedManyWithoutOrganizationInput
+  trendAlerts?: Prisma.TrendAlertCreateNestedManyWithoutOrganizationInput
+  executiveGoals?: Prisma.ExecutiveGoalCreateNestedManyWithoutOrganizationInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutOrganizationInput
+  demoCalls?: Prisma.DemoCallCreateNestedManyWithoutOrganizationInput
+  nonConversionReasons?: Prisma.NonConversionReasonCreateNestedManyWithoutOrganizationInput
+  crmNotes?: Prisma.CrmNoteCreateNestedManyWithoutOrganizationInput
+  crmActivities?: Prisma.CrmActivityCreateNestedManyWithoutOrganizationInput
+  referralsMade?: Prisma.ReferralCreateNestedManyWithoutReferrerOrgInput
+  referralReceived?: Prisma.ReferralCreateNestedOneWithoutReferredOrgInput
+  billingCredits?: Prisma.BillingCreditCreateNestedManyWithoutOrgInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  supportConversations?: Prisma.SupportConversationCreateNestedManyWithoutOrganizationInput
+  broadcasts?: Prisma.BroadcastCreateNestedManyWithoutTargetOrgInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
+  emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutCustomViewsInput = {
+  id?: string
+  name: string
+  slug: string
+  logo?: string | null
+  industry?: string | null
+  companySize?: string | null
+  numberOfLocations?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialStartDate?: Date | string | null
+  trialEndsAt?: Date | string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripeCouponId?: string | null
+  subscriptionStatus?: string
+  plan?: string
+  productLine?: string
+  employeeLimit?: number | null
+  locationLimit?: number | null
+  checkoutIntentStatus?: string | null
+  intelligenceSuiteEnabled?: boolean
+  monthlyBasePrice?: number | null
+  monthlyScalingCost?: number | null
+  monthlyModulesCost?: number | null
+  monthlyTotalBeforeDiscount?: number | null
+  monthlyTotalAfterDiscount?: number | null
+  discountPercent?: number | null
+  discountExpiresAt?: Date | string | null
+  discountLabel?: string | null
+  suspendedAt?: Date | string | null
+  isDemo?: boolean
+  demoExpiresAt?: Date | string | null
+  aiSuggestionsAvailable?: boolean
+  aiSuggestionsPolicy?: string
+  aiSuggestionsAudience?: string
+  purchaseRequestEnabled?: boolean
+  purchaseRequestItemLimit?: number | null
+  purchaseRequestMonthlyLimit?: number | null
+  approval_intelligence_enabled?: boolean
+  ai_suggest_unmatched_items?: boolean
+  ai_confidence_threshold?: number
+  injuryAlertEmails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sopMatchSensitivity?: string
+  billingFrequency?: string
+  currentPrice?: number | null
+  priceLockedUntil?: Date | string | null
+  intelligenceModules?: Prisma.OrganizationCreateintelligenceModulesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  regions_enabled?: boolean
+  corporate_dashboard_enabled?: boolean
+  cross_location_analytics_enabled?: boolean
+  advanced_escalations_enabled?: boolean
+  api_webhooks_enabled?: boolean
+  sso_foundation_enabled?: boolean
+  shared_facility_enabled?: boolean
+  qr_codes_enabled?: boolean
+  external_collaborators_enabled?: boolean
+  multi_org_enabled?: boolean
+  executive_briefings_enabled?: boolean
+  health_scores_enabled?: boolean
+  trend_detection_enabled?: boolean
+  executive_goals_enabled?: boolean
+  wc_personal_inbox?: boolean
+  wc_individual_assignments?: boolean
+  wc_basic_notifications?: boolean
+  wc_basic_announcements?: boolean
+  wc_company_announcements?: boolean
+  wc_personal_reminders?: boolean
+  wc_push_notifications?: boolean
+  wc_email_notifications?: boolean
+  wc_inapp_notifications?: boolean
+  wc_basic_daily_briefing?: boolean
+  wc_announcement_history_readonly?: boolean
+  wc_department_announcements?: boolean
+  wc_team_announcements?: boolean
+  wc_shift_announcements?: boolean
+  wc_emergency_broadcasts?: boolean
+  wc_assignment_management?: boolean
+  wc_assignment_comments?: boolean
+  wc_assignment_attachments?: boolean
+  wc_assignment_history?: boolean
+  wc_announcement_acknowledgements?: boolean
+  wc_ai_daily_briefing?: boolean
+  wc_manager_announcement_dashboard?: boolean
+  wc_supervisor_tools?: boolean
+  wc_communication_search?: boolean
+  wc_inbox_filters?: boolean
+  wc_notification_preferences?: boolean
+  wc_department_communication_permissions?: boolean
+  wc_multi_location_announcements?: boolean
+  wc_regional_announcements?: boolean
+  wc_executive_announcements?: boolean
+  wc_org_wide_broadcasts?: boolean
+  wc_cross_location_communication?: boolean
+  wc_communication_analytics?: boolean
+  wc_announcement_reporting?: boolean
+  wc_read_rate_analytics?: boolean
+  wc_executive_communication_dashboard?: boolean
+  wc_ai_communication_summaries?: boolean
+  wc_ai_announcement_drafting?: boolean
+  wc_org_wide_assignment_management?: boolean
+  wc_cross_location_assignment_visibility?: boolean
+  wc_advanced_notification_rules?: boolean
+  wc_executive_daily_briefings?: boolean
+  wc_sms_gateway?: boolean
+  wc_custom_notification_providers?: boolean
+  wc_custom_escalation_policies?: boolean
+  wc_compliance_logging?: boolean
+  wc_advanced_audit_history?: boolean
+  wc_api_access_communications?: boolean
+  wc_white_label_communications?: boolean
+  wc_enterprise_communication_controls?: boolean
+  lifecycleStatus?: string
+  referralCode?: string | null
+  referralLink?: string | null
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutOrganizationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutOrganizationInput
+  regions?: Prisma.RegionUncheckedCreateNestedManyWithoutOrganizationInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutOrganizationInput
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutOrganizationInput
+  vendors?: Prisma.VendorUncheckedCreateNestedManyWithoutOrganizationInput
+  issues?: Prisma.IssueUncheckedCreateNestedManyWithoutOrganizationInput
+  escalationPolicies?: Prisma.EscalationPolicyUncheckedCreateNestedManyWithoutOrganizationInput
+  escalationChains?: Prisma.EscalationChainUncheckedCreateNestedManyWithoutOrganizationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutOrganizationInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutOrganizationInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutOrganizationInput
+  emailTemplates?: Prisma.EmailTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  impersonationLogs?: Prisma.ImpersonationLogUncheckedCreateNestedManyWithoutOrganizationInput
+  auditLogs?: Prisma.SuperAdminAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+  orgNotes?: Prisma.OrgNoteUncheckedCreateNestedManyWithoutOrganizationInput
+  analyticsSnapshots?: Prisma.AnalyticsSnapshotUncheckedCreateNestedManyWithoutOrganizationInput
+  employeeTypes?: Prisma.EmployeeTypeUncheckedCreateNestedManyWithoutOrganizationInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutOrganizationInput
+  sops?: Prisma.SOPUncheckedCreateNestedManyWithoutOrganizationInput
+  purchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  approvedCatalogItems?: Prisma.ApprovedCatalogItemUncheckedCreateNestedManyWithoutOrganizationInput
+  approvalPolicies?: Prisma.ApprovalPolicyUncheckedCreateNestedManyWithoutOrganizationInput
+  injuryReports?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutOrganizationInput
+  issueTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutOrganizationInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOrganizationInput
+  webhookEndpoints?: Prisma.WebhookEndpointUncheckedCreateNestedManyWithoutOrganizationInput
+  ssoConfig?: Prisma.SSOConfigUncheckedCreateNestedOneWithoutOrganizationInput
+  orgRelationshipsAsA?: Prisma.OrganizationRelationshipUncheckedCreateNestedManyWithoutOrgAInput
+  orgRelationshipsAsB?: Prisma.OrganizationRelationshipUncheckedCreateNestedManyWithoutOrgBInput
+  qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutOrganizationInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutOrganizationInput
+  executiveBriefings?: Prisma.ExecutiveBriefingUncheckedCreateNestedManyWithoutOrganizationInput
+  healthScores?: Prisma.HealthScoreUncheckedCreateNestedManyWithoutOrganizationInput
+  trendAlerts?: Prisma.TrendAlertUncheckedCreateNestedManyWithoutOrganizationInput
+  executiveGoals?: Prisma.ExecutiveGoalUncheckedCreateNestedManyWithoutOrganizationInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutOrganizationInput
+  demoCalls?: Prisma.DemoCallUncheckedCreateNestedManyWithoutOrganizationInput
+  nonConversionReasons?: Prisma.NonConversionReasonUncheckedCreateNestedManyWithoutOrganizationInput
+  crmNotes?: Prisma.CrmNoteUncheckedCreateNestedManyWithoutOrganizationInput
+  crmActivities?: Prisma.CrmActivityUncheckedCreateNestedManyWithoutOrganizationInput
+  referralsMade?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferrerOrgInput
+  referralReceived?: Prisma.ReferralUncheckedCreateNestedOneWithoutReferredOrgInput
+  billingCredits?: Prisma.BillingCreditUncheckedCreateNestedManyWithoutOrgInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  supportConversations?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  broadcasts?: Prisma.BroadcastUncheckedCreateNestedManyWithoutTargetOrgInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
+  emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutCustomViewsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutCustomViewsInput, Prisma.OrganizationUncheckedCreateWithoutCustomViewsInput>
+}
+
+export type OrganizationUpsertWithoutCustomViewsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutCustomViewsInput, Prisma.OrganizationUncheckedUpdateWithoutCustomViewsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutCustomViewsInput, Prisma.OrganizationUncheckedCreateWithoutCustomViewsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutCustomViewsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutCustomViewsInput, Prisma.OrganizationUncheckedUpdateWithoutCustomViewsInput>
+}
+
+export type OrganizationUpdateWithoutCustomViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfLocations?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intelligenceSuiteEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyBasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyScalingCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyModulesCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyTotalBeforeDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyTotalAfterDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  discountPercent?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  discountExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  discountLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDemo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  demoExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiSuggestionsAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiSuggestionsPolicy?: Prisma.StringFieldUpdateOperationsInput | string
+  aiSuggestionsAudience?: Prisma.StringFieldUpdateOperationsInput | string
+  purchaseRequestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  purchaseRequestItemLimit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  purchaseRequestMonthlyLimit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approval_intelligence_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ai_suggest_unmatched_items?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ai_confidence_threshold?: Prisma.FloatFieldUpdateOperationsInput | number
+  injuryAlertEmails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sopMatchSensitivity?: Prisma.StringFieldUpdateOperationsInput | string
+  billingFrequency?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  priceLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  intelligenceModules?: Prisma.OrganizationUpdateintelligenceModulesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  advanced_escalations_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  api_webhooks_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sso_foundation_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shared_facility_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  qr_codes_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  external_collaborators_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  multi_org_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executive_briefings_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  users?: Prisma.UserUpdateManyWithoutOrganizationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutOrganizationNestedInput
+  regions?: Prisma.RegionUpdateManyWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutOrganizationNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutOrganizationNestedInput
+  vendors?: Prisma.VendorUpdateManyWithoutOrganizationNestedInput
+  issues?: Prisma.IssueUpdateManyWithoutOrganizationNestedInput
+  escalationPolicies?: Prisma.EscalationPolicyUpdateManyWithoutOrganizationNestedInput
+  escalationChains?: Prisma.EscalationChainUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutOrganizationNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutOrganizationNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutOrganizationNestedInput
+  emailTemplates?: Prisma.EmailTemplateUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  impersonationLogs?: Prisma.ImpersonationLogUpdateManyWithoutOrganizationNestedInput
+  auditLogs?: Prisma.SuperAdminAuditLogUpdateManyWithoutOrganizationNestedInput
+  orgNotes?: Prisma.OrgNoteUpdateManyWithoutOrganizationNestedInput
+  analyticsSnapshots?: Prisma.AnalyticsSnapshotUpdateManyWithoutOrganizationNestedInput
+  employeeTypes?: Prisma.EmployeeTypeUpdateManyWithoutOrganizationNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutOrganizationNestedInput
+  sops?: Prisma.SOPUpdateManyWithoutOrganizationNestedInput
+  purchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutOrganizationNestedInput
+  approvedCatalogItems?: Prisma.ApprovedCatalogItemUpdateManyWithoutOrganizationNestedInput
+  approvalPolicies?: Prisma.ApprovalPolicyUpdateManyWithoutOrganizationNestedInput
+  injuryReports?: Prisma.InjuryReportUpdateManyWithoutOrganizationNestedInput
+  issueTemplates?: Prisma.IssueTemplateUpdateManyWithoutOrganizationNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutOrganizationNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutOrganizationNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOrganizationNestedInput
+  webhookEndpoints?: Prisma.WebhookEndpointUpdateManyWithoutOrganizationNestedInput
+  ssoConfig?: Prisma.SSOConfigUpdateOneWithoutOrganizationNestedInput
+  orgRelationshipsAsA?: Prisma.OrganizationRelationshipUpdateManyWithoutOrgANestedInput
+  orgRelationshipsAsB?: Prisma.OrganizationRelationshipUpdateManyWithoutOrgBNestedInput
+  qrCodes?: Prisma.QrCodeUpdateManyWithoutOrganizationNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutOrganizationNestedInput
+  executiveBriefings?: Prisma.ExecutiveBriefingUpdateManyWithoutOrganizationNestedInput
+  healthScores?: Prisma.HealthScoreUpdateManyWithoutOrganizationNestedInput
+  trendAlerts?: Prisma.TrendAlertUpdateManyWithoutOrganizationNestedInput
+  executiveGoals?: Prisma.ExecutiveGoalUpdateManyWithoutOrganizationNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutOrganizationNestedInput
+  demoCalls?: Prisma.DemoCallUpdateManyWithoutOrganizationNestedInput
+  nonConversionReasons?: Prisma.NonConversionReasonUpdateManyWithoutOrganizationNestedInput
+  crmNotes?: Prisma.CrmNoteUpdateManyWithoutOrganizationNestedInput
+  crmActivities?: Prisma.CrmActivityUpdateManyWithoutOrganizationNestedInput
+  referralsMade?: Prisma.ReferralUpdateManyWithoutReferrerOrgNestedInput
+  referralReceived?: Prisma.ReferralUpdateOneWithoutReferredOrgNestedInput
+  billingCredits?: Prisma.BillingCreditUpdateManyWithoutOrgNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  supportConversations?: Prisma.SupportConversationUpdateManyWithoutOrganizationNestedInput
+  broadcasts?: Prisma.BroadcastUpdateManyWithoutTargetOrgNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
+  emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutCustomViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfLocations?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStartDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCouponId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  productLine?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  locationLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  checkoutIntentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intelligenceSuiteEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyBasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyScalingCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyModulesCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyTotalBeforeDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  monthlyTotalAfterDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  discountPercent?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  discountExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  discountLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDemo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  demoExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiSuggestionsAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiSuggestionsPolicy?: Prisma.StringFieldUpdateOperationsInput | string
+  aiSuggestionsAudience?: Prisma.StringFieldUpdateOperationsInput | string
+  purchaseRequestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  purchaseRequestItemLimit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  purchaseRequestMonthlyLimit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  approval_intelligence_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ai_suggest_unmatched_items?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ai_confidence_threshold?: Prisma.FloatFieldUpdateOperationsInput | number
+  injuryAlertEmails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sopMatchSensitivity?: Prisma.StringFieldUpdateOperationsInput | string
+  billingFrequency?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  priceLockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  intelligenceModules?: Prisma.OrganizationUpdateintelligenceModulesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pageAccessConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  navigationConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  terminologyConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  regions_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  corporate_dashboard_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  cross_location_analytics_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  advanced_escalations_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  api_webhooks_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sso_foundation_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shared_facility_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  qr_codes_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  external_collaborators_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  multi_org_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executive_briefings_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_company_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_personal_reminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_push_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_email_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inapp_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_basic_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_history_readonly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_team_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_shift_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_emergency_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_comments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_attachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_assignment_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_acknowledgements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_daily_briefing?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_manager_announcement_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_supervisor_tools?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_search?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_inbox_filters?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_notification_preferences?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_department_communication_permissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_multi_location_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_regional_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_announcements?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_broadcasts?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_communication?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_communication_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_announcement_reporting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_read_rate_analytics?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_communication_dashboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_communication_summaries?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_ai_announcement_drafting?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_org_wide_assignment_management?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_cross_location_assignment_visibility?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_notification_rules?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_executive_daily_briefings?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_sms_gateway?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_notification_providers?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_custom_escalation_policies?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_compliance_logging?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_advanced_audit_history?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_api_access_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_white_label_communications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wc_enterprise_communication_controls?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  users?: Prisma.UserUncheckedUpdateManyWithoutOrganizationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutOrganizationNestedInput
+  regions?: Prisma.RegionUncheckedUpdateManyWithoutOrganizationNestedInput
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutOrganizationNestedInput
+  vendors?: Prisma.VendorUncheckedUpdateManyWithoutOrganizationNestedInput
+  issues?: Prisma.IssueUncheckedUpdateManyWithoutOrganizationNestedInput
+  escalationPolicies?: Prisma.EscalationPolicyUncheckedUpdateManyWithoutOrganizationNestedInput
+  escalationChains?: Prisma.EscalationChainUncheckedUpdateManyWithoutOrganizationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutOrganizationNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutOrganizationNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutOrganizationNestedInput
+  emailTemplates?: Prisma.EmailTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  impersonationLogs?: Prisma.ImpersonationLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  auditLogs?: Prisma.SuperAdminAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  orgNotes?: Prisma.OrgNoteUncheckedUpdateManyWithoutOrganizationNestedInput
+  analyticsSnapshots?: Prisma.AnalyticsSnapshotUncheckedUpdateManyWithoutOrganizationNestedInput
+  employeeTypes?: Prisma.EmployeeTypeUncheckedUpdateManyWithoutOrganizationNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutOrganizationNestedInput
+  sops?: Prisma.SOPUncheckedUpdateManyWithoutOrganizationNestedInput
+  purchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  approvedCatalogItems?: Prisma.ApprovedCatalogItemUncheckedUpdateManyWithoutOrganizationNestedInput
+  approvalPolicies?: Prisma.ApprovalPolicyUncheckedUpdateManyWithoutOrganizationNestedInput
+  injuryReports?: Prisma.InjuryReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  issueTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOrganizationNestedInput
+  webhookEndpoints?: Prisma.WebhookEndpointUncheckedUpdateManyWithoutOrganizationNestedInput
+  ssoConfig?: Prisma.SSOConfigUncheckedUpdateOneWithoutOrganizationNestedInput
+  orgRelationshipsAsA?: Prisma.OrganizationRelationshipUncheckedUpdateManyWithoutOrgANestedInput
+  orgRelationshipsAsB?: Prisma.OrganizationRelationshipUncheckedUpdateManyWithoutOrgBNestedInput
+  qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutOrganizationNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutOrganizationNestedInput
+  executiveBriefings?: Prisma.ExecutiveBriefingUncheckedUpdateManyWithoutOrganizationNestedInput
+  healthScores?: Prisma.HealthScoreUncheckedUpdateManyWithoutOrganizationNestedInput
+  trendAlerts?: Prisma.TrendAlertUncheckedUpdateManyWithoutOrganizationNestedInput
+  executiveGoals?: Prisma.ExecutiveGoalUncheckedUpdateManyWithoutOrganizationNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutOrganizationNestedInput
+  demoCalls?: Prisma.DemoCallUncheckedUpdateManyWithoutOrganizationNestedInput
+  nonConversionReasons?: Prisma.NonConversionReasonUncheckedUpdateManyWithoutOrganizationNestedInput
+  crmNotes?: Prisma.CrmNoteUncheckedUpdateManyWithoutOrganizationNestedInput
+  crmActivities?: Prisma.CrmActivityUncheckedUpdateManyWithoutOrganizationNestedInput
+  referralsMade?: Prisma.ReferralUncheckedUpdateManyWithoutReferrerOrgNestedInput
+  referralReceived?: Prisma.ReferralUncheckedUpdateOneWithoutReferredOrgNestedInput
+  billingCredits?: Prisma.BillingCreditUncheckedUpdateManyWithoutOrgNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  supportConversations?: Prisma.SupportConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  broadcasts?: Prisma.BroadcastUncheckedUpdateManyWithoutTargetOrgNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
+  emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
 export type OrganizationCreateWithoutWorkspaceChangeLogsInput = {
   id?: string
   name: string
@@ -4256,6 +4993,7 @@ export type OrganizationCreateWithoutWorkspaceChangeLogsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput = {
@@ -4430,6 +5168,7 @@ export type OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutWorkspaceChangeLogsInput = {
@@ -4620,6 +5359,7 @@ export type OrganizationUpdateWithoutWorkspaceChangeLogsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutWorkspaceChangeLogsInput = {
@@ -4794,6 +5534,7 @@ export type OrganizationUncheckedUpdateWithoutWorkspaceChangeLogsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutUsersInput = {
@@ -4968,6 +5709,7 @@ export type OrganizationCreateWithoutUsersInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutUsersInput = {
@@ -5142,6 +5884,7 @@ export type OrganizationUncheckedCreateWithoutUsersInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutUsersInput = {
@@ -5332,6 +6075,7 @@ export type OrganizationUpdateWithoutUsersInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutUsersInput = {
@@ -5506,6 +6250,7 @@ export type OrganizationUncheckedUpdateWithoutUsersInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutLocationsInput = {
@@ -5680,6 +6425,7 @@ export type OrganizationCreateWithoutLocationsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutLocationsInput = {
@@ -5854,6 +6600,7 @@ export type OrganizationUncheckedCreateWithoutLocationsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutLocationsInput = {
@@ -6044,6 +6791,7 @@ export type OrganizationUpdateWithoutLocationsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutLocationsInput = {
@@ -6218,6 +6966,7 @@ export type OrganizationUncheckedUpdateWithoutLocationsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutDepartmentsInput = {
@@ -6392,6 +7141,7 @@ export type OrganizationCreateWithoutDepartmentsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
@@ -6566,6 +7316,7 @@ export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutDepartmentsInput = {
@@ -6756,6 +7507,7 @@ export type OrganizationUpdateWithoutDepartmentsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
@@ -6930,6 +7682,7 @@ export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAssetsInput = {
@@ -7104,6 +7857,7 @@ export type OrganizationCreateWithoutAssetsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAssetsInput = {
@@ -7278,6 +8032,7 @@ export type OrganizationUncheckedCreateWithoutAssetsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAssetsInput = {
@@ -7468,6 +8223,7 @@ export type OrganizationUpdateWithoutAssetsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAssetsInput = {
@@ -7642,6 +8398,7 @@ export type OrganizationUncheckedUpdateWithoutAssetsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutVendorsInput = {
@@ -7816,6 +8573,7 @@ export type OrganizationCreateWithoutVendorsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutVendorsInput = {
@@ -7990,6 +8748,7 @@ export type OrganizationUncheckedCreateWithoutVendorsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutVendorsInput = {
@@ -8180,6 +8939,7 @@ export type OrganizationUpdateWithoutVendorsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutVendorsInput = {
@@ -8354,6 +9114,7 @@ export type OrganizationUncheckedUpdateWithoutVendorsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutIssuesInput = {
@@ -8528,6 +9289,7 @@ export type OrganizationCreateWithoutIssuesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutIssuesInput = {
@@ -8702,6 +9464,7 @@ export type OrganizationUncheckedCreateWithoutIssuesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutIssuesInput = {
@@ -8892,6 +9655,7 @@ export type OrganizationUpdateWithoutIssuesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutIssuesInput = {
@@ -9066,6 +9830,7 @@ export type OrganizationUncheckedUpdateWithoutIssuesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEscalationPoliciesInput = {
@@ -9240,6 +10005,7 @@ export type OrganizationCreateWithoutEscalationPoliciesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEscalationPoliciesInput = {
@@ -9414,6 +10180,7 @@ export type OrganizationUncheckedCreateWithoutEscalationPoliciesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEscalationPoliciesInput = {
@@ -9604,6 +10371,7 @@ export type OrganizationUpdateWithoutEscalationPoliciesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEscalationPoliciesInput = {
@@ -9778,6 +10546,7 @@ export type OrganizationUncheckedUpdateWithoutEscalationPoliciesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutNotificationsInput = {
@@ -9952,6 +10721,7 @@ export type OrganizationCreateWithoutNotificationsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutNotificationsInput = {
@@ -10126,6 +10896,7 @@ export type OrganizationUncheckedCreateWithoutNotificationsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutNotificationsInput = {
@@ -10316,6 +11087,7 @@ export type OrganizationUpdateWithoutNotificationsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
@@ -10490,6 +11262,7 @@ export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutRoutingRulesInput = {
@@ -10664,6 +11437,7 @@ export type OrganizationCreateWithoutRoutingRulesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutRoutingRulesInput = {
@@ -10838,6 +11612,7 @@ export type OrganizationUncheckedCreateWithoutRoutingRulesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutRoutingRulesInput = {
@@ -11028,6 +11803,7 @@ export type OrganizationUpdateWithoutRoutingRulesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutRoutingRulesInput = {
@@ -11202,6 +11978,7 @@ export type OrganizationUncheckedUpdateWithoutRoutingRulesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSuggestionsInput = {
@@ -11376,6 +12153,7 @@ export type OrganizationCreateWithoutSuggestionsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSuggestionsInput = {
@@ -11550,6 +12328,7 @@ export type OrganizationUncheckedCreateWithoutSuggestionsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSuggestionsInput = {
@@ -11740,6 +12519,7 @@ export type OrganizationUpdateWithoutSuggestionsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSuggestionsInput = {
@@ -11914,6 +12694,7 @@ export type OrganizationUncheckedUpdateWithoutSuggestionsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEmailTemplatesInput = {
@@ -12088,6 +12869,7 @@ export type OrganizationCreateWithoutEmailTemplatesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEmailTemplatesInput = {
@@ -12262,6 +13044,7 @@ export type OrganizationUncheckedCreateWithoutEmailTemplatesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEmailTemplatesInput = {
@@ -12452,6 +13235,7 @@ export type OrganizationUpdateWithoutEmailTemplatesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEmailTemplatesInput = {
@@ -12626,6 +13410,7 @@ export type OrganizationUncheckedUpdateWithoutEmailTemplatesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutInvitationsInput = {
@@ -12800,6 +13585,7 @@ export type OrganizationCreateWithoutInvitationsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutInvitationsInput = {
@@ -12974,6 +13760,7 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutInvitationsInput = {
@@ -13164,6 +13951,7 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
@@ -13338,6 +14126,7 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutOrgNotesInput = {
@@ -13512,6 +14301,7 @@ export type OrganizationCreateWithoutOrgNotesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutOrgNotesInput = {
@@ -13686,6 +14476,7 @@ export type OrganizationUncheckedCreateWithoutOrgNotesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutOrgNotesInput = {
@@ -13876,6 +14667,7 @@ export type OrganizationUpdateWithoutOrgNotesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutOrgNotesInput = {
@@ -14050,6 +14842,7 @@ export type OrganizationUncheckedUpdateWithoutOrgNotesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutImpersonationLogsInput = {
@@ -14224,6 +15017,7 @@ export type OrganizationCreateWithoutImpersonationLogsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutImpersonationLogsInput = {
@@ -14398,6 +15192,7 @@ export type OrganizationUncheckedCreateWithoutImpersonationLogsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutImpersonationLogsInput = {
@@ -14588,6 +15383,7 @@ export type OrganizationUpdateWithoutImpersonationLogsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutImpersonationLogsInput = {
@@ -14762,6 +15558,7 @@ export type OrganizationUncheckedUpdateWithoutImpersonationLogsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAuditLogsInput = {
@@ -14936,6 +15733,7 @@ export type OrganizationCreateWithoutAuditLogsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
@@ -15110,6 +15908,7 @@ export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAuditLogsInput = {
@@ -15300,6 +16099,7 @@ export type OrganizationUpdateWithoutAuditLogsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
@@ -15474,6 +16274,7 @@ export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEmployeeTypesInput = {
@@ -15648,6 +16449,7 @@ export type OrganizationCreateWithoutEmployeeTypesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEmployeeTypesInput = {
@@ -15822,6 +16624,7 @@ export type OrganizationUncheckedCreateWithoutEmployeeTypesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEmployeeTypesInput = {
@@ -16012,6 +16815,7 @@ export type OrganizationUpdateWithoutEmployeeTypesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEmployeeTypesInput = {
@@ -16186,6 +16990,7 @@ export type OrganizationUncheckedUpdateWithoutEmployeeTypesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutIssueTemplatesInput = {
@@ -16360,6 +17165,7 @@ export type OrganizationCreateWithoutIssueTemplatesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutIssueTemplatesInput = {
@@ -16534,6 +17340,7 @@ export type OrganizationUncheckedCreateWithoutIssueTemplatesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutIssueTemplatesInput = {
@@ -16724,6 +17531,7 @@ export type OrganizationUpdateWithoutIssueTemplatesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutIssueTemplatesInput = {
@@ -16898,6 +17706,7 @@ export type OrganizationUncheckedUpdateWithoutIssueTemplatesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutMaintenanceSchedulesInput = {
@@ -17072,6 +17881,7 @@ export type OrganizationCreateWithoutMaintenanceSchedulesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutMaintenanceSchedulesInput = {
@@ -17246,6 +18056,7 @@ export type OrganizationUncheckedCreateWithoutMaintenanceSchedulesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutMaintenanceSchedulesInput = {
@@ -17436,6 +18247,7 @@ export type OrganizationUpdateWithoutMaintenanceSchedulesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutMaintenanceSchedulesInput = {
@@ -17610,6 +18422,7 @@ export type OrganizationUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAnalyticsSnapshotsInput = {
@@ -17784,6 +18597,7 @@ export type OrganizationCreateWithoutAnalyticsSnapshotsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAnalyticsSnapshotsInput = {
@@ -17958,6 +18772,7 @@ export type OrganizationUncheckedCreateWithoutAnalyticsSnapshotsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAnalyticsSnapshotsInput = {
@@ -18148,6 +18963,7 @@ export type OrganizationUpdateWithoutAnalyticsSnapshotsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAnalyticsSnapshotsInput = {
@@ -18322,6 +19138,7 @@ export type OrganizationUncheckedUpdateWithoutAnalyticsSnapshotsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSopsInput = {
@@ -18496,6 +19313,7 @@ export type OrganizationCreateWithoutSopsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSopsInput = {
@@ -18670,6 +19488,7 @@ export type OrganizationUncheckedCreateWithoutSopsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSopsInput = {
@@ -18860,6 +19679,7 @@ export type OrganizationUpdateWithoutSopsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSopsInput = {
@@ -19034,6 +19854,7 @@ export type OrganizationUncheckedUpdateWithoutSopsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutPurchaseRequestsInput = {
@@ -19208,6 +20029,7 @@ export type OrganizationCreateWithoutPurchaseRequestsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutPurchaseRequestsInput = {
@@ -19382,6 +20204,7 @@ export type OrganizationUncheckedCreateWithoutPurchaseRequestsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutPurchaseRequestsInput = {
@@ -19572,6 +20395,7 @@ export type OrganizationUpdateWithoutPurchaseRequestsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutPurchaseRequestsInput = {
@@ -19746,6 +20570,7 @@ export type OrganizationUncheckedUpdateWithoutPurchaseRequestsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutApprovedCatalogItemsInput = {
@@ -19920,6 +20745,7 @@ export type OrganizationCreateWithoutApprovedCatalogItemsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutApprovedCatalogItemsInput = {
@@ -20094,6 +20920,7 @@ export type OrganizationUncheckedCreateWithoutApprovedCatalogItemsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutApprovedCatalogItemsInput = {
@@ -20284,6 +21111,7 @@ export type OrganizationUpdateWithoutApprovedCatalogItemsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutApprovedCatalogItemsInput = {
@@ -20458,6 +21286,7 @@ export type OrganizationUncheckedUpdateWithoutApprovedCatalogItemsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutApprovalPoliciesInput = {
@@ -20632,6 +21461,7 @@ export type OrganizationCreateWithoutApprovalPoliciesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutApprovalPoliciesInput = {
@@ -20806,6 +21636,7 @@ export type OrganizationUncheckedCreateWithoutApprovalPoliciesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutApprovalPoliciesInput = {
@@ -20996,6 +21827,7 @@ export type OrganizationUpdateWithoutApprovalPoliciesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutApprovalPoliciesInput = {
@@ -21170,6 +22002,7 @@ export type OrganizationUncheckedUpdateWithoutApprovalPoliciesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutInjuryReportsInput = {
@@ -21344,6 +22177,7 @@ export type OrganizationCreateWithoutInjuryReportsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutInjuryReportsInput = {
@@ -21518,6 +22352,7 @@ export type OrganizationUncheckedCreateWithoutInjuryReportsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutInjuryReportsInput = {
@@ -21708,6 +22543,7 @@ export type OrganizationUpdateWithoutInjuryReportsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutInjuryReportsInput = {
@@ -21882,6 +22718,7 @@ export type OrganizationUncheckedUpdateWithoutInjuryReportsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutBugReportsInput = {
@@ -22056,6 +22893,7 @@ export type OrganizationCreateWithoutBugReportsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutBugReportsInput = {
@@ -22230,6 +23068,7 @@ export type OrganizationUncheckedCreateWithoutBugReportsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutBugReportsInput = {
@@ -22420,6 +23259,7 @@ export type OrganizationUpdateWithoutBugReportsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutBugReportsInput = {
@@ -22594,6 +23434,7 @@ export type OrganizationUncheckedUpdateWithoutBugReportsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutFeatureRequestsInput = {
@@ -22768,6 +23609,7 @@ export type OrganizationCreateWithoutFeatureRequestsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutFeatureRequestsInput = {
@@ -22942,6 +23784,7 @@ export type OrganizationUncheckedCreateWithoutFeatureRequestsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutFeatureRequestsInput = {
@@ -23132,6 +23975,7 @@ export type OrganizationUpdateWithoutFeatureRequestsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutFeatureRequestsInput = {
@@ -23306,6 +24150,7 @@ export type OrganizationUncheckedUpdateWithoutFeatureRequestsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutRegionsInput = {
@@ -23480,6 +24325,7 @@ export type OrganizationCreateWithoutRegionsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutRegionsInput = {
@@ -23654,6 +24500,7 @@ export type OrganizationUncheckedCreateWithoutRegionsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutRegionsInput = {
@@ -23844,6 +24691,7 @@ export type OrganizationUpdateWithoutRegionsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutRegionsInput = {
@@ -24018,6 +24866,7 @@ export type OrganizationUncheckedUpdateWithoutRegionsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEscalationChainsInput = {
@@ -24192,6 +25041,7 @@ export type OrganizationCreateWithoutEscalationChainsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEscalationChainsInput = {
@@ -24366,6 +25216,7 @@ export type OrganizationUncheckedCreateWithoutEscalationChainsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEscalationChainsInput = {
@@ -24556,6 +25407,7 @@ export type OrganizationUpdateWithoutEscalationChainsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEscalationChainsInput = {
@@ -24730,6 +25582,7 @@ export type OrganizationUncheckedUpdateWithoutEscalationChainsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutApiKeysInput = {
@@ -24904,6 +25757,7 @@ export type OrganizationCreateWithoutApiKeysInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutApiKeysInput = {
@@ -25078,6 +25932,7 @@ export type OrganizationUncheckedCreateWithoutApiKeysInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutApiKeysInput = {
@@ -25268,6 +26123,7 @@ export type OrganizationUpdateWithoutApiKeysInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutApiKeysInput = {
@@ -25442,6 +26298,7 @@ export type OrganizationUncheckedUpdateWithoutApiKeysInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutWebhookEndpointsInput = {
@@ -25616,6 +26473,7 @@ export type OrganizationCreateWithoutWebhookEndpointsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutWebhookEndpointsInput = {
@@ -25790,6 +26648,7 @@ export type OrganizationUncheckedCreateWithoutWebhookEndpointsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutWebhookEndpointsInput = {
@@ -25980,6 +26839,7 @@ export type OrganizationUpdateWithoutWebhookEndpointsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutWebhookEndpointsInput = {
@@ -26154,6 +27014,7 @@ export type OrganizationUncheckedUpdateWithoutWebhookEndpointsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSsoConfigInput = {
@@ -26328,6 +27189,7 @@ export type OrganizationCreateWithoutSsoConfigInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSsoConfigInput = {
@@ -26502,6 +27364,7 @@ export type OrganizationUncheckedCreateWithoutSsoConfigInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSsoConfigInput = {
@@ -26692,6 +27555,7 @@ export type OrganizationUpdateWithoutSsoConfigInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSsoConfigInput = {
@@ -26866,6 +27730,7 @@ export type OrganizationUncheckedUpdateWithoutSsoConfigInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutOrgRelationshipsAsAInput = {
@@ -27040,6 +27905,7 @@ export type OrganizationCreateWithoutOrgRelationshipsAsAInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsAInput = {
@@ -27214,6 +28080,7 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsAInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutOrgRelationshipsAsAInput = {
@@ -27393,6 +28260,7 @@ export type OrganizationCreateWithoutOrgRelationshipsAsBInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsBInput = {
@@ -27567,6 +28435,7 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsBInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutOrgRelationshipsAsBInput = {
@@ -27757,6 +28626,7 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsAInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsAInput = {
@@ -27931,6 +28801,7 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsAInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUpsertWithoutOrgRelationshipsAsBInput = {
@@ -28116,6 +28987,7 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsBInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsBInput = {
@@ -28290,6 +29162,7 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsBInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutQrCodesInput = {
@@ -28464,6 +29337,7 @@ export type OrganizationCreateWithoutQrCodesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutQrCodesInput = {
@@ -28638,6 +29512,7 @@ export type OrganizationUncheckedCreateWithoutQrCodesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutQrCodesInput = {
@@ -28828,6 +29703,7 @@ export type OrganizationUpdateWithoutQrCodesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutQrCodesInput = {
@@ -29002,6 +29878,7 @@ export type OrganizationUncheckedUpdateWithoutQrCodesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutUserOrgMembershipsInput = {
@@ -29176,6 +30053,7 @@ export type OrganizationCreateWithoutUserOrgMembershipsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutUserOrgMembershipsInput = {
@@ -29350,6 +30228,7 @@ export type OrganizationUncheckedCreateWithoutUserOrgMembershipsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutUserOrgMembershipsInput = {
@@ -29540,6 +30419,7 @@ export type OrganizationUpdateWithoutUserOrgMembershipsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutUserOrgMembershipsInput = {
@@ -29714,6 +30594,7 @@ export type OrganizationUncheckedUpdateWithoutUserOrgMembershipsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutExecutiveBriefingsInput = {
@@ -29888,6 +30769,7 @@ export type OrganizationCreateWithoutExecutiveBriefingsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutExecutiveBriefingsInput = {
@@ -30062,6 +30944,7 @@ export type OrganizationUncheckedCreateWithoutExecutiveBriefingsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutExecutiveBriefingsInput = {
@@ -30252,6 +31135,7 @@ export type OrganizationUpdateWithoutExecutiveBriefingsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutExecutiveBriefingsInput = {
@@ -30426,6 +31310,7 @@ export type OrganizationUncheckedUpdateWithoutExecutiveBriefingsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutHealthScoresInput = {
@@ -30600,6 +31485,7 @@ export type OrganizationCreateWithoutHealthScoresInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutHealthScoresInput = {
@@ -30774,6 +31660,7 @@ export type OrganizationUncheckedCreateWithoutHealthScoresInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutHealthScoresInput = {
@@ -30964,6 +31851,7 @@ export type OrganizationUpdateWithoutHealthScoresInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutHealthScoresInput = {
@@ -31138,6 +32026,7 @@ export type OrganizationUncheckedUpdateWithoutHealthScoresInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutTrendAlertsInput = {
@@ -31312,6 +32201,7 @@ export type OrganizationCreateWithoutTrendAlertsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutTrendAlertsInput = {
@@ -31486,6 +32376,7 @@ export type OrganizationUncheckedCreateWithoutTrendAlertsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutTrendAlertsInput = {
@@ -31676,6 +32567,7 @@ export type OrganizationUpdateWithoutTrendAlertsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutTrendAlertsInput = {
@@ -31850,6 +32742,7 @@ export type OrganizationUncheckedUpdateWithoutTrendAlertsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutExecutiveGoalsInput = {
@@ -32024,6 +32917,7 @@ export type OrganizationCreateWithoutExecutiveGoalsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutExecutiveGoalsInput = {
@@ -32198,6 +33092,7 @@ export type OrganizationUncheckedCreateWithoutExecutiveGoalsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutExecutiveGoalsInput = {
@@ -32388,6 +33283,7 @@ export type OrganizationUpdateWithoutExecutiveGoalsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutExecutiveGoalsInput = {
@@ -32562,6 +33458,7 @@ export type OrganizationUncheckedUpdateWithoutExecutiveGoalsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutLegalAcceptancesInput = {
@@ -32736,6 +33633,7 @@ export type OrganizationCreateWithoutLegalAcceptancesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutLegalAcceptancesInput = {
@@ -32910,6 +33808,7 @@ export type OrganizationUncheckedCreateWithoutLegalAcceptancesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutLegalAcceptancesInput = {
@@ -33100,6 +33999,7 @@ export type OrganizationUpdateWithoutLegalAcceptancesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutLegalAcceptancesInput = {
@@ -33274,6 +34174,7 @@ export type OrganizationUncheckedUpdateWithoutLegalAcceptancesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutDemoCallsInput = {
@@ -33448,6 +34349,7 @@ export type OrganizationCreateWithoutDemoCallsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutDemoCallsInput = {
@@ -33622,6 +34524,7 @@ export type OrganizationUncheckedCreateWithoutDemoCallsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutDemoCallsInput = {
@@ -33812,6 +34715,7 @@ export type OrganizationUpdateWithoutDemoCallsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutDemoCallsInput = {
@@ -33986,6 +34890,7 @@ export type OrganizationUncheckedUpdateWithoutDemoCallsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutNonConversionReasonsInput = {
@@ -34160,6 +35065,7 @@ export type OrganizationCreateWithoutNonConversionReasonsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutNonConversionReasonsInput = {
@@ -34334,6 +35240,7 @@ export type OrganizationUncheckedCreateWithoutNonConversionReasonsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutNonConversionReasonsInput = {
@@ -34524,6 +35431,7 @@ export type OrganizationUpdateWithoutNonConversionReasonsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutNonConversionReasonsInput = {
@@ -34698,6 +35606,7 @@ export type OrganizationUncheckedUpdateWithoutNonConversionReasonsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutCrmNotesInput = {
@@ -34872,6 +35781,7 @@ export type OrganizationCreateWithoutCrmNotesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutCrmNotesInput = {
@@ -35046,6 +35956,7 @@ export type OrganizationUncheckedCreateWithoutCrmNotesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutCrmNotesInput = {
@@ -35236,6 +36147,7 @@ export type OrganizationUpdateWithoutCrmNotesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutCrmNotesInput = {
@@ -35410,6 +36322,7 @@ export type OrganizationUncheckedUpdateWithoutCrmNotesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutCrmActivitiesInput = {
@@ -35584,6 +36497,7 @@ export type OrganizationCreateWithoutCrmActivitiesInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutCrmActivitiesInput = {
@@ -35758,6 +36672,7 @@ export type OrganizationUncheckedCreateWithoutCrmActivitiesInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutCrmActivitiesInput = {
@@ -35948,6 +36863,7 @@ export type OrganizationUpdateWithoutCrmActivitiesInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutCrmActivitiesInput = {
@@ -36122,6 +37038,7 @@ export type OrganizationUncheckedUpdateWithoutCrmActivitiesInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutBillingCreditsInput = {
@@ -36296,6 +37213,7 @@ export type OrganizationCreateWithoutBillingCreditsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutBillingCreditsInput = {
@@ -36470,6 +37388,7 @@ export type OrganizationUncheckedCreateWithoutBillingCreditsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutBillingCreditsInput = {
@@ -36660,6 +37579,7 @@ export type OrganizationUpdateWithoutBillingCreditsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutBillingCreditsInput = {
@@ -36834,6 +37754,7 @@ export type OrganizationUncheckedUpdateWithoutBillingCreditsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutReferralsMadeInput = {
@@ -37008,6 +37929,7 @@ export type OrganizationCreateWithoutReferralsMadeInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutReferralsMadeInput = {
@@ -37182,6 +38104,7 @@ export type OrganizationUncheckedCreateWithoutReferralsMadeInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutReferralsMadeInput = {
@@ -37361,6 +38284,7 @@ export type OrganizationCreateWithoutReferralReceivedInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutReferralReceivedInput = {
@@ -37535,6 +38459,7 @@ export type OrganizationUncheckedCreateWithoutReferralReceivedInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutReferralReceivedInput = {
@@ -37725,6 +38650,7 @@ export type OrganizationUpdateWithoutReferralsMadeInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutReferralsMadeInput = {
@@ -37899,6 +38825,7 @@ export type OrganizationUncheckedUpdateWithoutReferralsMadeInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUpsertWithoutReferralReceivedInput = {
@@ -38084,6 +39011,7 @@ export type OrganizationUpdateWithoutReferralReceivedInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutReferralReceivedInput = {
@@ -38258,6 +39186,7 @@ export type OrganizationUncheckedUpdateWithoutReferralReceivedInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutConversationsInput = {
@@ -38432,6 +39361,7 @@ export type OrganizationCreateWithoutConversationsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutConversationsInput = {
@@ -38606,6 +39536,7 @@ export type OrganizationUncheckedCreateWithoutConversationsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutConversationsInput = {
@@ -38796,6 +39727,7 @@ export type OrganizationUpdateWithoutConversationsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutConversationsInput = {
@@ -38970,6 +39902,7 @@ export type OrganizationUncheckedUpdateWithoutConversationsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSupportConversationsInput = {
@@ -39144,6 +40077,7 @@ export type OrganizationCreateWithoutSupportConversationsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSupportConversationsInput = {
@@ -39318,6 +40252,7 @@ export type OrganizationUncheckedCreateWithoutSupportConversationsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSupportConversationsInput = {
@@ -39508,6 +40443,7 @@ export type OrganizationUpdateWithoutSupportConversationsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSupportConversationsInput = {
@@ -39682,6 +40618,7 @@ export type OrganizationUncheckedUpdateWithoutSupportConversationsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutBroadcastsInput = {
@@ -39856,6 +40793,7 @@ export type OrganizationCreateWithoutBroadcastsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutBroadcastsInput = {
@@ -40030,6 +40968,7 @@ export type OrganizationUncheckedCreateWithoutBroadcastsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutBroadcastsInput = {
@@ -40220,6 +41159,7 @@ export type OrganizationUpdateWithoutBroadcastsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutBroadcastsInput = {
@@ -40394,6 +41334,7 @@ export type OrganizationUncheckedUpdateWithoutBroadcastsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAssignmentsInput = {
@@ -40568,6 +41509,7 @@ export type OrganizationCreateWithoutAssignmentsInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAssignmentsInput = {
@@ -40742,6 +41684,7 @@ export type OrganizationUncheckedCreateWithoutAssignmentsInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAssignmentsInput = {
@@ -40932,6 +41875,7 @@ export type OrganizationUpdateWithoutAssignmentsInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAssignmentsInput = {
@@ -41106,6 +42050,7 @@ export type OrganizationUncheckedUpdateWithoutAssignmentsInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAnnouncementsInput = {
@@ -41280,6 +42225,7 @@ export type OrganizationCreateWithoutAnnouncementsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
@@ -41454,6 +42400,7 @@ export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAnnouncementsInput = {
@@ -41644,6 +42591,7 @@ export type OrganizationUpdateWithoutAnnouncementsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
@@ -41818,6 +42766,7 @@ export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   emergencyBroadcasts?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutEmergencyBroadcastsInput = {
@@ -41992,6 +42941,7 @@ export type OrganizationCreateWithoutEmergencyBroadcastsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutEmergencyBroadcastsInput = {
@@ -42166,6 +43116,7 @@ export type OrganizationUncheckedCreateWithoutEmergencyBroadcastsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutOrganizationInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutOrganizationInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedCreateNestedManyWithoutOrganizationInput
+  customViews?: Prisma.CustomViewUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutEmergencyBroadcastsInput = {
@@ -42356,6 +43307,7 @@ export type OrganizationUpdateWithoutEmergencyBroadcastsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput = {
@@ -42530,6 +43482,7 @@ export type OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutOrganizationNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutOrganizationNestedInput
   workspaceChangeLogs?: Prisma.WorkspaceChangeLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  customViews?: Prisma.CustomViewUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 
@@ -42590,6 +43543,7 @@ export type OrganizationCountOutputType = {
   announcements: number
   emergencyBroadcasts: number
   workspaceChangeLogs: number
+  customViews: number
 }
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -42645,6 +43599,7 @@ export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   announcements?: boolean | OrganizationCountOutputTypeCountAnnouncementsArgs
   emergencyBroadcasts?: boolean | OrganizationCountOutputTypeCountEmergencyBroadcastsArgs
   workspaceChangeLogs?: boolean | OrganizationCountOutputTypeCountWorkspaceChangeLogsArgs
+  customViews?: boolean | OrganizationCountOutputTypeCountCustomViewsArgs
 }
 
 /**
@@ -43021,6 +43976,13 @@ export type OrganizationCountOutputTypeCountWorkspaceChangeLogsArgs<ExtArgs exte
   where?: Prisma.WorkspaceChangeLogWhereInput
 }
 
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountCustomViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CustomViewWhereInput
+}
+
 
 export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -43195,6 +44157,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   announcements?: boolean | Prisma.Organization$announcementsArgs<ExtArgs>
   emergencyBroadcasts?: boolean | Prisma.Organization$emergencyBroadcastsArgs<ExtArgs>
   workspaceChangeLogs?: boolean | Prisma.Organization$workspaceChangeLogsArgs<ExtArgs>
+  customViews?: boolean | Prisma.Organization$customViewsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organization"]>
 
@@ -43617,6 +44580,7 @@ export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   announcements?: boolean | Prisma.Organization$announcementsArgs<ExtArgs>
   emergencyBroadcasts?: boolean | Prisma.Organization$emergencyBroadcastsArgs<ExtArgs>
   workspaceChangeLogs?: boolean | Prisma.Organization$workspaceChangeLogsArgs<ExtArgs>
+  customViews?: boolean | Prisma.Organization$customViewsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -43679,6 +44643,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     announcements: Prisma.$AnnouncementPayload<ExtArgs>[]
     emergencyBroadcasts: Prisma.$EmergencyBroadcastPayload<ExtArgs>[]
     workspaceChangeLogs: Prisma.$WorkspaceChangeLogPayload<ExtArgs>[]
+    customViews: Prisma.$CustomViewPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -44247,6 +45212,7 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   announcements<T extends Prisma.Organization$announcementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$announcementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emergencyBroadcasts<T extends Prisma.Organization$emergencyBroadcastsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$emergencyBroadcastsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   workspaceChangeLogs<T extends Prisma.Organization$workspaceChangeLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$workspaceChangeLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceChangeLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  customViews<T extends Prisma.Organization$customViewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$customViewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -46070,6 +47036,30 @@ export type Organization$workspaceChangeLogsArgs<ExtArgs extends runtime.Types.E
   take?: number
   skip?: number
   distinct?: Prisma.WorkspaceChangeLogScalarFieldEnum | Prisma.WorkspaceChangeLogScalarFieldEnum[]
+}
+
+/**
+ * Organization.customViews
+ */
+export type Organization$customViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomView
+   */
+  select?: Prisma.CustomViewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomView
+   */
+  omit?: Prisma.CustomViewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomViewInclude<ExtArgs> | null
+  where?: Prisma.CustomViewWhereInput
+  orderBy?: Prisma.CustomViewOrderByWithRelationInput | Prisma.CustomViewOrderByWithRelationInput[]
+  cursor?: Prisma.CustomViewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CustomViewScalarFieldEnum | Prisma.CustomViewScalarFieldEnum[]
 }
 
 /**

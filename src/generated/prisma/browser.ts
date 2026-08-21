@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type Organization = Prisma.OrganizationModel
 /**
+ * Model CustomView
+ * 
+ */
+export type CustomView = Prisma.CustomViewModel
+/**
  * Model WorkspaceChangeLog
  * 
  */

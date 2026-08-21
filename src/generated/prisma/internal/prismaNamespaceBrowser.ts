@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Organization: 'Organization',
+  CustomView: 'CustomView',
   WorkspaceChangeLog: 'WorkspaceChangeLog',
   User: 'User',
   PasswordResetToken: 'PasswordResetToken',
@@ -298,6 +299,26 @@ export const OrganizationScalarFieldEnum = {
 } as const
 
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
+
+
+export const CustomViewScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  sourceType: 'sourceType',
+  name: 'name',
+  icon: 'icon',
+  filters: 'filters',
+  columns: 'columns',
+  sortField: 'sortField',
+  sortDir: 'sortDir',
+  showInSidebar: 'showInSidebar',
+  sidebarOrder: 'sidebarOrder',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomViewScalarFieldEnum = (typeof CustomViewScalarFieldEnum)[keyof typeof CustomViewScalarFieldEnum]
 
 
 export const WorkspaceChangeLogScalarFieldEnum = {

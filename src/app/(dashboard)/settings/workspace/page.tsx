@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { isWashEssentials } from "@/lib/pricing"
 import { getIndustryNavItems, PLATFORM_DEFAULTS, type TermKey } from "@/lib/workspace-config"
 import { WorkspaceSettingsClient } from "./workspace-settings-client"
+import { Filter } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -76,6 +78,24 @@ export default async function WorkspaceSettingsPage() {
   return (
     <div>
       <Header title="Workspace" />
+      {/* Custom Views entry point */}
+      <div className="max-w-2xl mx-auto px-4 pt-6">
+        <Link
+          href="/settings/workspace/views"
+          className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-5 mb-2 hover:border-blue-300 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+              <Filter className="w-4 h-4 text-blue-600" />
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 text-sm">Custom Views</p>
+              <p className="text-xs text-gray-500">Saved filtered issue views, optionally pinned to the sidebar</p>
+            </div>
+          </div>
+          <span className="text-gray-400 text-sm">→</span>
+        </Link>
+      </div>
       <WorkspaceSettingsClient
         industry={industry}
         navItems={navItemsForUI}

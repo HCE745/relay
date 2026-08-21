@@ -40,6 +40,7 @@ import type { PageKey } from "@/lib/page-access"
 import { RelayWordmarkWhite } from "@/components/logo"
 import type { RecentlyViewedItem } from "@/components/layout/recently-viewed-tracker"
 import { CARWASH_NAV_ITEMS, PROPERTY_NAV_ITEMS, MANUFACTURING_NAV_ITEMS, getIndustryNavItems, isIndustryNavFlat } from "@/lib/workspace-config"
+import { resolveViewIcon, type CustomViewSidebarItem } from "@/lib/custom-view-config"
 
 const STATUS_BADGE: Record<string, string> = {
   OPEN:        "bg-blue-500",
@@ -93,6 +94,7 @@ interface SidebarProps {
   executiveGoalsEnabled?: boolean
   trendDetectionEnabled?: boolean
   navLabelOverrides?: Record<string, string>
+  customViewItems?: CustomViewSidebarItem[]
 }
 
 export function Sidebar({
@@ -108,6 +110,7 @@ export function Sidebar({
   executiveGoalsEnabled,
   trendDetectionEnabled,
   navLabelOverrides,
+  customViewItems = [],
 }: SidebarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -216,8 +219,17 @@ export function Sidebar({
     sharedFacilityEnabled             && { href: "/settings/shared-facility", label: "Shared Facility",  icon: Building2 },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 
+  const customViewExtras = allowedSet.has("issues")
+    ? customViewItems.map(v => ({
+        href:  `/issues?view=${v.id}`,
+        label: v.name,
+        icon:  resolveViewIcon(v.icon),
+      }))
+    : []
+
   const sectionExtras: Record<string, Array<{ href: string; label: string; icon: React.ElementType }>> = {
-    INTELLIGENCE: intelligenceExtras,
+    MAIN:           customViewExtras,
+    INTELLIGENCE:   intelligenceExtras,
     ADMINISTRATION: adminExtras,
   }
 
@@ -233,6 +245,10 @@ export function Sidebar({
             {visibleNavItems.map(({ href, label, icon: Icon }) =>
               navLink(href, navLabelOverrides?.[href] ?? label, Icon)
             )}
+            {allowedSet.has("issues") && customViewItems.map(view => {
+              const Icon = resolveViewIcon(view.icon)
+              return navLink(`/issues?view=${view.id}`, view.name, Icon)
+            })}
           </div>
         ) : (
           SECTION_ORDER.map(section => {

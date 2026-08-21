@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Organization: 'Organization',
+  CustomView: 'CustomView',
   WorkspaceChangeLog: 'WorkspaceChangeLog',
   User: 'User',
   PasswordResetToken: 'PasswordResetToken',
@@ -506,7 +507,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "workspaceChangeLog" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "linkClick" | "linkTrackingEvent" | "salesSetting" | "aiCache" | "salesUser" | "visibilityPrompt" | "visibilityCompetitor" | "visibilityCheck" | "visibilityRun" | "visibilitySetting"
+    modelProps: "organization" | "customView" | "workspaceChangeLog" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "linkClick" | "linkTrackingEvent" | "salesSetting" | "aiCache" | "salesUser" | "visibilityPrompt" | "visibilityCompetitor" | "visibilityCheck" | "visibilityRun" | "visibilitySetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -581,6 +582,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.OrganizationCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.OrganizationCountAggregateOutputType> | number
+        }
+      }
+    }
+    CustomView: {
+      payload: Prisma.$CustomViewPayload<ExtArgs>
+      fields: Prisma.CustomViewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CustomViewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CustomViewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>
+        }
+        findFirst: {
+          args: Prisma.CustomViewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CustomViewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>
+        }
+        findMany: {
+          args: Prisma.CustomViewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>[]
+        }
+        create: {
+          args: Prisma.CustomViewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>
+        }
+        createMany: {
+          args: Prisma.CustomViewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CustomViewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>[]
+        }
+        delete: {
+          args: Prisma.CustomViewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>
+        }
+        update: {
+          args: Prisma.CustomViewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>
+        }
+        deleteMany: {
+          args: Prisma.CustomViewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CustomViewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CustomViewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>[]
+        }
+        upsert: {
+          args: Prisma.CustomViewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomViewPayload>
+        }
+        aggregate: {
+          args: Prisma.CustomViewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCustomView>
+        }
+        groupBy: {
+          args: Prisma.CustomViewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomViewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CustomViewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomViewCountAggregateOutputType> | number
         }
       }
     }
@@ -8591,6 +8666,26 @@ export const OrganizationScalarFieldEnum = {
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
 
 
+export const CustomViewScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  sourceType: 'sourceType',
+  name: 'name',
+  icon: 'icon',
+  filters: 'filters',
+  columns: 'columns',
+  sortField: 'sortField',
+  sortDir: 'sortDir',
+  showInSidebar: 'showInSidebar',
+  sidebarOrder: 'sidebarOrder',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomViewScalarFieldEnum = (typeof CustomViewScalarFieldEnum)[keyof typeof CustomViewScalarFieldEnum]
+
+
 export const WorkspaceChangeLogScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -10960,6 +11055,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   organization?: Prisma.OrganizationOmit
+  customView?: Prisma.CustomViewOmit
   workspaceChangeLog?: Prisma.WorkspaceChangeLogOmit
   user?: Prisma.UserOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit

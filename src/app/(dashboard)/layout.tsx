@@ -19,6 +19,7 @@ import { getAccessConfig, type PageAccessConfig } from "@/lib/page-access"
 import { setOrgContext } from "@/lib/sentry"
 import { Clock, AlertTriangle } from "lucide-react"
 import { isReadOnly, isWashEssentials } from "@/lib/pricing"
+import type { CustomViewSidebarItem } from "@/lib/custom-view-config"
 import { ReadOnlyProvider } from "@/components/layout/read-only-context"
 import { TermsUpdateModal } from "@/components/legal/terms-update-modal"
 import { LegalFooter } from "@/components/legal/legal-footer"
@@ -30,7 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const session = await getSession()
   if (!session) redirect("/login")
 
-  const [org, userSettings, latestAcceptance] = await Promise.all([
+  const [org, userSettings, latestAcceptance, sidebarViews] = await Promise.all([
     prisma.organization.findUnique({
       where: { id: session.organizationId },
       select: {
@@ -64,6 +65,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
       orderBy: { acceptedAt: "desc" },
       select:  { termsVersion: true, privacyVersion: true },
     }),
+    isWashEssentials(session.productLine)
+      ? Promise.resolve([] as CustomViewSidebarItem[])
+      : prisma.customView.findMany({
+          where:   { organizationId: session.organizationId, showInSidebar: true },
+          orderBy: { sidebarOrder: "asc" },
+          select:  { id: true, name: true, icon: true },
+        }),
   ])
 
   const needsTermsUpdate =
@@ -137,6 +145,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         executiveGoalsEnabled={org?.executive_goals_enabled ?? false}
         trendDetectionEnabled={org?.trend_detection_enabled ?? false}
         navLabelOverrides={navLabelOverrides}
+        customViewItems={sidebarViews}
       />
 
       {/* Mobile: top bar + slide-out drawer + bottom tab bar */}
@@ -149,6 +158,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         userName={session.name ?? ""}
         orgName={org?.name ?? ""}
         navLabelOverrides={navLabelOverrides}
+        customViewItems={sidebarViews}
       />
 
       {/* Content area: right of sidebar on desktop, full-width on mobile */}

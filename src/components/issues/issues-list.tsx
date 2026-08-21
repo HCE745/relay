@@ -35,9 +35,11 @@ interface Props {
   issues: Issue[]
   users: User[]
   currentFilters: Record<string, string>
+  visibleColumns?: string[] | null
 }
 
-export function IssuesList({ issues, users, currentFilters }: Props) {
+export function IssuesList({ issues, users, currentFilters, visibleColumns }: Props) {
+  const col = (key: string) => !visibleColumns || visibleColumns.includes(key)
   const router = useRouter()
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkLoading, setBulkLoading] = useState(false)
@@ -210,12 +212,12 @@ export function IssuesList({ issues, users, currentFilters }: Props) {
                     />
                   </th>
                   <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Issue</th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Priority</th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Status</th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Category</th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Assigned To</th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Location</th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Created</th>
+                  {col("priority")   && <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Priority</th>}
+                  {col("status")     && <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Status</th>}
+                  {col("category")   && <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Category</th>}
+                  {col("assignedTo") && <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Assigned To</th>}
+                  {col("location")   && <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Location</th>}
+                  {col("createdAt")  && <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Created</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -255,26 +257,38 @@ export function IssuesList({ issues, users, currentFilters }: Props) {
                         <CopyLink url={`${typeof window !== "undefined" ? window.location.origin : ""}/issues/${issue.id}`} />
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <Badge className={PRIORITY_COLOR[issue.priority]}>
-                        {ISSUE_PRIORITY[issue.priority as keyof typeof ISSUE_PRIORITY] ?? issue.priority}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-4">
-                      <Badge className={STATUS_COLOR[issue.status]}>
-                        {ISSUE_STATUS[issue.status as keyof typeof ISSUE_STATUS] ?? issue.status}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-600">
-                      {ISSUE_CATEGORY[issue.category as keyof typeof ISSUE_CATEGORY] ?? issue.category}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-600">
-                      {issue.assignedTo?.name ?? <span className="text-gray-300">Unassigned</span>}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-600">{issue.location?.name ?? "—"}</td>
-                    <td className="px-4 py-4 text-xs text-gray-400 whitespace-nowrap">
-                      {formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}
-                    </td>
+                    {col("priority") && (
+                      <td className="px-4 py-4">
+                        <Badge className={PRIORITY_COLOR[issue.priority]}>
+                          {ISSUE_PRIORITY[issue.priority as keyof typeof ISSUE_PRIORITY] ?? issue.priority}
+                        </Badge>
+                      </td>
+                    )}
+                    {col("status") && (
+                      <td className="px-4 py-4">
+                        <Badge className={STATUS_COLOR[issue.status]}>
+                          {ISSUE_STATUS[issue.status as keyof typeof ISSUE_STATUS] ?? issue.status}
+                        </Badge>
+                      </td>
+                    )}
+                    {col("category") && (
+                      <td className="px-4 py-4 text-sm text-gray-600">
+                        {ISSUE_CATEGORY[issue.category as keyof typeof ISSUE_CATEGORY] ?? issue.category}
+                      </td>
+                    )}
+                    {col("assignedTo") && (
+                      <td className="px-4 py-4 text-sm text-gray-600">
+                        {issue.assignedTo?.name ?? <span className="text-gray-300">Unassigned</span>}
+                      </td>
+                    )}
+                    {col("location") && (
+                      <td className="px-4 py-4 text-sm text-gray-600">{issue.location?.name ?? "—"}</td>
+                    )}
+                    {col("createdAt") && (
+                      <td className="px-4 py-4 text-xs text-gray-400 whitespace-nowrap">
+                        {formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}
+                      </td>
+                    )}
                   </tr>
                   )
                 })}

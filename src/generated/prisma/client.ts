@@ -52,6 +52,11 @@ export type Organization = Prisma.OrganizationModel
  */
 export type CustomView = Prisma.CustomViewModel
 /**
+ * Model CustomPage
+ * 
+ */
+export type CustomPage = Prisma.CustomPageModel
+/**
  * Model WorkspaceChangeLog
  * 
  */

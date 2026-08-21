@@ -10,6 +10,7 @@
  */
 export type * from './models/Organization'
 export type * from './models/CustomView'
+export type * from './models/CustomPage'
 export type * from './models/WorkspaceChangeLog'
 export type * from './models/User'
 export type * from './models/PasswordResetToken'

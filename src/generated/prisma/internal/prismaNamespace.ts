@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Organization: 'Organization',
   CustomView: 'CustomView',
+  CustomPage: 'CustomPage',
   WorkspaceChangeLog: 'WorkspaceChangeLog',
   User: 'User',
   PasswordResetToken: 'PasswordResetToken',
@@ -507,7 +508,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "customView" | "workspaceChangeLog" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "linkClick" | "linkTrackingEvent" | "salesSetting" | "aiCache" | "salesUser" | "visibilityPrompt" | "visibilityCompetitor" | "visibilityCheck" | "visibilityRun" | "visibilitySetting"
+    modelProps: "organization" | "customView" | "customPage" | "workspaceChangeLog" | "user" | "passwordResetToken" | "location" | "department" | "asset" | "vendor" | "issue" | "issueComment" | "issueHistory" | "issueEscalation" | "escalationPolicy" | "escalationStep" | "maintenanceLog" | "notification" | "routingRule" | "suggestion" | "emailTemplate" | "invitation" | "orgNote" | "superAdmin" | "impersonationLog" | "superAdminAuditLog" | "attachment" | "userLocation" | "employeeType" | "userSettings" | "issueTemplate" | "maintenanceSchedule" | "analyticsSnapshot" | "platformConfig" | "issuePattern" | "sOP" | "purchaseRequest" | "approvedCatalogItem" | "approvedCatalogItemSubstitute" | "approvalPolicy" | "approvalPolicyRule" | "purchaseRequestApproval" | "injuryReport" | "bugReport" | "featureRequest" | "region" | "escalationChain" | "escalationChainStep" | "apiKey" | "webhookEndpoint" | "webhookDeliveryLog" | "sSOConfig" | "organizationRelationship" | "sharedFacilityRule" | "qrCode" | "qrCodeSubmission" | "userOrgMembership" | "executiveBriefing" | "healthScore" | "trendAlert" | "executiveGoal" | "goalProgress" | "legalAcceptance" | "demoCall" | "nonConversionReason" | "crmNote" | "crmActivity" | "deviceToken" | "billingCredit" | "referralProgram" | "referral" | "crmEmail" | "followUpStage" | "crmEmailTemplate" | "imapConfig" | "crmSettings" | "crmSequence" | "crmSequenceStep" | "crmEmailSequenceEnrollment" | "crmFollowUp" | "conversation" | "conversationMember" | "chatMessage" | "messageReaction" | "supportConversation" | "supportMessage" | "broadcast" | "assignment" | "assignmentComment" | "assignmentStatusHistory" | "announcement" | "announcementAcknowledgment" | "emergencyBroadcast" | "emergencyAcknowledgment" | "dailyBriefingCache" | "prospect" | "prospectContact" | "prospectNote" | "demoAnalytics" | "linkClick" | "linkTrackingEvent" | "salesSetting" | "aiCache" | "salesUser" | "visibilityPrompt" | "visibilityCompetitor" | "visibilityCheck" | "visibilityRun" | "visibilitySetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -656,6 +657,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CustomViewCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CustomViewCountAggregateOutputType> | number
+        }
+      }
+    }
+    CustomPage: {
+      payload: Prisma.$CustomPagePayload<ExtArgs>
+      fields: Prisma.CustomPageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CustomPageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CustomPageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>
+        }
+        findFirst: {
+          args: Prisma.CustomPageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CustomPageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>
+        }
+        findMany: {
+          args: Prisma.CustomPageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>[]
+        }
+        create: {
+          args: Prisma.CustomPageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>
+        }
+        createMany: {
+          args: Prisma.CustomPageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CustomPageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>[]
+        }
+        delete: {
+          args: Prisma.CustomPageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>
+        }
+        update: {
+          args: Prisma.CustomPageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>
+        }
+        deleteMany: {
+          args: Prisma.CustomPageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CustomPageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CustomPageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>[]
+        }
+        upsert: {
+          args: Prisma.CustomPageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomPagePayload>
+        }
+        aggregate: {
+          args: Prisma.CustomPageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCustomPage>
+        }
+        groupBy: {
+          args: Prisma.CustomPageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomPageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CustomPageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomPageCountAggregateOutputType> | number
         }
       }
     }
@@ -8686,6 +8761,23 @@ export const CustomViewScalarFieldEnum = {
 export type CustomViewScalarFieldEnum = (typeof CustomViewScalarFieldEnum)[keyof typeof CustomViewScalarFieldEnum]
 
 
+export const CustomPageScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  icon: 'icon',
+  description: 'description',
+  widgets: 'widgets',
+  showInSidebar: 'showInSidebar',
+  sidebarOrder: 'sidebarOrder',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomPageScalarFieldEnum = (typeof CustomPageScalarFieldEnum)[keyof typeof CustomPageScalarFieldEnum]
+
+
 export const WorkspaceChangeLogScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -11056,6 +11148,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   organization?: Prisma.OrganizationOmit
   customView?: Prisma.CustomViewOmit
+  customPage?: Prisma.CustomPageOmit
   workspaceChangeLog?: Prisma.WorkspaceChangeLogOmit
   user?: Prisma.UserOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit

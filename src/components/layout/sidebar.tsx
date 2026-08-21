@@ -41,6 +41,7 @@ import { RelayWordmarkWhite } from "@/components/logo"
 import type { RecentlyViewedItem } from "@/components/layout/recently-viewed-tracker"
 import { CARWASH_NAV_ITEMS, PROPERTY_NAV_ITEMS, MANUFACTURING_NAV_ITEMS, getIndustryNavItems, isIndustryNavFlat } from "@/lib/workspace-config"
 import { resolveViewIcon, type CustomViewSidebarItem } from "@/lib/custom-view-config"
+import type { CustomPageSidebarItem } from "@/lib/widget-registry"
 
 const STATUS_BADGE: Record<string, string> = {
   OPEN:        "bg-blue-500",
@@ -95,6 +96,7 @@ interface SidebarProps {
   trendDetectionEnabled?: boolean
   navLabelOverrides?: Record<string, string>
   customViewItems?: CustomViewSidebarItem[]
+  customPageItems?: CustomPageSidebarItem[]
 }
 
 export function Sidebar({
@@ -111,6 +113,7 @@ export function Sidebar({
   trendDetectionEnabled,
   navLabelOverrides,
   customViewItems = [],
+  customPageItems = [],
 }: SidebarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -227,8 +230,14 @@ export function Sidebar({
       }))
     : []
 
+  const customPageExtras = customPageItems.map(p => ({
+    href:  `/workspace/${p.id}`,
+    label: p.name,
+    icon:  resolveViewIcon(p.icon),
+  }))
+
   const sectionExtras: Record<string, Array<{ href: string; label: string; icon: React.ElementType }>> = {
-    MAIN:           customViewExtras,
+    MAIN:           [...customViewExtras, ...customPageExtras],
     INTELLIGENCE:   intelligenceExtras,
     ADMINISTRATION: adminExtras,
   }
@@ -248,6 +257,10 @@ export function Sidebar({
             {allowedSet.has("issues") && customViewItems.map(view => {
               const Icon = resolveViewIcon(view.icon)
               return navLink(`/issues?view=${view.id}`, view.name, Icon)
+            })}
+            {customPageItems.map(page => {
+              const Icon = resolveViewIcon(page.icon)
+              return navLink(`/workspace/${page.id}`, page.name, Icon)
             })}
           </div>
         ) : (

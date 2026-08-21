@@ -86,7 +86,12 @@ const PAGE_LABELS: [string, string][] = [
   ["/notifications",                           "Notifications"],
 ]
 
-function getPageTitle(pathname: string): string {
+function getPageTitle(pathname: string, customPageItems?: CustomPageSidebarItem[]): string {
+  if (pathname.startsWith("/workspace/")) {
+    const id = pathname.split("/")[2]
+    const page = customPageItems?.find(p => p.id === id)
+    return page?.name ?? "Custom Page"
+  }
   for (const [prefix, label] of PAGE_LABELS) {
     if (pathname === prefix || pathname.startsWith(prefix + "/") || (prefix.endsWith("/") && pathname.startsWith(prefix))) {
       return label
@@ -178,7 +183,7 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
         if (i.key === "regional-dashboard" && !corporateDashboardEnabled) return false
         return true
       })
-  const pageTitle = getPageTitle(pathname)
+  const pageTitle = getPageTitle(pathname, customPageItems)
 
   function isActive(href: string) {
     const qIdx = href.indexOf("?")

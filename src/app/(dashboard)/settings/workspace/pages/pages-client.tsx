@@ -19,7 +19,6 @@ import { resolveViewIcon, CUSTOM_VIEW_ICON_NAMES } from "@/lib/custom-view-confi
 import { ISSUE_COLUMN_KEYS, ISSUE_COLUMN_LABELS, VIEW_SORT_OPTIONS } from "@/lib/custom-view-config"
 import {
   WIDGET_META,
-  WIDGET_TYPES,
   WIDGET_WIDTHS,
   KPI_METRICS,
   KPI_METRIC_KEYS,
@@ -59,8 +58,8 @@ type PageDraft = {
 type ModalState =
   | { view: "list" }
   | { view: "page-form"; mode: "create" | "edit"; pageId?: string }
-  | { view: "widget-pick" }
-  | { view: "widget-config"; widgetIndex: number | null; type: WidgetTypeKey }
+  | { view: "widget-pick"; pageMode: "create" | "edit"; pageId?: string }
+  | { view: "widget-config"; widgetIndex: number | null; type: WidgetTypeKey; pageMode: "create" | "edit"; pageId?: string }
 
 const BLANK_DRAFT: PageDraft = {
   name:         "",
@@ -435,7 +434,7 @@ function WidgetConfigForm({
           <label className="block text-xs font-medium text-gray-700">
             URL <span className="text-red-500">*</span>
             <input
-              type="url"
+              type="text"
               value={String(config.url ?? "")}
               onChange={e => set("url", e.target.value)}
               placeholder="https://example.com or /internal/path"
@@ -502,25 +501,28 @@ export function PagesClient({ initialPages, customViews, locations }: Props) {
   // ── Widget operations ────────────────────────────────────────────────────────
 
   function pickWidget() {
-    setModal({ view: "widget-pick" })
+    const m = modal as { mode: "create" | "edit"; pageId?: string }
+    setModal({ view: "widget-pick", pageMode: m.mode, pageId: m.pageId })
   }
 
   function selectWidgetType(type: WidgetTypeKey) {
-    const meta = WIDGET_META.find(m => m.type === type)!
+    const m = modal as { pageMode: "create" | "edit"; pageId?: string }
+    const meta = WIDGET_META.find(m2 => m2.type === type)!
     setEditingWidget({ id: newId(), type, width: meta.defaultWidth, config: widgetDefaultConfig(type) })
-    setModal({ view: "widget-config", widgetIndex: null, type })
+    setModal({ view: "widget-config", widgetIndex: null, type, pageMode: m.pageMode, pageId: m.pageId })
   }
 
   function editWidget(index: number) {
+    const m = modal as { mode: "create" | "edit"; pageId?: string }
     const w = draft.widgets[index]
     setEditingWidget({ ...w })
-    setModal({ view: "widget-config", widgetIndex: index, type: w.type })
+    setModal({ view: "widget-config", widgetIndex: index, type: w.type, pageMode: m.mode, pageId: m.pageId })
   }
 
   function confirmWidget() {
     if (!editingWidget) return
     if (modal.view !== "widget-config") return
-    const { widgetIndex } = modal
+    const { widgetIndex, pageMode, pageId } = modal
     setDraft(prev => {
       const widgets = [...prev.widgets]
       if (widgetIndex === null) {
@@ -531,14 +533,13 @@ export function PagesClient({ initialPages, customViews, locations }: Props) {
       return { ...prev, widgets }
     })
     setEditingWidget(null)
-    setModal({ view: "page-form", mode: modal.view === "widget-config" ? "edit" : "create" })
+    setModal({ view: "page-form", mode: pageMode, pageId })
   }
 
   function cancelWidget() {
     setEditingWidget(null)
-    // Return to page form — figure out mode from current state
-    const pageId = (modal as { pageId?: string }).pageId
-    setModal({ view: "page-form", mode: pageId ? "edit" : "create", pageId })
+    const m = modal as { pageMode?: "create" | "edit"; pageId?: string }
+    setModal({ view: "page-form", mode: m.pageMode ?? "create", pageId: m.pageId })
   }
 
   function removeWidget(index: number) {
@@ -837,7 +838,6 @@ export function PagesClient({ initialPages, customViews, locations }: Props) {
             ) : (
               <div className="divide-y divide-gray-100">
                 {draft.widgets.map((widget, i) => {
-                  const Icon = resolveViewIcon(null)
                   return (
                     <div key={widget.id} className="flex items-center gap-3 px-4 py-3">
                       <div className="flex flex-col gap-0.5">

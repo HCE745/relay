@@ -33,6 +33,8 @@ import {
   Clock,
   Radio,
   ClipboardCheck,
+  Megaphone,
+  PieChart,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { logout } from "@/lib/auth-actions"
@@ -60,6 +62,9 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "assignments",         href: "/assignments",         label: "Assignments",           icon: ClipboardCheck,  section: "MAIN" },
   { key: "communications",      href: "/communications",      label: "Communications",        icon: Radio,           section: "MAIN" },
 
+  { key: "voice",               href: "/voice",               label: "Employee Voice",        icon: Megaphone,       section: "EMPLOYEE VOICE" },
+  { key: "suggestions",         href: "/suggestions",         label: "Suggestions",           icon: Lightbulb,       section: "EMPLOYEE VOICE" },
+
   { key: "calendar",            href: "/calendar",            label: "Calendar",              icon: CalendarDays,    section: "OPERATIONS" },
   { key: "purchase-requests",   href: "/purchase-requests",   label: "Purchase Requests",     icon: ShoppingCart,    section: "OPERATIONS" },
   { key: "approval-intelligence", href: "/approval-intelligence", label: "Approval Intelligence", icon: CheckSquare, section: "OPERATIONS" },
@@ -75,12 +80,11 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "corporate-dashboard", href: "/corporate-dashboard", label: "Corporate View",        icon: Globe2,          section: "INTELLIGENCE" },
   { key: "regional-dashboard",  href: "/regional-dashboard",  label: "Regional View",         icon: Building,        section: "INTELLIGENCE" },
   { key: "analytics",           href: "/analytics",           label: "Analytics",             icon: BarChart2,       section: "INTELLIGENCE" },
-  { key: "suggestions",         href: "/suggestions",         label: "Suggestions",           icon: Lightbulb,       section: "INTELLIGENCE" },
 
   { key: "team",                href: "/team",                label: "Team",                  icon: Users,           section: "ADMINISTRATION" },
 ]
 
-const SECTION_ORDER = ["MAIN", "OPERATIONS", "INTELLIGENCE", "ADMINISTRATION"]
+const SECTION_ORDER = ["MAIN", "EMPLOYEE VOICE", "OPERATIONS", "INTELLIGENCE", "ADMINISTRATION"]
 
 interface SidebarProps {
   allowedPageKeys: PageKey[]
@@ -94,6 +98,7 @@ interface SidebarProps {
   executiveBriefingsEnabled?: boolean
   executiveGoalsEnabled?: boolean
   trendDetectionEnabled?: boolean
+  voiceInsightsVisible?: boolean
   navLabelOverrides?: Record<string, string>
   customViewItems?: CustomViewSidebarItem[]
   customPageItems?: CustomPageSidebarItem[]
@@ -111,6 +116,7 @@ export function Sidebar({
   executiveBriefingsEnabled,
   executiveGoalsEnabled,
   trendDetectionEnabled,
+  voiceInsightsVisible,
   navLabelOverrides,
   customViewItems = [],
   customPageItems = [],
@@ -160,7 +166,6 @@ export function Sidebar({
   const isActive = (href: string) => {
     const qIdx = href.indexOf("?")
     if (qIdx !== -1) {
-      // href has query params — must match both pathname and every param in the href
       const hrefPath = href.slice(0, qIdx)
       if (pathname !== hrefPath) return false
       const hrefParams = new URLSearchParams(href.slice(qIdx + 1))
@@ -169,7 +174,6 @@ export function Sidebar({
       }
       return true
     }
-    // Plain href — but don't activate if a more-specific industry item with query params matches
     if (industryNavItems) {
       const hasSpecificMatch = industryNavItems.some(item => {
         const iqIdx = item.href.indexOf("?")
@@ -208,7 +212,10 @@ export function Sidebar({
     </div>
   )
 
-  // Extra items per section (feature-gated)
+  const voiceExtras = [
+    voiceInsightsVisible && { href: "/voice/insights", label: "Voice Insights", icon: PieChart },
+  ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
+
   const intelligenceExtras = [
     executiveBriefingsEnabled && { href: "/executive-briefings", label: "AI Briefings",  icon: FileText  },
     trendDetectionEnabled     && { href: "/trend-alerts",        label: "Trend Alerts",  icon: TrendingUp },
@@ -237,9 +244,10 @@ export function Sidebar({
   }))
 
   const sectionExtras: Record<string, Array<{ href: string; label: string; icon: React.ElementType }>> = {
-    MAIN:           [...customViewExtras, ...customPageExtras],
-    INTELLIGENCE:   intelligenceExtras,
-    ADMINISTRATION: adminExtras,
+    MAIN:             [...customViewExtras, ...customPageExtras],
+    "EMPLOYEE VOICE": voiceExtras,
+    INTELLIGENCE:     intelligenceExtras,
+    ADMINISTRATION:   adminExtras,
   }
 
   return (
@@ -275,7 +283,7 @@ export function Sidebar({
                   {section}
                 </p>
                 <div className="space-y-0.5">
-                  {items.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
+                  {items.map(({ href, label, icon: Icon }) => navLink(href, navLabelOverrides?.[href] ?? label, Icon))}
                   {extras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
                 </div>
               </div>

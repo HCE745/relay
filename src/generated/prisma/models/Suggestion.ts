@@ -29,6 +29,7 @@ export type SuggestionMinAggregateOutputType = {
   organizationId: string | null
   submittedById: string | null
   content: string | null
+  type: string | null
   status: string | null
   adminNote: string | null
   detectedCategory: string | null
@@ -45,6 +46,7 @@ export type SuggestionMaxAggregateOutputType = {
   organizationId: string | null
   submittedById: string | null
   content: string | null
+  type: string | null
   status: string | null
   adminNote: string | null
   detectedCategory: string | null
@@ -61,6 +63,7 @@ export type SuggestionCountAggregateOutputType = {
   organizationId: number
   submittedById: number
   content: number
+  type: number
   status: number
   adminNote: number
   detectedCategory: number
@@ -79,6 +82,7 @@ export type SuggestionMinAggregateInputType = {
   organizationId?: true
   submittedById?: true
   content?: true
+  type?: true
   status?: true
   adminNote?: true
   detectedCategory?: true
@@ -95,6 +99,7 @@ export type SuggestionMaxAggregateInputType = {
   organizationId?: true
   submittedById?: true
   content?: true
+  type?: true
   status?: true
   adminNote?: true
   detectedCategory?: true
@@ -111,6 +116,7 @@ export type SuggestionCountAggregateInputType = {
   organizationId?: true
   submittedById?: true
   content?: true
+  type?: true
   status?: true
   adminNote?: true
   detectedCategory?: true
@@ -200,6 +206,7 @@ export type SuggestionGroupByOutputType = {
   organizationId: string
   submittedById: string
   content: string
+  type: string
   status: string
   adminNote: string | null
   detectedCategory: string | null
@@ -237,6 +244,7 @@ export type SuggestionWhereInput = {
   organizationId?: Prisma.StringFilter<"Suggestion"> | string
   submittedById?: Prisma.StringFilter<"Suggestion"> | string
   content?: Prisma.StringFilter<"Suggestion"> | string
+  type?: Prisma.StringFilter<"Suggestion"> | string
   status?: Prisma.StringFilter<"Suggestion"> | string
   adminNote?: Prisma.StringNullableFilter<"Suggestion"> | string | null
   detectedCategory?: Prisma.StringNullableFilter<"Suggestion"> | string | null
@@ -258,6 +266,7 @@ export type SuggestionOrderByWithRelationInput = {
   organizationId?: Prisma.SortOrder
   submittedById?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   adminNote?: Prisma.SortOrderInput | Prisma.SortOrder
   detectedCategory?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -283,6 +292,7 @@ export type SuggestionWhereUniqueInput = Prisma.AtLeast<{
   organizationId?: Prisma.StringFilter<"Suggestion"> | string
   submittedById?: Prisma.StringFilter<"Suggestion"> | string
   content?: Prisma.StringFilter<"Suggestion"> | string
+  type?: Prisma.StringFilter<"Suggestion"> | string
   status?: Prisma.StringFilter<"Suggestion"> | string
   adminNote?: Prisma.StringNullableFilter<"Suggestion"> | string | null
   detectedCategory?: Prisma.StringNullableFilter<"Suggestion"> | string | null
@@ -303,6 +313,7 @@ export type SuggestionOrderByWithAggregationInput = {
   organizationId?: Prisma.SortOrder
   submittedById?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   adminNote?: Prisma.SortOrderInput | Prisma.SortOrder
   detectedCategory?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -325,6 +336,7 @@ export type SuggestionScalarWhereWithAggregatesInput = {
   organizationId?: Prisma.StringWithAggregatesFilter<"Suggestion"> | string
   submittedById?: Prisma.StringWithAggregatesFilter<"Suggestion"> | string
   content?: Prisma.StringWithAggregatesFilter<"Suggestion"> | string
+  type?: Prisma.StringWithAggregatesFilter<"Suggestion"> | string
   status?: Prisma.StringWithAggregatesFilter<"Suggestion"> | string
   adminNote?: Prisma.StringNullableWithAggregatesFilter<"Suggestion"> | string | null
   detectedCategory?: Prisma.StringNullableWithAggregatesFilter<"Suggestion"> | string | null
@@ -339,6 +351,7 @@ export type SuggestionScalarWhereWithAggregatesInput = {
 export type SuggestionCreateInput = {
   id?: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -358,6 +371,7 @@ export type SuggestionUncheckedCreateInput = {
   organizationId: string
   submittedById: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -373,6 +387,7 @@ export type SuggestionUncheckedCreateInput = {
 export type SuggestionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -392,6 +407,7 @@ export type SuggestionUncheckedUpdateInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedById?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -409,6 +425,7 @@ export type SuggestionCreateManyInput = {
   organizationId: string
   submittedById: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -423,6 +440,7 @@ export type SuggestionCreateManyInput = {
 export type SuggestionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -437,6 +455,7 @@ export type SuggestionUncheckedUpdateManyInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedById?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -468,6 +487,7 @@ export type SuggestionCountOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   submittedById?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   adminNote?: Prisma.SortOrder
   detectedCategory?: Prisma.SortOrder
@@ -484,6 +504,7 @@ export type SuggestionMaxOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   submittedById?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   adminNote?: Prisma.SortOrder
   detectedCategory?: Prisma.SortOrder
@@ -500,6 +521,7 @@ export type SuggestionMinOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   submittedById?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   adminNote?: Prisma.SortOrder
   detectedCategory?: Prisma.SortOrder
@@ -688,6 +710,7 @@ export type SuggestionUpdateOneWithoutAttachmentsNestedInput = {
 export type SuggestionCreateWithoutOrganizationInput = {
   id?: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -705,6 +728,7 @@ export type SuggestionUncheckedCreateWithoutOrganizationInput = {
   id?: string
   submittedById: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -751,6 +775,7 @@ export type SuggestionScalarWhereInput = {
   organizationId?: Prisma.StringFilter<"Suggestion"> | string
   submittedById?: Prisma.StringFilter<"Suggestion"> | string
   content?: Prisma.StringFilter<"Suggestion"> | string
+  type?: Prisma.StringFilter<"Suggestion"> | string
   status?: Prisma.StringFilter<"Suggestion"> | string
   adminNote?: Prisma.StringNullableFilter<"Suggestion"> | string | null
   detectedCategory?: Prisma.StringNullableFilter<"Suggestion"> | string | null
@@ -765,6 +790,7 @@ export type SuggestionScalarWhereInput = {
 export type SuggestionCreateWithoutSubmittedByInput = {
   id?: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -782,6 +808,7 @@ export type SuggestionUncheckedCreateWithoutSubmittedByInput = {
   id?: string
   organizationId: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -807,6 +834,7 @@ export type SuggestionCreateManySubmittedByInputEnvelope = {
 export type SuggestionCreateWithoutRoutedToUserInput = {
   id?: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -825,6 +853,7 @@ export type SuggestionUncheckedCreateWithoutRoutedToUserInput = {
   organizationId: string
   submittedById: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -881,6 +910,7 @@ export type SuggestionUpdateManyWithWhereWithoutRoutedToUserInput = {
 export type SuggestionCreateWithoutConvertedToIssueInput = {
   id?: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -899,6 +929,7 @@ export type SuggestionUncheckedCreateWithoutConvertedToIssueInput = {
   organizationId: string
   submittedById: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -929,6 +960,7 @@ export type SuggestionUpdateToOneWithWhereWithoutConvertedToIssueInput = {
 export type SuggestionUpdateWithoutConvertedToIssueInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -947,6 +979,7 @@ export type SuggestionUncheckedUpdateWithoutConvertedToIssueInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedById?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -961,6 +994,7 @@ export type SuggestionUncheckedUpdateWithoutConvertedToIssueInput = {
 export type SuggestionCreateWithoutAttachmentsInput = {
   id?: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -979,6 +1013,7 @@ export type SuggestionUncheckedCreateWithoutAttachmentsInput = {
   organizationId: string
   submittedById: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -1009,6 +1044,7 @@ export type SuggestionUpdateToOneWithWhereWithoutAttachmentsInput = {
 export type SuggestionUpdateWithoutAttachmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1027,6 +1063,7 @@ export type SuggestionUncheckedUpdateWithoutAttachmentsInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedById?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1042,6 +1079,7 @@ export type SuggestionCreateManyOrganizationInput = {
   id?: string
   submittedById: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -1056,6 +1094,7 @@ export type SuggestionCreateManyOrganizationInput = {
 export type SuggestionUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1073,6 +1112,7 @@ export type SuggestionUncheckedUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedById?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1089,6 +1129,7 @@ export type SuggestionUncheckedUpdateManyWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedById?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1104,6 +1145,7 @@ export type SuggestionCreateManySubmittedByInput = {
   id?: string
   organizationId: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -1120,6 +1162,7 @@ export type SuggestionCreateManyRoutedToUserInput = {
   organizationId: string
   submittedById: string
   content: string
+  type?: string
   status?: string
   adminNote?: string | null
   detectedCategory?: string | null
@@ -1133,6 +1176,7 @@ export type SuggestionCreateManyRoutedToUserInput = {
 export type SuggestionUpdateWithoutSubmittedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1150,6 +1194,7 @@ export type SuggestionUncheckedUpdateWithoutSubmittedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1166,6 +1211,7 @@ export type SuggestionUncheckedUpdateManyWithoutSubmittedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1180,6 +1226,7 @@ export type SuggestionUncheckedUpdateManyWithoutSubmittedByInput = {
 export type SuggestionUpdateWithoutRoutedToUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1198,6 +1245,7 @@ export type SuggestionUncheckedUpdateWithoutRoutedToUserInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedById?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1214,6 +1262,7 @@ export type SuggestionUncheckedUpdateManyWithoutRoutedToUserInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedById?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1260,6 +1309,7 @@ export type SuggestionSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   organizationId?: boolean
   submittedById?: boolean
   content?: boolean
+  type?: boolean
   status?: boolean
   adminNote?: boolean
   detectedCategory?: boolean
@@ -1282,6 +1332,7 @@ export type SuggestionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   organizationId?: boolean
   submittedById?: boolean
   content?: boolean
+  type?: boolean
   status?: boolean
   adminNote?: boolean
   detectedCategory?: boolean
@@ -1302,6 +1353,7 @@ export type SuggestionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   organizationId?: boolean
   submittedById?: boolean
   content?: boolean
+  type?: boolean
   status?: boolean
   adminNote?: boolean
   detectedCategory?: boolean
@@ -1322,6 +1374,7 @@ export type SuggestionSelectScalar = {
   organizationId?: boolean
   submittedById?: boolean
   content?: boolean
+  type?: boolean
   status?: boolean
   adminNote?: boolean
   detectedCategory?: boolean
@@ -1333,7 +1386,7 @@ export type SuggestionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SuggestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "submittedById" | "content" | "status" | "adminNote" | "detectedCategory" | "routedToUserId" | "routedNote" | "convertedToIssueId" | "assigneeApproaches" | "createdAt" | "updatedAt", ExtArgs["result"]["suggestion"]>
+export type SuggestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "submittedById" | "content" | "type" | "status" | "adminNote" | "detectedCategory" | "routedToUserId" | "routedNote" | "convertedToIssueId" | "assigneeApproaches" | "createdAt" | "updatedAt", ExtArgs["result"]["suggestion"]>
 export type SuggestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   submittedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1369,6 +1422,7 @@ export type $SuggestionPayload<ExtArgs extends runtime.Types.Extensions.Internal
     organizationId: string
     submittedById: string
     content: string
+    type: string
     status: string
     adminNote: string | null
     detectedCategory: string | null
@@ -1810,6 +1864,7 @@ export interface SuggestionFieldRefs {
   readonly organizationId: Prisma.FieldRef<"Suggestion", 'String'>
   readonly submittedById: Prisma.FieldRef<"Suggestion", 'String'>
   readonly content: Prisma.FieldRef<"Suggestion", 'String'>
+  readonly type: Prisma.FieldRef<"Suggestion", 'String'>
   readonly status: Prisma.FieldRef<"Suggestion", 'String'>
   readonly adminNote: Prisma.FieldRef<"Suggestion", 'String'>
   readonly detectedCategory: Prisma.FieldRef<"Suggestion", 'String'>

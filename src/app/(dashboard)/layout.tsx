@@ -114,6 +114,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const videoMode = cookieStore.get("relay-vd")?.value === "1" || cookieStore.get("relay-vm")?.value === "1"
 
   const showRouting = ["ADMIN", "MANAGER"].includes(session.role)
+  const voiceInsightsVisible = ["ADMIN", "HR", "MANAGER"].includes(session.role)
 
   // Trial banner — read from JWT (no extra DB query)
   const trialEndsAt = session.trialEndsAt ? new Date(session.trialEndsAt) : null
@@ -152,6 +153,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         executiveBriefingsEnabled={org?.executive_briefings_enabled ?? false}
         executiveGoalsEnabled={org?.executive_goals_enabled ?? false}
         trendDetectionEnabled={org?.trend_detection_enabled ?? false}
+        voiceInsightsVisible={voiceInsightsVisible}
         navLabelOverrides={navLabelOverrides}
         customViewItems={sidebarViews}
         customPageItems={sidebarPages}

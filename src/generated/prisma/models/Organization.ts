@@ -117,6 +117,7 @@ export type OrganizationMinAggregateOutputType = {
   health_scores_enabled: boolean | null
   trend_detection_enabled: boolean | null
   executive_goals_enabled: boolean | null
+  recognition_enabled: boolean | null
   wc_personal_inbox: boolean | null
   wc_individual_assignments: boolean | null
   wc_basic_notifications: boolean | null
@@ -233,6 +234,7 @@ export type OrganizationMaxAggregateOutputType = {
   health_scores_enabled: boolean | null
   trend_detection_enabled: boolean | null
   executive_goals_enabled: boolean | null
+  recognition_enabled: boolean | null
   wc_personal_inbox: boolean | null
   wc_individual_assignments: boolean | null
   wc_basic_notifications: boolean | null
@@ -354,6 +356,7 @@ export type OrganizationCountAggregateOutputType = {
   health_scores_enabled: number
   trend_detection_enabled: number
   executive_goals_enabled: number
+  recognition_enabled: number
   wc_personal_inbox: number
   wc_individual_assignments: number
   wc_basic_notifications: number
@@ -502,6 +505,7 @@ export type OrganizationMinAggregateInputType = {
   health_scores_enabled?: true
   trend_detection_enabled?: true
   executive_goals_enabled?: true
+  recognition_enabled?: true
   wc_personal_inbox?: true
   wc_individual_assignments?: true
   wc_basic_notifications?: true
@@ -618,6 +622,7 @@ export type OrganizationMaxAggregateInputType = {
   health_scores_enabled?: true
   trend_detection_enabled?: true
   executive_goals_enabled?: true
+  recognition_enabled?: true
   wc_personal_inbox?: true
   wc_individual_assignments?: true
   wc_basic_notifications?: true
@@ -739,6 +744,7 @@ export type OrganizationCountAggregateInputType = {
   health_scores_enabled?: true
   trend_detection_enabled?: true
   executive_goals_enabled?: true
+  recognition_enabled?: true
   wc_personal_inbox?: true
   wc_individual_assignments?: true
   wc_basic_notifications?: true
@@ -947,6 +953,7 @@ export type OrganizationGroupByOutputType = {
   health_scores_enabled: boolean
   trend_detection_enabled: boolean
   executive_goals_enabled: boolean
+  recognition_enabled: boolean
   wc_personal_inbox: boolean
   wc_individual_assignments: boolean
   wc_basic_notifications: boolean
@@ -1091,6 +1098,7 @@ export type OrganizationWhereInput = {
   health_scores_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   trend_detection_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   executive_goals_enabled?: Prisma.BoolFilter<"Organization"> | boolean
+  recognition_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   wc_personal_inbox?: Prisma.BoolFilter<"Organization"> | boolean
   wc_individual_assignments?: Prisma.BoolFilter<"Organization"> | boolean
   wc_basic_notifications?: Prisma.BoolFilter<"Organization"> | boolean
@@ -1268,6 +1276,7 @@ export type OrganizationOrderByWithRelationInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  recognition_enabled?: Prisma.SortOrder
   wc_personal_inbox?: Prisma.SortOrder
   wc_individual_assignments?: Prisma.SortOrder
   wc_basic_notifications?: Prisma.SortOrder
@@ -1449,6 +1458,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   health_scores_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   trend_detection_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   executive_goals_enabled?: Prisma.BoolFilter<"Organization"> | boolean
+  recognition_enabled?: Prisma.BoolFilter<"Organization"> | boolean
   wc_personal_inbox?: Prisma.BoolFilter<"Organization"> | boolean
   wc_individual_assignments?: Prisma.BoolFilter<"Organization"> | boolean
   wc_basic_notifications?: Prisma.BoolFilter<"Organization"> | boolean
@@ -1625,6 +1635,7 @@ export type OrganizationOrderByWithAggregationInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  recognition_enabled?: Prisma.SortOrder
   wc_personal_inbox?: Prisma.SortOrder
   wc_individual_assignments?: Prisma.SortOrder
   wc_basic_notifications?: Prisma.SortOrder
@@ -1754,6 +1765,7 @@ export type OrganizationScalarWhereWithAggregatesInput = {
   health_scores_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   trend_detection_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   executive_goals_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
+  recognition_enabled?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   wc_personal_inbox?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   wc_individual_assignments?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
   wc_basic_notifications?: Prisma.BoolWithAggregatesFilter<"Organization"> | boolean
@@ -1875,6 +1887,7 @@ export type OrganizationCreateInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -2052,6 +2065,7 @@ export type OrganizationUncheckedCreateInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -2229,6 +2243,7 @@ export type OrganizationUpdateInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2406,6 +2421,7 @@ export type OrganizationUncheckedUpdateInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2583,6 +2599,7 @@ export type OrganizationCreateManyInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -2704,6 +2721,7 @@ export type OrganizationUpdateManyMutationInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2825,6 +2843,7 @@ export type OrganizationUncheckedUpdateManyInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2954,6 +2973,7 @@ export type OrganizationCountOrderByAggregateInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  recognition_enabled?: Prisma.SortOrder
   wc_personal_inbox?: Prisma.SortOrder
   wc_individual_assignments?: Prisma.SortOrder
   wc_basic_notifications?: Prisma.SortOrder
@@ -3085,6 +3105,7 @@ export type OrganizationMaxOrderByAggregateInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  recognition_enabled?: Prisma.SortOrder
   wc_personal_inbox?: Prisma.SortOrder
   wc_individual_assignments?: Prisma.SortOrder
   wc_basic_notifications?: Prisma.SortOrder
@@ -3201,6 +3222,7 @@ export type OrganizationMinOrderByAggregateInput = {
   health_scores_enabled?: Prisma.SortOrder
   trend_detection_enabled?: Prisma.SortOrder
   executive_goals_enabled?: Prisma.SortOrder
+  recognition_enabled?: Prisma.SortOrder
   wc_personal_inbox?: Prisma.SortOrder
   wc_individual_assignments?: Prisma.SortOrder
   wc_basic_notifications?: Prisma.SortOrder
@@ -4192,6 +4214,7 @@ export type OrganizationCreateWithoutCustomViewsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -4368,6 +4391,7 @@ export type OrganizationUncheckedCreateWithoutCustomViewsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -4560,6 +4584,7 @@ export type OrganizationUpdateWithoutCustomViewsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4736,6 +4761,7 @@ export type OrganizationUncheckedUpdateWithoutCustomViewsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4912,6 +4938,7 @@ export type OrganizationCreateWithoutCustomPagesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -5088,6 +5115,7 @@ export type OrganizationUncheckedCreateWithoutCustomPagesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -5280,6 +5308,7 @@ export type OrganizationUpdateWithoutCustomPagesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5456,6 +5485,7 @@ export type OrganizationUncheckedUpdateWithoutCustomPagesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5632,6 +5662,7 @@ export type OrganizationCreateWithoutWorkspaceChangeLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -5808,6 +5839,7 @@ export type OrganizationUncheckedCreateWithoutWorkspaceChangeLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -6000,6 +6032,7 @@ export type OrganizationUpdateWithoutWorkspaceChangeLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6176,6 +6209,7 @@ export type OrganizationUncheckedUpdateWithoutWorkspaceChangeLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6352,6 +6386,7 @@ export type OrganizationCreateWithoutUsersInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -6528,6 +6563,7 @@ export type OrganizationUncheckedCreateWithoutUsersInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -6720,6 +6756,7 @@ export type OrganizationUpdateWithoutUsersInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6896,6 +6933,7 @@ export type OrganizationUncheckedUpdateWithoutUsersInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7072,6 +7110,7 @@ export type OrganizationCreateWithoutLocationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -7248,6 +7287,7 @@ export type OrganizationUncheckedCreateWithoutLocationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -7440,6 +7480,7 @@ export type OrganizationUpdateWithoutLocationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7616,6 +7657,7 @@ export type OrganizationUncheckedUpdateWithoutLocationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7792,6 +7834,7 @@ export type OrganizationCreateWithoutDepartmentsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -7968,6 +8011,7 @@ export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -8160,6 +8204,7 @@ export type OrganizationUpdateWithoutDepartmentsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8336,6 +8381,7 @@ export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8512,6 +8558,7 @@ export type OrganizationCreateWithoutAssetsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -8688,6 +8735,7 @@ export type OrganizationUncheckedCreateWithoutAssetsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -8880,6 +8928,7 @@ export type OrganizationUpdateWithoutAssetsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9056,6 +9105,7 @@ export type OrganizationUncheckedUpdateWithoutAssetsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9232,6 +9282,7 @@ export type OrganizationCreateWithoutVendorsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -9408,6 +9459,7 @@ export type OrganizationUncheckedCreateWithoutVendorsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -9600,6 +9652,7 @@ export type OrganizationUpdateWithoutVendorsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9776,6 +9829,7 @@ export type OrganizationUncheckedUpdateWithoutVendorsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9952,6 +10006,7 @@ export type OrganizationCreateWithoutIssuesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -10128,6 +10183,7 @@ export type OrganizationUncheckedCreateWithoutIssuesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -10320,6 +10376,7 @@ export type OrganizationUpdateWithoutIssuesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10496,6 +10553,7 @@ export type OrganizationUncheckedUpdateWithoutIssuesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10672,6 +10730,7 @@ export type OrganizationCreateWithoutEscalationPoliciesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -10848,6 +10907,7 @@ export type OrganizationUncheckedCreateWithoutEscalationPoliciesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -11040,6 +11100,7 @@ export type OrganizationUpdateWithoutEscalationPoliciesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11216,6 +11277,7 @@ export type OrganizationUncheckedUpdateWithoutEscalationPoliciesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11392,6 +11454,7 @@ export type OrganizationCreateWithoutNotificationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -11568,6 +11631,7 @@ export type OrganizationUncheckedCreateWithoutNotificationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -11760,6 +11824,7 @@ export type OrganizationUpdateWithoutNotificationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11936,6 +12001,7 @@ export type OrganizationUncheckedUpdateWithoutNotificationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12112,6 +12178,7 @@ export type OrganizationCreateWithoutRoutingRulesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -12288,6 +12355,7 @@ export type OrganizationUncheckedCreateWithoutRoutingRulesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -12480,6 +12548,7 @@ export type OrganizationUpdateWithoutRoutingRulesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12656,6 +12725,7 @@ export type OrganizationUncheckedUpdateWithoutRoutingRulesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12832,6 +12902,7 @@ export type OrganizationCreateWithoutSuggestionsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -13008,6 +13079,7 @@ export type OrganizationUncheckedCreateWithoutSuggestionsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -13200,6 +13272,7 @@ export type OrganizationUpdateWithoutSuggestionsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13376,6 +13449,7 @@ export type OrganizationUncheckedUpdateWithoutSuggestionsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13552,6 +13626,7 @@ export type OrganizationCreateWithoutEmailTemplatesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -13728,6 +13803,7 @@ export type OrganizationUncheckedCreateWithoutEmailTemplatesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -13920,6 +13996,7 @@ export type OrganizationUpdateWithoutEmailTemplatesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14096,6 +14173,7 @@ export type OrganizationUncheckedUpdateWithoutEmailTemplatesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14272,6 +14350,7 @@ export type OrganizationCreateWithoutInvitationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -14448,6 +14527,7 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -14640,6 +14720,7 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14816,6 +14897,7 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14992,6 +15074,7 @@ export type OrganizationCreateWithoutOrgNotesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -15168,6 +15251,7 @@ export type OrganizationUncheckedCreateWithoutOrgNotesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -15360,6 +15444,7 @@ export type OrganizationUpdateWithoutOrgNotesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15536,6 +15621,7 @@ export type OrganizationUncheckedUpdateWithoutOrgNotesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15712,6 +15798,7 @@ export type OrganizationCreateWithoutImpersonationLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -15888,6 +15975,7 @@ export type OrganizationUncheckedCreateWithoutImpersonationLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -16080,6 +16168,7 @@ export type OrganizationUpdateWithoutImpersonationLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -16256,6 +16345,7 @@ export type OrganizationUncheckedUpdateWithoutImpersonationLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -16432,6 +16522,7 @@ export type OrganizationCreateWithoutAuditLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -16608,6 +16699,7 @@ export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -16800,6 +16892,7 @@ export type OrganizationUpdateWithoutAuditLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -16976,6 +17069,7 @@ export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -17152,6 +17246,7 @@ export type OrganizationCreateWithoutEmployeeTypesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -17328,6 +17423,7 @@ export type OrganizationUncheckedCreateWithoutEmployeeTypesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -17520,6 +17616,7 @@ export type OrganizationUpdateWithoutEmployeeTypesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -17696,6 +17793,7 @@ export type OrganizationUncheckedUpdateWithoutEmployeeTypesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -17872,6 +17970,7 @@ export type OrganizationCreateWithoutIssueTemplatesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -18048,6 +18147,7 @@ export type OrganizationUncheckedCreateWithoutIssueTemplatesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -18240,6 +18340,7 @@ export type OrganizationUpdateWithoutIssueTemplatesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -18416,6 +18517,7 @@ export type OrganizationUncheckedUpdateWithoutIssueTemplatesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -18592,6 +18694,7 @@ export type OrganizationCreateWithoutMaintenanceSchedulesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -18768,6 +18871,7 @@ export type OrganizationUncheckedCreateWithoutMaintenanceSchedulesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -18960,6 +19064,7 @@ export type OrganizationUpdateWithoutMaintenanceSchedulesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -19136,6 +19241,7 @@ export type OrganizationUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -19312,6 +19418,7 @@ export type OrganizationCreateWithoutAnalyticsSnapshotsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -19488,6 +19595,7 @@ export type OrganizationUncheckedCreateWithoutAnalyticsSnapshotsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -19680,6 +19788,7 @@ export type OrganizationUpdateWithoutAnalyticsSnapshotsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -19856,6 +19965,7 @@ export type OrganizationUncheckedUpdateWithoutAnalyticsSnapshotsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -20032,6 +20142,7 @@ export type OrganizationCreateWithoutSopsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -20208,6 +20319,7 @@ export type OrganizationUncheckedCreateWithoutSopsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -20400,6 +20512,7 @@ export type OrganizationUpdateWithoutSopsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -20576,6 +20689,7 @@ export type OrganizationUncheckedUpdateWithoutSopsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -20752,6 +20866,7 @@ export type OrganizationCreateWithoutPurchaseRequestsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -20928,6 +21043,7 @@ export type OrganizationUncheckedCreateWithoutPurchaseRequestsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -21120,6 +21236,7 @@ export type OrganizationUpdateWithoutPurchaseRequestsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -21296,6 +21413,7 @@ export type OrganizationUncheckedUpdateWithoutPurchaseRequestsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -21472,6 +21590,7 @@ export type OrganizationCreateWithoutApprovedCatalogItemsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -21648,6 +21767,7 @@ export type OrganizationUncheckedCreateWithoutApprovedCatalogItemsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -21840,6 +21960,7 @@ export type OrganizationUpdateWithoutApprovedCatalogItemsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -22016,6 +22137,7 @@ export type OrganizationUncheckedUpdateWithoutApprovedCatalogItemsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -22192,6 +22314,7 @@ export type OrganizationCreateWithoutApprovalPoliciesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -22368,6 +22491,7 @@ export type OrganizationUncheckedCreateWithoutApprovalPoliciesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -22560,6 +22684,7 @@ export type OrganizationUpdateWithoutApprovalPoliciesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -22736,6 +22861,7 @@ export type OrganizationUncheckedUpdateWithoutApprovalPoliciesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -22912,6 +23038,7 @@ export type OrganizationCreateWithoutInjuryReportsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -23088,6 +23215,7 @@ export type OrganizationUncheckedCreateWithoutInjuryReportsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -23280,6 +23408,7 @@ export type OrganizationUpdateWithoutInjuryReportsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -23456,6 +23585,7 @@ export type OrganizationUncheckedUpdateWithoutInjuryReportsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -23632,6 +23762,7 @@ export type OrganizationCreateWithoutBugReportsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -23808,6 +23939,7 @@ export type OrganizationUncheckedCreateWithoutBugReportsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -24000,6 +24132,7 @@ export type OrganizationUpdateWithoutBugReportsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -24176,6 +24309,7 @@ export type OrganizationUncheckedUpdateWithoutBugReportsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -24352,6 +24486,7 @@ export type OrganizationCreateWithoutFeatureRequestsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -24528,6 +24663,7 @@ export type OrganizationUncheckedCreateWithoutFeatureRequestsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -24720,6 +24856,7 @@ export type OrganizationUpdateWithoutFeatureRequestsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -24896,6 +25033,7 @@ export type OrganizationUncheckedUpdateWithoutFeatureRequestsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -25072,6 +25210,7 @@ export type OrganizationCreateWithoutRegionsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -25248,6 +25387,7 @@ export type OrganizationUncheckedCreateWithoutRegionsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -25440,6 +25580,7 @@ export type OrganizationUpdateWithoutRegionsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -25616,6 +25757,7 @@ export type OrganizationUncheckedUpdateWithoutRegionsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -25792,6 +25934,7 @@ export type OrganizationCreateWithoutEscalationChainsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -25968,6 +26111,7 @@ export type OrganizationUncheckedCreateWithoutEscalationChainsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -26160,6 +26304,7 @@ export type OrganizationUpdateWithoutEscalationChainsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -26336,6 +26481,7 @@ export type OrganizationUncheckedUpdateWithoutEscalationChainsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -26512,6 +26658,7 @@ export type OrganizationCreateWithoutApiKeysInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -26688,6 +26835,7 @@ export type OrganizationUncheckedCreateWithoutApiKeysInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -26880,6 +27028,7 @@ export type OrganizationUpdateWithoutApiKeysInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -27056,6 +27205,7 @@ export type OrganizationUncheckedUpdateWithoutApiKeysInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -27232,6 +27382,7 @@ export type OrganizationCreateWithoutWebhookEndpointsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -27408,6 +27559,7 @@ export type OrganizationUncheckedCreateWithoutWebhookEndpointsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -27600,6 +27752,7 @@ export type OrganizationUpdateWithoutWebhookEndpointsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -27776,6 +27929,7 @@ export type OrganizationUncheckedUpdateWithoutWebhookEndpointsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -27952,6 +28106,7 @@ export type OrganizationCreateWithoutSsoConfigInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -28128,6 +28283,7 @@ export type OrganizationUncheckedCreateWithoutSsoConfigInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -28320,6 +28476,7 @@ export type OrganizationUpdateWithoutSsoConfigInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -28496,6 +28653,7 @@ export type OrganizationUncheckedUpdateWithoutSsoConfigInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -28672,6 +28830,7 @@ export type OrganizationCreateWithoutOrgRelationshipsAsAInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -28848,6 +29007,7 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsAInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -29029,6 +29189,7 @@ export type OrganizationCreateWithoutOrgRelationshipsAsBInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -29205,6 +29366,7 @@ export type OrganizationUncheckedCreateWithoutOrgRelationshipsAsBInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -29397,6 +29559,7 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsAInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -29573,6 +29736,7 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsAInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -29760,6 +29924,7 @@ export type OrganizationUpdateWithoutOrgRelationshipsAsBInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -29936,6 +30101,7 @@ export type OrganizationUncheckedUpdateWithoutOrgRelationshipsAsBInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -30112,6 +30278,7 @@ export type OrganizationCreateWithoutQrCodesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -30288,6 +30455,7 @@ export type OrganizationUncheckedCreateWithoutQrCodesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -30480,6 +30648,7 @@ export type OrganizationUpdateWithoutQrCodesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -30656,6 +30825,7 @@ export type OrganizationUncheckedUpdateWithoutQrCodesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -30832,6 +31002,7 @@ export type OrganizationCreateWithoutUserOrgMembershipsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -31008,6 +31179,7 @@ export type OrganizationUncheckedCreateWithoutUserOrgMembershipsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -31200,6 +31372,7 @@ export type OrganizationUpdateWithoutUserOrgMembershipsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -31376,6 +31549,7 @@ export type OrganizationUncheckedUpdateWithoutUserOrgMembershipsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -31552,6 +31726,7 @@ export type OrganizationCreateWithoutExecutiveBriefingsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -31728,6 +31903,7 @@ export type OrganizationUncheckedCreateWithoutExecutiveBriefingsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -31920,6 +32096,7 @@ export type OrganizationUpdateWithoutExecutiveBriefingsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -32096,6 +32273,7 @@ export type OrganizationUncheckedUpdateWithoutExecutiveBriefingsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -32272,6 +32450,7 @@ export type OrganizationCreateWithoutHealthScoresInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -32448,6 +32627,7 @@ export type OrganizationUncheckedCreateWithoutHealthScoresInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -32640,6 +32820,7 @@ export type OrganizationUpdateWithoutHealthScoresInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -32816,6 +32997,7 @@ export type OrganizationUncheckedUpdateWithoutHealthScoresInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -32992,6 +33174,7 @@ export type OrganizationCreateWithoutTrendAlertsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -33168,6 +33351,7 @@ export type OrganizationUncheckedCreateWithoutTrendAlertsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -33360,6 +33544,7 @@ export type OrganizationUpdateWithoutTrendAlertsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -33536,6 +33721,7 @@ export type OrganizationUncheckedUpdateWithoutTrendAlertsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -33712,6 +33898,7 @@ export type OrganizationCreateWithoutExecutiveGoalsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -33888,6 +34075,7 @@ export type OrganizationUncheckedCreateWithoutExecutiveGoalsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -34080,6 +34268,7 @@ export type OrganizationUpdateWithoutExecutiveGoalsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -34256,6 +34445,7 @@ export type OrganizationUncheckedUpdateWithoutExecutiveGoalsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -34432,6 +34622,7 @@ export type OrganizationCreateWithoutLegalAcceptancesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -34608,6 +34799,7 @@ export type OrganizationUncheckedCreateWithoutLegalAcceptancesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -34800,6 +34992,7 @@ export type OrganizationUpdateWithoutLegalAcceptancesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -34976,6 +35169,7 @@ export type OrganizationUncheckedUpdateWithoutLegalAcceptancesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -35152,6 +35346,7 @@ export type OrganizationCreateWithoutDemoCallsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -35328,6 +35523,7 @@ export type OrganizationUncheckedCreateWithoutDemoCallsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -35520,6 +35716,7 @@ export type OrganizationUpdateWithoutDemoCallsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -35696,6 +35893,7 @@ export type OrganizationUncheckedUpdateWithoutDemoCallsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -35872,6 +36070,7 @@ export type OrganizationCreateWithoutNonConversionReasonsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -36048,6 +36247,7 @@ export type OrganizationUncheckedCreateWithoutNonConversionReasonsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -36240,6 +36440,7 @@ export type OrganizationUpdateWithoutNonConversionReasonsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -36416,6 +36617,7 @@ export type OrganizationUncheckedUpdateWithoutNonConversionReasonsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -36592,6 +36794,7 @@ export type OrganizationCreateWithoutCrmNotesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -36768,6 +36971,7 @@ export type OrganizationUncheckedCreateWithoutCrmNotesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -36960,6 +37164,7 @@ export type OrganizationUpdateWithoutCrmNotesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -37136,6 +37341,7 @@ export type OrganizationUncheckedUpdateWithoutCrmNotesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -37312,6 +37518,7 @@ export type OrganizationCreateWithoutCrmActivitiesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -37488,6 +37695,7 @@ export type OrganizationUncheckedCreateWithoutCrmActivitiesInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -37680,6 +37888,7 @@ export type OrganizationUpdateWithoutCrmActivitiesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -37856,6 +38065,7 @@ export type OrganizationUncheckedUpdateWithoutCrmActivitiesInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -38032,6 +38242,7 @@ export type OrganizationCreateWithoutBillingCreditsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -38208,6 +38419,7 @@ export type OrganizationUncheckedCreateWithoutBillingCreditsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -38400,6 +38612,7 @@ export type OrganizationUpdateWithoutBillingCreditsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -38576,6 +38789,7 @@ export type OrganizationUncheckedUpdateWithoutBillingCreditsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -38752,6 +38966,7 @@ export type OrganizationCreateWithoutReferralsMadeInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -38928,6 +39143,7 @@ export type OrganizationUncheckedCreateWithoutReferralsMadeInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -39109,6 +39325,7 @@ export type OrganizationCreateWithoutReferralReceivedInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -39285,6 +39502,7 @@ export type OrganizationUncheckedCreateWithoutReferralReceivedInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -39477,6 +39695,7 @@ export type OrganizationUpdateWithoutReferralsMadeInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -39653,6 +39872,7 @@ export type OrganizationUncheckedUpdateWithoutReferralsMadeInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -39840,6 +40060,7 @@ export type OrganizationUpdateWithoutReferralReceivedInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -40016,6 +40237,7 @@ export type OrganizationUncheckedUpdateWithoutReferralReceivedInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -40192,6 +40414,7 @@ export type OrganizationCreateWithoutConversationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -40368,6 +40591,7 @@ export type OrganizationUncheckedCreateWithoutConversationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -40560,6 +40784,7 @@ export type OrganizationUpdateWithoutConversationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -40736,6 +40961,7 @@ export type OrganizationUncheckedUpdateWithoutConversationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -40912,6 +41138,7 @@ export type OrganizationCreateWithoutSupportConversationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -41088,6 +41315,7 @@ export type OrganizationUncheckedCreateWithoutSupportConversationsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -41280,6 +41508,7 @@ export type OrganizationUpdateWithoutSupportConversationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -41456,6 +41685,7 @@ export type OrganizationUncheckedUpdateWithoutSupportConversationsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -41632,6 +41862,7 @@ export type OrganizationCreateWithoutBroadcastsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -41808,6 +42039,7 @@ export type OrganizationUncheckedCreateWithoutBroadcastsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -42000,6 +42232,7 @@ export type OrganizationUpdateWithoutBroadcastsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -42176,6 +42409,7 @@ export type OrganizationUncheckedUpdateWithoutBroadcastsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -42352,6 +42586,7 @@ export type OrganizationCreateWithoutAssignmentsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -42528,6 +42763,7 @@ export type OrganizationUncheckedCreateWithoutAssignmentsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -42720,6 +42956,7 @@ export type OrganizationUpdateWithoutAssignmentsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -42896,6 +43133,7 @@ export type OrganizationUncheckedUpdateWithoutAssignmentsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -43072,6 +43310,7 @@ export type OrganizationCreateWithoutAnnouncementsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -43248,6 +43487,7 @@ export type OrganizationUncheckedCreateWithoutAnnouncementsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -43440,6 +43680,7 @@ export type OrganizationUpdateWithoutAnnouncementsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -43616,6 +43857,7 @@ export type OrganizationUncheckedUpdateWithoutAnnouncementsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -43792,6 +44034,7 @@ export type OrganizationCreateWithoutEmergencyBroadcastsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -43968,6 +44211,7 @@ export type OrganizationUncheckedCreateWithoutEmergencyBroadcastsInput = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -44160,6 +44404,7 @@ export type OrganizationUpdateWithoutEmergencyBroadcastsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -44336,6 +44581,7 @@ export type OrganizationUncheckedUpdateWithoutEmergencyBroadcastsInput = {
   health_scores_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trend_detection_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   executive_goals_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recognition_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_personal_inbox?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_individual_assignments?: Prisma.BoolFieldUpdateOperationsInput | boolean
   wc_basic_notifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -45020,6 +45266,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -45198,6 +45445,7 @@ export type OrganizationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -45319,6 +45567,7 @@ export type OrganizationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -45440,6 +45689,7 @@ export type OrganizationSelectScalar = {
   health_scores_enabled?: boolean
   trend_detection_enabled?: boolean
   executive_goals_enabled?: boolean
+  recognition_enabled?: boolean
   wc_personal_inbox?: boolean
   wc_individual_assignments?: boolean
   wc_basic_notifications?: boolean
@@ -45495,7 +45745,7 @@ export type OrganizationSelectScalar = {
   referralLink?: boolean
 }
 
-export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logo" | "industry" | "companySize" | "numberOfLocations" | "onboardingCompletedAt" | "trialStartDate" | "trialEndsAt" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeCouponId" | "subscriptionStatus" | "plan" | "productLine" | "employeeLimit" | "locationLimit" | "checkoutIntentStatus" | "intelligenceSuiteEnabled" | "monthlyBasePrice" | "monthlyScalingCost" | "monthlyModulesCost" | "monthlyTotalBeforeDiscount" | "monthlyTotalAfterDiscount" | "discountPercent" | "discountExpiresAt" | "discountLabel" | "suspendedAt" | "isDemo" | "demoExpiresAt" | "aiSuggestionsAvailable" | "aiSuggestionsPolicy" | "aiSuggestionsAudience" | "purchaseRequestEnabled" | "purchaseRequestItemLimit" | "purchaseRequestMonthlyLimit" | "approval_intelligence_enabled" | "ai_suggest_unmatched_items" | "ai_confidence_threshold" | "injuryAlertEmails" | "sopMatchSensitivity" | "billingFrequency" | "currentPrice" | "priceLockedUntil" | "intelligenceModules" | "createdAt" | "updatedAt" | "pageAccessConfig" | "navigationConfig" | "terminologyConfig" | "regions_enabled" | "corporate_dashboard_enabled" | "cross_location_analytics_enabled" | "advanced_escalations_enabled" | "api_webhooks_enabled" | "sso_foundation_enabled" | "shared_facility_enabled" | "qr_codes_enabled" | "external_collaborators_enabled" | "multi_org_enabled" | "executive_briefings_enabled" | "health_scores_enabled" | "trend_detection_enabled" | "executive_goals_enabled" | "wc_personal_inbox" | "wc_individual_assignments" | "wc_basic_notifications" | "wc_basic_announcements" | "wc_company_announcements" | "wc_personal_reminders" | "wc_push_notifications" | "wc_email_notifications" | "wc_inapp_notifications" | "wc_basic_daily_briefing" | "wc_announcement_history_readonly" | "wc_department_announcements" | "wc_team_announcements" | "wc_shift_announcements" | "wc_emergency_broadcasts" | "wc_assignment_management" | "wc_assignment_comments" | "wc_assignment_attachments" | "wc_assignment_history" | "wc_announcement_acknowledgements" | "wc_ai_daily_briefing" | "wc_manager_announcement_dashboard" | "wc_supervisor_tools" | "wc_communication_search" | "wc_inbox_filters" | "wc_notification_preferences" | "wc_department_communication_permissions" | "wc_multi_location_announcements" | "wc_regional_announcements" | "wc_executive_announcements" | "wc_org_wide_broadcasts" | "wc_cross_location_communication" | "wc_communication_analytics" | "wc_announcement_reporting" | "wc_read_rate_analytics" | "wc_executive_communication_dashboard" | "wc_ai_communication_summaries" | "wc_ai_announcement_drafting" | "wc_org_wide_assignment_management" | "wc_cross_location_assignment_visibility" | "wc_advanced_notification_rules" | "wc_executive_daily_briefings" | "wc_sms_gateway" | "wc_custom_notification_providers" | "wc_custom_escalation_policies" | "wc_compliance_logging" | "wc_advanced_audit_history" | "wc_api_access_communications" | "wc_white_label_communications" | "wc_enterprise_communication_controls" | "lifecycleStatus" | "referralCode" | "referralLink", ExtArgs["result"]["organization"]>
+export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logo" | "industry" | "companySize" | "numberOfLocations" | "onboardingCompletedAt" | "trialStartDate" | "trialEndsAt" | "stripeCustomerId" | "stripeSubscriptionId" | "stripeCouponId" | "subscriptionStatus" | "plan" | "productLine" | "employeeLimit" | "locationLimit" | "checkoutIntentStatus" | "intelligenceSuiteEnabled" | "monthlyBasePrice" | "monthlyScalingCost" | "monthlyModulesCost" | "monthlyTotalBeforeDiscount" | "monthlyTotalAfterDiscount" | "discountPercent" | "discountExpiresAt" | "discountLabel" | "suspendedAt" | "isDemo" | "demoExpiresAt" | "aiSuggestionsAvailable" | "aiSuggestionsPolicy" | "aiSuggestionsAudience" | "purchaseRequestEnabled" | "purchaseRequestItemLimit" | "purchaseRequestMonthlyLimit" | "approval_intelligence_enabled" | "ai_suggest_unmatched_items" | "ai_confidence_threshold" | "injuryAlertEmails" | "sopMatchSensitivity" | "billingFrequency" | "currentPrice" | "priceLockedUntil" | "intelligenceModules" | "createdAt" | "updatedAt" | "pageAccessConfig" | "navigationConfig" | "terminologyConfig" | "regions_enabled" | "corporate_dashboard_enabled" | "cross_location_analytics_enabled" | "advanced_escalations_enabled" | "api_webhooks_enabled" | "sso_foundation_enabled" | "shared_facility_enabled" | "qr_codes_enabled" | "external_collaborators_enabled" | "multi_org_enabled" | "executive_briefings_enabled" | "health_scores_enabled" | "trend_detection_enabled" | "executive_goals_enabled" | "recognition_enabled" | "wc_personal_inbox" | "wc_individual_assignments" | "wc_basic_notifications" | "wc_basic_announcements" | "wc_company_announcements" | "wc_personal_reminders" | "wc_push_notifications" | "wc_email_notifications" | "wc_inapp_notifications" | "wc_basic_daily_briefing" | "wc_announcement_history_readonly" | "wc_department_announcements" | "wc_team_announcements" | "wc_shift_announcements" | "wc_emergency_broadcasts" | "wc_assignment_management" | "wc_assignment_comments" | "wc_assignment_attachments" | "wc_assignment_history" | "wc_announcement_acknowledgements" | "wc_ai_daily_briefing" | "wc_manager_announcement_dashboard" | "wc_supervisor_tools" | "wc_communication_search" | "wc_inbox_filters" | "wc_notification_preferences" | "wc_department_communication_permissions" | "wc_multi_location_announcements" | "wc_regional_announcements" | "wc_executive_announcements" | "wc_org_wide_broadcasts" | "wc_cross_location_communication" | "wc_communication_analytics" | "wc_announcement_reporting" | "wc_read_rate_analytics" | "wc_executive_communication_dashboard" | "wc_ai_communication_summaries" | "wc_ai_announcement_drafting" | "wc_org_wide_assignment_management" | "wc_cross_location_assignment_visibility" | "wc_advanced_notification_rules" | "wc_executive_daily_briefings" | "wc_sms_gateway" | "wc_custom_notification_providers" | "wc_custom_escalation_policies" | "wc_compliance_logging" | "wc_advanced_audit_history" | "wc_api_access_communications" | "wc_white_label_communications" | "wc_enterprise_communication_controls" | "lifecycleStatus" | "referralCode" | "referralLink", ExtArgs["result"]["organization"]>
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Organization$usersArgs<ExtArgs>
   locations?: boolean | Prisma.Organization$locationsArgs<ExtArgs>
@@ -45684,6 +45934,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     health_scores_enabled: boolean
     trend_detection_enabled: boolean
     executive_goals_enabled: boolean
+    recognition_enabled: boolean
     wc_personal_inbox: boolean
     wc_individual_assignments: boolean
     wc_basic_notifications: boolean
@@ -46281,6 +46532,7 @@ export interface OrganizationFieldRefs {
   readonly health_scores_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly trend_detection_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly executive_goals_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
+  readonly recognition_enabled: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly wc_personal_inbox: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly wc_individual_assignments: Prisma.FieldRef<"Organization", 'Boolean'>
   readonly wc_basic_notifications: Prisma.FieldRef<"Organization", 'Boolean'>

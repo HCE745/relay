@@ -212,6 +212,7 @@ export interface OrgFeatureFlags {
   health_scores_enabled:            boolean
   trend_detection_enabled:          boolean
   executive_goals_enabled:          boolean
+  recognition_enabled:              boolean
 }
 
 export const FEATURE_FLAG_LABELS: Record<keyof OrgFeatureFlags, string> = {
@@ -229,6 +230,7 @@ export const FEATURE_FLAG_LABELS: Record<keyof OrgFeatureFlags, string> = {
   health_scores_enabled:            "AI Operational Health Scores",
   trend_detection_enabled:          "AI Trend Detection",
   executive_goals_enabled:          "Executive Goals & KPI Tracking",
+  recognition_enabled:              "Employee Contribution & Recognition",
 }
 
 export const FEATURE_FLAG_DESCRIPTIONS: Record<keyof OrgFeatureFlags, string> = {
@@ -246,6 +248,7 @@ export const FEATURE_FLAG_DESCRIPTIONS: Record<keyof OrgFeatureFlags, string> = 
   health_scores_enabled:            "AI-calculated operational health scores (0–100) for your org, regions, and locations.",
   trend_detection_enabled:          "Automated background trend detection: volume spikes, recurring assets, safety increases, slow resolution.",
   executive_goals_enabled:          "Set operational goals with measurable targets and track progress automatically against real data.",
+  recognition_enabled:              "Track meaningful employee contributions and give managers a simple way to recognize employees who identify problems, propose improvements, and help resolve them.",
 }
 
 export function isProfessional(plan: string) {
@@ -285,6 +288,10 @@ export function isBlockedOnWashEssentials(
   productLine: string | undefined | null,
 ): boolean {
   return isWashEssentials(productLine)
+}
+
+export function isRecognitionEnabled(plan: string, recognitionEnabled: boolean): boolean {
+  return isProfessional(plan) && recognitionEnabled
 }
 
 export function isProfessionalPlus(plan: string) {

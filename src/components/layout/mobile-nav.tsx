@@ -28,6 +28,7 @@ import {
   ShoppingCart,
   ClipboardCheck,
   Radio,
+  Megaphone,
 } from "lucide-react"
 import type { PageKey } from "@/lib/page-access"
 import { RelayIconWhite, RelayWordmarkWhite } from "@/components/logo"
@@ -48,6 +49,7 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "departments",     href: "/departments",       label: "Departments",    icon: Building2 },
   { key: "vendors",         href: "/vendors",           label: "Vendors",        icon: Wrench },
   { key: "team",            href: "/team",              label: "Team",           icon: Users },
+  { key: "voice",           href: "/voice",              label: "Employee Voice", icon: Megaphone },
   { key: "suggestions",     href: "/suggestions",       label: "Suggestions",    icon: Lightbulb },
   { key: "analytics",       href: "/analytics",         label: "Analytics",      icon: BarChart2 },
   { key: "sops",            href: "/sops",              label: "SOPs",           icon: BookOpen },
@@ -56,6 +58,8 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
 
 // Ordered prefix→title pairs (most-specific first)
 const PAGE_LABELS: [string, string][] = [
+  ["/voice/insights",                          "Voice Insights"],
+  ["/voice",                                   "Employee Voice"],
   ["/issues/new",                              "Report Issue"],
   ["/issues/",                                 "Issue Detail"],
   ["/assets/",                                 "Asset Detail"],

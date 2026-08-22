@@ -5,10 +5,16 @@ import { cookies } from "next/headers"
 import { Header } from "@/components/layout/header"
 import { SuggestionForm } from "@/components/suggestions/suggestion-form"
 import { SuggestionInbox } from "@/components/suggestions/suggestion-inbox"
+import { isProfessional } from "@/lib/pricing"
+import type { SuggestionType } from "@/lib/suggestion-constants"
 
 export const dynamic = "force-dynamic"
 
-export default async function SuggestionsPage() {
+export default async function SuggestionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>
+}) {
   const session = await getSession()
   if (!session) redirect("/login")
 
@@ -28,6 +34,12 @@ export default async function SuggestionsPage() {
     },
   })
 
+  const { type: rawTypeParam } = await searchParams
+  const VALID_TYPES: SuggestionType[] = ["SUGGESTION", "FEEDBACK", "CONCERN"]
+  const defaultType: SuggestionType = VALID_TYPES.includes(rawTypeParam as SuggestionType)
+    ? (rawTypeParam as SuggestionType)
+    : "SUGGESTION"
+
   // Users needed for override picker (form) and reassign/convert selects (inbox)
   const [users, org, userSettings] = await Promise.all([
     prisma.user.findMany({
@@ -35,7 +47,7 @@ export default async function SuggestionsPage() {
       orderBy: { name: "asc" },
       select: { id: true, name: true, role: true },
     }),
-    prisma.organization.findUnique({ where: { id: orgId }, select: { aiSuggestionsAvailable: true, aiSuggestionsPolicy: true } }),
+    prisma.organization.findUnique({ where: { id: orgId }, select: { aiSuggestionsAvailable: true, aiSuggestionsPolicy: true, plan: true } }),
     prisma.userSettings.findUnique({ where: { userId: session.userId }, select: { aiSuggestionsOn: true, aiSuggestionsCollapsed: true } }),
   ])
 
@@ -118,7 +130,12 @@ export default async function SuggestionsPage() {
           <p className="text-sm text-gray-500 mb-6">
             Have an idea or feedback? It will be automatically routed to the right person based on what you write.
           </p>
-          <SuggestionForm users={users} aiSuggestionsEnabled={aiSuggestionsEnabled} />
+          <SuggestionForm
+            users={users}
+            aiSuggestionsEnabled={aiSuggestionsEnabled}
+            isProfessional={isProfessional(org?.plan ?? "essentials")}
+            defaultType={defaultType}
+          />
         </div>
       </div>
     </div>

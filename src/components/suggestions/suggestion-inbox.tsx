@@ -5,13 +5,15 @@ import { formatDistanceToNow } from "date-fns"
 import {
   CheckCircle, XCircle, Inbox, MessageSquare,
   Forward, ClipboardList, X, ExternalLink, UserCheck, Sparkles, ChevronDown, ChevronUp,
+  Star,
 } from "lucide-react"
 import Link from "next/link"
 import { ISSUE_PRIORITY } from "@/lib/constants"
-import { SUGGESTION_CATEGORY_LABEL } from "@/lib/suggestion-constants"
+import { SUGGESTION_CATEGORY_LABEL, SUGGESTION_TYPE_LABEL } from "@/lib/suggestion-constants"
 
 interface Suggestion {
   id: string
+  type: string
   content: string
   status: string
   adminNote: string | null
@@ -39,15 +41,23 @@ interface Props {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  REVIEWED: "bg-green-100 text-green-800",
-  DISMISSED: "bg-gray-100 text-gray-500",
-  CONVERTED: "bg-blue-100 text-blue-800",
+  PENDING:     "bg-yellow-100 text-yellow-800",
+  REVIEWED:    "bg-green-100 text-green-800",
+  DISMISSED:   "bg-gray-100 text-gray-500",
+  CONVERTED:   "bg-blue-100 text-blue-800",
+  IMPLEMENTED: "bg-emerald-100 text-emerald-800",
+}
+
+const TYPE_BADGE: Record<string, string> = {
+  SUGGESTION: "bg-blue-50 text-blue-700 border-blue-100",
+  FEEDBACK:   "bg-purple-50 text-purple-700 border-purple-100",
+  CONCERN:    "bg-amber-50 text-amber-700 border-amber-100",
 }
 
 export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAdmin, defaultApproachesExpanded }: Props) {
   const [suggestions, setSuggestions] = useState(initialSuggestions)
-  const [filter, setFilter] = useState<string>("PENDING")
+  const [statusFilter, setStatusFilter] = useState<string>("PENDING")
+  const [typeFilter, setTypeFilter] = useState<string>("ALL")
   const [expandedApproaches, setExpandedApproaches] = useState<Set<string>>(() => {
     if (!defaultApproachesExpanded) return new Set()
     return new Set(
@@ -57,17 +67,12 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
     )
   })
 
-  // Note dialog
   const [noteId, setNoteId] = useState<string | null>(null)
   const [noteText, setNoteText] = useState("")
-
-  // Reassign dialog
   const [reassignId, setReassignId] = useState<string | null>(null)
   const [reassignUserId, setReassignUserId] = useState("")
   const [reassignNote, setReassignNote] = useState("")
   const [reassigning, setReassigning] = useState(false)
-
-  // Convert dialog
   const [convertId, setConvertId] = useState<string | null>(null)
   const [convertTitle, setConvertTitle] = useState("")
   const [convertPriority, setConvertPriority] = useState("MEDIUM")
@@ -75,13 +80,27 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
   const [converting, setConverting] = useState(false)
   const [convertError, setConvertError] = useState("")
 
-  const filterTabs = isAdmin
-    ? ["PENDING", "REVIEWED", "DISMISSED", "CONVERTED", "ALL"] as const
+  const statusTabs = isAdmin
+    ? ["PENDING", "REVIEWED", "IMPLEMENTED", "DISMISSED", "CONVERTED", "ALL"] as const
     : ["PENDING", "REVIEWED", "ALL"] as const
 
-  const visible = filter === "ALL" ? suggestions : suggestions.filter(s => s.status === filter)
-  const counts: Record<string, number> = {}
-  filterTabs.forEach(f => { if (f !== "ALL") counts[f] = suggestions.filter(s => s.status === f).length })
+  const typeTabs = ["ALL", "SUGGESTION", "FEEDBACK", "CONCERN"] as const
+
+  const visible = suggestions.filter(s => {
+    if (statusFilter !== "ALL" && s.status !== statusFilter) return false
+    if (typeFilter !== "ALL" && s.type !== typeFilter) return false
+    return true
+  })
+
+  const statusCounts: Record<string, number> = {}
+  statusTabs.forEach(f => { if (f !== "ALL") statusCounts[f] = suggestions.filter(s => s.status === f).length })
+
+  const typeCounts: Record<string, number> = {
+    SUGGESTION: suggestions.filter(s => s.type === "SUGGESTION").length,
+    FEEDBACK:   suggestions.filter(s => s.type === "FEEDBACK").length,
+    CONCERN:    suggestions.filter(s => s.type === "CONCERN").length,
+  }
+  const hasMultipleTypes = typeCounts.FEEDBACK > 0 || typeCounts.CONCERN > 0
 
   function patchSuggestion(updated: Suggestion) {
     setSuggestions(prev => prev.map(s => s.id === updated.id ? updated : s))
@@ -95,7 +114,6 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
     })
   }
 
-  // Parse ## sections from AI approach text
   function parseApproachSections(text: string): Array<{ heading: string; body: string }> {
     const sections: Array<{ heading: string; body: string }> = []
     let current: { heading: string; lines: string[] } | null = null
@@ -176,33 +194,54 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
     setConvertError("")
   }
 
-  const canReassign = (s: Suggestion) =>
-    isAdmin || s.routedToUser?.id === sessionUserId
+  const canReassign = (s: Suggestion) => isAdmin || s.routedToUser?.id === sessionUserId
 
   return (
     <div>
-      {/* Tabs */}
-      <div className="flex items-center gap-2 mb-4 flex-wrap">
-        {filterTabs.map(f => (
+      {/* Status filter tabs */}
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
+        {statusTabs.map(f => (
           <button
             key={f}
-            onClick={() => setFilter(f)}
+            onClick={() => setStatusFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filter === f ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              statusFilter === f ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
-            {f === "ALL" ? "All" : f.charAt(0) + f.slice(1).toLowerCase()}
-            {f !== "ALL" && counts[f] !== undefined && (
-              <span className="ml-1.5 text-xs opacity-75">({counts[f]})</span>
+            {f === "ALL" ? "All" : f === "IMPLEMENTED" ? "Implemented" : f.charAt(0) + f.slice(1).toLowerCase()}
+            {f !== "ALL" && statusCounts[f] !== undefined && (
+              <span className="ml-1.5 text-xs opacity-75">({statusCounts[f]})</span>
             )}
           </button>
         ))}
       </div>
 
+      {/* Type filter — only shown when org has feedback/concern submissions */}
+      {isAdmin && hasMultipleTypes && (
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          {typeTabs.map(t => (
+            <button
+              key={t}
+              onClick={() => setTypeFilter(t)}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors border ${
+                typeFilter === t
+                  ? "bg-gray-800 text-white border-gray-800"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              {t === "ALL" ? "All types" : SUGGESTION_TYPE_LABEL[t]}
+              {t !== "ALL" && typeCounts[t] !== undefined && (
+                <span className="ml-1 opacity-60">({typeCounts[t]})</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
       {visible.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-200">
           <Inbox className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm text-gray-400">No suggestions in this category</p>
+          <p className="text-sm text-gray-400">Nothing here</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -213,8 +252,14 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                   {/* Header row */}
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="text-sm font-medium text-gray-900">{s.submittedBy.name}</span>
+                    {/* Type badge — show if not a plain SUGGESTION */}
+                    {s.type && s.type !== "SUGGESTION" && (
+                      <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${TYPE_BADGE[s.type] ?? "bg-gray-50 text-gray-600 border-gray-100"}`}>
+                        {SUGGESTION_TYPE_LABEL[s.type] ?? s.type}
+                      </span>
+                    )}
                     <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${STATUS_STYLE[s.status] ?? "bg-gray-100 text-gray-500"}`}>
-                      {s.status.charAt(0) + s.status.slice(1).toLowerCase()}
+                      {s.status === "IMPLEMENTED" ? "Implemented" : s.status.charAt(0) + s.status.slice(1).toLowerCase()}
                     </span>
                     {s.detectedCategory && (
                       <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
@@ -226,10 +271,8 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                     </span>
                   </div>
 
-                  {/* Content */}
                   <p className="text-sm text-gray-700 whitespace-pre-wrap mb-2">{s.content}</p>
 
-                  {/* Routing info */}
                   {s.routedToUser && (
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
                       <UserCheck className="w-3.5 h-3.5 text-blue-400" />
@@ -238,26 +281,21 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                     </div>
                   )}
 
-                  {/* Converted link */}
                   {s.convertedToIssue && (
-                    <Link
-                      href={`/issues/${s.convertedToIssue.id}`}
-                      className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
-                    >
+                    <Link href={`/issues/${s.convertedToIssue.id}`} className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
                       <ExternalLink className="w-3 h-3" />
                       Work order: {s.convertedToIssue.title}
                     </Link>
                   )}
 
-                  {/* Admin note */}
                   {s.adminNote && (
                     <div className="mt-2 text-xs text-gray-500 bg-gray-50 rounded p-2 border-l-2 border-blue-300">
                       <span className="font-medium text-gray-600">Note: </span>{s.adminNote}
                     </div>
                   )}
 
-                  {/* AI implementation approaches — shown to recipient only */}
-                  {s.assigneeApproaches && s.routedToUser?.id === sessionUserId && s.status !== "DISMISSED" && s.status !== "CONVERTED" && (
+                  {/* AI approaches — suggestions only */}
+                  {s.type !== "FEEDBACK" && s.type !== "CONCERN" && s.assigneeApproaches && s.routedToUser?.id === sessionUserId && s.status !== "DISMISSED" && s.status !== "CONVERTED" && s.status !== "IMPLEMENTED" && (
                     <div className="mt-3">
                       <button
                         onClick={() => toggleApproaches(s.id)}
@@ -265,10 +303,7 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                       >
                         <Sparkles className="w-3.5 h-3.5" />
                         AI Implementation Approaches
-                        {expandedApproaches.has(s.id)
-                          ? <ChevronUp className="w-3 h-3" />
-                          : <ChevronDown className="w-3 h-3" />
-                        }
+                        {expandedApproaches.has(s.id) ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
                       {expandedApproaches.has(s.id) && (
                         <div className="mt-2 space-y-2">
@@ -280,14 +315,11 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                                   const boldMatch = line.match(/^\*\*(.+?):\*\*\s*(.+)$/)
                                   if (boldMatch) {
                                     const effortColor = boldMatch[1] === "Effort"
-                                      ? boldMatch[2] === "Low" ? "text-green-700"
-                                        : boldMatch[2] === "High" ? "text-red-700"
-                                        : "text-amber-700"
+                                      ? boldMatch[2] === "Low" ? "text-green-700" : boldMatch[2] === "High" ? "text-red-700" : "text-amber-700"
                                       : "text-purple-900"
                                     return (
                                       <div key={j} className={`text-xs leading-relaxed ${effortColor}`}>
-                                        <span className="font-semibold text-purple-800">{boldMatch[1]}:</span>{" "}
-                                        {boldMatch[2]}
+                                        <span className="font-semibold text-purple-800">{boldMatch[1]}:</span> {boldMatch[2]}
                                       </div>
                                     )
                                   }
@@ -305,13 +337,19 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
 
                 {/* Action buttons */}
                 <div className="flex items-center gap-1 shrink-0">
-                  {isAdmin && s.status !== "REVIEWED" && s.status !== "CONVERTED" && (
+                  {isAdmin && s.status !== "REVIEWED" && s.status !== "CONVERTED" && s.status !== "IMPLEMENTED" && (
                     <button onClick={() => updateStatus(s.id, "REVIEWED")} title="Mark Reviewed"
                       className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600">
                       <CheckCircle className="w-4 h-4" />
                     </button>
                   )}
-                  {isAdmin && s.status !== "DISMISSED" && s.status !== "CONVERTED" && (
+                  {isAdmin && s.status !== "IMPLEMENTED" && s.status !== "CONVERTED" && s.status !== "DISMISSED" && (
+                    <button onClick={() => updateStatus(s.id, "IMPLEMENTED")} title="Mark Implemented"
+                      className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600">
+                      <Star className="w-4 h-4" />
+                    </button>
+                  )}
+                  {isAdmin && s.status !== "DISMISSED" && s.status !== "CONVERTED" && s.status !== "IMPLEMENTED" && (
                     <button onClick={() => updateStatus(s.id, "DISMISSED")} title="Dismiss"
                       className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600">
                       <XCircle className="w-4 h-4" />
@@ -323,14 +361,14 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                       <MessageSquare className="w-4 h-4" />
                     </button>
                   )}
-                  {canReassign(s) && s.status !== "CONVERTED" && (
+                  {canReassign(s) && s.status !== "CONVERTED" && s.status !== "IMPLEMENTED" && (
                     <button onClick={() => { setReassignId(s.id); setReassignUserId(s.routedToUser?.id ?? ""); setReassignNote("") }}
                       title="Reassign / Forward"
                       className="p-1.5 rounded-lg hover:bg-orange-50 text-gray-400 hover:text-orange-600">
                       <Forward className="w-4 h-4" />
                     </button>
                   )}
-                  {canReassign(s) && s.status !== "CONVERTED" && !s.convertedToIssue && (
+                  {canReassign(s) && s.type !== "FEEDBACK" && s.type !== "CONCERN" && s.status !== "CONVERTED" && s.status !== "IMPLEMENTED" && !s.convertedToIssue && (
                     <button onClick={() => openConvert(s)} title="Convert to Work Order"
                       className="p-1.5 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600">
                       <ClipboardList className="w-4 h-4" />
@@ -425,7 +463,7 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                   {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
                 </select>
               </div>
-              <p className="text-xs text-gray-400">The suggestion&apos;s full text becomes the work order description. It will appear in the assignee&apos;s issue queue.</p>
+              <p className="text-xs text-gray-400">The suggestion&apos;s full text becomes the work order description.</p>
             </div>
             <div className="flex gap-2 px-6 py-4 border-t border-gray-100 justify-end">
               <button onClick={() => setConvertId(null)} className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>

@@ -5,6 +5,7 @@ import { detectSuggestionCategory, routeSuggestion } from "@/lib/suggestion-rout
 import { writeIssuePattern } from "@/lib/patterns"
 import { checkLimit, limiters } from "@/lib/ratelimit"
 import { generateSuggestionApproaches } from "@/lib/ai-suggestions"
+import { isProfessional } from "@/lib/pricing"
 
 export async function GET() {
   const session = await getSession()
@@ -50,8 +51,22 @@ export async function POST(request: NextRequest) {
   )
   if (blocked) return blocked
 
-  const { content, overrideUserId, attachments } = await request.json()
+  const { content, overrideUserId, attachments, type: rawType } = await request.json()
   if (!content?.trim()) return NextResponse.json({ error: "Content is required" }, { status: 400 })
+
+  // Validate type — FEEDBACK and CONCERN require Professional plan
+  const VALID_TYPES = ["SUGGESTION", "FEEDBACK", "CONCERN"]
+  const type = VALID_TYPES.includes(rawType) ? rawType as string : "SUGGESTION"
+
+  if (type !== "SUGGESTION") {
+    const orgPlan = await prisma.organization.findUnique({
+      where: { id: session.organizationId },
+      select: { plan: true },
+    })
+    if (!isProfessional(orgPlan?.plan ?? "essentials")) {
+      return NextResponse.json({ error: "Feedback and Concern submissions require a Professional plan" }, { status: 403 })
+    }
+  }
 
   const detectedCategory = detectSuggestionCategory(content)
 
@@ -71,6 +86,7 @@ export async function POST(request: NextRequest) {
       organizationId: session.organizationId,
       submittedById: session.userId,
       content: content.trim(),
+      type,
       detectedCategory,
       routedToUserId,
     },
@@ -105,8 +121,8 @@ export async function POST(request: NextRequest) {
     }).catch(() => {/* non-critical */})
   }
 
-  // ── AI approaches for recipient (fire-and-forget) ─────────────────────────
-  if (routedToUserId) {
+  // ── AI approaches for recipient (fire-and-forget, suggestions only) ──────
+  if (routedToUserId && type === "SUGGESTION") {
     generateSuggestionApproaches(
       suggestion.id,
       content.trim(),

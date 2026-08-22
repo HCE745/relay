@@ -85,6 +85,7 @@ model Organization {
   health_scores_enabled              Boolean @default(false)
   trend_detection_enabled            Boolean @default(false)
   executive_goals_enabled            Boolean @default(false)
+  recognition_enabled                Boolean @default(false)
 
   // ── Workforce Communications feature flags ────────────────────────────────
   // To add a new feature: (1) add the flag here with @default(false),
@@ -647,7 +648,8 @@ model Suggestion {
   organizationId     String
   submittedById      String
   content            String
-  status             String   @default("PENDING")  // PENDING | REVIEWED | DISMISSED | CONVERTED
+  type               String   @default("SUGGESTION") // SUGGESTION | FEEDBACK | CONCERN
+  status             String   @default("PENDING")    // PENDING | REVIEWED | DISMISSED | CONVERTED | IMPLEMENTED
   adminNote          String?
   detectedCategory   String?  // auto-detected from content keywords
   routedToUserId     String?  // auto or manually assigned recipient

@@ -18,6 +18,7 @@ const ALLOWED_FLAGS: (keyof OrgFeatureFlags)[] = [
   "health_scores_enabled",
   "trend_detection_enabled",
   "executive_goals_enabled",
+  "recognition_enabled",
 ]
 
 export async function PATCH(
@@ -65,6 +66,7 @@ export async function PATCH(
       health_scores_enabled: true,
       trend_detection_enabled: true,
       executive_goals_enabled: true,
+      recognition_enabled: true,
     },
   })
 

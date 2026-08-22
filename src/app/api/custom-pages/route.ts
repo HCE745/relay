@@ -5,7 +5,7 @@ import { isWashEssentials } from "@/lib/pricing"
 import { Prisma } from "@/generated/prisma/client"
 import type { InputJsonValue } from "@prisma/client/runtime/client"
 import { CUSTOM_VIEW_ICON_NAMES } from "@/lib/custom-view-config"
-import { parseWidgets, type CustomViewRefConfig } from "@/lib/widget-registry"
+import { parseWidgets, isMetricAllowedForIndustry, type CustomViewRefConfig, type KpiCountConfig } from "@/lib/widget-registry"
 
 const toInput = (v: unknown): InputJsonValue => JSON.parse(JSON.stringify(v ?? null)) as InputJsonValue
 
@@ -27,6 +27,18 @@ async function parsePageBody(body: Record<string, unknown>, orgId: string) {
   const widgetsResult = parseWidgets(rawWidgets)
   if ("error" in widgetsResult) return { error: widgetsResult.error }
   const widgets = widgetsResult
+
+  // Validate industry-gated KPI metrics
+  const org = await prisma.organization.findUnique({ where: { id: orgId }, select: { industry: true } })
+  const orgIndustry = org?.industry ?? null
+  for (const w of widgets) {
+    if (w.type === "kpi-count") {
+      const metric = (w.config as KpiCountConfig).metric
+      if (!isMetricAllowedForIndustry(metric, orgIndustry)) {
+        return { error: `Metric "${metric}" is not available for this organization` }
+      }
+    }
+  }
 
   // Validate custom-view references belong to this org
   const viewRefIds = widgets

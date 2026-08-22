@@ -22,10 +22,17 @@ import {
   WIDGET_WIDTHS,
   KPI_METRICS,
   KPI_METRIC_KEYS,
+  KPI_METRIC_INDUSTRIES,
+  CHART_METRICS,
+  CHART_METRIC_KEYS,
+  CHART_PERIODS,
+  isMetricAllowedForIndustry,
   type CustomPageRow,
   type PageWidget,
   type WidgetTypeKey,
   type WidgetWidth,
+  type ChartMetricKey,
+  type ChartType,
 } from "@/lib/widget-registry"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -37,6 +44,7 @@ interface Props {
   initialPages: CustomPageRow[]
   customViews:  CustomView[]
   locations:    Location[]
+  industry:     string | null
 }
 
 type WidgetDraft = {
@@ -83,6 +91,7 @@ function widgetDefaultConfig(type: WidgetTypeKey): Record<string, unknown> {
     case "locations-list": return { maxRows: 10 }
     case "text":           return { body: "" }
     case "link-block":     return { title: "", url: "" }
+    case "chart":          return { chartType: "bar", metric: "issues_by_status" }
   }
 }
 
@@ -165,12 +174,14 @@ function WidgetConfigForm({
   onChange,
   customViews,
   locations,
+  industry,
 }: {
   type:        WidgetTypeKey
   config:      Record<string, unknown>
   onChange:    (c: Record<string, unknown>) => void
   customViews: CustomView[]
   locations:   Location[]
+  industry:    string | null
 }) {
   const set = (key: string, val: unknown) => onChange({ ...config, [key]: val })
   const filters = (config.filters ?? {}) as Record<string, unknown>
@@ -188,7 +199,7 @@ function WidgetConfigForm({
               onChange={e => set("metric", e.target.value)}
               className="mt-1 block w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {KPI_METRIC_KEYS.map(k => (
+              {KPI_METRIC_KEYS.filter(k => isMetricAllowedForIndustry(k, industry)).map(k => (
                 <option key={k} value={k}>{KPI_METRICS[k]}</option>
               ))}
             </select>
@@ -455,6 +466,88 @@ function WidgetConfigForm({
         </div>
       )
 
+    case "chart": {
+      const currentMetric = (config.metric as ChartMetricKey | undefined) ?? "issues_by_status"
+      const metricMeta    = CHART_METRICS[currentMetric]
+      const allowedTypes  = metricMeta?.chartTypes as readonly string[] ?? ["bar"]
+      const currentType   = (config.chartType as ChartType | undefined) ?? "bar"
+
+      function handleMetricChange(newMetric: ChartMetricKey) {
+        const allowed = CHART_METRICS[newMetric].chartTypes as readonly string[]
+        const nextType = allowed.includes(currentType) ? currentType : (allowed[0] as ChartType)
+        onChange({ ...config, metric: newMetric, chartType: nextType })
+      }
+
+      return (
+        <div className="space-y-3">
+          <label className="block text-xs font-medium text-gray-700">
+            Metric <span className="text-red-500">*</span>
+            <select
+              value={currentMetric}
+              onChange={e => handleMetricChange(e.target.value as ChartMetricKey)}
+              className="mt-1 block w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {CHART_METRIC_KEYS.map(k => (
+                <option key={k} value={k}>{CHART_METRICS[k].label}</option>
+              ))}
+            </select>
+          </label>
+
+          <div>
+            <p className="text-xs font-medium text-gray-700 mb-1.5">Chart type</p>
+            <div className="flex gap-2">
+              {(["bar", "line", "pie"] as ChartType[]).map(ct => (
+                <button
+                  key={ct}
+                  type="button"
+                  disabled={!allowedTypes.includes(ct)}
+                  onClick={() => onChange({ ...config, chartType: ct })}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors",
+                    !allowedTypes.includes(ct)
+                      ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                      : currentType === ct
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "border-gray-200 text-gray-600 hover:border-gray-300",
+                  )}
+                >
+                  {ct.charAt(0).toUpperCase() + ct.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {metricMeta?.hasPeriod && (
+            <label className="block text-xs font-medium text-gray-700">
+              Period
+              <select
+                value={String(config.period ?? "30d")}
+                onChange={e => onChange({ ...config, period: e.target.value })}
+                className="mt-1 block w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {CHART_PERIODS.map(p => (
+                  <option key={p} value={p}>
+                    {p === "7d" ? "Last 7 days" : p === "30d" ? "Last 30 days" : "Last 90 days"}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+
+          <label className="block text-xs font-medium text-gray-700">
+            Custom title (optional)
+            <input
+              type="text"
+              value={String(config.title ?? "")}
+              onChange={e => onChange({ ...config, title: e.target.value || undefined })}
+              placeholder={metricMeta?.label ?? ""}
+              className="mt-1 block w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </label>
+        </div>
+      )
+    }
+
     default:
       return <p className="text-sm text-gray-400">No configuration for this widget type.</p>
   }
@@ -462,7 +555,7 @@ function WidgetConfigForm({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function PagesClient({ initialPages, customViews, locations }: Props) {
+export function PagesClient({ initialPages, customViews, locations, industry }: Props) {
   const [pages, setPages]     = useState<CustomPageRow[]>(initialPages)
   const [modal, setModal]     = useState<ModalState>({ view: "list" })
   const [draft, setDraft]     = useState<PageDraft>(BLANK_DRAFT)
@@ -707,6 +800,7 @@ export function PagesClient({ initialPages, customViews, locations }: Props) {
             onChange={config => setEditingWidget(prev => prev ? { ...prev, config } : null)}
             customViews={customViews}
             locations={locations}
+            industry={industry}
           />
 
           <div className="flex gap-2 pt-2">
@@ -873,6 +967,12 @@ export function PagesClient({ initialPages, customViews, locations }: Props) {
                         {widget.type === "kpi-count" && typeof widget.config.metric === "string" && (
                           <p className="text-xs text-gray-600 truncate mt-0.5">
                             {KPI_METRICS[widget.config.metric as keyof typeof KPI_METRICS] ?? widget.config.metric}
+                          </p>
+                        )}
+                        {widget.type === "chart" && typeof widget.config.metric === "string" && (
+                          <p className="text-xs text-gray-600 truncate mt-0.5">
+                            {CHART_METRICS[widget.config.metric as ChartMetricKey]?.label ?? widget.config.metric}
+                            {typeof widget.config.chartType === "string" && ` · ${widget.config.chartType}`}
                           </p>
                         )}
                       </div>

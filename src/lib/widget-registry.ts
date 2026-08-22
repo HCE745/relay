@@ -14,6 +14,7 @@ export const WIDGET_TYPES = [
   "locations-list",
   "text",
   "link-block",
+  "chart",
 ] as const
 
 export type WidgetTypeKey = (typeof WIDGET_TYPES)[number]
@@ -34,12 +35,57 @@ export const KPI_METRICS = {
   total_assets:            "Total Assets",
   open_equipment_issues:   "Open Equipment Issues",
   open_maintenance_issues: "Open Maintenance Issues",
-  open_safety_issues:      "Open Safety Issues",
+  open_safety_issues:            "Open Safety Issues",
+  // Industry-specific — only shown/validated when org industry matches
+  mfg_repeat_equipment_problems: "Repeat Equipment Problems",
+  pm_tenant_requests_today:      "Tenant Requests Today",
+  pm_properties_with_issues:     "Properties With Issues",
+  cw_customer_reports_today:     "Customer Reports Today",
 } as const
 
 export type KpiMetricKey = keyof typeof KPI_METRICS
 
 export const KPI_METRIC_KEYS = Object.keys(KPI_METRICS) as KpiMetricKey[]
+
+// ── Industry applicability for KPI metrics ────────────────────────────────────
+// Absence = universal (shown for all industries).
+// Presence = shown/validated only when org.industry is in the list.
+
+export const KPI_METRIC_INDUSTRIES: Partial<Record<KpiMetricKey, string[]>> = {
+  mfg_repeat_equipment_problems: ["Manufacturing"],
+  pm_tenant_requests_today:      ["Property Management"],
+  pm_properties_with_issues:     ["Property Management"],
+  cw_customer_reports_today:     ["Car Wash"],
+}
+
+export function isMetricAllowedForIndustry(metric: KpiMetricKey, orgIndustry: string | null): boolean {
+  const allowed = KPI_METRIC_INDUSTRIES[metric]
+  if (!allowed) return true          // universal
+  if (!orgIndustry) return false     // metric needs specific industry, org has none
+  return allowed.includes(orgIndustry)
+}
+
+// ── Chart widget ──────────────────────────────────────────────────────────────
+
+export type ChartType   = "bar" | "line" | "pie"
+export type ChartPeriod = "7d" | "30d" | "90d"
+
+export const CHART_PERIODS: ChartPeriod[] = ["7d", "30d", "90d"]
+
+export type ChartDataPoint = { label: string; value: number }
+
+export const CHART_METRICS = {
+  issues_by_status:   { label: "Issues by Status",   chartTypes: ["bar", "pie"]  as const, hasPeriod: false, requiredKey: "issues" },
+  issues_by_priority: { label: "Issues by Priority", chartTypes: ["bar", "pie"]  as const, hasPeriod: false, requiredKey: "issues" },
+  issues_by_category: { label: "Issues by Category", chartTypes: ["bar", "pie"]  as const, hasPeriod: false, requiredKey: "issues" },
+  issues_by_location: { label: "Issues by Location", chartTypes: ["bar"]         as const, hasPeriod: false, requiredKey: "issues" },
+  issues_over_time:   { label: "Issues Over Time",   chartTypes: ["bar", "line"] as const, hasPeriod: true,  requiredKey: "issues" },
+  equipment_status:   { label: "Equipment Status",   chartTypes: ["bar", "pie"]  as const, hasPeriod: false, requiredKey: "assets"  },
+  resolution_trend:   { label: "Resolution Trend",   chartTypes: ["line", "bar"] as const, hasPeriod: true,  requiredKey: "issues" },
+} as const
+
+export type ChartMetricKey = keyof typeof CHART_METRICS
+export const CHART_METRIC_KEYS = Object.keys(CHART_METRICS) as ChartMetricKey[]
 
 // ── Per-widget config interfaces ──────────────────────────────────────────────
 
@@ -50,6 +96,7 @@ export interface AssetsListConfig  { title?: string; maxRows?: number }
 export interface LocationsListConfig { title?: string; maxRows?: number }
 export interface TextConfig        { title?: string; body: string }
 export interface LinkBlockConfig   { title: string; url: string; description?: string }
+export interface ChartConfig       { title?: string; chartType: ChartType; metric: ChartMetricKey; period?: ChartPeriod }
 
 export type WidgetConfig =
   | ({ type: "kpi-count"      } & KpiCountConfig)
@@ -59,6 +106,7 @@ export type WidgetConfig =
   | ({ type: "locations-list" } & LocationsListConfig)
   | ({ type: "text"           } & TextConfig)
   | ({ type: "link-block"     } & LinkBlockConfig)
+  | ({ type: "chart"          } & ChartConfig)
 
 // ── PageWidget (stored in CustomPage.widgets JSON) ────────────────────────────
 
@@ -109,6 +157,7 @@ export const WIDGET_META: WidgetMeta[] = [
   { type: "locations-list", name: "Locations / Sites",   description: "List of locations",                        defaultWidth: "half",      requiredKey: "locations" },
   { type: "text",           name: "Text Block",          description: "Plain text section with optional heading", defaultWidth: "full"      },
   { type: "link-block",     name: "Link",                description: "A clickable link card",                    defaultWidth: "third"     },
+  { type: "chart",          name: "Chart",               description: "Bar, line, or pie chart of org metrics",   defaultWidth: "half"      },
 ]
 
 // ── Server-side widget config validation ──────────────────────────────────────
@@ -199,6 +248,31 @@ function parseWidgetConfig(type: WidgetTypeKey, raw: unknown): ParseResult<Widge
       const description = typeof c.description === "string"
         ? c.description.trim().slice(0, 200) : undefined
       return { type, title, url: rawUrl, ...(description ? { description } : {}) }
+    }
+
+    case "chart": {
+      const metric = typeof c.metric === "string" && (CHART_METRIC_KEYS as string[]).includes(c.metric)
+        ? (c.metric as ChartMetricKey) : null
+      if (!metric) return { error: "chart: valid metric required" }
+
+      const allowedTypes = CHART_METRICS[metric].chartTypes as readonly string[]
+      const VALID_CHART_TYPES: string[] = ["bar", "line", "pie"]
+      const chartType = typeof c.chartType === "string" && VALID_CHART_TYPES.includes(c.chartType)
+        ? (c.chartType as ChartType) : null
+      if (!chartType) return { error: "chart: chartType must be bar, line, or pie" }
+      if (!allowedTypes.includes(chartType)) {
+        return { error: `chart: ${chartType} is not supported for metric ${metric}` }
+      }
+
+      const hasPeriod = CHART_METRICS[metric].hasPeriod
+      const VALID_PERIODS: string[] = ["7d", "30d", "90d"]
+      const period: ChartPeriod | undefined = hasPeriod
+        ? typeof c.period === "string" && VALID_PERIODS.includes(c.period)
+          ? (c.period as ChartPeriod) : "30d"
+        : undefined
+
+      const title = typeof c.title === "string" ? c.title.trim().slice(0, 80) : undefined
+      return { type, chartType, metric, ...(period ? { period } : {}), ...(title ? { title } : {}) }
     }
 
     default:

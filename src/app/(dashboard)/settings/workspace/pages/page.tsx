@@ -24,7 +24,7 @@ export default async function CustomPagesPage() {
     )
   }
 
-  const [pages, views, locations] = await Promise.all([
+  const [pages, views, locations, org] = await Promise.all([
     prisma.customPage.findMany({
       where:   { organizationId: session.organizationId },
       orderBy: [{ sidebarOrder: "asc" }, { createdAt: "asc" }],
@@ -38,6 +38,10 @@ export default async function CustomPagesPage() {
       where:   { organizationId: session.organizationId },
       orderBy: { name: "asc" },
       select:  { id: true, name: true },
+    }),
+    prisma.organization.findUnique({
+      where:  { id: session.organizationId },
+      select: { industry: true },
     }),
   ])
 
@@ -57,6 +61,7 @@ export default async function CustomPagesPage() {
         }))}
         customViews={views}
         locations={locations}
+        industry={org?.industry ?? null}
       />
     </div>
   )

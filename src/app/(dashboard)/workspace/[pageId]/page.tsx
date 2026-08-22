@@ -4,7 +4,7 @@ import { Header } from "@/components/layout/header"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { getAccessConfig, type PageAccessConfig } from "@/lib/page-access"
-import { fetchIssues, fetchKpiCount } from "@/lib/issue-queries"
+import { fetchIssues, fetchKpiCount, fetchChartData } from "@/lib/issue-queries"
 import { resolveViewIcon } from "@/lib/custom-view-config"
 import { cn } from "@/lib/utils"
 import {
@@ -17,10 +17,16 @@ import {
   type LocationsListConfig,
   type TextConfig,
   type LinkBlockConfig,
+  type ChartConfig,
+  type ChartDataPoint,
+  type ChartType,
   widthColSpan,
   KPI_METRICS,
+  CHART_METRICS,
   WIDGET_META,
+  isMetricAllowedForIndustry,
 } from "@/lib/widget-registry"
+import { ChartWidget } from "@/components/widgets/chart-widget"
 import type { IssueColumnKey, ViewFilters } from "@/lib/custom-view-config"
 import { VIEW_SORT_OPTIONS } from "@/lib/custom-view-config"
 import {
@@ -46,6 +52,7 @@ type WidgetData =
   | { kind: "locations"; locations: LocationRow[]; title?: string }
   | { kind: "text";      title?: string; body: string }
   | { kind: "link";      title: string; url: string; description?: string }
+  | { kind: "chart";     chartType: ChartType; title?: string; data: ChartDataPoint[] }
   | { kind: "denied" }
   | { kind: "error" }
 
@@ -55,6 +62,7 @@ async function fetchWidgetData(
   widget: PageWidget,
   orgId: string,
   allowedSet: Set<string>,
+  orgIndustry: string | null,
 ): Promise<WidgetData> {
   try {
     const config = widget.config as WidgetConfig & Record<string, unknown>
@@ -63,6 +71,7 @@ async function fetchWidgetData(
       case "kpi-count": {
         if (!allowedSet.has("dashboard")) return { kind: "denied" }
         const c = config as KpiCountConfig
+        if (!isMetricAllowedForIndustry(c.metric, orgIndustry)) return { kind: "denied" }
         const value = await fetchKpiCount(orgId, c.metric)
         return { kind: "kpi", value, label: c.title ?? KPI_METRICS[c.metric], metric: c.metric }
       }
@@ -128,6 +137,14 @@ async function fetchWidgetData(
       case "link-block": {
         const c = config as LinkBlockConfig
         return { kind: "link", title: c.title, url: c.url, description: c.description }
+      }
+
+      case "chart": {
+        const c = config as ChartConfig
+        const requiredKey = CHART_METRICS[c.metric]?.requiredKey ?? "issues"
+        if (!allowedSet.has(requiredKey)) return { kind: "denied" }
+        const data = await fetchChartData(orgId, c.metric, c.period)
+        return { kind: "chart", chartType: c.chartType, title: c.title, data }
       }
 
       default:
@@ -343,7 +360,7 @@ export default async function WorkspacePage({
     }),
     prisma.organization.findUnique({
       where:  { id: session.organizationId },
-      select: { pageAccessConfig: true },
+      select: { pageAccessConfig: true, industry: true },
     }),
   ])
 
@@ -353,14 +370,15 @@ export default async function WorkspacePage({
     session.role,
     (org?.pageAccessConfig ?? null) as PageAccessConfig | null,
   )
-  const allowedSet = new Set(allowedPageKeys)
+  const allowedSet  = new Set(allowedPageKeys)
+  const orgIndustry = org?.industry ?? null
 
   const rawWidgets = Array.isArray(page.widgets) ? (page.widgets as unknown[]) : []
   const widgets = rawWidgets as PageWidget[]
   const sortedWidgets = [...widgets].sort((a, b) => a.order - b.order)
 
   const widgetDataResults = await Promise.all(
-    sortedWidgets.map(w => fetchWidgetData(w, session.organizationId, allowedSet)),
+    sortedWidgets.map(w => fetchWidgetData(w, session.organizationId, allowedSet, orgIndustry)),
   )
 
   const PageIcon = page.icon ? resolveViewIcon(page.icon) : LayoutDashboard
@@ -422,6 +440,8 @@ export default async function WorkspacePage({
                     <TextWidget data={data} />
                   ) : data.kind === "link" ? (
                     <LinkWidget data={data} />
+                  ) : data.kind === "chart" ? (
+                    <ChartWidget chartType={data.chartType} title={data.title} data={data.data} />
                   ) : null}
                 </div>
               )

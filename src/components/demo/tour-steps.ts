@@ -430,9 +430,22 @@ export const TOUR_STEPS: TourStep[] = [
     },
   },
 
-  // ── Step 17: Announcements ────────────────────────────────────────────────
+  // ── Step 17: Employee Voice ───────────────────────────────────────────────
   {
     id: 17,
+    path: "/voice",
+    targetSelector: "[data-tour='voice-tiles']",
+    getCue: (industry) => `${ind(industry).workerPlural.charAt(0).toUpperCase() + ind(industry).workerPlural.slice(1)} can share ideas, concerns, and feedback without needing a meeting.`,
+    getTitle: () => "A channel for every kind of employee voice.",
+    getExplain: (industry) => {
+      const c = ind(industry)
+      return `Problems surface in meetings. Ideas get mentioned and forgotten. Relay gives every ${c.worker} a direct channel: report an issue, make a suggestion, give feedback, share a concern, or take a quick survey. Managers see patterns over time, and employees know their voice is being heard. The best ideas often come from the people doing the work.`
+    },
+  },
+
+  // ── Step 18: Announcements ────────────────────────────────────────────────
+  {
+    id: 18,
     path: "/communications/announcements",
     targetSelector: "[data-tour='announcements-list']",
     cue: "Critical information reaches the right people, and you know who got it.",
@@ -441,9 +454,9 @@ export const TOUR_STEPS: TourStep[] = [
       "When a safety update or process change needs to reach everyone, email and radio do not guarantee it arrived. Relay broadcasts operational announcements to the entire organization, a specific location, or a single department. For critical communications, Relay tracks acknowledgment in real time, so you always know who has seen the message and who has not.",
   },
 
-  // ── Step 18: Role cycling ─────────────────────────────────────────────────
+  // ── Step 19: Role cycling ─────────────────────────────────────────────────
   {
-    id: 18,
+    id: 19,
     path: null,
     targetSelector: "[data-tour='role-switcher']",
     type: "cycling-roles",
@@ -455,9 +468,9 @@ export const TOUR_STEPS: TourStep[] = [
     },
   },
 
-  // ── Step 19: Industry cycling ─────────────────────────────────────────────
+  // ── Step 20: Industry cycling ─────────────────────────────────────────────
   {
-    id: 19,
+    id: 20,
     path: "/dashboard",
     targetSelector: "[data-tour='industry-selector']",
     type: "cycling-industries",
@@ -467,9 +480,9 @@ export const TOUR_STEPS: TourStep[] = [
       "Relay adapts to different types of operations: manufacturing plants, distribution centers, hospitality properties, retail locations, healthcare facilities, and more. The departments, terminology, issue categories, and workflows all reflect the selected environment, so the system feels like it was built for the operation it runs.",
   },
 
-  // ── Step 20: Package cycling ──────────────────────────────────────────────
+  // ── Step 21: Package cycling ──────────────────────────────────────────────
   {
-    id: 20,
+    id: 21,
     path: null,
     targetSelector: "[data-tour='package-selector']",
     type: "cycling-packages",
@@ -479,9 +492,9 @@ export const TOUR_STEPS: TourStep[] = [
       "Essentials covers core issue tracking for a single location. Professional adds assets, vendors, multi-location support, and intelligence modules. Professional Plus adds executive visibility, regional management, and cross-location analytics. Choose the package that matches your operational needs today and expand as you grow.",
   },
 
-  // ── Step 21: Completion ───────────────────────────────────────────────────
+  // ── Step 22: Completion ───────────────────────────────────────────────────
   {
-    id: 21,
+    id: 22,
     path: null,
     targetSelector: null,
     type: "completion",
@@ -870,9 +883,20 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
       "When a problem requires an outside roofing contractor or plumber, coordinating the response usually means phone calls, follow-up calls, and hoping the right context made it through. Relay keeps contractor communication attached to the issue so the full history travels with it and nothing gets lost between inboxes.",
   },
 
-  // Step 12: Completion
+  // Step 12: Employee Voice
   {
     id: 12,
+    path: "/voice",
+    targetSelector: "[data-tour='voice-tiles']",
+    cue: "Technicians and staff can share ideas and concerns without needing a meeting.",
+    getTitle: () => "Give your maintenance team a voice.",
+    getExplain: () =>
+      "Your technicians notice problems before management does — recurring issues, process gaps, safety concerns. Relay gives every team member a direct channel to submit suggestions, share feedback, and take surveys. Managers see the patterns. The people doing the work feel heard.",
+  },
+
+  // Step 13: Completion
+  {
+    id: 13,
     path: null,
     targetSelector: null,
     type: "completion",
@@ -1024,9 +1048,21 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
       "Safety procedures, LOTO checklists, and maintenance SOPs live inside Relay where your team actually works. When an issue is flagged for a possible SOP violation, the relevant procedure is visible right alongside the issue so supervisors can address it immediately.",
   },
 
-  // Step 12: Completion
+  // Step 12: Employee Voice
   {
     id: 12,
+    path: "/voice",
+    targetSelector: "[data-tour='voice-tiles']",
+    audioFile: null,
+    cue: "Operators can surface ideas and safety concerns directly — no meeting required.",
+    getTitle: () => "The people on the floor see problems first.",
+    getExplain: () =>
+      "Operators notice inefficiencies, near-misses, and process gaps long before they become incidents. Relay gives every team member a direct channel: submit a suggestion, flag a concern, or complete a quick survey. Managers see the patterns that emerge across shifts and departments — the kind of insight that does not show up in maintenance logs.",
+  },
+
+  // Step 13: Completion
+  {
+    id: 13,
     path: null,
     targetSelector: null,
     type: "completion",

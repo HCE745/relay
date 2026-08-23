@@ -6,6 +6,10 @@ import { startOfMonth } from "date-fns"
 import { SUGGESTION_CATEGORY_LABEL, SUGGESTION_TYPE_LABEL } from "@/lib/suggestion-constants"
 import Link from "next/link"
 import { AlertCircle, CheckCircle, ClipboardList, Clock, ChevronRight, TrendingUp } from "lucide-react"
+import { isProfessionalPlus } from "@/lib/pricing"
+import { getCached } from "@/lib/ai-haiku"
+import { AiInsightsPanel } from "@/components/voice/ai-insights-panel"
+import { FeatureGate } from "@/components/ui/feature-gate"
 
 export const dynamic = "force-dynamic"
 
@@ -18,7 +22,7 @@ export default async function VoiceInsightsPage() {
   const orgId = session.organizationId
   const monthStart = startOfMonth(new Date())
 
-  const [allSuggestions, thisMonthSuggestions, trendAlerts, recentSuggestions] = await Promise.all([
+  const [allSuggestions, thisMonthSuggestions, trendAlerts, recentSuggestions, org] = await Promise.all([
     prisma.suggestion.groupBy({
       by: ["status"],
       where: { organizationId: orgId },
@@ -43,6 +47,7 @@ export default async function VoiceInsightsPage() {
         submittedBy: { select: { name: true } },
       },
     }),
+    prisma.organization.findUnique({ where: { id: orgId }, select: { plan: true } }),
   ])
 
   // Aggregate status counts from groupBy
@@ -69,6 +74,10 @@ export default async function VoiceInsightsPage() {
   for (const s of thisMonthSuggestions) {
     typeCounts[s.type] = (typeCounts[s.type] ?? 0) + 1
   }
+
+  const isPP = isProfessionalPlus(org?.plan ?? "essentials")
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cachedAnalysis = isPP ? (await getCached(orgId, "voice-ai-insights")) as any ?? null : null
 
   const SEVERITY_COLOR: Record<string, string> = {
     HIGH:   "bg-red-50 border-red-200 text-red-800",
@@ -132,6 +141,11 @@ export default async function VoiceInsightsPage() {
             <div className="text-xs text-gray-400 mt-0.5">to work orders</div>
           </div>
         </div>
+
+        {/* AI Voice Analysis — Professional Plus */}
+        <FeatureGate enabled={isPP} feature="AI Voice Analysis" planRequired="professional_plus" compact={false}>
+          <AiInsightsPanel initialAnalysis={cachedAnalysis} />
+        </FeatureGate>
 
         {/* Type breakdown + Category breakdown side by side */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

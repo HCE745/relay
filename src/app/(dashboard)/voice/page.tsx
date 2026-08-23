@@ -123,7 +123,7 @@ export default async function VoicePage() {
         </div>
 
         {/* Action tiles */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div data-tour="voice-tiles" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {visibleTiles.map(tile => {
             const Icon = tile.icon
             return (

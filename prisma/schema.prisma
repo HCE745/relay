@@ -206,6 +206,7 @@ model Organization {
   workspaceChangeLogs   WorkspaceChangeLog[]
   customViews           CustomView[]
   customPages           CustomPage[]
+  surveys               Survey[]
 }
 
 model CustomView {
@@ -334,6 +335,8 @@ model User {
   emergencyAcks               EmergencyAcknowledgment[] @relation("EmergencyAcks")
   dailyBriefings              DailyBriefingCache[]     @relation("UserDailyBriefings")
   referralsInitiated          Referral[]               @relation("ReferralInitiator")
+  createdSurveys              Survey[]                 @relation("CreatedSurveys")
+  surveyResponses             SurveyResponse[]         @relation("SurveyResponses")
 }
 
 model PasswordResetToken {
@@ -2699,4 +2702,74 @@ model VisibilitySetting {
   lastAutoRunAt        DateTime?
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
+}
+
+// ─── Employee Voice — Surveys ─────────────────────────────────────────────────
+
+model Survey {
+  id             String           @id @default(cuid())
+  organizationId String
+  title          String
+  description    String?
+  status         String           @default("DRAFT") // DRAFT|ACTIVE|CLOSED
+  isAnonymous    Boolean          @default(true)
+  startsAt       DateTime?
+  endsAt         DateTime?
+  closedAt       DateTime?
+  createdById    String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy      User             @relation("CreatedSurveys", fields: [createdById], references: [id])
+  questions      SurveyQuestion[]
+  responses      SurveyResponse[]
+
+  @@index([organizationId])
+  @@index([status])
+}
+
+model SurveyQuestion {
+  id       String  @id @default(cuid())
+  surveyId String
+  order    Int
+  type     String  // RATING|YES_NO|MULTIPLE_CHOICE|FREE_TEXT
+  text     String
+  required Boolean @default(true)
+  options  Json?   // string[] — used for MULTIPLE_CHOICE
+
+  survey  Survey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers SurveyAnswer[]
+
+  @@index([surveyId])
+}
+
+model SurveyResponse {
+  id           String   @id @default(cuid())
+  surveyId     String
+  respondentId String?  // null when survey is anonymous
+  submittedAt  DateTime @default(now())
+
+  survey     Survey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  respondent User?          @relation("SurveyResponses", fields: [respondentId], references: [id])
+  answers    SurveyAnswer[]
+
+  @@unique([surveyId, respondentId])
+  @@index([surveyId])
+}
+
+model SurveyAnswer {
+  id          String   @id @default(cuid())
+  responseId  String
+  questionId  String
+  ratingValue Int?     // RATING 1–5
+  boolValue   Boolean? // YES_NO
+  choiceValue String?  // MULTIPLE_CHOICE: selected option text
+  textValue   String?  // FREE_TEXT
+
+  response SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([responseId, questionId])
+  @@index([questionId])
 }

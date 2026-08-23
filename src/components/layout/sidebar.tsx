@@ -64,6 +64,7 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
 
   { key: "voice",               href: "/voice",               label: "Employee Voice",        icon: Megaphone,       section: "EMPLOYEE VOICE" },
   { key: "suggestions",         href: "/suggestions",         label: "Suggestions",           icon: Lightbulb,       section: "EMPLOYEE VOICE" },
+  { key: "surveys",             href: "/surveys",             label: "Surveys",               icon: ClipboardList,   section: "EMPLOYEE VOICE" },
 
   { key: "calendar",            href: "/calendar",            label: "Calendar",              icon: CalendarDays,    section: "OPERATIONS" },
   { key: "purchase-requests",   href: "/purchase-requests",   label: "Purchase Requests",     icon: ShoppingCart,    section: "OPERATIONS" },

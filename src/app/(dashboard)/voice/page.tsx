@@ -79,9 +79,7 @@ export default async function VoicePage() {
       description: "Respond to team surveys and pulse checks",
       color: "text-green-600",
       bg: "bg-green-50 hover:bg-green-100 border-green-100",
-      always: false,
-      requiresPro: true,
-      comingSoon: true,
+      always: true,
     },
   ]
 
@@ -131,8 +129,8 @@ export default async function VoicePage() {
             return (
               <Link
                 key={tile.href}
-                href={tile.comingSoon ? "#" : tile.href}
-                className={`relative flex items-start gap-3 p-4 rounded-xl border transition-colors ${tile.bg} ${tile.comingSoon ? "pointer-events-none opacity-60" : ""}`}
+                href={tile.href}
+                className={`relative flex items-start gap-3 p-4 rounded-xl border transition-colors ${tile.bg}`}
               >
                 <div className={`mt-0.5 shrink-0 ${tile.color}`}>
                   <Icon className="w-5 h-5" />
@@ -140,13 +138,10 @@ export default async function VoicePage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900 text-sm">{tile.label}</span>
-                    {tile.comingSoon && (
-                      <span className="text-xs px-1.5 py-0.5 rounded bg-gray-200 text-gray-500 font-medium">Soon</span>
-                    )}
                   </div>
                   <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{tile.description}</p>
                 </div>
-                {!tile.comingSoon && <ChevronRight className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />}
+                <ChevronRight className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
               </Link>
             )
           })}

@@ -23,6 +23,7 @@ export const CONFIGURABLE_PAGES = [
   { key: "corporate-dashboard",    label: "Corporate Dashboard" },
   { key: "regional-dashboard",     label: "Regional Dashboard" },
   { key: "voice",                  label: "Employee Voice" },
+  { key: "surveys",                label: "Surveys" },
 ] as const
 
 export type PageKey = (typeof CONFIGURABLE_PAGES)[number]["key"]
@@ -47,11 +48,11 @@ export const CONFIGURABLE_ROLES = ["EMPLOYEE", "SUPERVISOR", "MANAGER", "HR", "V
 
 // Default page access per role — used when no custom config is stored
 export const DEFAULT_ACCESS: Record<string, PageKey[]> = {
-  ADMIN:      ["dashboard", "issues", "assignments", "communications", "archive", "calendar", "sops", "assets", "qr-codes", "locations", "departments", "vendors", "team", "voice", "suggestions", "my-submissions", "purchase-requests", "approval-intelligence", "injury-reports", "analytics", "corporate-dashboard", "regional-dashboard"],
-  HR:         ["dashboard", "assignments", "communications", "team", "injury-reports", "voice", "suggestions", "my-submissions", "analytics", "archive"],
-  MANAGER:    ["dashboard", "issues", "assignments", "communications", "archive", "calendar", "sops", "assets", "qr-codes", "departments", "vendors", "team", "voice", "suggestions", "my-submissions", "purchase-requests", "approval-intelligence", "injury-reports", "analytics", "corporate-dashboard", "regional-dashboard"],
-  SUPERVISOR: ["dashboard", "issues", "assignments", "communications", "archive", "calendar", "sops", "team", "voice", "suggestions", "my-submissions", "purchase-requests", "injury-reports"],
-  EMPLOYEE:   ["dashboard", "assignments", "communications", "voice", "suggestions", "my-submissions", "purchase-requests"],
+  ADMIN:      ["dashboard", "issues", "assignments", "communications", "archive", "calendar", "sops", "assets", "qr-codes", "locations", "departments", "vendors", "team", "voice", "suggestions", "surveys", "my-submissions", "purchase-requests", "approval-intelligence", "injury-reports", "analytics", "corporate-dashboard", "regional-dashboard"],
+  HR:         ["dashboard", "assignments", "communications", "team", "injury-reports", "voice", "suggestions", "surveys", "my-submissions", "analytics", "archive"],
+  MANAGER:    ["dashboard", "issues", "assignments", "communications", "archive", "calendar", "sops", "assets", "qr-codes", "departments", "vendors", "team", "voice", "suggestions", "surveys", "my-submissions", "purchase-requests", "approval-intelligence", "injury-reports", "analytics", "corporate-dashboard", "regional-dashboard"],
+  SUPERVISOR: ["dashboard", "issues", "assignments", "communications", "archive", "calendar", "sops", "team", "voice", "suggestions", "surveys", "my-submissions", "purchase-requests", "injury-reports"],
+  EMPLOYEE:   ["dashboard", "assignments", "communications", "voice", "suggestions", "surveys", "my-submissions", "purchase-requests"],
   VENDOR:     ["my-submissions"],
 }
 

@@ -13,6 +13,7 @@ interface TourState {
   submittedIssueId: string | null
   firstIssueId: string | null
   firstAssetId: string | null
+  escalatedIssueId: string | null
 }
 
 interface TourContextValue extends TourState {
@@ -27,6 +28,7 @@ interface TourContextValue extends TourState {
   setSubmittedIssueId: (id: string) => void
   setFirstIssueId: (id: string) => void
   setFirstAssetId: (id: string) => void
+  setEscalatedIssueId: (id: string) => void
   setIndustry: (industry: string) => void
 }
 
@@ -48,6 +50,7 @@ export function TourProvider({ children, initialIndustry = "Manufacturing", init
       submittedIssueId: null,
       firstIssueId: null,
       firstAssetId: null,
+      escalatedIssueId: null,
     }
     if (typeof window === "undefined") return base
     const params = new URLSearchParams(window.location.search)
@@ -103,6 +106,10 @@ export function TourProvider({ children, initialIndustry = "Manufacturing", init
     setState(prev => ({ ...prev, firstAssetId: id }))
   }, [])
 
+  const setEscalatedIssueId = useCallback((id: string) => {
+    setState(prev => ({ ...prev, escalatedIssueId: id }))
+  }, [])
+
   const setIndustry = useCallback((ind: string) => {
     setIndustryState(ind)
   }, [])
@@ -121,6 +128,7 @@ export function TourProvider({ children, initialIndustry = "Manufacturing", init
       setSubmittedIssueId,
       setFirstIssueId,
       setFirstAssetId,
+      setEscalatedIssueId,
       setIndustry,
     }}>
       {children}

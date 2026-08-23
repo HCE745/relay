@@ -461,7 +461,7 @@ export function SopLibrary({ initialSops, departments, isAdminLevel }: Props) {
           )}
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2" data-tour="sop-list">
           {filtered.map(sop => (
             <div
               key={sop.id}

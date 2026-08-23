@@ -405,8 +405,8 @@ export function TourOverlay() {
   const tour = useTour()
   const {
     isActive, currentStep, nextStep, prevStep, exitTour, skipTour, industry,
-    submittedIssueId, firstAssetId, firstIssueId,
-    setSubmittedIssueId, setFirstAssetId, setFirstIssueId,
+    submittedIssueId, firstAssetId, firstIssueId, escalatedIssueId,
+    setSubmittedIssueId, setFirstAssetId, setFirstIssueId, setEscalatedIssueId,
   } = tour
   const router = useRouter()
   const pathname = usePathname()
@@ -447,9 +447,10 @@ export function TourOverlay() {
 
   // Resolve dynamic paths
   const resolvedPath = !step ? null
-    : step.path === "SUBMITTED_ISSUE" ? (submittedIssueId ? `/issues/${submittedIssueId}` : null)
-    : step.path === "FIRST_ASSET"     ? (firstAssetId    ? `/assets/${firstAssetId}`  : null)
-    : step.path === "FIRST_ISSUE"     ? (firstIssueId    ? `/issues/${firstIssueId}`   : null)
+    : step.path === "SUBMITTED_ISSUE"  ? (submittedIssueId  ? `/issues/${submittedIssueId}`  : null)
+    : step.path === "FIRST_ASSET"      ? (firstAssetId      ? `/assets/${firstAssetId}`      : null)
+    : step.path === "FIRST_ISSUE"      ? (firstIssueId      ? `/issues/${firstIssueId}`      : null)
+    : step.path === "ESCALATED_ISSUE"  ? (escalatedIssueId  ? `/issues/${escalatedIssueId}`  : null)
     : step.path
 
   // Check if current location matches a resolved path (handles query params)
@@ -554,7 +555,7 @@ export function TourOverlay() {
       .catch(() => {})
   }, [isActive, firstAssetId]) // eslint-disable-line
 
-  // Fetch first issue ID at tour start — used for FIRST_ISSUE path resolution (Car Wash steps 6-7)
+  // Fetch first issue ID at tour start — used for FIRST_ISSUE path resolution
   useEffect(() => {
     if (!isActive || firstIssueId) return
     fetch("/api/issues")
@@ -565,6 +566,17 @@ export function TourOverlay() {
       })
       .catch(() => {})
   }, [isActive, firstIssueId]) // eslint-disable-line
+
+  // Fetch escalated issue ID at tour start — used for ESCALATED_ISSUE path resolution
+  useEffect(() => {
+    if (!isActive || escalatedIssueId) return
+    fetch("/api/demo/escalated-issue")
+      .then(r => r.json() as Promise<{ id?: string | null }>)
+      .then(data => {
+        if (data.id) setEscalatedIssueId(data.id)
+      })
+      .catch(() => {})
+  }, [isActive, escalatedIssueId]) // eslint-disable-line
 
   // Auto-fill form on form-fill step
   useEffect(() => {

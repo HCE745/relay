@@ -259,6 +259,7 @@ export type SuggestionWhereInput = {
   routedToUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   convertedToIssue?: Prisma.XOR<Prisma.IssueNullableScalarRelationFilter, Prisma.IssueWhereInput> | null
   attachments?: Prisma.AttachmentListRelationFilter
+  recognition?: Prisma.XOR<Prisma.RecognitionNullableScalarRelationFilter, Prisma.RecognitionWhereInput> | null
 }
 
 export type SuggestionOrderByWithRelationInput = {
@@ -281,6 +282,7 @@ export type SuggestionOrderByWithRelationInput = {
   routedToUser?: Prisma.UserOrderByWithRelationInput
   convertedToIssue?: Prisma.IssueOrderByWithRelationInput
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
+  recognition?: Prisma.RecognitionOrderByWithRelationInput
 }
 
 export type SuggestionWhereUniqueInput = Prisma.AtLeast<{
@@ -306,6 +308,7 @@ export type SuggestionWhereUniqueInput = Prisma.AtLeast<{
   routedToUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   convertedToIssue?: Prisma.XOR<Prisma.IssueNullableScalarRelationFilter, Prisma.IssueWhereInput> | null
   attachments?: Prisma.AttachmentListRelationFilter
+  recognition?: Prisma.XOR<Prisma.RecognitionNullableScalarRelationFilter, Prisma.RecognitionWhereInput> | null
 }, "id" | "convertedToIssueId">
 
 export type SuggestionOrderByWithAggregationInput = {
@@ -364,6 +367,7 @@ export type SuggestionCreateInput = {
   routedToUser?: Prisma.UserCreateNestedOneWithoutRoutedSuggestionsInput
   convertedToIssue?: Prisma.IssueCreateNestedOneWithoutConvertedFromSuggestionInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionUncheckedCreateInput = {
@@ -382,6 +386,7 @@ export type SuggestionUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionUncheckedCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionUpdateInput = {
@@ -400,6 +405,7 @@ export type SuggestionUpdateInput = {
   routedToUser?: Prisma.UserUpdateOneWithoutRoutedSuggestionsNestedInput
   convertedToIssue?: Prisma.IssueUpdateOneWithoutConvertedFromSuggestionNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateInput = {
@@ -418,6 +424,7 @@ export type SuggestionUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUncheckedUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionCreateManyInput = {
@@ -707,6 +714,22 @@ export type SuggestionUpdateOneWithoutAttachmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SuggestionUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.SuggestionUpdateWithoutAttachmentsInput>, Prisma.SuggestionUncheckedUpdateWithoutAttachmentsInput>
 }
 
+export type SuggestionCreateNestedOneWithoutRecognitionInput = {
+  create?: Prisma.XOR<Prisma.SuggestionCreateWithoutRecognitionInput, Prisma.SuggestionUncheckedCreateWithoutRecognitionInput>
+  connectOrCreate?: Prisma.SuggestionCreateOrConnectWithoutRecognitionInput
+  connect?: Prisma.SuggestionWhereUniqueInput
+}
+
+export type SuggestionUpdateOneWithoutRecognitionNestedInput = {
+  create?: Prisma.XOR<Prisma.SuggestionCreateWithoutRecognitionInput, Prisma.SuggestionUncheckedCreateWithoutRecognitionInput>
+  connectOrCreate?: Prisma.SuggestionCreateOrConnectWithoutRecognitionInput
+  upsert?: Prisma.SuggestionUpsertWithoutRecognitionInput
+  disconnect?: Prisma.SuggestionWhereInput | boolean
+  delete?: Prisma.SuggestionWhereInput | boolean
+  connect?: Prisma.SuggestionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SuggestionUpdateToOneWithWhereWithoutRecognitionInput, Prisma.SuggestionUpdateWithoutRecognitionInput>, Prisma.SuggestionUncheckedUpdateWithoutRecognitionInput>
+}
+
 export type SuggestionCreateWithoutOrganizationInput = {
   id?: string
   content: string
@@ -722,6 +745,7 @@ export type SuggestionCreateWithoutOrganizationInput = {
   routedToUser?: Prisma.UserCreateNestedOneWithoutRoutedSuggestionsInput
   convertedToIssue?: Prisma.IssueCreateNestedOneWithoutConvertedFromSuggestionInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionUncheckedCreateWithoutOrganizationInput = {
@@ -739,6 +763,7 @@ export type SuggestionUncheckedCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionUncheckedCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionCreateOrConnectWithoutOrganizationInput = {
@@ -802,6 +827,7 @@ export type SuggestionCreateWithoutSubmittedByInput = {
   routedToUser?: Prisma.UserCreateNestedOneWithoutRoutedSuggestionsInput
   convertedToIssue?: Prisma.IssueCreateNestedOneWithoutConvertedFromSuggestionInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionUncheckedCreateWithoutSubmittedByInput = {
@@ -819,6 +845,7 @@ export type SuggestionUncheckedCreateWithoutSubmittedByInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionUncheckedCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionCreateOrConnectWithoutSubmittedByInput = {
@@ -846,6 +873,7 @@ export type SuggestionCreateWithoutRoutedToUserInput = {
   submittedBy: Prisma.UserCreateNestedOneWithoutSuggestionsInput
   convertedToIssue?: Prisma.IssueCreateNestedOneWithoutConvertedFromSuggestionInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionUncheckedCreateWithoutRoutedToUserInput = {
@@ -863,6 +891,7 @@ export type SuggestionUncheckedCreateWithoutRoutedToUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionUncheckedCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionCreateOrConnectWithoutRoutedToUserInput = {
@@ -922,6 +951,7 @@ export type SuggestionCreateWithoutConvertedToIssueInput = {
   submittedBy: Prisma.UserCreateNestedOneWithoutSuggestionsInput
   routedToUser?: Prisma.UserCreateNestedOneWithoutRoutedSuggestionsInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionUncheckedCreateWithoutConvertedToIssueInput = {
@@ -939,6 +969,7 @@ export type SuggestionUncheckedCreateWithoutConvertedToIssueInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutSuggestionInput
+  recognition?: Prisma.RecognitionUncheckedCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionCreateOrConnectWithoutConvertedToIssueInput = {
@@ -972,6 +1003,7 @@ export type SuggestionUpdateWithoutConvertedToIssueInput = {
   submittedBy?: Prisma.UserUpdateOneRequiredWithoutSuggestionsNestedInput
   routedToUser?: Prisma.UserUpdateOneWithoutRoutedSuggestionsNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateWithoutConvertedToIssueInput = {
@@ -989,6 +1021,7 @@ export type SuggestionUncheckedUpdateWithoutConvertedToIssueInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUncheckedUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionCreateWithoutAttachmentsInput = {
@@ -1006,6 +1039,7 @@ export type SuggestionCreateWithoutAttachmentsInput = {
   submittedBy: Prisma.UserCreateNestedOneWithoutSuggestionsInput
   routedToUser?: Prisma.UserCreateNestedOneWithoutRoutedSuggestionsInput
   convertedToIssue?: Prisma.IssueCreateNestedOneWithoutConvertedFromSuggestionInput
+  recognition?: Prisma.RecognitionCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionUncheckedCreateWithoutAttachmentsInput = {
@@ -1023,6 +1057,7 @@ export type SuggestionUncheckedCreateWithoutAttachmentsInput = {
   assigneeApproaches?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  recognition?: Prisma.RecognitionUncheckedCreateNestedOneWithoutSuggestionInput
 }
 
 export type SuggestionCreateOrConnectWithoutAttachmentsInput = {
@@ -1056,6 +1091,7 @@ export type SuggestionUpdateWithoutAttachmentsInput = {
   submittedBy?: Prisma.UserUpdateOneRequiredWithoutSuggestionsNestedInput
   routedToUser?: Prisma.UserUpdateOneWithoutRoutedSuggestionsNestedInput
   convertedToIssue?: Prisma.IssueUpdateOneWithoutConvertedFromSuggestionNestedInput
+  recognition?: Prisma.RecognitionUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateWithoutAttachmentsInput = {
@@ -1073,6 +1109,95 @@ export type SuggestionUncheckedUpdateWithoutAttachmentsInput = {
   assigneeApproaches?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recognition?: Prisma.RecognitionUncheckedUpdateOneWithoutSuggestionNestedInput
+}
+
+export type SuggestionCreateWithoutRecognitionInput = {
+  id?: string
+  content: string
+  type?: string
+  status?: string
+  adminNote?: string | null
+  detectedCategory?: string | null
+  routedNote?: string | null
+  assigneeApproaches?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutSuggestionsInput
+  submittedBy: Prisma.UserCreateNestedOneWithoutSuggestionsInput
+  routedToUser?: Prisma.UserCreateNestedOneWithoutRoutedSuggestionsInput
+  convertedToIssue?: Prisma.IssueCreateNestedOneWithoutConvertedFromSuggestionInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutSuggestionInput
+}
+
+export type SuggestionUncheckedCreateWithoutRecognitionInput = {
+  id?: string
+  organizationId: string
+  submittedById: string
+  content: string
+  type?: string
+  status?: string
+  adminNote?: string | null
+  detectedCategory?: string | null
+  routedToUserId?: string | null
+  routedNote?: string | null
+  convertedToIssueId?: string | null
+  assigneeApproaches?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutSuggestionInput
+}
+
+export type SuggestionCreateOrConnectWithoutRecognitionInput = {
+  where: Prisma.SuggestionWhereUniqueInput
+  create: Prisma.XOR<Prisma.SuggestionCreateWithoutRecognitionInput, Prisma.SuggestionUncheckedCreateWithoutRecognitionInput>
+}
+
+export type SuggestionUpsertWithoutRecognitionInput = {
+  update: Prisma.XOR<Prisma.SuggestionUpdateWithoutRecognitionInput, Prisma.SuggestionUncheckedUpdateWithoutRecognitionInput>
+  create: Prisma.XOR<Prisma.SuggestionCreateWithoutRecognitionInput, Prisma.SuggestionUncheckedCreateWithoutRecognitionInput>
+  where?: Prisma.SuggestionWhereInput
+}
+
+export type SuggestionUpdateToOneWithWhereWithoutRecognitionInput = {
+  where?: Prisma.SuggestionWhereInput
+  data: Prisma.XOR<Prisma.SuggestionUpdateWithoutRecognitionInput, Prisma.SuggestionUncheckedUpdateWithoutRecognitionInput>
+}
+
+export type SuggestionUpdateWithoutRecognitionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routedNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeApproaches?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutSuggestionsNestedInput
+  submittedBy?: Prisma.UserUpdateOneRequiredWithoutSuggestionsNestedInput
+  routedToUser?: Prisma.UserUpdateOneWithoutRoutedSuggestionsNestedInput
+  convertedToIssue?: Prisma.IssueUpdateOneWithoutConvertedFromSuggestionNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutSuggestionNestedInput
+}
+
+export type SuggestionUncheckedUpdateWithoutRecognitionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedById?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routedToUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routedNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  convertedToIssueId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeApproaches?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutSuggestionNestedInput
 }
 
 export type SuggestionCreateManyOrganizationInput = {
@@ -1106,6 +1231,7 @@ export type SuggestionUpdateWithoutOrganizationInput = {
   routedToUser?: Prisma.UserUpdateOneWithoutRoutedSuggestionsNestedInput
   convertedToIssue?: Prisma.IssueUpdateOneWithoutConvertedFromSuggestionNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateWithoutOrganizationInput = {
@@ -1123,6 +1249,7 @@ export type SuggestionUncheckedUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUncheckedUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateManyWithoutOrganizationInput = {
@@ -1188,6 +1315,7 @@ export type SuggestionUpdateWithoutSubmittedByInput = {
   routedToUser?: Prisma.UserUpdateOneWithoutRoutedSuggestionsNestedInput
   convertedToIssue?: Prisma.IssueUpdateOneWithoutConvertedFromSuggestionNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateWithoutSubmittedByInput = {
@@ -1205,6 +1333,7 @@ export type SuggestionUncheckedUpdateWithoutSubmittedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUncheckedUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateManyWithoutSubmittedByInput = {
@@ -1238,6 +1367,7 @@ export type SuggestionUpdateWithoutRoutedToUserInput = {
   submittedBy?: Prisma.UserUpdateOneRequiredWithoutSuggestionsNestedInput
   convertedToIssue?: Prisma.IssueUpdateOneWithoutConvertedFromSuggestionNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateWithoutRoutedToUserInput = {
@@ -1255,6 +1385,7 @@ export type SuggestionUncheckedUpdateWithoutRoutedToUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutSuggestionNestedInput
+  recognition?: Prisma.RecognitionUncheckedUpdateOneWithoutSuggestionNestedInput
 }
 
 export type SuggestionUncheckedUpdateManyWithoutRoutedToUserInput = {
@@ -1324,6 +1455,7 @@ export type SuggestionSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   routedToUser?: boolean | Prisma.Suggestion$routedToUserArgs<ExtArgs>
   convertedToIssue?: boolean | Prisma.Suggestion$convertedToIssueArgs<ExtArgs>
   attachments?: boolean | Prisma.Suggestion$attachmentsArgs<ExtArgs>
+  recognition?: boolean | Prisma.Suggestion$recognitionArgs<ExtArgs>
   _count?: boolean | Prisma.SuggestionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["suggestion"]>
 
@@ -1393,6 +1525,7 @@ export type SuggestionInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   routedToUser?: boolean | Prisma.Suggestion$routedToUserArgs<ExtArgs>
   convertedToIssue?: boolean | Prisma.Suggestion$convertedToIssueArgs<ExtArgs>
   attachments?: boolean | Prisma.Suggestion$attachmentsArgs<ExtArgs>
+  recognition?: boolean | Prisma.Suggestion$recognitionArgs<ExtArgs>
   _count?: boolean | Prisma.SuggestionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SuggestionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1416,6 +1549,7 @@ export type $SuggestionPayload<ExtArgs extends runtime.Types.Extensions.Internal
     routedToUser: Prisma.$UserPayload<ExtArgs> | null
     convertedToIssue: Prisma.$IssuePayload<ExtArgs> | null
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
+    recognition: Prisma.$RecognitionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1831,6 +1965,7 @@ export interface Prisma__SuggestionClient<T, Null = never, ExtArgs extends runti
   routedToUser<T extends Prisma.Suggestion$routedToUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Suggestion$routedToUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   convertedToIssue<T extends Prisma.Suggestion$convertedToIssueArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Suggestion$convertedToIssueArgs<ExtArgs>>): Prisma.Prisma__IssueClient<runtime.Types.Result.GetResult<Prisma.$IssuePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   attachments<T extends Prisma.Suggestion$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Suggestion$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recognition<T extends Prisma.Suggestion$recognitionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Suggestion$recognitionArgs<ExtArgs>>): Prisma.Prisma__RecognitionClient<runtime.Types.Result.GetResult<Prisma.$RecognitionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2334,6 +2469,25 @@ export type Suggestion$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+}
+
+/**
+ * Suggestion.recognition
+ */
+export type Suggestion$recognitionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Recognition
+   */
+  select?: Prisma.RecognitionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Recognition
+   */
+  omit?: Prisma.RecognitionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecognitionInclude<ExtArgs> | null
+  where?: Prisma.RecognitionWhereInput
 }
 
 /**

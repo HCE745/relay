@@ -159,7 +159,12 @@ export const ModelName = {
   VisibilityCompetitor: 'VisibilityCompetitor',
   VisibilityCheck: 'VisibilityCheck',
   VisibilityRun: 'VisibilityRun',
-  VisibilitySetting: 'VisibilitySetting'
+  VisibilitySetting: 'VisibilitySetting',
+  Survey: 'Survey',
+  SurveyQuestion: 'SurveyQuestion',
+  SurveyResponse: 'SurveyResponse',
+  SurveyAnswer: 'SurveyAnswer',
+  Recognition: 'Recognition'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -2173,6 +2178,74 @@ export const VisibilitySettingScalarFieldEnum = {
 } as const
 
 export type VisibilitySettingScalarFieldEnum = (typeof VisibilitySettingScalarFieldEnum)[keyof typeof VisibilitySettingScalarFieldEnum]
+
+
+export const SurveyScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  title: 'title',
+  description: 'description',
+  status: 'status',
+  isAnonymous: 'isAnonymous',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  closedAt: 'closedAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SurveyScalarFieldEnum = (typeof SurveyScalarFieldEnum)[keyof typeof SurveyScalarFieldEnum]
+
+
+export const SurveyQuestionScalarFieldEnum = {
+  id: 'id',
+  surveyId: 'surveyId',
+  order: 'order',
+  type: 'type',
+  text: 'text',
+  required: 'required',
+  options: 'options'
+} as const
+
+export type SurveyQuestionScalarFieldEnum = (typeof SurveyQuestionScalarFieldEnum)[keyof typeof SurveyQuestionScalarFieldEnum]
+
+
+export const SurveyResponseScalarFieldEnum = {
+  id: 'id',
+  surveyId: 'surveyId',
+  respondentId: 'respondentId',
+  submittedAt: 'submittedAt'
+} as const
+
+export type SurveyResponseScalarFieldEnum = (typeof SurveyResponseScalarFieldEnum)[keyof typeof SurveyResponseScalarFieldEnum]
+
+
+export const SurveyAnswerScalarFieldEnum = {
+  id: 'id',
+  responseId: 'responseId',
+  questionId: 'questionId',
+  ratingValue: 'ratingValue',
+  boolValue: 'boolValue',
+  choiceValue: 'choiceValue',
+  textValue: 'textValue'
+} as const
+
+export type SurveyAnswerScalarFieldEnum = (typeof SurveyAnswerScalarFieldEnum)[keyof typeof SurveyAnswerScalarFieldEnum]
+
+
+export const RecognitionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  recipientId: 'recipientId',
+  grantedById: 'grantedById',
+  message: 'message',
+  visibility: 'visibility',
+  suggestionId: 'suggestionId',
+  createdAt: 'createdAt'
+} as const
+
+export type RecognitionScalarFieldEnum = (typeof RecognitionScalarFieldEnum)[keyof typeof RecognitionScalarFieldEnum]
 
 
 export const SortOrder = {

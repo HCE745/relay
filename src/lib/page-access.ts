@@ -24,6 +24,7 @@ export const CONFIGURABLE_PAGES = [
   { key: "regional-dashboard",     label: "Regional Dashboard" },
   { key: "voice",                  label: "Employee Voice" },
   { key: "surveys",                label: "Surveys" },
+  { key: "recognition",            label: "Recognition" },
 ] as const
 
 export type PageKey = (typeof CONFIGURABLE_PAGES)[number]["key"]

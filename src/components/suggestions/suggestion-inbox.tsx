@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns"
 import {
   CheckCircle, XCircle, Inbox, MessageSquare,
   Forward, ClipboardList, X, ExternalLink, UserCheck, Sparkles, ChevronDown, ChevronUp,
-  Star,
+  Star, Award, Globe, Lock,
 } from "lucide-react"
 import Link from "next/link"
 import { ISSUE_PRIORITY } from "@/lib/constants"
@@ -38,6 +38,7 @@ interface Props {
   sessionUserId: string
   isAdmin: boolean
   defaultApproachesExpanded: boolean
+  recognitionEnabled?: boolean
 }
 
 const STATUS_STYLE: Record<string, string> = {
@@ -54,7 +55,7 @@ const TYPE_BADGE: Record<string, string> = {
   CONCERN:    "bg-amber-50 text-amber-700 border-amber-100",
 }
 
-export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAdmin, defaultApproachesExpanded }: Props) {
+export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAdmin, defaultApproachesExpanded, recognitionEnabled = false }: Props) {
   const [suggestions, setSuggestions] = useState(initialSuggestions)
   const [statusFilter, setStatusFilter] = useState<string>("PENDING")
   const [typeFilter, setTypeFilter] = useState<string>("ALL")
@@ -79,6 +80,14 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
   const [convertAssigneeId, setConvertAssigneeId] = useState("")
   const [converting, setConverting] = useState(false)
   const [convertError, setConvertError] = useState("")
+
+  // Recognition modal — triggered when admin marks IMPLEMENTED
+  const [recognizeId, setRecognizeId]         = useState<string | null>(null)
+  const [recognizeRecipient, setRecognizeRecipient] = useState<{ id: string; name: string } | null>(null)
+  const [recognizeMessage, setRecognizeMessage]   = useState("")
+  const [recognizeVisibility, setRecognizeVisibility] = useState<"PUBLIC" | "PRIVATE">("PUBLIC")
+  const [recognizing, setRecognizing]         = useState(false)
+  const [recognizeError, setRecognizeError]   = useState("")
 
   const statusTabs = isAdmin
     ? ["PENDING", "REVIEWED", "IMPLEMENTED", "DISMISSED", "CONVERTED", "ALL"] as const
@@ -192,6 +201,50 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
     setConvertTitle(s.content.split("\n")[0].slice(0, 80))
     setConvertAssigneeId(s.routedToUser?.id ?? "")
     setConvertError("")
+  }
+
+  function openRecognize(s: Suggestion) {
+    setRecognizeId(s.id)
+    setRecognizeRecipient(s.submittedBy)
+    setRecognizeMessage("")
+    setRecognizeVisibility("PUBLIC")
+    setRecognizeError("")
+  }
+
+  async function doMarkImplemented(id: string) {
+    await updateStatus(id, "IMPLEMENTED")
+    setRecognizeId(null)
+    setRecognizeRecipient(null)
+    setRecognizeMessage("")
+  }
+
+  async function doMarkAndRecognize() {
+    if (!recognizeId) return
+    setRecognizing(true)
+    setRecognizeError("")
+    await updateStatus(recognizeId, "IMPLEMENTED")
+    if (recognizeMessage.trim() && recognizeRecipient) {
+      const res = await fetch("/api/recognition", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipientId: recognizeRecipient.id,
+          message: recognizeMessage.trim(),
+          visibility: recognizeVisibility,
+          suggestionId: recognizeId,
+        }),
+      })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        setRecognizeError(d.error ?? "Recognition could not be saved, but the suggestion was marked implemented.")
+        setRecognizing(false)
+        return
+      }
+    }
+    setRecognizing(false)
+    setRecognizeId(null)
+    setRecognizeRecipient(null)
+    setRecognizeMessage("")
   }
 
   const canReassign = (s: Suggestion) => isAdmin || s.routedToUser?.id === sessionUserId
@@ -344,8 +397,13 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                     </button>
                   )}
                   {isAdmin && s.status !== "IMPLEMENTED" && s.status !== "CONVERTED" && s.status !== "DISMISSED" && (
-                    <button onClick={() => updateStatus(s.id, "IMPLEMENTED")} title="Mark Implemented"
-                      className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600">
+                    <button
+                      onClick={() => recognitionEnabled && s.submittedBy.id !== sessionUserId
+                        ? openRecognize(s)
+                        : updateStatus(s.id, "IMPLEMENTED")}
+                      title="Mark Implemented"
+                      className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600"
+                    >
                       <Star className="w-4 h-4" />
                     </button>
                   )}
@@ -391,6 +449,91 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Recognition modal */}
+      {recognizeId && recognizeRecipient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="bg-white rounded-xl shadow-xl border border-gray-200 w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-amber-500" />
+                <h3 className="font-semibold text-gray-900">Recognize {recognizeRecipient.name}</h3>
+              </div>
+              <button onClick={() => setRecognizeId(null)} className="p-1.5 rounded hover:bg-gray-100 text-gray-400"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="px-6 py-4 space-y-4">
+              {recognizeError && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{recognizeError}</div>
+              )}
+              <p className="text-sm text-gray-500">
+                Optionally add a recognition message for <span className="font-medium text-gray-700">{recognizeRecipient.name}</span> before marking this as implemented.
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Recognition message (optional)</label>
+                <textarea
+                  value={recognizeMessage}
+                  onChange={e => setRecognizeMessage(e.target.value)}
+                  placeholder="Great initiative — this directly improved our workflow…"
+                  rows={3}
+                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                />
+              </div>
+              {recognizeMessage.trim() && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setRecognizeVisibility("PUBLIC")}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border transition-colors ${
+                        recognizeVisibility === "PUBLIC"
+                          ? "bg-amber-50 border-amber-300 text-amber-800 font-medium"
+                          : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Globe className="w-3.5 h-3.5" />
+                      Public
+                    </button>
+                    <button
+                      onClick={() => setRecognizeVisibility("PRIVATE")}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border transition-colors ${
+                        recognizeVisibility === "PRIVATE"
+                          ? "bg-gray-100 border-gray-400 text-gray-800 font-medium"
+                          : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Lock className="w-3.5 h-3.5" />
+                      Private
+                    </button>
+                  </div>
+                  <p className="mt-1.5 text-xs text-gray-400">
+                    {recognizeVisibility === "PUBLIC"
+                      ? "Visible to everyone in your organization."
+                      : "Visible only to you, the recipient, and admins."}
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 px-6 py-4 border-t border-gray-100 justify-end">
+              <button onClick={() => setRecognizeId(null)} className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+              <button
+                onClick={() => doMarkImplemented(recognizeId)}
+                disabled={recognizing}
+                className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-60"
+              >
+                Mark Only
+              </button>
+              <button
+                onClick={doMarkAndRecognize}
+                disabled={recognizing}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:opacity-60"
+              >
+                <Award className="w-3.5 h-3.5" />
+                {recognizing ? "Saving…" : recognizeMessage.trim() ? "Mark & Recognize" : "Mark Implemented"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

@@ -358,6 +358,10 @@ export type UserWhereInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentListRelationFilter
   dailyBriefings?: Prisma.DailyBriefingCacheListRelationFilter
   referralsInitiated?: Prisma.ReferralListRelationFilter
+  createdSurveys?: Prisma.SurveyListRelationFilter
+  surveyResponses?: Prisma.SurveyResponseListRelationFilter
+  receivedRecognitions?: Prisma.RecognitionListRelationFilter
+  grantedRecognitions?: Prisma.RecognitionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -430,6 +434,10 @@ export type UserOrderByWithRelationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentOrderByRelationAggregateInput
   dailyBriefings?: Prisma.DailyBriefingCacheOrderByRelationAggregateInput
   referralsInitiated?: Prisma.ReferralOrderByRelationAggregateInput
+  createdSurveys?: Prisma.SurveyOrderByRelationAggregateInput
+  surveyResponses?: Prisma.SurveyResponseOrderByRelationAggregateInput
+  receivedRecognitions?: Prisma.RecognitionOrderByRelationAggregateInput
+  grantedRecognitions?: Prisma.RecognitionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -505,6 +513,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   emergencyAcks?: Prisma.EmergencyAcknowledgmentListRelationFilter
   dailyBriefings?: Prisma.DailyBriefingCacheListRelationFilter
   referralsInitiated?: Prisma.ReferralListRelationFilter
+  createdSurveys?: Prisma.SurveyListRelationFilter
+  surveyResponses?: Prisma.SurveyResponseListRelationFilter
+  receivedRecognitions?: Prisma.RecognitionListRelationFilter
+  grantedRecognitions?: Prisma.RecognitionListRelationFilter
 }, "id" | "email" | "calendarToken">
 
 export type UserOrderByWithAggregationInput = {
@@ -625,6 +637,10 @@ export type UserCreateInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -691,6 +707,10 @@ export type UserUncheckedCreateInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUpdateInput = {
@@ -757,6 +777,10 @@ export type UserUpdateInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -823,6 +847,10 @@ export type UserUncheckedUpdateInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1851,6 +1879,64 @@ export type UserUpdateOneRequiredWithoutDailyBriefingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDailyBriefingsInput, Prisma.UserUpdateWithoutDailyBriefingsInput>, Prisma.UserUncheckedUpdateWithoutDailyBriefingsInput>
 }
 
+export type UserCreateNestedOneWithoutCreatedSurveysInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedSurveysInput, Prisma.UserUncheckedCreateWithoutCreatedSurveysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedSurveysInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCreatedSurveysNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedSurveysInput, Prisma.UserUncheckedCreateWithoutCreatedSurveysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedSurveysInput
+  upsert?: Prisma.UserUpsertWithoutCreatedSurveysInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedSurveysInput, Prisma.UserUpdateWithoutCreatedSurveysInput>, Prisma.UserUncheckedUpdateWithoutCreatedSurveysInput>
+}
+
+export type UserCreateNestedOneWithoutSurveyResponsesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSurveyResponsesInput, Prisma.UserUncheckedCreateWithoutSurveyResponsesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSurveyResponsesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutSurveyResponsesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSurveyResponsesInput, Prisma.UserUncheckedCreateWithoutSurveyResponsesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSurveyResponsesInput
+  upsert?: Prisma.UserUpsertWithoutSurveyResponsesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSurveyResponsesInput, Prisma.UserUpdateWithoutSurveyResponsesInput>, Prisma.UserUncheckedUpdateWithoutSurveyResponsesInput>
+}
+
+export type UserCreateNestedOneWithoutReceivedRecognitionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedRecognitionsInput, Prisma.UserUncheckedCreateWithoutReceivedRecognitionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedRecognitionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutGrantedRecognitionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGrantedRecognitionsInput, Prisma.UserUncheckedCreateWithoutGrantedRecognitionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGrantedRecognitionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReceivedRecognitionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedRecognitionsInput, Prisma.UserUncheckedCreateWithoutReceivedRecognitionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedRecognitionsInput
+  upsert?: Prisma.UserUpsertWithoutReceivedRecognitionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedRecognitionsInput, Prisma.UserUpdateWithoutReceivedRecognitionsInput>, Prisma.UserUncheckedUpdateWithoutReceivedRecognitionsInput>
+}
+
+export type UserUpdateOneRequiredWithoutGrantedRecognitionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGrantedRecognitionsInput, Prisma.UserUncheckedCreateWithoutGrantedRecognitionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGrantedRecognitionsInput
+  upsert?: Prisma.UserUpsertWithoutGrantedRecognitionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutGrantedRecognitionsInput, Prisma.UserUpdateWithoutGrantedRecognitionsInput>, Prisma.UserUncheckedUpdateWithoutGrantedRecognitionsInput>
+}
+
 export type UserCreateWithoutOrganizationInput = {
   id?: string
   email: string
@@ -1914,6 +2000,10 @@ export type UserCreateWithoutOrganizationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutOrganizationInput = {
@@ -1979,6 +2069,10 @@ export type UserUncheckedCreateWithoutOrganizationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutOrganizationInput = {
@@ -2097,6 +2191,10 @@ export type UserCreateWithoutDirectReportsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutDirectReportsInput = {
@@ -2162,6 +2260,10 @@ export type UserUncheckedCreateWithoutDirectReportsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutDirectReportsInput = {
@@ -2232,6 +2334,10 @@ export type UserCreateWithoutManagerInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutManagerInput = {
@@ -2297,6 +2403,10 @@ export type UserUncheckedCreateWithoutManagerInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutManagerInput = {
@@ -2383,6 +2493,10 @@ export type UserUpdateWithoutDirectReportsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDirectReportsInput = {
@@ -2448,6 +2562,10 @@ export type UserUncheckedUpdateWithoutDirectReportsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutManagerInput = {
@@ -2529,6 +2647,10 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -2594,6 +2716,10 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -2675,6 +2801,10 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -2740,6 +2870,10 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutSafetyContactAtInput = {
@@ -2805,6 +2939,10 @@ export type UserCreateWithoutSafetyContactAtInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutSafetyContactAtInput = {
@@ -2870,6 +3008,10 @@ export type UserUncheckedCreateWithoutSafetyContactAtInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutSafetyContactAtInput = {
@@ -2940,6 +3082,10 @@ export type UserCreateWithoutLocationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutLocationInput = {
@@ -3005,6 +3151,10 @@ export type UserUncheckedCreateWithoutLocationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutLocationInput = {
@@ -3091,6 +3241,10 @@ export type UserUpdateWithoutSafetyContactAtInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSafetyContactAtInput = {
@@ -3156,6 +3310,10 @@ export type UserUncheckedUpdateWithoutSafetyContactAtInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutLocationInput = {
@@ -3237,6 +3395,10 @@ export type UserCreateWithoutDepartmentInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutDepartmentInput = {
@@ -3302,6 +3464,10 @@ export type UserUncheckedCreateWithoutDepartmentInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutDepartmentInput = {
@@ -3393,6 +3559,10 @@ export type UserCreateWithoutReportedIssuesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutReportedIssuesInput = {
@@ -3458,6 +3628,10 @@ export type UserUncheckedCreateWithoutReportedIssuesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutReportedIssuesInput = {
@@ -3528,6 +3702,10 @@ export type UserCreateWithoutAssignedIssuesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutAssignedIssuesInput = {
@@ -3593,6 +3771,10 @@ export type UserUncheckedCreateWithoutAssignedIssuesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutAssignedIssuesInput = {
@@ -3674,6 +3856,10 @@ export type UserUpdateWithoutReportedIssuesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedIssuesInput = {
@@ -3739,6 +3925,10 @@ export type UserUncheckedUpdateWithoutReportedIssuesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUpsertWithoutAssignedIssuesInput = {
@@ -3815,6 +4005,10 @@ export type UserUpdateWithoutAssignedIssuesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedIssuesInput = {
@@ -3880,6 +4074,10 @@ export type UserUncheckedUpdateWithoutAssignedIssuesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -3945,6 +4143,10 @@ export type UserCreateWithoutCommentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -4010,6 +4212,10 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -4091,6 +4297,10 @@ export type UserUpdateWithoutCommentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -4156,6 +4366,10 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -4221,6 +4435,10 @@ export type UserCreateWithoutNotificationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -4286,6 +4504,10 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -4367,6 +4589,10 @@ export type UserUpdateWithoutNotificationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -4432,6 +4658,10 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutRoutingRulesInput = {
@@ -4497,6 +4727,10 @@ export type UserCreateWithoutRoutingRulesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutRoutingRulesInput = {
@@ -4562,6 +4796,10 @@ export type UserUncheckedCreateWithoutRoutingRulesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutRoutingRulesInput = {
@@ -4643,6 +4881,10 @@ export type UserUpdateWithoutRoutingRulesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoutingRulesInput = {
@@ -4708,6 +4950,10 @@ export type UserUncheckedUpdateWithoutRoutingRulesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutSuggestionsInput = {
@@ -4773,6 +5019,10 @@ export type UserCreateWithoutSuggestionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutSuggestionsInput = {
@@ -4838,6 +5088,10 @@ export type UserUncheckedCreateWithoutSuggestionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutSuggestionsInput = {
@@ -4908,6 +5162,10 @@ export type UserCreateWithoutRoutedSuggestionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutRoutedSuggestionsInput = {
@@ -4973,6 +5231,10 @@ export type UserUncheckedCreateWithoutRoutedSuggestionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutRoutedSuggestionsInput = {
@@ -5054,6 +5316,10 @@ export type UserUpdateWithoutSuggestionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSuggestionsInput = {
@@ -5119,6 +5385,10 @@ export type UserUncheckedUpdateWithoutSuggestionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUpsertWithoutRoutedSuggestionsInput = {
@@ -5195,6 +5465,10 @@ export type UserUpdateWithoutRoutedSuggestionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoutedSuggestionsInput = {
@@ -5260,6 +5534,10 @@ export type UserUncheckedUpdateWithoutRoutedSuggestionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutSentInvitationsInput = {
@@ -5325,6 +5603,10 @@ export type UserCreateWithoutSentInvitationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutSentInvitationsInput = {
@@ -5390,6 +5672,10 @@ export type UserUncheckedCreateWithoutSentInvitationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutSentInvitationsInput = {
@@ -5471,6 +5757,10 @@ export type UserUpdateWithoutSentInvitationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentInvitationsInput = {
@@ -5536,6 +5826,10 @@ export type UserUncheckedUpdateWithoutSentInvitationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutAssignedLocationsInput = {
@@ -5601,6 +5895,10 @@ export type UserCreateWithoutAssignedLocationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutAssignedLocationsInput = {
@@ -5666,6 +5964,10 @@ export type UserUncheckedCreateWithoutAssignedLocationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutAssignedLocationsInput = {
@@ -5747,6 +6049,10 @@ export type UserUpdateWithoutAssignedLocationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedLocationsInput = {
@@ -5812,6 +6118,10 @@ export type UserUncheckedUpdateWithoutAssignedLocationsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutEmployeeTypeInput = {
@@ -5877,6 +6187,10 @@ export type UserCreateWithoutEmployeeTypeInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutEmployeeTypeInput = {
@@ -5942,6 +6256,10 @@ export type UserUncheckedCreateWithoutEmployeeTypeInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutEmployeeTypeInput = {
@@ -6033,6 +6351,10 @@ export type UserCreateWithoutUserSettingsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutUserSettingsInput = {
@@ -6098,6 +6420,10 @@ export type UserUncheckedCreateWithoutUserSettingsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutUserSettingsInput = {
@@ -6179,6 +6505,10 @@ export type UserUpdateWithoutUserSettingsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserSettingsInput = {
@@ -6244,6 +6574,10 @@ export type UserUncheckedUpdateWithoutUserSettingsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutCreatedTemplatesInput = {
@@ -6309,6 +6643,10 @@ export type UserCreateWithoutCreatedTemplatesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutCreatedTemplatesInput = {
@@ -6374,6 +6712,10 @@ export type UserUncheckedCreateWithoutCreatedTemplatesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutCreatedTemplatesInput = {
@@ -6455,6 +6797,10 @@ export type UserUpdateWithoutCreatedTemplatesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedTemplatesInput = {
@@ -6520,6 +6866,10 @@ export type UserUncheckedUpdateWithoutCreatedTemplatesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutMaintenanceSchedulesInput = {
@@ -6585,6 +6935,10 @@ export type UserCreateWithoutMaintenanceSchedulesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutMaintenanceSchedulesInput = {
@@ -6650,6 +7004,10 @@ export type UserUncheckedCreateWithoutMaintenanceSchedulesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutMaintenanceSchedulesInput = {
@@ -6731,6 +7089,10 @@ export type UserUpdateWithoutMaintenanceSchedulesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMaintenanceSchedulesInput = {
@@ -6796,6 +7158,10 @@ export type UserUncheckedUpdateWithoutMaintenanceSchedulesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutSubmittedPurchaseRequestsInput = {
@@ -6861,6 +7227,10 @@ export type UserCreateWithoutSubmittedPurchaseRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutSubmittedPurchaseRequestsInput = {
@@ -6926,6 +7296,10 @@ export type UserUncheckedCreateWithoutSubmittedPurchaseRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutSubmittedPurchaseRequestsInput = {
@@ -6996,6 +7370,10 @@ export type UserCreateWithoutApprovedPurchaseRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutApprovedPurchaseRequestsInput = {
@@ -7061,6 +7439,10 @@ export type UserUncheckedCreateWithoutApprovedPurchaseRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutApprovedPurchaseRequestsInput = {
@@ -7142,6 +7524,10 @@ export type UserUpdateWithoutSubmittedPurchaseRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubmittedPurchaseRequestsInput = {
@@ -7207,6 +7593,10 @@ export type UserUncheckedUpdateWithoutSubmittedPurchaseRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUpsertWithoutApprovedPurchaseRequestsInput = {
@@ -7283,6 +7673,10 @@ export type UserUpdateWithoutApprovedPurchaseRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApprovedPurchaseRequestsInput = {
@@ -7348,6 +7742,10 @@ export type UserUncheckedUpdateWithoutApprovedPurchaseRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutPurchaseRequestApprovalsInput = {
@@ -7413,6 +7811,10 @@ export type UserCreateWithoutPurchaseRequestApprovalsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutPurchaseRequestApprovalsInput = {
@@ -7478,6 +7880,10 @@ export type UserUncheckedCreateWithoutPurchaseRequestApprovalsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutPurchaseRequestApprovalsInput = {
@@ -7559,6 +7965,10 @@ export type UserUpdateWithoutPurchaseRequestApprovalsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPurchaseRequestApprovalsInput = {
@@ -7624,6 +8034,10 @@ export type UserUncheckedUpdateWithoutPurchaseRequestApprovalsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutReportedInjuriesInput = {
@@ -7689,6 +8103,10 @@ export type UserCreateWithoutReportedInjuriesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutReportedInjuriesInput = {
@@ -7754,6 +8172,10 @@ export type UserUncheckedCreateWithoutReportedInjuriesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutReportedInjuriesInput = {
@@ -7824,6 +8246,10 @@ export type UserCreateWithoutReviewedInjuriesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutReviewedInjuriesInput = {
@@ -7889,6 +8315,10 @@ export type UserUncheckedCreateWithoutReviewedInjuriesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutReviewedInjuriesInput = {
@@ -7970,6 +8400,10 @@ export type UserUpdateWithoutReportedInjuriesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedInjuriesInput = {
@@ -8035,6 +8469,10 @@ export type UserUncheckedUpdateWithoutReportedInjuriesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUpsertWithoutReviewedInjuriesInput = {
@@ -8111,6 +8549,10 @@ export type UserUpdateWithoutReviewedInjuriesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewedInjuriesInput = {
@@ -8176,6 +8618,10 @@ export type UserUncheckedUpdateWithoutReviewedInjuriesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutBugReportsInput = {
@@ -8241,6 +8687,10 @@ export type UserCreateWithoutBugReportsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutBugReportsInput = {
@@ -8306,6 +8756,10 @@ export type UserUncheckedCreateWithoutBugReportsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutBugReportsInput = {
@@ -8387,6 +8841,10 @@ export type UserUpdateWithoutBugReportsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBugReportsInput = {
@@ -8452,6 +8910,10 @@ export type UserUncheckedUpdateWithoutBugReportsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutFeatureRequestsInput = {
@@ -8517,6 +8979,10 @@ export type UserCreateWithoutFeatureRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutFeatureRequestsInput = {
@@ -8582,6 +9048,10 @@ export type UserUncheckedCreateWithoutFeatureRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutFeatureRequestsInput = {
@@ -8663,6 +9133,10 @@ export type UserUpdateWithoutFeatureRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFeatureRequestsInput = {
@@ -8728,6 +9202,10 @@ export type UserUncheckedUpdateWithoutFeatureRequestsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutRegionInput = {
@@ -8793,6 +9271,10 @@ export type UserCreateWithoutRegionInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutRegionInput = {
@@ -8858,6 +9340,10 @@ export type UserUncheckedCreateWithoutRegionInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutRegionInput = {
@@ -8949,6 +9435,10 @@ export type UserCreateWithoutAssignedQrCodesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutAssignedQrCodesInput = {
@@ -9014,6 +9504,10 @@ export type UserUncheckedCreateWithoutAssignedQrCodesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutAssignedQrCodesInput = {
@@ -9095,6 +9589,10 @@ export type UserUpdateWithoutAssignedQrCodesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedQrCodesInput = {
@@ -9160,6 +9658,10 @@ export type UserUncheckedUpdateWithoutAssignedQrCodesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutUserOrgMembershipsInput = {
@@ -9225,6 +9727,10 @@ export type UserCreateWithoutUserOrgMembershipsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutUserOrgMembershipsInput = {
@@ -9290,6 +9796,10 @@ export type UserUncheckedCreateWithoutUserOrgMembershipsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutUserOrgMembershipsInput = {
@@ -9371,6 +9881,10 @@ export type UserUpdateWithoutUserOrgMembershipsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserOrgMembershipsInput = {
@@ -9436,6 +9950,10 @@ export type UserUncheckedUpdateWithoutUserOrgMembershipsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutLegalAcceptancesInput = {
@@ -9501,6 +10019,10 @@ export type UserCreateWithoutLegalAcceptancesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
@@ -9566,6 +10088,10 @@ export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutLegalAcceptancesInput = {
@@ -9647,6 +10173,10 @@ export type UserUpdateWithoutLegalAcceptancesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
@@ -9712,6 +10242,10 @@ export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutDeviceTokensInput = {
@@ -9777,6 +10311,10 @@ export type UserCreateWithoutDeviceTokensInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutDeviceTokensInput = {
@@ -9842,6 +10380,10 @@ export type UserUncheckedCreateWithoutDeviceTokensInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutDeviceTokensInput = {
@@ -9923,6 +10465,10 @@ export type UserUpdateWithoutDeviceTokensInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeviceTokensInput = {
@@ -9988,6 +10534,10 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutReferralsInitiatedInput = {
@@ -10053,6 +10603,10 @@ export type UserCreateWithoutReferralsInitiatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutReferralsInitiatedInput = {
@@ -10118,6 +10672,10 @@ export type UserUncheckedCreateWithoutReferralsInitiatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutReferralsInitiatedInput = {
@@ -10199,6 +10757,10 @@ export type UserUpdateWithoutReferralsInitiatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferralsInitiatedInput = {
@@ -10264,6 +10826,10 @@ export type UserUncheckedUpdateWithoutReferralsInitiatedInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutConversationsCreatedInput = {
@@ -10329,6 +10895,10 @@ export type UserCreateWithoutConversationsCreatedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutConversationsCreatedInput = {
@@ -10394,6 +10964,10 @@ export type UserUncheckedCreateWithoutConversationsCreatedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutConversationsCreatedInput = {
@@ -10475,6 +11049,10 @@ export type UserUpdateWithoutConversationsCreatedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationsCreatedInput = {
@@ -10540,6 +11118,10 @@ export type UserUncheckedUpdateWithoutConversationsCreatedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutConversationMembershipsInput = {
@@ -10605,6 +11187,10 @@ export type UserCreateWithoutConversationMembershipsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutConversationMembershipsInput = {
@@ -10670,6 +11256,10 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutConversationMembershipsInput = {
@@ -10751,6 +11341,10 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
@@ -10816,6 +11410,10 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutSentChatMessagesInput = {
@@ -10881,6 +11479,10 @@ export type UserCreateWithoutSentChatMessagesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutSentChatMessagesInput = {
@@ -10946,6 +11548,10 @@ export type UserUncheckedCreateWithoutSentChatMessagesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutSentChatMessagesInput = {
@@ -11027,6 +11633,10 @@ export type UserUpdateWithoutSentChatMessagesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
@@ -11092,6 +11702,10 @@ export type UserUncheckedUpdateWithoutSentChatMessagesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutMessageReactionsInput = {
@@ -11157,6 +11771,10 @@ export type UserCreateWithoutMessageReactionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutMessageReactionsInput = {
@@ -11222,6 +11840,10 @@ export type UserUncheckedCreateWithoutMessageReactionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutMessageReactionsInput = {
@@ -11303,6 +11925,10 @@ export type UserUpdateWithoutMessageReactionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessageReactionsInput = {
@@ -11368,6 +11994,10 @@ export type UserUncheckedUpdateWithoutMessageReactionsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutSupportMessagesAsUserInput = {
@@ -11433,6 +12063,10 @@ export type UserCreateWithoutSupportMessagesAsUserInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutSupportMessagesAsUserInput = {
@@ -11498,6 +12132,10 @@ export type UserUncheckedCreateWithoutSupportMessagesAsUserInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutSupportMessagesAsUserInput = {
@@ -11579,6 +12217,10 @@ export type UserUpdateWithoutSupportMessagesAsUserInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportMessagesAsUserInput = {
@@ -11644,6 +12286,10 @@ export type UserUncheckedUpdateWithoutSupportMessagesAsUserInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutAssignedAssignmentsInput = {
@@ -11709,6 +12355,10 @@ export type UserCreateWithoutAssignedAssignmentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutAssignedAssignmentsInput = {
@@ -11774,6 +12424,10 @@ export type UserUncheckedCreateWithoutAssignedAssignmentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutAssignedAssignmentsInput = {
@@ -11844,6 +12498,10 @@ export type UserCreateWithoutCreatedAssignmentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutCreatedAssignmentsInput = {
@@ -11909,6 +12567,10 @@ export type UserUncheckedCreateWithoutCreatedAssignmentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutCreatedAssignmentsInput = {
@@ -11990,6 +12652,10 @@ export type UserUpdateWithoutAssignedAssignmentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedAssignmentsInput = {
@@ -12055,6 +12721,10 @@ export type UserUncheckedUpdateWithoutAssignedAssignmentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUpsertWithoutCreatedAssignmentsInput = {
@@ -12131,6 +12801,10 @@ export type UserUpdateWithoutCreatedAssignmentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedAssignmentsInput = {
@@ -12196,6 +12870,10 @@ export type UserUncheckedUpdateWithoutCreatedAssignmentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutAssignmentCommentsInput = {
@@ -12261,6 +12939,10 @@ export type UserCreateWithoutAssignmentCommentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutAssignmentCommentsInput = {
@@ -12326,6 +13008,10 @@ export type UserUncheckedCreateWithoutAssignmentCommentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutAssignmentCommentsInput = {
@@ -12407,6 +13093,10 @@ export type UserUpdateWithoutAssignmentCommentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignmentCommentsInput = {
@@ -12472,6 +13162,10 @@ export type UserUncheckedUpdateWithoutAssignmentCommentsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutAssignmentStatusChangesInput = {
@@ -12537,6 +13231,10 @@ export type UserCreateWithoutAssignmentStatusChangesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutAssignmentStatusChangesInput = {
@@ -12602,6 +13300,10 @@ export type UserUncheckedCreateWithoutAssignmentStatusChangesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutAssignmentStatusChangesInput = {
@@ -12683,6 +13385,10 @@ export type UserUpdateWithoutAssignmentStatusChangesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignmentStatusChangesInput = {
@@ -12748,6 +13454,10 @@ export type UserUncheckedUpdateWithoutAssignmentStatusChangesInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutCreatedAnnouncementsInput = {
@@ -12813,6 +13523,10 @@ export type UserCreateWithoutCreatedAnnouncementsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutCreatedAnnouncementsInput = {
@@ -12878,6 +13592,10 @@ export type UserUncheckedCreateWithoutCreatedAnnouncementsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutCreatedAnnouncementsInput = {
@@ -12959,6 +13677,10 @@ export type UserUpdateWithoutCreatedAnnouncementsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedAnnouncementsInput = {
@@ -13024,6 +13746,10 @@ export type UserUncheckedUpdateWithoutCreatedAnnouncementsInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutAnnouncementAcksInput = {
@@ -13089,6 +13815,10 @@ export type UserCreateWithoutAnnouncementAcksInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementAcksInput = {
@@ -13154,6 +13884,10 @@ export type UserUncheckedCreateWithoutAnnouncementAcksInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementAcksInput = {
@@ -13235,6 +13969,10 @@ export type UserUpdateWithoutAnnouncementAcksInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementAcksInput = {
@@ -13300,6 +14038,10 @@ export type UserUncheckedUpdateWithoutAnnouncementAcksInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutEmergencyBroadcastsCreatedInput = {
@@ -13365,6 +14107,10 @@ export type UserCreateWithoutEmergencyBroadcastsCreatedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput = {
@@ -13430,6 +14176,10 @@ export type UserUncheckedCreateWithoutEmergencyBroadcastsCreatedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutEmergencyBroadcastsCreatedInput = {
@@ -13500,6 +14250,10 @@ export type UserCreateWithoutEmergencyBroadcastsResolvedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput = {
@@ -13565,6 +14319,10 @@ export type UserUncheckedCreateWithoutEmergencyBroadcastsResolvedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutEmergencyBroadcastsResolvedInput = {
@@ -13646,6 +14404,10 @@ export type UserUpdateWithoutEmergencyBroadcastsCreatedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyBroadcastsCreatedInput = {
@@ -13711,6 +14473,10 @@ export type UserUncheckedUpdateWithoutEmergencyBroadcastsCreatedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUpsertWithoutEmergencyBroadcastsResolvedInput = {
@@ -13787,6 +14553,10 @@ export type UserUpdateWithoutEmergencyBroadcastsResolvedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyBroadcastsResolvedInput = {
@@ -13852,6 +14622,10 @@ export type UserUncheckedUpdateWithoutEmergencyBroadcastsResolvedInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutEmergencyAcksInput = {
@@ -13917,6 +14691,10 @@ export type UserCreateWithoutEmergencyAcksInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyAcksInput = {
@@ -13982,6 +14760,10 @@ export type UserUncheckedCreateWithoutEmergencyAcksInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutEmergencyAcksInput = {
@@ -14063,6 +14845,10 @@ export type UserUpdateWithoutEmergencyAcksInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyAcksInput = {
@@ -14128,6 +14914,10 @@ export type UserUncheckedUpdateWithoutEmergencyAcksInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserCreateWithoutDailyBriefingsInput = {
@@ -14193,6 +14983,10 @@ export type UserCreateWithoutDailyBriefingsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserUncheckedCreateWithoutDailyBriefingsInput = {
@@ -14258,6 +15052,10 @@ export type UserUncheckedCreateWithoutDailyBriefingsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
   referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
 }
 
 export type UserCreateOrConnectWithoutDailyBriefingsInput = {
@@ -14339,6 +15137,10 @@ export type UserUpdateWithoutDailyBriefingsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDailyBriefingsInput = {
@@ -14404,6 +15206,1178 @@ export type UserUncheckedUpdateWithoutDailyBriefingsInput = {
   emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
+}
+
+export type UserCreateWithoutCreatedSurveysInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
+}
+
+export type UserUncheckedCreateWithoutCreatedSurveysInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
+}
+
+export type UserCreateOrConnectWithoutCreatedSurveysInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedSurveysInput, Prisma.UserUncheckedCreateWithoutCreatedSurveysInput>
+}
+
+export type UserUpsertWithoutCreatedSurveysInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedSurveysInput, Prisma.UserUncheckedUpdateWithoutCreatedSurveysInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedSurveysInput, Prisma.UserUncheckedCreateWithoutCreatedSurveysInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedSurveysInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedSurveysInput, Prisma.UserUncheckedUpdateWithoutCreatedSurveysInput>
+}
+
+export type UserUpdateWithoutCreatedSurveysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedSurveysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
+}
+
+export type UserCreateWithoutSurveyResponsesInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
+}
+
+export type UserUncheckedCreateWithoutSurveyResponsesInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
+}
+
+export type UserCreateOrConnectWithoutSurveyResponsesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSurveyResponsesInput, Prisma.UserUncheckedCreateWithoutSurveyResponsesInput>
+}
+
+export type UserUpsertWithoutSurveyResponsesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSurveyResponsesInput, Prisma.UserUncheckedUpdateWithoutSurveyResponsesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSurveyResponsesInput, Prisma.UserUncheckedCreateWithoutSurveyResponsesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSurveyResponsesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSurveyResponsesInput, Prisma.UserUncheckedUpdateWithoutSurveyResponsesInput>
+}
+
+export type UserUpdateWithoutSurveyResponsesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSurveyResponsesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
+}
+
+export type UserCreateWithoutReceivedRecognitionsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  grantedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutGrantedByInput
+}
+
+export type UserUncheckedCreateWithoutReceivedRecognitionsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutGrantedByInput
+}
+
+export type UserCreateOrConnectWithoutReceivedRecognitionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedRecognitionsInput, Prisma.UserUncheckedCreateWithoutReceivedRecognitionsInput>
+}
+
+export type UserCreateWithoutGrantedRecognitionsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutUsersInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
+  location?: Prisma.LocationCreateNestedOneWithoutUsersInput
+  region?: Prisma.RegionCreateNestedOneWithoutUsersInput
+  manager?: Prisma.UserCreateNestedOneWithoutDirectReportsInput
+  directReports?: Prisma.UserCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationCreateNestedManyWithoutUserInput
+  employeeType?: Prisma.EmployeeTypeCreateNestedOneWithoutUsersInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionCreateNestedManyWithoutRecipientInput
+}
+
+export type UserUncheckedCreateWithoutGrantedRecognitionsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  role?: string
+  phone?: string | null
+  isActive?: boolean
+  organizationId: string
+  departmentId?: string | null
+  locationId?: string | null
+  managerId?: string | null
+  canInvite?: boolean
+  canChangeEmail?: boolean
+  calendarToken?: string | null
+  lastLoginAt?: Date | string | null
+  userType?: string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  regionId?: string | null
+  employeeTypeId?: string | null
+  directReports?: Prisma.UserUncheckedCreateNestedManyWithoutManagerInput
+  reportedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutReportedByInput
+  assignedIssues?: Prisma.IssueUncheckedCreateNestedManyWithoutAssignedToInput
+  userSettings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  comments?: Prisma.IssueCommentUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  routingRules?: Prisma.RoutingRuleUncheckedCreateNestedManyWithoutAssignToUserInput
+  suggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutSubmittedByInput
+  routedSuggestions?: Prisma.SuggestionUncheckedCreateNestedManyWithoutRoutedToUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedLocations?: Prisma.UserLocationUncheckedCreateNestedManyWithoutUserInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedCreateNestedManyWithoutAssignedToInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedCreateNestedManyWithoutApproverInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReportedByInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedCreateNestedManyWithoutReviewedByInput
+  safetyContactAt?: Prisma.LocationUncheckedCreateNestedManyWithoutSafetyContactInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedCreateNestedManyWithoutCreatedByInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutSubmittedByInput
+  featureRequests?: Prisma.FeatureRequestUncheckedCreateNestedManyWithoutSubmittedByInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutAssignedToInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationsCreated?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  assignedAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  createdAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedCreateNestedManyWithoutResolvedByInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedCreateNestedManyWithoutUserInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedCreateNestedManyWithoutUserInput
+  referralsInitiated?: Prisma.ReferralUncheckedCreateNestedManyWithoutReferredByUserInput
+  createdSurveys?: Prisma.SurveyUncheckedCreateNestedManyWithoutCreatedByInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedCreateNestedManyWithoutRespondentInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedCreateNestedManyWithoutRecipientInput
+}
+
+export type UserCreateOrConnectWithoutGrantedRecognitionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutGrantedRecognitionsInput, Prisma.UserUncheckedCreateWithoutGrantedRecognitionsInput>
+}
+
+export type UserUpsertWithoutReceivedRecognitionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReceivedRecognitionsInput, Prisma.UserUncheckedUpdateWithoutReceivedRecognitionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedRecognitionsInput, Prisma.UserUncheckedCreateWithoutReceivedRecognitionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReceivedRecognitionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReceivedRecognitionsInput, Prisma.UserUncheckedUpdateWithoutReceivedRecognitionsInput>
+}
+
+export type UserUpdateWithoutReceivedRecognitionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReceivedRecognitionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
+}
+
+export type UserUpsertWithoutGrantedRecognitionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutGrantedRecognitionsInput, Prisma.UserUncheckedUpdateWithoutGrantedRecognitionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutGrantedRecognitionsInput, Prisma.UserUncheckedCreateWithoutGrantedRecognitionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutGrantedRecognitionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutGrantedRecognitionsInput, Prisma.UserUncheckedUpdateWithoutGrantedRecognitionsInput>
+}
+
+export type UserUpdateWithoutGrantedRecognitionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutUsersNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
+  location?: Prisma.LocationUpdateOneWithoutUsersNestedInput
+  region?: Prisma.RegionUpdateOneWithoutUsersNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDirectReportsNestedInput
+  directReports?: Prisma.UserUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUpdateManyWithoutUserNestedInput
+  employeeType?: Prisma.EmployeeTypeUpdateOneWithoutUsersNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+}
+
+export type UserUncheckedUpdateWithoutGrantedRecognitionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  canInvite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canChangeEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  userType?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  regionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  directReports?: Prisma.UserUncheckedUpdateManyWithoutManagerNestedInput
+  reportedIssues?: Prisma.IssueUncheckedUpdateManyWithoutReportedByNestedInput
+  assignedIssues?: Prisma.IssueUncheckedUpdateManyWithoutAssignedToNestedInput
+  userSettings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  comments?: Prisma.IssueCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  routingRules?: Prisma.RoutingRuleUncheckedUpdateManyWithoutAssignToUserNestedInput
+  suggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  routedSuggestions?: Prisma.SuggestionUncheckedUpdateManyWithoutRoutedToUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedLocations?: Prisma.UserLocationUncheckedUpdateManyWithoutUserNestedInput
+  maintenanceSchedules?: Prisma.MaintenanceScheduleUncheckedUpdateManyWithoutAssignedToNestedInput
+  submittedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  approvedPurchaseRequests?: Prisma.PurchaseRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  purchaseRequestApprovals?: Prisma.PurchaseRequestApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  reportedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReportedByNestedInput
+  reviewedInjuries?: Prisma.InjuryReportUncheckedUpdateManyWithoutReviewedByNestedInput
+  safetyContactAt?: Prisma.LocationUncheckedUpdateManyWithoutSafetyContactNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  createdTemplates?: Prisma.IssueTemplateUncheckedUpdateManyWithoutCreatedByNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutSubmittedByNestedInput
+  featureRequests?: Prisma.FeatureRequestUncheckedUpdateManyWithoutSubmittedByNestedInput
+  userOrgMemberships?: Prisma.UserOrgMembershipUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  assignedQrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutAssignedToNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationsCreated?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  sentChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  supportMessagesAsUser?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  assignedAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignmentComments?: Prisma.AssignmentCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignmentStatusChanges?: Prisma.AssignmentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  createdAnnouncements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcementAcks?: Prisma.AnnouncementAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  emergencyBroadcastsCreated?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyBroadcastsResolved?: Prisma.EmergencyBroadcastUncheckedUpdateManyWithoutResolvedByNestedInput
+  emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
+  dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
+  referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateManyOrganizationInput = {
@@ -14492,6 +16466,10 @@ export type UserUpdateWithoutOrganizationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrganizationInput = {
@@ -14557,6 +16535,10 @@ export type UserUncheckedUpdateWithoutOrganizationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutOrganizationInput = {
@@ -14668,6 +16650,10 @@ export type UserUpdateWithoutManagerInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagerInput = {
@@ -14733,6 +16719,10 @@ export type UserUncheckedUpdateWithoutManagerInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutManagerInput = {
@@ -14844,6 +16834,10 @@ export type UserUpdateWithoutLocationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLocationInput = {
@@ -14909,6 +16903,10 @@ export type UserUncheckedUpdateWithoutLocationInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutLocationInput = {
@@ -15020,6 +17018,10 @@ export type UserUpdateWithoutDepartmentInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDepartmentInput = {
@@ -15085,6 +17087,10 @@ export type UserUncheckedUpdateWithoutDepartmentInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutDepartmentInput = {
@@ -15196,6 +17202,10 @@ export type UserUpdateWithoutEmployeeTypeInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmployeeTypeInput = {
@@ -15261,6 +17271,10 @@ export type UserUncheckedUpdateWithoutEmployeeTypeInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutEmployeeTypeInput = {
@@ -15372,6 +17386,10 @@ export type UserUpdateWithoutRegionInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRegionInput = {
@@ -15437,6 +17455,10 @@ export type UserUncheckedUpdateWithoutRegionInput = {
   emergencyAcks?: Prisma.EmergencyAcknowledgmentUncheckedUpdateManyWithoutUserNestedInput
   dailyBriefings?: Prisma.DailyBriefingCacheUncheckedUpdateManyWithoutUserNestedInput
   referralsInitiated?: Prisma.ReferralUncheckedUpdateManyWithoutReferredByUserNestedInput
+  createdSurveys?: Prisma.SurveyUncheckedUpdateManyWithoutCreatedByNestedInput
+  surveyResponses?: Prisma.SurveyResponseUncheckedUpdateManyWithoutRespondentNestedInput
+  receivedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutRecipientNestedInput
+  grantedRecognitions?: Prisma.RecognitionUncheckedUpdateManyWithoutGrantedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutRegionInput = {
@@ -15509,6 +17531,10 @@ export type UserCountOutputType = {
   emergencyAcks: number
   dailyBriefings: number
   referralsInitiated: number
+  createdSurveys: number
+  surveyResponses: number
+  receivedRecognitions: number
+  grantedRecognitions: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -15553,6 +17579,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   emergencyAcks?: boolean | UserCountOutputTypeCountEmergencyAcksArgs
   dailyBriefings?: boolean | UserCountOutputTypeCountDailyBriefingsArgs
   referralsInitiated?: boolean | UserCountOutputTypeCountReferralsInitiatedArgs
+  createdSurveys?: boolean | UserCountOutputTypeCountCreatedSurveysArgs
+  surveyResponses?: boolean | UserCountOutputTypeCountSurveyResponsesArgs
+  receivedRecognitions?: boolean | UserCountOutputTypeCountReceivedRecognitionsArgs
+  grantedRecognitions?: boolean | UserCountOutputTypeCountGrantedRecognitionsArgs
 }
 
 /**
@@ -15852,6 +17882,34 @@ export type UserCountOutputTypeCountReferralsInitiatedArgs<ExtArgs extends runti
   where?: Prisma.ReferralWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedSurveysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SurveyWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSurveyResponsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SurveyResponseWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReceivedRecognitionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecognitionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountGrantedRecognitionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecognitionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -15923,6 +17981,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   emergencyAcks?: boolean | Prisma.User$emergencyAcksArgs<ExtArgs>
   dailyBriefings?: boolean | Prisma.User$dailyBriefingsArgs<ExtArgs>
   referralsInitiated?: boolean | Prisma.User$referralsInitiatedArgs<ExtArgs>
+  createdSurveys?: boolean | Prisma.User$createdSurveysArgs<ExtArgs>
+  surveyResponses?: boolean | Prisma.User$surveyResponsesArgs<ExtArgs>
+  receivedRecognitions?: boolean | Prisma.User$receivedRecognitionsArgs<ExtArgs>
+  grantedRecognitions?: boolean | Prisma.User$grantedRecognitionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -16060,6 +18122,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   emergencyAcks?: boolean | Prisma.User$emergencyAcksArgs<ExtArgs>
   dailyBriefings?: boolean | Prisma.User$dailyBriefingsArgs<ExtArgs>
   referralsInitiated?: boolean | Prisma.User$referralsInitiatedArgs<ExtArgs>
+  createdSurveys?: boolean | Prisma.User$createdSurveysArgs<ExtArgs>
+  surveyResponses?: boolean | Prisma.User$surveyResponsesArgs<ExtArgs>
+  receivedRecognitions?: boolean | Prisma.User$receivedRecognitionsArgs<ExtArgs>
+  grantedRecognitions?: boolean | Prisma.User$grantedRecognitionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -16130,6 +18196,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     emergencyAcks: Prisma.$EmergencyAcknowledgmentPayload<ExtArgs>[]
     dailyBriefings: Prisma.$DailyBriefingCachePayload<ExtArgs>[]
     referralsInitiated: Prisma.$ReferralPayload<ExtArgs>[]
+    createdSurveys: Prisma.$SurveyPayload<ExtArgs>[]
+    surveyResponses: Prisma.$SurveyResponsePayload<ExtArgs>[]
+    receivedRecognitions: Prisma.$RecognitionPayload<ExtArgs>[]
+    grantedRecognitions: Prisma.$RecognitionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -16595,6 +18665,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   emergencyAcks<T extends Prisma.User$emergencyAcksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emergencyAcksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyAcknowledgmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   dailyBriefings<T extends Prisma.User$dailyBriefingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$dailyBriefingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyBriefingCachePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   referralsInitiated<T extends Prisma.User$referralsInitiatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referralsInitiatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdSurveys<T extends Prisma.User$createdSurveysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdSurveysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SurveyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  surveyResponses<T extends Prisma.User$surveyResponsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$surveyResponsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SurveyResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  receivedRecognitions<T extends Prisma.User$receivedRecognitionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedRecognitionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecognitionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  grantedRecognitions<T extends Prisma.User$grantedRecognitionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$grantedRecognitionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecognitionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18141,6 +20215,102 @@ export type User$referralsInitiatedArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.ReferralScalarFieldEnum | Prisma.ReferralScalarFieldEnum[]
+}
+
+/**
+ * User.createdSurveys
+ */
+export type User$createdSurveysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Survey
+   */
+  select?: Prisma.SurveySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Survey
+   */
+  omit?: Prisma.SurveyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SurveyInclude<ExtArgs> | null
+  where?: Prisma.SurveyWhereInput
+  orderBy?: Prisma.SurveyOrderByWithRelationInput | Prisma.SurveyOrderByWithRelationInput[]
+  cursor?: Prisma.SurveyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SurveyScalarFieldEnum | Prisma.SurveyScalarFieldEnum[]
+}
+
+/**
+ * User.surveyResponses
+ */
+export type User$surveyResponsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SurveyResponse
+   */
+  select?: Prisma.SurveyResponseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SurveyResponse
+   */
+  omit?: Prisma.SurveyResponseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SurveyResponseInclude<ExtArgs> | null
+  where?: Prisma.SurveyResponseWhereInput
+  orderBy?: Prisma.SurveyResponseOrderByWithRelationInput | Prisma.SurveyResponseOrderByWithRelationInput[]
+  cursor?: Prisma.SurveyResponseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SurveyResponseScalarFieldEnum | Prisma.SurveyResponseScalarFieldEnum[]
+}
+
+/**
+ * User.receivedRecognitions
+ */
+export type User$receivedRecognitionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Recognition
+   */
+  select?: Prisma.RecognitionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Recognition
+   */
+  omit?: Prisma.RecognitionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecognitionInclude<ExtArgs> | null
+  where?: Prisma.RecognitionWhereInput
+  orderBy?: Prisma.RecognitionOrderByWithRelationInput | Prisma.RecognitionOrderByWithRelationInput[]
+  cursor?: Prisma.RecognitionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecognitionScalarFieldEnum | Prisma.RecognitionScalarFieldEnum[]
+}
+
+/**
+ * User.grantedRecognitions
+ */
+export type User$grantedRecognitionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Recognition
+   */
+  select?: Prisma.RecognitionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Recognition
+   */
+  omit?: Prisma.RecognitionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecognitionInclude<ExtArgs> | null
+  where?: Prisma.RecognitionWhereInput
+  orderBy?: Prisma.RecognitionOrderByWithRelationInput | Prisma.RecognitionOrderByWithRelationInput[]
+  cursor?: Prisma.RecognitionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecognitionScalarFieldEnum | Prisma.RecognitionScalarFieldEnum[]
 }
 
 /**

@@ -29,6 +29,7 @@ import {
   ClipboardCheck,
   Radio,
   Megaphone,
+  Award,
 } from "lucide-react"
 import type { PageKey } from "@/lib/page-access"
 import { RelayIconWhite, RelayWordmarkWhite } from "@/components/logo"
@@ -52,6 +53,7 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "voice",           href: "/voice",              label: "Employee Voice", icon: Megaphone },
   { key: "suggestions",     href: "/suggestions",       label: "Suggestions",    icon: Lightbulb },
   { key: "surveys",         href: "/surveys",           label: "Surveys",        icon: ClipboardList },
+  { key: "recognition",    href: "/recognition",       label: "Recognition",    icon: Award },
   { key: "analytics",       href: "/analytics",         label: "Analytics",      icon: BarChart2 },
   { key: "sops",            href: "/sops",              label: "SOPs",           icon: BookOpen },
   { key: "purchase-requests", href: "/purchase-requests", label: "Purchases",   icon: ShoppingCart },
@@ -61,7 +63,9 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
 const PAGE_LABELS: [string, string][] = [
   ["/voice/insights",                          "Voice Insights"],
   ["/voice",                                   "Employee Voice"],
-  ["/surveys/manage/new",                      "New Survey"],
+  ["/recognition/new",                          "Give Recognition"],
+  ["/recognition",                              "Recognition"],
+  ["/surveys/manage/new",                       "New Survey"],
   ["/surveys/manage/",                         "Survey Results"],
   ["/surveys/manage",                          "Manage Surveys"],
   ["/surveys/",                                "Take Survey"],

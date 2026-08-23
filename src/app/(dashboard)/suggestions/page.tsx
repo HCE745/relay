@@ -5,7 +5,7 @@ import { cookies } from "next/headers"
 import { Header } from "@/components/layout/header"
 import { SuggestionForm } from "@/components/suggestions/suggestion-form"
 import { SuggestionInbox } from "@/components/suggestions/suggestion-inbox"
-import { isProfessional } from "@/lib/pricing"
+import { isProfessional, isRecognitionEnabled } from "@/lib/pricing"
 import type { SuggestionType } from "@/lib/suggestion-constants"
 
 export const dynamic = "force-dynamic"
@@ -47,9 +47,11 @@ export default async function SuggestionsPage({
       orderBy: { name: "asc" },
       select: { id: true, name: true, role: true },
     }),
-    prisma.organization.findUnique({ where: { id: orgId }, select: { aiSuggestionsAvailable: true, aiSuggestionsPolicy: true, plan: true } }),
+    prisma.organization.findUnique({ where: { id: orgId }, select: { aiSuggestionsAvailable: true, aiSuggestionsPolicy: true, plan: true, recognition_enabled: true } }),
     prisma.userSettings.findUnique({ where: { userId: session.userId }, select: { aiSuggestionsOn: true, aiSuggestionsCollapsed: true } }),
   ])
+
+  const recognitionEnabled = isRecognitionEnabled(org?.plan ?? "essentials", org?.recognition_enabled ?? false)
 
   const aiPolicy = org?.aiSuggestionsPolicy ?? "user_choice"
   const aiSuggestionsEnabled =
@@ -96,6 +98,7 @@ export default async function SuggestionsPage({
               sessionUserId={session.userId}
               isAdmin={false}
               defaultApproachesExpanded={!panelsCollapsed}
+              recognitionEnabled={recognitionEnabled}
             />
           </div>
         )}
@@ -120,6 +123,7 @@ export default async function SuggestionsPage({
               sessionUserId={session.userId}
               isAdmin={true}
               defaultApproachesExpanded={!panelsCollapsed}
+              recognitionEnabled={recognitionEnabled}
             />
           </div>
         )}

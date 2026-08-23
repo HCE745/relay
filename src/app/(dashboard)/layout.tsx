@@ -18,7 +18,7 @@ import { cookies } from "next/headers"
 import { getAccessConfig, type PageAccessConfig } from "@/lib/page-access"
 import { setOrgContext } from "@/lib/sentry"
 import { Clock, AlertTriangle } from "lucide-react"
-import { isReadOnly, isWashEssentials } from "@/lib/pricing"
+import { isReadOnly, isWashEssentials, isRecognitionEnabled } from "@/lib/pricing"
 import type { CustomViewSidebarItem } from "@/lib/custom-view-config"
 import type { CustomPageSidebarItem } from "@/lib/widget-registry"
 import { ReadOnlyProvider } from "@/components/layout/read-only-context"
@@ -54,6 +54,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         executive_briefings_enabled: true,
         executive_goals_enabled: true,
         trend_detection_enabled: true,
+        recognition_enabled: true,
         navigationConfig: true,
       },
     }),
@@ -101,13 +102,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const storedConfig = (org?.pageAccessConfig ?? null) as PageAccessConfig | null
   const basePageKeys = getAccessConfig(session.role, storedConfig)
 
+  // Recognition: only visible when org flag + Professional plan both satisfied
+  const recognitionOn = isRecognitionEnabled(org?.plan ?? "essentials", org?.recognition_enabled ?? false)
+
   // Wash Essentials hides features that are out of scope for the car-wash product
   const WASH_ESSENTIALS_HIDDEN: Set<string> = new Set([
     "departments", "sops", "purchase-requests", "approval-intelligence",
   ])
-  const allowedPageKeys = isWashEssentials(session.productLine)
+  const baseFiltered = isWashEssentials(session.productLine)
     ? basePageKeys.filter(k => !WASH_ESSENTIALS_HIDDEN.has(k))
     : basePageKeys
+  const allowedPageKeys = recognitionOn
+    ? ([...baseFiltered, "recognition"] as typeof baseFiltered)
+    : baseFiltered
   const cookieStore = await cookies()
   // relay-vd: set by /demo-video page for iframe recording
   // relay-vm: set by middleware when ?videomode=true is in the URL

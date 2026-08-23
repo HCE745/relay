@@ -586,3 +586,28 @@ export type VisibilityRun = Prisma.VisibilityRunModel
  * 
  */
 export type VisibilitySetting = Prisma.VisibilitySettingModel
+/**
+ * Model Survey
+ * 
+ */
+export type Survey = Prisma.SurveyModel
+/**
+ * Model SurveyQuestion
+ * 
+ */
+export type SurveyQuestion = Prisma.SurveyQuestionModel
+/**
+ * Model SurveyResponse
+ * 
+ */
+export type SurveyResponse = Prisma.SurveyResponseModel
+/**
+ * Model SurveyAnswer
+ * 
+ */
+export type SurveyAnswer = Prisma.SurveyAnswerModel
+/**
+ * Model Recognition
+ * 
+ */
+export type Recognition = Prisma.RecognitionModel

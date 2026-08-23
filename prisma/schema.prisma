@@ -207,6 +207,7 @@ model Organization {
   customViews           CustomView[]
   customPages           CustomPage[]
   surveys               Survey[]
+  recognitions          Recognition[]
 }
 
 model CustomView {
@@ -337,6 +338,8 @@ model User {
   referralsInitiated          Referral[]               @relation("ReferralInitiator")
   createdSurveys              Survey[]                 @relation("CreatedSurveys")
   surveyResponses             SurveyResponse[]         @relation("SurveyResponses")
+  receivedRecognitions        Recognition[]            @relation("ReceivedRecognitions")
+  grantedRecognitions         Recognition[]            @relation("GrantedRecognitions")
 }
 
 model PasswordResetToken {
@@ -667,6 +670,7 @@ model Suggestion {
   routedToUser     User?        @relation("SuggestionRoutedTo", fields: [routedToUserId], references: [id], onDelete: SetNull)
   convertedToIssue Issue?       @relation("SuggestionIssue", fields: [convertedToIssueId], references: [id])
   attachments      Attachment[]
+  recognition      Recognition? @relation("SuggestionRecognition")
 }
 
 // ─── Email Templates ──────────────────────────────────────────────────────────
@@ -2772,4 +2776,25 @@ model SurveyAnswer {
 
   @@unique([responseId, questionId])
   @@index([questionId])
+}
+
+// ─── Employee Voice — Recognition ────────────────────────────────────────────
+
+model Recognition {
+  id             String    @id @default(cuid())
+  organizationId String
+  recipientId    String
+  grantedById    String
+  message        String
+  visibility     String    @default("PUBLIC")  // "PUBLIC" | "PRIVATE"
+  suggestionId   String?   @unique             // one recognition per suggestion
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  recipient    User         @relation("ReceivedRecognitions", fields: [recipientId], references: [id])
+  grantedBy    User         @relation("GrantedRecognitions", fields: [grantedById], references: [id])
+  suggestion   Suggestion?  @relation("SuggestionRecognition", fields: [suggestionId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([recipientId])
 }

@@ -490,9 +490,9 @@ export function TourOverlay() {
   useEffect(() => {
     if (isActive && currentStep === 1 && !trackedStartRef.current) {
       trackedStartRef.current = true
-      fireTrackingEvent("tour_started", { step: 1 })
+      fireTrackingEvent("tour_started", { step: 1, industry })
     }
-  }, [isActive, currentStep])
+  }, [isActive, currentStep]) // eslint-disable-line
 
   // Fire tour_step_completed whenever we advance past a step
   useEffect(() => {

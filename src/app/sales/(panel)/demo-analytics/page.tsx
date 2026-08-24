@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import { subDays, startOfDay, format } from "date-fns"
-import { BarChart2, Users, Clock, MousePointerClick, TrendingUp, Target } from "lucide-react"
+import { BarChart2, Users, Clock, MousePointerClick, TrendingUp, Target, Mail, CheckCircle2 } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -39,6 +39,30 @@ export default async function DemoAnalyticsPage() {
 
   const since30 = startOfDay(subDays(new Date(), 30))
   const since14 = startOfDay(subDays(new Date(), 13))
+
+  // Email-referred tour sessions via LinkClick → LinkTrackingEvent
+  const emailClicks = await prisma.linkClick.findMany({
+    where: {
+      crmEmailId: { not: null },
+      isBotSuspected: false,
+      events: { some: { eventType: "tour_started", isBotSuspected: false } },
+    },
+    include: {
+      events: {
+        where: { isBotSuspected: false },
+        orderBy: { createdAt: "asc" },
+      },
+      crmEmail: {
+        select: {
+          sentAt: true,
+          demoCall: { select: { contactName: true, companyName: true } },
+        },
+      },
+      prospect: { select: { id: true, companyName: true } },
+    },
+    orderBy: { firstClickedAt: "desc" },
+    take: 100,
+  })
 
   const [all, recent, industriesRaw, ctaStats, conversions, dailyCounts, tourSessions] = await Promise.all([
     prisma.demoAnalytics.count(),
@@ -136,6 +160,85 @@ export default async function DemoAnalyticsPage() {
     const drop = stepCounts[i].count - stepCounts[i + 1].count
     if (drop > maxDropoff) { maxDropoff = drop; maxDropoffStep = stepCounts[i].step }
   }
+
+  // ── Email-referred session processing ────────────────────────────────────
+  function stepsForIndustry(ind: string | null) {
+    if (ind === "Car Wash") return 20
+    if (ind === "Property Management") return 20
+    if (ind === "Manufacturing") return 21
+    return 22
+  }
+  function fmtActiveSec(sec: number) {
+    if (sec < 60) return `${sec}s`
+    const m = Math.floor(sec / 60), s = sec % 60
+    return s > 0 ? `${m}m ${s}s` : `${m}m`
+  }
+
+  type EmailSession = {
+    id: string
+    contactName: string | null
+    companyName: string | null
+    emailSentAt: Date | null
+    visitDate: Date | null
+    industry: string | null
+    stepsCompleted: number
+    totalSteps: number
+    tourCompleted: boolean
+    activeTimeSec: number
+    ctaLabel: string | null
+  }
+
+  const emailSessions: EmailSession[] = emailClicks.map(click => {
+    const events = click.events
+    const tourStarted = events.find(e => e.eventType === "tour_started")
+    const stepEvts = events.filter(e => e.eventType === "tour_step_completed")
+    const uniqueSteps = new Set(stepEvts.map(e => (e.eventData as Record<string, unknown>)?.step))
+    const industry = (tourStarted?.eventData as Record<string, unknown> | null)?.industry as string | null ?? null
+    const visitDate = events.find(e => e.eventType === "tour_started")?.createdAt ?? null
+
+    let ctaLabel: string | null = null
+    for (const ev of events) {
+      if (ev.eventType === "trial_started") { ctaLabel = "Start Trial"; break }
+      if (ev.eventType === "demo_requested") { ctaLabel = "Book Demo"; break }
+      if (ev.eventType === "pricing_viewed" && !ctaLabel) ctaLabel = "Explore"
+    }
+
+    const activeTimeSec = events.reduce((mx, ev) => Math.max(mx, ev.activeTimeSeconds ?? 0), 0)
+
+    return {
+      id: click.id,
+      contactName: click.crmEmail?.demoCall?.contactName ?? null,
+      companyName: click.crmEmail?.demoCall?.companyName ?? click.prospect?.companyName ?? null,
+      emailSentAt: click.crmEmail?.sentAt ?? null,
+      visitDate,
+      industry,
+      stepsCompleted: uniqueSteps.size,
+      totalSteps: stepsForIndustry(industry),
+      tourCompleted: events.some(e => e.eventType === "tour_completed"),
+      activeTimeSec,
+      ctaLabel,
+    }
+  })
+
+  const emailTotal = emailSessions.length
+  const emailCompleted = emailSessions.filter(s => s.tourCompleted).length
+  const emailCompRate = emailTotal > 0 ? ((emailCompleted / emailTotal) * 100).toFixed(0) : "0"
+  const emailAvgSteps = emailTotal > 0
+    ? (emailSessions.reduce((sum, s) => sum + s.stepsCompleted, 0) / emailTotal).toFixed(1)
+    : "0"
+
+  // Direct (anonymous DemoAnalytics) comparison
+  const directAvgSteps = totalTourSessions > 0
+    ? (tourSessions.reduce((sum, s) => sum + s.tourStepsCompleted.length, 0) / totalTourSessions).toFixed(1)
+    : "0"
+
+  // Industry breakdown for email sessions
+  const emailIndustryMap: Record<string, number> = {}
+  for (const s of emailSessions) {
+    const key = s.industry ?? "Unknown"
+    emailIndustryMap[key] = (emailIndustryMap[key] ?? 0) + 1
+  }
+  const emailIndustries = Object.entries(emailIndustryMap).sort(([, a], [, b]) => b - a)
 
   return (
     <div className="p-6 max-w-6xl space-y-6">
@@ -331,6 +434,129 @@ export default async function DemoAnalyticsPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Traffic Source Breakdown ── */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Mail className="w-4 h-4 text-indigo-400" />
+          <h2 className="text-sm font-semibold text-gray-300">Traffic Source</h2>
+          <span className="text-[11px] text-gray-600 ml-auto">Email-referred vs Direct</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Email-referred */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
+              <span className="text-xs font-semibold text-gray-300">Email ({emailTotal} sessions)</span>
+            </div>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between text-gray-400 bg-gray-800/50 rounded-lg px-3 py-2">
+                <span>Tour completion rate</span>
+                <span className={`font-semibold ${parseInt(emailCompRate) >= 50 ? "text-emerald-400" : "text-gray-300"}`}>{emailCompRate}%</span>
+              </div>
+              <div className="flex items-center justify-between text-gray-400 bg-gray-800/50 rounded-lg px-3 py-2">
+                <span>Avg steps completed</span>
+                <span className="font-semibold text-gray-300">{emailAvgSteps}</span>
+              </div>
+              {emailIndustries.length > 0 && (
+                <div className="bg-gray-800/50 rounded-lg px-3 py-2">
+                  <div className="text-gray-500 mb-1.5">Industries selected</div>
+                  <div className="space-y-1">
+                    {emailIndustries.slice(0, 5).map(([ind, cnt]) => (
+                      <div key={ind} className="flex items-center justify-between">
+                        <span className="text-gray-400">{ind}</span>
+                        <span className="text-gray-500">{cnt}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {emailTotal === 0 && (
+                <p className="text-gray-600 text-xs italic">No email-referred tour sessions yet. Send tracked emails and watch this fill in.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Direct */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-gray-500 shrink-0" />
+              <span className="text-xs font-semibold text-gray-300">Direct ({totalTourSessions} sessions)</span>
+            </div>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between text-gray-400 bg-gray-800/50 rounded-lg px-3 py-2">
+                <span>Tour completion rate</span>
+                <span className={`font-semibold ${parseFloat(completionRate) >= 50 ? "text-emerald-400" : "text-gray-300"}`}>{completionRate}%</span>
+              </div>
+              <div className="flex items-center justify-between text-gray-400 bg-gray-800/50 rounded-lg px-3 py-2">
+                <span>Avg steps completed</span>
+                <span className="font-semibold text-gray-300">{directAvgSteps}</span>
+              </div>
+              {totalTourSessions === 0 && (
+                <p className="text-gray-600 text-xs italic">No direct tour sessions recorded in last 30 days.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Visitors From Your Emails ── */}
+      {emailSessions.length > 0 && (
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-sm font-semibold text-gray-300">Visitors From Your Emails</h2>
+            <span className="text-[11px] text-gray-600 ml-auto">{emailSessions.length} known session{emailSessions.length !== 1 ? "s" : ""}</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-gray-600 border-b border-gray-800">
+                  <th className="text-left pb-2 font-medium pr-4">Contact / Company</th>
+                  <th className="text-left pb-2 font-medium pr-4">Email Sent</th>
+                  <th className="text-left pb-2 font-medium pr-4">Tour Visit</th>
+                  <th className="text-left pb-2 font-medium pr-4">Industry</th>
+                  <th className="text-left pb-2 font-medium pr-4">Steps</th>
+                  <th className="text-left pb-2 font-medium pr-4">Time</th>
+                  <th className="text-left pb-2 font-medium">CTA</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800/60">
+                {emailSessions.slice(0, 50).map(s => (
+                  <tr key={s.id} className="hover:bg-gray-800/30 transition-colors">
+                    <td className="py-2.5 pr-4">
+                      <div className="font-medium text-gray-300">{s.contactName ?? "—"}</div>
+                      <div className="text-gray-600">{s.companyName ?? "Unknown company"}</div>
+                    </td>
+                    <td className="py-2.5 pr-4 text-gray-500">
+                      {s.emailSentAt ? s.emailSentAt.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—"}
+                    </td>
+                    <td className="py-2.5 pr-4 text-gray-500">
+                      {s.visitDate ? s.visitDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—"}
+                    </td>
+                    <td className="py-2.5 pr-4 text-gray-400">{s.industry ?? "—"}</td>
+                    <td className="py-2.5 pr-4">
+                      <span className="text-gray-300 font-medium">{s.stepsCompleted}</span>
+                      <span className="text-gray-600"> / {s.totalSteps}</span>
+                    </td>
+                    <td className="py-2.5 pr-4 text-gray-500">
+                      {s.activeTimeSec > 0 ? fmtActiveSec(s.activeTimeSec) : "—"}
+                    </td>
+                    <td className="py-2.5">
+                      {s.ctaLabel ? (
+                        <span className="px-1.5 py-0.5 rounded bg-amber-900/40 text-amber-300 text-[10px] font-medium">{s.ctaLabel}</span>
+                      ) : (
+                        <span className="text-gray-700">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

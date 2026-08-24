@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import {
   Mail, Send, X, ChevronDown, Loader2, RefreshCw, ArrowLeft,
   ArrowUpRight, ArrowDownLeft, Search, Calendar, CheckCircle2, Clock, Eye, EyeOff,
+  MapPin, Footprints, BarChart2, MousePointerClick,
 } from "lucide-react"
 import { EmailActionMenu } from "@/components/crm/email-action-menu"
 
@@ -429,6 +430,164 @@ function ThreadRow({ thread, isSelected, onClick }: {
 
 // ─── Thread detail ────────────────────────────────────────────────────────────
 
+// ─── Tour Engagement ──────────────────────────────────────────────────────────
+
+interface TourEngagementData {
+  hasEngagement:    boolean
+  linkClicked:      boolean
+  linkClickedAt:    string | null
+  tourStarted:      boolean
+  industrySelected: string | null
+  stepsCompleted:   number
+  totalSteps:       number
+  tourCompleted:    boolean
+  activeTimeSec:    number
+  ctaClicked:       string | null
+  ctaClickedLabel:  string | null
+}
+
+function fmtActiveSec(sec: number): string {
+  if (sec < 60) return `${sec}s`
+  const m = Math.floor(sec / 60)
+  const s = sec % 60
+  return s > 0 ? `${m}m ${s}s` : `${m}m`
+}
+
+function fmtRelative(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const days = Math.floor(diff / 86400000)
+  if (days === 0) return "today"
+  if (days === 1) return "yesterday"
+  if (days < 30) return `${days}d ago`
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+}
+
+function TourEngagementBanner({ emailIds }: { emailIds: string[] }) {
+  const [data, setData] = useState<TourEngagementData | null>(null)
+  const ids = emailIds.join(",")
+
+  useEffect(() => {
+    if (!ids) return
+    fetch(`/api/super-admin/crm/tour-engagement?emailIds=${ids}`)
+      .then(r => r.json() as Promise<TourEngagementData>)
+      .then(d => { if (d.hasEngagement) setData(d) })
+      .catch(() => {})
+  }, [ids])
+
+  if (!data) return null
+
+  const pctSteps = data.totalSteps > 0
+    ? Math.round((data.stepsCompleted / data.totalSteps) * 100)
+    : 0
+
+  return (
+    <div className="px-5 pt-3 shrink-0">
+      <div className="bg-indigo-950/40 border border-indigo-700/40 rounded-xl p-4">
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-3">
+          <BarChart2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+          <span className="text-xs font-semibold text-indigo-300 uppercase tracking-wide">Tour Engagement</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs">
+          {/* Link Clicked */}
+          <div className="flex items-start gap-1.5">
+            <MousePointerClick className="w-3 h-3 text-gray-500 mt-0.5 shrink-0" />
+            <div>
+              <span className="text-gray-500">Link Clicked</span>
+              <span className={`ml-1.5 font-medium ${data.linkClicked ? "text-emerald-400" : "text-gray-600"}`}>
+                {data.linkClicked ? "Yes" : "No"}
+              </span>
+              {data.linkClickedAt && (
+                <span className="text-gray-600 ml-1">· {fmtRelative(data.linkClickedAt)}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Tour Started */}
+          <div className="flex items-start gap-1.5">
+            <Footprints className="w-3 h-3 text-gray-500 mt-0.5 shrink-0" />
+            <div>
+              <span className="text-gray-500">Tour Started</span>
+              <span className={`ml-1.5 font-medium ${data.tourStarted ? "text-emerald-400" : "text-gray-600"}`}>
+                {data.tourStarted ? "Yes" : "No"}
+              </span>
+            </div>
+          </div>
+
+          {/* Industry */}
+          {data.tourStarted && (
+            <div className="flex items-start gap-1.5">
+              <MapPin className="w-3 h-3 text-gray-500 mt-0.5 shrink-0" />
+              <div>
+                <span className="text-gray-500">Industry</span>
+                <span className="ml-1.5 font-medium text-gray-200">
+                  {data.industrySelected ?? "—"}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Steps */}
+          {data.tourStarted && (
+            <div className="flex items-start gap-1.5">
+              <BarChart2 className="w-3 h-3 text-gray-500 mt-0.5 shrink-0" />
+              <div>
+                <span className="text-gray-500">Steps</span>
+                <span className="ml-1.5 font-medium text-gray-200">
+                  {data.stepsCompleted} of {data.totalSteps}
+                </span>
+                {data.totalSteps > 0 && (
+                  <span className="text-gray-600 ml-1">({pctSteps}%)</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Tour Completed */}
+          {data.tourStarted && (
+            <div className="flex items-start gap-1.5">
+              <CheckCircle2 className="w-3 h-3 text-gray-500 mt-0.5 shrink-0" />
+              <div>
+                <span className="text-gray-500">Completed</span>
+                <span className={`ml-1.5 font-medium ${data.tourCompleted ? "text-emerald-400" : "text-gray-500"}`}>
+                  {data.tourCompleted ? "Yes" : "No"}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Active Time */}
+          {data.activeTimeSec > 0 && (
+            <div className="flex items-start gap-1.5">
+              <Clock className="w-3 h-3 text-gray-500 mt-0.5 shrink-0" />
+              <div>
+                <span className="text-gray-500">Active Time</span>
+                <span className="ml-1.5 font-medium text-gray-200">{fmtActiveSec(data.activeTimeSec)}</span>
+              </div>
+            </div>
+          )}
+
+          {/* CTA */}
+          {data.tourStarted && (
+            <div className="flex items-start gap-1.5 col-span-2">
+              <MousePointerClick className="w-3 h-3 text-gray-500 mt-0.5 shrink-0" />
+              <div>
+                <span className="text-gray-500">CTA Clicked</span>
+                <span className={`ml-1.5 font-medium ${data.ctaClickedLabel ? "text-amber-400" : "text-gray-600"}`}>
+                  {data.ctaClickedLabel ?? "None"}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
   thread:         Thread
   onBack:         () => void
@@ -510,6 +669,7 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
 
   const lastEmail = thread.emails[thread.emails.length - 1]!
   const replyAddr = lastEmail.direction === "received" ? lastEmail.fromAddress : lastEmail.toAddress
+  const sentEmailIds = thread.emails.filter(e => e.direction === "sent").map(e => e.id)
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -539,6 +699,9 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
           {thread.emails.length} email{thread.emails.length !== 1 ? "s" : ""}
         </span>
       </div>
+
+      {/* Tour engagement (lazy loaded — only shown when a tracked link was clicked) */}
+      <TourEngagementBanner emailIds={sentEmailIds} />
 
       {/* Email list */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">

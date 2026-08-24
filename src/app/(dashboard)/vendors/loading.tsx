@@ -13,7 +13,7 @@ export default function VendorsLoading() {
         </div>
       </div>
 
-      <div className="px-3 md:px-6 py-2 md:py-6">
+      <div className="px-3 md:px-6 py-2 md:py-6" data-tour="vendor-list">
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-4 py-4 border-b border-gray-100 last:border-0">

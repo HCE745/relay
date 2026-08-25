@@ -593,7 +593,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "cinematic",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-01.mp3",
     getTitle: () => "Equipment goes down. Customers leave. No one knows until the next shift.",
     getExplain: () =>
       "Running a car wash means keeping every bay operational, responding to equipment failures before they cost revenue, and staying ahead of maintenance. The challenge is the same whether you run self-service stalls, in-bay automatics, or a tunnel: problems surface faster than communication does. Relay gives your team a shared operational system so nothing gets missed.",
@@ -604,7 +604,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 2,
     path: "/dashboard",
     targetSelector: "[data-tour='carwash-equipment-status']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-02.mp3",
     cue: "This is what your team sees before the first car arrives.",
     getTitle: () => "Bay and equipment status — before the first car arrives.",
     getExplain: () =>
@@ -616,7 +616,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 3,
     path: "/dashboard",
     targetSelector: "[data-tour='carwash-customer-reports']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-03.mp3",
     cue: "Customer reports come in directly — no phone call required.",
     getTitle: () => "Customer reports flow directly to your team.",
     getExplain: () =>
@@ -628,7 +628,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 4,
     path: "/qr-codes",
     targetSelector: "[data-tour='qr-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-04.mp3",
     cue: "Every bay, vacuum, and pay station can have its own code.",
     getTitle: () => "The QR code does the routing — they just describe the problem.",
     getExplain: () =>
@@ -640,7 +640,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 5,
     path: "/issues/new",
     targetSelector: "[data-tour='issue-form']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-05.mp3",
     type: "form-fill",
     cue: "Your technician can log a problem from the floor just as quickly.",
     getTitle: () => "Staff report problems in seconds — from anywhere on site.",
@@ -658,7 +658,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 6,
     path: "/issues",
     targetSelector: "[data-tour='issue-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-06.mp3",
     cue: "Every report — customer and staff — in one unified queue.",
     getTitle: () => "All reports in one place. Nothing in a text thread.",
     getExplain: () =>
@@ -670,7 +670,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 7,
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='issue-detail-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-07.mp3",
     cue: "The report is already categorized and ready to assign.",
     getTitle: () => "Every problem has a clear owner immediately.",
     getExplain: () =>
@@ -682,7 +682,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 8,
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='ai-panel']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-08.mp3",
     cue: "Relay's AI can suggest what's likely wrong and how to respond.",
     getTitle: () => "AI analysis — before your technician arrives at the bay.",
     getExplain: () =>
@@ -694,7 +694,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 9,
     path: "ESCALATED_ISSUE",
     targetSelector: "[data-tour='issue-detail-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-09.mp3",
     cue: "Here's an issue that stayed open longer than it should have.",
     getTitle: () => "Critical failures get flagged — not buried.",
     getExplain: () =>
@@ -706,7 +706,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 10,
     path: "ESCALATED_ISSUE",
     targetSelector: "[data-tour='escalation-timeline']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-10.mp3",
     cue: "When no one responds in time, Relay escalates automatically.",
     getTitle: () => "Problems that go unaddressed don't stay silent.",
     getExplain: () =>
@@ -718,7 +718,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 11,
     path: "/assets",
     targetSelector: "[data-tour='asset-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-11.mp3",
     cue: "Every bay, pump, vacuum, and station is tracked here.",
     getTitle: () => "All equipment tracked in one system.",
     getExplain: () =>
@@ -730,7 +730,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 12,
     path: "FIRST_ASSET",
     targetSelector: "[data-tour='asset-history']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-12.mp3",
     getCue: () => "Every piece of equipment builds its own maintenance record.",
     getTitle: () => "Equipment history — every issue, every repair, every visit.",
     getExplain: () =>
@@ -742,7 +742,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 13,
     path: "/issues?category=MAINTENANCE",
     targetSelector: "[data-tour='issue-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-13.mp3",
     cue: "Routine maintenance stays visible alongside reactive repairs.",
     getTitle: () => "Stay ahead of maintenance — not behind it.",
     getExplain: () =>
@@ -754,7 +754,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 14,
     path: "/vendors",
     targetSelector: "[data-tour='vendor-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-14.mp3",
     cue: "Parts suppliers and service contractors stay connected to every issue.",
     getTitle: () => "Vendors connected to the work — not buried in a contact list.",
     getExplain: () =>
@@ -766,7 +766,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 15,
     path: "/locations",
     targetSelector: "[data-tour='location-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-15.mp3",
     cue: "Each wash site is its own location — all visible in one system.",
     getTitle: () => "All your sites in one system.",
     getExplain: () =>
@@ -778,7 +778,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 16,
     path: "/assignments",
     targetSelector: "[data-tour='assignment-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-16.mp3",
     cue: "Technicians see exactly what needs to get done — nothing missed.",
     getTitle: () => "One list. No hunting. Just the work.",
     getExplain: () =>
@@ -790,7 +790,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 17,
     path: "/communications/announcements",
     targetSelector: "[data-tour='announcements-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-17.mp3",
     cue: "Get a safety change or chemical update to every site immediately.",
     getTitle: () => "Critical communications reach every site at once.",
     getExplain: () =>
@@ -802,7 +802,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 18,
     path: "/analytics",
     targetSelector: "[data-tour='analytics-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-18.mp3",
     cue: "Every issue your team resolves builds this data over time.",
     getTitle: () => "The data that makes better maintenance decisions.",
     getExplain: () =>
@@ -814,7 +814,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     id: 19,
     path: "/voice",
     targetSelector: "[data-tour='voice-tiles']",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-19.mp3",
     cue: "Technicians can flag concerns and suggest improvements directly.",
     getTitle: () => "Give your team a direct channel.",
     getExplain: () =>
@@ -827,7 +827,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "completion",
-    audioFile: null,
+    audioFile: "/demo-audio/carwash-step-20.mp3",
     getTitle: () => "That's Relay for Car Wash.",
     getExplain: () =>
       "Relay helps car wash operators replace fragmented communication with a shared operational system. Equipment problems are tracked the moment they happen. Technicians have clear tasks. Managers have visibility across every site — self-serve, in-bay automatic, or tunnel. Wash Essentials is available for smaller operations. Full Relay covers multi-site operators that need the complete operational platform. Start a free trial or schedule a demo to see it running at your wash.",
@@ -843,7 +843,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "cinematic",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-01.mp3",
     getTitle: () => "A tenant reported water coming through the ceiling. Three hours later, no one has responded.",
     getExplain: () =>
       "Managing a property portfolio means handling tenant requests, coordinating contractors, tracking equipment across multiple buildings, and staying ahead of maintenance. When communication happens over the phone, email, and memory, things fall through. Relay gives property teams a shared operational system so every request is tracked, every technician has a clear task, and every property manager has full visibility.",
@@ -854,7 +854,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 2,
     path: "/dashboard",
     targetSelector: "[data-tour='pm-kpi-cards']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-02.mp3",
     cue: "This is what your property team sees every morning.",
     getTitle: () => "Your property portfolio — everything that matters, immediately.",
     getExplain: () =>
@@ -866,7 +866,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 3,
     path: "/dashboard",
     targetSelector: "[data-tour='pm-equipment-status']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-03.mp3",
     cue: "Building equipment status across all your properties.",
     getTitle: () => "Equipment health — across every building.",
     getExplain: () =>
@@ -878,7 +878,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 4,
     path: "/dashboard",
     targetSelector: "[data-tour='pm-tenant-requests']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-04.mp3",
     cue: "Tenant requests come in directly — no phone tag required.",
     getTitle: () => "Tenant requests flow directly to your team.",
     getExplain: () =>
@@ -890,7 +890,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 5,
     path: "/qr-codes",
     targetSelector: "[data-tour='qr-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-05.mp3",
     cue: "Each code is linked to a building, floor, or common area.",
     getTitle: () => "Tenants report problems in seconds — no account, no app.",
     getExplain: () =>
@@ -902,7 +902,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 6,
     path: "/issues/new",
     targetSelector: "[data-tour='issue-form']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-06.mp3",
     type: "form-fill",
     cue: "Watch how a maintenance tech logs the ceiling water damage report.",
     getTitle: () => "Staff and tenants report the same way — in seconds.",
@@ -920,7 +920,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 7,
     path: "/issues",
     targetSelector: "[data-tour='issue-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-07.mp3",
     cue: "Every request and issue — across all properties — in one queue.",
     getTitle: () => "Every request tracked. Nothing lost in email.",
     getExplain: () =>
@@ -932,7 +932,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 8,
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='issue-detail-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-08.mp3",
     cue: "Assign the right technician immediately — before the damage gets worse.",
     getTitle: () => "Every request has a clear owner within minutes.",
     getExplain: () =>
@@ -944,7 +944,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 9,
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='ai-panel']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-09.mp3",
     cue: "Relay's AI can identify the most likely source and response path.",
     getTitle: () => "AI helps narrow down the cause before the tech arrives.",
     getExplain: () =>
@@ -956,7 +956,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 10,
     path: "ESCALATED_ISSUE",
     targetSelector: "[data-tour='issue-detail-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-10.mp3",
     cue: "Here's a critical issue that needed to reach management.",
     getTitle: () => "High-impact issues surface immediately — not after the fact.",
     getExplain: () =>
@@ -968,7 +968,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 11,
     path: "ESCALATED_ISSUE",
     targetSelector: "[data-tour='escalation-timeline']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-11.mp3",
     cue: "When a contractor or tech misses the response window, Relay escalates.",
     getTitle: () => "No response? It escalates automatically.",
     getExplain: () =>
@@ -980,7 +980,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 12,
     path: "/assets",
     targetSelector: "[data-tour='asset-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-12.mp3",
     cue: "Every piece of building equipment tracked in one place.",
     getTitle: () => "All building equipment tracked across every property.",
     getExplain: () =>
@@ -992,7 +992,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 13,
     path: "FIRST_ASSET",
     targetSelector: "[data-tour='asset-history']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-13.mp3",
     getCue: () => "Every piece of equipment builds its own service history.",
     getTitle: () => "Equipment history — every issue, every inspection, every repair.",
     getExplain: () =>
@@ -1004,7 +1004,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 14,
     path: "/issues?category=MAINTENANCE",
     targetSelector: "[data-tour='issue-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-14.mp3",
     cue: "Scheduled maintenance stays visible alongside reactive tenant requests.",
     getTitle: () => "Maintenance queue — active work always in view.",
     getExplain: () =>
@@ -1016,7 +1016,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 15,
     path: "/vendors",
     targetSelector: "[data-tour='vendor-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-15.mp3",
     cue: "Every contractor in your portfolio — connected to the work.",
     getTitle: () => "Contractors connected to the work — not buried in a contact list.",
     getExplain: () =>
@@ -1028,7 +1028,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 16,
     path: "/locations",
     targetSelector: "[data-tour='location-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-16.mp3",
     cue: "Every property in your portfolio — all visible in one system.",
     getTitle: () => "All your properties in one system.",
     getExplain: () =>
@@ -1040,7 +1040,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 17,
     path: "/assignments",
     targetSelector: "[data-tour='assignment-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-17.mp3",
     cue: "Technicians always know what's on their plate and where.",
     getTitle: () => "Maintenance technicians have a clear daily work order.",
     getExplain: () =>
@@ -1052,7 +1052,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 18,
     path: "/analytics",
     targetSelector: "[data-tour='analytics-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-18.mp3",
     cue: "Every resolved request builds this data over time.",
     getTitle: () => "The data that drives better property decisions.",
     getExplain: () =>
@@ -1064,7 +1064,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     id: 19,
     path: "/voice",
     targetSelector: "[data-tour='voice-tiles']",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-19.mp3",
     cue: "Maintenance staff can surface process gaps and suggestions directly.",
     getTitle: () => "Give your maintenance team a direct channel.",
     getExplain: () =>
@@ -1077,14 +1077,14 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "completion",
-    audioFile: null,
+    audioFile: "/demo-audio/property-step-20.mp3",
     getTitle: () => "That's Relay for Property Management.",
     getExplain: () =>
       "Relay helps property management teams replace scattered communication with a shared operational system. Tenants have a clear way to report problems. Maintenance staff have clear assignments. Managers have visibility across every property. That means faster contractor response, better tenant communication, and a complete work order history across your portfolio. Start a free trial or schedule a demo to see it in your operation.",
   },
 ]
 
-// ─── Manufacturing tour (21 steps, all audioFile: null) ───────────────────────
+// ─── Manufacturing tour (21 steps) ───────────────────────────────────────────
 
 export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
   // Step 1: Cinematic
@@ -1093,7 +1093,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "cinematic",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-01.mp3",
     getTitle: () => "A machine on Line 3 went down. An operator mentioned it at shift change. It never got logged.",
     getExplain: () =>
       "Keeping equipment running, coordinating maintenance, managing safety procedures, and knowing what is happening across every plant and line — when any of these depend on verbal handoffs or text messages, problems disappear between shifts. Relay gives manufacturing teams a shared operational system so every equipment failure is tracked, every maintenance tech has a clear task, and plant managers have real-time visibility across every location.",
@@ -1104,7 +1104,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 2,
     path: "/dashboard",
     targetSelector: "[data-tour='kpi-cards']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-02.mp3",
     cue: "This is what your team sees the moment a shift starts.",
     getTitle: () => "Plant operations at a glance — before the first part ships.",
     getExplain: () =>
@@ -1116,7 +1116,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 3,
     path: "/dashboard",
     targetSelector: "[data-tour='mfg-machine-status']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-03.mp3",
     cue: "Every machine your plant tracks shows its current state here.",
     getTitle: () => "Machine status — operational, down, or in maintenance.",
     getExplain: () =>
@@ -1128,7 +1128,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 4,
     path: "/dashboard",
     targetSelector: "[data-tour='mfg-recent-breakdowns']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-04.mp3",
     cue: "Every equipment breakdown lands here the moment it's reported.",
     getTitle: () => "Equipment issues tracked the moment they happen.",
     getExplain: () =>
@@ -1140,7 +1140,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 5,
     path: "/issues/new",
     targetSelector: "[data-tour='issue-form']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-05.mp3",
     type: "form-fill",
     cue: "This is how any operator logs a problem — from a breakdown to a safety concern.",
     getTitle: () => "Any operator can log a problem in seconds.",
@@ -1158,7 +1158,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 6,
     path: "/issues",
     targetSelector: "[data-tour='issue-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-06.mp3",
     cue: "Every issue logged — across all lines and departments — in one queue.",
     getTitle: () => "Every issue tracked, assigned, and visible.",
     getExplain: () =>
@@ -1170,7 +1170,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 7,
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='issue-detail-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-07.mp3",
     cue: "The issue is already categorized and ready to assign.",
     getTitle: () => "Every issue has a clear owner immediately.",
     getExplain: () =>
@@ -1182,7 +1182,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 8,
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='ai-panel']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-08.mp3",
     cue: "Relay's AI can suggest likely causes and a response approach.",
     getTitle: () => "AI analysis — before the maintenance tech arrives at the machine.",
     getExplain: () =>
@@ -1194,7 +1194,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 9,
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='sop-panel']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-09.mp3",
     cue: "Safety procedures can be linked directly to the work order.",
     getTitle: () => "Safety procedures attached to the work — not in a binder.",
     getExplain: () =>
@@ -1206,7 +1206,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 10,
     path: "ESCALATED_ISSUE",
     targetSelector: "[data-tour='issue-detail-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-10.mp3",
     cue: "Here's a production-critical failure that required management escalation.",
     getTitle: () => "Production-impact failures are flagged — not buried.",
     getExplain: () =>
@@ -1218,7 +1218,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 11,
     path: "ESCALATED_ISSUE",
     targetSelector: "[data-tour='escalation-timeline']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-11.mp3",
     cue: "When an issue goes unresolved, Relay escalates automatically.",
     getTitle: () => "Production-impact issues don't wait for the next shift meeting.",
     getExplain: () =>
@@ -1230,7 +1230,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 12,
     path: "/assets",
     targetSelector: "[data-tour='asset-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-12.mp3",
     cue: "Every machine and piece of production equipment is tracked here.",
     getTitle: () => "All machines and equipment tracked in one system.",
     getExplain: () =>
@@ -1242,7 +1242,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 13,
     path: "FIRST_ASSET",
     targetSelector: "[data-tour='asset-history']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-13.mp3",
     getCue: () => "Every machine builds its own complete maintenance history.",
     getTitle: () => "Equipment history — every breakdown, every service, every repair.",
     getExplain: () =>
@@ -1254,7 +1254,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 14,
     path: "/qr-codes",
     targetSelector: "[data-tour='qr-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-14.mp3",
     cue: "Operators report machine problems without leaving the production line.",
     getTitle: () => "QR codes on every machine — report without leaving the floor.",
     getExplain: () =>
@@ -1266,7 +1266,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 15,
     path: "/sops",
     targetSelector: "[data-tour='sop-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-15.mp3",
     cue: "Every safety procedure, inspection checklist, and LOTO protocol — centralized.",
     getTitle: () => "SOPs centralized and searchable — not buried in a binder.",
     getExplain: () =>
@@ -1278,7 +1278,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 16,
     path: "/vendors",
     targetSelector: "[data-tour='vendor-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-16.mp3",
     cue: "Specialty repair contractors stay connected to every machine issue.",
     getTitle: () => "Specialist contractors connected to the work.",
     getExplain: () =>
@@ -1290,7 +1290,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 17,
     path: "/locations",
     targetSelector: "[data-tour='location-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-17.mp3",
     cue: "Each plant is its own location — all visible in one system.",
     getTitle: () => "All your plants in one system.",
     getExplain: () =>
@@ -1302,7 +1302,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 18,
     path: "/assignments",
     targetSelector: "[data-tour='assignment-list']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-18.mp3",
     cue: "Maintenance technicians have a clear task list every shift.",
     getTitle: () => "Every maintenance task has a clear owner and deadline.",
     getExplain: () =>
@@ -1314,7 +1314,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 19,
     path: "/analytics",
     targetSelector: "[data-tour='analytics-header']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-19.mp3",
     cue: "Every issue your team resolves builds this data over time.",
     getTitle: () => "Equipment reliability and maintenance data — across every plant.",
     getExplain: () =>
@@ -1326,7 +1326,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     id: 20,
     path: "/voice",
     targetSelector: "[data-tour='voice-tiles']",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-20.mp3",
     cue: "Operators surface near-misses and process gaps before they become incidents.",
     getTitle: () => "The people on the floor see problems first.",
     getExplain: () =>
@@ -1339,7 +1339,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "completion",
-    audioFile: null,
+    audioFile: "/demo-audio/manufacturing-step-21.mp3",
     getTitle: () => "That's Relay for Manufacturing.",
     getExplain: () =>
       "Relay helps manufacturing teams replace fragmented communication with a shared operational system. Equipment problems are tracked the moment they happen. Maintenance technicians have clear tasks. Plant managers have visibility across every plant and line. That means faster response to breakdowns, fewer issues lost between shifts, and a complete maintenance record for every machine. Start a free trial or schedule a demo to see it in your operation.",

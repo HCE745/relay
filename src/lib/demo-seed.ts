@@ -1569,6 +1569,23 @@ async function seedWorkforceCommsDemoContent({
       break
     }
 
+    case "car_wash": {
+      const bay2IssueId = await findIssue("Bay 2")
+      const roIssueId   = await findIssue("RO system")
+      asgSeeds = [
+        { title: "Replace vacuum filter on Vacuum 3",             notes: "Filters are stored in the pump room supply cabinet. Check suction after replacement and log result.", priority: "medium", status: "in_progress", assigneeId: emp(0), dueDate: fromNow(6),  linkedAssetId: asset(5)                              },
+        { title: "Inspect pay station coin mechanism",             notes: "Clean coin acceptor and test with a sample quarter. Log result in Relay when complete.",             priority: "medium", status: "pending",     assigneeId: emp(1), dueDate: fromNow(30), linkedAssetId: asset(6)                              },
+        { title: "Check RO system pressure readings",              notes: "Log inlet, outlet, and reject pressure. Compare against spec on the RO panel door.",                priority: "medium", status: "pending",     assigneeId: sup(0), dueDate: fromNow(72), linkedAssetId: asset(9), linkedIssueId: roIssueId   },
+        { title: "Clean and inspect Bay 2 equipment after repair", notes: "Verify high-pressure function, check nozzle, flush soap lines, and test coin operation.",           priority: "medium", status: "pending",     assigneeId: emp(0), dueDate: fromNow(6),  linkedAssetId: asset(1), linkedIssueId: bay2IssueId },
+      ]
+      annSeeds = [
+        { title: "Bay 2 back in service",                         body: "The high-pressure system on Bay 2 has been repaired and tested. Bay 2 is back in service. Thanks to the team for the quick turnaround.", priority: "normal", scopeType: "org",      scopeId: null,          requiresAcknowledgment: false },
+        { title: "Weekly equipment inspection — Friday morning",   body: "The weekly equipment inspection is scheduled for Friday morning. All site managers: please ensure area pre-inspection checklists are completed in Relay before the group walk begins.", priority: "normal", scopeType: "org", scopeId: null, requiresAcknowledgment: false },
+        { title: "Chemical supplier delivery tomorrow",            body: "The chemical supplier is delivering tomorrow morning. Please ensure the receiving area is clear and accessible before opening. Log any discrepancies in Relay immediately.", priority: "urgent", scopeType: "location", scopeId: locationIds[0], requiresAcknowledgment: true },
+      ]
+      break
+    }
+
     default:
       return
   }

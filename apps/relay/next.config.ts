@@ -1,7 +1,14 @@
 import type { NextConfig } from "next"
 import { withSentryConfig } from "@sentry/nextjs"
+import path from "path"
 
 const nextConfig: NextConfig = {
+  // In the monorepo, Next would otherwise infer the workspace root from a
+  // stray lockfile outside the repo. Pin it to the monorepo root so file
+  // tracing and bundling resolve correctly.
+  turbopack: {
+    root: path.join(__dirname, "..", ".."),
+  },
   async rewrites() {
     return [
       // Next.js can't route dot-prefixed segments, so we rewrite these well-known URLs

@@ -1,0 +1,15 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Native/build lifecycle scripts permitted to run during install.
+# Mirrors the per-app `allowScripts` fields so pnpm doesn't silently block
+# Prisma engine, sharp, esbuild, and Sentry CLI builds.
+onlyBuiltDependencies:
+  - "@prisma/client"
+  - "@prisma/engines"
+  - prisma
+  - sharp
+  - esbuild
+  - unrs-resolver
+  - "@sentry/cli"

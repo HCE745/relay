@@ -1,0 +1,25 @@
+export type ScanResult = {
+  vendorName: string | null
+  matchedVendorId: string | null
+  date: string | null
+  currency: string
+  subtotalCents: number | null
+  taxCents: number | null
+  totalCents: number | null
+  lineItems: {
+    description: string
+    amountCents: number
+    suggestedAccountId: string | null
+    suggestedAccountName: string
+  }[]
+  overallSuggestedAccountId: string | null
+  isLikelyRecurring: boolean
+  recurringReason: string | null
+  detectedTermMonths: number | null
+  isLikelyAnnualOrTermContract: boolean
+  confidence: "high" | "medium" | "low"
+  // Vercel Blob URL set server-side if BLOB_READ_WRITE_TOKEN is configured; null otherwise
+  receiptUrl: string | null
+  // Set when the scan route created a new vendor (not found in existing list)
+  createdVendorName: string | null
+}

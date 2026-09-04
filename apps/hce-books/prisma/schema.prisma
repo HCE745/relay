@@ -1,0 +1,1151 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["hce"]
+}
+
+// ─── FOUNDATIONAL ────────────────────────────────────────────────────────────
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  entities      Entity[]
+  users         HceUser[]
+  accounts      Account[]
+  periods       AccountingPeriod[]
+  journalEntries JournalEntry[]
+  classes       Class[]
+  departments   Department[]
+  customers     Customer[]
+  vendors       Vendor[]
+  invoices      Invoice[]
+  bills         Bill[]
+  products      Product[]
+  bankAccounts  BankAccount[]
+  bankTxns      BankTransaction[]
+  bankRules     BankRule[]
+  auditLogs     AuditLog[]
+  budgets       Budget[]
+  cashForecastAdjustments CashForecastAdjustment[]
+  recurringTemplates RecurringTemplate[]
+  amortizationSchedules AmortizationSchedule[]
+  anomalyFlags  AnomalyFlag[]
+  purchaseOrders PurchaseOrder[]
+  fixedAssets    FixedAsset[]
+  scenarios      Scenario[]
+
+  @@schema("hce")
+  @@map("hce_tenants")
+}
+
+model Entity {
+  id                    String   @id @default(cuid())
+  tenantId              String
+  name                  String
+  legalName             String
+  parentEntityId        String?
+  isConsolidationParent Boolean  @default(false)
+  baseCurrency          String   @default("USD")
+  createdAt             DateTime @default(now())
+
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent         Entity?  @relation("EntityHierarchy", fields: [parentEntityId], references: [id])
+  children       Entity[] @relation("EntityHierarchy")
+  userAccess     EntityAccess[]
+  accounts       Account[]
+  periods        AccountingPeriod[]
+  journalEntries JournalEntry[]
+  classes        Class[]
+  departments    Department[]
+  customers      Customer[]
+  vendors        Vendor[]
+  invoices       Invoice[]
+  bills          Bill[]
+  products       Product[]
+  bankAccounts   BankAccount[]
+  bankTxns       BankTransaction[]
+  auditLogs      AuditLog[]
+  budgets        Budget[]
+  cashForecastAdjustments CashForecastAdjustment[]
+  recurringTemplates RecurringTemplate[]
+  amortizationSchedules AmortizationSchedule[]
+  anomalyFlags   AnomalyFlag[]
+  purchaseOrders PurchaseOrder[]
+  fixedAssets    FixedAsset[]
+  scenarios      Scenario[]
+
+  @@index([tenantId])
+  @@schema("hce")
+  @@map("hce_entities")
+}
+
+model HceUser {
+  id           String   @id @default(cuid())
+  tenantId     String
+  email        String
+  name         String?
+  passwordHash String?
+  role         UserRole @default(VIEWER)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entityAccess  EntityAccess[]
+  journalEntries JournalEntry[]
+  auditLogs     AuditLog[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@schema("hce")
+  @@map("hce_users")
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  ACCOUNTANT
+  BOOKKEEPER
+  VIEWER
+
+  @@schema("hce")
+  @@map("hce_user_role")
+}
+
+model EntityAccess {
+  id       String @id @default(cuid())
+  userId   String
+  entityId String
+
+  user   HceUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entity Entity  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, entityId])
+  @@schema("hce")
+  @@map("hce_entity_access")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  tenantId   String
+  entityId   String?
+  userId     String?
+  action     String
+  tableName  String
+  recordId   String
+  beforeJson Json?
+  afterJson  Json?
+  createdAt  DateTime @default(now())
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity? @relation(fields: [entityId], references: [id])
+  user   HceUser? @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, tableName, recordId])
+  @@schema("hce")
+  @@map("hce_audit_logs")
+}
+
+// ─── LEDGER ──────────────────────────────────────────────────────────────────
+
+model Account {
+  id            String      @id @default(cuid())
+  tenantId      String
+  entityId      String
+  code          String
+  name          String
+  type          AccountType
+  subtype       String?
+  normalBalance NormalBalance
+  parentId      String?
+  isActive      Boolean     @default(true)
+  isCurrent     Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity       Entity        @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  parent       Account?      @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children     Account[]     @relation("AccountHierarchy")
+  journalLines JournalLine[]
+  invoiceLines InvoiceLine[]
+  billLines    BillLine[]
+  budgetLines  BudgetLine[]
+  poLines      PurchaseOrderLine[]
+
+  @@unique([tenantId, entityId, code])
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_accounts")
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  INCOME
+  EXPENSE
+
+  @@schema("hce")
+  @@map("hce_account_type")
+}
+
+enum NormalBalance {
+  DEBIT
+  CREDIT
+
+  @@schema("hce")
+  @@map("hce_normal_balance")
+}
+
+model AccountingPeriod {
+  id          String       @id @default(cuid())
+  tenantId    String
+  entityId    String
+  periodStart DateTime
+  periodEnd   DateTime
+  status      PeriodStatus @default(OPEN)
+  createdAt   DateTime     @default(now())
+
+  tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity         Entity         @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  journalEntries JournalEntry[]
+
+  @@unique([tenantId, entityId, periodStart, periodEnd])
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_accounting_periods")
+}
+
+enum PeriodStatus {
+  OPEN
+  CLOSED
+
+  @@schema("hce")
+  @@map("hce_period_status")
+}
+
+model JournalEntry {
+  id                    String              @id @default(cuid())
+  tenantId              String
+  entityId              String
+  periodId              String?
+  date                  DateTime
+  memo                  String?
+  source                JournalSource       @default(MANUAL)
+  sourceId              String?
+  status                JournalStatus       @default(DRAFT)
+  isIntercompany        Boolean             @default(false)
+  counterpartyEntityId  String?
+  intercompanyGroupId   String?
+  createdByUserId       String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  tenant  Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity  Entity           @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  period  AccountingPeriod? @relation(fields: [periodId], references: [id])
+  createdBy HceUser?       @relation(fields: [createdByUserId], references: [id])
+  lines   JournalLine[]
+
+  @@index([tenantId, entityId])
+  @@index([tenantId, intercompanyGroupId])
+  @@index([sourceId])
+  @@schema("hce")
+  @@map("hce_journal_entries")
+}
+
+enum JournalSource {
+  MANUAL
+  INVOICE
+  BILL
+  PAYMENT
+  RECONCILIATION
+  INTERCOMPANY
+  CLOSING
+  RECURRING
+  AMORTIZATION
+  FIXED_ASSET
+  DEPRECIATION
+
+  @@schema("hce")
+  @@map("hce_journal_source")
+}
+
+enum JournalStatus {
+  DRAFT
+  POSTED
+  VOID
+
+  @@schema("hce")
+  @@map("hce_journal_status")
+}
+
+model JournalLine {
+  id             String  @id @default(cuid())
+  journalEntryId String
+  accountId      String
+  debit          Int     @default(0)
+  credit         Int     @default(0)
+  classId        String?
+  departmentId   String?
+  memo           String?
+
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  account      Account      @relation(fields: [accountId], references: [id])
+  class        Class?       @relation(fields: [classId], references: [id])
+  department   Department?  @relation(fields: [departmentId], references: [id])
+
+  @@index([journalEntryId])
+  @@index([accountId])
+  @@schema("hce")
+  @@map("hce_journal_lines")
+}
+
+model Class {
+  id       String @id @default(cuid())
+  tenantId String
+  entityId String
+  name     String
+  isActive Boolean @default(true)
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity       Entity        @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  journalLines JournalLine[]
+  invoiceLines InvoiceLine[]
+  billLines    BillLine[]
+
+  @@unique([tenantId, entityId, name])
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_classes")
+}
+
+model Department {
+  id       String @id @default(cuid())
+  tenantId String
+  entityId String
+  name     String
+  isActive Boolean @default(true)
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity       Entity        @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  journalLines JournalLine[]
+  invoiceLines InvoiceLine[]
+  billLines    BillLine[]
+
+  @@unique([tenantId, entityId, name])
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_departments")
+}
+
+// ─── AR / AP ──────────────────────────────────────────────────────────────────
+
+model Customer {
+  id             String  @id @default(cuid())
+  tenantId       String
+  entityId       String
+  name           String
+  email          String?
+  phone          String?
+  address        String?
+  paymentTerms   String  @default("NET30")
+  defaultAccountId String?
+  taxRate        Float?
+  isActive       Boolean @default(true)
+  createdAt      DateTime @default(now())
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity   Entity    @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  invoices Invoice[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_customers")
+}
+
+model Vendor {
+  id             String  @id @default(cuid())
+  tenantId       String
+  entityId       String
+  name           String
+  email          String?
+  phone          String?
+  address        String?
+  paymentTerms   String  @default("NET30")
+  defaultAccountId String?
+  taxId          String?
+  isActive       Boolean @default(true)
+  createdAt      DateTime @default(now())
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity         Entity          @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  bills          Bill[]
+  purchaseOrders PurchaseOrder[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_vendors")
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  tenantId    String
+  entityId    String
+  name        String
+  description String?
+  type        ProductType @default(SERVICE)
+  unitPrice   Int         @default(0)
+  incomeAccountId  String?
+  expenseAccountId String?
+  taxRate     Float?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_products")
+}
+
+enum ProductType {
+  SERVICE
+  INVENTORY
+  NON_INVENTORY
+
+  @@schema("hce")
+  @@map("hce_product_type")
+}
+
+model Invoice {
+  id              String        @id @default(cuid())
+  tenantId        String
+  entityId        String
+  customerId      String
+  invoiceNumber   String
+  date            DateTime
+  dueDate         DateTime
+  status          InvoiceStatus @default(DRAFT)
+  memo            String?
+  taxRate         Float?
+  subtotal        Int           @default(0)
+  taxAmount       Int           @default(0)
+  total           Int           @default(0)
+  amountPaid      Int           @default(0)
+  amountDue       Int           @default(0)
+  journalEntryId  String?
+  isRecurring     Boolean       @default(false)
+  recurringCron   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  tenant   Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity   Entity        @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  customer Customer      @relation(fields: [customerId], references: [id])
+  lines    InvoiceLine[]
+  payments InvoicePayment[]
+  creditMemos CreditMemo[]
+
+  @@unique([tenantId, entityId, invoiceNumber])
+  @@index([tenantId, entityId])
+  @@index([customerId])
+  @@schema("hce")
+  @@map("hce_invoices")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIAL
+  PAID
+  OVERDUE
+  VOID
+
+  @@schema("hce")
+  @@map("hce_invoice_status")
+}
+
+model InvoiceLine {
+  id           String  @id @default(cuid())
+  invoiceId    String
+  description  String?
+  productId    String?
+  accountId    String?
+  quantity     Float   @default(1)
+  unitPrice    Int
+  amount       Int
+  taxRate      Float?
+  taxAmount    Int     @default(0)
+  classId      String?
+  departmentId String?
+
+  invoice    Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  account    Account?    @relation(fields: [accountId], references: [id])
+  class      Class?      @relation(fields: [classId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  @@index([invoiceId])
+  @@schema("hce")
+  @@map("hce_invoice_lines")
+}
+
+model InvoicePayment {
+  id             String   @id @default(cuid())
+  invoiceId      String
+  date           DateTime
+  amount         Int
+  bankAccountId  String?
+  journalEntryId String?
+  memo           String?
+  createdAt      DateTime @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@schema("hce")
+  @@map("hce_invoice_payments")
+}
+
+model CreditMemo {
+  id             String   @id @default(cuid())
+  tenantId       String
+  entityId       String
+  invoiceId      String?
+  customerId     String
+  amount         Int
+  date           DateTime
+  memo           String?
+  journalEntryId String?
+  createdAt      DateTime @default(now())
+
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_credit_memos")
+}
+
+model Bill {
+  id             String     @id @default(cuid())
+  tenantId       String
+  entityId       String
+  vendorId       String
+  billNumber     String?
+  date           DateTime
+  dueDate        DateTime
+  status         BillStatus @default(ENTERED)
+  memo           String?
+  subtotal       Int        @default(0)
+  total          Int        @default(0)
+  amountPaid     Int        @default(0)
+  amountDue      Int        @default(0)
+  journalEntryId String?
+  receiptUrl     String?
+  poId           String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity        Entity         @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  vendor        Vendor         @relation(fields: [vendorId], references: [id])
+  lines         BillLine[]
+  payments      BillPayment[]
+  vendorCredits VendorCredit[]
+  purchaseOrder PurchaseOrder? @relation(fields: [poId], references: [id])
+
+  @@index([tenantId, entityId])
+  @@index([vendorId])
+  @@schema("hce")
+  @@map("hce_bills")
+}
+
+enum BillStatus {
+  ENTERED
+  PARTIAL
+  PAID
+  VOID
+
+  @@schema("hce")
+  @@map("hce_bill_status")
+}
+
+model BillLine {
+  id           String  @id @default(cuid())
+  billId       String
+  description  String?
+  productId    String?
+  accountId    String?
+  quantity     Float   @default(1)
+  unitPrice    Int
+  amount       Int
+  classId      String?
+  departmentId String?
+
+  bill       Bill        @relation(fields: [billId], references: [id], onDelete: Cascade)
+  account    Account?    @relation(fields: [accountId], references: [id])
+  class      Class?      @relation(fields: [classId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  @@index([billId])
+  @@schema("hce")
+  @@map("hce_bill_lines")
+}
+
+model BillPayment {
+  id             String   @id @default(cuid())
+  billId         String
+  date           DateTime
+  amount         Int
+  bankAccountId  String?
+  journalEntryId String?
+  memo           String?
+  createdAt      DateTime @default(now())
+
+  bill Bill @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  @@index([billId])
+  @@schema("hce")
+  @@map("hce_bill_payments")
+}
+
+model VendorCredit {
+  id             String   @id @default(cuid())
+  tenantId       String
+  entityId       String
+  billId         String?
+  vendorId       String
+  amount         Int
+  date           DateTime
+  memo           String?
+  journalEntryId String?
+  createdAt      DateTime @default(now())
+
+  bill Bill? @relation(fields: [billId], references: [id])
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_vendor_credits")
+}
+
+// ─── BANKING ─────────────────────────────────────────────────────────────────
+
+model BankAccount {
+  id               String  @id @default(cuid())
+  tenantId         String
+  entityId         String
+  name             String
+  ledgerAccountId  String?
+  plaidItemId      String?
+  plaidAccountId   String?
+  plaidAccessToken String?
+  lastSyncedAt     DateTime?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  tenant       Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity       Entity          @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  transactions BankTransaction[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_bank_accounts")
+}
+
+model BankTransaction {
+  id              String            @id @default(cuid())
+  tenantId        String
+  entityId        String
+  bankAccountId   String
+  plaidTransactionId String?
+  date            DateTime
+  name            String
+  amount          Int
+  isMatched       Boolean           @default(false)
+  matchedEntryId  String?
+  isCleared       Boolean           @default(false)
+  category        String?
+  accountId       String?
+  memo            String?
+  createdAt       DateTime          @default(now())
+
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity      Entity      @relation(fields: [entityId], references: [id])
+  bankAccount BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([bankAccountId, plaidTransactionId])
+  @@index([tenantId, entityId])
+  @@index([bankAccountId])
+  @@schema("hce")
+  @@map("hce_bank_transactions")
+}
+
+model BankRule {
+  id            String  @id @default(cuid())
+  tenantId      String
+  entityId      String
+  name          String
+  matchType     String  @default("CONTAINS")
+  matchValue    String
+  accountId     String?
+  classId       String?
+  departmentId  String?
+  memo          String?
+  isActive      Boolean @default(true)
+  createdAt     DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_bank_rules")
+}
+
+// ─── BUDGETS ──────────────────────────────────────────────────────────────────
+
+enum BudgetPeriodType {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+
+  @@schema("hce")
+  @@map("hce_budget_period_type")
+}
+
+model Budget {
+  id         String           @id @default(cuid())
+  tenantId   String
+  entityId   String
+  name       String
+  fiscalYear Int
+  periodType BudgetPeriodType @default(MONTHLY)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  tenant Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity       @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  lines  BudgetLine[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_budgets")
+}
+
+model BudgetLine {
+  id          String @id @default(cuid())
+  budgetId    String
+  accountId   String
+  period      Int
+  amountCents Int    @default(0)
+
+  budget  Budget  @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id])
+
+  @@unique([budgetId, accountId, period])
+  @@index([budgetId])
+  @@schema("hce")
+  @@map("hce_budget_lines")
+}
+
+// ─── CASH FORECAST ───────────────────────────────────────────────────────────
+
+model CashForecastAdjustment {
+  id          String   @id @default(cuid())
+  tenantId    String
+  entityId    String
+  date        DateTime
+  description String
+  amountCents Int
+  createdAt   DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityId, date])
+  @@schema("hce")
+  @@map("hce_cash_forecast_adjustments")
+}
+
+// ─── RECURRING ENTRIES ────────────────────────────────────────────────────────
+
+enum RecurringType {
+  BILL
+  INVOICE
+  JOURNAL
+
+  @@schema("hce")
+  @@map("hce_recurring_type")
+}
+
+enum RecurringFrequency {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+
+  @@schema("hce")
+  @@map("hce_recurring_frequency")
+}
+
+model RecurringTemplate {
+  id          String             @id @default(cuid())
+  tenantId    String
+  entityId    String
+  name        String
+  type        RecurringType
+  frequency   RecurringFrequency
+  startDate   DateTime
+  endDate     DateTime?
+  nextRunDate DateTime
+  active      Boolean            @default(true)
+  payload     Json
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  tenant Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity         @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  runs   RecurringRun[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_recurring_templates")
+}
+
+model RecurringRun {
+  id          String   @id @default(cuid())
+  templateId  String
+  periodStart DateTime
+  sourceId    String?
+  sourceType  String?
+  runAt       DateTime @default(now())
+
+  template RecurringTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, periodStart])
+  @@index([templateId])
+  @@schema("hce")
+  @@map("hce_recurring_runs")
+}
+
+// ─── AMORTIZATION SCHEDULES ───────────────────────────────────────────────────
+
+enum AmortizationType {
+  PREPAID_EXPENSE
+  DEFERRED_REVENUE
+
+  @@schema("hce")
+  @@map("hce_amortization_type")
+}
+
+enum AmortizationStatus {
+  ACTIVE
+  COMPLETED
+  VOIDED
+
+  @@schema("hce")
+  @@map("hce_amortization_status")
+}
+
+model AmortizationSchedule {
+  id               String             @id @default(cuid())
+  tenantId         String
+  entityId         String
+  name             String
+  type             AmortizationType
+  totalAmountCents Int
+  startDate        DateTime
+  months           Int
+  bsAccountId      String
+  plAccountId      String
+  status           AmortizationStatus @default(ACTIVE)
+  createdAt        DateTime           @default(now())
+
+  tenant  Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity  Entity              @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  entries AmortizationEntry[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_amortization_schedules")
+}
+
+model AmortizationEntry {
+  id             String    @id @default(cuid())
+  scheduleId     String
+  periodNumber   Int
+  periodDate     DateTime
+  amountCents    Int
+  posted         Boolean   @default(false)
+  journalEntryId String?
+  postedAt       DateTime?
+
+  schedule AmortizationSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, periodNumber])
+  @@index([scheduleId])
+  @@schema("hce")
+  @@map("hce_amortization_entries")
+}
+
+// ─── ANOMALY DETECTION ────────────────────────────────────────────────────────
+
+enum AnomalySeverity {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@schema("hce")
+  @@map("hce_anomaly_severity")
+}
+
+enum AnomalyStatus {
+  OPEN
+  DISMISSED
+
+  @@schema("hce")
+  @@map("hce_anomaly_status")
+}
+
+model AnomalyFlag {
+  id          String          @id @default(cuid())
+  tenantId    String
+  entityId    String
+  sourceType  String
+  sourceId    String
+  reason      String
+  severity    AnomalySeverity @default(MEDIUM)
+  ruleType    String
+  status      AnomalyStatus   @default(OPEN)
+  dismissedAt DateTime?
+  dismissedBy String?
+  createdAt   DateTime        @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityId, status])
+  @@schema("hce")
+  @@map("hce_anomaly_flags")
+}
+
+// ─── PURCHASE ORDERS ─────────────────────────────────────────────────────────
+
+enum PoStatus {
+  DRAFT
+  OPEN
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CLOSED
+  CANCELLED
+
+  @@schema("hce")
+  @@map("hce_po_status")
+}
+
+model PurchaseOrder {
+  id           String    @id @default(cuid())
+  tenantId     String
+  entityId     String
+  vendorId     String
+  poNumber     String
+  date         DateTime
+  expectedDate DateTime?
+  status       PoStatus  @default(DRAFT)
+  notes        String?
+  totalCents   Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant   Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity   Entity                @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  vendor   Vendor                @relation(fields: [vendorId], references: [id])
+  lines    PurchaseOrderLine[]
+  receipts PurchaseOrderReceipt[]
+  bills    Bill[]
+
+  @@unique([tenantId, entityId, poNumber])
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_purchase_orders")
+}
+
+model PurchaseOrderLine {
+  id             String  @id @default(cuid())
+  poId           String
+  description    String?
+  qty            Float   @default(1)
+  unitPriceCents Int
+  amountCents    Int
+  accountId      String?
+  qtyReceived    Float   @default(0)
+  sortOrder      Int     @default(0)
+
+  po      PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+  account Account?      @relation(fields: [accountId], references: [id])
+
+  @@index([poId])
+  @@schema("hce")
+  @@map("hce_purchase_order_lines")
+}
+
+model PurchaseOrderReceipt {
+  id         String   @id @default(cuid())
+  poId       String
+  receivedAt DateTime @default(now())
+  receivedBy String?
+  notes      String?
+  lines      Json
+
+  po PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+
+  @@index([poId])
+  @@schema("hce")
+  @@map("hce_purchase_order_receipts")
+}
+
+// ─── FIXED ASSETS & DEPRECIATION ─────────────────────────────────────────────
+
+enum AssetCategory {
+  EQUIPMENT
+  VEHICLE
+  FURNITURE
+  COMPUTER
+  BUILDING
+  OTHER
+
+  @@schema("hce")
+  @@map("hce_asset_category")
+}
+
+enum DepreciationMethod {
+  STRAIGHT_LINE
+  DECLINING_BALANCE
+
+  @@schema("hce")
+  @@map("hce_depreciation_method")
+}
+
+enum AssetStatus {
+  ACTIVE
+  FULLY_DEPRECIATED
+  DISPOSED
+
+  @@schema("hce")
+  @@map("hce_asset_status")
+}
+
+enum DepreciationEntryStatus {
+  SCHEDULED
+  POSTED
+
+  @@schema("hce")
+  @@map("hce_depreciation_entry_status")
+}
+
+model FixedAsset {
+  id                               String             @id @default(cuid())
+  tenantId                         String
+  entityId                         String
+  name                             String
+  description                      String?
+  category                         AssetCategory      @default(EQUIPMENT)
+  acquisitionDate                  DateTime
+  inServiceDate                    DateTime
+  costCents                        Int
+  salvageValueCents                Int                @default(0)
+  usefulLifeMonths                 Int
+  depreciationMethod               DepreciationMethod @default(STRAIGHT_LINE)
+  assetAccountId                   String
+  accumulatedDepreciationAccountId String
+  depreciationExpenseAccountId     String
+  sourceAccountId                  String
+  gainLossAccountId                String?
+  status                           AssetStatus        @default(ACTIVE)
+  acquisitionEntryId               String?
+  disposedAt                       DateTime?
+  disposalProceedsCents            Int?
+  createdAt                        DateTime           @default(now())
+  updatedAt                        DateTime           @updatedAt
+
+  tenant              Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity              Entity              @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  depreciationEntries DepreciationEntry[]
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_fixed_assets")
+}
+
+model DepreciationEntry {
+  id             String                  @id @default(cuid())
+  fixedAssetId   String
+  periodNumber   Int
+  periodDate     DateTime
+  amountCents    Int
+  journalEntryId String?
+  status         DepreciationEntryStatus @default(SCHEDULED)
+
+  fixedAsset FixedAsset @relation(fields: [fixedAssetId], references: [id], onDelete: Cascade)
+
+  @@unique([fixedAssetId, periodNumber])
+  @@index([fixedAssetId])
+  @@schema("hce")
+  @@map("hce_depreciation_entries")
+}
+
+// ─── STATEMENT SCANS ──────────────────────────────────────────────────────────
+
+model StatementScan {
+  id           String   @id @default(cuid())
+  tenantId     String
+  entityId     String
+  fileHash     String
+  processedAt  DateTime @default(now())
+  lineCount    Int      @default(0)
+  matchedCount Int      @default(0)
+
+  @@unique([tenantId, entityId, fileHash])
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_statement_scans")
+}
+
+// ─── SCENARIOS ────────────────────────────────────────────────────────────────
+
+enum ScenarioType {
+  HIRING
+  EQUIPMENT
+  DEBT
+
+  @@schema("hce")
+}
+
+model Scenario {
+  id        String       @id @default(cuid())
+  tenantId  String
+  entityId  String
+  name      String
+  type      ScenarioType
+  inputs    Json
+  result    Json
+  aiSummary String?
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityId])
+  @@schema("hce")
+  @@map("hce_scenarios")
+}

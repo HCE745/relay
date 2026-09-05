@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm --filter relay build",
+  "buildCommand": "pnpm exec prisma generate && pnpm exec next build",
   "crons": [
     {
       "path":     "/api/cron/imap-sync",

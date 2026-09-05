@@ -1,4 +1,5 @@
 {
+  "buildCommand": "pnpm --filter relay build",
   "crons": [
     {
       "path":     "/api/cron/imap-sync",

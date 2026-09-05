@@ -168,6 +168,9 @@ importers:
       '@hce/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@hce/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@prisma/adapter-pg':
         specifier: 7.8.0
         version: 7.8.0
@@ -337,6 +340,24 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
+
+  packages/ui:
+    dependencies:
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: 1.17.0
+        version: 1.17.0(react@19.2.7)
+      react:
+        specifier: '>=19'
+        version: 19.2.7
+      react-dom:
+        specifier: '>=19'
+        version: 19.2.7(react@19.2.7)
+      tailwind-merge:
+        specifier: 3.6.0
+        version: 3.6.0
 
 packages:
 
@@ -8619,6 +8640,10 @@ snapshots:
   lucide-react@1.17.0(react@19.2.4):
     dependencies:
       react: 19.2.4
+
+  lucide-react@1.17.0(react@19.2.7):
+    dependencies:
+      react: 19.2.7
 
   lucide-react@1.21.0(react@19.2.7):
     dependencies:

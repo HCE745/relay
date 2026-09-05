@@ -27,6 +27,7 @@
     "@capacitor/push-notifications": "8.1.1",
     "@capacitor/status-bar": "8.0.2",
     "@hce/auth": "workspace:*",
+    "@hce/ui": "workspace:*",
     "@prisma/adapter-pg": "7.8.0",
     "@prisma/client": "7.8.0",
     "@sentry/nextjs": "10.58.0",

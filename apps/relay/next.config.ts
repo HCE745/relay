@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     root: path.join(__dirname, "..", ".."),
   },
   // Compile the workspace TypeScript packages we consume from source.
-  transpilePackages: ["@hce/auth"],
+  transpilePackages: ["@hce/auth", "@hce/ui"],
   async rewrites() {
     return [
       // Next.js can't route dot-prefixed segments, so we rewrite these well-known URLs

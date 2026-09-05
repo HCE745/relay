@@ -1,0 +1,20 @@
+{
+  "name": "@hce/auth",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "jose": "6.2.3",
+    "server-only": "0.0.1"
+  },
+  "peerDependencies": {
+    "next": ">=15"
+  }
+}

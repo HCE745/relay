@@ -103,11 +103,15 @@ export const SERVICE_FREQUENCIES = [
   "CUSTOM",
 ] as const
 
+const timeString = z.string().regex(/^\d{1,2}:\d{2}$/, "Use HH:mm")
+const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD")
+
 export const servicePlanCreateSchema = z.object({
   serviceLocationId: z.string().min(1),
   name: z.string().trim().min(1, "Service plan name is required").max(200),
   frequency: z.enum(SERVICE_FREQUENCIES).default("WEEKLY"),
   rrule: optionalString,
+  startTime: timeString.optional(),
   crewSize: z.coerce.number().int().min(1).max(100).default(1),
   defaultDurationMin: z.coerce.number().int().min(1).max(1440).optional(),
   checklistTemplateId: z.string().min(1).optional(),
@@ -119,3 +123,39 @@ export const servicePlanUpdateSchema = servicePlanCreateSchema
   .partial()
   .extend({ isActive: z.boolean().optional() })
 export type ServicePlanCreateInput = z.infer<typeof servicePlanCreateSchema>
+
+// ─── Phase 2: scheduling, jobs, assignments ──────────────────────────────────
+
+export const generateJobsSchema = z.object({
+  days: z.coerce.number().int().min(1).max(365).default(30),
+})
+
+export const manualJobCreateSchema = z.object({
+  serviceLocationId: z.string().min(1),
+  title: z.string().trim().min(1, "Job title is required").max(200),
+  date: dateString,
+  startTime: timeString,
+  durationMin: z.coerce.number().int().min(1).max(1440).optional(),
+  crewSize: z.coerce.number().int().min(1).max(100).optional(),
+  checklistTemplateId: z.string().min(1).optional(),
+  notes: optionalString,
+})
+export type ManualJobCreateInput = z.infer<typeof manualJobCreateSchema>
+
+export const jobUpdateSchema = z
+  .object({
+    title: z.string().trim().min(1).max(200).optional(),
+    notes: optionalString,
+    crewSize: z.coerce.number().int().min(1).max(100).optional(),
+    date: dateString.optional(),
+    startTime: timeString.optional(),
+  })
+  // date and startTime must be provided together to reschedule.
+  .refine((v) => (v.date ? !!v.startTime : true) && (v.startTime ? !!v.date : true), {
+    message: "Provide both date and start time to reschedule",
+  })
+export type JobUpdateInput = z.infer<typeof jobUpdateSchema>
+
+export const assignCleanerSchema = z.object({
+  userId: z.string().min(1),
+})

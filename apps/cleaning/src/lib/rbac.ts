@@ -91,3 +91,16 @@ const ACCOUNT_MANAGEMENT_ROLES: ReadonlySet<Role> = new Set<Role>(["OWNER", "ADM
 export function canManageAccounts(role: string): boolean {
   return isRole(role) && ACCOUNT_MANAGEMENT_ROLES.has(role)
 }
+
+// Schedule/Jobs: managers write, supervisors read. Cleaners never (field app).
+const SCHEDULE_READ_ROLES: ReadonlySet<Role> = new Set<Role>(["OWNER", "ADMIN", "MANAGER", "SUPERVISOR"])
+
+/** True if the role may VIEW the schedule and jobs (managers + supervisors). */
+export function canViewSchedule(role: string): boolean {
+  return isRole(role) && SCHEDULE_READ_ROLES.has(role)
+}
+
+/** True if the role may CREATE/EDIT jobs, generate, and assign cleaners. */
+export function canManageSchedule(role: string): boolean {
+  return canManageAccounts(role)
+}

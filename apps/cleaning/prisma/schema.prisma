@@ -118,6 +118,8 @@ model Organization {
   onboardingCompletedAt DateTime?
   trialEndsAt           DateTime?
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
+  // Default IANA timezone for scheduling. Service locations may override.
+  timezone              String    @default("America/New_York")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -241,6 +243,8 @@ model ServiceLocation {
   latitude        Float?
   longitude       Float?
   geofenceRadiusM Int?
+  // IANA timezone override for this site; falls back to Organization.timezone.
+  timezone        String?
   // Site contact, used when different from the customer's primary contact.
   siteContactName  String?
   siteContactPhone String?
@@ -307,7 +311,8 @@ model ServicePlan {
   serviceLocationId  String
   name               String
   frequency          ServiceFrequency @default(WEEKLY)
-  rrule              String? // iCal RRULE for CUSTOM cadences
+  rrule              String? // iCal RRULE string for CUSTOM cadences (never shown raw to users)
+  startTime          String?          // local wall-clock "HH:mm" in the site timezone
   crewSize           Int              @default(1)
   defaultDurationMin Int?
   checklistTemplateId String?
@@ -338,6 +343,7 @@ model Job {
   status            JobStatus @default(SCHEDULED)
   scheduledStart    DateTime
   scheduledEnd      DateTime?
+  crewSize          Int?      // required/default crew size (copied from the plan)
   actualStart       DateTime?
   actualEnd         DateTime?
   notes             String?
@@ -354,9 +360,14 @@ model Job {
   checklistItems  JobChecklistItem[]
   timeEntries     TimeEntry[]
 
+  // Idempotent generation: a plan can produce at most one Job per occurrence
+  // start. Manual jobs have servicePlanId = NULL, which Postgres treats as
+  // distinct, so they never collide here.
+  @@unique([servicePlanId, scheduledStart])
   @@index([organizationId])
   @@index([serviceLocationId])
   @@index([status])
+  @@index([scheduledStart])
   @@schema("cleaning")
 }
 

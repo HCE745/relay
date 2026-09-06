@@ -71,6 +71,11 @@ export class OrgScopeError extends Error {
   }
 }
 
+/** True for a Prisma unique-constraint violation (P2002) — used for idempotency. */
+export function isUniqueViolation(e: unknown): boolean {
+  return !!e && typeof e === "object" && "code" in e && (e as { code?: string }).code === "P2002"
+}
+
 type AnyArgs = Record<string, unknown> | undefined
 
 function injectWhere(args: AnyArgs, orgId: string): AnyArgs {

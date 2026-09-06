@@ -111,6 +111,11 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
                                 {job.assignments.map((a) => a.user.name).join(", ")}
                               </span>
                             )}
+                            {job.crewSize != null && job.assignments.length > 0 && job.assignments.length < job.crewSize ? (
+                              <span className="ml-1 text-xs font-medium text-orange-600">
+                                ({job.assignments.length}/{job.crewSize})
+                              </span>
+                            ) : null}
                           </div>
                         </Card>
                       </Link>

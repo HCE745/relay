@@ -47,6 +47,11 @@ export async function middleware(request: NextRequest) {
     return toLogin(request)
   }
 
+  // API routes self-guard (getSession + role/capability checks in each handler);
+  // they must NOT be caught by the experience/role redirects below, or a
+  // cleaner's own field API calls would be bounced to /today.
+  if (pathname.startsWith("/api/")) return NextResponse.next()
+
   // Root → role-appropriate landing.
   if (pathname === "/") {
     return NextResponse.redirect(new URL(landingPathForRole(role), request.url))

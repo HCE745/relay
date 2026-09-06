@@ -54,6 +54,7 @@ export default async function SiteDetailPage({
                 city: site.city,
                 state: site.state,
                 postalCode: site.postalCode,
+                timezone: site.timezone,
                 siteContactName: site.siteContactName,
                 siteContactPhone: site.siteContactPhone,
                 notes: site.notes,

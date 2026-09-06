@@ -36,6 +36,8 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "JobAssignment",
   "TimeEntry",
   "AuditEvent",
+  "JobPhoto",
+  "Issue",
 ])
 
 const WHERE_OPS: ReadonlySet<string> = new Set([

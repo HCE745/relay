@@ -4,8 +4,30 @@ import {
   canAccessAdminRoute,
   navForRole,
   landingPathForRole,
+  canViewSchedule,
+  canManageSchedule,
+  canManageOrg,
   ADMIN_NAV,
 } from "../rbac"
+
+describe("schedule + org permissions", () => {
+  it("canViewSchedule: managers + supervisors, not cleaners", () => {
+    for (const r of ["OWNER", "ADMIN", "MANAGER", "SUPERVISOR"]) expect(canViewSchedule(r)).toBe(true)
+    expect(canViewSchedule("CLEANER")).toBe(false)
+  })
+  it("canManageSchedule: managers only, not supervisor/cleaner", () => {
+    for (const r of ["OWNER", "ADMIN", "MANAGER"]) expect(canManageSchedule(r)).toBe(true)
+    expect(canManageSchedule("SUPERVISOR")).toBe(false)
+    expect(canManageSchedule("CLEANER")).toBe(false)
+  })
+  it("canManageOrg: owner/admin only", () => {
+    expect(canManageOrg("OWNER")).toBe(true)
+    expect(canManageOrg("ADMIN")).toBe(true)
+    expect(canManageOrg("MANAGER")).toBe(false)
+    expect(canManageOrg("SUPERVISOR")).toBe(false)
+    expect(canManageOrg("CLEANER")).toBe(false)
+  })
+})
 
 describe("experience routing", () => {
   it("cleaners get the field experience; everyone else gets admin", () => {

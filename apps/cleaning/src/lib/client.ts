@@ -3,7 +3,7 @@
 
 export type ApiResult<T = unknown> =
   | { ok: true; data: T }
-  | { ok: false; error: string; details?: unknown }
+  | { ok: false; error: string; details?: unknown; unmet?: string[] }
 
 export async function apiSend<T = unknown>(
   url: string,
@@ -17,7 +17,12 @@ export async function apiSend<T = unknown>(
   })
   const data = await res.json().catch(() => null)
   if (!res.ok) {
-    return { ok: false, error: (data && data.error) || "Request failed", details: data?.details }
+    return {
+      ok: false,
+      error: (data && data.error) || "Request failed",
+      details: data?.details,
+      unmet: Array.isArray(data?.unmet) ? data.unmet : undefined,
+    }
   }
   return { ok: true, data: data as T }
 }

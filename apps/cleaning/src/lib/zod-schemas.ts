@@ -1,4 +1,7 @@
 import { z } from "zod"
+import { isValidTimezone } from "./scheduling/timezones"
+
+const ianaTimezone = z.string().refine(isValidTimezone, "Invalid IANA timezone")
 
 // Request-boundary schemas. Handlers and server actions validate here so
 // everything downstream works with typed, trusted input.
@@ -63,6 +66,8 @@ export const serviceLocationCreateSchema = z.object({
   country: optionalString,
   latitude: z.coerce.number().min(-90).max(90).optional(),
   longitude: z.coerce.number().min(-180).max(180).optional(),
+  // A valid IANA zone sets an override; "" or null clears it (inherit org tz).
+  timezone: ianaTimezone.nullish().or(z.literal("").transform(() => null)),
   siteContactName: optionalString,
   siteContactPhone: optionalString,
   siteContactEmail: optionalEmail,
@@ -159,3 +164,44 @@ export type JobUpdateInput = z.infer<typeof jobUpdateSchema>
 export const assignCleanerSchema = z.object({
   userId: z.string().min(1),
 })
+
+// ─── Phase 3: field execution ────────────────────────────────────────────────
+
+export const orgSettingsSchema = z.object({
+  timezone: ianaTimezone,
+})
+
+// Location is best-effort — clock-in/out succeeds even when it is absent.
+export const clockSchema = z.object({
+  lat: z.coerce.number().min(-90).max(90).optional(),
+  lng: z.coerce.number().min(-180).max(180).optional(),
+  accuracyM: z.coerce.number().min(0).optional(),
+  source: z.enum(["web", "native", "manual"]).optional(),
+})
+export type ClockInput = z.infer<typeof clockSchema>
+
+export const checklistItemUpdateSchema = z
+  .object({
+    isComplete: z.boolean().optional(),
+    note: optionalString,
+  })
+  .refine((v) => v.isComplete !== undefined || v.note !== undefined, {
+    message: "Nothing to update",
+  })
+
+export const ISSUE_CATEGORIES = [
+  "QUALITY",
+  "SAFETY",
+  "EQUIPMENT",
+  "SUPPLIES",
+  "ACCESS",
+  "CUSTOMER",
+  "OTHER",
+] as const
+
+export const reportProblemSchema = z.object({
+  category: z.enum(ISSUE_CATEGORIES).default("OTHER"),
+  title: optionalString,
+  description: z.string().trim().min(1, "Describe the problem").max(2000),
+})
+export type ReportProblemInput = z.infer<typeof reportProblemSchema>

@@ -81,7 +81,14 @@ export default async function JobsPage() {
                       {job.assignments.length === 0 ? (
                         <UnassignedBadge />
                       ) : (
-                        <span className="text-slate-600">{job.assignments.map((a) => a.user.name).join(", ")}</span>
+                        <span className="text-slate-600">
+                          {job.assignments.map((a) => a.user.name).join(", ")}
+                          {job.crewSize != null && job.assignments.length < job.crewSize ? (
+                            <span className="ml-1 text-xs font-medium text-orange-600">
+                              (understaffed {job.assignments.length}/{job.crewSize})
+                            </span>
+                          ) : null}
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-3">

@@ -132,6 +132,8 @@ model Organization {
   jobs               Job[]
   timeEntries        TimeEntry[]
   auditEvents        AuditEvent[]
+  jobPhotos          JobPhoto[]
+  issues             Issue[]
 
   @@schema("cleaning")
 }
@@ -157,6 +159,8 @@ model User {
   jobAssignments  JobAssignment[]
   timeEntries     TimeEntry[]
   createdJobs     Job[]            @relation("JobCreatedBy")
+  uploadedPhotos  JobPhoto[]       @relation("PhotoUploader")
+  reportedIssues  Issue[]          @relation("IssueReporter")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -262,6 +266,7 @@ model ServiceLocation {
   children     ServiceLocation[] @relation("LocationHierarchy")
   servicePlans ServicePlan[]
   jobs         Job[]
+  issues       Issue[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -347,7 +352,6 @@ model Job {
   actualStart       DateTime?
   actualEnd         DateTime?
   notes             String?
-  photos            Json? // proof-of-service image references
   createdById       String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -359,6 +363,8 @@ model Job {
   assignments     JobAssignment[]
   checklistItems  JobChecklistItem[]
   timeEntries     TimeEntry[]
+  photos          JobPhoto[]
+  issues          Issue[]
 
   // Idempotent generation: a plan can produce at most one Job per occurrence
   // start. Manual jobs have servicePlanId = NULL, which Postgres treats as
@@ -403,11 +409,11 @@ model JobChecklistItem {
   completedAt   DateTime?
   completedById String?
   note          String?
-  photos        Json?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job    Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  photos JobPhoto[]
 
   @@index([jobId])
   @@schema("cleaning")
@@ -469,5 +475,84 @@ model AuditEvent {
 
   @@index([organizationId])
   @@index([entityType, entityId])
+  @@schema("cleaning")
+}
+
+// ─── Proof of service (photos) ───────────────────────────────────────────────
+// Tenant-scoped photo records. Bytes live in object storage (see src/lib/storage);
+// this row holds the storage key + metadata (uploader, timestamp, size, type).
+// Deliberately NOT coupled to Relay's Issue model — Cleaning owns its own Issue.
+model JobPhoto {
+  id                 String   @id @default(cuid())
+  organizationId     String
+  jobId              String
+  jobChecklistItemId String?
+  issueId            String?
+  storageKey         String
+  contentType        String
+  sizeBytes          Int
+  uploadedById       String
+  caption            String?
+  createdAt          DateTime @default(now())
+
+  organization  Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  job           Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  checklistItem JobChecklistItem? @relation(fields: [jobChecklistItemId], references: [id], onDelete: SetNull)
+  issue         Issue?            @relation(fields: [issueId], references: [id], onDelete: SetNull)
+  uploadedBy    User              @relation("PhotoUploader", fields: [uploadedById], references: [id])
+
+  @@index([organizationId])
+  @@index([jobId])
+  @@index([jobChecklistItemId])
+  @@schema("cleaning")
+}
+
+// ─── Cleaning Issue (field problem reports) ──────────────────────────────────
+// The long-term Cleaning Issue model, intentionally introduced now in a minimal
+// shape (field "Report a Problem"). Phase 5 EXPANDS this (assignment, escalation,
+// corrective actions, resolution) — it does not replace it. Not Relay's Issue.
+enum IssueCategory {
+  QUALITY
+  SAFETY
+  EQUIPMENT
+  SUPPLIES
+  ACCESS
+  CUSTOMER
+  OTHER
+
+  @@schema("cleaning")
+}
+
+enum IssueStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+  CLOSED
+
+  @@schema("cleaning")
+}
+
+model Issue {
+  id                String        @id @default(cuid())
+  organizationId    String
+  jobId             String?
+  serviceLocationId String?
+  reportedById      String
+  category          IssueCategory @default(OTHER)
+  title             String?
+  description       String
+  status            IssueStatus   @default(OPEN)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  job             Job?             @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
+  reportedBy      User             @relation("IssueReporter", fields: [reportedById], references: [id])
+  photos          JobPhoto[]
+
+  @@index([organizationId])
+  @@index([jobId])
+  @@index([status])
   @@schema("cleaning")
 }

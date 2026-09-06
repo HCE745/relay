@@ -104,3 +104,8 @@ export function canViewSchedule(role: string): boolean {
 export function canManageSchedule(role: string): boolean {
   return canManageAccounts(role)
 }
+
+/** Organization-level administration (timezone, billing, workspace settings). */
+export function canManageOrg(role: string): boolean {
+  return isRole(role) && (role === "OWNER" || role === "ADMIN")
+}

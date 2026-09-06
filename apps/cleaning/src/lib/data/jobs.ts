@@ -30,8 +30,20 @@ export function getJob(orgId: string, id: string) {
         select: { id: true, name: true, timezone: true, customerId: true, customer: { select: { name: true } } },
       },
       servicePlan: { select: { id: true, name: true } },
-      assignments: { include: { user: { select: { id: true, name: true } } }, orderBy: { assignedAt: "asc" } },
-      checklistItems: { orderBy: { sortOrder: "asc" } },
+      assignments: {
+        include: { user: { select: { id: true, name: true } } },
+        orderBy: { assignedAt: "asc" },
+      },
+      checklistItems: { orderBy: { sortOrder: "asc" }, include: { photos: { select: { id: true } } } },
+      timeEntries: {
+        orderBy: { clockInAt: "desc" },
+        include: { user: { select: { id: true, name: true } } },
+      },
+      photos: { orderBy: { createdAt: "desc" }, include: { uploadedBy: { select: { name: true } } } },
+      issues: {
+        orderBy: { createdAt: "desc" },
+        include: { reportedBy: { select: { name: true } }, photos: { select: { id: true } } },
+      },
     },
   })
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import type { z } from "zod"
-import { ReferenceError } from "./data/errors"
+import { ReferenceError, ForbiddenActionError, ConflictError, RequirementsError } from "./data/errors"
 
 // Small helpers for API route handlers: consistent JSON errors + Zod parsing at
 // the request boundary (query and body). Relay validates by hand-casting; we
@@ -40,6 +40,13 @@ export async function runWrite<T>(
     return ok(result, opts.created ? 201 : undefined)
   } catch (e) {
     if (e instanceof ReferenceError) return badRequest(e.message)
+    if (e instanceof ForbiddenActionError) return forbidden(e.message)
+    if (e instanceof RequirementsError) {
+      return NextResponse.json({ error: e.message, unmet: e.unmet }, { status: 422 })
+    }
+    if (e instanceof ConflictError) {
+      return NextResponse.json({ error: e.message, details: e.details }, { status: 409 })
+    }
     throw e
   }
 }

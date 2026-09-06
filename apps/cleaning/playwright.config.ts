@@ -13,6 +13,10 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL ?? `http://localhost:${PORT}`,
     trace: "on-first-retry",
+    // Grant geolocation so field clock-in resolves instantly in headless runs
+    // (also exercises the location-capture path).
+    permissions: ["geolocation"],
+    geolocation: { latitude: 42.331, longitude: -83.045 },
   },
   webServer: process.env.BASE_URL
     ? undefined

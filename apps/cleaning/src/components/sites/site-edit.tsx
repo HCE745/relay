@@ -3,8 +3,9 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Modal } from "@/components/ui/modal"
-import { Button, Field, Input, Textarea } from "@/components/ui/controls"
+import { Button, Field, Input, Select, Textarea } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
+import { listTimezones } from "@/lib/scheduling/timezones"
 
 export type SiteEditValues = {
   id: string
@@ -13,6 +14,7 @@ export type SiteEditValues = {
   city: string | null
   state: string | null
   postalCode: string | null
+  timezone: string | null
   siteContactName: string | null
   siteContactPhone: string | null
   notes: string | null
@@ -25,7 +27,8 @@ export function SiteEditButton({ site }: { site: SiteEditValues }) {
   const [v, setV] = useState(site)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const set = (k: keyof SiteEditValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const zones = listTimezones()
+  const set = (k: keyof SiteEditValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setV({ ...v, [k]: e.target.value })
 
   async function submit(e: React.FormEvent) {
@@ -72,6 +75,16 @@ export function SiteEditButton({ site }: { site: SiteEditValues }) {
               <Input id="se-phone" value={v.siteContactPhone ?? ""} onChange={set("siteContactPhone")} />
             </Field>
           </div>
+          <Field label="Timezone" htmlFor="se-tz" hint="Overrides the organization default for scheduling this site.">
+            <Select id="se-tz" value={v.timezone ?? ""} onChange={set("timezone")}>
+              <option value="">Inherit organization default</option>
+              {zones.map((z) => (
+                <option key={z} value={z}>
+                  {z}
+                </option>
+              ))}
+            </Select>
+          </Field>
           <Field label="Access / site notes" htmlFor="se-notes">
             <Textarea id="se-notes" value={v.notes ?? ""} onChange={set("notes")} />
           </Field>

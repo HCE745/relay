@@ -1,0 +1,455 @@
+// Cleaning ERP — Prisma schema
+//
+// Conservative Phase 0 foundation + the immediately-following field-work spine
+// (customers → locations → service plans → jobs → assignments → checklists →
+// time tracking). Deferred on purpose (added in their own phases, NOT here):
+// inspections, issues/corrective-actions, invoicing, leads/estimates, vendors,
+// assets, procurement, and all Business/Enterprise-tier entities.
+//
+// All models live under the dedicated `cleaning` Postgres schema (multiSchema),
+// mirroring the hce-books precedent, so this database can be physically
+// co-located later at zero migration cost. This database is SEPARATE from
+// Relay's — there are no cross-app foreign keys, ever.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["cleaning"]
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MANAGER
+  SUPERVISOR
+  CLEANER
+
+  @@schema("cleaning")
+}
+
+// Commercial package. Employee counts are advisory only — capability access is
+// derived from this tier plus per-org overrides (see src/lib/entitlements).
+enum PackageTier {
+  SOLO
+  TEAM
+  BUSINESS
+  ENTERPRISE
+
+  @@schema("cleaning")
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  INACTIVE
+  TERMINATED
+
+  @@schema("cleaning")
+}
+
+// Timekeeping/labor-cost classification only. We do NOT process payroll, taxes,
+// or direct deposit — external providers do. This drives labor-cost math and
+// future payroll EXPORT only.
+enum PayType {
+  HOURLY
+  SALARY
+
+  @@schema("cleaning")
+}
+
+enum ServiceFrequency {
+  ONE_TIME
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  CUSTOM
+
+  @@schema("cleaning")
+}
+
+enum JobStatus {
+  SCHEDULED
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  MISSED
+  CANCELLED
+
+  @@schema("cleaning")
+}
+
+enum AssignmentStatus {
+  ASSIGNED
+  ACKNOWLEDGED
+  IN_PROGRESS
+  COMPLETED
+  DECLINED
+
+  @@schema("cleaning")
+}
+
+enum TimeEntryStatus {
+  OPEN
+  COMPLETED
+  APPROVED
+  REJECTED
+
+  @@schema("cleaning")
+}
+
+// ─── Tenant + identity ───────────────────────────────────────────────────────
+
+model Organization {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  // Entitlements: tier + per-org overrides. Product code resolves capabilities
+  // from these via canUse(); it must never branch on the tier directly.
+  packageTier         PackageTier @default(TEAM)
+  capabilityOverrides Json? // { "add": string[], "remove": string[] }
+
+  onboardingCompletedAt DateTime?
+  trialEndsAt           DateTime?
+  subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users              User[]
+  customers          Customer[]
+  serviceLocations   ServiceLocation[]
+  checklistTemplates ChecklistTemplate[]
+  servicePlans       ServicePlan[]
+  jobs               Job[]
+  timeEntries        TimeEntry[]
+  auditEvents        AuditEvent[]
+
+  @@schema("cleaning")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  password       String
+  role           UserRole @default(CLEANER)
+  phone          String?
+  isActive       Boolean  @default(true)
+  organizationId String
+  managerId      String?
+  lastLoginAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  manager         User?            @relation("UserHierarchy", fields: [managerId], references: [id])
+  reports         User[]           @relation("UserHierarchy")
+  employeeProfile EmployeeProfile?
+  jobAssignments  JobAssignment[]
+  timeEntries     TimeEntry[]
+  createdJobs     Job[]            @relation("JobCreatedBy")
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// HR / labor-cost data kept off the auth row. Cleaners are Users (they log in);
+// this 1:1 profile carries employment + pay-rate data used for labor costing
+// and future payroll EXPORT only — never for payroll processing.
+model EmployeeProfile {
+  id               String           @id @default(cuid())
+  userId           String           @unique
+  organizationId   String
+  employeeCode     String?
+  payType          PayType          @default(HOURLY)
+  payRate          Decimal?         @db.Decimal(10, 2)
+  employmentStatus EmploymentStatus @default(ACTIVE)
+  hireDate         DateTime?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// ─── Customers + sites ───────────────────────────────────────────────────────
+
+model Customer {
+  id                 String   @id @default(cuid())
+  organizationId     String
+  name               String
+  primaryContactName String?
+  email              String?
+  phone              String?
+  billingAddress     String?
+  notes              String?
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contacts         Contact[]
+  serviceLocations ServiceLocation[]
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+model Contact {
+  id             String   @id @default(cuid())
+  organizationId String
+  customerId     String
+  name           String
+  title          String?
+  email          String?
+  phone          String?
+  isPrimary      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([customerId])
+  @@schema("cleaning")
+}
+
+model ServiceLocation {
+  id             String   @id @default(cuid())
+  organizationId String
+  customerId     String
+  name           String
+  addressLine1   String?
+  addressLine2   String?
+  city           String?
+  state          String?
+  postalCode     String?
+  country        String?  @default("US")
+  // Geolocation is captured for future geofenced clock-in. The radius is stored
+  // so enforcement can be turned on later; Phase 0 does NOT enforce geofencing.
+  latitude        Float?
+  longitude       Float?
+  geofenceRadiusM Int?
+  parentId       String?
+  notes          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  parent       ServiceLocation?  @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children     ServiceLocation[] @relation("LocationHierarchy")
+  servicePlans ServicePlan[]
+  jobs         Job[]
+
+  @@index([organizationId])
+  @@index([customerId])
+  @@schema("cleaning")
+}
+
+// ─── Scope of work + recurring service ───────────────────────────────────────
+
+model ChecklistTemplate {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  version        Int      @default(1)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items        ChecklistTemplateItem[]
+  servicePlans ServicePlan[]
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+model ChecklistTemplateItem {
+  id           String   @id @default(cuid())
+  templateId   String
+  label        String
+  instructions String?
+  sortOrder    Int      @default(0)
+  requirePhoto Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  template ChecklistTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+  @@schema("cleaning")
+}
+
+model ServicePlan {
+  id                 String           @id @default(cuid())
+  organizationId     String
+  serviceLocationId  String
+  name               String
+  frequency          ServiceFrequency @default(WEEKLY)
+  rrule              String? // iCal RRULE for CUSTOM cadences
+  crewSize           Int              @default(1)
+  defaultDurationMin Int?
+  checklistTemplateId String?
+  startDate          DateTime?
+  endDate            DateTime?
+  isActive           Boolean          @default(true)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation   ServiceLocation    @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  checklistTemplate ChecklistTemplate? @relation(fields: [checklistTemplateId], references: [id])
+  jobs              Job[]
+
+  @@index([organizationId])
+  @@index([serviceLocationId])
+  @@schema("cleaning")
+}
+
+// ─── Jobs (scheduled work) + assignment + per-job checklist ──────────────────
+
+model Job {
+  id                String    @id @default(cuid())
+  organizationId    String
+  serviceLocationId String
+  servicePlanId     String?
+  title             String
+  status            JobStatus @default(SCHEDULED)
+  scheduledStart    DateTime
+  scheduledEnd      DateTime?
+  actualStart       DateTime?
+  actualEnd         DateTime?
+  notes             String?
+  photos            Json? // proof-of-service image references
+  createdById       String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation    @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  servicePlan     ServicePlan?       @relation(fields: [servicePlanId], references: [id])
+  createdBy       User?              @relation("JobCreatedBy", fields: [createdById], references: [id])
+  assignments     JobAssignment[]
+  checklistItems  JobChecklistItem[]
+  timeEntries     TimeEntry[]
+
+  @@index([organizationId])
+  @@index([serviceLocationId])
+  @@index([status])
+  @@schema("cleaning")
+}
+
+model JobAssignment {
+  id             String           @id @default(cuid())
+  organizationId String
+  jobId          String
+  userId         String
+  status         AssignmentStatus @default(ASSIGNED)
+  assignedAt     DateTime         @default(now())
+  acknowledgedAt DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, userId])
+  @@index([organizationId])
+  @@index([userId])
+  @@schema("cleaning")
+}
+
+model JobChecklistItem {
+  id            String   @id @default(cuid())
+  jobId         String
+  label         String
+  instructions  String?
+  sortOrder     Int      @default(0)
+  requirePhoto  Boolean  @default(false)
+  isComplete    Boolean  @default(false)
+  completedAt   DateTime?
+  completedById String?
+  note          String?
+  photos        Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@schema("cleaning")
+}
+
+// ─── Time tracking (geolocation-ready, geofence NOT enforced yet) ────────────
+
+model TimeEntry {
+  id             String          @id @default(cuid())
+  organizationId String
+  jobId          String?
+  userId         String
+  status         TimeEntryStatus @default(OPEN)
+
+  clockInAt        DateTime
+  clockInLat       Float?
+  clockInLng       Float?
+  clockInAccuracyM Float?
+  clockInSource    String? // "mobile_gps" | "manual" | "kiosk"
+
+  clockOutAt        DateTime?
+  clockOutLat       Float?
+  clockOutLng       Float?
+  clockOutAccuracyM Float?
+  clockOutSource    String?
+
+  breakMinutes Int      @default(0)
+  approvedById String?
+  approvedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job          Job?         @relation(fields: [jobId], references: [id])
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([jobId])
+  @@schema("cleaning")
+}
+
+// ─── Generic audit trail (the one liftable piece of Relay's IssueHistory) ────
+
+model AuditEvent {
+  id             String   @id @default(cuid())
+  organizationId String
+  actorUserId    String?
+  entityType     String
+  entityId       String
+  action         String
+  field          String?
+  oldValue       String?
+  newValue       String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([entityType, entityId])
+  @@schema("cleaning")
+}

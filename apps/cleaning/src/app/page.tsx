@@ -1,10 +1,9 @@
-import { cn } from "@hce/ui/utils"
+import { redirect } from "next/navigation"
+import { getSession } from "@/lib/session"
+import { landingPathForRole } from "@/lib/rbac"
 
-export default function Home() {
-  return (
-    <main className={cn("min-h-screen flex flex-col items-center justify-center gap-3 p-8 text-center")}>
-      <h1 className="text-2xl font-semibold">HCE Cleaning</h1>
-      <p className="text-gray-500">Cleaning ERP — scaffold. Nothing here yet.</p>
-    </main>
-  )
+// Middleware normally redirects "/" first; this is a defensive fallback.
+export default async function RootPage() {
+  const session = await getSession()
+  redirect(session ? landingPathForRole(session.role) : "/login")
 }

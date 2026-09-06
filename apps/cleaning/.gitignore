@@ -11,6 +11,9 @@
 *.tsbuildinfo
 next-env.d.ts
 
+# prisma generated client (regenerated on install/build)
+/src/generated/
+
 # env files
 .env
 .env.*

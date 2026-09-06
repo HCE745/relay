@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import type { z } from "zod"
+import { ReferenceError } from "./data/errors"
 
 // Small helpers for API route handlers: consistent JSON errors + Zod parsing at
 // the request boundary (query and body). Relay validates by hand-casting; we
@@ -19,6 +20,28 @@ export function forbidden(message = "Forbidden") {
 
 export function badRequest(details: unknown) {
   return NextResponse.json({ error: "Invalid request", details }, { status: 400 })
+}
+
+export function notFound(message = "Not found") {
+  return NextResponse.json({ error: message }, { status: 404 })
+}
+
+/**
+ * Run a data-layer write, mapping a cross-org/missing reference to 400 and a
+ * null "not found" result to 404. Other errors propagate to the platform.
+ */
+export async function runWrite<T>(
+  fn: () => Promise<T>,
+  opts: { created?: boolean } = {},
+): Promise<NextResponse> {
+  try {
+    const result = await fn()
+    if (result === null) return notFound()
+    return ok(result, opts.created ? 201 : undefined)
+  } catch (e) {
+    if (e instanceof ReferenceError) return badRequest(e.message)
+    throw e
+  }
 }
 
 /** Parse+validate URL search params; returns typed data or a 400 Response. */

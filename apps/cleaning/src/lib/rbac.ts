@@ -82,3 +82,12 @@ export function navForRole(role: string, hasCapability: (cap: string) => boolean
 export function landingPathForRole(role: string): string {
   return experienceForRole(role) === "field" ? "/today" : "/dashboard"
 }
+
+// Customer-account administration (customers, sites, scopes, service plans).
+// Supervisors are intentionally excluded — they run operations, not accounts.
+const ACCOUNT_MANAGEMENT_ROLES: ReadonlySet<Role> = new Set<Role>(["OWNER", "ADMIN", "MANAGER"])
+
+/** True if the role may manage customer accounts, sites, scopes, and plans. */
+export function canManageAccounts(role: string): boolean {
+  return isRole(role) && ACCOUNT_MANAGEMENT_ROLES.has(role)
+}

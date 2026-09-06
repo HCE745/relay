@@ -241,7 +241,12 @@ model ServiceLocation {
   latitude        Float?
   longitude       Float?
   geofenceRadiusM Int?
+  // Site contact, used when different from the customer's primary contact.
+  siteContactName  String?
+  siteContactPhone String?
+  siteContactEmail String?
   parentId       String?
+  // Access instructions / site notes (gate codes, alarm, parking, etc.).
   notes          String?
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
@@ -285,6 +290,7 @@ model ChecklistTemplateItem {
   label        String
   instructions String?
   sortOrder    Int      @default(0)
+  isRequired   Boolean  @default(true)
   requirePhoto Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -380,6 +386,7 @@ model JobChecklistItem {
   label         String
   instructions  String?
   sortOrder     Int      @default(0)
+  isRequired    Boolean  @default(true)
   requirePhoto  Boolean  @default(false)
   isComplete    Boolean  @default(false)
   completedAt   DateTime?

@@ -1,4 +1,5 @@
-import { PrismaClient } from "@/generated/prisma/client"
+// Relative (not "@/") so tsx scripts and Next both resolve it identically.
+import { PrismaClient } from "../generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 
 function createPrismaClient() {
@@ -14,6 +15,19 @@ function createPrismaClient() {
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
-// Reuse across hot-reloads (dev) and warm serverless invocations (Vercel).
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
-globalForPrisma.prisma = prisma
+function getClient(): PrismaClient {
+  if (!globalForPrisma.prisma) globalForPrisma.prisma = createPrismaClient()
+  return globalForPrisma.prisma
+}
+
+// Lazy proxy: the client is created on first property access, not at import.
+// This keeps pure modules (e.g. org-db's scopeArgs) importable in unit tests
+// without a DATABASE_URL, while callers still use `prisma.model.op(...)` as
+// usual. Methods are bound to the real client so `this` stays correct.
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = getClient() as unknown as Record<string | symbol, unknown>
+    const value = client[prop]
+    return typeof value === "function" ? (value as (...a: unknown[]) => unknown).bind(client) : value
+  },
+}) as PrismaClient

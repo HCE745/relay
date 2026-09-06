@@ -12,6 +12,8 @@
     "test": "vitest run",
     "seed": "tsx prisma/seed.ts",
     "verify:db": "tsx scripts/verify-db.ts",
+    "verify:phase1": "tsx scripts/verify-phase1.ts",
+    "e2e": "playwright test",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio"
@@ -32,6 +34,7 @@
     "zod": "3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.61.1",
     "@tailwindcss/postcss": "4.3.1",
     "@types/bcryptjs": "2.4.6",
     "@types/node": "20.19.43",

@@ -109,3 +109,17 @@ export function canManageSchedule(role: string): boolean {
 export function canManageOrg(role: string): boolean {
   return isRole(role) && (role === "OWNER" || role === "ADMIN")
 }
+
+// Inspections: supervisors perform QC alongside managers/admins.
+const INSPECTOR_ROLES: ReadonlySet<Role> = new Set<Role>(["OWNER", "ADMIN", "MANAGER", "SUPERVISOR"])
+
+/** True if the role may perform and finalize inspections. */
+export function canInspect(role: string): boolean {
+  return isRole(role) && INSPECTOR_ROLES.has(role)
+}
+
+// Time approval/correction/export is payroll-sensitive and org-wide (we have no
+// supervisor→team scoping yet), so it is Manager+ only — NOT supervisors.
+export function canApproveTime(role: string): boolean {
+  return canManageAccounts(role)
+}

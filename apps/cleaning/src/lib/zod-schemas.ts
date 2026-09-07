@@ -205,3 +205,49 @@ export const reportProblemSchema = z.object({
   description: z.string().trim().min(1, "Describe the problem").max(2000),
 })
 export type ReportProblemInput = z.infer<typeof reportProblemSchema>
+
+// ─── Phase 4: inspections, time approval/correction, missed ──────────────────
+
+export const inspectionItemSchema = z.object({
+  label: z.string().trim().min(1, "Item label is required").max(300),
+  instructions: optionalString,
+  points: z.coerce.number().int().min(0).max(100).optional().default(1),
+  isCritical: z.boolean().optional().default(false),
+  requirePhoto: z.boolean().optional().default(false),
+})
+export const inspectionTemplateCreateSchema = z.object({
+  name: z.string().trim().min(1, "Template name is required").max(200),
+  passThreshold: z.coerce.number().int().min(0).max(100).optional().default(80),
+  items: z.array(inspectionItemSchema).min(1, "Add at least one inspection item"),
+})
+export const inspectionTemplateUpdateSchema = z.object({
+  name: z.string().trim().min(1).max(200).optional(),
+  passThreshold: z.coerce.number().int().min(0).max(100).optional(),
+  isActive: z.boolean().optional(),
+  items: z.array(inspectionItemSchema).min(1).optional(),
+})
+
+export const createInspectionSchema = z.object({ templateId: z.string().min(1) })
+
+export const INSPECTION_RESULTS = ["PASS", "FAIL", "NA"] as const
+export const inspectionItemResultSchema = z
+  .object({
+    result: z.enum(INSPECTION_RESULTS).optional(),
+    note: optionalString,
+  })
+  .refine((v) => v.result !== undefined || v.note !== undefined, { message: "Nothing to update" })
+
+export const finalizeInspectionSchema = z.object({ comments: optionalString })
+
+export const correctTimeSchema = z
+  .object({
+    clockInAt: z.coerce.date().optional(),
+    clockOutAt: z.coerce.date().optional(),
+    reason: z.string().trim().min(1, "A reason is required").max(500),
+  })
+  .refine((v) => v.clockInAt || v.clockOutAt, { message: "Provide a new clock-in or clock-out time" })
+export type CorrectTimeInput = z.infer<typeof correctTimeSchema>
+
+export const markMissedSchema = z.object({
+  reason: z.string().trim().min(1, "A reason is required").max(500),
+})

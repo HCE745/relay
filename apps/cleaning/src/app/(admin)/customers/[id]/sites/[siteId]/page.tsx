@@ -2,9 +2,11 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
+import { DateTime } from "luxon"
 import { getServiceLocation } from "@/lib/data/service-locations"
 import { listChecklistTemplates } from "@/lib/data/checklist-templates"
 import { getChecklistTemplate } from "@/lib/data/checklist-templates"
+import { getOrgTimezone } from "@/lib/data/org"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card, StatusPill } from "@/components/ui/controls"
 import { SiteEditButton } from "@/components/sites/site-edit"
@@ -27,6 +29,7 @@ export default async function SiteDetailPage({
 
   const site = await getServiceLocation(orgId, siteId)
   if (!site || site.customerId !== customerId) notFound()
+  const tz = site.timezone ?? (await getOrgTimezone(orgId))
 
   // Org-level checklist library, hydrated with items for the editor.
   const templateSummaries = await listChecklistTemplates(orgId)
@@ -84,6 +87,25 @@ export default async function SiteDetailPage({
           ) : null}
         </Card>
       )}
+
+      {site.inspections.length > 0 ? (
+        <Card className="p-5">
+          <h2 className="mb-3 text-sm font-semibold text-slate-700">Quality history</h2>
+          <ul className="divide-y divide-slate-100">
+            {site.inspections.map((ins) => (
+              <li key={ins.id} className="flex items-center justify-between py-2 text-sm">
+                <Link href={`/inspections/${ins.id}`} className="text-slate-700 hover:text-brand">
+                  {ins.finalizedAt ? DateTime.fromJSDate(ins.finalizedAt, { zone: tz }).toFormat("MMM d, yyyy") : "—"} ·{" "}
+                  {ins.inspector.name}
+                </Link>
+                <span className={ins.outcome === "PASS" ? "font-medium text-emerald-600" : "font-medium text-red-600"}>
+                  {ins.outcome} · {ins.score}%
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
 
       <ScopeSection templates={templates} />
       <ServicePlansSection

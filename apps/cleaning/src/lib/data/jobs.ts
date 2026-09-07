@@ -1,5 +1,6 @@
 import { orgDb, systemDb } from "../org-db"
-import { assertFound } from "./errors"
+import { assertFound, ConflictError } from "./errors"
+import { recordAudit } from "./audit"
 import { wallTimeToInstant } from "../scheduling/time"
 import type { z } from "zod"
 import type { manualJobCreateSchema, jobUpdateSchema } from "../zod-schemas"
@@ -43,6 +44,10 @@ export function getJob(orgId: string, id: string) {
       issues: {
         orderBy: { createdAt: "desc" },
         include: { reportedBy: { select: { name: true } }, photos: { select: { id: true } } },
+      },
+      inspections: {
+        orderBy: { createdAt: "desc" },
+        include: { inspector: { select: { name: true } } },
       },
     },
   })
@@ -122,4 +127,17 @@ export async function updateJob(orgId: string, id: string, input: UpdateInput) {
 export async function cancelJob(orgId: string, id: string) {
   const { count } = await orgDb(orgId).job.updateMany({ where: { id }, data: { status: "CANCELLED" } })
   return count > 0
+}
+
+/** Manually mark an uncompleted job MISSED (audited). No automated MISSED logic. */
+export async function markJobMissed(orgId: string, id: string, actorId: string, reason: string) {
+  const db = orgDb(orgId)
+  const job = await db.job.findFirst({ where: { id }, select: { status: true } })
+  assertFound(job, "Job")
+  if (job!.status === "COMPLETED") throw new ConflictError("Cannot mark a completed job as missed")
+  if (job!.status === "CANCELLED") throw new ConflictError("This job is cancelled")
+  if (job!.status === "MISSED") return { alreadyMissed: true }
+  await db.job.updateMany({ where: { id }, data: { status: "MISSED" } })
+  await recordAudit(orgId, actorId, "Job", id, "mark_missed", { metadata: { reason } })
+  return { alreadyMissed: false }
 }

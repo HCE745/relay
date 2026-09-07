@@ -28,6 +28,12 @@ export function getServiceLocation(orgId: string, id: string) {
         orderBy: [{ isActive: "desc" }, { name: "asc" }],
         include: { checklistTemplate: { select: { id: true, name: true, version: true } } },
       },
+      inspections: {
+        where: { status: "FINALIZED" },
+        orderBy: { finalizedAt: "desc" },
+        take: 10,
+        include: { inspector: { select: { name: true } } },
+      },
     },
   })
 }

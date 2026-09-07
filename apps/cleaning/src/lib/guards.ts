@@ -1,6 +1,6 @@
 import "server-only"
 import { getSession, type SessionPayload } from "./session"
-import { canManageAccounts, canManageOrg } from "./rbac"
+import { canManageAccounts, canManageOrg, canInspect } from "./rbac"
 import { orgHasCapability } from "./page-guards"
 import { unauthorized, forbidden } from "./api"
 
@@ -45,4 +45,15 @@ export async function requireOrgAdmin(): Promise<Guarded> {
   if (!session) return { ok: false, response: unauthorized() }
   if (!canManageOrg(session.role)) return { ok: false, response: forbidden() }
   return { ok: true, session, orgId: session.organizationId }
+}
+
+/** Inspection guard: OWNER/ADMIN/MANAGER/SUPERVISOR (+ optional capability). */
+export async function requireInspector(requiredCap?: string): Promise<GuardedActor> {
+  const session = await getSession()
+  if (!session) return { ok: false, response: unauthorized() }
+  if (!canInspect(session.role)) return { ok: false, response: forbidden() }
+  if (requiredCap && !(await orgHasCapability(session.organizationId, requiredCap))) {
+    return { ok: false, response: forbidden(`Missing capability: ${requiredCap}`) }
+  }
+  return { ok: true, session, orgId: session.organizationId, userId: session.userId }
 }

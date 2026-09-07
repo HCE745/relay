@@ -2,16 +2,19 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
-import { canViewSchedule, canManageSchedule } from "@/lib/rbac"
+import { canViewSchedule, canManageSchedule, canInspect } from "@/lib/rbac"
 import { getJob } from "@/lib/data/jobs"
 import { listAssignableCleaners } from "@/lib/data/assignments"
+import { listInspectionTemplates } from "@/lib/data/inspection-templates"
 import { getOrgTimezone } from "@/lib/data/org"
+import { orgHasCapability } from "@/lib/page-guards"
 import { formatTimeInZone } from "@/lib/scheduling/time"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
 import { JobStatusBadge } from "@/components/jobs/job-status"
 import { AssignmentsPanel } from "@/components/jobs/assignments-panel"
 import { JobActions } from "@/components/jobs/job-actions"
+import { InspectButton } from "@/components/inspections/inspect-button"
 
 export const dynamic = "force-dynamic"
 
@@ -33,15 +36,21 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   if (!job) notFound()
 
   const canManage = canManageSchedule(session.role)
-  const [tz, cleaners] = await Promise.all([
+  const inspector = canInspect(session.role)
+  const [tz, cleaners, hasInspections, templates] = await Promise.all([
     getOrgTimezone(orgId),
     canManage ? listAssignableCleaners(orgId) : Promise.resolve([]),
+    orgHasCapability(orgId, "quality.inspections"),
+    inspector ? listInspectionTemplates(orgId) : Promise.resolve([]),
   ])
   const jtz = job.serviceLocation.timezone ?? tz
   const startDT = DateTime.fromJSDate(job.scheduledStart, { zone: jtz })
 
   const checklistDone = job.checklistItems.filter((i) => i.isComplete).length
   const understaffed = job.crewSize != null && job.assignments.length < job.crewSize
+  const canMarkMissed = !["COMPLETED", "CANCELLED", "MISSED"].includes(job.status)
+  const showInspect = inspector && hasInspections && job.status === "COMPLETED"
+  const activeTemplates = templates.filter((t) => t.isActive).map((t) => ({ id: t.id, name: t.name }))
 
   return (
     <div className="space-y-6">
@@ -51,12 +60,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         </Link>
         <div className="mt-2 flex items-start justify-between gap-4">
           <PageHeader title={job.title} subtitle={`${job.serviceLocation.customer.name} · ${job.serviceLocation.name}`} />
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <JobStatusBadge status={job.status} />
+            {showInspect ? <InspectButton jobId={job.id} templates={activeTemplates} /> : null}
             {canManage ? (
               <JobActions
                 jobId={job.id}
                 cancelled={job.status === "CANCELLED"}
+                canMarkMissed={canMarkMissed}
                 initial={{
                   title: job.title,
                   date: startDT.toFormat("yyyy-MM-dd"),
@@ -169,6 +180,33 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           </div>
         </Card>
       ) : null}
+
+      {/* Inspections */}
+      <Card className="p-5">
+        <h2 className="mb-3 text-sm font-semibold text-slate-700">Inspections</h2>
+        {job.inspections.length === 0 ? (
+          <p className="text-sm text-slate-500">
+            {showInspect ? "Not yet inspected — tap “Inspect work” above." : "No inspections."}
+          </p>
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {job.inspections.map((ins) => (
+              <li key={ins.id} className="flex items-center justify-between py-2.5 text-sm">
+                <Link href={`/inspections/${ins.id}`} className="text-slate-800 hover:text-brand">
+                  {ins.templateName} · {ins.inspector.name}
+                </Link>
+                {ins.status === "FINALIZED" ? (
+                  <span className={ins.outcome === "PASS" ? "font-medium text-emerald-600" : "font-medium text-red-600"}>
+                    {ins.outcome} · {ins.score}%
+                  </span>
+                ) : (
+                  <span className="text-xs text-slate-400">Draft</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
 
       {/* Reported problems */}
       {job.issues.length > 0 ? (

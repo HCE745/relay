@@ -7,6 +7,8 @@ import {
   canViewSchedule,
   canManageSchedule,
   canManageOrg,
+  canInspect,
+  canApproveTime,
   ADMIN_NAV,
 } from "../rbac"
 
@@ -26,6 +28,15 @@ describe("schedule + org permissions", () => {
     expect(canManageOrg("MANAGER")).toBe(false)
     expect(canManageOrg("SUPERVISOR")).toBe(false)
     expect(canManageOrg("CLEANER")).toBe(false)
+  })
+  it("canInspect: managers + supervisors, not cleaners", () => {
+    for (const r of ["OWNER", "ADMIN", "MANAGER", "SUPERVISOR"]) expect(canInspect(r)).toBe(true)
+    expect(canInspect("CLEANER")).toBe(false)
+  })
+  it("canApproveTime: Manager+ only (supervisors excluded — no team scope)", () => {
+    for (const r of ["OWNER", "ADMIN", "MANAGER"]) expect(canApproveTime(r)).toBe(true)
+    expect(canApproveTime("SUPERVISOR")).toBe(false)
+    expect(canApproveTime("CLEANER")).toBe(false)
   })
 })
 

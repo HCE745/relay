@@ -134,6 +134,8 @@ model Organization {
   auditEvents        AuditEvent[]
   jobPhotos          JobPhoto[]
   issues             Issue[]
+  inspectionTemplates InspectionTemplate[]
+  inspections         Inspection[]
 
   @@schema("cleaning")
 }
@@ -157,10 +159,12 @@ model User {
   reports         User[]           @relation("UserHierarchy")
   employeeProfile EmployeeProfile?
   jobAssignments  JobAssignment[]
-  timeEntries     TimeEntry[]
+  timeEntries     TimeEntry[]      @relation("TimeEntryWorker")
+  approvedTimeEntries TimeEntry[]  @relation("TimeEntryApprover")
   createdJobs     Job[]            @relation("JobCreatedBy")
   uploadedPhotos  JobPhoto[]       @relation("PhotoUploader")
   reportedIssues  Issue[]          @relation("IssueReporter")
+  inspections     Inspection[]     @relation("InspectionInspector")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -267,6 +271,7 @@ model ServiceLocation {
   servicePlans ServicePlan[]
   jobs         Job[]
   issues       Issue[]
+  inspections  Inspection[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -365,6 +370,7 @@ model Job {
   timeEntries     TimeEntry[]
   photos          JobPhoto[]
   issues          Issue[]
+  inspections     Inspection[]
 
   // Idempotent generation: a plan can produce at most one Job per occurrence
   // start. Manual jobs have servicePlanId = NULL, which Postgres treats as
@@ -447,7 +453,8 @@ model TimeEntry {
   updatedAt    DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User         @relation("TimeEntryWorker", fields: [userId], references: [id], onDelete: Cascade)
+  approvedBy   User?        @relation("TimeEntryApprover", fields: [approvedById], references: [id])
   job          Job?         @relation(fields: [jobId], references: [id])
 
   @@index([organizationId])
@@ -483,27 +490,33 @@ model AuditEvent {
 // this row holds the storage key + metadata (uploader, timestamp, size, type).
 // Deliberately NOT coupled to Relay's Issue model — Cleaning owns its own Issue.
 model JobPhoto {
-  id                 String   @id @default(cuid())
-  organizationId     String
-  jobId              String
-  jobChecklistItemId String?
-  issueId            String?
-  storageKey         String
-  contentType        String
-  sizeBytes          Int
-  uploadedById       String
-  caption            String?
-  createdAt          DateTime @default(now())
+  id                     String   @id @default(cuid())
+  organizationId         String
+  // jobId is nullable so inspection/issue photos not tied to one exact Job work.
+  jobId                  String?
+  jobChecklistItemId     String?
+  issueId                String?
+  inspectionId           String?
+  inspectionItemResultId String?
+  storageKey             String
+  contentType            String
+  sizeBytes              Int
+  uploadedById           String
+  caption                String?
+  createdAt              DateTime @default(now())
 
-  organization  Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  job           Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  checklistItem JobChecklistItem? @relation(fields: [jobChecklistItemId], references: [id], onDelete: SetNull)
-  issue         Issue?            @relation(fields: [issueId], references: [id], onDelete: SetNull)
-  uploadedBy    User              @relation("PhotoUploader", fields: [uploadedById], references: [id])
+  organization         Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  job                  Job?                  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  checklistItem        JobChecklistItem?     @relation(fields: [jobChecklistItemId], references: [id], onDelete: SetNull)
+  issue                Issue?                @relation(fields: [issueId], references: [id], onDelete: SetNull)
+  inspection           Inspection?           @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  inspectionItemResult InspectionItemResult? @relation(fields: [inspectionItemResultId], references: [id], onDelete: SetNull)
+  uploadedBy           User                  @relation("PhotoUploader", fields: [uploadedById], references: [id])
 
   @@index([organizationId])
   @@index([jobId])
   @@index([jobChecklistItemId])
+  @@index([inspectionId])
   @@schema("cleaning")
 }
 
@@ -537,6 +550,7 @@ model Issue {
   organizationId    String
   jobId             String?
   serviceLocationId String?
+  inspectionId      String?       @unique // at most one Issue per inspection (idempotent finalize)
   reportedById      String
   category          IssueCategory @default(OTHER)
   title             String?
@@ -548,11 +562,129 @@ model Issue {
   organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   job             Job?             @relation(fields: [jobId], references: [id], onDelete: SetNull)
   serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
+  inspection      Inspection?      @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
   reportedBy      User             @relation("IssueReporter", fields: [reportedById], references: [id])
   photos          JobPhoto[]
 
   @@index([organizationId])
   @@index([jobId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// ─── Inspections (quality control) ───────────────────────────────────────────
+// Cleaning-specific QC. An Inspection is historical evidence: on finalize it
+// snapshots the template (name + threshold) and each item (label/points/critical/
+// photo) onto the result rows, and stores the computed score + outcome. Later
+// template edits never change historical inspections.
+
+enum InspectionStatus {
+  DRAFT
+  FINALIZED
+
+  @@schema("cleaning")
+}
+
+enum InspectionOutcome {
+  PASS
+  FAIL
+
+  @@schema("cleaning")
+}
+
+enum InspectionResultValue {
+  PASS
+  FAIL
+  NA
+
+  @@schema("cleaning")
+}
+
+model InspectionTemplate {
+  id            String   @id @default(cuid())
+  organizationId String
+  name          String
+  passThreshold Int      @default(80) // percent required to PASS
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  organization Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items        InspectionTemplateItem[]
+  inspections  Inspection[]
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+model InspectionTemplateItem {
+  id           String   @id @default(cuid())
+  templateId   String
+  label        String
+  instructions String?
+  points       Int      @default(1)
+  isCritical   Boolean  @default(false)
+  requirePhoto Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  template InspectionTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+  @@schema("cleaning")
+}
+
+model Inspection {
+  id                String             @id @default(cuid())
+  organizationId    String
+  serviceLocationId String
+  jobId             String? // Phase 4 prioritizes Job-linked; nullable enables future site inspections
+  inspectorId       String
+  templateId        String?
+  templateName      String // snapshot
+  passThreshold     Int // snapshot
+  status            InspectionStatus   @default(DRAFT)
+  score             Float? // stored at finalize; never recomputed from the template
+  outcome           InspectionOutcome?
+  comments          String?
+  finalizedAt       DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  organization    Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation        @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  job             Job?                    @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  inspector       User                    @relation("InspectionInspector", fields: [inspectorId], references: [id])
+  template        InspectionTemplate?     @relation(fields: [templateId], references: [id])
+  results         InspectionItemResult[]
+  photos          JobPhoto[]
+  issue           Issue?
+
+  @@index([organizationId])
+  @@index([serviceLocationId])
+  @@index([jobId])
+  @@schema("cleaning")
+}
+
+model InspectionItemResult {
+  id           String                @id @default(cuid())
+  inspectionId String
+  // Snapshotted item data — historical, never re-derived from the template.
+  label        String
+  instructions String?
+  points       Int
+  isCritical   Boolean
+  requirePhoto Boolean
+  sortOrder    Int
+  result       InspectionResultValue?
+  note         String?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  photos     JobPhoto[]
+
+  @@index([inspectionId])
   @@schema("cleaning")
 }

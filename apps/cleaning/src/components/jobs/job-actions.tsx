@@ -10,10 +10,12 @@ export function JobActions({
   jobId,
   initial,
   cancelled,
+  canMarkMissed,
 }: {
   jobId: string
   initial: { title: string; date: string; startTime: string; crewSize: number | null; notes: string | null }
   cancelled: boolean
+  canMarkMissed: boolean
 }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -48,11 +50,24 @@ export function JobActions({
     if (res.ok) router.refresh()
   }
 
+  async function markMissed() {
+    const reason = window.prompt("Reason for marking this job MISSED?")
+    if (!reason) return
+    const res = await apiSend(`/api/jobs/${jobId}/missed`, "POST", { reason })
+    if (res.ok) router.refresh()
+    else alert(res.error)
+  }
+
   return (
     <div className="flex items-center gap-2">
       <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
         Edit
       </Button>
+      {canMarkMissed ? (
+        <Button variant="secondary" size="sm" onClick={markMissed}>
+          Mark missed
+        </Button>
+      ) : null}
       {!cancelled ? (
         <Button variant="danger" size="sm" onClick={cancelJob}>
           Cancel job

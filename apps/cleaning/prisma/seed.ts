@@ -67,6 +67,26 @@ async function main() {
     },
   })
 
+  // A default QC template so managers/supervisors can inspect out of the box.
+  await prisma.inspectionTemplate.upsert({
+    where: { id: "seed-inspection-tpl-sparkle" },
+    update: {},
+    create: {
+      id: "seed-inspection-tpl-sparkle",
+      organizationId: sparkle.id,
+      name: "Standard Site Inspection",
+      passThreshold: 80,
+      items: {
+        create: [
+          { label: "Floors clean and dry", points: 2, sortOrder: 0 },
+          { label: "Restrooms stocked and sanitized", points: 3, isCritical: true, sortOrder: 1 },
+          { label: "Trash emptied", points: 1, sortOrder: 2 },
+          { label: "Surfaces dusted", points: 1, sortOrder: 3 },
+        ],
+      },
+    },
+  })
+
   // ── Second org: Rival Cleaners (SOLO tier) — for cross-org isolation checks ──
   const rival = await prisma.organization.upsert({
     where: { slug: "rival-cleaners" },

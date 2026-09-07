@@ -36,6 +36,7 @@ import {
   Megaphone,
   PieChart,
   Award,
+  MessageSquare,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { logout } from "@/lib/auth-actions"
@@ -87,7 +88,7 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "team",                href: "/team",                label: "Team",                  icon: Users,           section: "ADMINISTRATION" },
 ]
 
-const SECTION_ORDER = ["MAIN", "EMPLOYEE VOICE", "OPERATIONS", "INTELLIGENCE", "ADMINISTRATION"]
+const SECTION_ORDER = ["MAIN", "EMPLOYEE VOICE", "CUSTOMER VOICE", "OPERATIONS", "INTELLIGENCE", "ADMINISTRATION"]
 
 interface SidebarProps {
   allowedPageKeys: PageKey[]
@@ -102,6 +103,7 @@ interface SidebarProps {
   executiveGoalsEnabled?: boolean
   trendDetectionEnabled?: boolean
   voiceInsightsVisible?: boolean
+  customerVoiceEnabled?: boolean
   navLabelOverrides?: Record<string, string>
   customViewItems?: CustomViewSidebarItem[]
   customPageItems?: CustomPageSidebarItem[]
@@ -120,6 +122,7 @@ export function Sidebar({
   executiveGoalsEnabled,
   trendDetectionEnabled,
   voiceInsightsVisible,
+  customerVoiceEnabled,
   navLabelOverrides,
   customViewItems = [],
   customPageItems = [],
@@ -225,6 +228,10 @@ export function Sidebar({
     executiveGoalsEnabled     && { href: "/executive-goals",     label: "Goals & KPIs",  icon: Target     },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 
+  const customerVoiceExtras = [
+    customerVoiceEnabled && { href: "/customer-voice", label: "Customer Voice", icon: MessageSquare },
+  ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
+
   const adminExtras = [
     regionsEnabled                    && { href: "/regions",                  label: "Regions",          icon: MapPin    },
     showRouting                        && { href: "/settings/routing",         label: "Routing Rules",    icon: GitBranch },
@@ -247,10 +254,11 @@ export function Sidebar({
   }))
 
   const sectionExtras: Record<string, Array<{ href: string; label: string; icon: React.ElementType }>> = {
-    MAIN:             [...customViewExtras, ...customPageExtras],
-    "EMPLOYEE VOICE": voiceExtras,
-    INTELLIGENCE:     intelligenceExtras,
-    ADMINISTRATION:   adminExtras,
+    MAIN:              [...customViewExtras, ...customPageExtras],
+    "EMPLOYEE VOICE":  voiceExtras,
+    "CUSTOMER VOICE":  customerVoiceExtras,
+    INTELLIGENCE:      intelligenceExtras,
+    ADMINISTRATION:    adminExtras,
   }
 
   return (

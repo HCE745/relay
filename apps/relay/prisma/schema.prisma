@@ -86,6 +86,7 @@ model Organization {
   trend_detection_enabled            Boolean @default(false)
   executive_goals_enabled            Boolean @default(false)
   recognition_enabled                Boolean @default(false)
+  customer_voice_enabled             Boolean @default(false)
 
   // ── Workforce Communications feature flags ────────────────────────────────
   // To add a new feature: (1) add the flag here with @default(false),
@@ -208,6 +209,8 @@ model Organization {
   customPages           CustomPage[]
   surveys               Survey[]
   recognitions          Recognition[]
+  connectedAccounts     ConnectedAccount[]
+  customerReviews       CustomerReview[]
 }
 
 model CustomView {
@@ -385,6 +388,7 @@ model Location {
   maintenanceSchedules    MaintenanceSchedule[]
   injuryReports           InjuryReport[]
   qrCodes                 QrCode[]
+  customerReviews         CustomerReview[]
 }
 
 model Department {
@@ -520,6 +524,7 @@ model Issue {
   attachments             Attachment[]
   conversation            Conversation?
   assignments             Assignment[]      @relation("IssueAssignments")
+  customerReviews         CustomerReview[]
 }
 
 model IssueComment {
@@ -2797,4 +2802,59 @@ model Recognition {
 
   @@index([organizationId])
   @@index([recipientId])
+}
+
+// ── Customer Voice ─────────────────────────────────────────────────────────────
+
+model ConnectedAccount {
+  id             String    @id @default(cuid())
+  organizationId String
+  provider       String    // "google_business_profile"
+  accountEmail   String
+  accountId      String
+  accessToken    String    // AES-256-GCM encrypted
+  refreshToken   String    // AES-256-GCM encrypted
+  expiresAt      DateTime
+  scopes         String[]
+  connectedById  String
+  connectedAt    DateTime  @default(now())
+  lastSyncAt     DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider])
+  @@index([organizationId])
+}
+
+model CustomerReview {
+  id                String    @id @default(cuid())
+  organizationId    String
+  locationId        String?
+  googleLocationId  String
+  googleReviewId    String    @unique
+  reviewerName      String?
+  rating            Int
+  reviewText        String?
+  reviewReplyText   String?
+  publishedAt       DateTime
+  sourceUrl         String?
+  aiClassification  String?   // ACTIONABLE | FEEDBACK | ARCHIVED
+  aiConfidence      Float?
+  aiSummary         String?
+  aiCategory        String?   // EQUIPMENT | SAFETY | SERVICE | CLEANLINESS | FACILITY | OTHER
+  aiLocationMatch   String?
+  aiAssetMention    String?
+  recommendedAction String?
+  issueId           String?
+  status            String    @default("PENDING") // PENDING | ISSUE_RECOMMENDED | ISSUE_CREATED | RECORDED_AS_FEEDBACK | ARCHIVED
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  location     Location?    @relation(fields: [locationId], references: [id])
+  issue        Issue?       @relation(fields: [issueId], references: [id])
+
+  @@index([organizationId])
+  @@index([googleLocationId])
+  @@index([status])
 }

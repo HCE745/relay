@@ -55,6 +55,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         executive_goals_enabled: true,
         trend_detection_enabled: true,
         recognition_enabled: true,
+        customer_voice_enabled: true,
         navigationConfig: true,
       },
     }),
@@ -161,6 +162,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         executiveGoalsEnabled={org?.executive_goals_enabled ?? false}
         trendDetectionEnabled={org?.trend_detection_enabled ?? false}
         voiceInsightsVisible={voiceInsightsVisible}
+        customerVoiceEnabled={org?.customer_voice_enabled ?? false}
         navLabelOverrides={navLabelOverrides}
         customViewItems={sidebarViews}
         customPageItems={sidebarPages}
@@ -175,6 +177,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         regionsEnabled={org?.regions_enabled ?? false}
         userName={session.name ?? ""}
         orgName={org?.name ?? ""}
+        customerVoiceEnabled={org?.customer_voice_enabled ?? false}
         navLabelOverrides={navLabelOverrides}
         customViewItems={sidebarViews}
         customPageItems={sidebarPages}

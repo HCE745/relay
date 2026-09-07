@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Key, Webhook, Shield, Plus, Trash2, ToggleLeft, ToggleRight, Copy, Check, ExternalLink } from "lucide-react"
+import { Key, Webhook, Shield, Plus, Trash2, ToggleLeft, ToggleRight, Copy, Check, ExternalLink, Link2, RefreshCw, LogOut } from "lucide-react"
 import { format } from "date-fns"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -19,6 +19,19 @@ interface WebhookEndpoint {
 interface SSOConfig {
   providerType: string; clientId: string | null; tenantIdOrDomain: string | null
   ssoEnabled: boolean; status: string
+}
+
+interface ConnectedAccountInfo {
+  email: string
+  lastSyncAt: string | null
+  locationCount: number
+}
+
+interface SyncResult {
+  locationsChecked: number
+  reviewsNew: number
+  reviewsClassified: number
+  errors: string[]
 }
 
 const ALL_EVENTS = [
@@ -307,6 +320,120 @@ function WebhooksSection({ initialEndpoints }: { initialEndpoints: WebhookEndpoi
   )
 }
 
+// ── Connected Accounts Section ────────────────────────────────────────────────
+
+function ConnectedAccountsSection({ initialAccount }: { initialAccount: ConnectedAccountInfo | null }) {
+  const [account, setAccount] = useState<ConnectedAccountInfo | null>(initialAccount)
+  const [syncing, setSyncing] = useState(false)
+  const [syncResult, setSyncResult] = useState<SyncResult | null>(null)
+  const [syncError, setSyncError] = useState("")
+  const [disconnecting, setDisconnecting] = useState(false)
+
+  async function sync() {
+    setSyncing(true); setSyncResult(null); setSyncError("")
+    try {
+      const res = await fetch("/api/integrations/google/sync", { method: "POST" })
+      if (!res.ok) { setSyncError("Sync failed — check your connection"); return }
+      const j = await res.json() as SyncResult
+      setSyncResult(j)
+      setAccount(a => a ? { ...a, lastSyncAt: new Date().toISOString() } : a)
+    } catch { setSyncError("Network error") }
+    finally { setSyncing(false) }
+  }
+
+  async function disconnect() {
+    if (!confirm("Disconnect Google Business Profile? Review syncing will stop.")) return
+    setDisconnecting(true)
+    try {
+      const res = await fetch("/api/integrations/google", { method: "DELETE" })
+      if (res.ok) { setAccount(null); setSyncResult(null) }
+    } finally { setDisconnecting(false) }
+  }
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-6">
+      <SectionHeader icon={Link2} title="Connected Accounts" description="Connect external services to power Relay features like Customer Voice review sync." />
+
+      <div className="border border-gray-200 rounded-xl overflow-hidden">
+        <div className="flex items-center gap-4 p-4">
+          {/* Google icon */}
+          <div className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm">
+            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-gray-900">Google Business Profile</p>
+            {account ? (
+              <div className="mt-0.5 space-y-0.5">
+                <p className="text-xs text-gray-500">{account.email}</p>
+                <p className="text-xs text-gray-400">
+                  {account.locationCount > 0 ? `${account.locationCount} location${account.locationCount === 1 ? "" : "s"}` : "No locations synced yet"}
+                  {account.lastSyncAt ? ` · Last synced ${format(new Date(account.lastSyncAt), "MMM d 'at' h:mm a")}` : " · Never synced"}
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400 mt-0.5">Not connected</p>
+            )}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {account ? (
+              <>
+                <button
+                  onClick={sync}
+                  disabled={syncing}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded-lg hover:border-gray-400 disabled:opacity-50 transition-colors"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+                  {syncing ? "Syncing…" : "Sync Now"}
+                </button>
+                <button
+                  onClick={disconnect}
+                  disabled={disconnecting}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:border-red-400 disabled:opacity-50 transition-colors"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  {disconnecting ? "Disconnecting…" : "Disconnect"}
+                </button>
+              </>
+            ) : (
+              <a
+                href="/api/integrations/google/connect"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 border border-blue-200 rounded-lg hover:border-blue-400 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Connect
+              </a>
+            )}
+          </div>
+        </div>
+
+        {syncResult && (
+          <div className="border-t border-gray-100 bg-green-50 px-4 py-3">
+            <p className="text-xs font-medium text-green-800">
+              Sync complete — {syncResult.reviewsNew} new review{syncResult.reviewsNew === 1 ? "" : "s"} ingested
+              across {syncResult.locationsChecked} location{syncResult.locationsChecked === 1 ? "" : "s"}
+              {syncResult.reviewsClassified > 0 ? `, ${syncResult.reviewsClassified} classified by AI` : ""}.
+            </p>
+            {syncResult.errors.length > 0 && (
+              <p className="text-xs text-amber-700 mt-1">{syncResult.errors.length} error{syncResult.errors.length === 1 ? "" : "s"}: {syncResult.errors.join("; ")}</p>
+            )}
+          </div>
+        )}
+
+        {syncError && (
+          <div className="border-t border-gray-100 bg-red-50 px-4 py-3">
+            <p className="text-xs text-red-700">{syncError}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── SSO Section ───────────────────────────────────────────────────────────────
 
 function SSOSection({ initialConfig }: { initialConfig: SSOConfig | null }) {
@@ -398,18 +525,23 @@ function SSOSection({ initialConfig }: { initialConfig: SSOConfig | null }) {
 export function IntegrationsClient({
   apiWebhooksEnabled,
   ssoEnabled,
+  customerVoiceEnabled,
+  connectedAccount,
   initialApiKeys,
   initialWebhooks,
   initialSSOConfig,
 }: {
   apiWebhooksEnabled: boolean
   ssoEnabled: boolean
+  customerVoiceEnabled: boolean
+  connectedAccount: ConnectedAccountInfo | null
   initialApiKeys: ApiKey[]
   initialWebhooks: WebhookEndpoint[]
   initialSSOConfig: SSOConfig | null
 }) {
   return (
     <div className="max-w-3xl space-y-6">
+      {customerVoiceEnabled && <ConnectedAccountsSection initialAccount={connectedAccount} />}
       {apiWebhooksEnabled && <ApiKeysSection initialKeys={initialApiKeys} />}
       {apiWebhooksEnabled && <WebhooksSection initialEndpoints={initialWebhooks} />}
       {ssoEnabled && <SSOSection initialConfig={initialSSOConfig} />}

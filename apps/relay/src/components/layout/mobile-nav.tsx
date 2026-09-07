@@ -30,6 +30,7 @@ import {
   Radio,
   Megaphone,
   Award,
+  MessageSquare,
 } from "lucide-react"
 import type { PageKey } from "@/lib/page-access"
 import { RelayIconWhite, RelayWordmarkWhite } from "@/components/logo"
@@ -125,9 +126,10 @@ interface MobileNavProps {
   navLabelOverrides?: Record<string, string>
   customViewItems?: CustomViewSidebarItem[]
   customPageItems?: CustomPageSidebarItem[]
+  customerVoiceEnabled?: boolean
 }
 
-export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, userName, orgName, navLabelOverrides, customViewItems = [], customPageItems = [] }: MobileNavProps) {
+export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, userName, orgName, navLabelOverrides, customViewItems = [], customPageItems = [], customerVoiceEnabled }: MobileNavProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -358,6 +360,20 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
                 </Link>
               )
             })}
+            {customerVoiceEnabled && (
+              <Link
+                href="/customer-voice"
+                className={cn(
+                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                  isActive("/customer-voice")
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                )}
+              >
+                <MessageSquare className="w-5 h-5 flex-shrink-0" />
+                Customer Voice
+              </Link>
+            )}
           </nav>
 
           {/* Footer */}

@@ -14,10 +14,10 @@ export default async function IntegrationsPage() {
 
   const org = await prisma.organization.findUnique({
     where: { id: session.organizationId },
-    select: { api_webhooks_enabled: true, sso_foundation_enabled: true },
+    select: { api_webhooks_enabled: true, sso_foundation_enabled: true, customer_voice_enabled: true },
   })
 
-  if (!org?.api_webhooks_enabled && !org?.sso_foundation_enabled) {
+  if (!org?.api_webhooks_enabled && !org?.sso_foundation_enabled && !org?.customer_voice_enabled) {
     return (
       <div>
         <Header title="Integrations" />
@@ -29,7 +29,7 @@ export default async function IntegrationsPage() {
     )
   }
 
-  const [apiKeys, webhookEndpoints, ssoConfig] = await Promise.all([
+  const [apiKeys, webhookEndpoints, ssoConfig, connectedAccountRaw, locationGroups] = await Promise.all([
     org.api_webhooks_enabled
       ? prisma.apiKey.findMany({
           where: { organizationId: session.organizationId },
@@ -52,6 +52,19 @@ export default async function IntegrationsPage() {
           where: { organizationId: session.organizationId },
         })
       : Promise.resolve(null),
+    org.customer_voice_enabled
+      ? prisma.connectedAccount.findUnique({
+          where: { organizationId_provider: { organizationId: session.organizationId, provider: "google_business_profile" } },
+          select: { accountEmail: true, lastSyncAt: true },
+        })
+      : Promise.resolve(null),
+    org.customer_voice_enabled
+      ? prisma.customerReview.findMany({
+          where: { organizationId: session.organizationId },
+          select: { googleLocationId: true },
+          distinct: ["googleLocationId"],
+        })
+      : Promise.resolve([]),
   ])
 
   return (
@@ -61,6 +74,12 @@ export default async function IntegrationsPage() {
         <IntegrationsClient
           apiWebhooksEnabled={org.api_webhooks_enabled}
           ssoEnabled={org.sso_foundation_enabled}
+          customerVoiceEnabled={org.customer_voice_enabled}
+          connectedAccount={connectedAccountRaw ? {
+            email: connectedAccountRaw.accountEmail,
+            lastSyncAt: connectedAccountRaw.lastSyncAt?.toISOString() ?? null,
+            locationCount: locationGroups.length,
+          } : null}
           initialApiKeys={apiKeys.map(k => ({
             id: k.id, name: k.name, keyPrefix: k.keyPrefix, isActive: k.isActive,
             lastUsedAt: k.lastUsedAt?.toISOString() ?? null,

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation"
 import { Header } from "@/components/layout/header"
-import { FeatureFlagGate } from "@/components/layout/feature-flag-gate"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { IntegrationsClient } from "./integrations-client"
@@ -14,23 +13,11 @@ export default async function IntegrationsPage() {
 
   const org = await prisma.organization.findUnique({
     where: { id: session.organizationId },
-    select: { api_webhooks_enabled: true, sso_foundation_enabled: true, customer_voice_enabled: true },
+    select: { api_webhooks_enabled: true, sso_foundation_enabled: true },
   })
 
-  if (!org?.api_webhooks_enabled && !org?.sso_foundation_enabled && !org?.customer_voice_enabled) {
-    return (
-      <div>
-        <Header title="Integrations" />
-        <FeatureFlagGate
-          featureName="API & Integrations"
-          description="Generate API keys, register webhook endpoints for real-time event notifications, and configure SSO. Contact support to enable."
-        />
-      </div>
-    )
-  }
-
   const [apiKeys, webhookEndpoints, ssoConfig, connectedAccountRaw, locationGroups] = await Promise.all([
-    org.api_webhooks_enabled
+    org?.api_webhooks_enabled
       ? prisma.apiKey.findMany({
           where: { organizationId: session.organizationId },
           orderBy: { createdAt: "desc" },
@@ -40,31 +27,27 @@ export default async function IntegrationsPage() {
           },
         })
       : Promise.resolve([]),
-    org.api_webhooks_enabled
+    org?.api_webhooks_enabled
       ? prisma.webhookEndpoint.findMany({
           where: { organizationId: session.organizationId },
           orderBy: { createdAt: "desc" },
           include: { _count: { select: { deliveryLogs: true } } },
         })
       : Promise.resolve([]),
-    org.sso_foundation_enabled
+    org?.sso_foundation_enabled
       ? prisma.sSOConfig.findUnique({
           where: { organizationId: session.organizationId },
         })
       : Promise.resolve(null),
-    org.customer_voice_enabled
-      ? prisma.connectedAccount.findUnique({
-          where: { organizationId_provider: { organizationId: session.organizationId, provider: "google_business_profile" } },
-          select: { accountEmail: true, lastSyncAt: true },
-        })
-      : Promise.resolve(null),
-    org.customer_voice_enabled
-      ? prisma.customerReview.findMany({
-          where: { organizationId: session.organizationId },
-          select: { googleLocationId: true },
-          distinct: ["googleLocationId"],
-        })
-      : Promise.resolve([]),
+    prisma.connectedAccount.findUnique({
+      where: { organizationId_provider: { organizationId: session.organizationId, provider: "google_business_profile" } },
+      select: { accountEmail: true, lastSyncAt: true },
+    }),
+    prisma.customerReview.findMany({
+      where: { organizationId: session.organizationId },
+      select: { googleLocationId: true },
+      distinct: ["googleLocationId"],
+    }),
   ])
 
   return (
@@ -72,9 +55,8 @@ export default async function IntegrationsPage() {
       <Header title="Integrations" />
       <div className="p-6">
         <IntegrationsClient
-          apiWebhooksEnabled={org.api_webhooks_enabled}
-          ssoEnabled={org.sso_foundation_enabled}
-          customerVoiceEnabled={org.customer_voice_enabled}
+          apiWebhooksEnabled={org?.api_webhooks_enabled ?? false}
+          ssoEnabled={org?.sso_foundation_enabled ?? false}
           connectedAccount={connectedAccountRaw ? {
             email: connectedAccountRaw.accountEmail,
             lastSyncAt: connectedAccountRaw.lastSyncAt?.toISOString() ?? null,

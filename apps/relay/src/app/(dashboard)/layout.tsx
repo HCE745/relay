@@ -163,6 +163,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         trendDetectionEnabled={org?.trend_detection_enabled ?? false}
         voiceInsightsVisible={voiceInsightsVisible}
         customerVoiceEnabled={org?.customer_voice_enabled ?? false}
+        showIntegrations={session.role === "ADMIN"}
         navLabelOverrides={navLabelOverrides}
         customViewItems={sidebarViews}
         customPageItems={sidebarPages}

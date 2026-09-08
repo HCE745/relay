@@ -525,7 +525,6 @@ function SSOSection({ initialConfig }: { initialConfig: SSOConfig | null }) {
 export function IntegrationsClient({
   apiWebhooksEnabled,
   ssoEnabled,
-  customerVoiceEnabled,
   connectedAccount,
   initialApiKeys,
   initialWebhooks,
@@ -533,7 +532,6 @@ export function IntegrationsClient({
 }: {
   apiWebhooksEnabled: boolean
   ssoEnabled: boolean
-  customerVoiceEnabled: boolean
   connectedAccount: ConnectedAccountInfo | null
   initialApiKeys: ApiKey[]
   initialWebhooks: WebhookEndpoint[]
@@ -541,7 +539,7 @@ export function IntegrationsClient({
 }) {
   return (
     <div className="max-w-3xl space-y-6">
-      {customerVoiceEnabled && <ConnectedAccountsSection initialAccount={connectedAccount} />}
+      <ConnectedAccountsSection initialAccount={connectedAccount} />
       {apiWebhooksEnabled && <ApiKeysSection initialKeys={initialApiKeys} />}
       {apiWebhooksEnabled && <WebhooksSection initialEndpoints={initialWebhooks} />}
       {ssoEnabled && <SSOSection initialConfig={initialSSOConfig} />}

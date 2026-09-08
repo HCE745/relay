@@ -104,6 +104,7 @@ interface SidebarProps {
   trendDetectionEnabled?: boolean
   voiceInsightsVisible?: boolean
   customerVoiceEnabled?: boolean
+  showIntegrations?: boolean
   navLabelOverrides?: Record<string, string>
   customViewItems?: CustomViewSidebarItem[]
   customPageItems?: CustomPageSidebarItem[]
@@ -123,6 +124,7 @@ export function Sidebar({
   trendDetectionEnabled,
   voiceInsightsVisible,
   customerVoiceEnabled,
+  showIntegrations,
   navLabelOverrides,
   customViewItems = [],
   customPageItems = [],
@@ -235,7 +237,7 @@ export function Sidebar({
   const adminExtras = [
     regionsEnabled                    && { href: "/regions",                  label: "Regions",          icon: MapPin    },
     showRouting                        && { href: "/settings/routing",         label: "Routing Rules",    icon: GitBranch },
-    (apiWebhooksEnabled || ssoEnabled) && { href: "/settings/integrations",   label: "Integrations",     icon: Key       },
+    showIntegrations                    && { href: "/settings/integrations",   label: "Integrations",     icon: Key       },
     sharedFacilityEnabled             && { href: "/settings/shared-facility", label: "Shared Facility",  icon: Building2 },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 

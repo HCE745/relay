@@ -283,6 +283,8 @@ export function Sidebar({
               const Icon = resolveViewIcon(page.icon)
               return navLink(`/workspace/${page.id}`, page.name, Icon)
             })}
+            {voiceExtras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
+            {customerVoiceExtras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
           </div>
         ) : (
           SECTION_ORDER.map(section => {

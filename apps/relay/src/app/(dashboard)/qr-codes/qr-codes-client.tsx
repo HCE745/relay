@@ -18,6 +18,8 @@ import {
   Shuffle,
   AlertTriangle,
   X,
+  MousePointerClick,
+  LayoutGrid,
 } from "lucide-react"
 import { PeoplePicker } from "@/components/ui/people-picker"
 import type { Person } from "@/components/ui/people-picker"
@@ -40,6 +42,8 @@ interface QrCodeItem {
   area:               string | null
   departmentId:       string | null
   departmentName:     string | null
+  assetId:            string | null
+  assetName:          string | null
   defaultCategory:    string
   collectContactInfo: boolean
   requireContactInfo: boolean
@@ -47,6 +51,10 @@ interface QrCodeItem {
   isActive:           boolean
   submissionCount:    number
   createdAt:          string
+  presentationMode:   string
+  enabledActions:     string[]
+  surveyId:           string | null
+  surveyTitle:        string | null
 }
 
 type TeamMember = Person
@@ -84,6 +92,13 @@ const ROLE_LABELS: Record<string, string> = {
   EMPLOYEE: "Employee",
 }
 
+const ACTION_LABELS: Record<string, string> = {
+  ISSUE:      "Issue Report",
+  FEEDBACK:   "Customer Feedback",
+  SURVEY:     "Survey",
+  ASSET_VIEW: "Asset View",
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function modeBadge(mode: string) {
@@ -93,6 +108,27 @@ function modeBadge(mode: string) {
       {label}
     </span>
   )
+}
+
+function presentationBadge(qr: QrCodeItem) {
+  if (qr.enabledActions.length > 0) {
+    if (qr.presentationMode === "MENU") {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-700">
+          <LayoutGrid className="w-3 h-3" />
+          Menu · {qr.enabledActions.map(a => ACTION_LABELS[a] ?? a).join(", ")}
+        </span>
+      )
+    }
+    const action = qr.enabledActions[0]
+    return (
+      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-sky-100 text-sky-700">
+        <MousePointerClick className="w-3 h-3" />
+        Direct · {ACTION_LABELS[action] ?? action}
+      </span>
+    )
+  }
+  return null
 }
 
 // ─── Routing Mode Section ─────────────────────────────────────────────────────
@@ -217,12 +253,173 @@ function RoutingBadge({ qr }: { qr: QrCodeItem }) {
   )
 }
 
+// ─── Presentation Section ─────────────────────────────────────────────────────
+
+function PresentationSection({
+  presentationMode, setPresentationMode,
+  enabledActions, setEnabledActions,
+  surveyId, setSurveyId,
+  assetId, setAssetId,
+  surveys, assets, customerVoiceEnabled,
+}: {
+  presentationMode:    string;    setPresentationMode: (v: string) => void
+  enabledActions:      string[];  setEnabledActions:   (v: string[]) => void
+  surveyId:            string;    setSurveyId:         (v: string) => void
+  assetId:             string;    setAssetId:          (v: string) => void
+  surveys:             { id: string; title: string }[]
+  assets:              { id: string; name: string }[]
+  customerVoiceEnabled: boolean
+}) {
+  const directAction = enabledActions[0] ?? "ISSUE"
+
+  function setDirectAction(action: string) {
+    setEnabledActions([action])
+    if (action !== "SURVEY")     setSurveyId("")
+    if (action !== "ASSET_VIEW") setAssetId("")
+  }
+
+  function toggleMenuAction(action: string, checked: boolean) {
+    if (checked) {
+      setEnabledActions([...enabledActions.filter(a => a !== action), action])
+    } else {
+      setEnabledActions(enabledActions.filter(a => a !== action))
+      if (action === "SURVEY")     setSurveyId("")
+      if (action === "ASSET_VIEW") setAssetId("")
+    }
+  }
+
+  const showSurveyPicker = enabledActions.includes("SURVEY") && surveys.length > 0
+  const showAssetPicker  = enabledActions.includes("ASSET_VIEW") && assets.length > 0
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+      <label className="block text-sm font-semibold text-gray-700">Presentation</label>
+
+      {/* DIRECT / MENU radio */}
+      <div className="grid grid-cols-2 gap-2">
+        {(["DIRECT", "MENU"] as const).map(mode => (
+          <label
+            key={mode}
+            className={`flex items-start gap-2.5 p-3 border rounded-lg cursor-pointer transition-colors ${
+              presentationMode === mode
+                ? "border-blue-500 bg-blue-50"
+                : "border-gray-200 hover:bg-gray-50"
+            }`}
+          >
+            <input
+              type="radio"
+              name="presentationMode"
+              value={mode}
+              checked={presentationMode === mode}
+              onChange={() => {
+                setPresentationMode(mode)
+                // Reset to single ISSUE action when switching to DIRECT if multiple selected
+                if (mode === "DIRECT" && enabledActions.length !== 1) {
+                  setEnabledActions(["ISSUE"])
+                  setSurveyId("")
+                  setAssetId("")
+                }
+              }}
+              className="mt-0.5 text-blue-600 focus:ring-blue-500"
+            />
+            <div>
+              {mode === "DIRECT"
+                ? <><p className="text-sm font-medium text-gray-800">Direct Action</p><p className="text-xs text-gray-500">Single tap-to-action</p></>
+                : <><p className="text-sm font-medium text-gray-800">Action Menu</p><p className="text-xs text-gray-500">Customer picks from list</p></>
+              }
+            </div>
+          </label>
+        ))}
+      </div>
+
+      {/* DIRECT: single action dropdown */}
+      {presentationMode === "DIRECT" && (
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Action</label>
+          <select
+            value={directAction}
+            onChange={e => setDirectAction(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="ISSUE">Report an Issue</option>
+            {customerVoiceEnabled && <option value="FEEDBACK">Customer Feedback</option>}
+            {surveys.length > 0 && <option value="SURVEY">Survey</option>}
+            {assets.length > 0 && <option value="ASSET_VIEW">Asset View</option>}
+          </select>
+        </div>
+      )}
+
+      {/* MENU: checkboxes */}
+      {presentationMode === "MENU" && (
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-2">Enabled Actions</label>
+          <div className="space-y-2">
+            {[
+              { value: "ISSUE",      label: "Report an Issue",      available: true },
+              { value: "FEEDBACK",   label: "Customer Feedback",     available: customerVoiceEnabled },
+              { value: "SURVEY",     label: "Survey",                available: surveys.length > 0 },
+              { value: "ASSET_VIEW", label: "Asset View",            available: assets.length > 0 },
+            ].filter(a => a.available).map(({ value, label }) => (
+              <label key={value} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={enabledActions.includes(value)}
+                  onChange={e => toggleMenuAction(value, e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded"
+                />
+                <span className="text-sm text-gray-700">{label}</span>
+              </label>
+            ))}
+          </div>
+          {enabledActions.length === 0 && (
+            <p className="text-xs text-amber-600 mt-2">Select at least one action.</p>
+          )}
+        </div>
+      )}
+
+      {/* Survey picker */}
+      {showSurveyPicker && (
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Survey</label>
+          <select
+            value={surveyId}
+            onChange={e => setSurveyId(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select a survey…</option>
+            {surveys.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+          </select>
+        </div>
+      )}
+
+      {/* Asset picker */}
+      {showAssetPicker && (
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Asset</label>
+          <select
+            value={assetId}
+            onChange={e => setAssetId(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select an asset…</option>
+            {assets.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Form fields shared by Create + Edit ─────────────────────────────────────
 
 function QrFormFields({
   name, setName,
   description, setDescription,
   reportingMode, setReportingMode,
+  presentationMode, setPresentationMode,
+  enabledActions, setEnabledActions,
+  surveyId, setSurveyId,
+  assetId, setAssetId,
   routingMode, setRoutingMode,
   assignedToId, setAssignedToId,
   locationId, setLocationId,
@@ -232,12 +429,16 @@ function QrFormFields({
   collectContactInfo, setCollectContactInfo,
   requireContactInfo, setRequireContactInfo,
   requirePhoto, setRequirePhoto,
-  locations, departments, members,
+  locations, departments, members, surveys, assets, customerVoiceEnabled,
   saving, error, submitLabel, onCancel,
 }: {
   name: string; setName: (v: string) => void
   description: string; setDescription: (v: string) => void
   reportingMode: string; setReportingMode: (v: string) => void
+  presentationMode: string; setPresentationMode: (v: string) => void
+  enabledActions: string[]; setEnabledActions: (v: string[]) => void
+  surveyId: string; setSurveyId: (v: string) => void
+  assetId: string; setAssetId: (v: string) => void
   routingMode: string; setRoutingMode: (v: string) => void
   assignedToId: string; setAssignedToId: (v: string) => void
   locationId: string; setLocationId: (v: string) => void
@@ -247,9 +448,12 @@ function QrFormFields({
   collectContactInfo: boolean; setCollectContactInfo: (v: boolean) => void
   requireContactInfo: boolean; setRequireContactInfo: (v: boolean) => void
   requirePhoto: boolean; setRequirePhoto: (v: boolean) => void
-  locations: { id: string; name: string }[]
-  departments: { id: string; name: string }[]
-  members: TeamMember[]
+  locations:            { id: string; name: string }[]
+  departments:          { id: string; name: string }[]
+  members:              TeamMember[]
+  surveys:              { id: string; title: string }[]
+  assets:               { id: string; name: string }[]
+  customerVoiceEnabled: boolean
   saving: boolean; error: string; submitLabel: string; onCancel: () => void
 }) {
   return (
@@ -277,8 +481,18 @@ function QrFormFields({
         />
       </div>
 
+      <PresentationSection
+        presentationMode={presentationMode}  setPresentationMode={setPresentationMode}
+        enabledActions={enabledActions}       setEnabledActions={setEnabledActions}
+        surveyId={surveyId}                   setSurveyId={setSurveyId}
+        assetId={assetId}                     setAssetId={setAssetId}
+        surveys={surveys}
+        assets={assets}
+        customerVoiceEnabled={customerVoiceEnabled}
+      />
+
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Reporting Mode</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Reporting Mode <span className="text-xs text-gray-400">(legacy — used for issue routing context)</span></label>
         <select
           value={reportingMode}
           onChange={e => setReportingMode(e.target.value)}
@@ -392,17 +606,25 @@ function QrFormFields({
 // ─── Create Modal ─────────────────────────────────────────────────────────────
 
 function CreateModal({
-  locations, departments, members, onClose, onCreated,
+  locations, departments, members, surveys, assets, customerVoiceEnabled,
+  onClose, onCreated,
 }: {
-  locations:   { id: string; name: string }[]
-  departments: { id: string; name: string }[]
-  members:     TeamMember[]
-  onClose:     () => void
-  onCreated:   (qr: QrCodeItem) => void
+  locations:            { id: string; name: string }[]
+  departments:          { id: string; name: string }[]
+  members:              TeamMember[]
+  surveys:              { id: string; title: string }[]
+  assets:               { id: string; name: string }[]
+  customerVoiceEnabled: boolean
+  onClose:   () => void
+  onCreated: (qr: QrCodeItem) => void
 }) {
   const [name,               setName]               = useState("")
   const [description,        setDescription]        = useState("")
   const [reportingMode,      setReportingMode]      = useState("PUBLIC_ISSUE")
+  const [presentationMode,   setPresentationMode]   = useState("DIRECT")
+  const [enabledActions,     setEnabledActions]     = useState<string[]>(["ISSUE"])
+  const [surveyId,           setSurveyId]           = useState("")
+  const [assetId,            setAssetId]            = useState("")
   const [routingMode,        setRoutingMode]        = useState("AUTO")
   const [assignedToId,       setAssignedToId]       = useState("")
   const [locationId,         setLocationId]         = useState("")
@@ -419,6 +641,7 @@ function CreateModal({
     e.preventDefault()
     if (!name.trim()) { setError("Name is required"); return }
     if (routingMode === "MANUAL" && !assignedToId) { setError("Please select a person for manual routing"); return }
+    if (presentationMode === "MENU" && enabledActions.length === 0) { setError("Select at least one action for the menu"); return }
     setSaving(true); setError("")
     try {
       const res = await fetch("/api/qr-codes", {
@@ -429,9 +652,14 @@ function CreateModal({
           reportingMode, routingMode,
           assignedToId: routingMode === "MANUAL" ? assignedToId : null,
           locationId: locationId || null, area: area.trim() || null,
-          departmentId: departmentId || null, defaultCategory,
+          departmentId: departmentId || null,
+          assetId: assetId || null,
+          defaultCategory,
           collectContactInfo, requireContactInfo: collectContactInfo ? requireContactInfo : false,
           requirePhoto,
+          presentationMode,
+          enabledActions,
+          surveyId: surveyId || null,
         }),
       })
       if (!res.ok) { const j = await res.json() as { error?: string }; setError(j.error ?? "Failed to create QR code"); return }
@@ -452,6 +680,10 @@ function CreateModal({
             name={name} setName={setName}
             description={description} setDescription={setDescription}
             reportingMode={reportingMode} setReportingMode={setReportingMode}
+            presentationMode={presentationMode} setPresentationMode={setPresentationMode}
+            enabledActions={enabledActions} setEnabledActions={setEnabledActions}
+            surveyId={surveyId} setSurveyId={setSurveyId}
+            assetId={assetId} setAssetId={setAssetId}
             routingMode={routingMode} setRoutingMode={setRoutingMode}
             assignedToId={assignedToId} setAssignedToId={setAssignedToId}
             locationId={locationId} setLocationId={setLocationId}
@@ -462,6 +694,7 @@ function CreateModal({
             requireContactInfo={requireContactInfo} setRequireContactInfo={setRequireContactInfo}
             requirePhoto={requirePhoto} setRequirePhoto={setRequirePhoto}
             locations={locations} departments={departments} members={members}
+            surveys={surveys} assets={assets} customerVoiceEnabled={customerVoiceEnabled}
             saving={saving} error={error} submitLabel="Create QR Code" onCancel={onClose}
           />
         </form>
@@ -473,18 +706,28 @@ function CreateModal({
 // ─── Edit Modal ───────────────────────────────────────────────────────────────
 
 function EditModal({
-  qr, locations, departments, members, onClose, onSaved,
+  qr, locations, departments, members, surveys, assets, customerVoiceEnabled,
+  onClose, onSaved,
 }: {
-  qr:          QrCodeItem
-  locations:   { id: string; name: string }[]
-  departments: { id: string; name: string }[]
-  members:     TeamMember[]
-  onClose:     () => void
-  onSaved:     (updated: QrCodeItem) => void
+  qr:                   QrCodeItem
+  locations:            { id: string; name: string }[]
+  departments:          { id: string; name: string }[]
+  members:              TeamMember[]
+  surveys:              { id: string; title: string }[]
+  assets:               { id: string; name: string }[]
+  customerVoiceEnabled: boolean
+  onClose: () => void
+  onSaved: (updated: QrCodeItem) => void
 }) {
   const [name,               setName]               = useState(qr.name)
   const [description,        setDescription]        = useState(qr.description ?? "")
   const [reportingMode,      setReportingMode]      = useState(qr.reportingMode)
+  const [presentationMode,   setPresentationMode]   = useState(qr.presentationMode ?? "DIRECT")
+  const [enabledActions,     setEnabledActions]     = useState<string[]>(
+    qr.enabledActions?.length > 0 ? qr.enabledActions : ["ISSUE"]
+  )
+  const [surveyId,           setSurveyId]           = useState(qr.surveyId ?? "")
+  const [assetId,            setAssetId]            = useState(qr.assetId ?? "")
   const [routingMode,        setRoutingMode]        = useState(qr.routingMode)
   const [assignedToId,       setAssignedToId]       = useState(qr.assignedToId ?? "")
   const [locationId,         setLocationId]         = useState(qr.locationId ?? "")
@@ -501,6 +744,7 @@ function EditModal({
     e.preventDefault()
     if (!name.trim()) { setError("Name is required"); return }
     if (routingMode === "MANUAL" && !assignedToId) { setError("Please select a person for manual routing"); return }
+    if (presentationMode === "MENU" && enabledActions.length === 0) { setError("Select at least one action for the menu"); return }
     setSaving(true); setError("")
     try {
       const res = await fetch(`/api/qr-codes/${qr.id}`, {
@@ -511,9 +755,14 @@ function EditModal({
           reportingMode, routingMode,
           assignedToId: routingMode === "MANUAL" ? assignedToId : null,
           locationId: locationId || null, area: area.trim() || null,
-          departmentId: departmentId || null, defaultCategory,
+          departmentId: departmentId || null,
+          assetId: assetId || null,
+          defaultCategory,
           collectContactInfo, requireContactInfo: collectContactInfo ? requireContactInfo : false,
           requirePhoto,
+          presentationMode,
+          enabledActions,
+          surveyId: surveyId || null,
         }),
       })
       if (!res.ok) { const j = await res.json() as { error?: string }; setError(j.error ?? "Failed to save changes"); return }
@@ -534,6 +783,10 @@ function EditModal({
             name={name} setName={setName}
             description={description} setDescription={setDescription}
             reportingMode={reportingMode} setReportingMode={setReportingMode}
+            presentationMode={presentationMode} setPresentationMode={setPresentationMode}
+            enabledActions={enabledActions} setEnabledActions={setEnabledActions}
+            surveyId={surveyId} setSurveyId={setSurveyId}
+            assetId={assetId} setAssetId={setAssetId}
             routingMode={routingMode} setRoutingMode={setRoutingMode}
             assignedToId={assignedToId} setAssignedToId={setAssignedToId}
             locationId={locationId} setLocationId={setLocationId}
@@ -544,6 +797,7 @@ function EditModal({
             requireContactInfo={requireContactInfo} setRequireContactInfo={setRequireContactInfo}
             requirePhoto={requirePhoto} setRequirePhoto={setRequirePhoto}
             locations={locations} departments={departments} members={members}
+            surveys={surveys} assets={assets} customerVoiceEnabled={customerVoiceEnabled}
             saving={saving} error={error} submitLabel="Save Changes" onCancel={onClose}
           />
         </form>
@@ -559,11 +813,17 @@ export function QrCodesClient({
   locations,
   departments,
   members,
+  surveys,
+  assets,
+  customerVoiceEnabled,
 }: {
-  qrCodes:     QrCodeItem[]
-  locations:   { id: string; name: string }[]
-  departments: { id: string; name: string }[]
-  members:     TeamMember[]
+  qrCodes:              QrCodeItem[]
+  locations:            { id: string; name: string }[]
+  departments:          { id: string; name: string }[]
+  members:              TeamMember[]
+  surveys:              { id: string; title: string }[]
+  assets:               { id: string; name: string }[]
+  customerVoiceEnabled: boolean
 }) {
   const router = useRouter()
   const [qrCodes, setQrCodes]         = useState(initial)
@@ -622,6 +882,9 @@ export function QrCodesClient({
           locations={locations}
           departments={departments}
           members={members}
+          surveys={surveys}
+          assets={assets}
+          customerVoiceEnabled={customerVoiceEnabled}
           onClose={() => setShowCreate(false)}
           onCreated={handleCreated}
         />
@@ -632,6 +895,9 @@ export function QrCodesClient({
           locations={locations}
           departments={departments}
           members={members}
+          surveys={surveys}
+          assets={assets}
+          customerVoiceEnabled={customerVoiceEnabled}
           onClose={() => setEditingQr(null)}
           onSaved={handleSaved}
         />
@@ -659,6 +925,7 @@ export function QrCodesClient({
         <div className="grid gap-4 sm:grid-cols-2">
           {qrCodes.map(qr => {
             const needsRoutingUpdate = qr.routingMode === "MANUAL" && !qr.assignedToActive
+            const pBadge = presentationBadge(qr)
             return (
               <div
                 key={qr.id}
@@ -683,7 +950,7 @@ export function QrCodesClient({
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-1.5">
-                      {modeBadge(qr.reportingMode)}
+                      {pBadge ?? modeBadge(qr.reportingMode)}
                       <RoutingBadge qr={qr} />
                     </div>
                   </div>

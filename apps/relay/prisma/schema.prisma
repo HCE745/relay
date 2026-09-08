@@ -1417,6 +1417,10 @@ model QrCode {
   requireContactInfo Boolean  @default(false) // if shown, are they mandatory?
   requirePhoto       Boolean  @default(false)
   isActive           Boolean  @default(true)
+  // Unified QR action system
+  presentationMode  String   @default("DIRECT")   // "DIRECT" | "MENU"
+  enabledActions    String[] @default([])          // "ISSUE" | "FEEDBACK" | "SURVEY" | "ASSET_VIEW"
+  surveyId          String?                        // FK to Survey when SURVEY action is configured
   createdById        String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -1426,7 +1430,9 @@ model QrCode {
   department   Department?       @relation(fields: [departmentId], references: [id])
   asset        Asset?            @relation(fields: [assetId], references: [id])
   assignedTo   User?             @relation("QrCodeAssignee", fields: [assignedToId], references: [id])
+  survey       Survey?           @relation(fields: [surveyId], references: [id])
   submissions  QrCodeSubmission[]
+  customerReviews CustomerReview[]
 
   @@index([organizationId])
   @@index([token])
@@ -2733,6 +2739,7 @@ model Survey {
   createdBy      User             @relation("CreatedSurveys", fields: [createdById], references: [id])
   questions      SurveyQuestion[]
   responses      SurveyResponse[]
+  qrCodes        QrCode[]
 
   @@index([organizationId])
   @@index([status])
@@ -2830,7 +2837,7 @@ model CustomerReview {
   id                String    @id @default(cuid())
   organizationId    String
   locationId        String?
-  googleLocationId  String
+  googleLocationId  String?   // nullable — not set for QR/manual sources
   googleReviewId    String    @unique
   reviewerName      String?
   rating            Int
@@ -2838,6 +2845,8 @@ model CustomerReview {
   reviewReplyText   String?
   publishedAt       DateTime
   sourceUrl         String?
+  source            String    @default("GOOGLE") // "GOOGLE" | "QR" | "MANUAL"
+  qrCodeId          String?                      // set when source = "QR"
   aiClassification  String?   // ACTIONABLE | FEEDBACK | ARCHIVED
   aiConfidence      Float?
   aiSummary         String?
@@ -2853,8 +2862,11 @@ model CustomerReview {
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   location     Location?    @relation(fields: [locationId], references: [id])
   issue        Issue?       @relation(fields: [issueId], references: [id])
+  qrCode       QrCode?      @relation(fields: [qrCodeId], references: [id])
 
   @@index([organizationId])
   @@index([googleLocationId])
   @@index([status])
+  @@index([source])
+  @@index([qrCodeId])
 }

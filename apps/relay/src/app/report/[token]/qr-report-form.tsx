@@ -24,6 +24,8 @@ interface QrCodeData {
   organization: { id: string; name: string }
 }
 
+export type { QrCodeData }
+
 const MODE_PLACEHOLDERS: Record<string, string> = {
   PUBLIC_ISSUE:        "Describe the issue you're reporting…",
   EMPLOYEE_REPORTING:  "Describe what you observed…",
@@ -45,11 +47,13 @@ export function QrReportForm({
   isCarWash = false,
   isPropMgmt = false,
   isManufacturing = false,
+  menuUrl = null,
 }: {
   qrCode: QrCodeData
   isCarWash?: boolean
   isPropMgmt?: boolean
   isManufacturing?: boolean
+  menuUrl?: string | null
 }) {
   const isVisitorFeedback = qrCode.reportingMode === "VISITOR_FEEDBACK"
 
@@ -180,6 +184,11 @@ export function QrReportForm({
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="max-w-lg mx-auto">
+          {menuUrl && (
+            <a href={menuUrl} className="inline-flex items-center gap-1 text-xs text-indigo-600 mb-2">
+              ← Back
+            </a>
+          )}
           <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">{qrCode.organization.name}</p>
           <h1 className="text-xl font-bold text-gray-900">{qrCode.name}</h1>
           {locationStr && (

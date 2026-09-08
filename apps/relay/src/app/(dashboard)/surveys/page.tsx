@@ -6,7 +6,7 @@ import { isProfessional } from "@/lib/pricing"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 import {
-  Plus, ClipboardList, CheckCircle, Clock, BarChart2, Lock, Loader2,
+  Plus, ClipboardList, CheckCircle, Clock, BarChart2, Lock,
 } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -138,12 +138,39 @@ export default async function SurveysPage() {
           </div>
         )}
 
-        {/* No active surveys for employees */}
+        {/* No active surveys — employees and supervisors */}
         {!canManage && !isManager && activeSurveys.length === 0 && (
           <div className="text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-200">
             <ClipboardList className="w-8 h-8 text-gray-300 mx-auto mb-2" />
             <p className="text-sm text-gray-400">No active surveys right now</p>
             <p className="text-xs text-gray-300 mt-1">Check back later</p>
+          </div>
+        )}
+
+        {/* No active surveys — managers (can see active + closed but not create) */}
+        {isManager && activeSurveys.length === 0 && closedSurveys.length === 0 && (
+          <div className="text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <ClipboardList className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+            <p className="text-sm text-gray-400">No surveys to review yet</p>
+            <p className="text-xs text-gray-300 mt-1">Surveys created by admins will appear here</p>
+          </div>
+        )}
+
+        {/* No surveys at all — admins */}
+        {canManage && surveys.length === 0 && (
+          <div className="text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <ClipboardList className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+            <p className="text-sm text-gray-500 font-medium">No surveys yet</p>
+            <p className="text-xs text-gray-400 mt-1 mb-4">Create your first survey to collect team feedback</p>
+            {canCreate && (
+              <Link
+                href="/surveys/manage/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg"
+              >
+                <Plus className="w-4 h-4" />
+                New Survey
+              </Link>
+            )}
           </div>
         )}
 

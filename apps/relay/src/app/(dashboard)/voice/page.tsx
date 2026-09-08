@@ -175,7 +175,7 @@ export default async function VoicePage() {
           ) : (
             <div className="space-y-2">
               {mySubmissions.map(s => (
-                <div key={s.id} className="flex items-start gap-3 bg-white rounded-xl border border-gray-200 p-3.5">
+                <Link key={s.id} href={`/suggestions/${s.id}`} className="flex items-start gap-3 bg-white rounded-xl border border-gray-200 p-3.5 hover:border-blue-200 hover:bg-blue-50/30 transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-xs font-medium text-gray-500">{TYPE_LABEL[s.type] ?? "Submission"}</span>
@@ -185,7 +185,8 @@ export default async function VoicePage() {
                     </div>
                     <p className="text-sm text-gray-700 truncate">{s.content}</p>
                   </div>
-                </div>
+                  <ChevronRight className="w-4 h-4 text-gray-300 mt-0.5 shrink-0" />
+                </Link>
               ))}
             </div>
           )}

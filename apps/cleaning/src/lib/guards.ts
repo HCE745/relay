@@ -1,6 +1,6 @@
 import "server-only"
 import { getSession, type SessionPayload } from "./session"
-import { canManageAccounts, canManageOrg, canInspect } from "./rbac"
+import { canManageAccounts, canManageOrg, canInspect, canViewSchedule } from "./rbac"
 import { orgHasCapability } from "./page-guards"
 import { unauthorized, forbidden } from "./api"
 
@@ -55,5 +55,23 @@ export async function requireInspector(requiredCap?: string): Promise<GuardedAct
   if (requiredCap && !(await orgHasCapability(session.organizationId, requiredCap))) {
     return { ok: false, response: forbidden(`Missing capability: ${requiredCap}`) }
   }
+  return { ok: true, session, orgId: session.organizationId, userId: session.userId }
+}
+
+/** Operations guard for Issues: OWNER/ADMIN/MANAGER/SUPERVISOR (+ capability). */
+export async function requireOperations(requiredCap?: string): Promise<GuardedActor> {
+  const session = await getSession()
+  if (!session) return { ok: false, response: unauthorized() }
+  if (!canViewSchedule(session.role)) return { ok: false, response: forbidden() }
+  if (requiredCap && !(await orgHasCapability(session.organizationId, requiredCap))) {
+    return { ok: false, response: forbidden(`Missing capability: ${requiredCap}`) }
+  }
+  return { ok: true, session, orgId: session.organizationId, userId: session.userId }
+}
+
+/** Any authenticated user (for self-service actions like changing own password). */
+export async function requireSession(): Promise<GuardedActor> {
+  const session = await getSession()
+  if (!session) return { ok: false, response: unauthorized() }
   return { ok: true, session, orgId: session.organizationId, userId: session.userId }
 }

@@ -1,5 +1,6 @@
 import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound } from "./errors"
+import { notifyUser } from "../notify"
 
 // Cleaner ↔ Job assignment management. Validates that both the Job and the
 // cleaner belong to the authenticated org and that the cleaner is an active
@@ -63,6 +64,7 @@ export async function assignCleaner(orgId: string, jobId: string, userId: string
 
   // Advance SCHEDULED → ASSIGNED (never touch IN_PROGRESS/COMPLETED/etc.).
   await db.job.updateMany({ where: { id: jobId, status: "SCHEDULED" }, data: { status: "ASSIGNED" } })
+  await notifyUser(orgId, userId, "You've been assigned a job", `You have a new cleaning job assignment. Check Today's Work in the app.`)
   return { assigned: true, alreadyAssigned: false, conflicts }
 }
 

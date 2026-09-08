@@ -37,11 +37,11 @@ test("admin: customer → site → scope → service plan", async ({ page }) => 
 
   // Open the site, define a scope/checklist.
   await page.getByRole("link", { name: siteName }).first().click()
-  await page.getByRole("button", { name: "New checklist" }).click()
+  await page.getByRole("button", { name: "New scope of work" }).click()
   const scopeDialog = page.getByRole("dialog")
   await scopeDialog.locator("#sc-name").fill(checklistName)
   await scopeDialog.locator('input[placeholder^="Task"]').first().fill("Empty all trash")
-  await scopeDialog.getByRole("button", { name: "Create checklist" }).click()
+  await scopeDialog.getByRole("button", { name: "Create scope of work" }).click()
   await expect(page.getByText(checklistName, { exact: true })).toBeVisible()
 
   // Create a recurring service plan referencing that scope.

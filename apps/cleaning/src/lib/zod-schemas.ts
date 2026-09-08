@@ -251,3 +251,54 @@ export type CorrectTimeInput = z.infer<typeof correctTimeSchema>
 export const markMissedSchema = z.object({
   reason: z.string().trim().min(1, "A reason is required").max(500),
 })
+
+// ─── Phase 5A: users, bootstrap, credentials, issues workflow ────────────────
+
+const ROLE_ENUM = z.enum(["OWNER", "ADMIN", "MANAGER", "SUPERVISOR", "CLEANER"])
+const PAY_TYPE = z.enum(["HOURLY", "SALARY"])
+const password = z.string().min(8, "At least 8 characters").max(200)
+
+export const userCreateSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(200),
+  email: z.string().trim().toLowerCase().email(),
+  phone: optionalString,
+  role: ROLE_ENUM,
+  password,
+  employeeCode: optionalString,
+  payType: PAY_TYPE.optional(),
+  payRate: z.coerce.number().min(0).max(1_000_000).optional(),
+  hireDate: z.coerce.date().optional(),
+  isActive: z.boolean().optional(),
+})
+export const userUpdateSchema = z.object({
+  name: z.string().trim().min(1).max(200).optional(),
+  phone: optionalString,
+  role: ROLE_ENUM.optional(),
+  isActive: z.boolean().optional(),
+  employeeCode: optionalString,
+  payType: PAY_TYPE.optional(),
+  payRate: z.coerce.number().min(0).max(1_000_000).optional(),
+  hireDate: z.coerce.date().optional(),
+  employmentStatus: z.enum(["ACTIVE", "INACTIVE", "TERMINATED"]).optional(),
+})
+export const setPasswordSchema = z.object({ password })
+
+export const registerOrgSchema = z.object({
+  orgName: z.string().trim().min(1, "Company name is required").max(200),
+  name: z.string().trim().min(1, "Your name is required").max(200),
+  email: z.string().trim().toLowerCase().email(),
+  password,
+  timezone: ianaTimezone,
+  bootstrapToken: z.string().min(1, "A setup code is required"),
+})
+
+export const forgotPasswordSchema = z.object({ email: z.string().trim().toLowerCase().email() })
+export const resetPasswordSchema = z.object({ token: z.string().min(1), password })
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: password,
+})
+
+export const assignIssueSchema = z.object({ assigneeId: z.string().min(1).nullable() })
+export const issueStatusSchema = z.object({ status: z.enum(["OPEN", "ACKNOWLEDGED", "RESOLVED", "CLOSED"]) })
+export const issueCommentSchema = z.object({ body: z.string().trim().min(1, "Write a note").max(2000) })

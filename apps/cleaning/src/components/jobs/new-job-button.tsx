@@ -82,7 +82,7 @@ export function NewJobButton({ sites, templates }: { sites: Option[]; templates:
               <Input id="j-crew" type="number" min={1} value={v.crewSize} onChange={set("crewSize")} />
             </Field>
           </div>
-          <Field label="Scope / checklist (optional)" htmlFor="j-tpl">
+          <Field label="Scope of Work (optional)" htmlFor="j-tpl">
             <Select id="j-tpl" value={v.checklistTemplateId} onChange={set("checklistTemplateId")}>
               <option value="">— None —</option>
               {templates.map((t) => (

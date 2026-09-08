@@ -9,6 +9,7 @@ import {
   canManageOrg,
   canInspect,
   canApproveTime,
+  assignableRoles,
   ADMIN_NAV,
 } from "../rbac"
 
@@ -21,6 +22,12 @@ describe("schedule + org permissions", () => {
     for (const r of ["OWNER", "ADMIN", "MANAGER"]) expect(canManageSchedule(r)).toBe(true)
     expect(canManageSchedule("SUPERVISOR")).toBe(false)
     expect(canManageSchedule("CLEANER")).toBe(false)
+  })
+  it("assignableRoles: OWNER/ADMIN grant any, MANAGER limited, CLEANER none", () => {
+    expect(assignableRoles("OWNER")).toContain("ADMIN")
+    expect(assignableRoles("ADMIN")).toContain("OWNER")
+    expect(assignableRoles("MANAGER")).toEqual(["SUPERVISOR", "CLEANER"])
+    expect(assignableRoles("CLEANER")).toEqual([])
   })
   it("canManageOrg: owner/admin only", () => {
     expect(canManageOrg("OWNER")).toBe(true)
@@ -76,7 +83,7 @@ describe("admin route access matrix", () => {
 
   it("manager gets most routes but not settings", () => {
     expect(canAccessAdminRoute("MANAGER", "customers")).toBe(true)
-    expect(canAccessAdminRoute("MANAGER", "reports")).toBe(true)
+    expect(canAccessAdminRoute("MANAGER", "issues")).toBe(true)
     expect(canAccessAdminRoute("MANAGER", "settings")).toBe(false)
   })
 

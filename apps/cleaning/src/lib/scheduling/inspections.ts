@@ -1,6 +1,7 @@
 import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound, ConflictError, RequirementsError } from "../data/errors"
 import { recordAudit } from "../data/audit"
+import { notifyManagers } from "../notify"
 import { scoreInspection, type ResultValue } from "./scoring"
 
 // Inspection lifecycle. An Inspection snapshots its template + items at creation,
@@ -158,6 +159,11 @@ export async function finalizeInspection(
         issueId = existing?.id ?? null
       } else throw e
     }
+    await notifyManagers(
+      orgId,
+      `Inspection FAILED (${score}%) at ${insp!.templateName}`,
+      `An inspection was finalized with a FAIL result (${score}%, threshold ${insp!.passThreshold}%). A quality issue was created.`,
+    )
   }
 
   return { score, outcome, issueId, alreadyFinalized: false }

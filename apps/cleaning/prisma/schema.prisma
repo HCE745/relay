@@ -164,7 +164,10 @@ model User {
   createdJobs     Job[]            @relation("JobCreatedBy")
   uploadedPhotos  JobPhoto[]       @relation("PhotoUploader")
   reportedIssues  Issue[]          @relation("IssueReporter")
+  assignedIssues  Issue[]          @relation("IssueAssignee")
+  issueComments   IssueComment[]   @relation("IssueCommentAuthor")
   inspections     Inspection[]     @relation("InspectionInspector")
+  passwordResetTokens PasswordResetToken[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -552,10 +555,14 @@ model Issue {
   serviceLocationId String?
   inspectionId      String?       @unique // at most one Issue per inspection (idempotent finalize)
   reportedById      String
+  assignedToId      String?
   category          IssueCategory @default(OTHER)
   title             String?
   description       String
   status            IssueStatus   @default(OPEN)
+  acknowledgedAt    DateTime?
+  resolvedAt        DateTime?
+  closedAt          DateTime?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
@@ -564,11 +571,46 @@ model Issue {
   serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
   inspection      Inspection?      @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
   reportedBy      User             @relation("IssueReporter", fields: [reportedById], references: [id])
+  assignedTo      User?            @relation("IssueAssignee", fields: [assignedToId], references: [id])
+  comments        IssueComment[]
   photos          JobPhoto[]
 
   @@index([organizationId])
   @@index([jobId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+model IssueComment {
+  id             String   @id @default(cuid())
+  organizationId String
+  issueId        String
+  authorId       String
+  body           String
+  createdAt      DateTime @default(now())
+
+  issue  Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  author User  @relation("IssueCommentAuthor", fields: [authorId], references: [id])
+
+  @@index([issueId])
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// Password reset tokens — accessed by token BEFORE authentication, so this is
+// intentionally NOT organization-scoped. Only a SHA-256 hash of the token is
+// stored; the raw token lives only in the emailed link and is single-use.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
   @@schema("cleaning")
 }
 

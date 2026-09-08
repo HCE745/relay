@@ -131,7 +131,7 @@ function PlanForm({
           <Input id="p-dur" type="number" min={1} value={v.defaultDurationMin} onChange={set("defaultDurationMin")} />
         </Field>
       </div>
-      <Field label="Scope / checklist" htmlFor="p-tpl" hint={templates.length ? undefined : "Create a checklist first to attach a scope"}>
+      <Field label="Scope of Work" htmlFor="p-tpl" hint={templates.length ? undefined : "Create a checklist first to attach a scope"}>
         <Select id="p-tpl" value={v.checklistTemplateId} onChange={set("checklistTemplateId")}>
           <option value="">— None —</option>
           {templates.map((t) => (

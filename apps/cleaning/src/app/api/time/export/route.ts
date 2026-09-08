@@ -29,6 +29,7 @@ export async function GET(request: Request) {
   const entries = await listApprovedForExport(g.orgId, start, end)
 
   const header = [
+    "Employee Code",
     "Employee ID",
     "Employee Name",
     "Date",
@@ -45,6 +46,7 @@ export async function GET(request: Request) {
     const outDt = e.clockOutAt ? DateTime.fromJSDate(e.clockOutAt, { zone: tz }) : null
     const hours = outDt ? (outDt.toMillis() - inDt.toMillis()) / 3_600_000 : 0
     return [
+      e.user.employeeProfile?.employeeCode ?? "",
       e.user.id,
       e.user.name,
       inDt.toFormat("yyyy-MM-dd"),

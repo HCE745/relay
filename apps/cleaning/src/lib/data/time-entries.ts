@@ -80,7 +80,7 @@ export function listApprovedForExport(orgId: string, start: Date, end: Date) {
     where: { status: "APPROVED", clockInAt: { gte: start, lte: end } },
     orderBy: { clockInAt: "asc" },
     include: {
-      user: { select: { id: true, name: true } },
+      user: { select: { id: true, name: true, employeeProfile: { select: { employeeCode: true } } } },
       job: {
         select: {
           id: true,

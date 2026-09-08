@@ -5,6 +5,7 @@ import { getOrgSettings } from "@/lib/data/org"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
 import { OrgTimezoneForm } from "@/components/settings/org-timezone-form"
+import { ChangePasswordForm } from "@/components/settings/change-password-form"
 
 export const dynamic = "force-dynamic"
 
@@ -33,6 +34,11 @@ export default async function SettingsPage() {
             <dd className="text-sm font-medium text-slate-900">{session.role}</dd>
           </div>
         </dl>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="mb-3 text-sm font-semibold text-slate-700">Your password</h2>
+        <ChangePasswordForm />
       </Card>
 
       <Card className="p-6">

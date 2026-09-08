@@ -18,7 +18,18 @@ const SECRET = new TextEncoder().encode(
   process.env.CLEANING_SESSION_SECRET ?? "cleaning-dev-secret-change-me-in-production-32ch",
 )
 
-const PUBLIC_PATHS = ["/login", "/api/health", "/icon", "/apple-icon", "/manifest.webmanifest"]
+const PUBLIC_PATHS = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/api/auth", // forgot/reset — self-contained, token-based
+  "/api/cron", // self-guards via CRON_SECRET
+  "/api/health",
+  "/icon",
+  "/apple-icon",
+  "/manifest.webmanifest",
+]
 const FIELD_PREFIXES = ["/today", "/job"]
 
 function isUnder(pathname: string, base: string) {

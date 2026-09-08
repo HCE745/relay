@@ -9,6 +9,7 @@ import { createChecklistTemplate } from "../src/lib/data/checklist-templates"
 import { createManualJob, getJob } from "../src/lib/data/jobs"
 import { assignCleaner } from "../src/lib/data/assignments"
 import { clockIn, toggleChecklistItem, clockOut } from "../src/lib/scheduling/execution"
+import { reportProblem } from "../src/lib/data/issues"
 import { DateTime } from "luxon"
 
 async function main() {
@@ -71,6 +72,12 @@ async function main() {
   await orgDb(sparkle.id).timeEntry.updateMany({
     where: { id: te.id },
     data: { clockInAt: new Date(te.clockOutAt!.getTime() - 2 * 3600_000) },
+  })
+
+  // A deterministic OPEN field-reported issue for the Issues-workflow E2E.
+  await reportProblem(sparkle.id, doneJob.id, dana.id, {
+    category: "SUPPLIES",
+    description: "Broken soap dispenser in the lobby restroom",
   })
 
   console.log(`E2E fixture ready — field job ${job.id} (${cleaner.email}); completed job ${doneJob.id} (${dana.email})`)

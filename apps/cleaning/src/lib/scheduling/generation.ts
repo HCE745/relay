@@ -111,3 +111,20 @@ export async function generateUpcomingForOrg(
   }
   return { plans: plans.length, created, skipped }
 }
+
+export type OrgGenerationResult = { orgId: string; created?: number; skipped?: number; plans?: number; error?: string }
+
+/** Roll the schedule forward for EVERY organization — the cron entry point. */
+export async function generateUpcomingAllOrgs(days: number, now: Date = new Date()): Promise<OrgGenerationResult[]> {
+  const orgs = await systemDb.organization.findMany({ select: { id: true } })
+  const results: OrgGenerationResult[] = []
+  for (const org of orgs) {
+    try {
+      const r = await generateUpcomingForOrg(org.id, days, now)
+      results.push({ orgId: org.id, ...r })
+    } catch (e) {
+      results.push({ orgId: org.id, error: (e as Error).message })
+    }
+  }
+  return results
+}

@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "seed": "tsx prisma/seed.ts",
+    "seed:demo": "tsx scripts/seed-demo.ts",
     "verify:db": "tsx scripts/verify-db.ts",
     "verify:phase1": "tsx scripts/verify-phase1.ts",
     "e2e": "playwright test",

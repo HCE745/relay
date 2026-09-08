@@ -9,6 +9,7 @@ import { formatTimeInZone } from "@/lib/scheduling/time"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, EmptyState } from "@/components/ui/controls"
 import { ApproveButton, CorrectButton } from "@/components/time/time-actions"
+import { ExportBar } from "@/components/time/export-bar"
 
 export const dynamic = "force-dynamic"
 const CAP = "workforce.timeTracking"
@@ -49,14 +50,7 @@ export default async function TimePage() {
           title="Time"
           subtitle={`Labor records — last 30 days${pending ? ` · ${pending} awaiting approval` : ""}. Not payroll.`}
         />
-        {canApprove ? (
-          <a
-            href="/api/time/export"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
-          >
-            Export approved (CSV)
-          </a>
-        ) : null}
+        {canApprove ? <ExportBar /> : null}
       </div>
 
       {entries.length === 0 ? (

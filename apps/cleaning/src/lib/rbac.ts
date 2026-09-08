@@ -46,7 +46,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "time",        label: "Time",        href: "/time",        requiredCap: "workforce.timeTracking" },
   { key: "inspections", label: "Inspections", href: "/inspections", requiredCap: "quality.inspections" },
   { key: "issues",      label: "Issues",      href: "/issues",      requiredCap: "operations.issues" },
-  { key: "reports",     label: "Reports",     href: "/reports",     requiredCap: "core.reporting.basic" },
+  // Reports intentionally omitted until it is real (audit: prefer hiding unfinished).
   { key: "settings",    label: "Settings",    href: "/settings" },
 ]
 
@@ -57,7 +57,7 @@ export const ADMIN_ROUTE_KEYS: ReadonlySet<string> = new Set(ADMIN_NAV.map((i) =
 const ROLE_ROUTE_ACCESS: Record<Role, string[] | "*"> = {
   OWNER: "*",
   ADMIN: "*",
-  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "inspections", "issues", "reports"],
+  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "inspections", "issues"],
   SUPERVISOR: ["dashboard", "schedule", "jobs", "time", "inspections", "issues"],
   CLEANER: [], // cleaners have no admin routes; they use the field app
 }
@@ -122,4 +122,16 @@ export function canInspect(role: string): boolean {
 // supervisor→team scoping yet), so it is Manager+ only — NOT supervisors.
 export function canApproveTime(role: string): boolean {
   return canManageAccounts(role)
+}
+
+/** Who may manage the Team (create/edit users). Same set as account management. */
+export function canManageTeam(role: string): boolean {
+  return canManageAccounts(role)
+}
+
+/** Roles an actor may assign. Only OWNER/ADMIN may grant OWNER/ADMIN. */
+export function assignableRoles(actorRole: string): Role[] {
+  if (actorRole === "OWNER" || actorRole === "ADMIN") return ["OWNER", "ADMIN", "MANAGER", "SUPERVISOR", "CLEANER"]
+  if (actorRole === "MANAGER") return ["SUPERVISOR", "CLEANER"]
+  return []
 }

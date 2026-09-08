@@ -34,10 +34,10 @@ test("admin: service plan → generate jobs → schedule → assign cleaner", as
   await page.getByRole("link", { name: siteName }).first().click()
 
   // Scope + recurring plan (daily, starting today).
-  await page.getByRole("button", { name: "New checklist" }).click()
+  await page.getByRole("button", { name: "New scope of work" }).click()
   await page.getByRole("dialog").locator("#sc-name").fill(checklistName)
   await page.getByRole("dialog").locator('input[placeholder^="Task"]').first().fill("Empty trash")
-  await page.getByRole("dialog").getByRole("button", { name: "Create checklist" }).click()
+  await page.getByRole("dialog").getByRole("button", { name: "Create scope of work" }).click()
   await expect(page.getByText(checklistName, { exact: true })).toBeVisible()
 
   await page.getByRole("button", { name: "Create service plan" }).click()

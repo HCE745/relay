@@ -47,7 +47,7 @@ function ScopeForm({ initial, onDone }: { initial?: ChecklistTemplate; onDone: (
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <Field label="Checklist name" htmlFor="sc-name" hint="e.g. Standard nightly office clean">
+      <Field label="Scope name" htmlFor="sc-name" hint="e.g. Standard nightly office clean">
         <Input id="sc-name" required value={name} onChange={(e) => setName(e.target.value)} />
       </Field>
       <Field label="Description" htmlFor="sc-desc">
@@ -104,7 +104,7 @@ function ScopeForm({ initial, onDone }: { initial?: ChecklistTemplate; onDone: (
           Cancel
         </Button>
         <Button type="submit" disabled={saving}>
-          {saving ? "Saving…" : initial ? "Save checklist" : "Create checklist"}
+          {saving ? "Saving…" : initial ? "Save scope" : "Create scope of work"}
         </Button>
       </div>
     </form>
@@ -117,9 +117,9 @@ export function ScopeSection({ templates }: { templates: ChecklistTemplate[] }) 
   return (
     <Card className="p-5">
       <div className="mb-1 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-700">Scope of work — checklists</h2>
+        <h2 className="text-sm font-semibold text-slate-700">Scopes of Work</h2>
         <Button size="sm" onClick={() => setDialog({ mode: "new" })}>
-          New checklist
+          New scope of work
         </Button>
       </div>
       <p className="mb-3 text-xs text-slate-500">
@@ -127,7 +127,7 @@ export function ScopeSection({ templates }: { templates: ChecklistTemplate[] }) 
         already-completed work.
       </p>
       {templates.length === 0 ? (
-        <EmptyState title="No checklists yet">Define the scope of work for this customer&apos;s sites.</EmptyState>
+        <EmptyState title="No scopes of work yet">Define what must be done at this customer&apos;s sites.</EmptyState>
       ) : (
         <ul className="divide-y divide-slate-100">
           {templates.map((t) => (
@@ -150,7 +150,7 @@ export function ScopeSection({ templates }: { templates: ChecklistTemplate[] }) 
       <Modal
         open={dialog !== null}
         onClose={() => setDialog(null)}
-        title={dialog?.mode === "edit" ? "Edit checklist" : "New checklist"}
+        title={dialog?.mode === "edit" ? "Edit scope of work" : "New scope of work"}
       >
         {dialog ? <ScopeForm initial={dialog.mode === "edit" ? dialog.tpl : undefined} onDone={() => setDialog(null)} /> : null}
       </Modal>

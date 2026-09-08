@@ -17,23 +17,19 @@ export default async function IntegrationsPage() {
   })
 
   const [apiKeys, webhookEndpoints, ssoConfig, connectedAccountRaw, locationGroups] = await Promise.all([
-    org?.api_webhooks_enabled
-      ? prisma.apiKey.findMany({
-          where: { organizationId: session.organizationId },
-          orderBy: { createdAt: "desc" },
-          select: {
-            id: true, name: true, keyPrefix: true, isActive: true,
-            lastUsedAt: true, expiresAt: true, createdAt: true,
-          },
-        })
-      : Promise.resolve([]),
-    org?.api_webhooks_enabled
-      ? prisma.webhookEndpoint.findMany({
-          where: { organizationId: session.organizationId },
-          orderBy: { createdAt: "desc" },
-          include: { _count: { select: { deliveryLogs: true } } },
-        })
-      : Promise.resolve([]),
+    prisma.apiKey.findMany({
+      where: { organizationId: session.organizationId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true, name: true, keyPrefix: true, isActive: true,
+        lastUsedAt: true, expiresAt: true, createdAt: true,
+      },
+    }),
+    prisma.webhookEndpoint.findMany({
+      where: { organizationId: session.organizationId },
+      orderBy: { createdAt: "desc" },
+      include: { _count: { select: { deliveryLogs: true } } },
+    }),
     org?.sso_foundation_enabled
       ? prisma.sSOConfig.findUnique({
           where: { organizationId: session.organizationId },

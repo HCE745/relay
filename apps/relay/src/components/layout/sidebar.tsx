@@ -37,6 +37,7 @@ import {
   PieChart,
   Award,
   MessageSquare,
+  Settings2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { logout } from "@/lib/auth-actions"
@@ -231,7 +232,9 @@ export function Sidebar({
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 
   const customerVoiceExtras = [
-    customerVoiceEnabled && { href: "/customer-voice", label: "Customer Voice", icon: MessageSquare },
+    customerVoiceEnabled && { href: "/customer-voice",          label: "Customer Voice", icon: MessageSquare },
+    customerVoiceEnabled && { href: "/customer-voice/surveys",  label: "Surveys",        icon: ClipboardList },
+    customerVoiceEnabled && { href: "/customer-voice/settings", label: "CV Settings",    icon: Settings2     },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 
   const adminExtras = [

@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { isWashEssentials, WASH_ESSENTIALS_MAX_LOCATIONS } from "@/lib/pricing"
 import { syncWashEssentialsLocationBilling } from "@/lib/wash-billing"
+import { generateSlug } from "@/lib/slug"
 
 export async function GET() {
   const session = await getSession()
@@ -65,6 +66,17 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Generate a unique slug for this location within the org
+  const baseSlug = generateSlug(name)
+  const existingSlugs = await prisma.location.findMany({
+    where:  { organizationId: session.organizationId, slug: { not: null } },
+    select: { slug: true },
+  })
+  const slugSet = new Set(existingSlugs.map(l => l.slug))
+  let slug = baseSlug
+  let suffix = 2
+  while (slugSet.has(slug)) { slug = `${baseSlug}-${suffix++}` }
+
   // Create location in DB.
   // If Stripe succeeded but this write fails (rare), attempt to roll back Stripe.
   let location
@@ -72,6 +84,7 @@ export async function POST(request: NextRequest) {
     location = await prisma.location.create({
       data: {
         name,
+        slug,
         address:         address || null,
         city:            city || null,
         state:           state || null,

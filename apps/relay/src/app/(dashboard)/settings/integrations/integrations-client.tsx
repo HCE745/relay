@@ -540,8 +540,8 @@ export function IntegrationsClient({
   return (
     <div className="max-w-3xl space-y-6">
       <ConnectedAccountsSection initialAccount={connectedAccount} />
-      {apiWebhooksEnabled && <ApiKeysSection initialKeys={initialApiKeys} />}
-      {apiWebhooksEnabled && <WebhooksSection initialEndpoints={initialWebhooks} />}
+      <ApiKeysSection initialKeys={initialApiKeys} />
+      <WebhooksSection initialEndpoints={initialWebhooks} />
       {ssoEnabled && <SSOSection initialConfig={initialSSOConfig} />}
     </div>
   )

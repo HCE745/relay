@@ -211,6 +211,8 @@ model Organization {
   recognitions          Recognition[]
   connectedAccounts     ConnectedAccount[]
   customerFeedback      CustomerFeedback[]
+  customerSurveys       CustomerSurvey[]
+  customerSurveyResponses CustomerSurveyResponse[]
 }
 
 model CustomView {
@@ -343,6 +345,7 @@ model User {
   surveyResponses             SurveyResponse[]         @relation("SurveyResponses")
   receivedRecognitions        Recognition[]            @relation("ReceivedRecognitions")
   grantedRecognitions         Recognition[]            @relation("GrantedRecognitions")
+  createdCustomerSurveys      CustomerSurvey[]         @relation("CreatedCustomerSurveys")
 }
 
 model PasswordResetToken {
@@ -389,6 +392,9 @@ model Location {
   injuryReports           InjuryReport[]
   qrCodes                 QrCode[]
   customerFeedback        CustomerFeedback[]
+  customerSurveys         CustomerSurvey[]
+  customerSurveyResponses CustomerSurveyResponse[]
+  slug                    String?  // URL-safe identifier for public feedback links; unique per org scope via DB index
 }
 
 model Department {
@@ -2881,4 +2887,50 @@ model CustomerFeedback {
   @@index([organizationId, source])
   @@index([qrCodeId])
   @@index([submittedAt])
+}
+
+// ─── Customer Voice — Customer Surveys ───────────────────────────────────────
+
+model CustomerSurvey {
+  id                  String    @id @default(cuid())
+  organizationId      String
+  locationId          String?
+  title               String
+  description         String?
+  questions           Json      @default("[]")  // SurveyQuestion[]
+  isAnonymous         Boolean   @default(true)
+  status              String    @default("DRAFT")   // DRAFT|ACTIVE|CLOSED
+  distributionMethod  String    @default("LINK")    // QR|LINK|BOTH
+  surveyToken         String    @unique @default(cuid())
+  closedAt            DateTime?
+  createdById         String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  organization  Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  location      Location?                @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  createdBy     User                     @relation("CreatedCustomerSurveys", fields: [createdById], references: [id])
+  responses     CustomerSurveyResponse[]
+
+  @@index([organizationId])
+  @@index([surveyToken])
+}
+
+model CustomerSurveyResponse {
+  id             String    @id @default(cuid())
+  surveyId       String
+  organizationId String
+  locationId     String?
+  answers        Json      @default("{}")  // { [questionId]: value }
+  customerName   String?
+  customerEmail  String?
+  submittedAt    DateTime  @default(now())
+  sourceMetadata Json?  // { qrToken, etc. }
+
+  survey       CustomerSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  location     Location?      @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  @@index([surveyId])
+  @@index([organizationId])
 }

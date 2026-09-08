@@ -304,7 +304,7 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
                 <div className="flex-1 min-w-0">
                   {/* Header row */}
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-sm font-medium text-gray-900">{s.submittedBy.name}</span>
+                    <Link href={`/suggestions/${s.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">{s.submittedBy.name}</Link>
                     {/* Type badge — show if not a plain SUGGESTION */}
                     {s.type && s.type !== "SUGGESTION" && (
                       <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${TYPE_BADGE[s.type] ?? "bg-gray-50 text-gray-600 border-gray-100"}`}>
@@ -390,6 +390,10 @@ export function SuggestionInbox({ initialSuggestions, users, sessionUserId, isAd
 
                 {/* Action buttons */}
                 <div className="flex items-center gap-1 shrink-0">
+                  <Link href={`/suggestions/${s.id}`} title="View details"
+                    className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600">
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
                   {isAdmin && s.status !== "REVIEWED" && s.status !== "CONVERTED" && s.status !== "IMPLEMENTED" && (
                     <button onClick={() => updateStatus(s.id, "REVIEWED")} title="Mark Reviewed"
                       className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600">

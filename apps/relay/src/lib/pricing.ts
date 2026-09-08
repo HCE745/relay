@@ -213,6 +213,7 @@ export interface OrgFeatureFlags {
   trend_detection_enabled:          boolean
   executive_goals_enabled:          boolean
   recognition_enabled:              boolean
+  customer_voice_enabled:           boolean
 }
 
 export const FEATURE_FLAG_LABELS: Record<keyof OrgFeatureFlags, string> = {
@@ -231,6 +232,7 @@ export const FEATURE_FLAG_LABELS: Record<keyof OrgFeatureFlags, string> = {
   trend_detection_enabled:          "AI Trend Detection",
   executive_goals_enabled:          "Executive Goals & KPI Tracking",
   recognition_enabled:              "Employee Contribution & Recognition",
+  customer_voice_enabled:           "Customer Voice",
 }
 
 export const FEATURE_FLAG_DESCRIPTIONS: Record<keyof OrgFeatureFlags, string> = {
@@ -249,6 +251,7 @@ export const FEATURE_FLAG_DESCRIPTIONS: Record<keyof OrgFeatureFlags, string> = 
   trend_detection_enabled:          "Automated background trend detection: volume spikes, recurring assets, safety increases, slow resolution.",
   executive_goals_enabled:          "Set operational goals with measurable targets and track progress automatically against real data.",
   recognition_enabled:              "Track meaningful employee contributions and give managers a simple way to recognize employees who identify problems, propose improvements, and help resolve them.",
+  customer_voice_enabled:           "Sync Google Business Profile reviews, collect QR and link feedback, and triage customer sentiment with AI classification.",
 }
 
 export function isProfessional(plan: string) {

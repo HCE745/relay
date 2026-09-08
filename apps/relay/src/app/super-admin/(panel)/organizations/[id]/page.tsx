@@ -395,6 +395,7 @@ export default async function OrgDetailPage({
                 trend_detection_enabled:            org.trend_detection_enabled,
                 executive_goals_enabled:            org.executive_goals_enabled,
                 recognition_enabled:                org.recognition_enabled,
+                customer_voice_enabled:             org.customer_voice_enabled,
               }}
             />
           </div>

@@ -6,13 +6,17 @@ import { callHaiku } from "@/lib/ai-haiku"
 // ── AI Classification ──────────────────────────────────────────────────────────
 
 interface ReviewClassification {
-  classification:   "ACTIONABLE" | "FEEDBACK" | "ARCHIVED"
-  confidence:       number
-  summary:          string
-  category:         "EQUIPMENT" | "SAFETY" | "SERVICE" | "CLEANLINESS" | "FACILITY" | "OTHER"
-  locationMatch:    string | null
-  assetMention:     string | null
-  recommendedAction: string | null
+  classification:       "ACTIONABLE" | "FEEDBACK" | "POSITIVE" | "ARCHIVED"
+  confidence:           number
+  summary:              string
+  sentiment:            "POSITIVE" | "NEUTRAL" | "NEGATIVE" | "MIXED"
+  urgency:              "HIGH" | "MEDIUM" | "LOW"
+  category:             "EQUIPMENT" | "SAFETY" | "SERVICE" | "CLEANLINESS" | "FACILITY" | "PRICING" | "STAFF" | "OTHER"
+  assetMention:         string | null
+  employeeMention:      string | null
+  vendorMention:        string | null
+  recurrenceIndicator:  boolean
+  recommendedAction:    string | null
 }
 
 async function classifyReview(
@@ -25,21 +29,33 @@ Review (${rating} stars): "${reviewText}"
 
 Return JSON:
 {
-  "classification": "ACTIONABLE" | "FEEDBACK" | "ARCHIVED",
+  "classification": "ACTIONABLE" | "FEEDBACK" | "POSITIVE" | "ARCHIVED",
   "confidence": 0.0-1.0,
-  "summary": "one sentence summary of the issue or feedback",
-  "category": "EQUIPMENT" | "SAFETY" | "SERVICE" | "CLEANLINESS" | "FACILITY" | "OTHER",
-  "locationMatch": "specific location mentioned or null",
+  "summary": "one sentence summary",
+  "sentiment": "POSITIVE" | "NEUTRAL" | "NEGATIVE" | "MIXED",
+  "urgency": "HIGH" | "MEDIUM" | "LOW",
+  "category": "EQUIPMENT" | "SAFETY" | "SERVICE" | "CLEANLINESS" | "FACILITY" | "PRICING" | "STAFF" | "OTHER",
   "assetMention": "specific equipment mentioned or null",
+  "employeeMention": "employee name or role mentioned or null",
+  "vendorMention": "vendor or supplier mentioned or null",
+  "recurrenceIndicator": true | false,
   "recommendedAction": "one sentence action item if ACTIONABLE, null otherwise"
 }
 
 Classification rules:
 - ACTIONABLE: 1-3 stars AND mentions a specific problem (broken equipment, safety issue, service failure, cleanliness problem). Needs a work order.
 - FEEDBACK: 4-5 stars OR a general complaint without a specific actionable issue. Record and learn.
-- ARCHIVED: Off-topic, spam, or irrelevant. No action needed.`
+- POSITIVE: 4-5 stars with genuine praise, no problems mentioned.
+- ARCHIVED: Off-topic, spam, or irrelevant. No action needed.
 
-  const text = await callHaiku(prompt, { maxTokens: 300, timeoutMs: 8000 })
+Urgency rules:
+- HIGH: safety hazard, equipment failure causing downtime, or health risk.
+- MEDIUM: service failure or significant cleanliness issue.
+- LOW: minor complaint or general feedback.
+
+Set recurrenceIndicator to true if the text implies this is a repeated or ongoing issue.`
+
+  const text = await callHaiku(prompt, { maxTokens: 400, timeoutMs: 8000 })
   if (!text) return null
 
   try {
@@ -53,10 +69,10 @@ Classification rules:
 // ── Main ingestion ─────────────────────────────────────────────────────────────
 
 export interface IngestResult {
-  locationsChecked: number
-  reviewsNew:       number
+  locationsChecked:  number
+  reviewsNew:        number
   reviewsClassified: number
-  errors:           string[]
+  errors:            string[]
 }
 
 export async function ingestReviews(organizationId: string): Promise<IngestResult> {
@@ -114,9 +130,10 @@ export async function ingestReviews(organizationId: string): Promise<IngestResul
         const recentReviews = reviews.filter(r => r.publishedAt >= sinceDate)
 
         for (const review of recentReviews) {
-          // Skip if already stored
-          const existing = await prisma.customerReview.findUnique({
-            where: { googleReviewId: review.reviewId },
+          // Dedup: check if this externalId already exists for this org+source
+          const existing = await prisma.customerFeedback.findFirst({
+            where: { organizationId, source: "GOOGLE_REVIEW", externalId: review.reviewId },
+            select: { id: true },
           })
           if (existing) continue
 
@@ -125,26 +142,34 @@ export async function ingestReviews(organizationId: string): Promise<IngestResul
             ? await classifyReview(review.comment, review.rating)
             : null
 
-          await prisma.customerReview.create({
+          await prisma.customerFeedback.create({
             data: {
               organizationId,
-              locationId:       matchedLocationId,
-              googleLocationId: googleLoc.googleLocationId,
-              googleReviewId:   review.reviewId,
-              reviewerName:     review.reviewerName,
-              rating:           review.rating,
-              reviewText:       review.comment,
-              reviewReplyText:  review.replyText,
-              publishedAt:      review.publishedAt,
-              sourceUrl:        review.sourceUrl,
-              aiClassification: classification?.classification ?? null,
-              aiConfidence:     classification?.confidence ?? null,
-              aiSummary:        classification?.summary ?? null,
-              aiCategory:       classification?.category ?? null,
-              aiLocationMatch:  classification?.locationMatch ?? null,
-              aiAssetMention:   classification?.assetMention ?? null,
-              recommendedAction: classification?.recommendedAction ?? null,
-              status:           classification?.classification === "ACTIONABLE"
+              locationId:    matchedLocationId,
+              source:        "GOOGLE_REVIEW",
+              externalId:    review.reviewId,
+              customerName:  review.reviewerName,
+              rating:        review.rating,
+              feedbackText:  review.comment,
+              submittedAt:   review.publishedAt,
+              // Google-specific fields packed into sourceMetadata
+              sourceMetadata: {
+                googleLocationId: googleLoc.googleLocationId,
+                reviewUrl:        review.sourceUrl ?? null,
+                replyText:        review.replyText  ?? null,
+              },
+              aiClassification:     classification?.classification    ?? null,
+              aiSentiment:          classification?.sentiment          ?? null,
+              aiUrgency:            classification?.urgency            ?? null,
+              aiConfidence:         classification?.confidence         ?? null,
+              aiSummary:            classification?.summary            ?? null,
+              aiCategory:           classification?.category           ?? null,
+              aiAssetMention:       classification?.assetMention       ?? null,
+              aiEmployeeMention:    classification?.employeeMention    ?? null,
+              aiVendorMention:      classification?.vendorMention      ?? null,
+              aiRecommendedAction:  classification?.recommendedAction  ?? null,
+              aiRecurrenceIndicator: classification?.recurrenceIndicator ?? false,
+              status: classification?.classification === "ACTIONABLE"
                 ? "ISSUE_RECOMMENDED"
                 : "PENDING",
             },

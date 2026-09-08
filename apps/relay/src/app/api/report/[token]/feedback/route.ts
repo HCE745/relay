@@ -39,43 +39,52 @@ export async function POST(
     return NextResponse.json({ error: "Rating must be an integer between 1 and 5" }, { status: 400 })
   }
 
-  const comment  = typeof body.comment === "string" ? body.comment.trim() : null
-  const name     = typeof body.name    === "string" ? body.name.trim()    : null
-
-  // Synthetic unique ID to satisfy the @unique constraint on googleReviewId
-  const syntheticId = `qr_${qrCode.id}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  const comment = typeof body.comment === "string" ? body.comment.trim() : null
+  const name    = typeof body.name    === "string" ? body.name.trim()    : null
 
   let aiClassification: string | null = null
+  let aiSentiment:      string | null = null
+  let aiUrgency:        string | null = null
   let aiSummary:        string | null = null
   let aiConfidence:     number | null = null
 
-  // Run AI classification when there's enough text to analyze
   if (comment && comment.length >= 10) {
     try {
-      const prompt = `Classify this customer feedback (rating: ${rating}/5). Return JSON only: {"classification":"ACTIONABLE"|"FEEDBACK"|"ARCHIVED","confidence":0.0-1.0,"summary":"one sentence"}\n\nFeedback: "${comment}"`
+      const prompt = `Classify this customer feedback (rating: ${rating}/5). Return JSON only:
+{"classification":"ACTIONABLE"|"FEEDBACK"|"POSITIVE"|"ARCHIVED","sentiment":"POSITIVE"|"NEUTRAL"|"NEGATIVE"|"MIXED","urgency":"HIGH"|"MEDIUM"|"LOW","confidence":0.0-1.0,"summary":"one sentence"}
+
+Feedback: "${comment}"`
       const raw = await callHaiku(prompt)
       if (!raw) throw new Error("no response")
-      const parsed = JSON.parse(raw) as { classification?: string; confidence?: number; summary?: string }
+      const parsed = JSON.parse(raw) as {
+        classification?: string; sentiment?: string; urgency?: string
+        confidence?: number; summary?: string
+      }
       aiClassification = parsed.classification ?? null
+      aiSentiment      = parsed.sentiment      ?? null
+      aiUrgency        = parsed.urgency        ?? null
       aiConfidence     = typeof parsed.confidence === "number" ? parsed.confidence : null
-      aiSummary        = parsed.summary ?? null
+      aiSummary        = parsed.summary        ?? null
     } catch {
       // AI classification is best-effort — never block submission
     }
   }
 
-  await prisma.customerReview.create({
+  await prisma.customerFeedback.create({
     data: {
-      organizationId:   qrCode.organizationId,
-      locationId:       qrCode.locationId ?? null,
-      googleReviewId:   syntheticId,
-      reviewerName:     name ?? null,
+      organizationId: qrCode.organizationId,
+      locationId:     qrCode.locationId ?? null,
+      source:         "QR_SCAN",
+      externalId:     null,   // QR scans have no external system ID
+      customerName:   name    ?? null,
       rating,
-      reviewText:       comment ?? null,
-      publishedAt:      new Date(),
-      source:           "QR",
-      qrCodeId:         qrCode.id,
+      feedbackText:   comment ?? null,
+      submittedAt:    new Date(),
+      qrCodeId:       qrCode.id,
+      sourceMetadata: { qrCodeId: qrCode.id },
       aiClassification: aiClassification ?? (rating <= 2 ? "ACTIONABLE" : "FEEDBACK"),
+      aiSentiment:      aiSentiment      ?? (rating <= 2 ? "NEGATIVE" : rating >= 4 ? "POSITIVE" : "NEUTRAL"),
+      aiUrgency:        aiUrgency        ?? (rating <= 2 ? "MEDIUM" : "LOW"),
       aiConfidence,
       aiSummary,
       status:           rating <= 2 ? "ISSUE_RECOMMENDED" : "PENDING",

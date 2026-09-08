@@ -20,32 +20,35 @@ export default async function CustomerVoicePage() {
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-  const [connectedAccount, inboxReviews, stats, ratingGroups, recentReviews] = await Promise.all([
+  const [connectedAccount, inboxItems, stats, ratingGroups, recentItems] = await Promise.all([
     prisma.connectedAccount.findUnique({
       where: { organizationId_provider: { organizationId: session.organizationId, provider: "google_business_profile" } },
       select: { accountEmail: true, lastSyncAt: true },
     }),
-    prisma.customerReview.findMany({
-      where: { organizationId: session.organizationId, status: { in: ["PENDING", "ISSUE_RECOMMENDED"] } },
-      orderBy: { publishedAt: "desc" },
+    prisma.customerFeedback.findMany({
+      where: {
+        organizationId: session.organizationId,
+        status: { in: ["PENDING", "ISSUE_RECOMMENDED"] },
+      },
+      orderBy: { submittedAt: "desc" },
       take: 50,
       include: { location: { select: { id: true, name: true } } },
     }),
-    prisma.customerReview.aggregate({
-      where: { organizationId: session.organizationId },
-      _avg: { rating: true },
+    prisma.customerFeedback.aggregate({
+      where:  { organizationId: session.organizationId, rating: { not: null } },
+      _avg:   { rating: true },
       _count: { _all: true },
     }),
-    prisma.customerReview.groupBy({
-      by: ["rating"],
-      where: { organizationId: session.organizationId },
+    prisma.customerFeedback.groupBy({
+      by:     ["rating"],
+      where:  { organizationId: session.organizationId, rating: { not: null } },
       _count: { _all: true },
       orderBy: { rating: "asc" },
     }),
-    prisma.customerReview.findMany({
-      where: { organizationId: session.organizationId, publishedAt: { gte: thirtyDaysAgo } },
-      select: { publishedAt: true, rating: true },
-      orderBy: { publishedAt: "asc" },
+    prisma.customerFeedback.findMany({
+      where:  { organizationId: session.organizationId, submittedAt: { gte: thirtyDaysAgo } },
+      select: { submittedAt: true, rating: true },
+      orderBy: { submittedAt: "asc" },
     }),
   ])
 
@@ -54,10 +57,10 @@ export default async function CustomerVoicePage() {
     count: ratingGroups.find(g => g.rating === r)?._count._all ?? 0,
   }))
 
-  // Group recent reviews by day for trend
+  // Group recent items by day for trend sparkline
   const trendMap = new Map<string, number>()
-  for (const r of recentReviews) {
-    const day = r.publishedAt.toISOString().slice(0, 10)
+  for (const r of recentItems) {
+    const day = r.submittedAt.toISOString().slice(0, 10)
     trendMap.set(day, (trendMap.get(day) ?? 0) + 1)
   }
   const trend = Array.from(trendMap.entries())
@@ -71,23 +74,27 @@ export default async function CustomerVoicePage() {
         <CustomerVoiceClient
           connected={!!connectedAccount}
           connectedEmail={connectedAccount?.accountEmail ?? null}
-          inboxReviews={inboxReviews.map(r => ({
-            id: r.id,
-            reviewerName: r.reviewerName,
-            rating: r.rating,
-            reviewText: r.reviewText,
-            publishedAt: r.publishedAt.toISOString(),
-            status: r.status,
+          inboxReviews={inboxItems.map(r => ({
+            id:               r.id,
+            customerName:     r.customerName,
+            rating:           r.rating,
+            feedbackText:     r.feedbackText,
+            submittedAt:      r.submittedAt.toISOString(),
+            status:           r.status,
+            source:           r.source,
             aiClassification: r.aiClassification,
-            aiSummary: r.aiSummary,
-            aiCategory: r.aiCategory,
-            recommendedAction: r.recommendedAction,
-            locationName: r.location?.name ?? null,
-            sourceUrl: r.sourceUrl,
+            aiSentiment:      r.aiSentiment,
+            aiUrgency:        r.aiUrgency,
+            aiSummary:        r.aiSummary,
+            aiCategory:       r.aiCategory,
+            aiRecommendedAction: r.aiRecommendedAction,
+            aiRecurrenceIndicator: r.aiRecurrenceIndicator,
+            locationName:     r.location?.name ?? null,
+            reviewUrl: (r.sourceMetadata as Record<string, string> | null)?.reviewUrl ?? null,
           }))}
           insights={{
             totalReviews: stats._count._all,
-            avgRating: stats._avg.rating ?? null,
+            avgRating:    stats._avg.rating ?? null,
             ratingDistribution,
             trend,
           }}

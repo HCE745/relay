@@ -11,6 +11,8 @@ const CATEGORY_MAP: Record<string, string> = {
   SERVICE:     "GENERAL",
   CLEANLINESS: "CLEANLINESS",
   FACILITY:    "FACILITY",
+  PRICING:     "GENERAL",
+  STAFF:       "GENERAL",
   OTHER:       "GENERAL",
 }
 
@@ -22,44 +24,46 @@ export async function POST(
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  const review = await prisma.customerReview.findUnique({
+  const feedback = await prisma.customerFeedback.findUnique({
     where: { id },
     include: { location: true },
   })
 
-  if (!review) return NextResponse.json({ error: "Review not found" }, { status: 404 })
-  if (review.organizationId !== session.organizationId) {
+  if (!feedback) return NextResponse.json({ error: "Feedback not found" }, { status: 404 })
+  if (feedback.organizationId !== session.organizationId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
-  if (review.status === "ISSUE_CREATED") {
-    return NextResponse.json({ error: "Issue already created for this review" }, { status: 409 })
+  if (feedback.status === "ISSUE_CREATED") {
+    return NextResponse.json({ error: "Issue already created for this feedback" }, { status: 409 })
   }
 
-  const isCritical = review.rating <= 2 &&
-    (review.aiCategory === "SAFETY" || review.aiCategory === "EQUIPMENT")
+  const isCritical = (feedback.rating ?? 5) <= 2 &&
+    (feedback.aiCategory === "SAFETY" || feedback.aiCategory === "EQUIPMENT")
+
+  const sourceUrl = (feedback.sourceMetadata as Record<string, string> | null)?.reviewUrl ?? null
 
   const description = [
-    review.aiSummary ? `**AI Summary:** ${review.aiSummary}` : null,
-    `**Customer Review (${review.rating} ★):** ${review.reviewText ?? "(no text)"}`,
-    review.reviewerName ? `**Reviewer:** ${review.reviewerName}` : null,
-    review.recommendedAction ? `**Recommended Action:** ${review.recommendedAction}` : null,
-    review.sourceUrl ? `**Source:** ${review.sourceUrl}` : null,
+    feedback.aiSummary      ? `**AI Summary:** ${feedback.aiSummary}` : null,
+    `**Customer Feedback (${feedback.rating ?? "?"} ★):** ${feedback.feedbackText ?? "(no text)"}`,
+    feedback.customerName   ? `**From:** ${feedback.customerName}` : null,
+    feedback.aiRecommendedAction ? `**Recommended Action:** ${feedback.aiRecommendedAction}` : null,
+    sourceUrl               ? `**Source:** ${sourceUrl}` : null,
   ].filter(Boolean).join("\n\n")
 
   const issue = await prisma.issue.create({
     data: {
-      title:          review.aiSummary ?? `Customer review: ${review.rating}★ — ${(review.reviewText ?? "").slice(0, 80)}`,
+      title:          feedback.aiSummary ?? `Customer feedback: ${feedback.rating ?? "?"}★ — ${(feedback.feedbackText ?? "").slice(0, 80)}`,
       description,
       status:         "OPEN",
       priority:       isCritical ? "HIGH" : "MEDIUM",
-      category:       CATEGORY_MAP[review.aiCategory ?? "OTHER"] ?? "GENERAL",
+      category:       CATEGORY_MAP[feedback.aiCategory ?? "OTHER"] ?? "GENERAL",
       organizationId: session.organizationId,
-      locationId:     review.locationId ?? undefined,
+      locationId:     feedback.locationId ?? undefined,
       reportedById:   session.userId,
     },
   })
 
-  await prisma.customerReview.update({
+  await prisma.customerFeedback.update({
     where: { id },
     data:  { status: "ISSUE_CREATED", issueId: issue.id },
   })

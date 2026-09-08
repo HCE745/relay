@@ -15,14 +15,14 @@ export async function POST(
   const { id } = await params
   const body = await req.json() as { action: "feedback" | "archive" }
 
-  const review = await prisma.customerReview.findUnique({ where: { id } })
-  if (!review) return NextResponse.json({ error: "Review not found" }, { status: 404 })
-  if (review.organizationId !== session.organizationId) {
+  const feedback = await prisma.customerFeedback.findUnique({ where: { id } })
+  if (!feedback) return NextResponse.json({ error: "Feedback not found" }, { status: 404 })
+  if (feedback.organizationId !== session.organizationId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
   const status = body.action === "feedback" ? "RECORDED_AS_FEEDBACK" : "ARCHIVED"
-  await prisma.customerReview.update({ where: { id }, data: { status } })
+  await prisma.customerFeedback.update({ where: { id }, data: { status } })
 
   return NextResponse.json({ ok: true, status })
 }

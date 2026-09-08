@@ -43,11 +43,13 @@ export default async function IntegrationsPage() {
       where: { organizationId_provider: { organizationId: session.organizationId, provider: "google_business_profile" } },
       select: { accountEmail: true, lastSyncAt: true },
     }),
-    prisma.customerReview.findMany({
-      where: { organizationId: session.organizationId },
-      select: { googleLocationId: true },
-      distinct: ["googleLocationId"],
-    }),
+    prisma.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(DISTINCT "sourceMetadata"->>'googleLocationId') AS count
+      FROM "CustomerFeedback"
+      WHERE "organizationId" = ${session.organizationId}
+        AND "source" = 'GOOGLE_REVIEW'
+        AND "sourceMetadata"->>'googleLocationId' IS NOT NULL
+    `,
   ])
 
   return (
@@ -60,7 +62,7 @@ export default async function IntegrationsPage() {
           connectedAccount={connectedAccountRaw ? {
             email: connectedAccountRaw.accountEmail,
             lastSyncAt: connectedAccountRaw.lastSyncAt?.toISOString() ?? null,
-            locationCount: locationGroups.length,
+            locationCount: Number(locationGroups[0]?.count ?? 0),
           } : null}
           initialApiKeys={apiKeys.map(k => ({
             id: k.id, name: k.name, keyPrefix: k.keyPrefix, isActive: k.isActive,

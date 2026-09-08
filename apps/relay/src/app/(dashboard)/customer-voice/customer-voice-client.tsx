@@ -3,35 +3,40 @@
 import { useState } from "react"
 import Link from "next/link"
 import { format } from "date-fns"
-import { Star, MessageSquare, AlertCircle, CheckCircle, Archive, Plus, ChevronLeft, ChevronRight, Filter } from "lucide-react"
+import { Star, MessageSquare, AlertCircle, CheckCircle, Archive, Plus, ChevronLeft, ChevronRight, Filter, RotateCcw } from "lucide-react"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface ReviewItem {
-  id: string
-  reviewerName: string | null
-  rating: number
-  reviewText: string | null
-  publishedAt: string
-  status: string
-  aiClassification: string | null
-  aiSummary: string | null
-  aiCategory: string | null
-  recommendedAction: string | null
-  locationName: string | null
-  sourceUrl: string | null
+  id:                    string
+  customerName:          string | null
+  rating:                number | null
+  feedbackText:          string | null
+  submittedAt:           string
+  status:                string
+  source:                string
+  aiClassification:      string | null
+  aiSentiment:           string | null
+  aiUrgency:             string | null
+  aiSummary:             string | null
+  aiCategory:            string | null
+  aiRecommendedAction:   string | null
+  aiRecurrenceIndicator: boolean
+  locationName:          string | null
+  reviewUrl:             string | null
 }
 
 interface Insights {
-  totalReviews: number
-  avgRating: number | null
+  totalReviews:       number
+  avgRating:          number | null
   ratingDistribution: Array<{ rating: number; count: number }>
-  trend: Array<{ date: string; count: number }>
+  trend:              Array<{ date: string; count: number }>
 }
 
 // ── Star Rating ───────────────────────────────────────────────────────────────
 
-function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "lg" }) {
+function StarRating({ rating, size = "sm" }: { rating: number | null; size?: "sm" | "lg" }) {
+  if (rating === null) return null
   const sz = size === "lg" ? "w-5 h-5" : "w-3.5 h-3.5"
   return (
     <span className="flex items-center gap-0.5">
@@ -52,6 +57,7 @@ function ClassBadge({ classification }: { classification: string | null }) {
   const map: Record<string, string> = {
     ACTIONABLE: "bg-red-100 text-red-700",
     FEEDBACK:   "bg-blue-100 text-blue-700",
+    POSITIVE:   "bg-green-100 text-green-700",
     ARCHIVED:   "bg-gray-100 text-gray-500",
   }
   return (
@@ -61,9 +67,45 @@ function ClassBadge({ classification }: { classification: string | null }) {
   )
 }
 
+// ── Urgency Badge ─────────────────────────────────────────────────────────────
+
+function UrgencyBadge({ urgency }: { urgency: string | null }) {
+  if (!urgency || urgency === "LOW") return null
+  return (
+    <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+      urgency === "HIGH" ? "bg-red-50 text-red-600 border border-red-200" : "bg-amber-50 text-amber-600 border border-amber-200"
+    }`}>
+      {urgency}
+    </span>
+  )
+}
+
+// ── Source Badge ──────────────────────────────────────────────────────────────
+
+function SourceBadge({ source }: { source: string }) {
+  const map: Record<string, { label: string; cls: string }> = {
+    GOOGLE_REVIEW:  { label: "Google",   cls: "bg-blue-50 text-blue-600" },
+    QR_SCAN:        { label: "QR Scan",  cls: "bg-violet-50 text-violet-600" },
+    FEEDBACK_LINK:  { label: "Link",     cls: "bg-sky-50 text-sky-600" },
+    MANUAL:         { label: "Manual",   cls: "bg-gray-100 text-gray-500" },
+  }
+  const { label, cls } = map[source] ?? { label: source, cls: "bg-gray-100 text-gray-500" }
+  return (
+    <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${cls}`}>
+      {label}
+    </span>
+  )
+}
+
 // ── Review Card ───────────────────────────────────────────────────────────────
 
-function ReviewCard({ review, onAction }: { review: ReviewItem; onAction: (id: string, action: "issue" | "feedback" | "archive") => void }) {
+function ReviewCard({
+  review,
+  onAction,
+}: {
+  review: ReviewItem
+  onAction: (id: string, action: "issue" | "feedback" | "archive") => void
+}) {
   const [busy, setBusy] = useState<string | null>(null)
 
   async function act(action: "issue" | "feedback" | "archive") {
@@ -92,25 +134,32 @@ function ReviewCard({ review, onAction }: { review: ReviewItem; onAction: (id: s
           {review.locationName && (
             <span className="text-xs text-gray-400">{review.locationName}</span>
           )}
+          <SourceBadge source={review.source} />
           <ClassBadge classification={review.aiClassification} />
+          <UrgencyBadge urgency={review.aiUrgency} />
+          {review.aiRecurrenceIndicator && (
+            <span title="Recurring issue" className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 border border-orange-200">
+              <RotateCcw className="w-2.5 h-2.5" /> Recurring
+            </span>
+          )}
         </div>
-        <span className="text-xs text-gray-400 shrink-0">{format(new Date(review.publishedAt), "MMM d, yyyy")}</span>
+        <span className="text-xs text-gray-400 shrink-0">{format(new Date(review.submittedAt), "MMM d, yyyy")}</span>
       </div>
 
-      {review.reviewerName && (
-        <p className="text-xs font-semibold text-gray-600 mb-1">{review.reviewerName}</p>
+      {review.customerName && (
+        <p className="text-xs font-semibold text-gray-600 mb-1">{review.customerName}</p>
       )}
 
-      {review.reviewText && (
-        <p className="text-sm text-gray-700 mb-3 leading-relaxed">{review.reviewText}</p>
+      {review.feedbackText && (
+        <p className="text-sm text-gray-700 mb-3 leading-relaxed">{review.feedbackText}</p>
       )}
 
       {review.aiSummary && (
         <div className="bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 mb-3">
           <p className="text-xs font-semibold text-blue-700 mb-0.5">AI Summary</p>
           <p className="text-xs text-blue-800">{review.aiSummary}</p>
-          {review.recommendedAction && (
-            <p className="text-xs text-blue-600 mt-1 font-medium">→ {review.recommendedAction}</p>
+          {review.aiRecommendedAction && (
+            <p className="text-xs text-blue-600 mt-1 font-medium">→ {review.aiRecommendedAction}</p>
           )}
         </div>
       )}
@@ -146,8 +195,8 @@ function ReviewCard({ review, onAction }: { review: ReviewItem; onAction: (id: s
             </button>
           </>
         )}
-        {review.sourceUrl && (
-          <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" className="ml-auto text-xs text-gray-400 hover:text-gray-600 underline">
+        {review.reviewUrl && (
+          <a href={review.reviewUrl} target="_blank" rel="noopener noreferrer" className="ml-auto text-xs text-gray-400 hover:text-gray-600 underline">
             View on Google
           </a>
         )}
@@ -170,14 +219,14 @@ function InboxTab({ initialReviews }: { initialReviews: ReviewItem[] }) {
       <div className="text-center py-16">
         <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-3" />
         <p className="text-gray-600 font-medium">Inbox is clear</p>
-        <p className="text-sm text-gray-400 mt-1">All reviews have been reviewed — check back after the next sync.</p>
+        <p className="text-sm text-gray-400 mt-1">All feedback has been reviewed — check back after the next sync.</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-500">{reviews.length} review{reviews.length === 1 ? "" : "s"} awaiting action</p>
+      <p className="text-sm text-gray-500">{reviews.length} item{reviews.length === 1 ? "" : "s"} awaiting action</p>
       {reviews.map(r => (
         <ReviewCard key={r.id} review={r} onAction={handleAction} />
       ))}
@@ -188,28 +237,30 @@ function InboxTab({ initialReviews }: { initialReviews: ReviewItem[] }) {
 // ── All Reviews Tab ───────────────────────────────────────────────────────────
 
 interface AllReviewsResponse {
-  reviews: ReviewItem[]
-  total: number
-  page: number
-  pageSize: number
+  reviews:    ReviewItem[]
+  total:      number
+  page:       number
+  pageSize:   number
   totalPages: number
 }
 
 function AllReviewsTab() {
-  const [reviews, setReviews] = useState<ReviewItem[]>([])
-  const [loading, setLoading] = useState(false)
-  const [loaded, setLoaded] = useState(false)
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [total, setTotal] = useState(0)
+  const [reviews,      setReviews]      = useState<ReviewItem[]>([])
+  const [loading,      setLoading]      = useState(false)
+  const [loaded,       setLoaded]       = useState(false)
+  const [page,         setPage]         = useState(1)
+  const [totalPages,   setTotalPages]   = useState(1)
+  const [total,        setTotal]        = useState(0)
   const [statusFilter, setStatusFilter] = useState("")
-  const [ratingMin, setRatingMin] = useState("")
+  const [sourceFilter, setSourceFilter] = useState("")
+  const [ratingMax,    setRatingMax]    = useState("")
 
-  async function load(p: number, status: string, rating: string) {
+  async function load(p: number, status: string, source: string, rating: string) {
     setLoading(true)
     try {
       const params = new URLSearchParams({ page: String(p) })
       if (status) params.set("status", status)
+      if (source) params.set("source", source)
       if (rating) params.set("ratingMax", rating)
       const res = await fetch(`/api/customer-voice/reviews?${params}`)
       if (res.ok) {
@@ -222,16 +273,16 @@ function AllReviewsTab() {
     } finally { setLoading(false); setLoaded(true) }
   }
 
-  function applyFilters() { load(1, statusFilter, ratingMin) }
+  function applyFilters() { load(1, statusFilter, sourceFilter, ratingMax) }
 
   if (!loaded) {
     return (
       <div className="text-center py-8">
         <button
-          onClick={() => load(1, "", "")}
+          onClick={() => load(1, "", "", "")}
           className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:border-blue-400 transition-colors"
         >
-          Load Reviews
+          Load Feedback
         </button>
       </div>
     )
@@ -255,8 +306,18 @@ function AllReviewsTab() {
           <option value="ARCHIVED">Archived</option>
         </select>
         <select
-          value={ratingMin}
-          onChange={e => setRatingMin(e.target.value)}
+          value={sourceFilter}
+          onChange={e => setSourceFilter(e.target.value)}
+          className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">All Sources</option>
+          <option value="GOOGLE_REVIEW">Google</option>
+          <option value="QR_SCAN">QR Scan</option>
+          <option value="MANUAL">Manual</option>
+        </select>
+        <select
+          value={ratingMax}
+          onChange={e => setRatingMax(e.target.value)}
           className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Any Rating</option>
@@ -276,7 +337,7 @@ function AllReviewsTab() {
       {loading ? (
         <div className="text-center py-8 text-gray-400 text-sm">Loading…</div>
       ) : reviews.length === 0 ? (
-        <div className="text-center py-8 text-gray-400 text-sm">No reviews match your filters.</div>
+        <div className="text-center py-8 text-gray-400 text-sm">No feedback matches your filters.</div>
       ) : (
         <div className="space-y-3">
           {reviews.map(r => (
@@ -285,19 +346,26 @@ function AllReviewsTab() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <StarRating rating={r.rating} />
                   {r.locationName && <span className="text-xs text-gray-400">{r.locationName}</span>}
+                  <SourceBadge source={r.source} />
                   <ClassBadge classification={r.aiClassification} />
+                  <UrgencyBadge urgency={r.aiUrgency} />
+                  {r.aiRecurrenceIndicator && (
+                    <span className="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 border border-orange-200">
+                      Recurring
+                    </span>
+                  )}
                   <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${
-                    r.status === "ISSUE_CREATED" ? "bg-green-100 text-green-700"
-                    : r.status === "ARCHIVED" ? "bg-gray-100 text-gray-400"
+                    r.status === "ISSUE_CREATED"       ? "bg-green-100 text-green-700"
+                    : r.status === "ARCHIVED"          ? "bg-gray-100 text-gray-400"
                     : r.status === "RECORDED_AS_FEEDBACK" ? "bg-blue-100 text-blue-600"
                     : "bg-amber-100 text-amber-700"
                   }`}>{r.status.replace(/_/g, " ")}</span>
                 </div>
-                <span className="text-xs text-gray-400 shrink-0">{format(new Date(r.publishedAt), "MMM d, yyyy")}</span>
+                <span className="text-xs text-gray-400 shrink-0">{format(new Date(r.submittedAt), "MMM d, yyyy")}</span>
               </div>
-              {r.reviewerName && <p className="text-xs font-semibold text-gray-600 mb-1">{r.reviewerName}</p>}
-              {r.reviewText && <p className="text-sm text-gray-700">{r.reviewText}</p>}
-              {r.aiSummary && <p className="text-xs text-blue-600 mt-1 italic">{r.aiSummary}</p>}
+              {r.customerName  && <p className="text-xs font-semibold text-gray-600 mb-1">{r.customerName}</p>}
+              {r.feedbackText  && <p className="text-sm text-gray-700">{r.feedbackText}</p>}
+              {r.aiSummary     && <p className="text-xs text-blue-600 mt-1 italic">{r.aiSummary}</p>}
             </div>
           ))}
         </div>
@@ -307,7 +375,7 @@ function AllReviewsTab() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-3 mt-5">
           <button
-            onClick={() => { const p = page - 1; setPage(p); load(p, statusFilter, ratingMin) }}
+            onClick={() => { const p = page - 1; setPage(p); load(p, statusFilter, sourceFilter, ratingMax) }}
             disabled={page <= 1 || loading}
             className="p-1.5 text-gray-400 hover:text-gray-700 disabled:opacity-30 transition-colors"
           >
@@ -315,7 +383,7 @@ function AllReviewsTab() {
           </button>
           <span className="text-sm text-gray-600">Page {page} of {totalPages}</span>
           <button
-            onClick={() => { const p = page + 1; setPage(p); load(p, statusFilter, ratingMin) }}
+            onClick={() => { const p = page + 1; setPage(p); load(p, statusFilter, sourceFilter, ratingMax) }}
             disabled={page >= totalPages || loading}
             className="p-1.5 text-gray-400 hover:text-gray-700 disabled:opacity-30 transition-colors"
           >
@@ -339,7 +407,7 @@ function InsightsTab({ insights }: { insights: Insights }) {
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Total Reviews</p>
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Total Feedback</p>
           <p className="text-3xl font-bold text-gray-900">{totalReviews.toLocaleString()}</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -386,12 +454,12 @@ function InsightsTab({ insights }: { insights: Insights }) {
       {/* 30-day trend */}
       {trend.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-sm font-semibold text-gray-900 mb-4">30-Day Review Trend</p>
+          <p className="text-sm font-semibold text-gray-900 mb-4">30-Day Feedback Trend</p>
           <div className="flex items-end gap-1 h-20">
             {trend.map(({ date, count }) => (
               <div
                 key={date}
-                title={`${format(new Date(date + "T12:00:00"), "MMM d")}: ${count} review${count === 1 ? "" : "s"}`}
+                title={`${format(new Date(date + "T12:00:00"), "MMM d")}: ${count} item${count === 1 ? "" : "s"}`}
                 className="flex-1 bg-blue-400 rounded-t min-h-[2px] transition-all hover:bg-blue-500 cursor-default"
                 style={{ height: `${Math.max(4, (count / maxTrend) * 100)}%` }}
               />
@@ -417,10 +485,10 @@ export function CustomerVoiceClient({
   inboxReviews,
   insights,
 }: {
-  connected: boolean
+  connected:      boolean
   connectedEmail: string | null
-  inboxReviews: ReviewItem[]
-  insights: Insights
+  inboxReviews:   ReviewItem[]
+  insights:       Insights
 }) {
   const [tab, setTab] = useState<Tab>("inbox")
 
@@ -449,7 +517,7 @@ export function CustomerVoiceClient({
 
   const tabs: Array<{ key: Tab; label: string }> = [
     { key: "inbox",    label: `Inbox (${inboxReviews.length})` },
-    { key: "all",      label: "All Reviews" },
+    { key: "all",      label: "All Feedback" },
     { key: "insights", label: "Insights" },
   ]
 

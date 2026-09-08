@@ -210,7 +210,7 @@ model Organization {
   surveys               Survey[]
   recognitions          Recognition[]
   connectedAccounts     ConnectedAccount[]
-  customerReviews       CustomerReview[]
+  customerFeedback      CustomerFeedback[]
 }
 
 model CustomView {
@@ -388,7 +388,7 @@ model Location {
   maintenanceSchedules    MaintenanceSchedule[]
   injuryReports           InjuryReport[]
   qrCodes                 QrCode[]
-  customerReviews         CustomerReview[]
+  customerFeedback        CustomerFeedback[]
 }
 
 model Department {
@@ -524,7 +524,7 @@ model Issue {
   attachments             Attachment[]
   conversation            Conversation?
   assignments             Assignment[]      @relation("IssueAssignments")
-  customerReviews         CustomerReview[]
+  customerFeedback        CustomerFeedback[]
 }
 
 model IssueComment {
@@ -1431,8 +1431,8 @@ model QrCode {
   asset        Asset?            @relation(fields: [assetId], references: [id])
   assignedTo   User?             @relation("QrCodeAssignee", fields: [assignedToId], references: [id])
   survey       Survey?           @relation(fields: [surveyId], references: [id])
-  submissions  QrCodeSubmission[]
-  customerReviews CustomerReview[]
+  submissions      QrCodeSubmission[]
+  customerFeedback CustomerFeedback[]
 
   @@index([organizationId])
   @@index([token])
@@ -2833,40 +2833,52 @@ model ConnectedAccount {
   @@index([organizationId])
 }
 
-model CustomerReview {
-  id                String    @id @default(cuid())
-  organizationId    String
-  locationId        String?
-  googleLocationId  String?   // nullable — not set for QR/manual sources
-  googleReviewId    String    @unique
-  reviewerName      String?
-  rating            Int
-  reviewText        String?
-  reviewReplyText   String?
-  publishedAt       DateTime
-  sourceUrl         String?
-  source            String    @default("GOOGLE") // "GOOGLE" | "QR" | "MANUAL"
-  qrCodeId          String?                      // set when source = "QR"
-  aiClassification  String?   // ACTIONABLE | FEEDBACK | ARCHIVED
-  aiConfidence      Float?
-  aiSummary         String?
-  aiCategory        String?   // EQUIPMENT | SAFETY | SERVICE | CLEANLINESS | FACILITY | OTHER
-  aiLocationMatch   String?
-  aiAssetMention    String?
-  recommendedAction String?
-  issueId           String?
-  status            String    @default("PENDING") // PENDING | ISSUE_RECOMMENDED | ISSUE_CREATED | RECORDED_AS_FEEDBACK | ARCHIVED
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+model CustomerFeedback {
+  id              String   @id @default(cuid())
+  organizationId  String
+  locationId      String?
+  source          String   @default("GOOGLE_REVIEW") // GOOGLE_REVIEW | QR_SCAN | FEEDBACK_LINK | SURVEY | WEBHOOK | CSV_IMPORT | EMAIL | MANUAL
+  externalId      String?  // source system's ID (googleReviewId, survey response ID, etc.); nullable for QR/manual
+  rating          Int?
+  feedbackText    String?
+  customerName    String?
+  customerContact String?  // email or phone if intentionally collected
+  submittedAt     DateTime
+
+  // AI analysis
+  aiClassification      String?  // ACTIONABLE | FEEDBACK | POSITIVE | ARCHIVED
+  aiSentiment           String?  // POSITIVE | NEUTRAL | NEGATIVE | MIXED
+  aiUrgency             String?  // HIGH | MEDIUM | LOW
+  aiCategory            String?  // EQUIPMENT | SAFETY | SERVICE | CLEANLINESS | FACILITY | PRICING | STAFF | OTHER
+  aiSummary             String?
+  aiConfidence          Float?
+  aiAssetMention        String?
+  aiEmployeeMention     String?
+  aiVendorMention       String?
+  aiRecommendedAction   String?
+  aiRecurrenceIndicator Boolean  @default(false)
+
+  issueId        String?
+  qrCodeId       String?
+  status         String   @default("PENDING") // PENDING | ISSUE_RECOMMENDED | ISSUE_CREATED | RECORDED_AS_FEEDBACK | ARCHIVED
+
+  // Source-specific data (googleLocationId + reviewUrl + replyText for GOOGLE_REVIEW;
+  // qrCodeId + qrToken for QR_SCAN; webhookEndpointId + rawPayload for WEBHOOK; etc.)
+  sourceMetadata Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   location     Location?    @relation(fields: [locationId], references: [id])
   issue        Issue?       @relation(fields: [issueId], references: [id])
   qrCode       QrCode?      @relation(fields: [qrCodeId], references: [id])
 
+  // Partial unique index enforced at DB level: UNIQUE(organizationId, source, externalId) WHERE externalId IS NOT NULL
+  // Not expressible in Prisma schema syntax — created manually in migration 0025.
   @@index([organizationId])
-  @@index([googleLocationId])
-  @@index([status])
-  @@index([source])
+  @@index([organizationId, status])
+  @@index([organizationId, source])
   @@index([qrCodeId])
+  @@index([submittedAt])
 }

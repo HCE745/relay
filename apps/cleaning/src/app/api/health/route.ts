@@ -10,7 +10,10 @@ export async function GET(request: Request) {
   try {
     await systemDb.$queryRaw`SELECT 1`
     return NextResponse.json({ status: "ok", app: "cleaning", db: "ok" })
-  } catch {
+  } catch (e) {
+    // Surface the driver error to the server logs (never to the client). The pg
+    // error message aids diagnosis (SSL/auth/host) and contains no credentials.
+    console.error("[health] deep DB check failed:", e instanceof Error ? e.message : e)
     return NextResponse.json({ status: "degraded", app: "cleaning", db: "error" }, { status: 503 })
   }
 }

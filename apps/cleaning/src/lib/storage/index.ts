@@ -3,11 +3,13 @@ import { VercelBlobStorage } from "./blob"
 
 // Storage abstraction so the rest of Cleaning never depends on a concrete
 // backend. `put` returns an opaque REF that later get/delete calls interpret
-// (for local: the key; for Vercel Blob: the blob URL). Callers persist the ref.
+// (for local: the key; for Vercel Blob: the private blob pathname). Callers
+// persist the ref.
 //
 // Delivery stays authenticated/tenant-scoped: /api/photos/[id] looks the photo
-// up org-scoped, then streams bytes via storage.get(ref). Blob URLs (unguessable
-// + random-suffixed) are never exposed to clients.
+// up org-scoped, then streams bytes via storage.get(ref). The Blob store is
+// PRIVATE — refs (unguessable + random-suffixed) are read server-side with the
+// token and never exposed to clients.
 
 export interface Storage {
   put(key: string, data: Buffer, contentType: string): Promise<string>

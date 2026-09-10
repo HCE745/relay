@@ -13,7 +13,9 @@ export async function GET(request: Request) {
   } catch (e) {
     // Surface the driver error to the server logs (never to the client). The pg
     // error message aids diagnosis (SSL/auth/host) and contains no credentials.
-    console.error("[health] deep DB check failed:", e instanceof Error ? e.message : e)
+    const msg = (e instanceof Error ? e.message : String(e)).replace(/\s+/g, " ").trim()
+    const code = (e as { code?: string })?.code
+    console.error(`[health] deep DB check failed: code=${code ?? "n/a"} msg=${msg}`)
     return NextResponse.json({ status: "degraded", app: "cleaning", db: "error" }, { status: 503 })
   }
 }

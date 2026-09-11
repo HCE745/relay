@@ -7,8 +7,8 @@ packages — never a database.
 ## Environment variables — where each value comes from
 | Variable | Source | Notes |
 |---|---|---|
-| `DATABASE_URL` | **Supabase** | Pooler (port 6543), append `?pgbouncer=true`. Runtime app. |
-| `DIRECT_URL` | **Supabase** | Direct (port 5432). Used only by Prisma CLI for migrations (DDL). |
+| `DATABASE_URL` | **Supabase** | **Transaction Pooler** (`*.pooler.supabase.com`, port 6543), append `?pgbouncer=true`. Runtime app. Must be the pooler: it is IPv4-reachable from Vercel's serverless functions. |
+| `DIRECT_URL` | **Supabase** | Direct (`db.<ref>.supabase.co`, port 5432). Used only by the Prisma CLI for migrations (DDL). This host is **IPv6-only**, so it must NOT be used as the runtime `DATABASE_URL` — Vercel functions are IPv4-only and will get `ETIMEDOUT`. |
 | `DATABASE_POOL_MAX` | *you (optional)* | Runtime pool cap; defaults to 3. |
 | `CLEANING_SESSION_SECRET` | **you generate** | `openssl rand -base64 32`. Required in prod (min 32 chars). |
 | `BLOB_READ_WRITE_TOKEN` | **Vercel Blob** | Create a Blob store → copy its read/write token. Required in prod. |

@@ -18,9 +18,13 @@ const STATUS_STYLES: Record<string, { text: string; bg: string }> = {
 
 export default async function ProspectsPage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/super-admin/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
+
+  const isManager = session?.superAdmin || session?.salesUserRole === "admin_sales"
+  const repFilter = isManager ? {} : { assignedToId: session?.salesUserId ?? "" }
 
   const prospects = await prisma.prospect.findMany({
+    where:    repFilter,
     orderBy:  [{ aiFitScore: "desc" }, { createdAt: "desc" }],
     take:     100,
     select: {

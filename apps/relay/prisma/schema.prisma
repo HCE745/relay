@@ -1631,9 +1631,15 @@ model DemoCall {
   objectionNotes     String?
   featuresDiscussed  String[]
 
-  organization Organization?                @relation(fields: [organizationId], references: [id])
-  crmEmails    CrmEmail[]
-  enrollments  CrmEmailSequenceEnrollment[]
+  assignedToId    String?
+  productInterest String?
+
+  organization  Organization?                @relation(fields: [organizationId], references: [id])
+  crmEmails     CrmEmail[]
+  enrollments   CrmEmailSequenceEnrollment[]
+  assignedTo    SalesUser?                   @relation("DemoCallAssigned", fields: [assignedToId], references: [id])
+  opportunities CrmOpportunity[]             @relation("DemoCallOpportunities")
+  tasks         CrmTask[]                    @relation("DemoCallTasks")
 
   @@index([organizationId])
   @@index([scheduledAt])
@@ -1641,6 +1647,7 @@ model DemoCall {
   @@index([callStatus])
   @@index([calendlyEventId])
   @@index([contactEmail])
+  @@index([assignedToId])
 }
 
 model NonConversionReason {
@@ -1922,12 +1929,14 @@ model CrmEmail {
   openedAt       DateTime?
   openCount      Int       @default(0)
   lastOpenedAt   DateTime?
-  imapConfigId   String?
-  createdAt      DateTime  @default(now())
+  imapConfigId      String?
+  sentBySalesUserId String?
+  createdAt         DateTime  @default(now())
 
-  demoCall   DemoCall?   @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
-  imapConfig ImapConfig? @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
-  linkClicks LinkClick[]
+  demoCall        DemoCall?   @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
+  imapConfig      ImapConfig? @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
+  sentBySalesUser SalesUser?  @relation("SentBySalesUser", fields: [sentBySalesUserId], references: [id])
+  linkClicks      LinkClick[]
 
   @@index([demoCallId])
   @@index([contactEmail])
@@ -1962,7 +1971,8 @@ model CrmEmailTemplate {
 
 model ImapConfig {
   id                   String    @id @default(cuid())
-  superAdminId         String    @unique
+  superAdminId         String?   @unique
+  salesUserId          String?   @unique
   host                 String    @default("imap.titan.email")
   port                 Int       @default(993)
   emailAddress         String
@@ -1975,7 +1985,8 @@ model ImapConfig {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  superAdmin SuperAdmin @relation(fields: [superAdminId], references: [id], onDelete: Cascade)
+  superAdmin SuperAdmin? @relation(fields: [superAdminId], references: [id], onDelete: Cascade)
+  salesUser  SalesUser?  @relation("SalesUserImap", fields: [salesUserId], references: [id], onDelete: Cascade)
   crmEmails  CrmEmail[]
 }
 
@@ -2479,14 +2490,21 @@ model Prospect {
   createdAt              DateTime          @default(now())
   updatedAt              DateTime          @updatedAt
 
-  contacts   ProspectContact[]
-  notes      ProspectNote[]
-  linkClicks LinkClick[]
+  assignedToId    String?
+  productInterest String?
+
+  contacts      ProspectContact[]
+  notes         ProspectNote[]
+  linkClicks    LinkClick[]
+  assignedTo    SalesUser?        @relation("ProspectAssigned",      fields: [assignedToId], references: [id])
+  opportunities CrmOpportunity[]  @relation("ProspectOpportunities")
+  tasks         CrmTask[]         @relation("ProspectTasks")
 
   @@index([aiFitScore])
   @@index([currentCrmStatus])
   @@index([industry])
   @@index([companyName])
+  @@index([assignedToId])
 }
 
 model ProspectContact {
@@ -2603,7 +2621,7 @@ model AiCache {
   @@index([expiresAt])
 }
 
-// ── Sales Team (future) ───────────────────────────────────────────────────────
+// ── Sales Team ────────────────────────────────────────────────────────────────
 
 model SalesUser {
   id           String   @id @default(cuid())
@@ -2614,6 +2632,144 @@ model SalesUser {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  // Phase 2: ownership
+  assignedDemoCalls   DemoCall[]   @relation("DemoCallAssigned")
+  assignedProspects   Prospect[]   @relation("ProspectAssigned")
+  // Phase 3: email attribution
+  imapConfig          ImapConfig?  @relation("SalesUserImap")
+  sentEmails          CrmEmail[]   @relation("SentBySalesUser")
+  // Phase 4-7
+  opportunities        CrmOpportunity[]
+  tasks                CrmTask[]
+  commissionEvents     CrmCommissionEvent[]
+  // Phase 8: transfers
+  transfersFrom        CrmTransferLog[]    @relation("TransferFrom")
+  transfersTo          CrmTransferLog[]    @relation("TransferTo")
+  transfersBy          CrmTransferLog[]    @relation("TransferBy")
+  transferRequestsMade CrmTransferRequest[] @relation("TransferRequester")
+  transferRequestsTo   CrmTransferRequest[] @relation("TransferTo2")
+  transferRequestsReviewed CrmTransferRequest[] @relation("TransferReviewer")
+}
+
+model CrmOpportunity {
+  id             String    @id @default(cuid())
+  prospectId     String?
+  demoCallId     String?
+  organizationId String?
+  assignedToId   String
+  title          String
+  product        String    @default("")
+  stage          String    @default("Qualified")
+  value          Decimal?  @db.Decimal(12,2)
+  closeDate      DateTime?
+  lostReason     String?
+  notes          String?   @db.Text
+  wonAt          DateTime?
+  lostAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  prospect      Prospect?  @relation("ProspectOpportunities", fields: [prospectId],  references: [id], onDelete: SetNull)
+  demoCall      DemoCall?  @relation("DemoCallOpportunities",  fields: [demoCallId],  references: [id], onDelete: SetNull)
+  assignedTo    SalesUser  @relation(fields: [assignedToId], references: [id])
+  tasks         CrmTask[]
+  commissions   CrmCommissionEvent[]
+  transferLogs  CrmTransferLog[]    @relation("OpportunityTransferLogs")
+  transferReqs  CrmTransferRequest[] @relation("OpportunityTransferReqs")
+
+  @@index([assignedToId])
+  @@index([stage])
+  @@index([prospectId])
+  @@index([demoCallId])
+}
+
+model CrmTask {
+  id            String    @id @default(cuid())
+  opportunityId String?
+  prospectId    String?
+  demoCallId    String?
+  assignedToId  String
+  title         String
+  taskType      String    @default("other") // call|email|linkedin|proposal|contract|other
+  dueAt         DateTime?
+  completedAt   DateTime?
+  notes         String?
+  priority      String    @default("normal") // low|normal|high
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  opportunity CrmOpportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  prospect    Prospect?       @relation("ProspectTasks",   fields: [prospectId],  references: [id], onDelete: SetNull)
+  demoCall    DemoCall?       @relation("DemoCallTasks",   fields: [demoCallId],  references: [id], onDelete: SetNull)
+  assignedTo  SalesUser       @relation(fields: [assignedToId], references: [id])
+
+  @@index([assignedToId])
+  @@index([dueAt])
+  @@index([opportunityId])
+  @@index([completedAt])
+}
+
+model CrmCommissionEvent {
+  id            String    @id @default(cuid())
+  opportunityId String
+  salesUserId   String
+  role          String    @default("closer") // closer|sourcer|sdr|manager
+  splitPercent  Int       @default(100)
+  amount        Decimal?  @db.Decimal(12,2)
+  paidAt        DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+
+  opportunity CrmOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  salesUser   SalesUser      @relation(fields: [salesUserId],   references: [id])
+
+  @@index([opportunityId])
+  @@index([salesUserId])
+}
+
+model CrmTransferLog {
+  id                  String   @id @default(cuid())
+  recordType          String   // prospect|democall|opportunity
+  recordId            String
+  opportunityId       String?
+  fromSalesUserId     String?
+  toSalesUserId       String
+  transferredBySAId   String?
+  transferredByUserId String?
+  reason              String?
+  recordsTransferred  Json     @default("[]")
+  createdAt           DateTime @default(now())
+
+  fromUser    SalesUser?      @relation("TransferFrom", fields: [fromSalesUserId],     references: [id])
+  toUser      SalesUser       @relation("TransferTo",   fields: [toSalesUserId],       references: [id])
+  byUser      SalesUser?      @relation("TransferBy",   fields: [transferredByUserId], references: [id])
+  opportunity CrmOpportunity? @relation("OpportunityTransferLogs", fields: [opportunityId], references: [id])
+
+  @@index([recordType, recordId])
+  @@index([toSalesUserId])
+}
+
+model CrmTransferRequest {
+  id                String    @id @default(cuid())
+  recordType        String    // prospect|democall|opportunity
+  recordId          String
+  opportunityId     String?
+  requestedByUserId String
+  toSalesUserId     String
+  reason            String?
+  status            String    @default("pending") // pending|approved|rejected
+  reviewedById      String?
+  reviewedAt        DateTime?
+  createdAt         DateTime  @default(now())
+
+  requestedBy SalesUser       @relation("TransferRequester", fields: [requestedByUserId], references: [id])
+  toUser      SalesUser       @relation("TransferTo2",        fields: [toSalesUserId],     references: [id])
+  reviewer    SalesUser?      @relation("TransferReviewer",   fields: [reviewedById],      references: [id])
+  opportunity CrmOpportunity? @relation("OpportunityTransferReqs", fields: [opportunityId], references: [id])
+
+  @@index([status])
+  @@index([recordType, recordId])
 }
 
 // ── AI Visibility Tracker ─────────────────────────────────────────────────────

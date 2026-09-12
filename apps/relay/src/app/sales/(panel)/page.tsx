@@ -243,7 +243,14 @@ export default async function SalesDashboardPage({
   searchParams: Promise<{ period?: string }>
 }) {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/sales/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
+
+  const myTasks = session?.salesUserId ? await prisma.crmTask.findMany({
+    where: { assignedToId: session.salesUserId, completedAt: null },
+    orderBy: [{ dueAt: "asc" }, { createdAt: "desc" }],
+    take: 10,
+    select: { id: true, title: true, taskType: true, dueAt: true, priority: true, opportunity: { select: { id: true, title: true } } },
+  }) : []
 
   const params = await searchParams
   const period = (params.period ?? "week") as Period
@@ -463,6 +470,57 @@ export default async function SalesDashboardPage({
         </div>
         <PeriodSelector current={period} />
       </div>
+
+      {/* ══════════════════════════════════════════════════════════════════════════
+          MY TASKS
+      ══════════════════════════════════════════════════════════════════════════ */}
+      {myTasks.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-base font-bold text-white">My Tasks</h2>
+            <span className="text-xs text-gray-500">{myTasks.length} open</span>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl divide-y divide-gray-800">
+            {myTasks.map(task => {
+              const overdue = task.dueAt && task.dueAt < new Date()
+              const priorityColor = task.priority === "urgent" ? "text-red-400" : task.priority === "high" ? "text-orange-400" : "text-gray-500"
+              const content = (
+                <div className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-gray-800/50 transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-white truncate">{task.title}</p>
+                    {task.opportunity && (
+                      <p className="text-xs text-gray-500 truncate">{task.opportunity.title}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {task.taskType && (
+                      <span className="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">{task.taskType}</span>
+                    )}
+                    {task.priority && (
+                      <span className={`text-xs font-medium ${priorityColor}`}>{task.priority}</span>
+                    )}
+                    {task.dueAt && (
+                      <span className={`text-xs ${overdue ? "text-red-400" : "text-gray-500"}`}>
+                        {overdue ? "Overdue · " : "Due · "}
+                        {task.dueAt.toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )
+              if (task.opportunity) {
+                return (
+                  <Link key={task.id} href={`/sales/opportunities/${task.opportunity.id}`} className="block">
+                    {content}
+                  </Link>
+                )
+              }
+              return <div key={task.id}>{content}</div>
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════════════
           SECTION 1 — ACTION CENTER

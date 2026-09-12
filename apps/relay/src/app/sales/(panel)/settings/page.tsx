@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic"
 
 export default async function SettingsPage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/super-admin/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   const settingsLinks = [
     {

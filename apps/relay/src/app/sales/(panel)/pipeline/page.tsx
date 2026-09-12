@@ -20,11 +20,15 @@ const STAGES: { key: string; label: string; color: string; border: string; badge
 
 export default async function PipelinePage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/super-admin/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
+
+  const isManager = session?.superAdmin || session?.salesUserRole === "admin_sales"
+  const repFilter = isManager ? {} : { assignedToId: session?.salesUserId ?? "" }
 
   const now = new Date()
 
   const calls = await prisma.demoCall.findMany({
+    where: repFilter,
     orderBy: { updatedAt: "desc" },
     select: {
       id:           true,

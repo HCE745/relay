@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
   Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
-  Bell, FileText, Calendar, TrendingUp, Layers, Eye,
+  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -18,11 +18,12 @@ interface NavItem {
   children?: NavItem[]
 }
 
-function buildSections(followUpsDue: number): { label?: string; items: NavItem[] }[] {
+function buildSections(followUpsDue: number, isManager: boolean): { label?: string; items: NavItem[] }[] {
   return [
     {
       items: [
         { label: "Dashboard",       href: "/sales",                  icon: LayoutDashboard },
+        { label: "Opportunities",   href: "/sales/opportunities",    icon: Briefcase },
         { label: "Pipeline",        href: "/sales/pipeline",         icon: GitBranch },
         { label: "Leads",           href: "/sales/leads",            icon: Users },
         {
@@ -52,17 +53,25 @@ function buildSections(followUpsDue: number): { label?: string; items: NavItem[]
         { label: "Marketing Intelligence", href: "/sales/marketing-intelligence", icon: Eye },
       ],
     },
+    ...(isManager ? [{
+      label: "Manager",
+      items: [
+        { label: "Team Dashboard",  href: "/sales/manager",          icon: UsersRound },
+      ],
+    }] : []),
     {
       label: "Config",
       items: [
         { label: "Settings",        href: "/sales/settings",         icon: Settings },
+        { label: "Email Config",    href: "/sales/settings/email",   icon: Mail },
         { label: "Follow-Up Stages", href: "/sales/settings/stages", icon: Layers },
+        { label: "Team Settings",   href: "/sales/settings/team",    icon: UsersRound },
       ],
     },
   ]
 }
 
-export function SalesSidebar({ name, email }: { name: string; email: string }) {
+export function SalesSidebar({ name, email, isManager }: { name: string; email: string; isManager: boolean }) {
   const pathname       = usePathname()
   const router         = useRouter()
   const [open, setOpen]               = useState(false)
@@ -92,7 +101,7 @@ export function SalesSidebar({ name, email }: { name: string; email: string }) {
     router.push("/sales/login")
   }
 
-  const sections = buildSections(followUpsDue)
+  const sections = buildSections(followUpsDue, isManager)
 
   function NavLink({ item, depth = 0 }: { item: NavItem; depth?: number }) {
     const active = item.href === "/sales" || item.href === "/sales/outreach"

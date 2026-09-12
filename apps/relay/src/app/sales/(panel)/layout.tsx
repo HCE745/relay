@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic"
 
 export default async function SalesLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/sales/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-950">

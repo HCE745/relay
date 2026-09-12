@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import {
-  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, Tag, Headphones, Megaphone, Gift, ExternalLink,
+  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, Tag, Headphones, Megaphone, Gift, ExternalLink, UserCog,
 } from "lucide-react"
 
 type NavItem = { href: string; label: string; icon: React.ElementType; exact?: boolean }
@@ -36,9 +36,10 @@ function buildSections(): NavSection[] {
     {
       label: "Sales Config",
       items: [
-        { href: "/super-admin/support",          label: "Support Inbox",   icon: Headphones },
-        { href: "/super-admin/referral-program", label: "Referral Program",icon: Gift },
-        { href: "/super-admin/crm/settings",     label: "CRM Settings",    icon: Settings },
+        { href: "/super-admin/support",               label: "Support Inbox",   icon: Headphones },
+        { href: "/super-admin/referral-program",      label: "Referral Program",icon: Gift },
+        { href: "/super-admin/crm/settings",          label: "CRM Settings",    icon: Settings },
+        { href: "/super-admin/settings/sales-users",  label: "Sales Users",     icon: UserCog },
       ],
     },
   ]

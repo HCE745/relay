@@ -12,7 +12,7 @@ async function getOrCreateSettings() {
 
 export async function GET() {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const settings = await getOrCreateSettings()
   return NextResponse.json({ settings })
@@ -20,7 +20,7 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const settings = await getOrCreateSettings()
   const body = await req.json() as {

@@ -9,7 +9,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
   const { name, daysAfterPrevious, description } = await req.json() as {
@@ -35,7 +35,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
   const stage = await prisma.followUpStage.findUnique({ where: { id } })

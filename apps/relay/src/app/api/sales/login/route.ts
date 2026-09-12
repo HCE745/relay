@@ -10,25 +10,45 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
   }
 
+  // 1 — Check SuperAdmin first (founder / existing flow)
   const sa = await prisma.superAdmin.findUnique({ where: { email } })
-  if (!sa || !sa.isActive) {
+  if (sa && sa.isActive) {
+    const valid = await bcrypt.compare(password, sa.password)
+    if (valid) {
+      await createSession({
+        userId:         sa.id,
+        email:          sa.email,
+        name:           sa.name,
+        role:           "SUPER_ADMIN",
+        organizationId: "",
+        superAdmin:     true,
+        superAdminId:   sa.id,
+      })
+      return NextResponse.json({ ok: true, role: "SUPER_ADMIN" })
+    }
+  }
+
+  // 2 — Check SalesUser (sales reps and sales managers)
+  const salesUser = await prisma.salesUser.findUnique({ where: { email } })
+  if (!salesUser || !salesUser.isActive) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
   }
 
-  const valid = await bcrypt.compare(password, sa.password)
+  const valid = await bcrypt.compare(password, salesUser.passwordHash)
   if (!valid) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
   }
 
   await createSession({
-    userId:         sa.id,
-    email:          sa.email,
-    name:           sa.name,
-    role:           "SUPER_ADMIN",
+    userId:         salesUser.id,
+    email:          salesUser.email,
+    name:           salesUser.name,
+    role:           salesUser.role,
     organizationId: "",
-    superAdmin:     true,
-    superAdminId:   sa.id,
+    salesUserId:    salesUser.id,
+    salesUserRole:  salesUser.role,
+    salesUserName:  salesUser.name,
   })
 
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true, role: salesUser.role })
 }

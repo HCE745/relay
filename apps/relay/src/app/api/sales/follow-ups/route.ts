@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic"
 
 export async function GET() {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   // Seed default stages if none exist
   const stageCount = await prisma.followUpStage.count()

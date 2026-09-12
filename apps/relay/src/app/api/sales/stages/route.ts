@@ -13,7 +13,7 @@ const DEFAULT_STAGES = [
 
 export async function GET() {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const count = await prisma.followUpStage.count()
   if (count === 0) {
@@ -26,7 +26,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { name, daysAfterPrevious, description } = await req.json() as {
     name: string; daysAfterPrevious: number; description?: string

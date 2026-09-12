@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic"
 
 export async function GET() {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ count: 0 }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ count: 0 }, { status: 401 })
 
   const count = await prisma.crmEmail.count({
     where: {

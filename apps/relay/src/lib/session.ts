@@ -28,6 +28,10 @@ export type SessionPayload = {
   // Super admin panel access
   superAdmin?: boolean        // true = this is a super admin session
   superAdminId?: string       // set on both SA sessions and impersonation sessions
+  // Sales team access (separate from super-admin)
+  salesUserId?:   string      // set when a SalesUser logs in via /sales/login
+  salesUserRole?: string      // "admin_sales" | "sales_rep"
+  salesUserName?: string      // display name for the logged-in sales user
   // Impersonation (set when a super admin is viewing as an org admin)
   impersonatedBy?: string     // superAdminId of the SA doing the impersonation
   impersonatedByName?: string

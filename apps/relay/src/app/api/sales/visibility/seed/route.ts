@@ -40,7 +40,7 @@ const DEFAULT_COMPETITORS = [
 
 export async function POST() {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const [existingPrompts, existingCompetitors] = await Promise.all([
     prisma.visibilityPrompt.count(),

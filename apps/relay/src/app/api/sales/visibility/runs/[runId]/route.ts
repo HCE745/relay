@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic"
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ runId: string }> }) {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { runId } = await params
 

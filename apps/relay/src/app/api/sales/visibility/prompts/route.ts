@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic"
 
 export async function GET() {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const prompts = await prisma.visibilityPrompt.findMany({ orderBy: [{ category: "asc" }, { createdAt: "asc" }] })
   return NextResponse.json({ prompts })
@@ -14,7 +14,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await req.json() as { promptText?: string; category?: string }
   const { promptText, category } = body

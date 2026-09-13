@@ -28,6 +28,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "to, subject, and bodyHtml required" }, { status: 400 })
     }
 
+    // Check suppression list before sending
+    const suppressed = await prisma.unsubscribeRecord.findUnique({ where: { email: to.toLowerCase() } })
+    if (suppressed) {
+      return NextResponse.json({ error: `This contact has unsubscribed (reason: ${suppressed.reason})` }, { status: 409 })
+    }
+
     // Find rep's IMAP config, fall back to SA's
     const repConfig = info.isSuperAdmin ? null : await prisma.imapConfig.findUnique({
       where: { salesUserId: info.salesUserId },
@@ -114,10 +120,11 @@ export async function POST(req: NextRequest) {
         await prisma.crmEmail.delete({ where: { id: email.id } }).catch(() => null)
         return NextResponse.json({ error: "Failed to decrypt SMTP credentials" }, { status: 500 })
       }
+      const unsubUrl = `https://app.getrelay.software/api/unsubscribe?email=${encodeURIComponent(to)}&token=${Buffer.from(to).toString("base64url")}`
       try {
         await sendViaTitanSmtp(
           { smtpHost: imapCfg.smtpHost, smtpPort: imapCfg.smtpPort, emailAddress: imapCfg.emailAddress, password: smtpPassword },
-          { to, cc, subject, bodyHtml: trackedHtml, bodyText, messageId, inReplyTo },
+          { to, cc, subject, bodyHtml: trackedHtml, bodyText, messageId, inReplyTo, unsubscribeUrl: unsubUrl },
         )
       } catch (sendErr) {
         await prisma.crmEmail.delete({ where: { id: email.id } }).catch(() => null)

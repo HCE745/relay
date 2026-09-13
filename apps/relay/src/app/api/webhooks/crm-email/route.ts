@@ -4,7 +4,7 @@ import { htmlToText } from "@/lib/html-to-text"
 
 export const dynamic = "force-dynamic"
 
-// Resend inbound webhook for crm@getrelay.software
+// Resend inbound + bounce webhook for crm@getrelay.software
 export async function POST(req: NextRequest) {
   // Verify inbound secret if configured
   const secret = process.env.RESEND_INBOUND_SECRET
@@ -16,6 +16,13 @@ export async function POST(req: NextRequest) {
   }
 
   const payload = await req.json() as {
+    type?:       string          // "email.bounced" | "email.delivery_delayed" | undefined (inbound)
+    data?:       {
+      email_id?:     string
+      to?:           string[]
+      bounce_type?:  "hard" | "soft"
+      created_at?:   string
+    }
     from?:       string
     to?:         string | string[]
     subject?:    string
@@ -24,6 +31,30 @@ export async function POST(req: NextRequest) {
     headers?:    Record<string, string>
     messageId?:  string
     inReplyTo?:  string
+  }
+
+  // Handle Resend bounce events
+  if (payload.type === "email.bounced" && payload.data) {
+    const bouncedTo  = payload.data.to?.[0]?.toLowerCase()
+    const bounceType = payload.data.bounce_type ?? "hard"
+    const bouncedAt  = payload.data.created_at ? new Date(payload.data.created_at) : new Date()
+
+    if (bouncedTo) {
+      // Update matching CrmEmail records
+      await prisma.crmEmail.updateMany({
+        where: { toAddress: { equals: bouncedTo, mode: "insensitive" }, direction: "sent", bouncedAt: null },
+        data:  { bouncedAt, bounceType },
+      })
+      // Hard bounces go to suppression list automatically
+      if (bounceType === "hard") {
+        await prisma.unsubscribeRecord.upsert({
+          where:  { email: bouncedTo },
+          create: { id: `bounce_${Date.now()}`, email: bouncedTo, reason: "BOUNCED" },
+          update: { reason: "BOUNCED" },
+        })
+      }
+    }
+    return NextResponse.json({ ok: true, handled: "bounce" })
   }
 
   const fromAddress  = payload.from ?? ""

@@ -20,7 +20,7 @@ const STATUS_STYLES: Record<string, { text: string; bg: string }> = {
 
 export default async function LeadsPage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/super-admin/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   const calls = await prisma.demoCall.findMany({
     orderBy: { createdAt: "desc" },

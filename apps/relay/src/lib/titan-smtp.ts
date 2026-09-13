@@ -10,13 +10,14 @@ interface SmtpConfig {
 }
 
 export interface SmtpSendOptions {
-  to:         string
-  cc?:        string
-  subject:    string
-  bodyHtml:   string
-  bodyText:   string
-  messageId:  string
-  inReplyTo?: string
+  to:              string
+  cc?:             string
+  subject:         string
+  bodyHtml:        string
+  bodyText:        string
+  messageId:       string
+  inReplyTo?:      string
+  unsubscribeUrl?: string
 }
 
 export async function sendViaTitanSmtp(
@@ -45,6 +46,10 @@ export async function sendViaTitanSmtp(
     headers: {
       "Message-ID": options.messageId,
       ...(options.inReplyTo ? { "In-Reply-To": `<${options.inReplyTo}>`, "References": `<${options.inReplyTo}>` } : {}),
+      ...(options.unsubscribeUrl ? {
+        "List-Unsubscribe":      `<${options.unsubscribeUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      } : {}),
     },
   })
 

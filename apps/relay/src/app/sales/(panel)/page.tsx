@@ -421,6 +421,54 @@ export default async function SalesDashboardPage({
     prisma.linkTrackingEvent.count({ where: { eventType: "trial_started",  isBotSuspected: false } }).catch(() => 0),
   ])
 
+  // ── Today view extras (outside main parallel block for simplicity) ──────────
+  const repFilter = (session?.superAdmin || session?.salesUserRole === "admin_sales")
+    ? {}
+    : { assignedToId: session?.salesUserId ?? "" }
+
+  const [oppsNoNextStep, recentEngaged] = await Promise.all([
+    prisma.crmOpportunity.findMany({
+      where: { nextStep: null, stage: { notIn: ["Closed Won", "Closed Lost"] }, ...repFilter },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+      select: { id: true, title: true, stage: true, prospect: { select: { companyName: true } } },
+    }),
+    prisma.linkClick.findMany({
+      where: {
+        isBotSuspected: false,
+        lastClickedAt:  { gte: new Date(Date.now() - 7 * 864e5) },
+        crmEmail: { contactEmail: { not: "" } },
+      },
+      orderBy: { lastClickedAt: "desc" },
+      take: 20,
+      select: {
+        lastClickedAt: true,
+        events: {
+          where:   { isBotSuspected: false },
+          orderBy: { createdAt: "desc" },
+          take:    1,
+          select:  { eventType: true },
+        },
+        crmEmail: { select: { contactEmail: true } },
+      },
+    }).then(rows => {
+      const seen = new Set<string>()
+      return rows
+        .filter(r => {
+          const email = r.crmEmail?.contactEmail
+          if (!email || seen.has(email)) return false
+          seen.add(email)
+          return true
+        })
+        .slice(0, 5)
+        .map(r => ({
+          contactEmail: r.crmEmail!.contactEmail,
+          eventType:    r.events[0]?.eventType ?? "link_clicked",
+          createdAt:    r.lastClickedAt ?? new Date(),
+        }))
+    }),
+  ])
+
   // ── Derived metrics ─────────────────────────────────────────────────────────
   const replyRate      = pct(recvPeriod, sentPeriod)
   const openRate       = pct(openedPeriod, sentPeriod)
@@ -517,6 +565,71 @@ export default async function SalesDashboardPage({
                 )
               }
               return <div key={task.id}>{content}</div>
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════════
+          DEALS MISSING NEXT STEP
+      ══════════════════════════════════════════════════════════════════════════ */}
+      {oppsNoNextStep.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Target className="w-4 h-4 text-amber-400" />
+            <h2 className="text-base font-bold text-white">Deals Missing Next Step</h2>
+            <span className="text-xs text-gray-500">{oppsNoNextStep.length} open deal{oppsNoNextStep.length !== 1 ? "s" : ""} with no next action</span>
+          </div>
+          <div className="bg-gray-900 border border-amber-900/40 rounded-xl divide-y divide-gray-800">
+            {oppsNoNextStep.map(opp => (
+              <Link key={opp.id} href={`/sales/opportunities/${opp.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-gray-800/50 transition-colors group">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white group-hover:text-amber-300 transition-colors truncate">{opp.title}</p>
+                  {opp.prospect?.companyName && (
+                    <p className="text-xs text-gray-500 truncate">{opp.prospect.companyName}</p>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">{opp.stage}</span>
+                  <span className="text-xs text-amber-500 font-medium">Add next step →</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════════
+          RECENTLY ENGAGED
+      ══════════════════════════════════════════════════════════════════════════ */}
+      {recentEngaged.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-base font-bold text-white">Recently Engaged</h2>
+            <span className="text-xs text-gray-500">Prospects active in the last 7 days</span>
+          </div>
+          <div className="bg-gray-900 border border-emerald-900/30 rounded-xl divide-y divide-gray-800">
+            {recentEngaged.map(ev => {
+              const eventLabel: Record<string, string> = {
+                tour_started: "Started tour",
+                tour_completed: "Completed tour",
+                pricing_viewed: "Viewed pricing",
+                demo_requested: "Requested demo",
+                trial_started: "Started trial",
+                link_clicked: "Clicked link",
+              }
+              return (
+                <div key={ev.contactEmail} className="flex items-center justify-between px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-200 font-mono truncate">{ev.contactEmail}</p>
+                    <p className="text-xs text-emerald-400 mt-0.5">{eventLabel[ev.eventType] ?? ev.eventType}</p>
+                  </div>
+                  <p className="text-xs text-gray-500 shrink-0">
+                    {new Date(ev.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              )
             })}
           </div>
         </div>

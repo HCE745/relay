@@ -137,6 +137,8 @@ export async function POST(
       emailSource?:    string
       emailConfidence?: string
       linkedinUrl?:    string
+      phone?:          string
+      role?:           string
       notes?:          string
     }
     // add_note
@@ -161,6 +163,8 @@ export async function POST(
           emailSource:     body.contact.emailSource      ?? null,
           emailConfidence: (body.contact.emailConfidence as never) ?? null,
           linkedinUrl:     body.contact.linkedinUrl      ?? null,
+          phone:           body.contact.phone            ?? null,
+          role:            body.contact.role             ?? null,
           notes:           body.contact.notes            ?? null,
         },
       })

@@ -92,6 +92,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "to, subject, and bodyHtml required" }, { status: 400 })
     }
 
+    // Check suppression list before sending
+    const suppressed = await prisma.unsubscribeRecord.findUnique({ where: { email: to.toLowerCase() } })
+    if (suppressed) {
+      return NextResponse.json({ error: `This contact has unsubscribed (reason: ${suppressed.reason})` }, { status: 409 })
+    }
+
     const bodyText = htmlToText(bodyHtml)
 
     // Build a unique Message-ID
@@ -183,6 +189,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Failed to decrypt SMTP credentials — check IMAP_ENCRYPTION_KEY" }, { status: 500 })
       }
       console.log(`[crm-email] Sending via Titan SMTP (${imapCfg.smtpHost}:${imapCfg.smtpPort})`)
+      const unsubUrl = `https://app.getrelay.software/api/unsubscribe?email=${encodeURIComponent(to)}&token=${Buffer.from(to).toString("base64url")}`
       try {
         await sendViaTitanSmtp(
           {
@@ -192,7 +199,7 @@ export async function POST(req: NextRequest) {
             password:     smtpPassword,
             fromName:     "Will @ Relay",
           },
-          { to, cc, subject, bodyHtml: trackedHtml, bodyText, messageId, inReplyTo },
+          { to, cc, subject, bodyHtml: trackedHtml, bodyText, messageId, inReplyTo, unsubscribeUrl: unsubUrl },
         )
       } catch (sendErr) {
         await prisma.crmEmail.delete({ where: { id: email.id } }).catch(() => null)
@@ -206,13 +213,19 @@ export async function POST(req: NextRequest) {
         console.error("[crm-email] No IMAP config and RESEND_API_KEY not set")
         return NextResponse.json({ error: "No SMTP configuration found — add one in CRM Settings" }, { status: 500 })
       }
+      const unsubUrlFallback = `https://app.getrelay.software/api/unsubscribe?email=${encodeURIComponent(to)}&token=${Buffer.from(to).toString("base64url")}`
       const resendPayload: Record<string, unknown> = {
         from:    "Will @ Relay <will@getrelay.software>",
         to:      [to],
         subject,
         html:    trackedHtml,
         text:    bodyText,
-        headers: { "Message-ID": messageId, ...(inReplyTo ? { "In-Reply-To": inReplyTo } : {}) },
+        headers: {
+          "Message-ID":            messageId,
+          ...(inReplyTo ? { "In-Reply-To": inReplyTo } : {}),
+          "List-Unsubscribe":      `<${unsubUrlFallback}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
       }
       if (cc) resendPayload.cc = [cc]
       const sendRes = await fetch("https://api.resend.com/emails", {

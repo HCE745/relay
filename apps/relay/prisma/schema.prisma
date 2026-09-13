@@ -1931,6 +1931,8 @@ model CrmEmail {
   lastOpenedAt   DateTime?
   imapConfigId      String?
   sentBySalesUserId String?
+  bouncedAt         DateTime?
+  bounceType        String?
   createdAt         DateTime  @default(now())
 
   demoCall        DemoCall?   @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
@@ -2517,6 +2519,8 @@ model ProspectContact {
   emailConfidence      EmailConfidenceLevel?
   discoveryDate        DateTime?
   linkedinUrl          String?
+  phone                String?
+  role                 String?
   notes                String?              @db.Text
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
@@ -2665,6 +2669,8 @@ model CrmOpportunity {
   closeDate      DateTime?
   lostReason     String?
   notes          String?   @db.Text
+  nextStep       String?
+  nextStepDate   DateTime?
   wonAt          DateTime?
   lostAt         DateTime?
   createdAt      DateTime  @default(now())
@@ -2770,6 +2776,19 @@ model CrmTransferRequest {
 
   @@index([status])
   @@index([recordType, recordId])
+}
+
+// ── Email Suppression List ────────────────────────────────────────────────────
+
+model UnsubscribeRecord {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  reason    String   @default("UNSUBSCRIBE") // UNSUBSCRIBE|DO_NOT_CONTACT|BOUNCED|MANUAL
+  addedById String?
+  addedAt   DateTime @default(now())
+  notes     String?
+
+  @@index([email])
 }
 
 // ── AI Visibility Tracker ─────────────────────────────────────────────────────

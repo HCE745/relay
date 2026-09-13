@@ -21,7 +21,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default async function MarketingIntelligencePage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/super-admin/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   // Auto-seed on first visit
   const [promptCount, competitorCount] = await Promise.all([

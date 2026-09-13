@@ -314,6 +314,13 @@ export async function enrollInSequence({
 }) {
   const { addBusinessDays } = await import("./business-days")
 
+  // Check suppression list before enrolling
+  const demoCallRecord = await prisma.demoCall.findUnique({ where: { id: demoCallId }, select: { contactEmail: true } })
+  if (demoCallRecord?.contactEmail) {
+    const suppressed = await prisma.unsubscribeRecord.findUnique({ where: { email: demoCallRecord.contactEmail.toLowerCase() } })
+    if (suppressed) return null
+  }
+
   const sequence = await prisma.crmSequence.findUnique({
     where:   { id: sequenceId },
     include: { steps: { orderBy: { stepNumber: "asc" } } },

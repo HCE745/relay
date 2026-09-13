@@ -32,6 +32,8 @@ type Opportunity = {
   product: string | null
   closeDate: string | null
   notes: string | null
+  nextStep: string | null
+  nextStepDate: string | null
   assignedToId: string | null
   assignedTo: { id: string; name: string } | null
   prospect: { id: string; contactName: string; companyName: string | null } | null
@@ -87,6 +89,11 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
   const [newStage, setNewStage] = useState("")
   const [stageSaving, setStageSaving] = useState(false)
 
+  // Next step
+  const [nextStepText, setNextStepText] = useState("")
+  const [nextStepDateStr, setNextStepDateStr] = useState("")
+  const [nextStepSaving, setNextStepSaving] = useState(false)
+
   // Transfer
   const [transferTo, setTransferTo] = useState("")
   const [transferNote, setTransferNote] = useState("")
@@ -106,6 +113,8 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
         setOpp(oppData)
         setAuth(authData)
         setNewStage(oppData.stage ?? "")
+        setNextStepText(oppData.nextStep ?? "")
+        setNextStepDateStr(oppData.nextStepDate ? oppData.nextStepDate.slice(0, 10) : "")
       } catch (e) {
         setError(e instanceof Error ? e.message : "Error loading opportunity")
       } finally {
@@ -158,6 +167,28 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
       alert("Failed to update stage")
     } finally {
       setStageSaving(false)
+    }
+  }
+
+  async function saveNextStep(e: React.FormEvent) {
+    e.preventDefault()
+    setNextStepSaving(true)
+    try {
+      const res = await fetch(`/api/sales/opportunities/${params.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          nextStep: nextStepText.trim() || null,
+          nextStepDate: nextStepDateStr || null,
+        }),
+      })
+      if (!res.ok) throw new Error("Failed to update next step")
+      const updated = await res.json()
+      setOpp(prev => prev ? { ...prev, nextStep: updated.nextStep, nextStepDate: updated.nextStepDate } : prev)
+    } catch {
+      alert("Failed to save next step")
+    } finally {
+      setNextStepSaving(false)
     }
   }
 
@@ -269,12 +300,53 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
             </Link>
           </div>
         )}
+        {opp.nextStep && (
+          <div className="col-span-2">
+            <p className="text-xs text-gray-500 mb-0.5">Next Step</p>
+            <p className="text-sm text-blue-300 font-medium">→ {opp.nextStep}</p>
+            {opp.nextStepDate && (
+              <p className="text-xs text-gray-500 mt-0.5">Due {fmtDate(opp.nextStepDate)}</p>
+            )}
+          </div>
+        )}
         {opp.notes && (
           <div className="col-span-2">
             <p className="text-xs text-gray-500 mb-0.5">Notes</p>
             <p className="text-sm text-gray-300 whitespace-pre-wrap">{opp.notes}</p>
           </div>
         )}
+      </div>
+
+      {/* Next step edit */}
+      <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
+        <p className="text-xs font-semibold text-gray-400 mb-3">Next Step</p>
+        <form onSubmit={saveNextStep} className="space-y-3">
+          <input
+            value={nextStepText}
+            onChange={e => setNextStepText(e.target.value)}
+            placeholder="Describe the next action…"
+            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-600"
+          />
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-1">
+              <Calendar className="w-4 h-4 text-gray-500 shrink-0" />
+              <input
+                type="date"
+                value={nextStepDateStr}
+                onChange={e => setNextStepDateStr(e.target.value)}
+                className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={nextStepSaving}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5"
+            >
+              {nextStepSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+              Save
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Stage change */}

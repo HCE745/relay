@@ -35,7 +35,7 @@ function formatActiveTime(seconds: number): string {
 
 export default async function DemoAnalyticsPage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/super-admin/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   const since30 = startOfDay(subDays(new Date(), 30))
   const since14 = startOfDay(subDays(new Date(), 13))

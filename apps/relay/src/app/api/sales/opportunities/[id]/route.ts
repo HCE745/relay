@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 const opportunityIncludes = {
   assignedTo: { select: { id: true, name: true } },
-  prospect: { select: { id: true, companyName: true } },
+  prospect: { select: { id: true, companyName: true, contactName: true } },
   demoCall: { select: { id: true, contactName: true, companyName: true } },
   commissionEvents: {
     select: { id: true, salesUserId: true, role: true, splitPercent: true, amount: true },
@@ -53,7 +53,7 @@ export async function PATCH(
   }
 
   const body = await req.json();
-  const { title, product, stage, value, closeDate, lostReason, notes, assignedToId, organizationId } = body;
+  const { title, product, stage, value, closeDate, lostReason, notes, assignedToId, organizationId, nextStep, nextStepDate } = body;
 
   const updateData: Record<string, unknown> = {};
 
@@ -65,6 +65,8 @@ export async function PATCH(
   if (lostReason !== undefined) updateData.lostReason = lostReason;
   if (notes !== undefined) updateData.notes = notes;
   if (organizationId !== undefined) updateData.organizationId = organizationId;
+  if (nextStep !== undefined) updateData.nextStep = nextStep;
+  if (nextStepDate !== undefined) updateData.nextStepDate = nextStepDate ? new Date(nextStepDate) : null;
   if (assignedToId !== undefined && (info.isManager || info.isSuperAdmin)) {
     updateData.assignedToId = assignedToId;
   }

@@ -6,7 +6,15 @@ import Link from "next/link"
 import { CrmDemoCallForm } from "@/components/super-admin/crm-demo-call-form"
 import { CrmEmailThread } from "@/components/super-admin/crm-email-thread"
 import { CrmEmailCompose } from "@/components/super-admin/crm-email-compose"
-import { Mail } from "lucide-react"
+import { Mail, Zap } from "lucide-react"
+
+interface EngagementData {
+  score: number
+  label: "Low" | "Medium" | "High" | "Hot"
+  openCount: number
+  events: { eventType: string; createdAt: string; url: string | null }[]
+  clicks: { url: string; clickCount: number; lastClickedAt: string | null }[]
+}
 
 interface DemoCall {
   id:               string
@@ -36,6 +44,7 @@ export default function DemoCallDetailPage() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [composing, setComposing] = useState(false)
+  const [engagement, setEngagement] = useState<EngagementData | null>(null)
 
   async function loadCall() {
     const res = await fetch(`/api/super-admin/crm/demo-calls/${id}`)
@@ -46,6 +55,13 @@ export default function DemoCallDetailPage() {
   }
 
   useEffect(() => { void loadCall() }, [id])
+
+  useEffect(() => {
+    fetch(`/api/super-admin/crm/demo-calls/${id}/engagement`)
+      .then(r => r.ok ? r.json() : null)
+      .then((d: EngagementData | null) => { if (d) setEngagement(d) })
+      .catch(() => {})
+  }, [id])
 
   async function markFollowUpComplete() {
     await fetch(`/api/super-admin/crm/demo-calls/${id}`, {
@@ -157,6 +173,56 @@ export default function DemoCallDetailPage() {
               <p className="text-xs font-medium text-gray-500 uppercase mb-1">Notes</p>
               <p className="text-sm text-gray-900 dark:text-gray-200 whitespace-pre-wrap">{call.callNotes}</p>
             </div>
+          )}
+        </div>
+      )}
+
+      {/* Engagement signals */}
+      {engagement && (
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Zap className="w-4 h-4 text-amber-500" />
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Engagement Signals</h2>
+            <span className={`ml-auto text-xs font-bold px-2 py-0.5 rounded-full ${
+              engagement.label === "Hot"    ? "bg-red-100 text-red-700" :
+              engagement.label === "High"   ? "bg-emerald-100 text-emerald-700" :
+              engagement.label === "Medium" ? "bg-blue-100 text-blue-700" :
+              "bg-gray-100 text-gray-500"
+            }`}>
+              {engagement.label} · {engagement.score} pts
+            </span>
+          </div>
+
+          <div className="flex gap-4 mb-4 text-center">
+            <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg py-3">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">{engagement.openCount}</p>
+              <p className="text-[10px] text-gray-500 uppercase">Email Opens</p>
+            </div>
+            <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg py-3">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
+                {engagement.clicks.reduce((s, c) => s + c.clickCount, 0)}
+              </p>
+              <p className="text-[10px] text-gray-500 uppercase">Link Clicks</p>
+            </div>
+            <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg py-3">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">{engagement.events.length}</p>
+              <p className="text-[10px] text-gray-500 uppercase">Events</p>
+            </div>
+          </div>
+
+          {engagement.events.length > 0 && (
+            <div className="space-y-1.5">
+              {engagement.events.slice(0, 8).map((ev, i) => (
+                <div key={i} className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
+                  <span className="font-medium capitalize">{ev.eventType.replace(/_/g, " ")}</span>
+                  <span className="text-gray-400">{new Date(ev.createdAt).toLocaleDateString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {engagement.events.length === 0 && engagement.openCount === 0 && (
+            <p className="text-sm text-gray-400 text-center py-2">No engagement signals yet.</p>
           )}
         </div>
       )}

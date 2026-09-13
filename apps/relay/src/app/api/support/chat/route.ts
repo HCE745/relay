@@ -78,11 +78,13 @@ Relay is a facility and operations management SaaS for industrial, manufacturing
 - Admin settings: configure routing rules, escalation policies, page access, AI settings
 
 ### Subscription & Billing
-- Free 14-day trial with full access
-- Essentials plan ($299/mo): 1 location, up to 25 employees
-- Professional plan ($599/mo+): multiple locations, unlimited employees, Intelligence Modules
-- Professional Plus: Regions, corporate dashboards, cross-location analytics, API/webhooks, SSO, shared facility
-- Intelligence Modules (Professional only): AI-powered analysis for issues, SOPs, assets, benchmarks, purchases
+- Free 14-day trial with full access, no credit card required
+- Wash Essentials ($40/mo base + $10/mo per additional location, up to 7 locations): Car wash edition with core issue tracking, routing, QR reporting
+- Relay Essentials ($149/mo): 1 location, up to 25 employees, core issue tracking, SOPs, analytics
+- Relay Professional ($299/mo+): Multi-location, 50+ employees, asset management, vendor management, purchase approvals, Intelligence Module add-ons ($49/mo each)
+- Relay Professional Plus ($999/mo+): Everything in Professional, all Intelligence Modules included, executive dashboards, AI health scores, corporate hierarchy, API/webhooks, SSO, priority support
+- Enterprise: Custom pricing, dedicated onboarding, SLA, volume discounts — contact sales
+- Intelligence Modules (Professional only): AI-powered analysis for issues, SOPs, assets, benchmarks, purchases ($49/mo each or $199/mo for all five)
 
 ### Common Tasks
 - **Create an issue**: Dashboard → New Issue button (or blue + button on mobile)

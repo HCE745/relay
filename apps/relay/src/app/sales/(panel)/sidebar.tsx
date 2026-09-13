@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
   Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
-  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound,
+  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -63,9 +63,10 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
       label: "Config",
       items: [
         { label: "Settings",        href: "/sales/settings",         icon: Settings },
-        { label: "Email Config",    href: "/sales/settings/email",   icon: Mail },
-        { label: "Follow-Up Stages", href: "/sales/settings/stages", icon: Layers },
-        { label: "Team Settings",   href: "/sales/settings/team",    icon: UsersRound },
+        { label: "Email Config",    href: "/sales/settings/email",         icon: Mail },
+        { label: "Suppressions",    href: "/sales/settings/suppressions",  icon: ShieldOff },
+        { label: "Follow-Up Stages", href: "/sales/settings/stages",       icon: Layers },
+        { label: "Team Settings",   href: "/sales/settings/team",          icon: UsersRound },
       ],
     },
   ]

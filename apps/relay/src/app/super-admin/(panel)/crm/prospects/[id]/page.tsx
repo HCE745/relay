@@ -28,6 +28,8 @@ interface ProspectContact {
   emailSource: string | null
   emailConfidence: EmailConfidenceLevel | null
   linkedinUrl: string | null
+  phone: string | null
+  role: string | null
   notes: string | null
   createdAt: string
 }
@@ -178,7 +180,7 @@ export default function ProspectDetailPage() {
   // Contacts inline add form
   const [showAddContact, setShowAddContact] = useState(false)
   const [contactForm, setContactForm] = useState({
-    name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", notes: "",
+    name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", role: "", notes: "",
   })
   const [contactLoading, setContactLoading] = useState(false)
 
@@ -311,6 +313,8 @@ export default function ProspectDetailPage() {
             email:           contactForm.email   || undefined,
             emailConfidence: contactForm.emailConfidence || undefined,
             linkedinUrl:     contactForm.linkedinUrl || undefined,
+            phone:           contactForm.phone   || undefined,
+            role:            contactForm.role    || undefined,
             notes:           contactForm.notes   || undefined,
           },
         }),
@@ -318,7 +322,7 @@ export default function ProspectDetailPage() {
       const json = await res.json() as { contact?: ProspectContact }
       if (res.ok && json.contact) {
         setProspect(p => p ? { ...p, contacts: [...p.contacts, json.contact!] } : p)
-        setContactForm({ name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", notes: "" })
+        setContactForm({ name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", role: "", notes: "" })
         setShowAddContact(false)
       }
     } finally {
@@ -659,6 +663,32 @@ export default function ProspectDetailPage() {
                       </select>
                     </div>
                     <div>
+                      <label className="block text-xs text-gray-500 mb-1">Phone</label>
+                      <input
+                        type="tel"
+                        value={contactForm.phone}
+                        onChange={e => setContactForm(f => ({ ...f, phone: e.target.value }))}
+                        placeholder="+1 (555) 000-0000"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Role</label>
+                      <select
+                        value={contactForm.role}
+                        onChange={e => setContactForm(f => ({ ...f, role: e.target.value }))}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        <option value="">— select —</option>
+                        <option value="decision_maker">Decision Maker</option>
+                        <option value="champion">Champion</option>
+                        <option value="influencer">Influencer</option>
+                        <option value="end_user">End User</option>
+                        <option value="blocker">Blocker</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div>
                       <label className="block text-xs text-gray-500 mb-1">LinkedIn URL</label>
                       <input
                         value={contactForm.linkedinUrl}
@@ -692,7 +722,7 @@ export default function ProspectDetailPage() {
                     <button
                       onClick={() => {
                         setShowAddContact(false)
-                        setContactForm({ name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", notes: "" })
+                        setContactForm({ name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", role: "", notes: "" })
                       }}
                       className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 text-sm rounded-lg transition-colors"
                     >
@@ -975,6 +1005,11 @@ function ContactCard({
               <span className="text-xs text-gray-500">{contact.title}</span>
             )}
           </div>
+          {contact.role && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-900/40 text-indigo-300 font-medium capitalize">
+              {contact.role.replace(/_/g, " ")}
+            </span>
+          )}
           {contact.email && (
             <div className="flex items-center gap-2 flex-wrap">
               <a href={`mailto:${contact.email}`}
@@ -987,6 +1022,11 @@ function ContactCard({
                 </span>
               )}
             </div>
+          )}
+          {contact.phone && (
+            <a href={`tel:${contact.phone}`} className="text-xs text-gray-400 hover:text-gray-200 transition-colors">
+              {contact.phone}
+            </a>
           )}
           {contact.linkedinUrl && (
             <a href={contact.linkedinUrl} target="_blank" rel="noreferrer"

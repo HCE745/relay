@@ -112,6 +112,18 @@ export default async function OpportunitiesPage() {
                       )}
                     </div>
 
+                    {opp.nextStep && (
+                      <p className="text-xs text-blue-400/80 mt-1.5 truncate" title={opp.nextStep}>
+                        → {opp.nextStep}
+                      </p>
+                    )}
+
+                    {opp.nextStepDate && (
+                      <p className="text-xs text-gray-600 mt-0.5">
+                        Due {new Date(opp.nextStepDate).toLocaleDateString()}
+                      </p>
+                    )}
+
                     {opp.closeDate && (
                       <p className="text-xs text-gray-600 mt-1.5">
                         Close {new Date(opp.closeDate).toLocaleDateString()}

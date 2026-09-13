@@ -1,11 +1,25 @@
 // Lightweight server-safe building blocks for Phase 0 shell pages. These are
 // intentionally minimal — real screens arrive in their respective phases.
 
-export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+// Consistent page header: title + optional subtitle on the left, an optional
+// primary action right-aligned. `action` keeps every screen's header identical
+// instead of each page hand-rolling its own flex row.
+export function PageHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string
+  subtitle?: string
+  action?: React.ReactNode
+}) {
   return (
-    <header className="mb-6">
-      <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-      {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
+    <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
+        {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
+      </div>
+      {action ? <div className="shrink-0">{action}</div> : null}
     </header>
   )
 }

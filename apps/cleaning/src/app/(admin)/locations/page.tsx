@@ -6,6 +6,7 @@ import { orgHasCapability } from "@/lib/page-guards"
 import { listAllSites } from "@/lib/data/service-locations"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, StatusPill, EmptyState } from "@/components/ui/controls"
+import { MapPinIcon } from "@/components/ui/icons"
 
 export const dynamic = "force-dynamic"
 const CAP = "core.locations"
@@ -29,7 +30,13 @@ export default async function LocationsPage() {
     <div>
       <PageHeader title="Service locations" subtitle="Every site you service, across all customers" />
       {sites.length === 0 ? (
-        <EmptyState title="No service locations yet">Add sites from a customer&apos;s page.</EmptyState>
+        <EmptyState
+          icon={<MapPinIcon />}
+          title="No service locations yet"
+          description="Service locations are the sites you clean. Each one lives under a customer — open a customer to add their first site."
+          actionLabel="Go to Customers"
+          actionHref="/customers"
+        />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">

@@ -5,6 +5,7 @@ import { orgHasCapability } from "@/lib/page-guards"
 import { listUsers } from "@/lib/data/users"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, EmptyState } from "@/components/ui/controls"
+import { UsersIcon } from "@/components/ui/icons"
 import { NewUserButton, UserRowActions } from "@/components/team/team-dialogs"
 
 export const dynamic = "force-dynamic"
@@ -36,13 +37,15 @@ export default async function TeamPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <PageHeader title="Team" subtitle="Employees & user accounts" />
-        <NewUserButton roles={roles} />
-      </div>
+      <PageHeader title="Team" subtitle="Employees & user accounts" action={<NewUserButton roles={roles} />} />
 
       {users.length === 0 ? (
-        <EmptyState title="No employees yet">Add your first employee to give them app access.</EmptyState>
+        <EmptyState
+          icon={<UsersIcon />}
+          title="No employees yet"
+          description="Add your cleaners, supervisors and managers here to give them app access and let you assign them to jobs."
+          action={<NewUserButton roles={roles} />}
+        />
       ) : (
         <Card className="overflow-x-auto">
           <table className="w-full text-sm">

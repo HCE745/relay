@@ -7,17 +7,18 @@ import { orgHasCapability } from "@/lib/page-guards"
 import { listIssues } from "@/lib/data/issues"
 import { getOrgTimezone } from "@/lib/data/org"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
-import { Card, EmptyState } from "@/components/ui/controls"
+import { Card, EmptyState, StatusBadge, type BadgeTone } from "@/components/ui/controls"
+import { InboxIcon } from "@/components/ui/icons"
 
 export const dynamic = "force-dynamic"
 const CAP = "operations.issues"
 
 const STATUSES = ["OPEN", "ACKNOWLEDGED", "RESOLVED", "CLOSED"]
-const STATUS_STYLE: Record<string, string> = {
-  OPEN: "bg-red-50 text-red-700",
-  ACKNOWLEDGED: "bg-amber-50 text-amber-700",
-  RESOLVED: "bg-emerald-50 text-emerald-700",
-  CLOSED: "bg-slate-100 text-slate-500",
+const STATUS_TONE: Record<string, BadgeTone> = {
+  OPEN: "danger",
+  ACKNOWLEDGED: "warning",
+  RESOLVED: "success",
+  CLOSED: "neutral",
 }
 
 export default async function IssuesPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
@@ -51,7 +52,25 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
       </div>
 
       {issues.length === 0 ? (
-        <EmptyState title="No issues">Nothing to triage right now.</EmptyState>
+        status ? (
+          <EmptyState
+            icon={<InboxIcon />}
+            title={`No ${status.toLowerCase()} issues`}
+            description="Nothing matches this filter right now."
+            actionLabel="View all issues"
+            actionHref="/issues"
+          />
+        ) : (
+          <EmptyState
+            icon={<InboxIcon />}
+            title="No issues reported"
+            description="Problems reported from the field and failed inspections show up here to triage. Nothing to do right now."
+            actionLabel="View jobs"
+            actionHref="/jobs"
+            secondaryLabel="Run an inspection"
+            secondaryHref="/inspections"
+          />
+        )
       ) : (
         <Card className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -81,7 +100,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
                   <td className="px-4 py-3 text-slate-600">{i.assignedTo?.name ?? <span className="text-slate-400">Unassigned</span>}</td>
                   <td className="px-4 py-3 text-slate-500">{DateTime.fromJSDate(i.createdAt, { zone: tz }).toFormat("MMM d")}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLE[i.status]}`}>{i.status}</span>
+                    <StatusBadge tone={STATUS_TONE[i.status] ?? "neutral"}>{i.status}</StatusBadge>
                   </td>
                 </tr>
               ))}

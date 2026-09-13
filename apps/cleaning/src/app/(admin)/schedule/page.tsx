@@ -10,7 +10,8 @@ import { listChecklistTemplates } from "@/lib/data/checklist-templates"
 import { getOrgTimezone } from "@/lib/data/org"
 import { formatTimeInZone, dateKeyInZone } from "@/lib/scheduling/time"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
-import { Card } from "@/components/ui/controls"
+import { Card, EmptyState } from "@/components/ui/controls"
+import { CalendarIcon } from "@/components/ui/icons"
 import { JobStatusBadge, UnassignedBadge } from "@/components/jobs/job-status"
 import { NewJobButton } from "@/components/jobs/new-job-button"
 
@@ -78,6 +79,20 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
         </div>
       </div>
 
+      {jobs.length === 0 ? (
+        <EmptyState
+          icon={<CalendarIcon />}
+          title="No jobs this week"
+          description="Generate jobs from a recurring service plan, or create a one-time job. Use the arrows above to check other weeks."
+          action={
+            canManage ? (
+              <NewJobButton sites={sites.map((s) => ({ id: s.id, name: s.name }))} templates={templates.map((t) => ({ id: t.id, name: t.name }))} />
+            ) : undefined
+          }
+          secondaryLabel={canManage ? "Set up a service plan" : undefined}
+          secondaryHref={canManage ? "/customers" : undefined}
+        />
+      ) : (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
         {days.map((day) => {
           const key = day.toFormat("yyyy-MM-dd")
@@ -127,6 +142,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
           )
         })}
       </div>
+      )}
     </div>
   )
 }

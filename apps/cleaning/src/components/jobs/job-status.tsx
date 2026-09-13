@@ -1,17 +1,23 @@
-// Server-safe Job status badge with a distinct color per lifecycle state.
+// Server-safe Job status badge — built on the shared StatusBadge so a status
+// looks identical here, on the schedule, and on job detail.
+import { StatusBadge, type BadgeTone } from "@/components/ui/controls"
 
-const STYLES: Record<string, { label: string; cls: string }> = {
-  SCHEDULED: { label: "Scheduled", cls: "bg-slate-100 text-slate-600" },
-  ASSIGNED: { label: "Assigned", cls: "bg-indigo-50 text-indigo-700" },
-  IN_PROGRESS: { label: "In progress", cls: "bg-amber-50 text-amber-700" },
-  COMPLETED: { label: "Completed", cls: "bg-emerald-50 text-emerald-700" },
-  MISSED: { label: "Missed", cls: "bg-red-50 text-red-700" },
-  CANCELLED: { label: "Cancelled", cls: "bg-slate-100 text-slate-400 line-through" },
+const STYLES: Record<string, { label: string; tone: BadgeTone; className?: string }> = {
+  SCHEDULED: { label: "Scheduled", tone: "neutral" },
+  ASSIGNED: { label: "Assigned", tone: "purple" },
+  IN_PROGRESS: { label: "In progress", tone: "warning" },
+  COMPLETED: { label: "Completed", tone: "success" },
+  MISSED: { label: "Missed", tone: "danger" },
+  CANCELLED: { label: "Cancelled", tone: "neutral", className: "line-through text-slate-400" },
 }
 
 export function JobStatusBadge({ status }: { status: string }) {
-  const s = STYLES[status] ?? { label: status, cls: "bg-slate-100 text-slate-600" }
-  return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${s.cls}`}>{s.label}</span>
+  const s = STYLES[status] ?? { label: status, tone: "neutral" as BadgeTone }
+  return (
+    <StatusBadge tone={s.tone} className={s.className}>
+      {s.label}
+    </StatusBadge>
+  )
 }
 
 export function UnassignedBadge() {

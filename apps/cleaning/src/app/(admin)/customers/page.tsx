@@ -6,6 +6,7 @@ import { orgHasCapability } from "@/lib/page-guards"
 import { listCustomers } from "@/lib/data/customers"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, StatusPill, EmptyState } from "@/components/ui/controls"
+import { BuildingIcon } from "@/components/ui/icons"
 import { NewCustomerButton } from "@/components/customers/customer-dialogs"
 
 export const dynamic = "force-dynamic"
@@ -28,13 +29,15 @@ export default async function CustomersPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <PageHeader title="Customers" subtitle="The companies you clean for" />
-        <NewCustomerButton />
-      </div>
+      <PageHeader title="Customers" subtitle="The companies you clean for" action={<NewCustomerButton />} />
 
       {customers.length === 0 ? (
-        <EmptyState title="No customers yet">Create your first cleaning customer to get started.</EmptyState>
+        <EmptyState
+          icon={<BuildingIcon />}
+          title="No customers yet"
+          description="Customers are the companies you clean for. Add your first one to start creating locations and scheduling work."
+          action={<NewCustomerButton />}
+        />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">

@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
-import { canManageOrg } from "@/lib/rbac"
+import { canManageOrg, canManageAccounts } from "@/lib/rbac"
 import { getOrgSettings } from "@/lib/data/org"
+import { getSetupProgress } from "@/lib/data/setup"
+import { isSetupGuideDismissed, restoreSetupGuide } from "@/lib/setup-actions"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
 import { OrgTimezoneForm } from "@/components/settings/org-timezone-form"
@@ -14,6 +16,12 @@ export default async function SettingsPage() {
   if (!session) redirect("/login")
   const org = await getOrgSettings(session.organizationId)
   const isOrgAdmin = canManageOrg(session.role)
+
+  const canSetup = canManageAccounts(session.role)
+  const [setup, setupDismissed] = canSetup
+    ? await Promise.all([getSetupProgress(session.organizationId), isSetupGuideDismissed()])
+    : [null, true]
+  const setupVisibleOnDashboard = canSetup && setup != null && !setup.allComplete && !setupDismissed
 
   return (
     <div className="space-y-6">
@@ -40,6 +48,29 @@ export default async function SettingsPage() {
         <h2 className="mb-3 text-sm font-semibold text-slate-700">Your password</h2>
         <ChangePasswordForm />
       </Card>
+
+      {canSetup && setup ? (
+        <Card className="p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Setup guide</h2>
+          <p className="text-sm text-slate-600">
+            {setup.allComplete
+              ? "You've completed all setup steps."
+              : setupVisibleOnDashboard
+                ? `The setup guide is on your dashboard — ${setup.completed} of ${setup.total} steps done.`
+                : `The setup guide is hidden — ${setup.completed} of ${setup.total} steps done.`}
+          </p>
+          {!setupVisibleOnDashboard ? (
+            <form action={restoreSetupGuide} className="mt-3">
+              <button
+                type="submit"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                Show setup guide on dashboard
+              </button>
+            </form>
+          ) : null}
+        </Card>
+      ) : null}
 
       <Card className="p-6">
         <h2 className="mb-1 text-sm font-semibold text-slate-700">Scheduling timezone</h2>

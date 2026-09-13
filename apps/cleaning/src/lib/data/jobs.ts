@@ -23,6 +23,20 @@ export function listJobsInWindow(orgId: string, start: Date, end: Date) {
   })
 }
 
+/**
+ * Completed jobs from the last 7 days that still lack a finalized inspection.
+ * Mirrors the dashboard's "awaiting inspection" metric so the tile's click-
+ * through shows exactly the jobs it counts.
+ */
+export function listJobsAwaitingInspection(orgId: string) {
+  const weekAgo = new Date(Date.now() - 7 * 86_400_000)
+  return orgDb(orgId).job.findMany({
+    where: { status: "COMPLETED", actualEnd: { gte: weekAgo }, inspections: { none: { status: "FINALIZED" } } },
+    orderBy: { scheduledStart: "desc" },
+    include: jobListInclude,
+  })
+}
+
 export function getJob(orgId: string, id: string) {
   return orgDb(orgId).job.findFirst({
     where: { id },

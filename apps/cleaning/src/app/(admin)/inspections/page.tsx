@@ -8,13 +8,14 @@ import { listRecentInspections } from "@/lib/scheduling/inspections"
 import { listInspectionTemplates } from "@/lib/data/inspection-templates"
 import { getOrgTimezone } from "@/lib/data/org"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
-import { Card, StatusPill, EmptyState } from "@/components/ui/controls"
+import { Card, StatusPill, StatusBadge, EmptyState } from "@/components/ui/controls"
+import { ClipboardCheckIcon } from "@/components/ui/icons"
 import { NewTemplateButton } from "@/components/inspections/template-dialogs"
 
 export const dynamic = "force-dynamic"
 const CAP = "quality.inspections"
 
-export default async function InspectionsPage() {
+export default async function InspectionsPage({ searchParams }: { searchParams: Promise<{ outcome?: string }> }) {
   const session = await getSession()
   if (!session) redirect("/login")
   if (!canViewSchedule(session.role)) redirect("/dashboard")
@@ -29,18 +30,48 @@ export default async function InspectionsPage() {
 
   const orgId = session.organizationId
   const canManage = canManageAccounts(session.role)
-  const [tz, inspections, templates] = await Promise.all([
+  const [tz, allInspections, templates] = await Promise.all([
     getOrgTimezone(orgId),
     listRecentInspections(orgId),
     listInspectionTemplates(orgId),
   ])
 
+  const { outcome } = await searchParams
+  const failOnly = outcome === "FAIL"
+  const inspections = failOnly ? allInspections.filter((i) => i.status === "FINALIZED" && i.outcome === "FAIL") : allInspections
+
   return (
     <div className="space-y-8">
       <div>
         <PageHeader title="Inspections" subtitle="Quality control" />
+        {failOnly ? (
+          <div className="mb-4 flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
+              Failed inspections
+              <Link href="/inspections" className="text-red-600 hover:text-red-800" aria-label="Clear filter">
+                ✕
+              </Link>
+            </span>
+          </div>
+        ) : null}
         {inspections.length === 0 ? (
-          <EmptyState title="No inspections yet">Open a completed job and tap “Inspect work”.</EmptyState>
+          failOnly ? (
+            <EmptyState
+              icon={<ClipboardCheckIcon />}
+              title="No failed inspections"
+              description="No recent inspections have failed."
+              actionLabel="View all inspections"
+              actionHref="/inspections"
+            />
+          ) : (
+            <EmptyState
+              icon={<ClipboardCheckIcon />}
+              title="No inspections yet"
+              description="Inspections are started from a completed job. Open a completed job and tap “Inspect work” to run one."
+              actionLabel="View jobs"
+              actionHref="/jobs"
+            />
+          )
         ) : (
           <Card className="overflow-hidden">
             <table className="w-full text-sm">
@@ -66,11 +97,11 @@ export default async function InspectionsPage() {
                     </td>
                     <td className="px-4 py-3">
                       {i.status === "FINALIZED" ? (
-                        <span className={i.outcome === "PASS" ? "font-medium text-emerald-600" : "font-medium text-red-600"}>
+                        <StatusBadge tone={i.outcome === "PASS" ? "success" : "danger"}>
                           {i.outcome} · {i.score}%
-                        </span>
+                        </StatusBadge>
                       ) : (
-                        <span className="text-xs text-slate-400">In progress</span>
+                        <StatusBadge tone="neutral">In progress</StatusBadge>
                       )}
                     </td>
                   </tr>
@@ -87,7 +118,12 @@ export default async function InspectionsPage() {
           {canManage ? <NewTemplateButton /> : null}
         </div>
         {templates.length === 0 ? (
-          <EmptyState title="No templates yet" />
+          <EmptyState
+            icon={<ClipboardCheckIcon />}
+            title="No inspection templates yet"
+            description="Build a reusable checklist of items inspectors score in the field."
+            action={canManage ? <NewTemplateButton /> : undefined}
+          />
         ) : (
           <Card className="divide-y divide-slate-100">
             {templates.map((t) => (

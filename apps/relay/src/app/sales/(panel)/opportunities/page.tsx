@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { DollarSign, Plus } from "lucide-react"
+import { DollarSign, Plus, AlertCircle, Clock } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -49,7 +49,9 @@ export default async function OpportunitiesPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Opportunities</h1>
-          <p className="text-gray-400 text-sm mt-0.5">{totalOpen} open deals</p>
+          <p className="text-gray-400 text-sm mt-0.5">
+            {totalOpen} open deals · <span className="text-gray-600" title="Deal Stage tracks where a potential contract sits in your sales process. Relationship Status (on the contact/call record) reflects the overall relationship health.">Deal Stage ↗</span>
+          </p>
         </div>
         <Link
           href="/sales/opportunities/new"
@@ -85,7 +87,13 @@ export default async function OpportunitiesPage() {
                   <Link
                     key={opp.id}
                     href={`/sales/opportunities/${opp.id}`}
-                    className={`block bg-gray-800 border ${stage.border} rounded-xl p-3.5 hover:bg-gray-700/80 transition-colors group`}
+                    className={`block bg-gray-800 border ${
+                      opp.nextStepDate && new Date(opp.nextStepDate) < new Date()
+                        ? "border-red-800/70"
+                        : opp.nextStepDate && new Date(opp.nextStepDate).toDateString() === new Date().toDateString()
+                        ? "border-amber-800/70"
+                        : stage.border
+                    } rounded-xl p-3.5 hover:bg-gray-700/80 transition-colors group`}
                   >
                     <p className="text-sm font-semibold text-white group-hover:text-emerald-300 transition-colors truncate mb-1">
                       {opp.title}
@@ -118,11 +126,17 @@ export default async function OpportunitiesPage() {
                       </p>
                     )}
 
-                    {opp.nextStepDate && (
-                      <p className="text-xs text-gray-600 mt-0.5">
-                        Due {new Date(opp.nextStepDate).toLocaleDateString()}
-                      </p>
-                    )}
+                    {opp.nextStepDate && (() => {
+                      const d = new Date(opp.nextStepDate)
+                      const overdue = d < new Date() && d.toDateString() !== new Date().toDateString()
+                      const dueToday = d.toDateString() === new Date().toDateString()
+                      return (
+                        <p className={`text-xs mt-0.5 flex items-center gap-1 ${overdue ? "text-red-400" : dueToday ? "text-amber-400" : "text-gray-600"}`}>
+                          {overdue ? <AlertCircle className="w-3 h-3" /> : dueToday ? <Clock className="w-3 h-3" /> : null}
+                          {overdue ? "Overdue" : dueToday ? "Due today" : `Due ${d.toLocaleDateString()}`}
+                        </p>
+                      )
+                    })()}
 
                     {opp.closeDate && (
                       <p className="text-xs text-gray-600 mt-1.5">

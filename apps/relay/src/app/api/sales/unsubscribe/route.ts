@@ -28,10 +28,11 @@ export async function POST(req: NextRequest) {
   const info = await getSalesSession()
   if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const body = await req.json() as { email: string; reason?: string; notes?: string }
+  const body = await req.json() as { email: string; reason?: string; notes?: string; source?: string }
   const email  = body.email?.toLowerCase()?.trim()
   const reason = body.reason ?? "MANUAL"
   const notes  = body.notes ?? null
+  const source = body.source ?? "MANUAL"
 
   if (!email) return NextResponse.json({ error: "email required" }, { status: 400 })
 
@@ -42,8 +43,8 @@ export async function POST(req: NextRequest) {
 
   const record = await prisma.unsubscribeRecord.upsert({
     where:  { email },
-    create: { id: `unsub_${Date.now()}`, email, reason, addedById: info.salesUserId ?? "sa", notes },
-    update: { reason, notes, addedById: info.salesUserId ?? "sa" },
+    create: { id: `unsub_${Date.now()}`, email, reason, source, addedById: info.salesUserId ?? "sa", notes },
+    update: { reason, source, notes, addedById: info.salesUserId ?? "sa" },
   })
 
   return NextResponse.json({ ok: true, record })

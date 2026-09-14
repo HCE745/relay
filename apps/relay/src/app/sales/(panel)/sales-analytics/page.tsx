@@ -26,7 +26,7 @@ function StatCard({ label, value, sub, icon: Icon, color }: {
 
 export default async function SalesAnalyticsPage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/super-admin/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   const since30  = startOfDay(subDays(new Date(), 30))
   const since90  = startOfDay(subDays(new Date(), 90))

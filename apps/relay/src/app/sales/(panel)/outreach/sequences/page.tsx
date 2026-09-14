@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 
 export default async function SequencesPage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/sales/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   const sequences = await prisma.crmSequence.findMany({
     orderBy: { createdAt: "desc" },

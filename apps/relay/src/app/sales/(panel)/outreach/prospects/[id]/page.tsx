@@ -9,6 +9,7 @@ import {
   MousePointer, Zap, Eye, TrendingUp, CheckCircle2, Trophy,
 } from "lucide-react"
 import { computeEngagementScore, scoreLabel, scoreColor } from "@/lib/engagement-score"
+import { SuppressionButtons } from "./SuppressionButtons"
 
 export const dynamic = "force-dynamic"
 
@@ -50,7 +51,7 @@ export default async function ProspectDetailPage({
   params: Promise<{ id: string }>
 }) {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/sales/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   const { id } = await params
 
@@ -215,13 +216,18 @@ export default async function ProspectDetailPage({
             )}
           </div>
         </div>
-        <Link
-          href={`/super-admin/crm/prospects/${prospect.id}`}
-          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors shrink-0"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          Full CRM View
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          {prospect.contacts[0]?.email && (
+            <SuppressionButtons email={prospect.contacts[0].email} prospectId={prospect.id} />
+          )}
+          <Link
+            href={`/super-admin/crm/prospects/${prospect.id}`}
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Full CRM View
+          </Link>
+        </div>
       </div>
 
       {/* ── KPI Section ── */}

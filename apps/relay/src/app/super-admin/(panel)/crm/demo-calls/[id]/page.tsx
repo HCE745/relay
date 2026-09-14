@@ -6,7 +6,7 @@ import Link from "next/link"
 import { CrmDemoCallForm } from "@/components/super-admin/crm-demo-call-form"
 import { CrmEmailThread } from "@/components/super-admin/crm-email-thread"
 import { CrmEmailCompose } from "@/components/super-admin/crm-email-compose"
-import { Mail, Zap } from "lucide-react"
+import { Mail, Zap, ShieldOff, AlertTriangle } from "lucide-react"
 
 interface EngagementData {
   score: number
@@ -63,6 +63,28 @@ export default function DemoCallDetailPage() {
       .catch(() => {})
   }, [id])
 
+  async function addSuppressionRecord(reason: "UNSUBSCRIBE" | "DO_NOT_CONTACT") {
+    if (!call) return
+    const label = reason === "UNSUBSCRIBE" ? "Unsubscribe" : "Do Not Contact"
+    if (!confirm(`Mark ${call.contactEmail} as ${label}? They will be suppressed from all future outreach.`)) return
+    const res = await fetch("/api/sales/unsubscribe", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({
+        email:  call.contactEmail,
+        reason,
+        source: "MANUAL",
+        notes:  `Added from DemoCall ${id}`,
+      }),
+    })
+    if (res.ok) {
+      alert(`${call.contactEmail} has been suppressed (${label}).`)
+    } else {
+      const d = await res.json()
+      alert(d.error ?? "Failed to add suppression record.")
+    }
+  }
+
   async function markFollowUpComplete() {
     await fetch(`/api/super-admin/crm/demo-calls/${id}`, {
       method:  "PATCH",
@@ -95,6 +117,22 @@ export default function DemoCallDetailPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => addSuppressionRecord("UNSUBSCRIBE")}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:border-red-400 text-xs rounded-lg transition-colors"
+            title="Mark as unsubscribed — suppresses from all future outreach"
+          >
+            <ShieldOff className="w-3.5 h-3.5" />
+            Unsub
+          </button>
+          <button
+            onClick={() => addSuppressionRecord("DO_NOT_CONTACT")}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-red-700 hover:border-red-600 text-xs rounded-lg transition-colors"
+            title="Mark as Do Not Contact — hard suppression for legal or relationship reasons"
+          >
+            <AlertTriangle className="w-3.5 h-3.5" />
+            DNC
+          </button>
           <button
             onClick={() => setComposing(true)}
             className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
@@ -138,7 +176,7 @@ export default function DemoCallDetailPage() {
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-100 dark:divide-gray-800">
-          <DetailRow label="Status"     value={call.callStatus} />
+          <DetailRow label="Relationship Status" value={call.callStatus} />
           <DetailRow label="Lead Source" value={call.leadSource} />
           <DetailRow label="Scheduled"  value={call.scheduledAt ? new Date(call.scheduledAt).toLocaleString() : "—"} />
           <DetailRow label="Outcome"    value={call.outcome ?? "—"} />

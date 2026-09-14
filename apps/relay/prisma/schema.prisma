@@ -1619,6 +1619,7 @@ model DemoCall {
   followUpCompleted Boolean @default(false)
   outcome         String?
   organizationId  String?
+  prospectId      String?
   createdBySAName String
   calendlyEventId String?
   calendlyPayload Json?
@@ -1635,6 +1636,7 @@ model DemoCall {
   productInterest String?
 
   organization  Organization?                @relation(fields: [organizationId], references: [id])
+  prospect      Prospect?                    @relation("ProspectDemoCalls", fields: [prospectId], references: [id], onDelete: SetNull)
   crmEmails     CrmEmail[]
   enrollments   CrmEmailSequenceEnrollment[]
   assignedTo    SalesUser?                   @relation("DemoCallAssigned", fields: [assignedToId], references: [id])
@@ -2498,6 +2500,7 @@ model Prospect {
   contacts      ProspectContact[]
   notes         ProspectNote[]
   linkClicks    LinkClick[]
+  demoCalls     DemoCall[]        @relation("ProspectDemoCalls")
   assignedTo    SalesUser?        @relation("ProspectAssigned",      fields: [assignedToId], references: [id])
   opportunities CrmOpportunity[]  @relation("ProspectOpportunities")
   tasks         CrmTask[]         @relation("ProspectTasks")
@@ -2521,6 +2524,7 @@ model ProspectContact {
   linkedinUrl          String?
   phone                String?
   role                 String?
+  roles                String[]             @default([])
   notes                String?              @db.Text
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
@@ -2781,12 +2785,14 @@ model CrmTransferRequest {
 // ── Email Suppression List ────────────────────────────────────────────────────
 
 model UnsubscribeRecord {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  reason    String   @default("UNSUBSCRIBE") // UNSUBSCRIBE|DO_NOT_CONTACT|BOUNCED|MANUAL
-  addedById String?
-  addedAt   DateTime @default(now())
-  notes     String?
+  id             String   @id @default(cuid())
+  email          String   @unique
+  reason         String   @default("UNSUBSCRIBE") // UNSUBSCRIBE|DO_NOT_CONTACT|BOUNCED|MANUAL
+  organizationId String?
+  source         String   @default("MANUAL") // MANUAL|REPLY_DETECTED|BOUNCE|SEQUENCE_STOP
+  addedById      String?
+  addedAt        DateTime @default(now())
+  notes          String?
 
   @@index([email])
 }

@@ -421,53 +421,115 @@ export default async function SalesDashboardPage({
     prisma.linkTrackingEvent.count({ where: { eventType: "trial_started",  isBotSuspected: false } }).catch(() => 0),
   ])
 
-  // ── Today view extras (outside main parallel block for simplicity) ──────────
+  // ── Today view extras ───────────────────────────────────────────────────────
   const repFilter = (session?.superAdmin || session?.salesUserRole === "admin_sales")
     ? {}
     : { assignedToId: session?.salesUserId ?? "" }
 
-  const [oppsNoNextStep, recentEngaged] = await Promise.all([
+  const in48h = new Date(Date.now() + 48 * 3600e3)
+
+  const [
+    oppsNoNextStep,
+    recentEngaged,
+    followUpTodayList,
+    upcomingDemosList,
+    rawRepliesAwaiting,
+  ] = await Promise.all([
     prisma.crmOpportunity.findMany({
       where: { nextStep: null, stage: { notIn: ["Closed Won", "Closed Lost"] }, ...repFilter },
       orderBy: { updatedAt: "desc" },
       take: 5,
       select: { id: true, title: true, stage: true, prospect: { select: { companyName: true } } },
     }),
-    prisma.linkClick.findMany({
+    // Recently engaged: last 48h, tour_completed or pricing_viewed, non-bot
+    prisma.linkTrackingEvent.findMany({
       where: {
         isBotSuspected: false,
-        lastClickedAt:  { gte: new Date(Date.now() - 7 * 864e5) },
-        crmEmail: { contactEmail: { not: "" } },
+        eventType: { in: ["tour_completed", "pricing_viewed"] },
+        createdAt: { gte: new Date(Date.now() - 48 * 3600e3) },
       },
-      orderBy: { lastClickedAt: "desc" },
-      take: 20,
+      orderBy: { createdAt: "desc" },
+      take: 30,
       select: {
-        lastClickedAt: true,
-        events: {
-          where:   { isBotSuspected: false },
-          orderBy: { createdAt: "desc" },
-          take:    1,
-          select:  { eventType: true },
+        eventType: true,
+        createdAt: true,
+        linkClick: {
+          select: {
+            crmEmail: { select: { contactEmail: true } },
+          },
         },
-        crmEmail: { select: { contactEmail: true } },
       },
     }).then(rows => {
       const seen = new Set<string>()
       return rows
         .filter(r => {
-          const email = r.crmEmail?.contactEmail
+          const email = r.linkClick?.crmEmail?.contactEmail
           if (!email || seen.has(email)) return false
           seen.add(email)
           return true
         })
         .slice(0, 5)
         .map(r => ({
-          contactEmail: r.crmEmail!.contactEmail,
-          eventType:    r.events[0]?.eventType ?? "link_clicked",
-          createdAt:    r.lastClickedAt ?? new Date(),
+          contactEmail: r.linkClick!.crmEmail!.contactEmail,
+          eventType:    r.eventType,
+          createdAt:    r.createdAt,
         }))
     }),
+    // Follow-ups due today — top 5 with contact info
+    prisma.crmEmail.findMany({
+      where: {
+        direction: "sent",
+        isDeleted: false,
+        followUpDate:   { gte: todayStart, lt: todayEnd },
+        followUpDoneAt: null,
+      },
+      orderBy: { followUpDate: "asc" },
+      take: 5,
+      select: { id: true, contactEmail: true, subject: true, followUpDate: true, demoCallId: true },
+    }),
+    // Upcoming demos in next 48h
+    prisma.demoCall.findMany({
+      where: { scheduledAt: { gte: now, lte: in48h }, ...repFilter },
+      orderBy: { scheduledAt: "asc" },
+      take: 5,
+      select: { id: true, companyName: true, contactName: true, contactEmail: true, scheduledAt: true },
+    }),
+    // Replies awaiting response: received last 7d
+    prisma.crmEmail.findMany({
+      where: {
+        direction: "received",
+        isDeleted: false,
+        isArchived: false,
+        sentAt: { gte: new Date(Date.now() - 7 * 864e5) },
+      },
+      orderBy: { sentAt: "desc" },
+      take: 20,
+      select: { id: true, contactEmail: true, subject: true, fromAddress: true, sentAt: true, threadId: true },
+    }),
   ])
+
+  // Filter replies: only those where no outbound reply exists after the received email
+  const threadIdsAwaiting = [...new Set(rawRepliesAwaiting.filter(e => e.threadId).map(e => e.threadId!))]
+  const outboundInThreads = threadIdsAwaiting.length > 0
+    ? await prisma.crmEmail.findMany({
+        where: { direction: "sent", isDeleted: false, threadId: { in: threadIdsAwaiting } },
+        select: { threadId: true, sentAt: true },
+      })
+    : []
+  const lastOutboundByThread = new Map<string, Date>()
+  for (const e of outboundInThreads) {
+    if (e.threadId) {
+      const existing = lastOutboundByThread.get(e.threadId)
+      if (!existing || e.sentAt > existing) lastOutboundByThread.set(e.threadId, e.sentAt)
+    }
+  }
+  const repliesAwaitingList = rawRepliesAwaiting
+    .filter(e => {
+      if (!e.threadId) return true
+      const lastOut = lastOutboundByThread.get(e.threadId)
+      return !lastOut || lastOut < e.sentAt
+    })
+    .slice(0, 5)
 
   // ── Derived metrics ─────────────────────────────────────────────────────────
   const replyRate      = pct(recvPeriod, sentPeriod)
@@ -520,220 +582,222 @@ export default async function SalesDashboardPage({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════════
-          MY TASKS
-      ══════════════════════════════════════════════════════════════════════════ */}
-      {myTasks.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-base font-bold text-white">My Tasks</h2>
-            <span className="text-xs text-gray-500">{myTasks.length} open</span>
-          </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl divide-y divide-gray-800">
-            {myTasks.map(task => {
-              const overdue = task.dueAt && task.dueAt < new Date()
-              const priorityColor = task.priority === "urgent" ? "text-red-400" : task.priority === "high" ? "text-orange-400" : "text-gray-500"
-              const content = (
-                <div className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-gray-800/50 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{task.title}</p>
-                    {task.opportunity && (
-                      <p className="text-xs text-gray-500 truncate">{task.opportunity.title}</p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    {task.taskType && (
-                      <span className="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">{task.taskType}</span>
-                    )}
-                    {task.priority && (
-                      <span className={`text-xs font-medium ${priorityColor}`}>{task.priority}</span>
-                    )}
-                    {task.dueAt && (
-                      <span className={`text-xs ${overdue ? "text-red-400" : "text-gray-500"}`}>
-                        {overdue ? "Overdue · " : "Due · "}
-                        {task.dueAt.toLocaleDateString()}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )
-              if (task.opportunity) {
-                return (
-                  <Link key={task.id} href={`/sales/opportunities/${task.opportunity.id}`} className="block">
-                    {content}
-                  </Link>
-                )
-              }
-              return <div key={task.id}>{content}</div>
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════════
-          DEALS MISSING NEXT STEP
-      ══════════════════════════════════════════════════════════════════════════ */}
-      {oppsNoNextStep.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Target className="w-4 h-4 text-amber-400" />
-            <h2 className="text-base font-bold text-white">Deals Missing Next Step</h2>
-            <span className="text-xs text-gray-500">{oppsNoNextStep.length} open deal{oppsNoNextStep.length !== 1 ? "s" : ""} with no next action</span>
-          </div>
-          <div className="bg-gray-900 border border-amber-900/40 rounded-xl divide-y divide-gray-800">
-            {oppsNoNextStep.map(opp => (
-              <Link key={opp.id} href={`/sales/opportunities/${opp.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-gray-800/50 transition-colors group">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white group-hover:text-amber-300 transition-colors truncate">{opp.title}</p>
-                  {opp.prospect?.companyName && (
-                    <p className="text-xs text-gray-500 truncate">{opp.prospect.companyName}</p>
-                  )}
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">{opp.stage}</span>
-                  <span className="text-xs text-amber-500 font-medium">Add next step →</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════════
-          RECENTLY ENGAGED
-      ══════════════════════════════════════════════════════════════════════════ */}
-      {recentEngaged.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-base font-bold text-white">Recently Engaged</h2>
-            <span className="text-xs text-gray-500">Prospects active in the last 7 days</span>
-          </div>
-          <div className="bg-gray-900 border border-emerald-900/30 rounded-xl divide-y divide-gray-800">
-            {recentEngaged.map(ev => {
-              const eventLabel: Record<string, string> = {
-                tour_started: "Started tour",
-                tour_completed: "Completed tour",
-                pricing_viewed: "Viewed pricing",
-                demo_requested: "Requested demo",
-                trial_started: "Started trial",
-                link_clicked: "Clicked link",
-              }
-              return (
-                <div key={ev.contactEmail} className="flex items-center justify-between px-4 py-3">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-200 font-mono truncate">{ev.contactEmail}</p>
-                    <p className="text-xs text-emerald-400 mt-0.5">{eventLabel[ev.eventType] ?? ev.eventType}</p>
-                  </div>
-                  <p className="text-xs text-gray-500 shrink-0">
-                    {new Date(ev.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════════
-          SECTION 1 — ACTION CENTER
+          TODAY — Action-first sales view
       ══════════════════════════════════════════════════════════════════════════ */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-amber-400" />
-            <h2 className="text-base font-bold text-white">Action Center</h2>
-            <span className="text-xs text-gray-500">What needs your attention right now</span>
-          </div>
+        <div className="flex items-center gap-2 mb-5">
+          <Zap className="w-4 h-4 text-amber-400" />
+          <h2 className="text-lg font-bold text-white">Today</h2>
+          <span className="text-xs text-gray-500">What needs your attention</span>
           <Link
             href="/sales/outreach/follow-ups"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors"
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors"
           >
-            Work Follow-Up Queue
+            Work Queue
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {/* Follow-ups due today */}
-          <Link href="/sales/outreach/follow-ups" className="group">
-            <div className={`bg-gray-900 border rounded-xl p-4 h-full transition-colors group-hover:border-gray-600 ${acFollowUpToday > 0 ? "border-amber-800/60" : "border-gray-800"}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className={`w-4 h-4 ${acFollowUpToday > 0 ? "text-amber-400" : "text-gray-500"}`} />
-                <span className="text-xs text-gray-500">Due Today</span>
+        <div className="space-y-4">
+          {/* 1. Replies Awaiting Response */}
+          {repliesAwaitingList.length > 0 && (
+            <div className="bg-gray-900 border border-emerald-900/50 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-emerald-400" />
+                  <span className="text-sm font-semibold text-white">Replies Awaiting Response</span>
+                  <span className="bg-emerald-900/60 text-emerald-300 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {repliesAwaitingList.length}
+                  </span>
+                </div>
+                <Link href="/sales/outreach/email" className="text-xs text-gray-500 hover:text-gray-300">View All →</Link>
               </div>
-              <p className={`text-3xl font-bold ${acFollowUpToday > 0 ? "text-amber-400" : "text-gray-500"}`}>
-                {acFollowUpToday}
-              </p>
-              <p className="text-[10px] text-gray-600 mt-1">follow-up reminders</p>
+              <div className="divide-y divide-gray-800/60">
+                {repliesAwaitingList.map(em => (
+                  <Link key={em.id} href="/sales/outreach/email" className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-800/40 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-200 truncate">{em.fromAddress}</p>
+                      <p className="text-xs text-gray-500 truncate">{em.subject}</p>
+                    </div>
+                    <span className="text-xs text-gray-600 shrink-0 ml-3">
+                      {new Date(em.sentAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </Link>
+          )}
 
-          {/* Overdue */}
-          <Link href="/sales/outreach/follow-ups" className="group">
-            <div className={`bg-gray-900 border rounded-xl p-4 h-full transition-colors group-hover:border-gray-600 ${acFollowUpOverdue > 0 ? "border-red-800/60" : "border-gray-800"}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className={`w-4 h-4 ${acFollowUpOverdue > 0 ? "text-red-400" : "text-gray-500"}`} />
-                <span className="text-xs text-gray-500">Overdue</span>
+          {/* 2. Follow-Ups Due Today */}
+          {followUpTodayList.length > 0 && (
+            <div className="bg-gray-900 border border-amber-900/50 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-amber-400" />
+                  <span className="text-sm font-semibold text-white">Follow-Ups Due Today</span>
+                  <span className="bg-amber-900/60 text-amber-300 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {acFollowUpToday}
+                  </span>
+                </div>
+                <Link href="/sales/outreach/follow-ups" className="text-xs text-gray-500 hover:text-gray-300">View All →</Link>
               </div>
-              <p className={`text-3xl font-bold ${acFollowUpOverdue > 0 ? "text-red-400" : "text-gray-500"}`}>
-                {acFollowUpOverdue}
-              </p>
-              <p className="text-[10px] text-gray-600 mt-1">follow-ups past due</p>
+              <div className="divide-y divide-gray-800/60">
+                {followUpTodayList.map(em => (
+                  <Link key={em.id} href="/sales/outreach/follow-ups" className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-800/40 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-200 truncate">{em.contactEmail}</p>
+                      <p className="text-xs text-gray-500 truncate">{em.subject}</p>
+                    </div>
+                    <span className="text-xs text-amber-500 shrink-0 ml-3">Due today</span>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </Link>
+          )}
 
-          {/* Replies awaiting */}
-          <Link href="/sales/outreach/email" className="group">
-            <div className={`bg-gray-900 border rounded-xl p-4 h-full transition-colors group-hover:border-gray-600 ${acRepliesUnread > 0 ? "border-emerald-800/60" : "border-gray-800"}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <MessageSquare className={`w-4 h-4 ${acRepliesUnread > 0 ? "text-emerald-400" : "text-gray-500"}`} />
-                <span className="text-xs text-gray-500">Replies</span>
+          {/* 3. Tasks Due Today */}
+          {myTasks.filter(t => t.dueAt && t.dueAt >= todayStart && t.dueAt < todayEnd).length > 0 && (
+            <div className="bg-gray-900 border border-blue-900/50 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm font-semibold text-white">Tasks Due Today</span>
+                  <span className="bg-blue-900/60 text-blue-300 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {myTasks.filter(t => t.dueAt && t.dueAt >= todayStart && t.dueAt < todayEnd).length}
+                  </span>
+                </div>
               </div>
-              <p className={`text-3xl font-bold ${acRepliesUnread > 0 ? "text-emerald-400" : "text-gray-500"}`}>
-                {acRepliesUnread}
-              </p>
-              <p className="text-[10px] text-gray-600 mt-1">unread responses</p>
+              <div className="divide-y divide-gray-800/60">
+                {myTasks
+                  .filter(t => t.dueAt && t.dueAt >= todayStart && t.dueAt < todayEnd)
+                  .slice(0, 5)
+                  .map(task => (
+                    <div key={task.id} className="flex items-center justify-between px-4 py-2.5">
+                      {task.opportunity
+                        ? (
+                          <Link href={`/sales/opportunities/${task.opportunity.id}`} className="flex-1 min-w-0 hover:text-white">
+                            <p className="text-sm text-gray-200 truncate">{task.title}</p>
+                            <p className="text-xs text-gray-500 truncate">{task.opportunity.title}</p>
+                          </Link>
+                        ) : (
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-200 truncate">{task.title}</p>
+                          </div>
+                        )
+                      }
+                      <span className="text-xs text-gray-600 shrink-0 ml-3 capitalize">{task.taskType}</span>
+                    </div>
+                  ))}
+              </div>
             </div>
-          </Link>
+          )}
 
-          {/* Drafts ready */}
-          <Link href="/sales/outreach/sequences" className="group">
-            <div className={`bg-gray-900 border rounded-xl p-4 h-full transition-colors group-hover:border-gray-600 ${acDraftsReady > 0 ? "border-yellow-800/60" : "border-gray-800"}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className={`w-4 h-4 ${acDraftsReady > 0 ? "text-yellow-400" : "text-gray-500"}`} />
-                <span className="text-xs text-gray-500">Drafts</span>
+          {/* 4. Recently Engaged Accounts */}
+          {recentEngaged.length > 0 && (
+            <div className="bg-gray-900 border border-emerald-900/30 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  <span className="text-sm font-semibold text-white">Recently Engaged Accounts</span>
+                  <span className="bg-emerald-900/40 text-emerald-300 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {recentEngaged.length}
+                  </span>
+                  <span className="text-xs text-gray-600">last 48h</span>
+                </div>
+                <Link href="/sales/accounts" className="text-xs text-gray-500 hover:text-gray-300">View All →</Link>
               </div>
-              <p className={`text-3xl font-bold ${acDraftsReady > 0 ? "text-yellow-400" : "text-gray-500"}`}>
-                {acDraftsReady}
-              </p>
-              <p className="text-[10px] text-gray-600 mt-1">ready for review</p>
+              <div className="divide-y divide-gray-800/60">
+                {recentEngaged.map(ev => {
+                  const evtLabel: Record<string, string> = {
+                    tour_completed: "Completed tour",
+                    pricing_viewed: "Viewed pricing",
+                  }
+                  return (
+                    <div key={ev.contactEmail} className="flex items-center justify-between px-4 py-2.5">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-200 truncate">{ev.contactEmail}</p>
+                        <p className="text-xs text-emerald-400 mt-0.5">{evtLabel[ev.eventType] ?? ev.eventType}</p>
+                      </div>
+                      <span className="text-xs text-gray-600 shrink-0 ml-3">
+                        {new Date(ev.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </Link>
+          )}
 
-          {/* Scheduled today */}
-          <Link href="/sales/outreach/sequences" className="group">
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 h-full transition-colors group-hover:border-gray-600">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-gray-500" />
-                <span className="text-xs text-gray-500">Scheduled</span>
+          {/* 5. Opportunities Without Next Step */}
+          {oppsNoNextStep.length > 0 && (
+            <div className="bg-gray-900 border border-amber-900/40 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-amber-400" />
+                  <span className="text-sm font-semibold text-white">Opportunities Without Next Step</span>
+                  <span className="bg-amber-900/60 text-amber-300 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {oppsNoNextStep.length}
+                  </span>
+                </div>
+                <Link href="/sales/opportunities" className="text-xs text-gray-500 hover:text-gray-300">View All →</Link>
               </div>
-              <p className="text-3xl font-bold text-white">{acScheduledToday}</p>
-              <p className="text-[10px] text-gray-600 mt-1">emails today</p>
+              <div className="divide-y divide-gray-800/60">
+                {oppsNoNextStep.map(opp => (
+                  <Link key={opp.id} href={`/sales/opportunities/${opp.id}`} className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-800/40 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-200 truncate">{opp.title}</p>
+                      {opp.prospect?.companyName && <p className="text-xs text-gray-500">{opp.prospect.companyName}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                      <span className="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">{opp.stage}</span>
+                      <span className="text-xs text-amber-500">Add next step →</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </Link>
+          )}
 
-          {/* Demos this week */}
-          <Link href="/sales/pipeline" className="group">
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 h-full transition-colors group-hover:border-gray-600">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-4 h-4 text-blue-400" />
-                <span className="text-xs text-gray-500">Demos</span>
+          {/* 6. Upcoming Demos */}
+          {upcomingDemosList.length > 0 && (
+            <div className="bg-gray-900 border border-blue-900/40 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm font-semibold text-white">Upcoming Demos</span>
+                  <span className="bg-blue-900/60 text-blue-300 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {upcomingDemosList.length}
+                  </span>
+                  <span className="text-xs text-gray-600">next 48h</span>
+                </div>
+                <Link href="/sales/accounts" className="text-xs text-gray-500 hover:text-gray-300">View All →</Link>
               </div>
-              <p className="text-3xl font-bold text-white">{acDemosThisWeek}</p>
-              <p className="text-[10px] text-gray-600 mt-1">scheduled this week</p>
+              <div className="divide-y divide-gray-800/60">
+                {upcomingDemosList.map(demo => (
+                  <Link key={demo.id} href={`/sales/accounts/${demo.id}`} className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-800/40 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-200 truncate">{demo.companyName}</p>
+                      <p className="text-xs text-gray-500 truncate">{demo.contactName} · {demo.contactEmail}</p>
+                    </div>
+                    <span className="text-xs text-blue-400 shrink-0 ml-3">
+                      {demo.scheduledAt ? new Date(demo.scheduledAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </Link>
+          )}
+
+          {/* Empty state */}
+          {repliesAwaitingList.length === 0 && followUpTodayList.length === 0 &&
+           myTasks.filter(t => t.dueAt && t.dueAt >= todayStart && t.dueAt < todayEnd).length === 0 &&
+           recentEngaged.length === 0 && oppsNoNextStep.length === 0 && upcomingDemosList.length === 0 && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
+              <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
+              <p className="text-gray-300 font-medium">All clear — nothing needs attention right now.</p>
+              <p className="text-gray-600 text-sm mt-1">Check back after sending more outreach.</p>
+            </div>
+          )}
         </div>
       </div>
 

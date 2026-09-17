@@ -15,13 +15,17 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status") ?? "pending";
 
-  const requests = await prisma.crmTransferRequest.findMany({
-    where: { status },
-    include: {
-      requestedBy: { select: { id: true, name: true } },
-      toUser: { select: { id: true, name: true } },
-    },
-  });
-
-  return NextResponse.json(requests);
+  try {
+    const requests = await prisma.crmTransferRequest.findMany({
+      where: { status },
+      include: {
+        requestedBy: { select: { id: true, name: true } },
+        toUser: { select: { id: true, name: true } },
+      },
+    });
+    return NextResponse.json(requests);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

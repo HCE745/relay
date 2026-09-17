@@ -15,13 +15,17 @@ export async function GET() {
   const session = await getSession()
   if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const count = await prisma.followUpStage.count()
-  if (count === 0) {
-    await prisma.followUpStage.createMany({ data: DEFAULT_STAGES })
+  try {
+    const count = await prisma.followUpStage.count()
+    if (count === 0) {
+      await prisma.followUpStage.createMany({ data: DEFAULT_STAGES })
+    }
+    const stages = await prisma.followUpStage.findMany({ orderBy: { stageNumber: "asc" } })
+    return NextResponse.json({ stages })
+  } catch (e) {
+    console.error(e)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-
-  const stages = await prisma.followUpStage.findMany({ orderBy: { stageNumber: "asc" } })
-  return NextResponse.json({ stages })
 }
 
 export async function POST(req: NextRequest) {
@@ -34,17 +38,25 @@ export async function POST(req: NextRequest) {
 
   if (!name?.trim()) return NextResponse.json({ error: "Name required" }, { status: 400 })
 
-  const maxStage = await prisma.followUpStage.findFirst({ orderBy: { stageNumber: "desc" } })
-  const stageNumber = (maxStage?.stageNumber ?? -1) + 1
+  try {
+    const maxStage = await prisma.followUpStage.findFirst({ orderBy: { stageNumber: "desc" } })
+    const stageNumber = (maxStage?.stageNumber ?? -1) + 1
 
-  const stage = await prisma.followUpStage.create({
-    data: {
-      stageNumber,
-      name: name.trim(),
-      daysAfterPrevious: Number(daysAfterPrevious) || 7,
-      description: description?.trim() || null,
-    },
-  })
+    const stage = await prisma.followUpStage.create({
+      data: {
+        stageNumber,
+        name: name.trim(),
+        daysAfterPrevious: Number(daysAfterPrevious) || 7,
+        description: description?.trim() || null,
+      },
+    })
 
-  return NextResponse.json({ stage })
+    return NextResponse.json({ stage })
+  } catch (e) {
+    const code = (e as { code?: string }).code
+    if (code === "P2025") return NextResponse.json({ error: "Not found" }, { status: 404 })
+    if (code === "P2002") return NextResponse.json({ error: "Conflict" }, { status: 409 })
+    console.error(e)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
 }

@@ -289,10 +289,10 @@ model User {
   regionId     String?
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  department   Department?  @relation(fields: [departmentId], references: [id])
-  location     Location?    @relation(fields: [locationId], references: [id])
-  region       Region?      @relation("UserRegion", fields: [regionId], references: [id])
-  manager      User?        @relation("UserHierarchy", fields: [managerId], references: [id])
+  department   Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  location     Location?    @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  region       Region?      @relation("UserRegion", fields: [regionId], references: [id], onDelete: SetNull)
+  manager      User?        @relation("UserHierarchy", fields: [managerId], references: [id], onDelete: SetNull)
   directReports User[]      @relation("UserHierarchy")
 
   employeeTypeId String?
@@ -307,7 +307,7 @@ model User {
   routedSuggestions      Suggestion[]          @relation("SuggestionRoutedTo")
   sentInvitations        Invitation[]          @relation("SentInvitations")
   assignedLocations      UserLocation[]
-  employeeType           EmployeeType?         @relation(fields: [employeeTypeId], references: [id])
+  employeeType           EmployeeType?         @relation(fields: [employeeTypeId], references: [id], onDelete: SetNull)
   maintenanceSchedules   MaintenanceSchedule[]
   submittedPurchaseRequests PurchaseRequest[] @relation("SubmittedPurchaseRequests")
   approvedPurchaseRequests  PurchaseRequest[] @relation("ApprovedPurchaseRequests")
@@ -376,10 +376,10 @@ model Location {
   regionId       String?
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  parent       Location?    @relation("LocationHierarchy", fields: [parentId], references: [id])
+  parent       Location?    @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children     Location[]   @relation("LocationHierarchy")
   safetyContact User?       @relation("LocationSafetyContact", fields: [safetyContactId], references: [id], onDelete: SetNull)
-  region       Region?      @relation(fields: [regionId], references: [id])
+  region       Region?      @relation(fields: [regionId], references: [id], onDelete: SetNull)
 
   users             User[]
   assets            Asset[]
@@ -406,7 +406,7 @@ model Department {
   updatedAt      DateTime @updatedAt
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  location     Location?        @relation(fields: [locationId], references: [id])
+  location     Location?        @relation(fields: [locationId], references: [id], onDelete: SetNull)
   users        User[]
   issues       Issue[]
   assets       Asset[]
@@ -439,9 +439,9 @@ model Asset {
   updatedAt      DateTime  @updatedAt
 
   organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  location        Location?        @relation(fields: [locationId], references: [id])
-  department      Department?      @relation(fields: [departmentId], references: [id])
-  vendor          Vendor?          @relation(fields: [vendorId], references: [id])
+  location        Location?        @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  department      Department?      @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  vendor          Vendor?          @relation(fields: [vendorId], references: [id], onDelete: SetNull)
   issues          Issue[]
   maintenanceLogs MaintenanceLog[]
   purchaseRequests PurchaseRequest[]
@@ -515,13 +515,13 @@ model Issue {
   updatedAt       DateTime  @updatedAt
 
   organization  Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  location      Location?         @relation(fields: [locationId], references: [id])
-  department    Department?       @relation(fields: [departmentId], references: [id])
-  asset         Asset?            @relation(fields: [assetId], references: [id])
-  vendor        Vendor?           @relation(fields: [vendorId], references: [id])
+  location      Location?         @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  department    Department?       @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  asset         Asset?            @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  vendor        Vendor?           @relation(fields: [vendorId], references: [id], onDelete: SetNull)
   reportedBy    User              @relation("ReportedIssues", fields: [reportedById], references: [id])
   assignedTo    User?             @relation("AssignedIssues", fields: [assignedToId], references: [id], onDelete: SetNull)
-  sop           SOP?              @relation(fields: [sopId], references: [id])
+  sop           SOP?              @relation(fields: [sopId], references: [id], onDelete: SetNull)
   comments                IssueComment[]
   history                 IssueHistory[]
   escalations             IssueEscalation[]
@@ -552,7 +552,8 @@ model IssueHistory {
   field       String
   oldValue    String?
   newValue    String?
-  changedById String?
+  changedById String?  // plain String, not a @relation — intentionally denormalized so audit history
+                        // is preserved even if the user who made the change is later deleted
   createdAt   DateTime @default(now())
 
   issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
@@ -581,7 +582,7 @@ model EscalationPolicy {
   updatedAt             DateTime @updatedAt
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  department   Department?      @relation(fields: [departmentId], references: [id])
+  department   Department?      @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   steps        EscalationStep[]
 }
 
@@ -608,7 +609,7 @@ model MaintenanceLog {
   createdAt   DateTime  @default(now())
 
   asset  Asset   @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  vendor Vendor? @relation(fields: [vendorId], references: [id])
+  vendor Vendor? @relation(fields: [vendorId], references: [id], onDelete: SetNull)
 }
 
 model Notification {
@@ -624,7 +625,7 @@ model Notification {
 
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  issue        Issue?       @relation(fields: [issueId], references: [id])
+  issue        Issue?       @relation(fields: [issueId], references: [id], onDelete: SetNull)
 }
 
 // ─── Routing Rules ────────────────────────────────────────────────────────────
@@ -653,8 +654,8 @@ model RoutingRule {
   assignToRole   String?  // route to nearest user with this role
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  condLocation Location?    @relation("RoutingRuleLocation", fields: [condLocationId], references: [id])
-  condDept     Department?  @relation("RoutingRuleDept", fields: [condDeptId], references: [id])
+  condLocation Location?    @relation("RoutingRuleLocation", fields: [condLocationId], references: [id], onDelete: SetNull)
+  condDept     Department?  @relation("RoutingRuleDept", fields: [condDeptId], references: [id], onDelete: SetNull)
   assignToUser User?        @relation("RoutingRuleUser", fields: [assignToUserId], references: [id], onDelete: SetNull)
 }
 
@@ -907,7 +908,7 @@ model MaintenanceSchedule {
   updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  location     Location?    @relation(fields: [locationId], references: [id])
+  location     Location?    @relation(fields: [locationId], references: [id], onDelete: SetNull)
   asset        Asset?       @relation("AssetMaintenanceSchedules", fields: [assetId], references: [id], onDelete: SetNull)
   assignedTo   User?        @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
 
@@ -2664,7 +2665,9 @@ model CrmOpportunity {
   id             String    @id @default(cuid())
   prospectId     String?
   demoCallId     String?
-  organizationId String?
+  organizationId String?  // plain String reference to a relay Organization — not a @relation because
+                           // the CRM schema is maintained separately and this field is optional context,
+                           // not an enforced FK constraint
   assignedToId   String
   title          String
   product        String    @default("")

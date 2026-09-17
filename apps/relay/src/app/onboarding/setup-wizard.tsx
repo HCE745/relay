@@ -12,6 +12,7 @@ import { RelayWordmark } from "@/components/logo"
 import { EMPLOYEE_TYPE_PRESETS, type EmployeeTypePreset } from "@/lib/employee-type-presets"
 import { CONFIGURABLE_PAGES, CONFIGURABLE_ACTIONS, type PageKey, type ActionKey } from "@/lib/page-access"
 import { INDUSTRY_LABELS, getTemplate } from "@/lib/industry-templates"
+import { PLANS } from "@/lib/pricing"
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -1156,7 +1157,7 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
               <p className="text-gray-500 text-sm mt-1">
                 {isCarWash
                   ? "Choose between Wash Essentials and Full Relay — Wash Edition."
-                  : "Choose your plan and get started immediately. Essentials from $149/mo."}
+                  : `Choose your plan and get started immediately. Essentials from $${PLANS.essentials.basePrice}/mo.`}
               </p>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400 shrink-0 mt-1" />
@@ -1166,7 +1167,7 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
               ? ["Wash Essentials", "Full Relay — Wash Edition"].map((f) => (
                   <span key={f} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{f}</span>
                 ))
-              : ["Essentials from $149/mo", "Professional from $299/mo"].map((f) => (
+              : [`Essentials from $${PLANS.essentials.basePrice}/mo`, `Professional from $${PLANS.professional.basePrice}/mo`].map((f) => (
                   <span key={f} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{f}</span>
                 ))
             }

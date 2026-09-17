@@ -20,38 +20,46 @@ export async function PATCH(
 
   const { id } = await params;
 
-  const task = await prisma.crmTask.findUnique({ where: { id } });
-  if (!task) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  try {
+    const task = await prisma.crmTask.findUnique({ where: { id } });
+    if (!task) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  if (info.isRep && task.assignedToId !== info.salesUserId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (info.isRep && task.assignedToId !== info.salesUserId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const { title, taskType, dueAt, notes, priority, completedAt, complete } = body;
+
+    const updateData: Record<string, unknown> = {};
+
+    if (title !== undefined) updateData.title = title;
+    if (taskType !== undefined) updateData.taskType = taskType;
+    if (dueAt !== undefined) updateData.dueAt = dueAt ? new Date(dueAt) : null;
+    if (notes !== undefined) updateData.notes = notes;
+    if (priority !== undefined) updateData.priority = priority;
+    if (completedAt !== undefined) updateData.completedAt = completedAt ? new Date(completedAt) : null;
+
+    if (complete === true && !task.completedAt) {
+      updateData.completedAt = new Date();
+    } else if (complete === false) {
+      updateData.completedAt = null;
+    }
+
+    const updated = await prisma.crmTask.update({
+      where: { id },
+      data: updateData,
+      include: taskIncludes,
+    });
+
+    return NextResponse.json(updated);
+  } catch (e) {
+    const code = (e as { code?: string }).code;
+    if (code === "P2025") return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (code === "P2002") return NextResponse.json({ error: "Conflict" }, { status: 409 });
+    console.error(e);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const body = await req.json();
-  const { title, taskType, dueAt, notes, priority, completedAt, complete } = body;
-
-  const updateData: Record<string, unknown> = {};
-
-  if (title !== undefined) updateData.title = title;
-  if (taskType !== undefined) updateData.taskType = taskType;
-  if (dueAt !== undefined) updateData.dueAt = dueAt ? new Date(dueAt) : null;
-  if (notes !== undefined) updateData.notes = notes;
-  if (priority !== undefined) updateData.priority = priority;
-  if (completedAt !== undefined) updateData.completedAt = completedAt ? new Date(completedAt) : null;
-
-  if (complete === true && !task.completedAt) {
-    updateData.completedAt = new Date();
-  } else if (complete === false) {
-    updateData.completedAt = null;
-  }
-
-  const updated = await prisma.crmTask.update({
-    where: { id },
-    data: updateData,
-    include: taskIncludes,
-  });
-
-  return NextResponse.json(updated);
 }
 
 export async function DELETE(
@@ -63,14 +71,20 @@ export async function DELETE(
 
   const { id } = await params;
 
-  const task = await prisma.crmTask.findUnique({ where: { id } });
-  if (!task) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  try {
+    const task = await prisma.crmTask.findUnique({ where: { id } });
+    if (!task) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  if (info.isRep && task.assignedToId !== info.salesUserId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (info.isRep && task.assignedToId !== info.salesUserId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    await prisma.crmTask.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    const code = (e as { code?: string }).code;
+    if (code === "P2025") return NextResponse.json({ error: "Not found" }, { status: 404 });
+    console.error(e);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  await prisma.crmTask.delete({ where: { id } });
-
-  return NextResponse.json({ ok: true });
 }

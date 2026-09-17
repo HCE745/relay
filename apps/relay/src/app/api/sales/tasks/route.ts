@@ -31,13 +31,17 @@ export async function GET(req: NextRequest) {
   if (opportunityId) where.opportunityId = opportunityId;
   if (prospectId) where.prospectId = prospectId;
 
-  const tasks = await prisma.crmTask.findMany({
-    where,
-    include: taskIncludes,
-    orderBy: [{ dueAt: "asc" }, { createdAt: "desc" }],
-  });
-
-  return NextResponse.json(tasks);
+  try {
+    const tasks = await prisma.crmTask.findMany({
+      where,
+      include: taskIncludes,
+      orderBy: [{ dueAt: "asc" }, { createdAt: "desc" }],
+    });
+    return NextResponse.json(tasks);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -57,26 +61,35 @@ export async function POST(req: NextRequest) {
     assignedToId: bodyAssignedToId,
   } = body;
 
-  let assignedToId = bodyAssignedToId ?? info.salesUserId;
+  if (!title?.trim()) return NextResponse.json({ error: "title is required" }, { status: 400 });
+
+  const assignedToId = bodyAssignedToId ?? info.salesUserId;
 
   if (info.isRep && assignedToId !== info.salesUserId) {
     return NextResponse.json({ error: "Reps can only create tasks assigned to themselves" }, { status: 403 });
   }
 
-  const task = await prisma.crmTask.create({
-    data: {
-      title,
-      taskType,
-      dueAt: dueAt ? new Date(dueAt) : undefined,
-      notes,
-      priority,
-      opportunityId,
-      prospectId,
-      demoCallId,
-      assignedToId,
-    },
-    include: taskIncludes,
-  });
-
-  return NextResponse.json(task);
+  try {
+    const task = await prisma.crmTask.create({
+      data: {
+        title,
+        taskType,
+        dueAt: dueAt ? new Date(dueAt) : undefined,
+        notes,
+        priority,
+        opportunityId,
+        prospectId,
+        demoCallId,
+        assignedToId,
+      },
+      include: taskIncludes,
+    });
+    return NextResponse.json(task);
+  } catch (e) {
+    const code = (e as { code?: string }).code;
+    if (code === "P2025") return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (code === "P2002") return NextResponse.json({ error: "Conflict" }, { status: 409 });
+    console.error(e);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

@@ -6,6 +6,9 @@ export const dynamic = "force-dynamic"
 
 const ALLOWED_KEYS = new Set(["link_tracking_enabled"])
 
+// Intentionally super-admin only — SalesSettings are global platform configuration
+// (e.g. link_tracking_enabled affects all sales reps) and must not be modifiable
+// by individual sales users or even admin_sales managers.
 async function requireSA() {
   const s = await getSession()
   return s?.superAdmin ? s : null

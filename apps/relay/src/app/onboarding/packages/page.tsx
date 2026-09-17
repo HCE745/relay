@@ -4,13 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useState, Suspense } from "react"
 import { ChevronLeft, ChevronRight, Droplets, Layers } from "lucide-react"
 import { RelayWordmark } from "@/components/logo"
+import { PLANS } from "@/lib/pricing"
 
 const PACKAGES = [
   {
     key: "wash_essentials",
     label: "Wash Essentials",
     tagline: "Purpose-built for car wash operations",
-    price: "$40/mo",
+    price: `$${PLANS.wash_essentials.basePrice}/mo`,
     priceSub: "+ $10/mo per additional location (up to 7 locations)",
     description:
       "Issue tracking, QR reporting, asset management, and team coordination — everything a car wash needs, nothing it doesn't.",
@@ -33,7 +34,7 @@ const PACKAGES = [
     key: "full_relay",
     label: "Full Relay — Wash Edition",
     tagline: "Full Relay platform tailored for Car Wash",
-    price: "From $149/mo",
+    price: `From $${PLANS.essentials.basePrice}/mo`,
     priceSub: "Standard Relay plans · billed by employee count",
     description:
       "Unlimited locations, vendors, purchase approvals, advanced analytics, and Intelligence Modules. Same platform used by manufacturing plants and property portfolios.",

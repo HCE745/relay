@@ -1,4 +1,5 @@
 import { Prisma } from "../generated/prisma/client"
+import { dateKeyInZone } from "./scheduling/time"
 
 // Pure billing arithmetic — no DB, no I/O — so the money-critical rules are unit
 // testable. All amounts are Prisma.Decimal (never a JS float); rounding is
@@ -50,3 +51,17 @@ export function agingBucket(daysOverdue: number): AgingBucket {
 
 export const startOfUtcDay = (isoDate: string): Date => new Date(`${isoDate}T00:00:00.000Z`)
 export const endOfUtcDay = (isoDate: string): Date => new Date(`${isoDate}T23:59:59.999Z`)
+
+/**
+ * Whether an instant belongs to a billing period, decided by the SITE's local
+ * wall-clock day — not by UTC. `tz` is the resolved site/org timezone (same
+ * resolution the scheduler uses); `periodStart`/`periodEnd` are inclusive
+ * `yyyy-MM-dd` bounds. Because `dateKeyInZone` yields `yyyy-MM-dd`, a lexical
+ * compare is a correct chronological compare. This is what keeps a job
+ * scheduled 8pm local on the 31st on that month's invoice even though it is the
+ * 1st in UTC.
+ */
+export function isInBillingPeriod(instant: Date, tz: string, periodStart: string, periodEnd: string): boolean {
+  const key = dateKeyInZone(instant, tz)
+  return key >= periodStart && key <= periodEnd
+}

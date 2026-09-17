@@ -10,6 +10,7 @@ import {
   agingBucket,
   startOfUtcDay,
   endOfUtcDay,
+  isInBillingPeriod,
 } from "../billing-math"
 
 describe("round2", () => {
@@ -95,5 +96,33 @@ describe("utc day bounds", () => {
   it("brackets a calendar day", () => {
     expect(startOfUtcDay("2026-09-16").toISOString()).toBe("2026-09-16T00:00:00.000Z")
     expect(endOfUtcDay("2026-09-16").toISOString()).toBe("2026-09-16T23:59:59.999Z")
+  })
+})
+
+describe("isInBillingPeriod — month boundary in a non-UTC site timezone", () => {
+  it("negative offset: 8pm on the 31st local stays in that month (though it is the 1st in UTC)", () => {
+    // 2026-08-31 20:00 America/New_York (EDT, UTC-4) === 2026-09-01T00:00:00Z.
+    const instant = new Date("2026-09-01T00:00:00.000Z")
+    const tz = "America/New_York"
+    expect(isInBillingPeriod(instant, tz, "2026-08-01", "2026-08-31")).toBe(true) // belongs to August
+    expect(isInBillingPeriod(instant, tz, "2026-09-01", "2026-09-30")).toBe(false) // NOT September
+    // A naive UTC bound would have (wrongly) placed it in September:
+    expect(instant >= startOfUtcDay("2026-09-01")).toBe(true)
+  })
+
+  it("positive offset: 8am on the 1st local belongs to the new month (though it is the 31st in UTC)", () => {
+    // 2026-09-01 08:00 Asia/Tokyo (UTC+9) === 2026-08-31T23:00:00Z.
+    const instant = new Date("2026-08-31T23:00:00.000Z")
+    const tz = "Asia/Tokyo"
+    expect(isInBillingPeriod(instant, tz, "2026-09-01", "2026-09-30")).toBe(true) // belongs to September
+    expect(isInBillingPeriod(instant, tz, "2026-08-01", "2026-08-31")).toBe(false) // NOT August
+    // A naive UTC bound would have (wrongly) placed it in August:
+    expect(instant <= endOfUtcDay("2026-08-31")).toBe(true)
+  })
+
+  it("a mid-period job is included; a clearly-outside job is not", () => {
+    const mid = new Date("2026-09-15T14:00:00.000Z")
+    expect(isInBillingPeriod(mid, "America/New_York", "2026-09-01", "2026-09-30")).toBe(true)
+    expect(isInBillingPeriod(mid, "America/New_York", "2026-10-01", "2026-10-31")).toBe(false)
   })
 })

@@ -72,6 +72,27 @@ async function main() {
   const jobC = await mkJob(hourly, "Hourly job C (unapproved)", 12)
   const jobD = await mkJob(noRate, "No-rate job D", 13)
 
+  // Month-boundary fixture on a site with a non-UTC timezone override.
+  // 2026-08-31 22:00 America/New_York (EDT) === 2026-09-01T02:00:00Z: its UTC day
+  // is Sept 1 but its local day is Aug 31, so it must bill in August.
+  const nySite = await systemDb.serviceLocation.create({
+    data: { organizationId: org.id, customerId: customer.id, name: "NY Branch", timezone: "America/New_York" },
+  })
+  const nyFlat = await systemDb.servicePlan.create({
+    data: { organizationId: org.id, serviceLocationId: nySite.id, name: "NY Flat", billingType: "FLAT_PER_JOB", rate: "200.00" },
+  })
+  const boundaryJob = await systemDb.job.create({
+    data: {
+      organizationId: org.id,
+      serviceLocationId: nySite.id,
+      servicePlanId: nyFlat.id,
+      title: "Month-boundary job (NY 10pm on the 31st)",
+      status: "COMPLETED",
+      scheduledStart: new Date("2026-09-01T02:00:00Z"),
+      actualEnd: new Date("2026-09-01T03:00:00Z"),
+    },
+  })
+
   // Job B: 90 min APPROVED → 1.5h. Job C: unapproved (COMPLETED status).
   await systemDb.timeEntry.create({
     data: { organizationId: org.id, userId: user.id, jobId: jobB.id, status: "APPROVED", clockInAt: new Date("2026-09-11T09:00:00Z"), clockOutAt: new Date("2026-09-11T10:30:00Z") },
@@ -126,6 +147,15 @@ async function main() {
 
   const billing = await getCustomerBilling(org.id, customer.id)
   check("customer outstanding back to 0", billing.outstanding.toFixed(2) === "0.00", billing.outstanding.toString())
+
+  console.log("Timezone — month-boundary job bills in its LOCAL month:")
+  // The September run (r1) had exactly 2 lines — proving the NY 10pm-on-the-31st
+  // job (UTC Sept 1) was NOT pulled into September.
+  check("boundary job kept out of September (r1 had 2 lines)", r1.created === true && (r1.created ? r1.lineCount : 0) === 2)
+  const aug = await generateInvoice(org.id, { customerId: customer.id, periodStart: "2026-08-01", periodEnd: "2026-08-31" })
+  check("boundary job bills in August (local day)", aug.created === true && (aug.created ? aug.lineCount : 0) === 1)
+  const augInv = aug.created ? await getInvoice(org.id, aug.invoiceId) : null
+  check("August line is the boundary job @ 200.00", augInv?.lines[0]?.jobId === boundaryJob.id && augInv?.total.toFixed(2) === "200.00")
 
   console.log("Invalid transitions are rejected:")
   await expectThrows("cannot move VOID → SENT", () => setInvoiceStatus(org.id, invoiceId, "SENT"))

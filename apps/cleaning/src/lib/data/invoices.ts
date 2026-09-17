@@ -1,5 +1,6 @@
 import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound, ConflictError } from "./errors"
+import { getOrgTimezone } from "./org"
 import { Prisma } from "../../generated/prisma/client"
 import {
   type Money,
@@ -11,6 +12,7 @@ import {
   agingBucket,
   startOfUtcDay,
   endOfUtcDay,
+  isInBillingPeriod,
 } from "../billing-math"
 
 // ─── Billing / invoicing (Phase 2) ───────────────────────────────────────────
@@ -43,15 +45,24 @@ export async function generateInvoice(
   const periodStart = startOfUtcDay(input.periodStart)
   const periodEnd = endOfUtcDay(input.periodEnd)
 
+  // Period membership is decided by the site's LOCAL wall-clock day (below), the
+  // same timezone resolution the scheduler uses (site override, else org
+  // default). We therefore fetch a widened UTC window — ±1 day covers every real
+  // timezone offset — and let isInBillingPeriod() make the exact call, so a job
+  // at 8pm local on the 31st stays on that month's invoice.
+  const orgTz = await getOrgTimezone(orgId)
+  const windowStart = new Date(periodStart.getTime() - 86_400_000)
+  const windowEnd = new Date(periodEnd.getTime() + 86_400_000)
+
   const jobs = await db.job.findMany({
     where: {
       status: "COMPLETED",
-      scheduledStart: { gte: periodStart, lte: periodEnd },
+      scheduledStart: { gte: windowStart, lte: windowEnd },
       serviceLocation: { customerId: input.customerId },
     },
     orderBy: { scheduledStart: "asc" },
     include: {
-      serviceLocation: { select: { name: true } },
+      serviceLocation: { select: { name: true, timezone: true } },
       servicePlan: { select: { name: true, billingType: true, rate: true, currency: true } },
       timeEntries: { select: { status: true, clockInAt: true, clockOutAt: true, breakMinutes: true } },
       // Non-empty only when this job already sits on a non-VOID invoice.
@@ -70,9 +81,17 @@ export async function generateInvoice(
     amount: Money
   }
   const drafts: Draft[] = []
-  let currency = "USD"
+  // The first billable job (ordered by scheduledStart) sets the invoice currency;
+  // jobs whose plan is in a different currency can't be summed onto it, so they
+  // are excluded and reported back rather than silently mixed. One invoice is
+  // one currency.
+  let currency: string | null = null
 
   for (const job of jobs) {
+    // Exact period membership by the site's local day (the window fetch above is
+    // deliberately wider than the period).
+    const siteTz = job.serviceLocation.timezone ?? orgTz
+    if (!isInBillingPeriod(job.scheduledStart, siteTz, input.periodStart, input.periodEnd)) continue
     if (job.invoiceLines.length > 0) continue // already on a non-VOID invoice — idempotent skip
     const plan = job.servicePlan
     if (!plan || plan.rate == null) {
@@ -80,7 +99,12 @@ export async function generateInvoice(
       continue
     }
     const rate = plan.rate as Money
-    currency = plan.currency ?? currency
+    const jobCurrency = plan.currency ?? "USD"
+    if (currency === null) currency = jobCurrency
+    else if (jobCurrency !== currency) {
+      excluded.push({ jobId: job.id, title: job.title, reason: `Different currency (${jobCurrency}) — invoice separately` })
+      continue
+    }
     const serviceDate = job.actualEnd ?? job.scheduledStart
     const siteName = job.serviceLocation.name
 
@@ -109,6 +133,7 @@ export async function generateInvoice(
   if (drafts.length === 0) {
     return { created: false, reason: "No billable completed jobs in this period", excluded }
   }
+  const invoiceCurrency = currency ?? "USD" // guaranteed set when drafts is non-empty
 
   const issueDate = new Date()
   const dueDate = dueDateFromTerms(issueDate, customer!.paymentTerms)
@@ -132,7 +157,7 @@ export async function generateInvoice(
           dueDate,
           periodStart,
           periodEnd,
-          currency,
+          currency: invoiceCurrency,
           subtotal,
           taxTotal: ZERO,
           total: subtotal,

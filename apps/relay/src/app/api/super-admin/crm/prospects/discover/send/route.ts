@@ -19,16 +19,17 @@ function bodyToHtml(plain: string): string {
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
-  if (!session?.superAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const body = await req.json() as {
-    company: DiscoveredCompany
-    to:      string
-    subject: string
+    company:   DiscoveredCompany
+    to:        string
+    subject:   string
     emailBody: string
+    force?:    boolean
   }
 
-  const { company, to, subject, emailBody } = body
+  const { company, to, subject, emailBody, force } = body
   if (!company?.companyName || !to || !subject || !emailBody) {
     return NextResponse.json({ error: "company, to, subject, and emailBody are required" }, { status: 400 })
   }
@@ -50,13 +51,24 @@ export async function POST(req: NextRequest) {
     orderBy: { sentAt: "desc" },
   })
 
-  // Return duplicate info but let the client decide whether to proceed
-  if (existingProspect || existingEmailContact) {
+  // 3. Is there already a DemoCall for this company or email?
+  const existingDemoCall = await prisma.demoCall.findFirst({
+    where: {
+      OR: [
+        { companyName:  { equals: company.companyName, mode: "insensitive" } },
+        { contactEmail: { equals: to,                  mode: "insensitive" } },
+      ],
+    },
+    select: { id: true, companyName: true },
+  })
+
+  // Return duplicate info but let the client decide whether to proceed (force=true skips this)
+  if (!force && (existingProspect || existingEmailContact || existingDemoCall)) {
     return NextResponse.json({
       duplicate: true,
       prospectId:    existingProspect?.id ?? null,
-      demoCallId:    existingEmailContact?.demoCall?.id ?? null,
-      companyName:   existingProspect?.companyName ?? existingEmailContact?.demoCall?.companyName ?? null,
+      demoCallId:    existingEmailContact?.demoCall?.id ?? existingDemoCall?.id ?? null,
+      companyName:   existingProspect?.companyName ?? existingEmailContact?.demoCall?.companyName ?? existingDemoCall?.companyName ?? null,
     }, { status: 409 })
   }
 
@@ -88,7 +100,7 @@ export async function POST(req: NextRequest) {
       leadSource:     "cold_outreach",
       callStatus:     "Pending",
       painPoints:     company.painPoints?.join("; ") || null,
-      createdBySAName: session.name ?? "Super Admin",
+      createdBySAName: session.name ?? (session.superAdmin ? "Super Admin" : "Sales Rep"),
     },
   })
 

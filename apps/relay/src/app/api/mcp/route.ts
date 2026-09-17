@@ -145,10 +145,36 @@ async function addProspect(args: Record<string, unknown>) {
   const companyName = String(args.companyName ?? "").trim()
   if (!companyName) throw new Error("companyName is required")
 
+  // Dedup check — Prospect by name, Prospect by domain, CrmEmail by domain
+  const existingByName = await prisma.prospect.findFirst({
+    where:  { companyName: { equals: companyName, mode: "insensitive" } },
+    select: { id: true, companyName: true },
+  })
+  const website = args.website ? String(args.website) : null
+  const domain  = website ? extractDomain(website) : null
+  let existingByDomain: { id: string; companyName: string } | null = null
+  if (domain) {
+    const all = await prisma.prospect.findMany({ select: { id: true, companyName: true, website: true } })
+    const hit = all.find(p => p.website && extractDomain(p.website) === domain)
+    if (hit) existingByDomain = { id: hit.id, companyName: hit.companyName }
+  }
+  const existingEmail = domain ? await prisma.crmEmail.findFirst({
+    where:  { toAddress: { contains: `@${domain}`, mode: "insensitive" }, direction: "sent" },
+    select: { id: true, toAddress: true },
+  }) : null
+
+  if (existingByName || existingByDomain || existingEmail) {
+    const conflicts: string[] = []
+    if (existingByName)   conflicts.push(`Prospect by name: "${existingByName.companyName}" (id: ${existingByName.id})`)
+    if (existingByDomain) conflicts.push(`Prospect by domain ${domain}: "${existingByDomain.companyName}" (id: ${existingByDomain.id})`)
+    if (existingEmail)    conflicts.push(`CrmEmail already sent to ${existingEmail.toAddress}`)
+    throw new Error(`Duplicate detected — ${conflicts.join("; ")}. Use search_prospects to view existing records.`)
+  }
+
   const prospect = await prisma.prospect.create({
     data: {
       companyName,
-      website:          args.website  ? String(args.website)  : null,
+      website:          website,
       industry:         args.industry ? String(args.industry) : null,
       headquartersCity:  args.city    ? String(args.city)     : null,
       headquartersState: args.state   ? String(args.state)    : null,

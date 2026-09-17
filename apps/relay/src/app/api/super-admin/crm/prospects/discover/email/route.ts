@@ -10,7 +10,7 @@ export const maxDuration = 60
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession()
-    if (!session?.superAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
     const { company } = await req.json() as { company: DiscoveredCompany }
     if (!company?.companyName) return NextResponse.json({ error: "company required" }, { status: 400 })
@@ -46,7 +46,7 @@ Return ONLY valid JSON: {"subject": "...", "body": "..."}`
       method: "POST",
       headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
       body: JSON.stringify({
-        model:      "claude-sonnet-5",
+        model:      "claude-haiku-4-5-20251001",
         max_tokens: 800,
         system:     "You are a B2B cold email writer. Output only valid JSON with keys 'subject' and 'body'. No markdown. No explanation.",
         messages: [

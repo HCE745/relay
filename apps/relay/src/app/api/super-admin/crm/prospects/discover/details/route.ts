@@ -8,7 +8,7 @@ export const maxDuration = 60
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession()
-    if (!session?.superAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
     const { company } = await req.json() as { company: DiscoveredCompanyBasic }
     if (!company?.companyName) return NextResponse.json({ error: "company required" }, { status: 400 })
@@ -42,7 +42,7 @@ Rules:
       method:  "POST",
       headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
       body: JSON.stringify({
-        model:      "claude-sonnet-5",
+        model:      "claude-haiku-4-5-20251001",
         max_tokens: 600,
         system:     "You are a B2B sales researcher. Output only valid JSON. No markdown. No explanation.",
         messages:   [{ role: "user", content: prompt }],

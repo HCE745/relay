@@ -134,7 +134,7 @@ function extractFromProse(text: string): DiscoveredCompanyBasic[] {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession()
-    if (!session?.superAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
     // Check if AI discovery is enabled
     const discoveryEnabled = (await getPlatformConfig("ai_prospect_discovery_enabled")) !== "false"
@@ -254,7 +254,7 @@ Your entire response must be only the JSON array — nothing before [, nothing a
         "content-type":      "application/json",
       },
       body: JSON.stringify({
-        model:      "claude-sonnet-5",
+        model:      "claude-haiku-4-5-20251001",
         max_tokens: 4000,
         system:     systemPrompt,
         messages:   [{ role: "user", content: userPrompt }],

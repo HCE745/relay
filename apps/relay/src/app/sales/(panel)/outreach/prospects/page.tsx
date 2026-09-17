@@ -3,7 +3,7 @@ import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
-import { Search, Building2, ExternalLink, Star } from "lucide-react"
+import { Search, Building2, ExternalLink, Star, Compass } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -53,13 +53,22 @@ export default async function ProspectsPage() {
           <h1 className="text-2xl font-bold text-white">Prospects</h1>
           <p className="text-gray-400 text-sm mt-0.5">{prospects.length} prospects in database</p>
         </div>
-        <Link
-          href="/super-admin/crm/prospects"
-          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          Full Prospects DB
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/sales/outreach/prospects/discover"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg transition-colors"
+          >
+            <Compass className="w-3.5 h-3.5" />
+            Find New Prospects
+          </Link>
+          <Link
+            href="/super-admin/crm/prospects"
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Full Prospects DB
+          </Link>
+        </div>
       </div>
 
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">

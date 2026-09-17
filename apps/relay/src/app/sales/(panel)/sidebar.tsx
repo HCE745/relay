@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
   Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
-  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2,
+  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2, Compass,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -32,8 +32,9 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
           href:  "/sales/outreach",
           icon:  Mail,
           children: [
-            { label: "Email",       href: "/sales/outreach/email",       icon: Mail },
-            { label: "Prospects",   href: "/sales/outreach/prospects",   icon: Search },
+            { label: "Email",           href: "/sales/outreach/email",              icon: Mail },
+            { label: "Prospects",       href: "/sales/outreach/prospects",          icon: Search },
+            { label: "Find Prospects",  href: "/sales/outreach/prospects/discover", icon: Compass },
             { label: "Follow-Ups",  href: "/sales/outreach/follow-ups",  icon: Bell, badge: followUpsDue },
             { label: "Sequences",   href: "/sales/outreach/sequences",   icon: GitBranch },
             { label: "Templates",   href: "/sales/outreach/templates",   icon: FileText },

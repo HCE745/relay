@@ -65,6 +65,24 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
   }
 
+  // Cross-org entity validation for mutable FK fields
+  const bodyLocationId   = body.locationId   || null
+  const bodyDepartmentId = body.departmentId || null
+  const bodyAssetId      = body.assetId      || null
+  const bodyVendorId     = body.vendorId     || null
+
+  if (bodyLocationId || bodyDepartmentId || bodyAssetId || bodyVendorId) {
+    const [loc, dept, ast, vnd] = await Promise.all([
+      bodyLocationId   ? prisma.location.findFirst({ where: { id: bodyLocationId,   organizationId: session.organizationId } })   : true,
+      bodyDepartmentId ? prisma.department.findFirst({ where: { id: bodyDepartmentId, organizationId: session.organizationId } }) : true,
+      bodyAssetId      ? prisma.asset.findFirst({ where: { id: bodyAssetId,         organizationId: session.organizationId } })   : true,
+      bodyVendorId     ? prisma.vendor.findFirst({ where: { id: bodyVendorId,       organizationId: session.organizationId } })   : true,
+    ])
+    if (!loc || !dept || !ast || !vnd) {
+      return NextResponse.json({ error: "Invalid entity reference" }, { status: 400 })
+    }
+  }
+
   const updateData: Record<string, unknown> = {}
   const historyEntries: Array<{ field: string; oldValue: string | null; newValue: string | null }> = []
 

@@ -156,8 +156,17 @@ export async function POST(request: NextRequest) {
 
         if (!systemSA) { referralResults.push({ id: ref.id, action: "skipped_no_sa" }); continue }
 
-        // Mark qualified then reward
-        await prisma.referral.update({ where: { id: ref.id }, data: { qualifiedAt: now } })
+        // Atomic guard: only one cron run can transition a referral to qualified.
+        // updateMany returns count=0 if the status already changed to "rewarded" between
+        // our read above and this write — prevents double-awarding on concurrent runs.
+        const atomicClaim = await prisma.referral.updateMany({
+          where: { id: ref.id, rewardStatus: { not: "rewarded" } },
+          data:  { qualifiedAt: now },
+        })
+        if (atomicClaim.count === 0) {
+          referralResults.push({ id: ref.id, action: "skipped_already_rewarded" })
+          continue
+        }
 
         try {
           const result = await triggerReferralReward(ref.id, systemSA.id)

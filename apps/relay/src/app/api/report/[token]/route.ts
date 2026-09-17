@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { autoRouteIssue } from "@/lib/routing"
+import { put } from "@vercel/blob"
 
 export async function POST(
   req: NextRequest,
@@ -58,8 +59,16 @@ export async function POST(
     const photoFile = formData.get("photo")
     if (photoFile && typeof photoFile !== "string" && (photoFile as File).size > 0) {
       photoAttached = true
-      // File storage not wired — photo received but not persisted to URL.
-      // photoUrls stays empty; photoAttached=true satisfies requirePhoto.
+      const file = photoFile as File
+      const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase()
+      const pathname = `relay/${qrCode.organizationId}/qr-submissions/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      try {
+        const blob = await put(pathname, file, { access: "private", contentType: file.type || "image/jpeg" })
+        photoUrls.push(blob.url)
+      } catch (uploadErr) {
+        console.error("[QR Submission] Photo upload failed:", uploadErr)
+        // Don't block submission on upload failure — photoAttached still true
+      }
     }
     const submittedCategory = (formData.get("category") as string | null)?.trim() || null
     if (submittedCategory) overrideCategory = submittedCategory
@@ -115,6 +124,14 @@ export async function POST(
       where: { organizationId: qrCode.organizationId, role: "ADMIN", isActive: true },
       select: { id: true },
     })
+
+    if (!orgAdmin) {
+      console.error("[QR Submission] No active admin for org", qrCode.organizationId, "— submission", submission.id, "saved but not routed")
+      return NextResponse.json(
+        { error: "This location is not currently accepting reports. Please try again later or contact the facility directly." },
+        { status: 503 }
+      )
+    }
 
     if (orgAdmin) {
       const category = overrideCategory ?? qrCode.defaultCategory ?? "GENERAL"
@@ -180,6 +197,19 @@ export async function POST(
         where: { id: submission.id },
         data:  { issueId: issue.id, status: "ROUTED" },
       })
+
+      // Create Attachment records for uploaded photos
+      if (photoUrls.length > 0) {
+        await prisma.attachment.createMany({
+          data: photoUrls.map(url => ({
+            url,
+            filename: url.split("/").pop() ?? "photo",
+            mimeType: "image/jpeg",
+            size:     0,
+            issueId:  issue.id,
+          })),
+        })
+      }
 
       await prisma.issueHistory.create({
         data: {

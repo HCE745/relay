@@ -51,6 +51,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const isManager   = ["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)
   if (!isAssignee && !isManager) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
+  // Validate cross-org assignee
+  const newAssigneeId = body.assigneeId as string | undefined
+  if (isManager && newAssigneeId) {
+    const assigneeMember = await prisma.user.findFirst({
+      where: { id: newAssigneeId, organizationId: session.organizationId, isActive: true },
+      select: { id: true },
+    })
+    if (!assigneeMember) {
+      return NextResponse.json({ error: "Assignee must be a member of this organization" }, { status: 400 })
+    }
+  }
+
   const newStatus = body.status as string | undefined
   const updated = await prisma.assignment.update({
     where: { id },

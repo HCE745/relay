@@ -151,6 +151,19 @@ export async function POST(request: NextRequest) {
 
   if (!title) return NextResponse.json({ error: "Title is required" }, { status: 400 })
 
+  // ── 0. Validate cross-org entity references ───────────────────────────────────
+  if (locationId || departmentId || assetId || vendorId) {
+    const [loc, dept, asset_, vendor_] = await Promise.all([
+      locationId   ? prisma.location.findFirst({ where: { id: locationId,   organizationId: session.organizationId } })   : true,
+      departmentId ? prisma.department.findFirst({ where: { id: departmentId, organizationId: session.organizationId } }) : true,
+      assetId      ? prisma.asset.findFirst({ where: { id: assetId,         organizationId: session.organizationId } })   : true,
+      vendorId     ? prisma.vendor.findFirst({ where: { id: vendorId,       organizationId: session.organizationId } })   : true,
+    ])
+    if (!loc || !dept || !asset_ || !vendor_) {
+      return NextResponse.json({ error: "Invalid entity reference" }, { status: 400 })
+    }
+  }
+
   // ── 1. Fetch reporter profile (location/department/manager fallbacks) ────────
   const reporter = await prisma.user.findUnique({
     where: { id: session.userId },

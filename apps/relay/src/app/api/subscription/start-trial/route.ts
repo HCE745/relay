@@ -12,8 +12,17 @@ export async function POST() {
 
   const org = await prisma.organization.findUnique({
     where:  { id: session.organizationId },
-    select: { lifecycleStatus: true },
+    select: { lifecycleStatus: true, subscriptionStatus: true },
   })
+
+  // Idempotency guard: don't reset an active/paying subscription to trialing
+  const currentStatus = org?.subscriptionStatus
+  if (currentStatus && currentStatus !== "trialing" && currentStatus !== "expired") {
+    return NextResponse.json(
+      { error: "Trial has already been started or subscription is already active" },
+      { status: 400 },
+    )
+  }
 
   await prisma.organization.update({
     where: { id: session.organizationId },

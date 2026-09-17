@@ -56,12 +56,14 @@ export async function POST(request: NextRequest) {
       activeProgram = prog
     }
 
-    const org = await prisma.organization.create({
-      data: { name: orgName, slug, referralCode, referralLink },
-    })
-
-    const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword, role: "ADMIN", organizationId: org.id },
+    const [org, user] = await prisma.$transaction(async (tx) => {
+      const newOrg = await tx.organization.create({
+        data: { name: orgName, slug, referralCode, referralLink },
+      })
+      const newUser = await tx.user.create({
+        data: { name, email, password: hashedPassword, role: "ADMIN", organizationId: newOrg.id },
+      })
+      return [newOrg, newUser] as const
     })
 
     // Create referral record if came through a valid referral link

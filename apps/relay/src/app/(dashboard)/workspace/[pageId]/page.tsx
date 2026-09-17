@@ -41,7 +41,7 @@ export const dynamic = "force-dynamic"
 
 // ── Widget data types ─────────────────────────────────────────────────────────
 
-type IssueRow = Awaited<ReturnType<typeof fetchIssues>>[number]
+type IssueRow = Awaited<ReturnType<typeof fetchIssues>>["issues"][number]
 type AssetRow = { id: string; name: string; type: string; status: string; location: { name: string } | null }
 type LocationRow = { id: string; name: string; locationType: string | null }
 
@@ -81,7 +81,7 @@ async function fetchWidgetData(
         const c = config as IssuesListConfig
         const filters: ViewFilters = c.filters ?? {}
         const sortDef = c.sort ? VIEW_SORT_OPTIONS.find(o => o.value === c.sort) : null
-        const issues = await fetchIssues(orgId, filters, sortDef?.field, sortDef?.dir, c.maxRows ?? 10)
+        const { issues } = await fetchIssues(orgId, filters, sortDef?.field, sortDef?.dir, c.maxRows ?? 10)
         return {
           kind:    "issues",
           issues,
@@ -96,7 +96,7 @@ async function fetchWidgetData(
         const view = await prisma.customView.findUnique({ where: { id: c.viewId } })
         if (!view || view.organizationId !== orgId) return { kind: "error" }
         const filters = (view.filters ?? {}) as ViewFilters
-        const issues  = await fetchIssues(orgId, filters, view.sortField, view.sortDir, 10)
+        const { issues } = await fetchIssues(orgId, filters, view.sortField, view.sortDir, 10)
         return {
           kind:    "issues",
           issues,

@@ -3,7 +3,7 @@ import { Header } from "@/components/layout/header"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { ASSET_TYPE, ASSET_STATUS, ASSET_STATUS_COLOR } from "@/lib/constants"
-import { Plus, Package, ChevronRight, Download, Wrench, AlertTriangle, MapPin } from "lucide-react"
+import { Plus, Package, ChevronRight, ChevronLeft, Download, Wrench, AlertTriangle, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { AssetDialog } from "@/components/assets/asset-dialog"
@@ -15,15 +15,25 @@ import { MFG_ASSET_TAXONOMY } from "@/lib/manufacturing-config"
 
 export const dynamic = "force-dynamic"
 
-export default async function AssetsPage() {
+const PAGE_SIZE = 50
+
+interface SearchParams { page?: string }
+
+export default async function AssetsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const session = await getSession()
   if (!session) redirect("/login")
   const orgId = session.organizationId
+  const params = await searchParams
 
-  const [assets, locations, departments, vendors, org] = await Promise.all([
+  const page = Math.max(1, parseInt(params.page ?? "1", 10))
+  const skip = (page - 1) * PAGE_SIZE
+
+  const [assets, assetTotal, locations, departments, vendors, org] = await Promise.all([
     prisma.asset.findMany({
       where: { organizationId: orgId },
       orderBy: { name: "asc" },
+      take: PAGE_SIZE,
+      skip,
       include: {
         location: { select: { name: true } },
         department: { select: { name: true } },
@@ -31,6 +41,7 @@ export default async function AssetsPage() {
         _count: { select: { issues: { where: { status: { notIn: ["RESOLVED", "CLOSED"] } } } } },
       },
     }),
+    prisma.asset.count({ where: { organizationId: orgId } }),
     prisma.location.findMany({ where: { organizationId: orgId }, orderBy: { name: "asc" } }),
     prisma.department.findMany({ where: { organizationId: orgId }, orderBy: { name: "asc" } }),
     prisma.vendor.findMany({ where: { organizationId: orgId, isActive: true }, orderBy: { name: "asc" } }),
@@ -270,6 +281,31 @@ export default async function AssetsPage() {
           )}
         </div>
         )}
+
+        {/* Pagination */}
+        {assetTotal > PAGE_SIZE && (() => {
+          const totalPages = Math.ceil(assetTotal / PAGE_SIZE)
+          return (
+            <div className="flex items-center justify-between px-1 pt-2">
+              <span className="text-xs text-gray-400">
+                Showing {skip + 1}–{Math.min(skip + PAGE_SIZE, assetTotal)} of {assetTotal}
+              </span>
+              <div className="flex items-center gap-2">
+                {page > 1 && (
+                  <Link href={`/assets?page=${page - 1}`} className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    <ChevronLeft className="w-4 h-4" /> Prev
+                  </Link>
+                )}
+                <span className="text-xs text-gray-500">{page} / {totalPages}</span>
+                {page < totalPages && (
+                  <Link href={`/assets?page=${page + 1}`} className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    Next <ChevronRight className="w-4 h-4" />
+                  </Link>
+                )}
+              </div>
+            </div>
+          )
+        })()}
       </div>
     </div>
   )

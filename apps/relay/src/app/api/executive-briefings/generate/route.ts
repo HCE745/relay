@@ -31,6 +31,16 @@ export async function POST(request: NextRequest) {
   const periodEnd = new Date()
   const periodStart = new Date(periodEnd.getTime() - days * 24 * 60 * 60 * 1000)
 
+  // Reset any briefings stuck in GENERATING for more than 60 minutes
+  await prisma.executiveBriefing.updateMany({
+    where: {
+      organizationId: session.organizationId,
+      status: "GENERATING",
+      createdAt: { lt: new Date(Date.now() - 60 * 60 * 1000) },
+    },
+    data: { status: "FAILED", content: "Generation timed out and was reset." },
+  })
+
   // Create briefing record with GENERATING status
   const briefing = await prisma.executiveBriefing.create({
     data: {
@@ -145,14 +155,20 @@ ${locationBreakdown.map(l => `${locMap[l.locationId!] ?? "Unknown"}: ${l._count.
       return NextResponse.json({ error: "AI service not configured" }, { status: 503 })
     }
 
-    const aiResponse = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
+    const abortController = new AbortController()
+    const timeoutId = setTimeout(() => abortController.abort(), 30_000)
+
+    let aiResponse: Response
+    try {
+      aiResponse = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        signal: abortController.signal,
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 2000,
         system: `You are an executive operations analyst generating professional operational briefings for facility and operations managers.
@@ -167,6 +183,19 @@ Always present data in context — explain what numbers mean operationally, not 
         ],
       }),
     })
+    } catch (fetchErr) {
+      clearTimeout(timeoutId)
+      const isTimeout = fetchErr instanceof Error && fetchErr.name === "AbortError"
+      await prisma.executiveBriefing.update({
+        where: { id: briefing.id },
+        data:  { status: "FAILED", content: isTimeout ? "AI request timed out after 30 seconds." : "AI request failed." },
+      }).catch(() => {})
+      return NextResponse.json(
+        { error: isTimeout ? "AI request timed out" : "AI request failed" },
+        { status: isTimeout ? 504 : 502 },
+      )
+    }
+    clearTimeout(timeoutId)
 
     if (!aiResponse.ok) {
       const errText = await aiResponse.text()

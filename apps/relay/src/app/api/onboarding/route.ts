@@ -53,9 +53,6 @@ export async function POST(request: NextRequest) {
     industry?: string
     companySize?: string
     numberOfLocations?: string
-    // Set only for Car Wash users who chose Wash Essentials on the packages page.
-    // Determines trial productLine from day 1 so the org is never granted access
-    // beyond its selected package, even during the free trial.
     packagePlan?: string
     issueTypes?: string[]
     locations?: Array<{ name: string; address?: string; locationType?: string }>
@@ -74,165 +71,162 @@ export async function POST(request: NextRequest) {
   }
 
   const orgId = session.organizationId
-
-  // ── 1. Update organization ───────────────────────────────────────────────
-  // Validate packagePlan: only "wash_essentials" for Car Wash orgs is accepted;
-  // any other value is ignored so the server never sets an unexpected plan.
-  const isValidWashEssentialsPlan =
-    packagePlan === "wash_essentials" && industry === "Car Wash"
-
-  await prisma.organization.update({
-    where: { id: orgId },
-    data: {
-      name:                  companyName?.trim() || undefined,
-      companySize:           companySize          || null,
-      industry:              industry             || null,
-      numberOfLocations:     numberOfLocations    || null,
-      onboardingCompletedAt: new Date(),
-      // Set plan+productLine from day 1 so trial access matches the chosen package.
-      ...(isValidWashEssentialsPlan
-        ? { plan: "wash_essentials", productLine: "WASH_ESSENTIALS" }
-        : {}),
-    },
-  })
-
-  // ── 2. Create locations ──────────────────────────────────────────────────
-  for (const loc of locations) {
-    if (!loc.name?.trim()) continue
-    await prisma.location.create({
-      data: {
-        organizationId: orgId,
-        name:         loc.name.trim(),
-        locationType: loc.locationType || null,
-        address:      loc.address?.trim() || null,
-      },
-    })
-  }
-
-  // ── 3. Create departments for selected issue types (dedup by dept name) ──
-  const deptNames = new Set<string>()
-  for (const label of issueTypes as string[]) {
-    const mapped = ISSUE_TYPE_MAP[label]
-    if (mapped?.dept) deptNames.add(mapped.dept)
-  }
-  for (const name of deptNames) {
-    const existing = await prisma.department.findFirst({ where: { organizationId: orgId, name } })
-    if (!existing) {
-      await prisma.department.create({ data: { organizationId: orgId, name } })
-    }
-  }
-
-  // ── 3.5. Create employee types defined during onboarding ─────────────────────
-  const localIdToDbId: Record<string, string> = {}
-  for (const def of employeeTypeDefs) {
-    if (!def.name?.trim()) continue
-    const existing = def.presetKey
-      ? await prisma.employeeType.findFirst({ where: { organizationId: orgId, presetKey: def.presetKey } })
-      : await prisma.employeeType.findFirst({ where: { organizationId: orgId, name: def.name.trim() } })
-    if (existing) {
-      localIdToDbId[def.id] = existing.id
-    } else {
-      const created = await prisma.employeeType.create({
-        data: {
-          organizationId: orgId,
-          name: def.name.trim(),
-          baseRole: def.baseRole || "EMPLOYEE",
-          pageAccess: def.pageAccess ?? [],
-          actions: def.actions ?? [],
-          canInvite: def.canInvite ?? false,
-          canChangeEmail: def.canChangeEmail ?? true,
-          isPreset: !!def.presetKey,
-          presetKey: def.presetKey ?? null,
-        },
-      })
-      localIdToDbId[def.id] = created.id
-    }
-  }
-
-  // ── 4. Send team invitations ─────────────────────────────────────────────
-  const org = await prisma.organization.findUnique({ where: { id: orgId }, select: { name: true } })
+  const isValidWashEssentialsPlan = packagePlan === "wash_essentials" && industry === "Car Wash"
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 
-  for (const member of team as Array<{ title: string; role: string; name: string; email: string; employeeTypeId?: string }>) {
-    const email = member.email?.trim()
-    if (!email) continue
-    const existing = await prisma.user.findUnique({ where: { email } })
-    if (existing) continue
-    const alreadyInvited = await prisma.invitation.findFirst({
-      where: { organizationId: orgId, email, usedAt: null },
-    })
-    if (alreadyInvited) continue
+  // Collect emails to send after the transaction commits
+  const pendingEmails: Array<{ to: string; subject: string; html: string }> = []
 
-    // Resolve role: use employee type's baseRole if specified, otherwise fall back to member.role
-    let inviteRole = member.role || "EMPLOYEE"
-    if (member.employeeTypeId) {
-      const typeDef = employeeTypeDefs.find(d => d.id === member.employeeTypeId)
-      if (typeDef?.baseRole) inviteRole = typeDef.baseRole
-    }
-
-    const token     = randomUUID()
-    const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000)
-    await prisma.invitation.create({
+  const updatedOrg = await prisma.$transaction(async (tx) => {
+    // ── 1. Update organization (without onboardingCompletedAt — set last) ────
+    await tx.organization.update({
+      where: { id: orgId },
       data: {
-        organizationId: orgId,
-        email,
-        token,
-        role:        inviteRole,
-        invitedById: session.userId,
-        expiresAt,
+        name:              companyName?.trim() || undefined,
+        companySize:       companySize          || null,
+        industry:          industry             || null,
+        numberOfLocations: numberOfLocations    || null,
+        ...(isValidWashEssentialsPlan
+          ? { plan: "wash_essentials", productLine: "WASH_ESSENTIALS" }
+          : {}),
       },
     })
-    const inviteUrl = `${appUrl}/invite/${token}`
-    await sendEmail({
-      to:      email,
-      subject: `You've been invited to join ${org?.name ?? "Relay"}`,
-      html:    inviteHtml(org?.name ?? "Relay", inviteUrl, member.name?.trim() || undefined),
-    })
-  }
 
-  // ── 5. Create routing rules ──────────────────────────────────────────────
-  // routing is Record<category, "role:MANAGER" | "user:email@...">
-  for (const [category, assignment] of Object.entries(routing as Record<string, string>)) {
-    if (!assignment) continue
-
-    let assignToRole: string | null    = null
-    let assignToUserId: string | null  = null
-    let ruleName = `${category} routing`
-
-    if (assignment.startsWith("role:")) {
-      assignToRole = assignment.slice(5)
-    } else if (assignment.startsWith("user:")) {
-      const email = assignment.slice(5)
-      const user  = await prisma.user.findUnique({ where: { email } })
-      if (user) assignToUserId = user.id
-      else assignToRole = "MANAGER" // fallback if not yet accepted
-      ruleName = `${category} → ${email}`
-    } else {
-      assignToRole = assignment
-    }
-
-    // Upsert: one rule per category per org (avoid duplicates on re-run)
-    const existing = await prisma.routingRule.findFirst({
-      where: { organizationId: orgId, condCategory: category, name: { startsWith: category } },
-    })
-    if (!existing) {
-      await prisma.routingRule.create({
+    // ── 2. Create locations ───────────────────────────────────────────────────
+    for (const loc of locations) {
+      if (!loc.name?.trim()) continue
+      await tx.location.create({
         data: {
           organizationId: orgId,
-          name:          ruleName,
-          condCategory:  category,
-          assignToRole,
-          assignToUserId,
+          name:         loc.name.trim(),
+          locationType: loc.locationType || null,
+          address:      loc.address?.trim() || null,
         },
       })
     }
+
+    // ── 3. Create departments for selected issue types ────────────────────────
+    const deptNames = new Set<string>()
+    for (const label of issueTypes as string[]) {
+      const mapped = ISSUE_TYPE_MAP[label]
+      if (mapped?.dept) deptNames.add(mapped.dept)
+    }
+    for (const name of deptNames) {
+      const existing = await tx.department.findFirst({ where: { organizationId: orgId, name } })
+      if (!existing) {
+        await tx.department.create({ data: { organizationId: orgId, name } })
+      }
+    }
+
+    // ── 3.5. Create employee types ────────────────────────────────────────────
+    for (const def of employeeTypeDefs) {
+      if (!def.name?.trim()) continue
+      const existing = def.presetKey
+        ? await tx.employeeType.findFirst({ where: { organizationId: orgId, presetKey: def.presetKey } })
+        : await tx.employeeType.findFirst({ where: { organizationId: orgId, name: def.name.trim() } })
+      if (!existing) {
+        await tx.employeeType.create({
+          data: {
+            organizationId: orgId,
+            name:           def.name.trim(),
+            baseRole:       def.baseRole || "EMPLOYEE",
+            pageAccess:     def.pageAccess ?? [],
+            actions:        def.actions ?? [],
+            canInvite:      def.canInvite ?? false,
+            canChangeEmail: def.canChangeEmail ?? true,
+            isPreset:       !!def.presetKey,
+            presetKey:      def.presetKey ?? null,
+          },
+        })
+      }
+    }
+
+    // ── 4. Create invitations (collect emails for post-commit send) ───────────
+    const org = await tx.organization.findUnique({ where: { id: orgId }, select: { name: true } })
+    for (const member of team as Array<{ title: string; role: string; name: string; email: string; employeeTypeId?: string }>) {
+      const email = member.email?.trim()
+      if (!email) continue
+      const existingUser = await tx.user.findUnique({ where: { email } })
+      if (existingUser) continue
+      const alreadyInvited = await tx.invitation.findFirst({ where: { organizationId: orgId, email, usedAt: null } })
+      if (alreadyInvited) continue
+
+      let inviteRole = member.role || "EMPLOYEE"
+      if (member.employeeTypeId) {
+        const typeDef = employeeTypeDefs.find(d => d.id === member.employeeTypeId)
+        if (typeDef?.baseRole) inviteRole = typeDef.baseRole
+      }
+
+      const token     = randomUUID()
+      const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000)
+      await tx.invitation.create({
+        data: {
+          organizationId: orgId,
+          email,
+          token,
+          role:        inviteRole,
+          invitedById: session.userId,
+          expiresAt,
+        },
+      })
+      const inviteUrl = `${appUrl}/invite/${token}`
+      pendingEmails.push({
+        to:      email,
+        subject: `You've been invited to join ${org?.name ?? "Relay"}`,
+        html:    inviteHtml(org?.name ?? "Relay", inviteUrl, member.name?.trim() || undefined),
+      })
+    }
+
+    // ── 5. Create routing rules ───────────────────────────────────────────────
+    for (const [category, assignment] of Object.entries(routing as Record<string, string>)) {
+      if (!assignment) continue
+
+      let assignToRole: string | null   = null
+      let assignToUserId: string | null = null
+      let ruleName = `${category} routing`
+
+      if (assignment.startsWith("role:")) {
+        assignToRole = assignment.slice(5)
+      } else if (assignment.startsWith("user:")) {
+        const email = assignment.slice(5)
+        const user  = await tx.user.findUnique({ where: { email } })
+        if (user) assignToUserId = user.id
+        else assignToRole = "MANAGER"
+        ruleName = `${category} → ${email}`
+      } else {
+        assignToRole = assignment
+      }
+
+      const existing = await tx.routingRule.findFirst({
+        where: { organizationId: orgId, condCategory: category, name: { startsWith: category } },
+      })
+      if (!existing) {
+        await tx.routingRule.create({
+          data: {
+            organizationId: orgId,
+            name:           ruleName,
+            condCategory:   category,
+            assignToRole,
+            assignToUserId,
+          },
+        })
+      }
+    }
+
+    // ── 6. Mark onboarding complete — final write in transaction ─────────────
+    return tx.organization.update({
+      where:  { id: orgId },
+      data:   { onboardingCompletedAt: new Date() },
+      select: { plan: true, productLine: true },
+    })
+  })
+
+  // Send invitation emails after transaction commits
+  for (const mail of pendingEmails) {
+    await sendEmail(mail).catch(() => {})
   }
 
-  // ── 6. Refresh session ───────────────────────────────────────────────────
-  const refreshedOrg = await prisma.organization.findUnique({
-    where:  { id: orgId },
-    select: { plan: true, productLine: true },
-  })
+  // ── Refresh session ───────────────────────────────────────────────────────
   await createSession({
     userId:              session.userId,
     email:               session.email,
@@ -242,8 +236,8 @@ export async function POST(request: NextRequest) {
     onboardingCompleted: true,
     trialEndsAt:         session.trialEndsAt,
     subscriptionStatus:  session.subscriptionStatus,
-    plan:                refreshedOrg?.plan ?? session.plan,
-    productLine:         refreshedOrg?.productLine ?? session.productLine,
+    plan:                updatedOrg.plan ?? session.plan,
+    productLine:         updatedOrg.productLine ?? session.productLine,
   })
 
   return NextResponse.json({ success: true })

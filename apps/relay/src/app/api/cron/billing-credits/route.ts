@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     // Resolve subscription state
     const isPaid    = referred.subscriptionStatus === "active"
     const isPastDue = referred.subscriptionStatus === "past_due"
-    const isCancelled = ["cancelled", "expired", "trialing"].includes(referred.subscriptionStatus ?? "")
+    const isCancelled = ["canceled", "expired", "trialing"].includes(referred.subscriptionStatus ?? "")
 
     // ── Fraud gate: don't process if flagged for review ──────────────────────
     if (ref.fraudReview) {

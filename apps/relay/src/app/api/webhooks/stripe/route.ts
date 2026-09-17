@@ -176,10 +176,14 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   if (!customerId) return
 
   const statusMap: Record<string, string | undefined> = {
-    active:   "active",
-    past_due: "past_due",
-    canceled: "canceled",
-    unpaid:   "past_due",
+    active:             "active",
+    past_due:           "past_due",
+    canceled:           "canceled",
+    unpaid:             "past_due",
+    trialing:           "trialing",
+    incomplete:         "incomplete",
+    incomplete_expired: "expired",
+    paused:             "paused",
   }
   const newStatus = statusMap[subscription.status]
   if (!newStatus) return
@@ -214,6 +218,19 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     where: { stripeCustomerId: customerId },
     data:  { subscriptionStatus: newStatus },
   })
+
+  // When a customer reactivates (status → active), restore lifecycle from Cancelled to Customer
+  if (newStatus === "active") {
+    const orgs = await prisma.organization.findMany({
+      where:  { stripeCustomerId: customerId },
+      select: { id: true, lifecycleStatus: true },
+    })
+    for (const org of orgs) {
+      if (org.lifecycleStatus === "Cancelled") {
+        await setLifecycle(org.id, "Customer", "Stripe", org.lifecycleStatus)
+      }
+    }
+  }
 }
 
 async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
@@ -227,7 +244,7 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
 
   await prisma.organization.updateMany({
     where: { stripeCustomerId: customerId },
-    data:  { subscriptionStatus: "canceled" },
+    data:  { subscriptionStatus: "canceled", canceledAt: new Date() },
   })
 
   for (const org of orgs) {

@@ -20,6 +20,13 @@ export async function GET(request: NextRequest) {
     return new Response("Invalid URL", { status: 400 })
   }
 
+  // Org scoping: blob path is /relay/{organizationId}/{filename}
+  const pathParts = parsed.pathname.split("/")
+  const blobOrgId = pathParts[2]
+  if (!blobOrgId || blobOrgId !== session.organizationId) {
+    return new Response("Forbidden", { status: 403 })
+  }
+
   try {
     const result = await get(url, { access: "private" })
     if (!result) return new Response("Not found", { status: 404 })

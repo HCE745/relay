@@ -12,6 +12,38 @@
     {
       "path":     "/api/cron/customer-voice-sync",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path":     "/api/cron/ai-briefings",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path":     "/api/cron/crm-digest",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path":     "/api/cron/deactivate-expired-externals",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path":     "/api/cron/health-scores",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path":     "/api/cron/trend-detection",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path":     "/api/cron/trial-reminders",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path":     "/api/cron/visibility-check",
+      "schedule": "0 9 * * 1"
+    },
+    {
+      "path":     "/api/cron/data-retention",
+      "schedule": "0 3 1 * *"
     }
   ]
 }

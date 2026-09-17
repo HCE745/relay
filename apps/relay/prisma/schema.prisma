@@ -189,6 +189,7 @@ model Organization {
   executiveGoals        ExecutiveGoal[]
   legalAcceptances      LegalAcceptance[]
   lifecycleStatus       String               @default("Lead")
+  canceledAt            DateTime?            // set when subscription transitions to canceled
   demoCalls             DemoCall[]
   nonConversionReasons  NonConversionReason[]
   crmNotes              CrmNote[]
@@ -448,6 +449,9 @@ model Asset {
   qrCodes         QrCode[]
   assignments     Assignment[]     @relation("AssetAssignments")
   maintenanceSchedules MaintenanceSchedule[] @relation("AssetMaintenanceSchedules")
+
+  @@index([organizationId, status])
+  @@index([organizationId, name])
 }
 
 model Vendor {
@@ -531,6 +535,12 @@ model Issue {
   conversation            Conversation?
   assignments             Assignment[]      @relation("IssueAssignments")
   customerFeedback        CustomerFeedback[]
+
+  @@index([organizationId, status])
+  @@index([organizationId, priority])
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([organizationId, assignedToId])
+  @@index([organizationId, locationId])
 }
 
 model IssueComment {

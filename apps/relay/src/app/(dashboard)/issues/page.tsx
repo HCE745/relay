@@ -3,7 +3,7 @@ import { Header } from "@/components/layout/header"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { Plus, X } from "lucide-react"
+import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react"
 import { IssueFilters } from "@/components/issues/issue-filters"
 import { IssuesList } from "@/components/issues/issues-list"
 import { SavedViews } from "@/components/issues/saved-views"
@@ -12,6 +12,8 @@ import { resolveViewIcon } from "@/lib/custom-view-config"
 import { fetchIssues } from "@/lib/issue-queries"
 
 export const dynamic = "force-dynamic"
+
+const PAGE_SIZE = 50
 
 interface SearchParams {
   view?:        string
@@ -22,6 +24,7 @@ interface SearchParams {
   locationId?:  string
   isEscalated?: string
   sort?:        string
+  page?:        string
 }
 
 
@@ -71,8 +74,11 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
   const effectiveSortField = activeView ? activeView.sortField : null
   const effectiveSortDir   = activeView ? activeView.sortDir   : null
 
-  const [issues, users, org, locations] = await Promise.all([
-    fetchIssues(session.organizationId, effectiveFilters, effectiveSortField, effectiveSortDir),
+  const page = Math.max(1, parseInt(params.page ?? "1", 10))
+  const skip = (page - 1) * PAGE_SIZE
+
+  const [{ issues, total }, users, org, locations] = await Promise.all([
+    fetchIssues(session.organizationId, effectiveFilters, effectiveSortField, effectiveSortDir, PAGE_SIZE, skip),
     prisma.user.findMany({
       where: { organizationId: session.organizationId, isActive: true },
       orderBy: { name: "asc" },
@@ -149,6 +155,34 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
             currentFilters={currentFilters}
             visibleColumns={activeView?.columns ?? null}
           />
+          {total > PAGE_SIZE && (() => {
+            const totalPages = Math.ceil(total / PAGE_SIZE)
+            const buildHref = (p: number) => {
+              const qs = new URLSearchParams({ ...currentFilters, page: String(p) })
+              if (params.view) qs.set("view", params.view)
+              return `/issues?${qs.toString()}`
+            }
+            return (
+              <div className="flex items-center justify-between px-1 pt-4">
+                <span className="text-xs text-gray-400">
+                  Showing {skip + 1}–{Math.min(skip + PAGE_SIZE, total)} of {total}
+                </span>
+                <div className="flex items-center gap-2">
+                  {page > 1 && (
+                    <Link href={buildHref(page - 1)} className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
+                      <ChevronLeft className="w-4 h-4" /> Prev
+                    </Link>
+                  )}
+                  <span className="text-xs text-gray-500">{page} / {totalPages}</span>
+                  {page < totalPages && (
+                    <Link href={buildHref(page + 1)} className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
+                      Next <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )
+          })()}
         </div>
       </div>
     </div>

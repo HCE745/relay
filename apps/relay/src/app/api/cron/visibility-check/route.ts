@@ -1,11 +1,15 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { callWithWebSearch, callForAnalysis, computeCheckCost, parseRelayMention } from "@/lib/visibility-engine"
 
 export const dynamic = "force-dynamic"
 export const maxDuration = 300
 
-export async function GET() {
+export async function POST(req: NextRequest) {
+  const cronSecret = process.env.CRON_SECRET
+  if (!cronSecret || req.headers.get("authorization") !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
   const settings = await prisma.visibilitySetting.findFirst()
   if (!settings || settings.mode !== "automatic") {
     return NextResponse.json({ skipped: "mode is manual" })

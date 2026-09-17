@@ -17,7 +17,8 @@ export async function fetchIssues(
   sortField?: string | null,
   sortDir?: string | null,
   limit?: number,
-) {
+  skip?: number,
+): Promise<{ issues: Awaited<ReturnType<typeof _queryIssues>>; total: number }> {
   const where: Record<string, unknown> = { organizationId: orgId }
   if (filters.status)     where.status     = filters.status
   if (filters.priority)   where.priority   = filters.priority
@@ -28,10 +29,25 @@ export async function fetchIssues(
 
   const orderBy = resolveSortPairs(sortField, sortDir).map(([f, d]) => ({ [f]: d }))
 
+  const [issues, total] = await Promise.all([
+    _queryIssues(where, orderBy, limit, skip),
+    limit != null ? prisma.issue.count({ where }) : Promise.resolve(0),
+  ])
+
+  return { issues, total }
+}
+
+function _queryIssues(
+  where: Record<string, unknown>,
+  orderBy: Record<string, string>[],
+  limit?: number,
+  skip?: number,
+) {
   return prisma.issue.findMany({
     where,
     orderBy,
     ...(limit ? { take: limit } : {}),
+    ...(skip  ? { skip }        : {}),
     include: {
       reportedBy: { select: { name: true } },
       assignedTo: { select: { name: true } },

@@ -3,8 +3,14 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Modal } from "@/components/ui/modal"
-import { Button, Field, Input, Textarea } from "@/components/ui/controls"
+import { Button, Field, Input, Select, Textarea } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
+
+const PAYMENT_TERMS_LABEL: Record<string, string> = {
+  DUE_ON_RECEIPT: "Due on receipt",
+  NET_15: "Net 15",
+  NET_30: "Net 30",
+}
 
 export type CustomerValues = {
   id?: string
@@ -13,6 +19,8 @@ export type CustomerValues = {
   email?: string | null
   phone?: string | null
   billingAddress?: string | null
+  billingEmail?: string | null
+  paymentTerms?: string | null
   notes?: string | null
 }
 
@@ -24,12 +32,16 @@ function CustomerForm({ initial, onDone }: { initial?: CustomerValues; onDone: (
     email: initial?.email ?? "",
     phone: initial?.phone ?? "",
     billingAddress: initial?.billingAddress ?? "",
+    billingEmail: initial?.billingEmail ?? "",
+    paymentTerms: initial?.paymentTerms ?? "DUE_ON_RECEIPT",
     notes: initial?.notes ?? "",
   })
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const set = (k: keyof CustomerValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setValues((v) => ({ ...v, [k]: e.target.value }))
+  const set =
+    (k: keyof CustomerValues) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setValues((v) => ({ ...v, [k]: e.target.value }))
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -63,6 +75,20 @@ function CustomerForm({ initial, onDone }: { initial?: CustomerValues; onDone: (
       <Field label="Billing / contact address" htmlFor="c-addr">
         <Textarea id="c-addr" value={values.billingAddress ?? ""} onChange={set("billingAddress")} />
       </Field>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Field label="Billing email" htmlFor="c-billemail" hint="Where invoices are addressed">
+          <Input id="c-billemail" type="email" value={values.billingEmail ?? ""} onChange={set("billingEmail")} />
+        </Field>
+        <Field label="Payment terms" htmlFor="c-terms">
+          <Select id="c-terms" value={values.paymentTerms ?? "DUE_ON_RECEIPT"} onChange={set("paymentTerms")}>
+            {Object.entries(PAYMENT_TERMS_LABEL).map(([val, label]) => (
+              <option key={val} value={val}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
       <Field label="Notes" htmlFor="c-notes">
         <Textarea id="c-notes" value={values.notes ?? ""} onChange={set("notes")} />
       </Field>

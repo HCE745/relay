@@ -26,6 +26,8 @@ export const CAPABILITIES = [
   "operations.issues",
   "operations.correctiveActions",
   "workforce.payrollExport", // export/integration only — never payroll processing
+  "billing.invoicing", // invoices, payments, AR
+  "billing.arAging", // accounts-receivable aging report
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",

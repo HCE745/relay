@@ -31,6 +31,8 @@ const TEAM_CAPS: Capability[] = [
   "operations.issues",
   "operations.correctiveActions",
   "workforce.payrollExport",
+  "billing.invoicing",
+  "billing.arAging",
 ]
 
 const BUSINESS_CAPS: Capability[] = [

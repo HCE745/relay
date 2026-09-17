@@ -31,12 +31,21 @@ const optionalEmail = z
   .optional()
   .or(z.literal("").transform(() => undefined))
 
+export const PAYMENT_TERMS = ["DUE_ON_RECEIPT", "NET_15", "NET_30"] as const
+
+// Money as a 2-decimal string so it reaches Prisma's Decimal without ever
+// passing through a JS float. "" is treated as "not provided".
+const money = z.string().trim().regex(/^\d{1,9}(\.\d{1,2})?$/, "Enter an amount like 120 or 120.50")
+const optionalMoney = money.optional().or(z.literal("").transform(() => undefined))
+
 export const customerCreateSchema = z.object({
   name: z.string().trim().min(1, "Customer name is required").max(200),
   primaryContactName: optionalString,
   email: optionalEmail,
   phone: optionalString,
   billingAddress: optionalString,
+  billingEmail: optionalEmail,
+  paymentTerms: z.enum(PAYMENT_TERMS).optional(),
   notes: optionalString,
 })
 export const customerUpdateSchema = customerCreateSchema.partial().extend({
@@ -111,6 +120,8 @@ export const SERVICE_FREQUENCIES = [
 const timeString = z.string().regex(/^\d{1,2}:\d{2}$/, "Use HH:mm")
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD")
 
+export const BILLING_TYPES = ["FLAT_PER_JOB", "HOURLY"] as const
+
 export const servicePlanCreateSchema = z.object({
   serviceLocationId: z.string().min(1),
   name: z.string().trim().min(1, "Service plan name is required").max(200),
@@ -122,6 +133,9 @@ export const servicePlanCreateSchema = z.object({
   checklistTemplateId: z.string().min(1).optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
+  billingType: z.enum(BILLING_TYPES).optional(),
+  rate: optionalMoney,
+  currency: z.string().trim().length(3).toUpperCase().optional(),
 })
 export const servicePlanUpdateSchema = servicePlanCreateSchema
   .omit({ serviceLocationId: true })
@@ -302,3 +316,26 @@ export const changePasswordSchema = z.object({
 export const assignIssueSchema = z.object({ assigneeId: z.string().min(1).nullable() })
 export const issueStatusSchema = z.object({ status: z.enum(["OPEN", "ACKNOWLEDGED", "RESOLVED", "CLOSED"]) })
 export const issueCommentSchema = z.object({ body: z.string().trim().min(1, "Write a note").max(2000) })
+
+// ─── Phase 2: billing / invoices ─────────────────────────────────────────────
+
+export const INVOICE_STATUSES = ["DRAFT", "SENT", "PAID", "VOID"] as const
+
+export const generateInvoiceSchema = z
+  .object({
+    customerId: z.string().min(1),
+    periodStart: dateString,
+    periodEnd: dateString,
+  })
+  .refine((v) => v.periodStart <= v.periodEnd, { message: "End date must be on or after the start date" })
+export type GenerateInvoiceInput = z.infer<typeof generateInvoiceSchema>
+
+export const invoiceStatusSchema = z.object({ status: z.enum(INVOICE_STATUSES) })
+
+export const invoicePaymentSchema = z.object({
+  amount: money,
+  receivedDate: dateString.optional(),
+  method: optionalString,
+  reference: optionalString,
+})
+export type InvoicePaymentInput = z.infer<typeof invoicePaymentSchema>

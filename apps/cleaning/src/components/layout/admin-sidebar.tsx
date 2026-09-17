@@ -19,20 +19,27 @@ export function AdminSidebar({
   const [open, setOpen] = useState(false)
 
   const links = (
-    <nav className="flex-1 space-y-1 px-3">
-      {nav.map((item) => {
+    <nav className="flex-1 space-y-1 overflow-y-auto px-3">
+      {nav.map((item, i) => {
         const active = pathname === item.href || pathname.startsWith(item.href + "/")
+        const showSection = !!item.section && item.section !== nav[i - 1]?.section
         return (
-          <Link
-            key={item.key}
-            href={item.href}
-            onClick={() => setOpen(false)}
-            className={`block rounded-lg px-3 py-2 text-sm font-medium transition ${
-              active ? "bg-brand text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            {item.label}
-          </Link>
+          <div key={item.key}>
+            {showSection ? (
+              <div className="px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                {item.section}
+              </div>
+            ) : null}
+            <Link
+              href={item.href}
+              onClick={() => setOpen(false)}
+              className={`block rounded-lg px-3 py-2 text-sm font-medium transition ${
+                active ? "bg-brand text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              {item.label}
+            </Link>
+          </div>
         )
       })}
     </nav>

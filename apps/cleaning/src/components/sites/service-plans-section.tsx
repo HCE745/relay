@@ -19,6 +19,9 @@ export type PlanValue = {
   endDate: string | Date | null
   isActive: boolean
   checklistTemplate: { id: string; name: string; version: number } | null
+  billingType: string
+  rate: string | null
+  currency: string
 }
 type TemplateOption = { id: string; name: string }
 
@@ -29,6 +32,15 @@ const FREQ_LABEL: Record<string, string> = {
   BIWEEKLY: "Every 2 weeks",
   MONTHLY: "Monthly",
   CUSTOM: "Custom",
+}
+
+const BILLING_LABEL: Record<string, string> = { FLAT_PER_JOB: "Flat per job", HOURLY: "Hourly" }
+
+function billingSummary(p: PlanValue): string {
+  if (!p.rate) return "no rate set"
+  const n = Number(p.rate)
+  const amount = Number.isFinite(n) ? `$${n.toFixed(2)}` : `$${p.rate}`
+  return p.billingType === "HOURLY" ? `${amount}/hr` : `${amount}/job`
 }
 
 const toDateInput = (d: string | Date | null): string => {
@@ -59,6 +71,9 @@ function PlanForm({
     startDate: toDateInput(initial?.startDate ?? null),
     endDate: toDateInput(initial?.endDate ?? null),
     rrule: initial?.rrule ?? "",
+    billingType: initial?.billingType ?? "FLAT_PER_JOB",
+    rate: initial?.rate ?? "",
+    currency: initial?.currency ?? "USD",
   })
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -81,6 +96,9 @@ function PlanForm({
     if (v.startDate) payload.startDate = v.startDate
     if (v.endDate) payload.endDate = v.endDate
     if (v.frequency === "CUSTOM" && v.rrule) payload.rrule = v.rrule
+    payload.billingType = v.billingType
+    payload.currency = v.currency || "USD"
+    if (v.rate.trim()) payload.rate = v.rate.trim()
 
     const res = initial
       ? await apiSend(`/api/service-plans/${initial.id}`, "PATCH", payload)
@@ -141,6 +159,20 @@ function PlanForm({
           ))}
         </Select>
       </Field>
+      <div className="grid grid-cols-3 gap-4">
+        <Field label="Billing" htmlFor="p-billtype">
+          <Select id="p-billtype" value={v.billingType} onChange={set("billingType")}>
+            <option value="FLAT_PER_JOB">Flat per job</option>
+            <option value="HOURLY">Hourly</option>
+          </Select>
+        </Field>
+        <Field label={v.billingType === "HOURLY" ? "Rate / hour" : "Rate / job"} htmlFor="p-rate" hint="e.g. 120 or 120.50">
+          <Input id="p-rate" inputMode="decimal" value={v.rate} onChange={set("rate")} placeholder="0.00" />
+        </Field>
+        <Field label="Currency" htmlFor="p-cur">
+          <Input id="p-cur" value={v.currency} onChange={set("currency")} maxLength={3} />
+        </Field>
+      </div>
       {error ? <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>
@@ -237,6 +269,8 @@ export function ServicePlansSection({
                 <div className="text-xs text-slate-500">
                   {FREQ_LABEL[p.frequency] ?? p.frequency} at {p.startTime ?? "09:00"} · crew of {p.crewSize}
                   {p.checklistTemplate ? ` · ${p.checklistTemplate.name} (v${p.checklistTemplate.version})` : " · no checklist"}
+                  {" · "}
+                  {BILLING_LABEL[p.billingType] ?? p.billingType} · {billingSummary(p)}
                 </div>
               </div>
               <div className="flex gap-1">

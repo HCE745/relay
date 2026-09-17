@@ -110,7 +110,22 @@ export default async function SiteDetailPage({
       <ScopeSection templates={templates} />
       <ServicePlansSection
         siteId={site.id}
-        plans={site.servicePlans}
+        plans={site.servicePlans.map((p) => ({
+          id: p.id,
+          name: p.name,
+          frequency: p.frequency,
+          startTime: p.startTime,
+          crewSize: p.crewSize,
+          defaultDurationMin: p.defaultDurationMin,
+          rrule: p.rrule,
+          startDate: p.startDate ? p.startDate.toISOString() : null,
+          endDate: p.endDate ? p.endDate.toISOString() : null,
+          isActive: p.isActive,
+          checklistTemplate: p.checklistTemplate,
+          billingType: p.billingType,
+          rate: p.rate ? p.rate.toString() : null,
+          currency: p.currency,
+        }))}
         templates={templates.filter((t) => t.isActive).map((t) => ({ id: t.id, name: t.name }))}
       />
     </div>

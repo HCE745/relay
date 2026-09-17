@@ -35,3 +35,16 @@ body {
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+/* Print-friendly documents (e.g. invoice detail): drop the app chrome so only
+   the document card prints. Mark chrome/action elements with [data-no-print]. */
+@media print {
+  aside,
+  [data-no-print] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+}

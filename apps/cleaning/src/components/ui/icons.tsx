@@ -141,6 +141,26 @@ export function CircleIcon({ className }: IconProps) {
   return base(<circle cx="12" cy="12" r="9" />, className)
 }
 
+export function ReceiptIcon({ className }: IconProps) {
+  return base(
+    <>
+      <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" />
+      <path d="M9 8h6M9 12h6" />
+    </>,
+    className,
+  )
+}
+
+export function DollarIcon({ className }: IconProps) {
+  return base(
+    <>
+      <path d="M12 2v20" />
+      <path d="M16 6.5A3.5 3.5 0 0 0 12.5 3h-1a3.5 3.5 0 0 0 0 7h1a3.5 3.5 0 0 1 0 7h-1A3.5 3.5 0 0 1 8 13.5" />
+    </>,
+    className,
+  )
+}
+
 export function SparklesIcon({ className }: IconProps) {
   return base(
     <>

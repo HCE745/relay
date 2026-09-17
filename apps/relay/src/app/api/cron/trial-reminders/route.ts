@@ -7,12 +7,9 @@ export const dynamic = "force-dynamic"
 // Triggered by Vercel Cron (or any scheduler) once per day.
 // Set CRON_SECRET in env and pass as Authorization: Bearer <secret>.
 export async function POST(request: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  if (secret) {
-    const auth = request.headers.get("authorization")
-    if (auth !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+  const cronSecret = process.env.CRON_SECRET
+  if (!cronSecret || request.headers.get("authorization") !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const now   = new Date()

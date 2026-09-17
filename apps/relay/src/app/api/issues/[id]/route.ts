@@ -44,6 +44,27 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   })
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
+  // Role-based write authorization
+  if (session.role === "EMPLOYEE" && !session.superAdmin) {
+    // Employees may only update issues they personally submitted
+    if (existing.reportedById !== session.userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+    // Employees may only set status to IN_PROGRESS — no other field changes
+    const restricted = [
+      "priority", "assignedToId", "locationId", "departmentId", "category",
+      "vendorId", "assetId", "dueDate", "resolvedMethod", "resolutionCost",
+      "rootCause", "timeToResolve", "resolutionCategory", "sopId",
+      "sopComplianceOutcome", "title", "description",
+    ]
+    for (const field of restricted) {
+      if (field in body) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+    if (body.status !== undefined && body.status !== "IN_PROGRESS") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+  }
+
   const updateData: Record<string, unknown> = {}
   const historyEntries: Array<{ field: string; oldValue: string | null; newValue: string | null }> = []
 

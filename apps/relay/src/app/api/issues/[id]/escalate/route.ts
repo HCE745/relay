@@ -7,11 +7,30 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  // Only MANAGER and ADMIN roles may escalate issues
+  if (!["MANAGER", "ADMIN"].includes(session.role) && !session.superAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
+
   const { id } = await params
   const { reason } = await request.json()
 
   const issue = await prisma.issue.findFirst({ where: { id, organizationId: session.organizationId } })
   if (!issue) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+  // Rate limit: one escalation per user per issue per hour
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+  const recentEscalation = await prisma.issueHistory.findFirst({
+    where: {
+      issueId: id,
+      changedById: session.userId,
+      field: "escalationLevel",
+      createdAt: { gte: oneHourAgo },
+    },
+  })
+  if (recentEscalation) {
+    return NextResponse.json({ error: "Too many requests — this issue was already escalated within the last hour" }, { status: 429 })
+  }
 
   const fromLevel = issue.escalationLevel
   const toLevel = fromLevel + 1

@@ -11,10 +11,9 @@ export const dynamic = "force-dynamic"
 
 // Daily cron at 6am UTC. Set CRON_SECRET and call with Authorization: Bearer <secret>.
 export async function POST(request: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  if (secret) {
-    const auth = request.headers.get("authorization")
-    if (auth !== `Bearer ${secret}`) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const cronSecret = process.env.CRON_SECRET
+  if (!cronSecret || request.headers.get("authorization") !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.getrelay.software"

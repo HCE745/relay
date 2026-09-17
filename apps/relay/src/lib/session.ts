@@ -9,9 +9,11 @@ import {
   deleteSessionCookie,
 } from "@hce/auth"
 
-const SECRET = encodeSecret(
-  process.env.SESSION_SECRET ?? "relay-secret-key-change-in-production-32ch"
-)
+const _sessionSecret = process.env.SESSION_SECRET
+if (!_sessionSecret) {
+  throw new Error("SESSION_SECRET environment variable is required — set it in .env or Vercel dashboard")
+}
+const SECRET = encodeSecret(_sessionSecret)
 
 export type SessionPayload = {
   userId: string

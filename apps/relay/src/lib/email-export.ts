@@ -119,7 +119,7 @@ export async function buildThreadPdf(
   emails:     ExportEmail[],
   linkClicks: ExportLinkClick[],
   meta?:      { companyName?: string; contactName?: string },
-): Promise<ArrayBuffer> {
+): Promise<Buffer> {
   const sorted = [...emails].sort(
     (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
   )
@@ -257,7 +257,7 @@ export async function buildThreadPdf(
   }
 
   const bytes = await doc.save()
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
+  return Buffer.from(bytes)
 }
 
 export async function buildBulkZip(
@@ -268,7 +268,7 @@ export async function buildBulkZip(
     meta?:      { companyName?: string; contactName?: string }
   }>,
   exportedAt: Date = new Date(),
-): Promise<ArrayBuffer> {
+): Promise<Buffer> {
   const zip = new JSZip()
 
   for (const thread of threads) {
@@ -283,9 +283,7 @@ export async function buildBulkZip(
     zip.file(`${slug}.txt`, text)
   }
 
-  const dateStr = exportedAt.toISOString().split("T")[0]
-  void dateStr  // used in filename at call site
+  void exportedAt  // used in filename at call site
 
-  const buf = await zip.generateAsync({ type: "nodebuffer" }) as Buffer
-  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer
+  return (await zip.generateAsync({ type: "nodebuffer" })) as Buffer
 }

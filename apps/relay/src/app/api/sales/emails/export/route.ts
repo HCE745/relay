@@ -8,24 +8,42 @@ import type { ExportEmail, ExportLinkClick } from "@/lib/email-export"
 
 type Format = "pdf" | "text" | "zip"
 
+// Buffer is valid BodyInit at runtime but TypeScript's lib.dom.d.ts doesn't know it.
+// Content-Length is critical: without it the client's res.blob() waits forever.
+function binaryResp(buf: Buffer, contentType: string, filename: string): NextResponse {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return new NextResponse(buf as any, {
+    headers: {
+      "Content-Type":        contentType,
+      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Length":      String(buf.byteLength),
+    },
+  })
+}
+
 export async function POST(req: NextRequest) {
+  console.log("[export] POST start")
   try {
     const info = await getSalesSession()
-    if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!info) {
+      console.log("[export] unauthorized")
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
     const body = await req.json() as {
-      threadId?:   string           // single thread
-      threadIds?:  string[]         // bulk threads
-      emailIds?:   string[]         // specific email IDs (derives threads)
+      threadId?:   string
+      threadIds?:  string[]
+      emailIds?:   string[]
       format:      Format
       startDate?:  string
       endDate?:    string
     }
 
     const { format, threadId, threadIds, emailIds, startDate, endDate } = body
+    console.log("[export] format=%s threadId=%s threadIds=%j emailIds=%j", format, threadId, threadIds, emailIds)
+
     if (!format) return NextResponse.json({ error: "format required" }, { status: 400 })
 
-    // Build date range filter
     const dateFilter = startDate || endDate ? {
       sentAt: {
         ...(startDate ? { gte: new Date(startDate) } : {}),
@@ -33,7 +51,6 @@ export async function POST(req: NextRequest) {
       },
     } : {}
 
-    // Determine scope: single thread, bulk threads, or specific emails
     let targetThreadIds: string[] = []
 
     if (threadId) {
@@ -41,7 +58,6 @@ export async function POST(req: NextRequest) {
     } else if (threadIds && threadIds.length > 0) {
       targetThreadIds = threadIds
     } else if (emailIds && emailIds.length > 0) {
-      // Look up thread IDs from email IDs
       const emails = await prisma.crmEmail.findMany({
         where: { id: { in: emailIds } },
         select: { id: true, threadId: true },
@@ -52,7 +68,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "threadId, threadIds, or emailIds required" }, { status: 400 })
     }
 
-    // Fetch all emails for target threads (with date filter)
+    console.log("[export] targetThreadIds=%j", targetThreadIds)
+
     const allEmails = await prisma.crmEmail.findMany({
       where: {
         AND: [
@@ -78,14 +95,14 @@ export async function POST(req: NextRequest) {
       orderBy: { sentAt: "asc" },
     })
 
-    // Sales rep restriction: can only export their own sent emails' threads
+    console.log("[export] found %d emails", allEmails.length)
+
     if (!info.isSuperAdmin && !info.isManager) {
       const repEmailAddresses = await prisma.imapConfig.findMany({
         where: { salesUserId: info.salesUserId },
         select: { emailAddress: true },
       })
       const repAddresses = new Set(repEmailAddresses.map(c => c.emailAddress.toLowerCase()))
-      // Filter to threads where the rep sent at least one email
       const repThreadIds = new Set(
         allEmails
           .filter(e => e.direction === "sent" && repAddresses.has(e.fromAddress.toLowerCase()))
@@ -93,13 +110,10 @@ export async function POST(req: NextRequest) {
       )
       const filteredEmails = allEmails.filter(e => repThreadIds.has(e.threadId ?? e.id))
       if (filteredEmails.length < allEmails.length) {
-        // Re-scope to only rep's threads
-        const filteredIds = [...repThreadIds]
-        targetThreadIds = filteredIds
+        targetThreadIds = [...repThreadIds]
       }
     }
 
-    // Group into threads
     const threadMap = new Map<string, typeof allEmails>()
     for (const e of allEmails) {
       const key = e.threadId ?? e.id
@@ -108,6 +122,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (threadMap.size === 0) {
+      console.log("[export] no emails found")
       return NextResponse.json({ error: "No emails found" }, { status: 404 })
     }
 
@@ -134,7 +149,7 @@ export async function POST(req: NextRequest) {
 
     const dateStr = new Date().toISOString().split("T")[0]!
 
-    // ── Single thread (PDF or Text) ──────────────────────────────────────────────
+    // ── Single thread ──────────────────────────────────────────────────────────
     if ((threadId || emailIds) && format !== "zip" && threadMap.size === 1) {
       const [, threadEmails] = [...threadMap.entries()][0]!
       const firstDc      = threadEmails.find(e => e.demoCall)?.demoCall
@@ -146,25 +161,18 @@ export async function POST(req: NextRequest) {
       const slug         = `${companyName}-${contactName}-${dateStr}`.replace(/[^a-zA-Z0-9-]/g, "_")
 
       if (format === "pdf") {
-        const pdfBuf  = await buildThreadPdf(exportEmails, allClicks, meta)
-        return new NextResponse(new Blob([pdfBuf], { type: "application/pdf" }), {
-          headers: {
-            "Content-Type":        "application/pdf",
-            "Content-Disposition": `attachment; filename="${slug}.pdf"`,
-          },
-        })
+        console.log("[export] building single PDF, %d emails", exportEmails.length)
+        const pdfBuf = await buildThreadPdf(exportEmails, allClicks, meta)
+        console.log("[export] PDF built, size=%d", pdfBuf.byteLength)
+        return binaryResp(pdfBuf, "application/pdf", `${slug}.pdf`)
       } else {
         const text = buildThreadText(exportEmails, allClicks, meta)
-        return new NextResponse(text, {
-          headers: {
-            "Content-Type":        "text/plain; charset=utf-8",
-            "Content-Disposition": `attachment; filename="${slug}.txt"`,
-          },
-        })
+        const buf  = Buffer.from(text, "utf8")
+        return binaryResp(buf, "text/plain; charset=utf-8", `${slug}.txt`)
       }
     }
 
-    // ── Bulk (ZIP, or multi-thread PDF/text) ─────────────────────────────────────
+    // ── Bulk ZIP ───────────────────────────────────────────────────────────────
     if (format === "zip") {
       const threads = [...threadMap.entries()].map(([key, emails]) => {
         const firstDc = emails.find(e => e.demoCall)?.demoCall
@@ -175,16 +183,13 @@ export async function POST(req: NextRequest) {
           meta:       { companyName: firstDc?.companyName, contactName: firstDc?.contactName },
         }
       })
+      console.log("[export] building ZIP, %d threads", threads.length)
       const zipBuffer = await buildBulkZip(threads)
-      return new NextResponse(new Blob([zipBuffer], { type: "application/zip" }), {
-        headers: {
-          "Content-Type":        "application/zip",
-          "Content-Disposition": `attachment; filename="relay-email-export-${dateStr}.zip"`,
-        },
-      })
+      console.log("[export] ZIP built, size=%d", zipBuffer.byteLength)
+      return binaryResp(zipBuffer, "application/zip", `relay-email-export-${dateStr}.zip`)
     }
 
-    // Multi-thread PDF
+    // ── Multi-thread PDF ───────────────────────────────────────────────────────
     if (format === "pdf") {
       const allExportEmails: ExportEmail[] = []
       const allExportClicks: ExportLinkClick[] = []
@@ -193,16 +198,13 @@ export async function POST(req: NextRequest) {
         allExportClicks.push(...emails.flatMap(e => e.linkClicks).map(toExportClick))
       }
       allExportEmails.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
-      const pdfBuf  = await buildThreadPdf(allExportEmails, allExportClicks, { companyName: "Multiple", contactName: "Multiple Contacts" })
-      return new NextResponse(new Blob([pdfBuf], { type: "application/pdf" }), {
-        headers: {
-          "Content-Type":        "application/pdf",
-          "Content-Disposition": `attachment; filename="relay-emails-${dateStr}.pdf"`,
-        },
-      })
+      console.log("[export] building multi-PDF, %d emails", allExportEmails.length)
+      const pdfBuf = await buildThreadPdf(allExportEmails, allExportClicks, { companyName: "Multiple", contactName: "Multiple Contacts" })
+      console.log("[export] multi-PDF built, size=%d", pdfBuf.byteLength)
+      return binaryResp(pdfBuf, "application/pdf", `relay-emails-${dateStr}.pdf`)
     }
 
-    // Multi-thread Text
+    // ── Multi-thread Text ──────────────────────────────────────────────────────
     const allExportEmails: ExportEmail[] = []
     const allExportClicks: ExportLinkClick[] = []
     for (const [, emails] of threadMap.entries()) {
@@ -211,14 +213,10 @@ export async function POST(req: NextRequest) {
     }
     allExportEmails.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
     const text = buildThreadText(allExportEmails, allExportClicks, { companyName: "Multiple", contactName: "Multiple Contacts" })
-    return new NextResponse(text, {
-      headers: {
-        "Content-Type":        "text/plain; charset=utf-8",
-        "Content-Disposition": `attachment; filename="relay-emails-${dateStr}.txt"`,
-      },
-    })
+    const buf  = Buffer.from(text, "utf8")
+    return binaryResp(buf, "text/plain; charset=utf-8", `relay-emails-${dateStr}.txt`)
   } catch (err) {
-    console.error("[sales/emails/export]", err)
-    return NextResponse.json({ error: "Export failed" }, { status: 500 })
+    console.error("[export] ERROR:", err)
+    return NextResponse.json({ error: "Export failed", detail: String(err) }, { status: 500 })
   }
 }

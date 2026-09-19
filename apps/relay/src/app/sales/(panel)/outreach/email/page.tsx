@@ -276,8 +276,13 @@ export default function SalesEmailPage() {
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({ threadIds: keys, format, ...dateParams }),
       })
-      if (!res.ok) return
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({ error: undefined })) as { error?: string }
+        alert(`Export failed: ${d.error ?? res.status}`)
+        return
+      }
       const blob    = await res.blob()
+      if (blob.size === 0) { alert("Export failed: server returned empty file"); return }
       const url     = URL.createObjectURL(blob)
       const a       = document.createElement("a")
       const cd      = res.headers.get("Content-Disposition") ?? ""
@@ -288,6 +293,8 @@ export default function SalesEmailPage() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
+    } catch (err) {
+      alert(`Export error: ${err instanceof Error ? err.message : String(err)}`)
     } finally {
       setBulkExporting(false)
       setShowBulkFilter(false)

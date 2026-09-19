@@ -6,10 +6,25 @@ import { prisma } from "@/lib/prisma"
 import { buildThreadText, buildThreadPdf } from "@/lib/email-export"
 import type { ExportEmail, ExportLinkClick } from "@/lib/email-export"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function binaryResp(buf: Buffer, contentType: string, filename: string): NextResponse {
+  return new NextResponse(buf as any, {
+    headers: {
+      "Content-Type":        contentType,
+      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Length":      String(buf.byteLength),
+    },
+  })
+}
+
 export async function POST(req: NextRequest) {
+  console.log("[export/account] POST start")
   try {
     const info = await getSalesSession()
-    if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!info) {
+      console.log("[export/account] unauthorized")
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
     const body = await req.json() as {
       accountId:   string
@@ -18,6 +33,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { accountId, accountType, format } = body
+    console.log("[export/account] accountId=%s accountType=%s format=%s", accountId, accountType, format)
+
     if (!accountId || !accountType || !format) {
       return NextResponse.json({ error: "accountId, accountType, and format required" }, { status: 400 })
     }
@@ -53,7 +70,6 @@ export async function POST(req: NextRequest) {
         orderBy: { sentAt: "asc" },
       })
     } else {
-      // prospect
       const prospect = await prisma.prospect.findUnique({
         where:   { id: accountId },
         include: { contacts: { select: { email: true } } },
@@ -86,6 +102,8 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    console.log("[export/account] found %d emails", emails.length)
+
     if (emails.length === 0) {
       return NextResponse.json({ error: "No emails found for this account" }, { status: 404 })
     }
@@ -115,29 +133,22 @@ export async function POST(req: NextRequest) {
       }))
     )
 
-    const meta       = { companyName, contactName }
-    const dateStr    = new Date().toISOString().split("T")[0]!
-    const slug       = `${companyName}-${contactName}-${dateStr}`.replace(/[^a-zA-Z0-9-]/g, "_")
+    const meta    = { companyName, contactName }
+    const dateStr = new Date().toISOString().split("T")[0]!
+    const slug    = `${companyName}-${contactName}-${dateStr}`.replace(/[^a-zA-Z0-9-]/g, "_")
 
     if (format === "pdf") {
-      const pdfBuf  = await buildThreadPdf(exportEmails, exportClicks, meta)
-      return new NextResponse(new Blob([pdfBuf], { type: "application/pdf" }), {
-        headers: {
-          "Content-Type":        "application/pdf",
-          "Content-Disposition": `attachment; filename="${slug}.pdf"`,
-        },
-      })
+      console.log("[export/account] building PDF, %d emails", exportEmails.length)
+      const pdfBuf = await buildThreadPdf(exportEmails, exportClicks, meta)
+      console.log("[export/account] PDF built, size=%d", pdfBuf.byteLength)
+      return binaryResp(pdfBuf, "application/pdf", `${slug}.pdf`)
     } else {
       const text = buildThreadText(exportEmails, exportClicks, meta)
-      return new NextResponse(text, {
-        headers: {
-          "Content-Type":        "text/plain; charset=utf-8",
-          "Content-Disposition": `attachment; filename="${slug}.txt"`,
-        },
-      })
+      const buf  = Buffer.from(text, "utf8")
+      return binaryResp(buf, "text/plain; charset=utf-8", `${slug}.txt`)
     }
   } catch (err) {
-    console.error("[sales/emails/export/account]", err)
-    return NextResponse.json({ error: "Export failed" }, { status: 500 })
+    console.error("[export/account] ERROR:", err)
+    return NextResponse.json({ error: "Export failed", detail: String(err) }, { status: 500 })
   }
 }

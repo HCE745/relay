@@ -81,10 +81,18 @@ export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byNam
         body:    JSON.stringify({ threadId: key, format }),
       })
       if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string }
-        setError(d.error ?? `Export failed (${res.status})`); return
+        const d = await res.json().catch(() => ({ error: undefined })) as { error?: string; detail?: string }
+        const msg = d.error ?? `Export failed (${res.status})`
+        setError(msg)
+        alert(`Export failed: ${msg}`)
+        return
       }
       const blob     = await res.blob()
+      if (blob.size === 0) {
+        setError("Export returned empty file")
+        alert("Export failed: empty response from server")
+        return
+      }
       const url      = URL.createObjectURL(blob)
       const a        = document.createElement("a")
       const cd       = res.headers.get("Content-Disposition") ?? ""
@@ -96,8 +104,10 @@ export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byNam
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
       setOpen(false)
-    } catch {
-      setError("Export failed")
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Export failed"
+      setError(msg)
+      alert(`Export error: ${msg}`)
     } finally {
       setExporting(false)
     }

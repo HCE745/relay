@@ -57,8 +57,13 @@ export default function DemoCallDetailPage() {
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({ accountId: call.id, accountType: "demoCall", format }),
       })
-      if (!res.ok) return
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({ error: undefined })) as { error?: string }
+        alert(`Export failed: ${d.error ?? res.status}`)
+        return
+      }
       const blob    = await res.blob()
+      if (blob.size === 0) { alert("Export failed: empty response"); return }
       const url     = URL.createObjectURL(blob)
       const a       = document.createElement("a")
       const cd      = res.headers.get("Content-Disposition") ?? ""
@@ -70,6 +75,8 @@ export default function DemoCallDetailPage() {
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
       setExportOpen(false)
+    } catch (err) {
+      alert(`Export error: ${err instanceof Error ? err.message : String(err)}`)
     } finally {
       setExporting(false)
     }

@@ -22,11 +22,18 @@ export function ExportEmailsButton({ accountId, accountType }: Props) {
         body:    JSON.stringify({ accountId, accountType, format }),
       })
       if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string }
-        setError(d.error ?? `Export failed (${res.status})`)
+        const d = await res.json().catch(() => ({ error: undefined })) as { error?: string }
+        const msg = d.error ?? `Export failed (${res.status})`
+        setError(msg)
+        alert(`Export failed: ${msg}`)
         return
       }
       const blob    = await res.blob()
+      if (blob.size === 0) {
+        setError("Export returned empty file")
+        alert("Export failed: server returned empty file")
+        return
+      }
       const url     = URL.createObjectURL(blob)
       const a       = document.createElement("a")
       const cd      = res.headers.get("Content-Disposition") ?? ""
@@ -38,8 +45,10 @@ export function ExportEmailsButton({ accountId, accountType }: Props) {
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
       setOpen(false)
-    } catch {
-      setError("Export failed — network error")
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Network error"
+      setError(msg)
+      alert(`Export error: ${msg}`)
     } finally {
       setExporting(false)
     }

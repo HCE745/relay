@@ -3,13 +3,11 @@ export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from "next/server"
 import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
-import { buildThreadText, buildThreadPdf, buildBulkZip } from "@/lib/email-export"
+import { buildThreadText, buildThreadHtml, buildBulkZip } from "@/lib/email-export"
 import type { ExportEmail, ExportLinkClick } from "@/lib/email-export"
 
-type Format = "pdf" | "text" | "zip"
+type Format = "html" | "text" | "zip"
 
-// Buffer is valid BodyInit at runtime but TypeScript's lib.dom.d.ts doesn't know it.
-// Content-Length is critical: without it the client's res.blob() waits forever.
 function binaryResp(buf: Buffer, contentType: string, filename: string): NextResponse {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new NextResponse(buf as any, {
@@ -25,10 +23,7 @@ export async function POST(req: NextRequest) {
   console.log("[export] POST start")
   try {
     const info = await getSalesSession()
-    if (!info) {
-      console.log("[export] unauthorized")
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+    if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json() as {
       threadId?:   string
@@ -40,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { format, threadId, threadIds, emailIds, startDate, endDate } = body
-    console.log("[export] format=%s threadId=%s threadIds=%j emailIds=%j", format, threadId, threadIds, emailIds)
+    console.log("[export] format=%s threadId=%s threadIds=%j", format, threadId, threadIds)
 
     if (!format) return NextResponse.json({ error: "format required" }, { status: 400 })
 
@@ -67,8 +62,6 @@ export async function POST(req: NextRequest) {
     } else {
       return NextResponse.json({ error: "threadId, threadIds, or emailIds required" }, { status: 400 })
     }
-
-    console.log("[export] targetThreadIds=%j", targetThreadIds)
 
     const allEmails = await prisma.crmEmail.findMany({
       where: {
@@ -98,18 +91,17 @@ export async function POST(req: NextRequest) {
     console.log("[export] found %d emails", allEmails.length)
 
     if (!info.isSuperAdmin && !info.isManager) {
-      const repEmailAddresses = await prisma.imapConfig.findMany({
+      const repConfigs = await prisma.imapConfig.findMany({
         where: { salesUserId: info.salesUserId },
         select: { emailAddress: true },
       })
-      const repAddresses = new Set(repEmailAddresses.map(c => c.emailAddress.toLowerCase()))
+      const repAddresses = new Set(repConfigs.map(c => c.emailAddress.toLowerCase()))
       const repThreadIds = new Set(
         allEmails
           .filter(e => e.direction === "sent" && repAddresses.has(e.fromAddress.toLowerCase()))
           .map(e => e.threadId ?? e.id)
       )
-      const filteredEmails = allEmails.filter(e => repThreadIds.has(e.threadId ?? e.id))
-      if (filteredEmails.length < allEmails.length) {
+      if (repThreadIds.size < targetThreadIds.length) {
         targetThreadIds = [...repThreadIds]
       }
     }
@@ -122,8 +114,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (threadMap.size === 0) {
-      console.log("[export] no emails found")
-      return NextResponse.json({ error: "No emails found" }, { status: 404 })
+      return NextResponse.json({ error: "No emails found for the requested thread(s)" }, { status: 404 })
     }
 
     const toExportEmail = (e: typeof allEmails[0]): ExportEmail => ({
@@ -152,19 +143,18 @@ export async function POST(req: NextRequest) {
     // ── Single thread ──────────────────────────────────────────────────────────
     if ((threadId || emailIds) && format !== "zip" && threadMap.size === 1) {
       const [, threadEmails] = [...threadMap.entries()][0]!
-      const firstDc      = threadEmails.find(e => e.demoCall)?.demoCall
-      const companyName  = firstDc?.companyName ?? "Unknown"
-      const contactName  = firstDc?.contactName ?? "Unknown"
-      const allClicks    = threadEmails.flatMap(e => e.linkClicks).map(toExportClick)
+      const firstDc     = threadEmails.find(e => e.demoCall)?.demoCall
+      const companyName = firstDc?.companyName ?? "Unknown"
+      const contactName = firstDc?.contactName ?? "Unknown"
+      const allClicks   = threadEmails.flatMap(e => e.linkClicks).map(toExportClick)
       const exportEmails = threadEmails.map(toExportEmail)
-      const meta         = { companyName, contactName }
-      const slug         = `${companyName}-${contactName}-${dateStr}`.replace(/[^a-zA-Z0-9-]/g, "_")
+      const meta        = { companyName, contactName }
+      const slug        = `${companyName}-${contactName}-${dateStr}`.replace(/[^a-zA-Z0-9-]/g, "_")
 
-      if (format === "pdf") {
-        console.log("[export] building single PDF, %d emails", exportEmails.length)
-        const pdfBuf = await buildThreadPdf(exportEmails, allClicks, meta)
-        console.log("[export] PDF built, size=%d", pdfBuf.byteLength)
-        return binaryResp(pdfBuf, "application/pdf", `${slug}.pdf`)
+      if (format === "html") {
+        const html = buildThreadHtml(exportEmails, allClicks, meta)
+        const buf  = Buffer.from(html, "utf8")
+        return binaryResp(buf, "text/html; charset=utf-8", `${slug}.html`)
       } else {
         const text = buildThreadText(exportEmails, allClicks, meta)
         const buf  = Buffer.from(text, "utf8")
@@ -184,13 +174,13 @@ export async function POST(req: NextRequest) {
         }
       })
       console.log("[export] building ZIP, %d threads", threads.length)
-      const zipBuffer = await buildBulkZip(threads)
-      console.log("[export] ZIP built, size=%d", zipBuffer.byteLength)
-      return binaryResp(zipBuffer, "application/zip", `relay-email-export-${dateStr}.zip`)
+      const zipBuf = await buildBulkZip(threads)
+      console.log("[export] ZIP built, size=%d", zipBuf.byteLength)
+      return binaryResp(zipBuf, "application/zip", `relay-email-export-${dateStr}.zip`)
     }
 
-    // ── Multi-thread PDF ───────────────────────────────────────────────────────
-    if (format === "pdf") {
+    // ── Multi-thread HTML ──────────────────────────────────────────────────────
+    if (format === "html") {
       const allExportEmails: ExportEmail[] = []
       const allExportClicks: ExportLinkClick[] = []
       for (const [, emails] of threadMap.entries()) {
@@ -198,10 +188,9 @@ export async function POST(req: NextRequest) {
         allExportClicks.push(...emails.flatMap(e => e.linkClicks).map(toExportClick))
       }
       allExportEmails.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
-      console.log("[export] building multi-PDF, %d emails", allExportEmails.length)
-      const pdfBuf = await buildThreadPdf(allExportEmails, allExportClicks, { companyName: "Multiple", contactName: "Multiple Contacts" })
-      console.log("[export] multi-PDF built, size=%d", pdfBuf.byteLength)
-      return binaryResp(pdfBuf, "application/pdf", `relay-emails-${dateStr}.pdf`)
+      const html = buildThreadHtml(allExportEmails, allExportClicks, { companyName: "Multiple", contactName: "Multiple Contacts" })
+      const buf  = Buffer.from(html, "utf8")
+      return binaryResp(buf, "text/html; charset=utf-8", `relay-emails-${dateStr}.html`)
     }
 
     // ── Multi-thread Text ──────────────────────────────────────────────────────
@@ -215,8 +204,12 @@ export async function POST(req: NextRequest) {
     const text = buildThreadText(allExportEmails, allExportClicks, { companyName: "Multiple", contactName: "Multiple Contacts" })
     const buf  = Buffer.from(text, "utf8")
     return binaryResp(buf, "text/plain; charset=utf-8", `relay-emails-${dateStr}.txt`)
+
   } catch (err) {
     console.error("[export] ERROR:", err)
-    return NextResponse.json({ error: "Export failed", detail: String(err) }, { status: 500 })
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : String(err) },
+      { status: 500 },
+    )
   }
 }

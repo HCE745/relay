@@ -1,4 +1,3 @@
-import { PDFDocument, StandardFonts, rgb, PageSizes } from "pdf-lib"
 import JSZip from "jszip"
 
 export interface ExportEmail {
@@ -32,20 +31,132 @@ function formatDate(d: Date | string): string {
   })
 }
 
-function stripHtml(html: string): string {
-  return html
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/p>/gi, "\n\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
+function escHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
 }
+
+function bodyToHtml(text: string): string {
+  if (!text?.trim()) return "<em style='color:#999'>No body</em>"
+  return escHtml(text)
+    .replace(/\n\n+/g, "</p><p>")
+    .replace(/\n/g, "<br>")
+    .replace(/^/, "<p>")
+    .replace(/$/, "</p>")
+}
+
+// ── HTML export (printable, no library required) ───────────────────────────────
+
+export function buildThreadHtml(
+  emails:     ExportEmail[],
+  linkClicks: ExportLinkClick[],
+  meta?:      { companyName?: string; contactName?: string },
+): string {
+  const sorted = [...emails].sort(
+    (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+  )
+  const company = meta?.companyName
+    ?? sorted.find(e => e.demoCall)?.demoCall?.companyName
+    ?? "Unknown Company"
+  const contact = meta?.contactName
+    ?? sorted.find(e => e.demoCall)?.demoCall?.contactName
+    ?? "Unknown Contact"
+  const subject = sorted[0]?.subject ?? "(no subject)"
+  const clicks  = linkClicks.filter(c => c.clickCount > 0)
+
+  const emailRows = sorted.map(e => {
+    const sent    = e.direction === "sent"
+    const dirCss  = sent ? "color:#0d6e40" : "color:#1a4ea0"
+    const dirLabel = sent ? "Outbound" : "Inbound"
+    const openInfo = sent
+      ? (e.openedAt
+          ? `✓ Opened ${e.openCount}× (first ${formatDate(e.openedAt)})`
+          : "Not opened")
+      : ""
+    const stage = e.stageNumber != null ? `<tr><td>Stage</td><td>S${e.stageNumber}</td></tr>` : ""
+    return `
+<div class="email">
+  <div class="email-dir" style="${dirCss}">${dirLabel}</div>
+  <table class="meta">
+    <tr><td>From</td><td>${escHtml(e.fromAddress)}</td></tr>
+    <tr><td>To</td><td>${escHtml(e.toAddress)}</td></tr>
+    <tr><td>Date</td><td>${formatDate(e.sentAt)}</td></tr>
+    <tr><td>Subject</td><td>${escHtml(e.subject)}</td></tr>
+    ${sent ? `<tr><td>Opens</td><td>${openInfo}</td></tr>` : ""}
+    ${stage}
+  </table>
+  <div class="body">${bodyToHtml(e.bodyText)}</div>
+</div>`
+  }).join("\n")
+
+  const clickRows = clicks.length === 0 ? "" : `
+<section class="clicks">
+  <h2>Link Click Events</h2>
+  <table class="click-table">
+    <thead><tr><th>URL</th><th>Clicks</th><th>First clicked</th></tr></thead>
+    <tbody>
+      ${clicks.map(c => `
+      <tr>
+        <td><a href="${escHtml(c.destinationUrl)}">${escHtml(c.destinationUrl)}</a></td>
+        <td>${c.clickCount}</td>
+        <td>${c.firstClickedAt ? formatDate(c.firstClickedAt) : "—"}</td>
+      </tr>`).join("")}
+    </tbody>
+  </table>
+</section>`
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Email Thread — ${escHtml(company)} / ${escHtml(contact)}</title>
+<style>
+  @media print { body { margin: 0; } .no-print { display: none; } }
+  body { font-family: -apple-system, Arial, sans-serif; font-size: 13px; color: #222; max-width: 800px; margin: 32px auto; padding: 0 24px; }
+  h1 { font-size: 20px; margin-bottom: 4px; color: #0d6e40; }
+  .subtitle { color: #666; margin-bottom: 24px; font-size: 12px; }
+  .meta-header table { border-collapse: collapse; margin-bottom: 24px; }
+  .meta-header td { padding: 3px 16px 3px 0; color: #444; }
+  .meta-header td:first-child { font-weight: 600; color: #888; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+  .email { border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .email-dir { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 6px 14px; background: #f7f7f7; border-bottom: 1px solid #e0e0e0; }
+  table.meta { border-collapse: collapse; width: 100%; padding: 10px 14px; display: table; }
+  table.meta td { padding: 2px 12px 2px 14px; vertical-align: top; }
+  table.meta td:first-child { font-weight: 600; color: #888; font-size: 11px; text-transform: uppercase; white-space: nowrap; width: 70px; }
+  .body { padding: 12px 14px 14px; border-top: 1px solid #eee; line-height: 1.6; }
+  .body p { margin: 0 0 .75em; }
+  .clicks h2 { font-size: 14px; margin-top: 32px; margin-bottom: 8px; }
+  .click-table { border-collapse: collapse; width: 100%; }
+  .click-table th, .click-table td { padding: 6px 10px; border: 1px solid #e0e0e0; font-size: 12px; }
+  .click-table th { background: #f5f5f5; font-weight: 600; }
+  .click-table a { color: #1a4ea0; word-break: break-all; }
+  .print-note { background: #fffbe6; border: 1px solid #f0d070; border-radius: 6px; padding: 10px 14px; margin-bottom: 20px; font-size: 12px; color: #664; }
+  .print-note strong { color: #443; }
+</style>
+</head>
+<body>
+<div class="no-print print-note">
+  <strong>Tip:</strong> To save as PDF, use your browser's Print function (Ctrl+P / ⌘+P) and choose "Save as PDF".
+</div>
+<h1>${escHtml(company)} — ${escHtml(contact)}</h1>
+<p class="subtitle">Exported ${formatDate(new Date())} · ${sorted.length} email${sorted.length !== 1 ? "s" : ""}</p>
+<div class="meta-header">
+  <table>
+    <tr><td>Subject</td><td>${escHtml(subject)}</td></tr>
+    <tr><td>Company</td><td>${escHtml(company)}</td></tr>
+    <tr><td>Contact</td><td>${escHtml(contact)}</td></tr>
+  </table>
+</div>
+${emailRows}
+${clickRows}
+</body>
+</html>`
+}
+
+// ── Plain-text export ─────────────────────────────────────────────────────────
 
 export function buildThreadText(
   emails:     ExportEmail[],
@@ -65,7 +176,7 @@ export function buildThreadText(
   const lines: string[] = []
 
   lines.push("═".repeat(70))
-  lines.push(`EMAIL THREAD EXPORT`)
+  lines.push("EMAIL THREAD EXPORT")
   lines.push(`Exported: ${formatDate(new Date())}`)
   lines.push("═".repeat(70))
   lines.push(`Company:  ${company}`)
@@ -91,17 +202,16 @@ export function buildThreadText(
       }
     }
     lines.push("")
-    const body = email.bodyText?.trim() ? email.bodyText : stripHtml("")
-    lines.push(body || "(no body)")
+    lines.push(email.bodyText?.trim() || "(no body)")
     lines.push("")
   }
 
-  if (linkClicks.length > 0) {
+  const clicks = linkClicks.filter(c => c.clickCount > 0)
+  if (clicks.length > 0) {
     lines.push("═".repeat(70))
     lines.push("LINK CLICK EVENTS")
     lines.push("─".repeat(70))
-    for (const click of linkClicks) {
-      if (click.clickCount === 0) continue
+    for (const click of clicks) {
       lines.push(`URL:      ${click.destinationUrl}`)
       lines.push(`Clicks:   ${click.clickCount}`)
       if (click.firstClickedAt) {
@@ -115,150 +225,7 @@ export function buildThreadText(
   return lines.join("\n")
 }
 
-export async function buildThreadPdf(
-  emails:     ExportEmail[],
-  linkClicks: ExportLinkClick[],
-  meta?:      { companyName?: string; contactName?: string },
-): Promise<Buffer> {
-  const sorted = [...emails].sort(
-    (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
-  )
-  const company = meta?.companyName
-    ?? sorted.find(e => e.demoCall)?.demoCall?.companyName
-    ?? "Unknown Company"
-  const contact = meta?.contactName
-    ?? sorted.find(e => e.demoCall)?.demoCall?.contactName
-    ?? "Unknown Contact"
-  const subject = sorted[0]?.subject ?? "(no subject)"
-
-  const doc   = await PDFDocument.create()
-  const font  = await doc.embedFont(StandardFonts.Helvetica)
-  const fontB = await doc.embedFont(StandardFonts.HelveticaBold)
-
-  const pageW = PageSizes.Letter[0]
-  const pageH = PageSizes.Letter[1]
-  const margin   = 50
-  const colW     = pageW - margin * 2
-  const lineH    = 14
-  const fontSize = 10
-  const titleSz  = 14
-  const headSz   = 11
-
-  let page  = doc.addPage(PageSizes.Letter)
-  let y     = pageH - margin
-
-  function ensureSpace(needed: number) {
-    if (y - needed < margin) {
-      page = doc.addPage(PageSizes.Letter)
-      y = pageH - margin
-    }
-  }
-
-  function drawText(text: string, opts: {
-    size?: number; bold?: boolean; color?: [number, number, number]; indent?: number
-  } = {}) {
-    const sz    = opts.size ?? fontSize
-    const f     = opts.bold ? fontB : font
-    const [r, g, b] = opts.color ?? [0.13, 0.13, 0.13]
-    const x     = margin + (opts.indent ?? 0)
-    const maxW  = colW - (opts.indent ?? 0)
-
-    // Word-wrap
-    const words = text.split(" ")
-    let line = ""
-    for (const word of words) {
-      const test = line ? `${line} ${word}` : word
-      const w    = f.widthOfTextAtSize(test, sz)
-      if (w > maxW && line) {
-        ensureSpace(sz + 4)
-        page.drawText(line, { x, y, size: sz, font: f, color: rgb(r, g, b) })
-        y -= sz + 4
-        line = word
-      } else {
-        line = test
-      }
-    }
-    if (line) {
-      ensureSpace(sz + 4)
-      page.drawText(line, { x, y, size: sz, font: f, color: rgb(r, g, b) })
-      y -= sz + 4
-    }
-  }
-
-  function drawRule(thick = false) {
-    ensureSpace(12)
-    page.drawLine({
-      start: { x: margin, y },
-      end:   { x: margin + colW, y },
-      thickness: thick ? 1.5 : 0.5,
-      color: thick ? rgb(0.2, 0.6, 0.4) : rgb(0.7, 0.7, 0.7),
-    })
-    y -= 10
-  }
-
-  function drawKv(key: string, value: string) {
-    ensureSpace(lineH + 4)
-    page.drawText(key, { x: margin, y, size: fontSize, font: fontB, color: rgb(0.4, 0.4, 0.4) })
-    page.drawText(value, { x: margin + 70, y, size: fontSize, font, color: rgb(0.13, 0.13, 0.13) })
-    y -= lineH + 2
-  }
-
-  // ── Cover block ──────────────────────────────────────────────────────────────
-  drawText("Email Thread Export", { size: titleSz, bold: true, color: [0.07, 0.43, 0.27] })
-  y -= 4
-  drawRule(true)
-
-  drawKv("Company:", company)
-  drawKv("Contact:", contact)
-  drawKv("Subject:", subject)
-  drawKv("Emails:", String(emails.length))
-  drawKv("Exported:", formatDate(new Date()))
-  y -= 8
-
-  // ── Emails ────────────────────────────────────────────────────────────────────
-  for (const email of sorted) {
-    drawRule()
-    const dir = email.direction === "sent" ? "Outbound" : "Inbound"
-    drawText(`${dir} Email`, { size: headSz, bold: true, color: email.direction === "sent" ? [0.06, 0.52, 0.29] : [0.13, 0.37, 0.73] })
-    y -= 2
-    drawKv("From:", email.fromAddress)
-    drawKv("To:", email.toAddress)
-    drawKv("Date:", formatDate(email.sentAt))
-    drawKv("Subject:", email.subject)
-    if (email.direction === "sent") {
-      drawKv("Opened:", email.openedAt ? `Yes (${email.openCount}×)` : "No")
-      if (email.stageNumber != null) drawKv("Stage:", `S${email.stageNumber}`)
-    }
-    y -= 4
-    const bodyText = email.bodyText?.trim() || "(no body)"
-    const lines    = bodyText.split("\n")
-    for (const ln of lines) {
-      if (ln.trim()) {
-        drawText(ln, { indent: 0 })
-      } else {
-        y -= fontSize
-      }
-    }
-    y -= 6
-  }
-
-  // ── Link clicks ───────────────────────────────────────────────────────────────
-  const clicks = linkClicks.filter(c => c.clickCount > 0)
-  if (clicks.length > 0) {
-    drawRule(true)
-    drawText("Link Click Events", { size: headSz, bold: true, color: [0.3, 0.3, 0.6] })
-    y -= 4
-    for (const click of clicks) {
-      drawKv("URL:", click.destinationUrl.slice(0, 60) + (click.destinationUrl.length > 60 ? "…" : ""))
-      drawKv("Clicks:", String(click.clickCount))
-      if (click.firstClickedAt) drawKv("First:", formatDate(click.firstClickedAt))
-      y -= 4
-    }
-  }
-
-  const bytes = await doc.save()
-  return Buffer.from(bytes)
-}
+// ── ZIP export (one text file per thread) ─────────────────────────────────────
 
 export async function buildBulkZip(
   threads: Array<{
@@ -267,7 +234,6 @@ export async function buildBulkZip(
     linkClicks: ExportLinkClick[]
     meta?:      { companyName?: string; contactName?: string }
   }>,
-  exportedAt: Date = new Date(),
 ): Promise<Buffer> {
   const zip = new JSZip()
 
@@ -282,8 +248,6 @@ export async function buildBulkZip(
     const slug    = `${company}-${contact}`.replace(/[^a-zA-Z0-9-]/g, "_").slice(0, 40)
     zip.file(`${slug}.txt`, text)
   }
-
-  void exportedAt  // used in filename at call site
 
   return (await zip.generateAsync({ type: "nodebuffer" })) as Buffer
 }

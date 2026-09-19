@@ -13,7 +13,7 @@ export function ExportEmailsButton({ accountId, accountType }: Props) {
   const [exporting, setExporting] = useState(false)
   const [error,     setError]     = useState("")
 
-  async function doExport(format: "pdf" | "text") {
+  async function doExport(format: "html" | "text") {
     setExporting(true); setError("")
     try {
       const res = await fetch("/api/sales/emails/export/account", {
@@ -70,18 +70,18 @@ export function ExportEmailsButton({ accountId, accountType }: Props) {
       {open && (
         <div className="absolute right-0 top-full mt-1 z-50 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-48 overflow-hidden">
           <button
-            onClick={() => void doExport("pdf")}
+            onClick={() => void doExport("html")}
             disabled={exporting}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white text-left transition-colors disabled:opacity-50"
           >
-            Export as PDF
+            Download as HTML (printable)
           </button>
           <button
             onClick={() => void doExport("text")}
             disabled={exporting}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white text-left transition-colors disabled:opacity-50"
           >
-            Export as Text
+            Download as Text
           </button>
           {error && (
             <p className="text-xs text-red-400 px-4 py-2">{error}</p>

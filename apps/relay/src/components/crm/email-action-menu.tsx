@@ -71,7 +71,7 @@ export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byNam
     }
   }
 
-  async function exportThread(format: "pdf" | "text") {
+  async function exportThread(format: "html" | "text") {
     setExporting(true); setError("")
     const key = threadKey ?? emailId
     try {
@@ -170,12 +170,12 @@ export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byNam
 
           {/* Export options */}
           <button
-            onClick={e => { e.stopPropagation(); void exportThread("pdf") }}
+            onClick={e => { e.stopPropagation(); void exportThread("html") }}
             disabled={exporting}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white text-left transition-colors disabled:opacity-50"
           >
             {exporting ? <Loader2 className="w-4 h-4 text-emerald-400 shrink-0 animate-spin" /> : <Download className="w-4 h-4 text-emerald-400 shrink-0" />}
-            Export Thread as PDF
+            Download as HTML (printable)
           </button>
           <button
             onClick={e => { e.stopPropagation(); void exportThread("text") }}
@@ -183,7 +183,7 @@ export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byNam
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white text-left transition-colors disabled:opacity-50"
           >
             <FileText className="w-4 h-4 text-blue-400 shrink-0" />
-            Export Thread as Text
+            Download as Text
           </button>
           {onForward && threadEmails && (
             <button

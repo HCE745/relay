@@ -3,11 +3,11 @@ export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from "next/server"
 import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
-import { buildThreadText, buildThreadPdf } from "@/lib/email-export"
+import { buildThreadText, buildThreadHtml } from "@/lib/email-export"
 import type { ExportEmail, ExportLinkClick } from "@/lib/email-export"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function binaryResp(buf: Buffer, contentType: string, filename: string): NextResponse {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new NextResponse(buf as any, {
     headers: {
       "Content-Type":        contentType,
@@ -21,15 +21,12 @@ export async function POST(req: NextRequest) {
   console.log("[export/account] POST start")
   try {
     const info = await getSalesSession()
-    if (!info) {
-      console.log("[export/account] unauthorized")
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+    if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json() as {
       accountId:   string
       accountType: "demoCall" | "prospect"
-      format:      "pdf" | "text"
+      format:      "html" | "text"
     }
 
     const { accountId, accountType, format } = body
@@ -41,18 +38,18 @@ export async function POST(req: NextRequest) {
 
     let companyName = "Unknown"
     let contactName = "Unknown"
-    type EmailWithIncludes = {
+    type EmailRow = {
       id: string; direction: string; fromAddress: string; toAddress: string
       subject: string; bodyText: string | null; sentAt: Date; openCount: number
       openedAt: Date | null; stageNumber: number | null
       linkClicks: { token: string; destinationUrl: string; clickCount: number; firstClickedAt: Date | null }[]
     }
-    let emails: EmailWithIncludes[] = []
+    let emails: EmailRow[] = []
 
     if (accountType === "demoCall") {
       const call = await prisma.demoCall.findUnique({
-        where:   { id: accountId },
-        select:  { id: true, contactName: true, companyName: true },
+        where:  { id: accountId },
+        select: { id: true, contactName: true, companyName: true },
       })
       if (!call) return NextResponse.json({ error: "DemoCall not found" }, { status: 404 })
 
@@ -60,7 +57,7 @@ export async function POST(req: NextRequest) {
       contactName = call.contactName
 
       emails = await prisma.crmEmail.findMany({
-        where: { demoCallId: accountId, isDeleted: false },
+        where:   { demoCallId: accountId, isDeleted: false },
         include: {
           linkClicks: {
             where:  { clickCount: { gt: 0 } },
@@ -119,9 +116,7 @@ export async function POST(req: NextRequest) {
       openCount:   e.openCount,
       openedAt:    e.openedAt,
       stageNumber: e.stageNumber,
-      demoCall:    accountType === "demoCall"
-        ? { contactName, companyName }
-        : null,
+      demoCall:    accountType === "demoCall" ? { contactName, companyName } : null,
     }))
 
     const exportClicks: ExportLinkClick[] = emails.flatMap(e =>
@@ -137,11 +132,10 @@ export async function POST(req: NextRequest) {
     const dateStr = new Date().toISOString().split("T")[0]!
     const slug    = `${companyName}-${contactName}-${dateStr}`.replace(/[^a-zA-Z0-9-]/g, "_")
 
-    if (format === "pdf") {
-      console.log("[export/account] building PDF, %d emails", exportEmails.length)
-      const pdfBuf = await buildThreadPdf(exportEmails, exportClicks, meta)
-      console.log("[export/account] PDF built, size=%d", pdfBuf.byteLength)
-      return binaryResp(pdfBuf, "application/pdf", `${slug}.pdf`)
+    if (format === "html") {
+      const html = buildThreadHtml(exportEmails, exportClicks, meta)
+      const buf  = Buffer.from(html, "utf8")
+      return binaryResp(buf, "text/html; charset=utf-8", `${slug}.html`)
     } else {
       const text = buildThreadText(exportEmails, exportClicks, meta)
       const buf  = Buffer.from(text, "utf8")
@@ -149,6 +143,9 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     console.error("[export/account] ERROR:", err)
-    return NextResponse.json({ error: "Export failed", detail: String(err) }, { status: 500 })
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : String(err) },
+      { status: 500 },
+    )
   }
 }

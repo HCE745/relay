@@ -265,7 +265,7 @@ export default function SalesEmailPage() {
     return { startDate: bulkStartDate || undefined, endDate: bulkEndDate || undefined }
   }
 
-  async function bulkExport(format: "pdf" | "text" | "zip") {
+  async function bulkExport(format: "html" | "text" | "zip") {
     const keys = [...checkedKeys]
     if (keys.length === 0) return
     setBulkExporting(true)
@@ -321,12 +321,12 @@ export default function SalesEmailPage() {
           </span>
           <div className="flex items-center gap-1.5 ml-1 flex-wrap">
             <button
-              onClick={() => void bulkExport("pdf")}
+              onClick={() => void bulkExport("html")}
               disabled={bulkExporting}
               className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-emerald-700/50 hover:bg-emerald-700/80 text-emerald-200 transition-colors disabled:opacity-50"
             >
               {bulkExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-              Export as PDF
+              Download HTML
             </button>
             <button
               onClick={() => void bulkExport("text")}

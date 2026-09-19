@@ -48,7 +48,7 @@ export default function DemoCallDetailPage() {
   const [exportOpen,    setExportOpen]    = useState(false)
   const [exporting,     setExporting]     = useState(false)
 
-  async function exportEmails(format: "pdf" | "text") {
+  async function exportEmails(format: "html" | "text") {
     if (!call) return
     setExporting(true)
     try {
@@ -166,18 +166,18 @@ export default function DemoCallDetailPage() {
             {exportOpen && (
               <div className="absolute right-0 top-full mt-1 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl w-44 overflow-hidden">
                 <button
-                  onClick={() => void exportEmails("pdf")}
+                  onClick={() => void exportEmails("html")}
                   disabled={exporting}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                 >
-                  Export as PDF
+                  Download HTML (printable)
                 </button>
                 <button
                   onClick={() => void exportEmails("text")}
                   disabled={exporting}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                 >
-                  Export as Text
+                  Download as Text
                 </button>
               </div>
             )}

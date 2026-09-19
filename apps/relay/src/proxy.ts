@@ -35,6 +35,12 @@ const PUBLIC_PATHS = [
   "/api/demo",
   // MCP server — handles its own auth via OAuth + bearer tokens
   "/api/mcp",
+  // Cron jobs — called by Vercel scheduler without a session; self-guard with CRON_SECRET
+  "/api/cron",
+  // Stripe and other service webhooks — verified by signature, not session
+  "/api/webhooks",
+  // QR report submissions — public endpoint for anonymous reporters
+  "/api/report",
 ]
 
 // Authenticated but bypass onboarding/billing guards

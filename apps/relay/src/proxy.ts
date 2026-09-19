@@ -41,6 +41,10 @@ const PUBLIC_PATHS = [
   "/api/webhooks",
   // QR report submissions — public endpoint for anonymous reporters
   "/api/report",
+  // Survey response submissions — public endpoint for survey respondents
+  "/api/survey",
+  // Customer feedback widget — public endpoint (also guarded by API key in handler)
+  "/api/feedback",
 ]
 
 // Authenticated but bypass onboarding/billing guards
@@ -146,9 +150,9 @@ export async function proxy(request: NextRequest) {
     return applyVideoMode(NextResponse.next(), vmParam)
   }
 
-  // ── Sales section — super admin credentials for now ───────────────────────
+  // ── Sales section — super admin or authenticated sales user ─────────────────
   if (pathname.startsWith("/sales") || pathname.startsWith("/api/sales")) {
-    if (!session.superAdmin) {
+    if (!session.superAdmin && !session.salesUserId) {
       return NextResponse.redirect(new URL("/sales/login", request.url))
     }
     return applyVideoMode(NextResponse.next(), vmParam)

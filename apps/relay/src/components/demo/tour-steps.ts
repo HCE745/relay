@@ -827,7 +827,6 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "completion",
-    audioFile: "/demo-audio/carwash-step-20.mp3",
     getTitle: () => "That's Relay for Car Wash.",
     getExplain: () =>
       "Relay helps car wash operators replace fragmented communication with a shared operational system. Equipment problems are tracked the moment they happen. Technicians have clear tasks. Managers have visibility across every site — self-serve, in-bay automatic, or tunnel. Wash Essentials is available for smaller operations. Full Relay covers multi-site operators that need the complete operational platform. Start a free trial or schedule a demo to see it running at your wash.",
@@ -1077,7 +1076,6 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "completion",
-    audioFile: "/demo-audio/property-step-20.mp3",
     getTitle: () => "That's Relay for Property Management.",
     getExplain: () =>
       "Relay helps property management teams replace scattered communication with a shared operational system. Tenants have a clear way to report problems. Maintenance staff have clear assignments. Managers have visibility across every property. That means faster contractor response, better tenant communication, and a complete work order history across your portfolio. Start a free trial or schedule a demo to see it in your operation.",
@@ -1339,7 +1337,6 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "completion",
-    audioFile: "/demo-audio/manufacturing-step-21.mp3",
     getTitle: () => "That's Relay for Manufacturing.",
     getExplain: () =>
       "Relay helps manufacturing teams replace fragmented communication with a shared operational system. Equipment problems are tracked the moment they happen. Maintenance technicians have clear tasks. Plant managers have visibility across every plant and line. That means faster response to breakdowns, fewer issues lost between shifts, and a complete maintenance record for every machine. Start a free trial or schedule a demo to see it in your operation.",

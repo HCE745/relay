@@ -191,8 +191,11 @@ export async function proxy(request: NextRequest) {
   }
 
   // ── Wash Essentials path guard ────────────────────────────────────────────
+  // Demo sessions bypass this restriction so the tour can showcase all features
+  // regardless of which productLine the demo org was seeded with.
   if (
     session.productLine === "WASH_ESSENTIALS" &&
+    !session.isDemo &&
     WASH_ESSENTIALS_BLOCKED.some((p) => pathname.startsWith(p))
   ) {
     return NextResponse.redirect(new URL("/dashboard", request.url))

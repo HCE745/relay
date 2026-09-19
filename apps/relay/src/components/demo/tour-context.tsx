@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useCallback } from "react"
 import { getNumTourSteps } from "./tour-steps"
 
-export const TOTAL_TOUR_STEPS = 21
+export const TOTAL_TOUR_STEPS = 22
 
 interface TourState {
   isActive: boolean

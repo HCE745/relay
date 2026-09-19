@@ -652,7 +652,7 @@ export function TourOverlay() {
     if (!autoAdvance) return
     // audioDurationSec is already set by the time formFillDone fires (~1s into playback),
     // so use the full duration — the extra ~1s of overlap is fine.
-    const delay = audioDurationSec !== null ? audioDurationSec * 1000 : 8000
+    const delay = audioDurationSec !== null ? audioDurationSec * 1000 + 300 : 8000
     const t = setTimeout(() => {
       autoSubmittedRef.current = true
       void handleTourSubmit()
@@ -667,7 +667,7 @@ export function TourOverlay() {
 
     let cancelled = false
     async function clickBenchmarks() {
-      await new Promise(r => setTimeout(r, 800))
+      await new Promise(r => setTimeout(r, 2000))
       if (cancelled) return
       const buttons = document.querySelectorAll<HTMLButtonElement>("button")
       for (const btn of buttons) {

@@ -6,7 +6,7 @@ import { BarChart2, Users, Clock, MousePointerClick, TrendingUp, Target, Mail, C
 
 export const dynamic = "force-dynamic"
 
-const TOTAL_TOUR_STEPS = 21
+const TOTAL_TOUR_STEPS = 22
 
 function StatCard({ label, value, sub, icon: Icon, color }: {
   label: string; value: string | number; sub?: string

@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { computeEngagementScore, scoreLabel, scoreColor } from "@/lib/engagement-score"
 import { SuppressionButtons } from "./SuppressionButtons"
+import { ExportEmailsButton } from "./ExportEmailsButton"
 
 export const dynamic = "force-dynamic"
 
@@ -216,9 +217,12 @@ export default async function ProspectDetailPage({
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
           {prospect.contacts[0]?.email && (
             <SuppressionButtons email={prospect.contacts[0].email} prospectId={prospect.id} />
+          )}
+          {contactEmails.length > 0 && (
+            <ExportEmailsButton accountId={prospect.id} accountType="prospect" />
           )}
           <Link
             href={`/super-admin/crm/prospects/${prospect.id}`}

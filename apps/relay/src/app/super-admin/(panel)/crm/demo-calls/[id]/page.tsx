@@ -6,7 +6,7 @@ import Link from "next/link"
 import { CrmDemoCallForm } from "@/components/super-admin/crm-demo-call-form"
 import { CrmEmailThread } from "@/components/super-admin/crm-email-thread"
 import { CrmEmailCompose } from "@/components/super-admin/crm-email-compose"
-import { Mail, Zap, ShieldOff, AlertTriangle } from "lucide-react"
+import { Mail, Zap, ShieldOff, AlertTriangle, Download, Loader2, ChevronDown } from "lucide-react"
 
 interface EngagementData {
   score: number
@@ -40,11 +40,40 @@ interface DemoCall {
 export default function DemoCallDetailPage() {
   const { id }  = useParams() as { id: string }
   const router  = useRouter()
-  const [call,    setCall]    = useState<DemoCall | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(false)
-  const [composing, setComposing] = useState(false)
-  const [engagement, setEngagement] = useState<EngagementData | null>(null)
+  const [call,          setCall]          = useState<DemoCall | null>(null)
+  const [loading,       setLoading]       = useState(true)
+  const [editing,       setEditing]       = useState(false)
+  const [composing,     setComposing]     = useState(false)
+  const [engagement,    setEngagement]    = useState<EngagementData | null>(null)
+  const [exportOpen,    setExportOpen]    = useState(false)
+  const [exporting,     setExporting]     = useState(false)
+
+  async function exportEmails(format: "pdf" | "text") {
+    if (!call) return
+    setExporting(true)
+    try {
+      const res = await fetch("/api/sales/emails/export/account", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ accountId: call.id, accountType: "demoCall", format }),
+      })
+      if (!res.ok) return
+      const blob    = await res.blob()
+      const url     = URL.createObjectURL(blob)
+      const a       = document.createElement("a")
+      const cd      = res.headers.get("Content-Disposition") ?? ""
+      const fnMatch = cd.match(/filename="([^"]+)"/)
+      a.href        = url
+      a.download    = fnMatch?.[1] ?? `email-export.${format}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      setExportOpen(false)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   async function loadCall() {
     const res = await fetch(`/api/super-admin/crm/demo-calls/${id}`)
@@ -117,6 +146,35 @@ export default function DemoCallDetailPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {/* Export emails dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setExportOpen(v => !v)}
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-emerald-600 hover:border-emerald-400 text-xs rounded-lg transition-colors"
+            >
+              {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+              Export Emails
+              <ChevronDown className="w-3 h-3" />
+            </button>
+            {exportOpen && (
+              <div className="absolute right-0 top-full mt-1 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl w-44 overflow-hidden">
+                <button
+                  onClick={() => void exportEmails("pdf")}
+                  disabled={exporting}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                >
+                  Export as PDF
+                </button>
+                <button
+                  onClick={() => void exportEmails("text")}
+                  disabled={exporting}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                >
+                  Export as Text
+                </button>
+              </div>
+            )}
+          </div>
           <button
             onClick={() => addSuppressionRecord("UNSUBSCRIBE")}
             className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:border-red-400 text-xs rounded-lg transition-colors"

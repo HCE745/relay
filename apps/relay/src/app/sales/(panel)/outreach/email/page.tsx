@@ -7,6 +7,7 @@ import {
   Mail, Send, X, ChevronDown, Loader2, RefreshCw, ArrowLeft,
   ArrowUpRight, ArrowDownLeft, Search, Calendar, CheckCircle2, Clock, Eye, EyeOff,
   MapPin, Footprints, BarChart2, MousePointerClick,
+  CheckSquare, Square, Download, FileText, Package, Filter,
 } from "lucide-react"
 import { EmailActionMenu } from "@/components/crm/email-action-menu"
 
@@ -67,6 +68,7 @@ interface Contact {
 }
 
 type Filter = "all" | "inbox" | "sent"
+type DateRange = "all" | "30d" | "90d" | "custom"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -132,16 +134,25 @@ function groupIntoThreads(emails: CrmEmail[]): Thread[] {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SalesEmailPage() {
-  const [emails,      setEmails]      = useState<CrmEmail[]>([])
-  const [templates,   setTemplates]   = useState<Template[]>([])
-  const [contacts,    setContacts]    = useState<Contact[]>([])
-  const [loading,     setLoading]     = useState(true)
-  const [syncing,     setSyncing]     = useState(false)
-  const [syncMsg,     setSyncMsg]     = useState("")
-  const [filter,      setFilter]      = useState<Filter>("all")
-  const [selectedKey, setSelectedKey] = useState<string | null>(null)
-  const [composing,   setComposing]   = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [emails,         setEmails]         = useState<CrmEmail[]>([])
+  const [templates,      setTemplates]      = useState<Template[]>([])
+  const [contacts,       setContacts]       = useState<Contact[]>([])
+  const [loading,        setLoading]        = useState(true)
+  const [syncing,        setSyncing]        = useState(false)
+  const [syncMsg,        setSyncMsg]        = useState("")
+  const [filter,         setFilter]         = useState<Filter>("all")
+  const [selectedKey,    setSelectedKey]    = useState<string | null>(null)
+  const [composing,      setComposing]      = useState(false)
+  const [composeInitial, setComposeInitial] = useState<{ body?: string; subject?: string } | null>(null)
+  const [searchQuery,    setSearchQuery]    = useState("")
+
+  // Multi-select state
+  const [checkedKeys,    setCheckedKeys]    = useState<Set<string>>(new Set())
+  const [showBulkFilter, setShowBulkFilter] = useState(false)
+  const [bulkDateRange,  setBulkDateRange]  = useState<DateRange>("all")
+  const [bulkStartDate,  setBulkStartDate]  = useState("")
+  const [bulkEndDate,    setBulkEndDate]    = useState("")
+  const [bulkExporting,  setBulkExporting]  = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -220,8 +231,168 @@ export default function SalesEmailPage() {
     void markThreadRead(t)
   }
 
+  // ── Multi-select helpers ────────────────────────────────────────────────────
+  const allChecked  = filteredThreads.length > 0 && filteredThreads.every(t => checkedKeys.has(t.key))
+  const someChecked = filteredThreads.some(t => checkedKeys.has(t.key))
+
+  function toggleAll() {
+    if (allChecked) {
+      setCheckedKeys(new Set())
+    } else {
+      setCheckedKeys(new Set(filteredThreads.map(t => t.key)))
+    }
+  }
+
+  function toggleKey(key: string) {
+    setCheckedKeys(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  function buildDateParams(): { startDate?: string; endDate?: string } {
+    if (bulkDateRange === "all") return {}
+    if (bulkDateRange === "30d") {
+      const d = new Date(); d.setDate(d.getDate() - 30)
+      return { startDate: d.toISOString().split("T")[0] }
+    }
+    if (bulkDateRange === "90d") {
+      const d = new Date(); d.setDate(d.getDate() - 90)
+      return { startDate: d.toISOString().split("T")[0] }
+    }
+    return { startDate: bulkStartDate || undefined, endDate: bulkEndDate || undefined }
+  }
+
+  async function bulkExport(format: "pdf" | "text" | "zip") {
+    const keys = [...checkedKeys]
+    if (keys.length === 0) return
+    setBulkExporting(true)
+    try {
+      const dateParams = buildDateParams()
+      const res = await fetch("/api/sales/emails/export", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ threadIds: keys, format, ...dateParams }),
+      })
+      if (!res.ok) return
+      const blob    = await res.blob()
+      const url     = URL.createObjectURL(blob)
+      const a       = document.createElement("a")
+      const cd      = res.headers.get("Content-Disposition") ?? ""
+      const fnMatch = cd.match(/filename="([^"]+)"/)
+      a.href        = url
+      a.download    = fnMatch?.[1] ?? `relay-email-export.${format}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } finally {
+      setBulkExporting(false)
+      setShowBulkFilter(false)
+    }
+  }
+
+  function openCompose(initial?: { body?: string; subject?: string }) {
+    setComposeInitial(initial ?? null)
+    setComposing(true)
+  }
+
+  function handleForward(body: string, subject: string) {
+    openCompose({ body, subject })
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
+
+      {/* ── Bulk action toolbar ── */}
+      {checkedKeys.size > 0 && (
+        <div className="shrink-0 flex items-center gap-3 px-4 py-2.5 bg-emerald-900/30 border-b border-emerald-700/40">
+          <span className="text-xs font-semibold text-emerald-300">
+            {checkedKeys.size} thread{checkedKeys.size !== 1 ? "s" : ""} selected
+          </span>
+          <div className="flex items-center gap-1.5 ml-1 flex-wrap">
+            <button
+              onClick={() => void bulkExport("pdf")}
+              disabled={bulkExporting}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-emerald-700/50 hover:bg-emerald-700/80 text-emerald-200 transition-colors disabled:opacity-50"
+            >
+              {bulkExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+              Export as PDF
+            </button>
+            <button
+              onClick={() => void bulkExport("text")}
+              disabled={bulkExporting}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-blue-800/50 hover:bg-blue-800/80 text-blue-200 transition-colors disabled:opacity-50"
+            >
+              <FileText className="w-3 h-3" />
+              Export as Text
+            </button>
+            <button
+              onClick={() => void bulkExport("zip")}
+              disabled={bulkExporting}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-purple-800/50 hover:bg-purple-800/80 text-purple-200 transition-colors disabled:opacity-50"
+            >
+              <Package className="w-3 h-3" />
+              Export as ZIP
+            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowBulkFilter(v => !v)}
+                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-gray-700/60 hover:bg-gray-700 text-gray-300 transition-colors"
+              >
+                <Filter className="w-3 h-3" />
+                {bulkDateRange !== "all" ? "Date filtered" : "Date range"}
+              </button>
+              {showBulkFilter && (
+                <div className="absolute left-0 top-full mt-1 z-50 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-64 p-3">
+                  <p className="text-[10px] text-gray-500 mb-2 uppercase tracking-wide">Date Range</p>
+                  {(["all", "30d", "90d", "custom"] as DateRange[]).map(r => (
+                    <label key={r} className="flex items-center gap-2 py-1 cursor-pointer text-sm text-gray-300 hover:text-white">
+                      <input
+                        type="radio"
+                        name="dateRange"
+                        value={r}
+                        checked={bulkDateRange === r}
+                        onChange={() => setBulkDateRange(r)}
+                        className="accent-emerald-500"
+                      />
+                      {r === "all" ? "All time" : r === "30d" ? "Last 30 days" : r === "90d" ? "Last 90 days" : "Custom range"}
+                    </label>
+                  ))}
+                  {bulkDateRange === "custom" && (
+                    <div className="mt-2 space-y-1.5">
+                      <input
+                        type="date"
+                        value={bulkStartDate}
+                        onChange={e => setBulkStartDate(e.target.value)}
+                        className="w-full text-xs bg-gray-700 border border-gray-600 rounded-lg px-2 py-1.5 text-white"
+                        placeholder="Start date"
+                      />
+                      <input
+                        type="date"
+                        value={bulkEndDate}
+                        onChange={e => setBulkEndDate(e.target.value)}
+                        className="w-full text-xs bg-gray-700 border border-gray-600 rounded-lg px-2 py-1.5 text-white"
+                        placeholder="End date"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={() => setCheckedKeys(new Set())}
+            className="ml-auto text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1 transition-colors"
+          >
+            <X className="w-3 h-3" />
+            Clear
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-1 min-h-0">
 
         {/* ── Thread list panel ── */}
@@ -246,7 +417,7 @@ export default function SalesEmailPage() {
               </div>
             </div>
             <button
-              onClick={() => setComposing(true)}
+              onClick={() => openCompose()}
               className="w-full flex items-center justify-center gap-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors"
             >
               <Mail className="w-4 h-4" />
@@ -296,6 +467,26 @@ export default function SalesEmailPage() {
             )}
           </div>
 
+          {/* Select-all row */}
+          {filteredThreads.length > 0 && (
+            <div className="flex items-center gap-2 px-4 py-1.5 border-b border-gray-800/60 bg-gray-900/80">
+              <button
+                onClick={toggleAll}
+                className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                {allChecked
+                  ? <CheckSquare className="w-3.5 h-3.5 text-emerald-500" />
+                  : someChecked
+                  ? <CheckSquare className="w-3.5 h-3.5 text-emerald-400/60" />
+                  : <Square className="w-3.5 h-3.5" />}
+                {allChecked ? "Deselect all" : "Select all"}
+              </button>
+              {checkedKeys.size > 0 && (
+                <span className="text-[10px] text-emerald-400 ml-auto">{checkedKeys.size} selected</span>
+              )}
+            </div>
+          )}
+
           {/* Thread list */}
           <div className="flex-1 overflow-y-auto">
             {loading ? (
@@ -307,7 +498,7 @@ export default function SalesEmailPage() {
                 <Mail className="w-10 h-10 text-gray-700 mb-3" />
                 <p className="text-gray-500 text-sm">No emails yet</p>
                 <button
-                  onClick={() => setComposing(true)}
+                  onClick={() => openCompose()}
                   className="mt-3 text-xs text-emerald-500 hover:text-emerald-400"
                 >
                   Compose your first email →
@@ -320,7 +511,9 @@ export default function SalesEmailPage() {
                     key={t.key}
                     thread={t}
                     isSelected={selectedKey === t.key}
+                    isChecked={checkedKeys.has(t.key)}
                     onClick={() => selectThread(t)}
+                    onToggle={() => toggleKey(t.key)}
                   />
                 ))}
               </ul>
@@ -336,6 +529,7 @@ export default function SalesEmailPage() {
               onBack={() => setSelectedKey(null)}
               onReplySuccess={load}
               onEmailAction={load}
+              onForward={handleForward}
             />
           ) : (
             <div className="flex flex-col items-center justify-center flex-1 text-center px-8">
@@ -352,8 +546,10 @@ export default function SalesEmailPage() {
         <ComposeModal
           templates={templates}
           contacts={contacts}
-          onClose={() => setComposing(false)}
-          onSent={() => { setComposing(false); void load() }}
+          initialBody={composeInitial?.body}
+          initialSubject={composeInitial?.subject}
+          onClose={() => { setComposing(false); setComposeInitial(null) }}
+          onSent={() => { setComposing(false); setComposeInitial(null); void load() }}
         />
       )}
     </div>
@@ -362,68 +558,85 @@ export default function SalesEmailPage() {
 
 // ─── Thread row ───────────────────────────────────────────────────────────────
 
-function ThreadRow({ thread, isSelected, onClick }: {
+function ThreadRow({ thread, isSelected, isChecked, onClick, onToggle }: {
   thread:     Thread
   isSelected: boolean
+  isChecked:  boolean
   onClick:    () => void
+  onToggle:   () => void
 }) {
   const preview = thread.lastEmail.bodyText.trim().slice(0, 80)
   const isSent  = thread.lastEmail.direction === "sent"
 
   return (
     <li
-      onClick={onClick}
       className={cn(
-        "flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-gray-800/60 transition-colors",
+        "flex items-start gap-2 px-3 py-3 cursor-pointer border-b border-gray-800/60 transition-colors group",
         isSelected
           ? "bg-emerald-600/20 border-l-2 border-l-emerald-500"
           : "hover:bg-gray-800/50 border-l-2 border-l-transparent",
       )}
     >
-      <div className={cn(
-        "shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold",
-        isSent ? "bg-emerald-900/60 text-emerald-300" : "bg-blue-900/40 text-blue-300",
-      )}>
-        {thread.contactName.charAt(0).toUpperCase()}
-      </div>
+      {/* Checkbox — visible on hover or when checked */}
+      <button
+        onClick={e => { e.stopPropagation(); onToggle() }}
+        className={cn(
+          "shrink-0 mt-2.5 transition-opacity",
+          isChecked ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+        )}
+        title={isChecked ? "Deselect" : "Select"}
+      >
+        {isChecked
+          ? <CheckSquare className="w-4 h-4 text-emerald-500" />
+          : <Square className="w-4 h-4 text-gray-600" />}
+      </button>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2 mb-0.5">
-          <span className={cn(
-            "text-sm truncate",
-            thread.hasUnread ? "text-white font-semibold" : "text-gray-300 font-medium",
-          )}>
-            {thread.contactName}
-          </span>
-          <span className="text-[10px] text-gray-600 shrink-0">{formatDate(thread.lastEmail.sentAt)}</span>
+      <div className="flex items-start gap-2 flex-1 min-w-0" onClick={onClick}>
+        <div className={cn(
+          "shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold",
+          isSent ? "bg-emerald-900/60 text-emerald-300" : "bg-blue-900/40 text-blue-300",
+        )}>
+          {thread.contactName.charAt(0).toUpperCase()}
         </div>
-        <p className={cn("text-xs truncate mb-0.5", thread.hasUnread ? "text-gray-200" : "text-gray-500")}>
-          {thread.subject || "(no subject)"}
-        </p>
-        <div className="flex items-center gap-2">
-          <p className="text-[11px] text-gray-600 truncate flex-1">{preview}</p>
-          {thread.lastSentOpenedAt ? (
-            <span
-              className="text-[10px] flex items-center gap-0.5 text-emerald-500 shrink-0"
-              title={`Est. open — pixel fired ${thread.lastSentOpenCount > 1 ? `${thread.lastSentOpenCount}× · ` : ""}last ${new Date(thread.lastSentOpenedAt).toLocaleDateString()}. May include preview tools.`}
-            >
-              <Eye className="w-3 h-3" />
-              {thread.lastSentOpenCount > 1 ? thread.lastSentOpenCount : ""}
-            </span>
-          ) : thread.emails.some(e => e.direction === "sent") ? (
-            <span title="Not opened yet"><EyeOff className="w-3 h-3 text-gray-700 shrink-0" /></span>
-          ) : null}
-          {thread.lastSentStage != null && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-500 shrink-0">
-              S{thread.lastSentStage}
-            </span>
-          )}
-        </div>
-      </div>
 
-      {thread.hasUnread && (
-        <div className="shrink-0 mt-2 w-2 h-2 rounded-full bg-emerald-500" />
-      )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2 mb-0.5">
+            <span className={cn(
+              "text-sm truncate",
+              thread.hasUnread ? "text-white font-semibold" : "text-gray-300 font-medium",
+            )}>
+              {thread.contactName}
+            </span>
+            <span className="text-[10px] text-gray-600 shrink-0">{formatDate(thread.lastEmail.sentAt)}</span>
+          </div>
+          <p className={cn("text-xs truncate mb-0.5", thread.hasUnread ? "text-gray-200" : "text-gray-500")}>
+            {thread.subject || "(no subject)"}
+          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-[11px] text-gray-600 truncate flex-1">{preview}</p>
+            {thread.lastSentOpenedAt ? (
+              <span
+                className="text-[10px] flex items-center gap-0.5 text-emerald-500 shrink-0"
+                title={`Est. open — pixel fired ${thread.lastSentOpenCount > 1 ? `${thread.lastSentOpenCount}× · ` : ""}last ${new Date(thread.lastSentOpenedAt).toLocaleDateString()}. May include preview tools.`}
+              >
+                <Eye className="w-3 h-3" />
+                {thread.lastSentOpenCount > 1 ? thread.lastSentOpenCount : ""}
+              </span>
+            ) : thread.emails.some(e => e.direction === "sent") ? (
+              <span title="Not opened yet"><EyeOff className="w-3 h-3 text-gray-700 shrink-0" /></span>
+            ) : null}
+            {thread.lastSentStage != null && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-500 shrink-0">
+                S{thread.lastSentStage}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {thread.hasUnread && (
+          <div className="shrink-0 mt-2 w-2 h-2 rounded-full bg-emerald-500" />
+        )}
+      </div>
     </li>
   )
 }
@@ -588,11 +801,12 @@ function TourEngagementBanner({ emailIds }: { emailIds: string[] }) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
+function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction, onForward }: {
   thread:         Thread
   onBack:         () => void
   onReplySuccess: () => void
   onEmailAction?: () => void
+  onForward?:     (body: string, subject: string) => void
 }) {
   const [expanded,        setExpanded]        = useState<Record<string, boolean>>({})
   const [replyText,       setReplyText]       = useState("")
@@ -667,9 +881,18 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
     onReplySuccess()
   }
 
-  const lastEmail = thread.emails[thread.emails.length - 1]!
-  const replyAddr = lastEmail.direction === "received" ? lastEmail.fromAddress : lastEmail.toAddress
+  const lastEmail    = thread.emails[thread.emails.length - 1]!
+  const replyAddr    = lastEmail.direction === "received" ? lastEmail.fromAddress : lastEmail.toAddress
   const sentEmailIds = thread.emails.filter(e => e.direction === "sent").map(e => e.id)
+
+  const threadEmailsForExport = thread.emails.map(e => ({
+    direction:   e.direction,
+    fromAddress: e.fromAddress,
+    toAddress:   e.toAddress,
+    subject:     e.subject,
+    bodyText:    e.bodyText ?? "",
+    sentAt:      e.sentAt,
+  }))
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -772,9 +995,12 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
                 </div>
                 <EmailActionMenu
                   emailId={email.id}
+                  threadKey={thread.key}
                   subject={email.subject}
                   isArchived={email.isArchived ?? false}
                   onSuccess={() => { onEmailAction?.(); onReplySuccess() }}
+                  onForward={onForward}
+                  threadEmails={threadEmailsForExport}
                 />
               </div>
 
@@ -905,15 +1131,17 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction }: {
 
 // ─── Compose modal ────────────────────────────────────────────────────────────
 
-function ComposeModal({ templates, contacts, onClose, onSent }: {
-  templates: Template[]
-  contacts:  Contact[]
-  onClose:   () => void
-  onSent:    () => void
+function ComposeModal({ templates, contacts, initialBody, initialSubject, onClose, onSent }: {
+  templates:      Template[]
+  contacts:       Contact[]
+  initialBody?:   string
+  initialSubject?: string
+  onClose:        () => void
+  onSent:         () => void
 }) {
   const [to,           setTo]           = useState("")
-  const [subject,      setSubject]      = useState("")
-  const [body,         setBody]         = useState("")
+  const [subject,      setSubject]      = useState(initialSubject ?? "")
+  const [body,         setBody]         = useState(initialBody ?? "")
   const [sending,      setSending]      = useState(false)
   const [error,        setError]        = useState("")
   const [showTpl,      setShowTpl]      = useState(false)
@@ -962,7 +1190,7 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
       <div className="w-full max-w-lg bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
-          <h2 className="text-sm font-semibold text-white">New Email</h2>
+          <h2 className="text-sm font-semibold text-white">{initialBody ? "Forward Email Thread" : "New Email"}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
@@ -1021,47 +1249,49 @@ function ComposeModal({ templates, contacts, onClose, onSent }: {
         </div>
 
         {/* Templates */}
-        <div className="flex items-center gap-2 px-5 py-2 border-b border-gray-800">
-          <div className="relative">
-            <button
-              onClick={() => setShowTpl(v => !v)}
-              className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
-            >
-              Templates
-              <ChevronDown className="w-3 h-3" />
-            </button>
-            {showTpl && (
-              <div className="absolute left-0 top-full mt-1 w-64 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-10 overflow-hidden">
-                {templates.length === 0 ? (
-                  <p className="text-xs text-gray-500 px-4 py-3">
-                    No templates.{" "}
-                    <Link href="/super-admin/crm/settings" className="text-emerald-400 hover:underline">
-                      Add one in CRM Settings.
-                    </Link>
-                  </p>
-                ) : (
-                  templates.map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => applyTemplate(t)}
-                      className="w-full text-left px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-700 border-b border-gray-700 last:border-0"
-                    >
-                      {t.name}
-                      <p className="text-xs text-gray-500 mt-0.5 truncate">{t.subject}</p>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
+        {!initialBody && (
+          <div className="flex items-center gap-2 px-5 py-2 border-b border-gray-800">
+            <div className="relative">
+              <button
+                onClick={() => setShowTpl(v => !v)}
+                className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
+              >
+                Templates
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              {showTpl && (
+                <div className="absolute left-0 top-full mt-1 w-64 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-10 overflow-hidden">
+                  {templates.length === 0 ? (
+                    <p className="text-xs text-gray-500 px-4 py-3">
+                      No templates.{" "}
+                      <Link href="/super-admin/crm/settings" className="text-emerald-400 hover:underline">
+                        Add one in CRM Settings.
+                      </Link>
+                    </p>
+                  ) : (
+                    templates.map(t => (
+                      <button
+                        key={t.id}
+                        onClick={() => applyTemplate(t)}
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-700 border-b border-gray-700 last:border-0"
+                      >
+                        {t.name}
+                        <p className="text-xs text-gray-500 mt-0.5 truncate">{t.subject}</p>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+            <span className="text-xs text-gray-600">Fill subject and body from a saved template</span>
           </div>
-          <span className="text-xs text-gray-600">Fill subject and body from a saved template</span>
-        </div>
+        )}
 
         {/* Body */}
         <textarea
           value={body}
           onChange={e => setBody(e.target.value)}
-          placeholder="Write your email…"
+          placeholder={initialBody ? "" : "Write your email…"}
           rows={8}
           className="flex-1 px-5 py-4 bg-transparent text-sm text-gray-200 placeholder-gray-600 resize-none outline-none leading-relaxed"
         />

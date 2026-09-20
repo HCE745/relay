@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { put } from "@vercel/blob"
+import { put, del } from "@vercel/blob"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { sendEmail } from "@/lib/email"
@@ -113,23 +113,29 @@ export async function POST(req: NextRequest) {
 
     // Store the raw private blob URL in the DB.
     // Access it later via /api/attachments/view?url=<encoded> which proxies private blobs.
-    await prisma.bugReport.create({
-      data: {
-        ticketNumber:     ticket,
-        organizationId:   session.organizationId,
-        submittedById:    session.userId,
-        submittedByName:  session.name,
-        submittedByRole:  session.role,
-        orgName:          org?.name ?? "Unknown",
-        orgPlan:          org?.plan ?? null,
-        description,
-        expectedBehavior: "See screen recording",
-        currentPageUrl,
-        browserInfo,
-        videoUrl:         blob.url,
-        status:           "new",
-      },
-    })
+    try {
+      await prisma.bugReport.create({
+        data: {
+          ticketNumber:     ticket,
+          organizationId:   session.organizationId,
+          submittedById:    session.userId,
+          submittedByName:  session.name,
+          submittedByRole:  session.role,
+          orgName:          org?.name ?? "Unknown",
+          orgPlan:          org?.plan ?? null,
+          description,
+          expectedBehavior: "See screen recording",
+          currentPageUrl,
+          browserInfo,
+          videoUrl:         blob.url,
+          status:           "new",
+        },
+      })
+    } catch (dbErr) {
+      // DB write failed — clean up the orphaned blob so it doesn't accumulate
+      await del(blob.url).catch(() => {})
+      throw dbErr
+    }
 
     // Email link goes through the authenticated proxy so the video is actually watchable.
     // The recipient must be logged in to the app — fine for an internal bug report email.

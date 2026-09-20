@@ -78,6 +78,19 @@ export default async function SuggestionsPage({
       </div>
       <div className="px-3 md:px-6 py-2 md:py-6 max-w-3xl space-y-4 md:space-y-6">
 
+        {/* Non-admin empty state — shown when no suggestions are routed to them */}
+        {!isAdmin && suggestions.length === 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+              <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3 3 0 01-.77 1.74L12 19.5l-2.121-1.414a3 3 0 01-.77-1.74l-.347-.347z" />
+              </svg>
+            </div>
+            <p className="font-semibold text-gray-900 mb-1">No suggestions yet</p>
+            <p className="text-sm text-gray-500 mb-5">Use the form below to submit your first idea or improvement.</p>
+          </div>
+        )}
+
         {/* Personal routed inbox — shown for non-admins if they have routed items */}
         {!isAdmin && suggestions.length > 0 && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -104,7 +117,26 @@ export default async function SuggestionsPage({
         )}
 
         {/* Admin full inbox */}
-        {isAdmin && (
+        {isAdmin && suggestions.length === 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+              <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3 3 0 01-.77 1.74L12 19.5l-2.121-1.414a3 3 0 01-.77-1.74l-.347-.347z" />
+              </svg>
+            </div>
+            <p className="font-semibold text-gray-900 mb-1">No suggestions yet</p>
+            <p className="text-sm text-gray-500 mb-6">Invite your team to start submitting ideas. You can also create a survey to collect structured feedback.</p>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <a href="/settings/team" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                Invite Team Members
+              </a>
+              <a href="/surveys" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-lg transition-colors">
+                Create a Survey
+              </a>
+            </div>
+          </div>
+        )}
+        {isAdmin && suggestions.length > 0 && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-semibold text-gray-900">All Suggestions</h2>

@@ -6,6 +6,7 @@ import { setLifecycle } from "@/lib/crm-lifecycle"
 import { setWorkforceCommsPlanFlags } from "@/lib/workforce-comms"
 import * as Sentry from "@sentry/nextjs"
 import type Stripe from "stripe"
+import { logActivationEvent } from "@/lib/analytics"
 
 export const dynamic = "force-dynamic"
 
@@ -120,6 +121,8 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
     where: { id: org.id },
     data:  { subscriptionStatus: "active" },
   })
+
+  logActivationEvent(org.id, "trial_converted_to_paid", { plan: org.plan }).catch(() => {})
 
   await sendEmail({
     to:      admin.email,

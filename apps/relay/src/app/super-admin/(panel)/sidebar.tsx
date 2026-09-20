@@ -29,6 +29,7 @@ function buildSections(): NavSection[] {
         { href: "/super-admin/feature-requests",label: "Feature Requests",icon: Lightbulb },
         { href: "/super-admin/audit",           label: "Audit Log",       icon: Activity },
         { href: "/super-admin/insights",        label: "Insights",        icon: TrendingUp },
+        { href: "/super-admin/analytics",       label: "Activation Funnel", icon: TrendingUp },
         { href: "/super-admin/platform-health", label: "Platform Health", icon: HeartPulse },
         { href: "/super-admin/settings",        label: "Settings",        icon: Settings },
       ],

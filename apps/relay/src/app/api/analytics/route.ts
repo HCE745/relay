@@ -63,17 +63,18 @@ export async function GET(request: NextRequest) {
   ])
 
   // ── Resolution time ────────────────────────────────────────────────────────
-  const resolvedIssues = await prisma.issue.findMany({
-    where: { ...scopedWhere, status: "RESOLVED", resolvedAt: { not: null } },
-    select: { createdAt: true, resolvedAt: true },
-  })
-  const avgResolutionDays =
-    resolvedIssues.length > 0
-      ? resolvedIssues.reduce((sum, i) => {
-          const ms = i.resolvedAt!.getTime() - i.createdAt.getTime()
-          return sum + ms / (1000 * 60 * 60 * 24)
-        }, 0) / resolvedIssues.length
-      : null
+  type ResolutionRow = { avg_days: number | null }
+  const [resolutionRow] = await prisma.$queryRaw<ResolutionRow[]>`
+    SELECT AVG(EXTRACT(EPOCH FROM ("resolvedAt" - "createdAt")) / 86400)::float AS avg_days
+    FROM "Issue"
+    WHERE "organizationId" = ${organizationId}
+      AND status = 'RESOLVED'
+      AND "resolvedAt" IS NOT NULL
+      AND "createdAt" >= ${since}
+      ${baseWhere.locationId ? Prisma.sql`AND "locationId" = ${baseWhere.locationId}` : Prisma.empty}
+      ${baseWhere.departmentId ? Prisma.sql`AND "departmentId" = ${baseWhere.departmentId}` : Prisma.empty}
+  `
+  const avgResolutionDays = resolutionRow?.avg_days ?? null
 
   // ── Monthly trend (raw SQL for efficiency) ────────────────────────────────
   type TrendRow = { month: Date; total: bigint; resolved: bigint }

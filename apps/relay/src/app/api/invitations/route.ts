@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { sendEmail, teamInviteEmail } from "@/lib/email"
 import { randomUUID } from "crypto"
 import { checkLimit, limiters } from "@/lib/ratelimit"
+import { logActivationEvent } from "@/lib/analytics"
 
 export async function GET() {
   const session = await getSession()
@@ -105,6 +106,8 @@ export async function POST(request: NextRequest) {
       expiresInDays: 7,
     }),
   })
+
+  logActivationEvent(session.organizationId, "first_team_member_invited").catch(() => {})
 
   return NextResponse.json({
     id: invitation.id,

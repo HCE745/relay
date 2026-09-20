@@ -207,7 +207,7 @@ function ReviewCard({
 
 // ── Inbox Tab ─────────────────────────────────────────────────────────────────
 
-function InboxTab({ initialReviews }: { initialReviews: ReviewItem[] }) {
+function InboxTab({ initialReviews, totalReviews }: { initialReviews: ReviewItem[]; totalReviews: number }) {
   const [reviews, setReviews] = useState(initialReviews)
 
   function handleAction(id: string) {
@@ -215,6 +215,42 @@ function InboxTab({ initialReviews }: { initialReviews: ReviewItem[] }) {
   }
 
   if (reviews.length === 0) {
+    if (totalReviews === 0) {
+      return (
+        <div className="py-10">
+          <p className="text-center text-gray-500 font-medium mb-6">No customer feedback yet — get started by collecting feedback through one of these channels:</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Link href="/settings/integrations" className="flex flex-col items-center gap-3 p-5 rounded-xl border border-gray-200 hover:border-blue-200 hover:bg-blue-50/40 transition-colors text-center">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <Star className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Connect Google Reviews</p>
+                <p className="text-xs text-gray-500 mt-0.5">Sync reviews from your Google Business Profile</p>
+              </div>
+            </Link>
+            <Link href="/qr-codes" className="flex flex-col items-center gap-3 p-5 rounded-xl border border-gray-200 hover:border-blue-200 hover:bg-blue-50/40 transition-colors text-center">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <Plus className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Create QR Code</p>
+                <p className="text-xs text-gray-500 mt-0.5">Print and post a QR code for instant feedback</p>
+              </div>
+            </Link>
+            <Link href="/customer-voice/settings" className="flex flex-col items-center gap-3 p-5 rounded-xl border border-gray-200 hover:border-blue-200 hover:bg-blue-50/40 transition-colors text-center">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <MessageSquare className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Share Feedback Link</p>
+                <p className="text-xs text-gray-500 mt-0.5">Send customers a direct link to leave feedback</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className="text-center py-16">
         <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-3" />
@@ -547,7 +583,7 @@ export function CustomerVoiceClient({
         ))}
       </div>
 
-      {tab === "inbox"    && <InboxTab initialReviews={inboxReviews} />}
+      {tab === "inbox"    && <InboxTab initialReviews={inboxReviews} totalReviews={insights.totalReviews} />}
       {tab === "all"      && <AllReviewsTab />}
       {tab === "insights" && <InsightsTab insights={insights} />}
     </div>

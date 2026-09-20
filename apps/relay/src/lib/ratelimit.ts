@@ -42,6 +42,10 @@ export const limiters = {
 
   // Global backstop — IP-based
   global:      make(500, "1 m"),   // 500 requests / min / IP
+
+  // Public QR / feedback submissions — IP+token based
+  qrReport:    make(10, "1 h"),    // 10 submissions / IP / hour / token
+  feedback:    make(10, "1 h"),    // 10 submissions / IP / hour
 } as const
 
 // ─── IP extraction ────────────────────────────────────────────────────────────

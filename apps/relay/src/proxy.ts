@@ -45,6 +45,8 @@ const PUBLIC_PATHS = [
   "/api/survey",
   // Customer feedback widget — public endpoint (also guarded by API key in handler)
   "/api/feedback",
+  // Health check — no auth, used by uptime monitors and load balancers
+  "/api/health",
 ]
 
 // Authenticated but bypass onboarding/billing guards

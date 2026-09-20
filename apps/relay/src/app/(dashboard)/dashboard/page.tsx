@@ -597,10 +597,10 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* ── Today's Priorities (2/3) + Relay AI (1/3) — desktop only ──── */}
-        <div className="hidden md:grid grid-cols-3 gap-4">
+        {/* ── Today's Priorities (2/3) + Relay AI (1/3) ──────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Today's Priorities */}
-          <div className="col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="md:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-5 py-3.5 border-b border-gray-100">
               <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">Today&apos;s Priorities</p>
             </div>
@@ -652,8 +652,8 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* Relay AI */}
-          <div className="col-span-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          {/* Relay AI — desktop only */}
+          <div className="hidden md:block col-span-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-gray-100">
               <div className="relative w-7 h-7 shrink-0">
                 <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
@@ -691,6 +691,25 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Welcome card — shown only when no issues have been logged yet ── */}
+        {data.totalIssues === 0 && (
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-1">Welcome to Relay</h2>
+            <p className="text-sm text-gray-600 mb-4">Your operations hub is set up and ready. Start by logging your first issue or placing a QR code so your team can report problems instantly.</p>
+            <div className="flex flex-wrap gap-3">
+              <a href="/issues/new" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                Log First Issue
+              </a>
+              <a href="/qr-codes" className="inline-flex items-center gap-2 px-4 py-2 border border-blue-200 bg-white hover:bg-blue-50 text-blue-700 text-sm font-semibold rounded-lg transition-colors">
+                Create QR Code
+              </a>
+              <a href="/settings/team" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-lg transition-colors">
+                Invite Your Team
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* ── Car Wash Dashboard / Generic KPI + Charts ─────────────────── */}
         {isCarWash ? (

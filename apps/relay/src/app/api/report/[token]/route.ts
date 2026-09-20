@@ -2,12 +2,17 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { autoRouteIssue } from "@/lib/routing"
 import { put } from "@vercel/blob"
+import { checkLimit, getIP, limiters } from "@/lib/ratelimit"
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params
+
+  const ip = getIP(req)
+  const limited = await checkLimit(limiters.qrReport, `${token}:${ip}`, "Too many submissions. Please try again later.")
+  if (limited) return limited
 
   const qrCode = await prisma.qrCode.findUnique({
     where: { token },

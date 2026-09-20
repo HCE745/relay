@@ -195,6 +195,7 @@ export function NewIssueForm({ locations, departments, assets, vendors, users, s
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (loading) return
     setLoading(true)
     setError("")
     const formData = new FormData(e.currentTarget)

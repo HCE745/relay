@@ -154,6 +154,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     })
   }
 
+  // Close open assignments when issue is resolved
+  if (resolvingNow) {
+    await prisma.assignment.updateMany({
+      where: { linkedIssueId: id, completedAt: null },
+      data:  { completedAt: new Date(), status: "completed" },
+    })
+  }
+
   // Update anonymized pattern when issue is resolved
   if (resolvingNow) {
     resolveIssuePattern(id, new Date(), existing.isEscalated, existing.createdAt)

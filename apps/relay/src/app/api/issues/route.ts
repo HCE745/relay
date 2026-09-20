@@ -9,6 +9,7 @@ import { checkLimit, limiters } from "@/lib/ratelimit"
 import { dispatchInjuryNotifications } from "@/lib/injury-notifications"
 import { sendPushNotification } from "@/lib/push-notifications"
 import { checkDuplicateIssue, suggestIssueTitle } from "@/lib/ai-haiku"
+import { logActivationEvent } from "@/lib/analytics"
 
 // ── AI category + priority inference ──────────────────────────────────────────
 
@@ -150,6 +151,28 @@ export async function POST(request: NextRequest) {
   } = body
 
   if (!title) return NextResponse.json({ error: "Title is required" }, { status: 400 })
+
+  // ── Idempotency: deduplicate rapid double-submits ─────────────────────────────
+  const tenSecondsAgo = new Date(Date.now() - 10_000)
+  const existingIssue = await prisma.issue.findFirst({
+    where: {
+      title,
+      organizationId: session.organizationId,
+      reportedById:   session.userId,
+      createdAt:      { gte: tenSecondsAgo },
+    },
+    include: {
+      reportedBy: { select: { id: true, name: true } },
+      assignedTo: { select: { id: true, name: true } },
+      location:   { select: { id: true, name: true } },
+    },
+  })
+  if (existingIssue) {
+    return NextResponse.json(
+      { ...existingIssue, autoRoutedTo: null, routingRuleName: null, duplicateWarning: null, titleSuggestion: null },
+      { status: 200 },
+    )
+  }
 
   // ── 0. Validate cross-org entity references ───────────────────────────────────
   if (locationId || departmentId || assetId || vendorId) {
@@ -429,6 +452,8 @@ export async function POST(request: NextRequest) {
     duplicateWarning = dup
     titleSuggestion  = titleHint
   }
+
+  logActivationEvent(session.organizationId, "first_issue_created").catch(() => {})
 
   return NextResponse.json(
     { ...issue, autoRoutedTo, routingRuleName, duplicateWarning, titleSuggestion },

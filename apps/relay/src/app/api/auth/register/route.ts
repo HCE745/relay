@@ -5,6 +5,7 @@ import { createSession } from "@/lib/session"
 import { sendEmail, welcomeEmail } from "@/lib/email"
 import { checkLimit, getIP, limiters } from "@/lib/ratelimit"
 import { generateUniqueReferralCode, buildReferralLink, getActiveReferralProgram } from "@/lib/billing-credits-engine"
+import { logActivationEvent } from "@/lib/analytics"
 
 export async function POST(request: NextRequest) {
   const blocked = await checkLimit(
@@ -95,6 +96,8 @@ export async function POST(request: NextRequest) {
       subject: "Welcome to Relay — Let's get you set up",
       html:    welcomeEmail({ name: user.name, orgName, setupUrl: `${appUrl}/onboarding` }),
     }).catch(console.error)
+
+    logActivationEvent(org.id, "org_created").catch(() => {})
 
     return NextResponse.json({ success: true })
   } catch {

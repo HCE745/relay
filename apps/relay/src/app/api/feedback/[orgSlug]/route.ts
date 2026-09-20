@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { classifyFeedback } from "@/lib/classify-feedback"
+import { checkLimit, getIP, limiters } from "@/lib/ratelimit"
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ orgSlug: string }> },
 ) {
   const { orgSlug } = await params
+
+  const ip = getIP(req)
+  const limited = await checkLimit(limiters.feedback, `${orgSlug}:${ip}`, "Too many submissions. Please try again later.")
+  if (limited) return limited
 
   const org = await prisma.organization.findUnique({
     where: { slug: orgSlug },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { logActivationEvent } from "@/lib/analytics"
 
 const VALID_MODES         = ["PUBLIC_ISSUE", "EMPLOYEE_REPORTING", "ASSET_REPORTING", "VISITOR_FEEDBACK", "SAFETY_REPORTING"]
 const VALID_CATEGORIES    = ["GENERAL", "EQUIPMENT_BREAKDOWN", "SAFETY", "MAINTENANCE", "VEHICLE", "FACILITY"]
@@ -199,6 +200,8 @@ export async function POST(req: NextRequest) {
     },
     include: INCLUDE,
   })
+
+  logActivationEvent(session.organizationId, "first_qr_code_created").catch(() => {})
 
   return NextResponse.json({ qrCode: buildResponseShape(qrCode) }, { status: 201 })
 }

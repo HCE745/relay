@@ -214,6 +214,7 @@ model Organization {
   customerFeedback      CustomerFeedback[]
   customerSurveys       CustomerSurvey[]
   customerSurveyResponses CustomerSurveyResponse[]
+  analyticsEvents         OrgAnalyticsEvent[]
 }
 
 model CustomView {
@@ -3127,4 +3128,19 @@ model CustomerSurveyResponse {
 
   @@index([surveyId])
   @@index([organizationId])
+}
+
+// ─── Product Analytics ────────────────────────────────────────────────────────
+
+model OrgAnalyticsEvent {
+  id             String   @id @default(cuid())
+  organizationId String
+  eventType      String
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, eventType])
+  @@index([createdAt])
 }

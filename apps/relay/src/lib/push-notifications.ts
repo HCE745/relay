@@ -84,7 +84,12 @@ export async function sendPushNotification(
           signal: AbortSignal.timeout(10_000),
         }).then(async res => {
           if (!res.ok) {
-            console.error("[push] FCM V1 error for token", token.slice(-8), res.status, await res.text())
+            const body = await res.text()
+            console.error("[push] FCM V1 error for token", token.slice(-8), res.status, body)
+            // 404 = UNREGISTERED, 410 = token permanently invalid — delete it
+            if (res.status === 404 || res.status === 410) {
+              await prisma.deviceToken.deleteMany({ where: { token } }).catch(() => {})
+            }
           }
         }),
       ),

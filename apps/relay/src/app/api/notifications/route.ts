@@ -6,7 +6,7 @@ export async function GET() {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const notifications = await prisma.notification.findMany({
-    where: { userId: session.userId },
+    where: { userId: session.userId, organizationId: session.organizationId },
     orderBy: { createdAt: "desc" },
     take: 50,
     include: { issue: { select: { id: true, title: true } } },
@@ -18,7 +18,7 @@ export async function PATCH(request: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   await prisma.notification.updateMany({
-    where: { userId: session.userId, isRead: false },
+    where: { userId: session.userId, organizationId: session.organizationId, isRead: false },
     data: { isRead: true },
   })
   return NextResponse.json({ success: true })

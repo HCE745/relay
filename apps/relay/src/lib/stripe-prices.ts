@@ -1,6 +1,38 @@
 import type { PlanKey, ModuleId } from "./pricing"
 import { PLANS, PRO_EMPLOYEE_BANDS, PP_EMPLOYEE_BANDS } from "./pricing"
 
+// Warn at startup if any Stripe price env vars are missing.
+// This surfaces misconfiguration early rather than at checkout time.
+;(function validateStripePrices() {
+  const required = [
+    "STRIPE_PRICE_WASH_ESSENTIALS",
+    "STRIPE_PRICE_WASH_ESSENTIALS_LOCATION",
+    "STRIPE_PRICE_ESSENTIALS",
+    "STRIPE_PRICE_PROFESSIONAL",
+    "STRIPE_PRICE_PROFESSIONAL_PLUS",
+    "STRIPE_PRICE_ADDITIONAL_LOCATION",
+    "STRIPE_PRICE_EMPLOYEES_51_100",
+    "STRIPE_PRICE_EMPLOYEES_101_200",
+    "STRIPE_PRICE_EMPLOYEES_201_350",
+    "STRIPE_PRICE_EMPLOYEES_351_500",
+    "STRIPE_PRICE_PP_ADDITIONAL_LOCATION",
+    "STRIPE_PRICE_PP_EMPLOYEES_251_500",
+    "STRIPE_PRICE_PP_EMPLOYEES_501_1000",
+    "STRIPE_PRICE_PP_EMPLOYEES_1001_2500",
+    "STRIPE_PRICE_ISSUE_INTELLIGENCE",
+    "STRIPE_PRICE_SOP_INTELLIGENCE",
+    "STRIPE_PRICE_ASSET_INTELLIGENCE",
+    "STRIPE_PRICE_BENCHMARK_INTELLIGENCE",
+    "STRIPE_PRICE_PURCHASE_INTELLIGENCE",
+    "STRIPE_PRICE_INTELLIGENCE_SUITE",
+  ]
+  for (const key of required) {
+    if (!process.env[key]) {
+      console.warn(`[stripe-prices] Missing env var: ${key}`)
+    }
+  }
+})()
+
 // Map from our internal IDs to Stripe Price IDs (read at call time so env is loaded)
 export function getPriceId(key: string): string {
   const map: Record<string, string | undefined> = {

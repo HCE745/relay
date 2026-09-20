@@ -183,9 +183,16 @@ export default async function AssetsPage({ searchParams }: { searchParams: Promi
         {!isCarWash && !isPropMgmt && !isManufacturing && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden" data-tour="asset-list">
           {assets.length === 0 ? (
-            <div className="py-16 text-center">
+            <div className="py-16 text-center px-6">
               <Package className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-400 text-sm">No assets registered yet</p>
+              <p className="text-gray-700 font-medium mb-1">No equipment registered yet</p>
+              <p className="text-gray-400 text-sm mb-6">Track your equipment, log maintenance, and monitor issues all in one place.</p>
+              <AssetDialog locations={locations} departments={departments} vendors={vendors}>
+                <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                  <Plus className="w-4 h-4" />
+                  Add Equipment
+                </button>
+              </AssetDialog>
             </div>
           ) : (
             <>

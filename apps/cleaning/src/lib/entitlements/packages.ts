@@ -33,6 +33,7 @@ const TEAM_CAPS: Capability[] = [
   "workforce.payrollExport",
   "billing.invoicing",
   "billing.arAging",
+  "reporting.profitability",
 ]
 
 const BUSINESS_CAPS: Capability[] = [

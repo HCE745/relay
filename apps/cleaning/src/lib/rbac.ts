@@ -50,7 +50,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "invoices",    label: "Invoices",    href: "/billing/invoices",  requiredCap: "billing.invoicing", section: "Billing" },
   { key: "payments",    label: "Payments",    href: "/billing/payments",  requiredCap: "billing.invoicing", section: "Billing" },
   { key: "ar-aging",    label: "AR Aging",    href: "/billing/ar-aging",  requiredCap: "billing.arAging",   section: "Billing" },
-  // Reports intentionally omitted until it is real (audit: prefer hiding unfinished).
+  { key: "profitability", label: "Profitability", href: "/reports/profitability", requiredCap: "reporting.profitability", section: "Reports" },
   { key: "settings",    label: "Settings",    href: "/settings" },
 ]
 
@@ -61,7 +61,7 @@ export const ADMIN_ROUTE_KEYS: ReadonlySet<string> = new Set(ADMIN_NAV.map((i) =
 const ROLE_ROUTE_ACCESS: Record<Role, string[] | "*"> = {
   OWNER: "*",
   ADMIN: "*",
-  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "inspections", "issues", "invoices", "payments", "ar-aging"],
+  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "inspections", "issues", "invoices", "payments", "ar-aging", "profitability"],
   SUPERVISOR: ["dashboard", "schedule", "jobs", "time", "inspections", "issues"],
   CLEANER: [], // cleaners have no admin routes; they use the field app
 }

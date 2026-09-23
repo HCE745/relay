@@ -11,6 +11,9 @@ import {
   startOfUtcDay,
   endOfUtcDay,
   isInBillingPeriod,
+  effectiveHourlyRate,
+  laborCostForEntry,
+  marginPct,
 } from "../billing-math"
 
 describe("round2", () => {
@@ -96,6 +99,47 @@ describe("utc day bounds", () => {
   it("brackets a calendar day", () => {
     expect(startOfUtcDay("2026-09-16").toISOString()).toBe("2026-09-16T00:00:00.000Z")
     expect(endOfUtcDay("2026-09-16").toISOString()).toBe("2026-09-16T23:59:59.999Z")
+  })
+})
+
+describe("effectiveHourlyRate", () => {
+  it("passes HOURLY through and converts SALARY at 2080 hrs/yr", () => {
+    expect(effectiveHourlyRate(dec("30"), "HOURLY").toFixed(2)).toBe("30.00")
+    expect(effectiveHourlyRate(dec("52000"), "SALARY").toFixed(2)).toBe("25.00") // 52000/2080
+    expect(effectiveHourlyRate(dec("30"), null).toFixed(2)).toBe("30.00") // null type treated as hourly
+  })
+})
+
+describe("laborCostForEntry", () => {
+  const at = (iso: string) => new Date(iso)
+  const entry = (mins: number, brk = 0) => ({
+    clockInAt: at("2026-09-16T09:00:00Z"),
+    clockOutAt: new Date(at("2026-09-16T09:00:00Z").getTime() + mins * 60000),
+    breakMinutes: brk,
+  })
+  it("HOURLY: worked hours × rate, net of breaks", () => {
+    expect(laborCostForEntry(entry(90), dec("30"), "HOURLY").toFixed(2)).toBe("45.00") // 1.5h × 30
+    expect(laborCostForEntry(entry(120, 30), dec("30"), "HOURLY").toFixed(2)).toBe("45.00") // 1.5h × 30
+  })
+  it("SALARY: hours × (rate / 2080)", () => {
+    expect(laborCostForEntry(entry(60), dec("52000"), "SALARY").toFixed(2)).toBe("25.00")
+  })
+  it("null rate → 0 (never guessed)", () => {
+    expect(laborCostForEntry(entry(90), null, "HOURLY").toFixed(2)).toBe("0.00")
+  })
+  it("open entry (no clock-out) → 0", () => {
+    expect(laborCostForEntry({ clockInAt: at("2026-09-16T09:00:00Z"), clockOutAt: null, breakMinutes: 0 }, dec("30"), "HOURLY").toFixed(2)).toBe("0.00")
+  })
+})
+
+describe("marginPct", () => {
+  it("computes (revenue-cost)/revenue as a 1-dp percent", () => {
+    expect(marginPct(dec("100"), dec("60"))).toBe(40)
+    expect(marginPct(dec("100"), dec("100"))).toBe(0)
+    expect(marginPct(dec("100"), dec("130"))).toBe(-30)
+  })
+  it("returns null when there is no revenue (avoids divide-by-zero)", () => {
+    expect(marginPct(dec("0"), dec("50"))).toBeNull()
   })
 })
 

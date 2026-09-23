@@ -28,6 +28,7 @@ export const CAPABILITIES = [
   "workforce.payrollExport", // export/integration only — never payroll processing
   "billing.invoicing", // invoices, payments, AR
   "billing.arAging", // accounts-receivable aging report
+  "reporting.profitability", // site/customer/plan margin (pay-rate-derived)
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",

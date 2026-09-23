@@ -487,6 +487,10 @@ model TimeEntry {
   breakMinutes Int      @default(0)
   approvedById String?
   approvedAt   DateTime?
+  // Snapshot of the worker's pay basis at APPROVAL time so later raises never
+  // rewrite historical labor cost (same snapshot pattern as invoice lines).
+  approvedPayRate Decimal? @db.Decimal(10, 2)
+  approvedPayType String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

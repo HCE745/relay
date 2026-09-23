@@ -28,13 +28,28 @@ export function listTimeEntries(orgId: string, start: Date, end: Date) {
 
 export async function approveTimeEntry(orgId: string, entryId: string, approverId: string) {
   const db = orgDb(orgId)
-  const e = await db.timeEntry.findFirst({ where: { id: entryId }, select: { id: true, status: true, clockOutAt: true } })
+  const e = await db.timeEntry.findFirst({
+    where: { id: entryId },
+    select: { id: true, status: true, clockOutAt: true, userId: true },
+  })
   assertFound(e, "Time entry")
   if (e!.status === "OPEN" || e!.clockOutAt == null) throw new ConflictError("Cannot approve an open time entry")
   if (e!.status === "APPROVED") return { alreadyApproved: true }
+  // Snapshot the worker's pay basis at approval so a later raise never rewrites
+  // this entry's historical labor cost (same pattern as invoice-line snapshots).
+  const worker = await db.user.findFirst({
+    where: { id: e!.userId },
+    select: { employeeProfile: { select: { payRate: true, payType: true } } },
+  })
   await db.timeEntry.updateMany({
     where: { id: entryId },
-    data: { status: "APPROVED", approvedById: approverId, approvedAt: new Date() },
+    data: {
+      status: "APPROVED",
+      approvedById: approverId,
+      approvedAt: new Date(),
+      approvedPayRate: worker?.employeeProfile?.payRate ?? null,
+      approvedPayType: worker?.employeeProfile?.payType ?? null,
+    },
   })
   await recordAudit(orgId, approverId, "TimeEntry", entryId, "approve")
   return { alreadyApproved: false }

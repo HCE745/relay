@@ -49,6 +49,38 @@ export function agingBucket(daysOverdue: number): AgingBucket {
   return "d90"
 }
 
+// ─── Labor cost & margin (Phase 4) ───────────────────────────────────────────
+
+// Standard full-time hours/year, used to express a SALARY rate as an hourly
+// cost for per-job labor. Named so it is easy to find and change.
+export const SALARY_HOURS_PER_YEAR = 2080
+
+/** A pay basis expressed as an hourly rate: HOURLY as-is, SALARY / 2080. */
+export function effectiveHourlyRate(rate: Money, payType: string | null): Money {
+  return payType === "SALARY" ? rate.div(SALARY_HOURS_PER_YEAR) : rate
+}
+
+/**
+ * Labor cost of one time entry = worked hours × effective hourly rate, rounded
+ * to 2 dp. `rate` is the snapshotted pay rate (or a fallback); a null rate
+ * yields 0 (unknown cost, never guessed as non-zero).
+ */
+export function laborCostForEntry(
+  entry: { clockInAt: Date; clockOutAt: Date | null; breakMinutes: number },
+  rate: Money | null,
+  payType: string | null,
+): Money {
+  if (rate == null) return ZERO
+  const hours = hoursFromMinutes(billableMinutes(entry))
+  return round2(hours.times(effectiveHourlyRate(rate, payType)))
+}
+
+/** Gross margin percentage as a number (1 dp), or null when there is no revenue. */
+export function marginPct(revenue: Money, cost: Money): number | null {
+  if (revenue.lessThanOrEqualTo(ZERO)) return null
+  return Number(revenue.minus(cost).div(revenue).times(100).toDecimalPlaces(1))
+}
+
 export const startOfUtcDay = (isoDate: string): Date => new Date(`${isoDate}T00:00:00.000Z`)
 export const endOfUtcDay = (isoDate: string): Date => new Date(`${isoDate}T23:59:59.999Z`)
 

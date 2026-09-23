@@ -4,6 +4,8 @@ import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
 import { canViewSchedule, canManageSchedule, canInspect } from "@/lib/rbac"
 import { getJob } from "@/lib/data/jobs"
+import { getJobProfitability } from "@/lib/data/profitability"
+import { formatMoney } from "@/lib/money"
 import { listAssignableCleaners } from "@/lib/data/assignments"
 import { listInspectionTemplates } from "@/lib/data/inspection-templates"
 import { getOrgTimezone } from "@/lib/data/org"
@@ -52,6 +54,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   const showInspect = inspector && hasInspections && job.status === "COMPLETED"
   const activeTemplates = templates.filter((t) => t.isActive).map((t) => ({ id: t.id, name: t.name }))
 
+  // Pay-rate-derived: OWNER/ADMIN/MANAGER only (canManage), gated by capability.
+  const showProfit = canManage && (await orgHasCapability(orgId, "reporting.profitability"))
+  const profit = showProfit ? await getJobProfitability(orgId, id) : null
+
   return (
     <div className="space-y-6">
       <div>
@@ -95,6 +101,27 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         <Detail label="Origin" value={job.servicePlan ? `Recurring · ${job.servicePlan.name}` : "One-time job"} />
         {job.notes ? <Detail label="Cleaner / job note" value={job.notes} /> : null}
       </Card>
+
+      {profit ? (
+        <Card className="p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-700">Profitability</h2>
+            <span className="text-xs text-slate-400">Owners / admins / managers only</span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-4">
+            <Detail label="Billed" value={formatMoney(profit.billedAmount)} />
+            <Detail label="Labor cost" value={formatMoney(profit.laborCost)} />
+            <Detail label="Gross margin" value={formatMoney(profit.grossMargin)} />
+            <Detail label="Margin %" value={profit.marginPct === null ? "—" : `${profit.marginPct.toFixed(1)}%`} />
+          </div>
+          {!profit.invoiced ? (
+            <p className="mt-3 text-xs text-amber-600">Not yet invoiced — revenue appears once this job is on an invoice.</p>
+          ) : null}
+          {profit.approvedEntries === 0 ? (
+            <p className="mt-1 text-xs text-slate-400">No approved time yet — labor cost stays 0 until time is approved.</p>
+          ) : null}
+        </Card>
+      ) : null}
 
       <AssignmentsPanel
         jobId={job.id}

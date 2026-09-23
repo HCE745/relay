@@ -47,6 +47,9 @@ const PUBLIC_PATHS = [
   "/api/feedback",
   // Health check — no auth, used by uptime monitors and load balancers
   "/api/health",
+  // Account deletion — required by app store policies, no login needed
+  "/account/delete",
+  "/api/account/delete-request",
 ]
 
 // Authenticated but bypass onboarding/billing guards

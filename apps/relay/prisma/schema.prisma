@@ -3130,6 +3130,20 @@ model CustomerSurveyResponse {
   @@index([organizationId])
 }
 
+// ─── Account Deletion Requests ───────────────────────────────────────────────
+
+model AccountDeletionRequest {
+  id          String    @id @default(cuid())
+  email       String
+  ipAddress   String?
+  status      String    @default("pending") // "pending" | "processed"
+  requestedAt DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([email])
+  @@index([requestedAt])
+}
+
 // ─── Product Analytics ────────────────────────────────────────────────────────
 
 model OrgAnalyticsEvent {

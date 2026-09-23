@@ -11,9 +11,10 @@ import {
   startOfUtcDay,
   endOfUtcDay,
   isInBillingPeriod,
-  effectiveHourlyRate,
-  laborCostForEntry,
+  entryLaborCost,
   marginPct,
+  summarizeMargin,
+  countsTowardMargin,
 } from "../billing-math"
 
 describe("round2", () => {
@@ -102,15 +103,7 @@ describe("utc day bounds", () => {
   })
 })
 
-describe("effectiveHourlyRate", () => {
-  it("passes HOURLY through and converts SALARY at 2080 hrs/yr", () => {
-    expect(effectiveHourlyRate(dec("30"), "HOURLY").toFixed(2)).toBe("30.00")
-    expect(effectiveHourlyRate(dec("52000"), "SALARY").toFixed(2)).toBe("25.00") // 52000/2080
-    expect(effectiveHourlyRate(dec("30"), null).toFixed(2)).toBe("30.00") // null type treated as hourly
-  })
-})
-
-describe("laborCostForEntry", () => {
+describe("entryLaborCost — salaried labor is excluded, never invented", () => {
   const at = (iso: string) => new Date(iso)
   const entry = (mins: number, brk = 0) => ({
     clockInAt: at("2026-09-16T09:00:00Z"),
@@ -118,17 +111,52 @@ describe("laborCostForEntry", () => {
     breakMinutes: brk,
   })
   it("HOURLY: worked hours × rate, net of breaks", () => {
-    expect(laborCostForEntry(entry(90), dec("30"), "HOURLY").toFixed(2)).toBe("45.00") // 1.5h × 30
-    expect(laborCostForEntry(entry(120, 30), dec("30"), "HOURLY").toFixed(2)).toBe("45.00") // 1.5h × 30
+    expect(entryLaborCost(entry(90), dec("30"), "HOURLY")?.toFixed(2)).toBe("45.00") // 1.5h × 30
+    expect(entryLaborCost(entry(120, 30), dec("30"), "HOURLY")?.toFixed(2)).toBe("45.00")
   })
-  it("SALARY: hours × (rate / 2080)", () => {
-    expect(laborCostForEntry(entry(60), dec("52000"), "SALARY").toFixed(2)).toBe("25.00")
+  it("SALARY: unavailable (null) — no ÷2080, no invented number", () => {
+    expect(entryLaborCost(entry(60), dec("52000"), "SALARY")).toBeNull()
+    expect(entryLaborCost(entry(60), dec("30"), "SALARY")).toBeNull()
   })
-  it("null rate → 0 (never guessed)", () => {
-    expect(laborCostForEntry(entry(90), null, "HOURLY").toFixed(2)).toBe("0.00")
+  it("missing rate: unavailable (null)", () => {
+    expect(entryLaborCost(entry(90), null, "HOURLY")).toBeNull()
   })
-  it("open entry (no clock-out) → 0", () => {
-    expect(laborCostForEntry({ clockInAt: at("2026-09-16T09:00:00Z"), clockOutAt: null, breakMinutes: 0 }, dec("30"), "HOURLY").toFixed(2)).toBe("0.00")
+  it("open entry (no clock-out), HOURLY → 0", () => {
+    expect(entryLaborCost({ clockInAt: at("2026-09-16T09:00:00Z"), clockOutAt: null, breakMinutes: 0 }, dec("30"), "HOURLY")?.toFixed(2)).toBe("0.00")
+  })
+})
+
+describe("summarizeMargin — uninvoiced excluded by default; salaried excluded always", () => {
+  const billed = { invoiced: true, laborKnown: true, billed: dec("200"), labor: dec("45") }
+  const uninvoiced = { invoiced: false, laborKnown: true, billed: dec("0"), labor: dec("60") }
+  const salaried = { invoiced: true, laborKnown: false, billed: dec("300"), labor: dec("0") }
+
+  it("default view excludes uninvoiced work — no false loss", () => {
+    const s = summarizeMargin([billed, uninvoiced, salaried], false)
+    expect(s.revenue.toFixed(2)).toBe("200.00") // only the invoiced+known job
+    expect(s.laborCost.toFixed(2)).toBe("45.00")
+    expect(s.margin.toFixed(2)).toBe("155.00")
+    expect(s.marginPct).toBe(77.5)
+    expect(s.jobs).toBe(1)
+    expect(s.uninvoicedJobs).toBe(1)
+    expect(s.uninvoicedLabor.toFixed(2)).toBe("60.00") // surfaced separately, not in margin
+    expect(s.unavailableJobs).toBe(1) // salaried job excluded
+  })
+
+  it("include-uninvoiced folds unbilled work in (opt-in), still excludes salaried", () => {
+    const s = summarizeMargin([billed, uninvoiced, salaried], true)
+    expect(s.revenue.toFixed(2)).toBe("200.00") // uninvoiced adds $0 revenue
+    expect(s.laborCost.toFixed(2)).toBe("105.00") // 45 + 60
+    expect(s.margin.toFixed(2)).toBe("95.00")
+    expect(s.jobs).toBe(2)
+    expect(s.unavailableJobs).toBe(1) // salaried never counted, even when including uninvoiced
+  })
+
+  it("only invoiced known-labor jobs count by default", () => {
+    expect(countsTowardMargin({ invoiced: true, laborKnown: true }, false)).toBe(true)
+    expect(countsTowardMargin({ invoiced: false, laborKnown: true }, false)).toBe(false)
+    expect(countsTowardMargin({ invoiced: false, laborKnown: true }, true)).toBe(true)
+    expect(countsTowardMargin({ invoiced: true, laborKnown: false }, true)).toBe(false) // salaried never
   })
 })
 

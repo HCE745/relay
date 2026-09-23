@@ -109,16 +109,18 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             <span className="text-xs text-slate-400">Owners / admins / managers only</span>
           </div>
           <div className="grid gap-4 sm:grid-cols-4">
-            <Detail label="Billed" value={formatMoney(profit.billedAmount)} />
-            <Detail label="Labor cost" value={formatMoney(profit.laborCost)} />
-            <Detail label="Gross margin" value={formatMoney(profit.grossMargin)} />
+            <Detail label="Billed" value={profit.invoiced ? formatMoney(profit.billedAmount) : "—"} />
+            <Detail label="Labor cost" value={profit.laborCost === null ? "Unavailable" : formatMoney(profit.laborCost)} />
+            <Detail label="Gross margin" value={profit.grossMargin === null ? "—" : formatMoney(profit.grossMargin)} />
             <Detail label="Margin %" value={profit.marginPct === null ? "—" : `${profit.marginPct.toFixed(1)}%`} />
           </div>
-          {!profit.invoiced ? (
-            <p className="mt-3 text-xs text-amber-600">Not yet invoiced — revenue appears once this job is on an invoice.</p>
+          {profit.salaried ? (
+            <p className="mt-3 text-xs text-slate-500">Labor cost unavailable — salaried-worker time is not costed.</p>
+          ) : profit.laborAvailable && !profit.invoiced ? (
+            <p className="mt-3 text-xs text-amber-600">Not yet invoiced — this is uninvoiced labor; margin appears once the job is on an invoice.</p>
           ) : null}
-          {profit.approvedEntries === 0 ? (
-            <p className="mt-1 text-xs text-slate-400">No approved time yet — labor cost stays 0 until time is approved.</p>
+          {profit.laborAvailable && profit.approvedEntries === 0 ? (
+            <p className="mt-1 text-xs text-slate-400">No approved time yet — labor cost stays $0 until time is approved.</p>
           ) : null}
         </Card>
       ) : null}

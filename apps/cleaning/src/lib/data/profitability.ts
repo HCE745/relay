@@ -1,15 +1,55 @@
 import { orgDb } from "../org-db"
 import { getOrgTimezone } from "./org"
-import { type Money, ZERO, laborCostForEntry, marginPct, isInBillingPeriod, startOfUtcDay, endOfUtcDay } from "../billing-math"
+import {
+  type Money,
+  type JobMarginInput,
+  type MarginSummary,
+  ZERO,
+  entryLaborCost,
+  marginPct,
+  summarizeMargin,
+  countsTowardMargin,
+  isInBillingPeriod,
+  startOfUtcDay,
+  endOfUtcDay,
+} from "../billing-math"
 
 // ─── Site / customer / plan profitability (Phase 4) ──────────────────────────
 //
 // Revenue = actually-invoiced amount for a job (its non-VOID InvoiceLine).
-// Labor cost = Σ APPROVED time × the pay rate SNAPSHOTTED at approval (falling
-// back to the worker's current rate only for entries approved before snapshots
-// existed). Money is Decimal throughout; period membership is by site-local day.
+// Labor cost = Σ APPROVED HOURLY time × the pay rate SNAPSHOTTED at approval
+// (falling back to the worker's current rate only for entries approved before
+// snapshots existed). SALARY time is EXCLUDED — never invented (see
+// entryLaborCost); a job with any such entry is "labor unavailable" and left
+// out of margin. Uninvoiced completed jobs are excluded by default so unbilled
+// work is never a false loss — pass includeUninvoiced to fold them in.
 //
-// This is pay-rate-derived — callers must gate it to OWNER/ADMIN/MANAGER.
+// Pay-rate-derived — callers must gate to OWNER/ADMIN/MANAGER.
+
+type ApprovedEntry = {
+  clockInAt: Date
+  clockOutAt: Date | null
+  breakMinutes: number
+  approvedPayRate: Money | null
+  approvedPayType: string | null
+  user: { employeeProfile: { payRate: Money | null; payType: string | null } | null }
+}
+
+/** Job labor: total known (hourly) cost, whether it is fully known, and whether any salaried time is present. */
+function jobLabor(entries: ApprovedEntry[]): { known: boolean; labor: Money; salaried: boolean } {
+  let labor = ZERO
+  let known = true
+  let salaried = false
+  for (const e of entries) {
+    const type = e.approvedPayType ?? e.user.employeeProfile?.payType ?? null
+    const rate = e.approvedPayRate ?? e.user.employeeProfile?.payRate ?? null
+    if (type === "SALARY") salaried = true
+    const cost = entryLaborCost(e, rate, type)
+    if (cost === null) known = false
+    else labor = labor.plus(cost)
+  }
+  return { known, labor, salaried }
+}
 
 type Row = { id: string; name: string; detail?: string; revenue: Money; laborCost: Money; jobs: number }
 export type ProfitRow = {
@@ -21,19 +61,6 @@ export type ProfitRow = {
   margin: Money
   marginPct: number | null
   jobs: number
-}
-
-function laborForEntry(e: {
-  clockInAt: Date
-  clockOutAt: Date | null
-  breakMinutes: number
-  approvedPayRate: Money | null
-  approvedPayType: string | null
-  user: { employeeProfile: { payRate: Money | null; payType: string | null } | null }
-}): Money {
-  const rate = e.approvedPayRate ?? e.user.employeeProfile?.payRate ?? null
-  const type = e.approvedPayType ?? e.user.employeeProfile?.payType ?? null
-  return laborCostForEntry(e, rate, type)
 }
 
 function upsert(map: Map<string, Row>, id: string, name: string, detail: string | undefined, billed: Money, labor: Money) {
@@ -54,10 +81,15 @@ export type Profitability = {
   bySite: ProfitRow[]
   byCustomer: ProfitRow[]
   byPlan: ProfitRow[]
-  totals: { revenue: Money; laborCost: Money; margin: Money; marginPct: number | null; jobs: number }
+  summary: MarginSummary
+  includeUninvoiced: boolean
 }
 
-export async function getProfitability(orgId: string, input: { periodStart: string; periodEnd: string }): Promise<Profitability> {
+export async function getProfitability(
+  orgId: string,
+  input: { periodStart: string; periodEnd: string; includeUninvoiced?: boolean },
+): Promise<Profitability> {
+  const includeUninvoiced = input.includeUninvoiced ?? false
   const db = orgDb(orgId)
   const orgTz = await getOrgTimezone(orgId)
   const windowStart = new Date(startOfUtcDay(input.periodStart).getTime() - 86_400_000)
@@ -66,9 +98,7 @@ export async function getProfitability(orgId: string, input: { periodStart: stri
   const jobs = await db.job.findMany({
     where: { status: "COMPLETED", scheduledStart: { gte: windowStart, lte: windowEnd } },
     include: {
-      serviceLocation: {
-        select: { id: true, name: true, timezone: true, customer: { select: { id: true, name: true } } },
-      },
+      serviceLocation: { select: { id: true, name: true, timezone: true, customer: { select: { id: true, name: true } } } },
       servicePlan: { select: { id: true, name: true } },
       timeEntries: {
         where: { status: "APPROVED" },
@@ -88,39 +118,33 @@ export async function getProfitability(orgId: string, input: { periodStart: stri
   const bySite = new Map<string, Row>()
   const byCustomer = new Map<string, Row>()
   const byPlan = new Map<string, Row>()
-  let totalRevenue = ZERO
-  let totalLabor = ZERO
-  let totalJobs = 0
+  const summaryInputs: JobMarginInput[] = []
 
   for (const job of jobs) {
     const siteTz = job.serviceLocation.timezone ?? orgTz
     if (!isInBillingPeriod(job.scheduledStart, siteTz, input.periodStart, input.periodEnd)) continue
 
     const billed = job.invoiceLines.reduce((a, l) => a.plus(l.amount), ZERO)
-    const labor = job.timeEntries.reduce((a, e) => a.plus(laborForEntry(e)), ZERO)
+    const invoiced = job.invoiceLines.length > 0
+    const { known, labor } = jobLabor(job.timeEntries)
 
-    const site = job.serviceLocation
-    const customer = site.customer
-    upsert(bySite, site.id, site.name, customer.name, billed, labor)
-    upsert(byCustomer, customer.id, customer.name, undefined, billed, labor)
-    upsert(byPlan, job.servicePlan?.id ?? "__none__", job.servicePlan?.name ?? "One-off / no plan", undefined, billed, labor)
+    summaryInputs.push({ invoiced, laborKnown: known, billed, labor })
 
-    totalRevenue = totalRevenue.plus(billed)
-    totalLabor = totalLabor.plus(labor)
-    totalJobs += 1
+    // Rows include only jobs that count toward margin, so row sums match totals.
+    if (countsTowardMargin({ invoiced, laborKnown: known }, includeUninvoiced)) {
+      const site = job.serviceLocation
+      upsert(bySite, site.id, site.name, site.customer.name, billed, labor)
+      upsert(byCustomer, site.customer.id, site.customer.name, undefined, billed, labor)
+      upsert(byPlan, job.servicePlan?.id ?? "__none__", job.servicePlan?.name ?? "One-off / no plan", undefined, billed, labor)
+    }
   }
 
   return {
     bySite: finalize(bySite),
     byCustomer: finalize(byCustomer),
     byPlan: finalize(byPlan),
-    totals: {
-      revenue: totalRevenue,
-      laborCost: totalLabor,
-      margin: totalRevenue.minus(totalLabor),
-      marginPct: marginPct(totalRevenue, totalLabor),
-      jobs: totalJobs,
-    },
+    summary: summarizeMargin(summaryInputs, includeUninvoiced),
+    includeUninvoiced,
   }
 }
 
@@ -144,14 +168,20 @@ export async function getJobProfitability(orgId: string, jobId: string) {
     },
   })
   if (!job) return null
+
   const billedAmount = job.invoiceLines.reduce((a, l) => a.plus(l.amount), ZERO)
-  const laborCost = job.timeEntries.reduce((a, e) => a.plus(laborForEntry(e)), ZERO)
+  const invoiced = job.invoiceLines.length > 0
+  const { known, labor, salaried } = jobLabor(job.timeEntries)
+
   return {
     billedAmount,
-    laborCost,
-    grossMargin: billedAmount.minus(laborCost),
-    marginPct: marginPct(billedAmount, laborCost),
+    invoiced,
+    laborAvailable: known,
+    salaried,
+    laborCost: known ? labor : null,
+    // Margin only when we have both real revenue and a known labor cost.
+    grossMargin: known && invoiced ? billedAmount.minus(labor) : null,
+    marginPct: known && invoiced ? marginPct(billedAmount, labor) : null,
     approvedEntries: job.timeEntries.length,
-    invoiced: job.invoiceLines.length > 0,
   }
 }

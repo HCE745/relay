@@ -51,34 +51,92 @@ export function agingBucket(daysOverdue: number): AgingBucket {
 
 // ─── Labor cost & margin (Phase 4) ───────────────────────────────────────────
 
-// Standard full-time hours/year, used to express a SALARY rate as an hourly
-// cost for per-job labor. Named so it is easy to find and change.
-export const SALARY_HOURS_PER_YEAR = 2080
-
-/** A pay basis expressed as an hourly rate: HOURLY as-is, SALARY / 2080. */
-export function effectiveHourlyRate(rate: Money, payType: string | null): Money {
-  return payType === "SALARY" ? rate.div(SALARY_HOURS_PER_YEAR) : rate
-}
-
 /**
- * Labor cost of one time entry = worked hours × effective hourly rate, rounded
- * to 2 dp. `rate` is the snapshotted pay rate (or a fallback); a null rate
- * yields 0 (unknown cost, never guessed as non-zero).
+ * Labor cost of one HOURLY time entry = worked hours × rate, rounded to 2 dp.
+ * Returns null ("unavailable") for anything we cannot cost honestly:
+ *   - SALARY pay type — we never invent an hourly number for salaried work
+ *   - a missing rate
+ * A job containing any null entry is excluded from margin (see summarizeMargin).
  */
-export function laborCostForEntry(
+export function entryLaborCost(
   entry: { clockInAt: Date; clockOutAt: Date | null; breakMinutes: number },
   rate: Money | null,
   payType: string | null,
-): Money {
-  if (rate == null) return ZERO
+): Money | null {
+  if (payType === "SALARY") return null
+  if (rate == null) return null
   const hours = hoursFromMinutes(billableMinutes(entry))
-  return round2(hours.times(effectiveHourlyRate(rate, payType)))
+  return round2(hours.times(rate))
 }
 
 /** Gross margin percentage as a number (1 dp), or null when there is no revenue. */
 export function marginPct(revenue: Money, cost: Money): number | null {
   if (revenue.lessThanOrEqualTo(ZERO)) return null
   return Number(revenue.minus(cost).div(revenue).times(100).toDecimalPlaces(1))
+}
+
+// One completed job's inputs to a margin aggregate.
+//  - laborKnown = false when any of its approved time is salaried/unpriceable
+//  - invoiced   = it has a non-void invoice line (i.e. real revenue)
+export type JobMarginInput = { invoiced: boolean; laborKnown: boolean; billed: Money; labor: Money }
+
+export type MarginSummary = {
+  revenue: Money
+  laborCost: Money
+  margin: Money
+  marginPct: number | null
+  jobs: number
+  // Excluded, but surfaced so the work stays visible:
+  uninvoicedLabor: Money // labor of completed-but-not-invoiced jobs (excluded by default)
+  uninvoicedJobs: number
+  unavailableJobs: number // jobs whose labor can't be costed (salaried/unpriceable)
+}
+
+/**
+ * Aggregate job margins. By DEFAULT, only invoiced jobs with known labor count
+ * toward margin — so unbilled work never shows as a false loss. Jobs with
+ * unavailable (salaried) labor are always excluded. `includeUninvoiced` folds
+ * completed-but-unbilled jobs into the margin (opt-in).
+ */
+export function summarizeMargin(jobs: JobMarginInput[], includeUninvoiced: boolean): MarginSummary {
+  let revenue = ZERO
+  let laborCost = ZERO
+  let counted = 0
+  let uninvoicedLabor = ZERO
+  let uninvoicedJobs = 0
+  let unavailableJobs = 0
+
+  for (const j of jobs) {
+    if (!j.laborKnown) {
+      unavailableJobs += 1 // salaried / unpriceable — never part of margin
+      continue
+    }
+    if (!j.invoiced) {
+      uninvoicedJobs += 1
+      uninvoicedLabor = uninvoicedLabor.plus(j.labor)
+    }
+    if (j.invoiced || includeUninvoiced) {
+      revenue = revenue.plus(j.billed)
+      laborCost = laborCost.plus(j.labor)
+      counted += 1
+    }
+  }
+
+  return {
+    revenue,
+    laborCost,
+    margin: revenue.minus(laborCost),
+    marginPct: marginPct(revenue, laborCost),
+    jobs: counted,
+    uninvoicedLabor,
+    uninvoicedJobs,
+    unavailableJobs,
+  }
+}
+
+/** Whether a job should count toward margin rows, matching summarizeMargin. */
+export function countsTowardMargin(j: { invoiced: boolean; laborKnown: boolean }, includeUninvoiced: boolean): boolean {
+  return j.laborKnown && (j.invoiced || includeUninvoiced)
 }
 
 export const startOfUtcDay = (isoDate: string): Date => new Date(`${isoDate}T00:00:00.000Z`)

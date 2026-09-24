@@ -38,6 +38,8 @@ export const CAPABILITIES = [
   "erp.siteProfitability",
   "procurement.purchaseOrders",
   "procurement.inventory",
+  "assets.management", // asset register + maintenance log
+  "supplies.inventory", // supply stock + usage log
   "core.reporting.advanced",
 
   // ── Enterprise ───────────────────────────────────────────────────────────

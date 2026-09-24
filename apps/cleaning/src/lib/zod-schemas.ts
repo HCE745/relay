@@ -392,3 +392,55 @@ export const estimateUpdateSchema = estimateCreateSchema.partial().extend({
 export type EstimateCreateInput = z.infer<typeof estimateCreateSchema>
 
 export const estimateStatusSchema = z.object({ status: z.enum(ESTIMATE_STATUSES) })
+
+// ─── Phase 6: assets & supplies ──────────────────────────────────────────────
+
+export const ASSET_CATEGORIES = ["EQUIPMENT", "VEHICLE", "MACHINE"] as const
+export const ASSET_STATUSES = ["ACTIVE", "MAINTENANCE", "RETIRED"] as const
+
+// Signed money (adjustments can be negative). Positive money reuses `money`.
+const signedMoney = z.string().trim().regex(/^-?\d{1,9}(\.\d{1,2})?$/, "Enter an amount like 5 or -2.5")
+
+export const assetCreateSchema = z.object({
+  name: z.string().trim().min(1, "Asset name is required").max(200),
+  category: z.enum(ASSET_CATEGORIES).optional(),
+  serial: optionalString,
+  purchaseDate: dateString.optional(),
+  purchaseCost: optionalMoney,
+  status: z.enum(ASSET_STATUSES).optional(),
+  assignedToSiteId: z.string().min(1).optional().or(z.literal("").transform(() => undefined)),
+  assignedToUserId: z.string().min(1).optional().or(z.literal("").transform(() => undefined)),
+})
+export const assetUpdateSchema = assetCreateSchema.partial()
+export type AssetCreateInput = z.infer<typeof assetCreateSchema>
+
+export const assetMaintenanceSchema = z.object({
+  type: z.string().trim().min(1, "What was done?").max(200),
+  date: dateString.optional(),
+  cost: optionalMoney,
+  notes: optionalString,
+})
+
+export const supplyCreateSchema = z.object({
+  name: z.string().trim().min(1, "Supply name is required").max(200),
+  unit: z.string().trim().min(1).max(40).optional(),
+  currentStock: optionalMoney, // opening stock
+  reorderThreshold: optionalMoney,
+  costPerUnit: optionalMoney,
+})
+export const supplyUpdateSchema = supplyCreateSchema.partial()
+export type SupplyCreateInput = z.infer<typeof supplyCreateSchema>
+
+// Manual stock adjustment with a required reason (signed delta). No purchasing.
+export const supplyAdjustSchema = z.object({
+  delta: signedMoney,
+  reason: z.string().trim().min(1, "A reason is required").max(300),
+})
+
+// Cleaner-facing: log usage of a supply on a job (one tap + quantity).
+export const supplyUsageSchema = z.object({
+  supplyId: z.string().min(1),
+  quantity: money,
+  jobId: z.string().min(1).optional(),
+})
+export type SupplyUsageInput = z.infer<typeof supplyUsageSchema>

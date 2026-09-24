@@ -44,6 +44,8 @@ const BUSINESS_CAPS: Capability[] = [
   "erp.siteProfitability",
   "procurement.purchaseOrders",
   "procurement.inventory",
+  "assets.management",
+  "supplies.inventory",
   "core.reporting.advanced",
 ]
 

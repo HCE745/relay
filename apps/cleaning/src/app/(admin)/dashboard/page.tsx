@@ -2,8 +2,10 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
+import { orgHasCapability } from "@/lib/page-guards"
 import { getOrgTimezone } from "@/lib/data/org"
 import { getDashboardMetrics } from "@/lib/data/dashboard"
+import { countLowStock } from "@/lib/data/supplies"
 import { getSetupProgress } from "@/lib/data/setup"
 import { isSetupGuideDismissed } from "@/lib/setup-actions"
 import { PageHeader } from "@/components/ui/placeholder"
@@ -53,6 +55,11 @@ export default async function DashboardPage() {
     { label: "Open problems", value: m.openIssues, href: "/issues?status=OPEN", alert: true },
     { label: "Time to approve", value: m.pendingApproval, href: "/time?status=pending", alert: true },
   ]
+
+  // Low-stock supplies — only for managers on a plan that includes supplies.
+  if (canManageAccounts(session.role) && (await orgHasCapability(orgId, "supplies.inventory"))) {
+    needsAttention.push({ label: "Low stock", value: await countLowStock(orgId), href: "/supplies?filter=low", alert: true })
+  }
   const overview: Tile[] = [
     { label: "Scheduled today", value: m.scheduledToday, href: "/jobs?f=scheduled-today", alert: false },
     { label: "In progress", value: m.inProgress, href: "/jobs?f=in-progress", alert: false },

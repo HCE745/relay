@@ -44,6 +44,9 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "Invoice",
   "Lead",
   "Estimate",
+  "Asset",
+  "Supply",
+  "SupplyUsage",
 ])
 
 const WHERE_OPS: ReadonlySet<string> = new Set([

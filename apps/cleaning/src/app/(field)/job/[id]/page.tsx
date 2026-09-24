@@ -4,7 +4,10 @@ import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
 import { getFieldJob } from "@/lib/data/field"
 import { getOrgTimezone } from "@/lib/data/org"
+import { orgHasCapability } from "@/lib/page-guards"
+import { listSuppliesForField } from "@/lib/data/supplies"
 import { FieldJobClient } from "./field-job-client"
+import { SupplyUsagePanel } from "@/components/field/supply-usage-panel"
 
 export const dynamic = "force-dynamic"
 
@@ -30,6 +33,9 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
     .join(", ")
 
   const isClockedIn = job.timeEntries.some((t) => t.status === "OPEN")
+
+  const hasSupplies = await orgHasCapability(orgId, "supplies.inventory")
+  const supplies = hasSupplies ? await listSuppliesForField(orgId) : []
 
   return (
     <div className="space-y-4">
@@ -60,6 +66,12 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
           hasPhoto: it.photos.length > 0,
         }))}
       />
+      {hasSupplies ? (
+        <div className="rounded-2xl border border-slate-200 bg-white p-4">
+          <h2 className="mb-3 text-sm font-semibold text-slate-700">Supplies used</h2>
+          <SupplyUsagePanel jobId={job.id} supplies={supplies} />
+        </div>
+      ) : null}
     </div>
   )
 }

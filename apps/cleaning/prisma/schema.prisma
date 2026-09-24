@@ -105,6 +105,24 @@ enum TimeEntryStatus {
 
 // ─── Tenant + identity ───────────────────────────────────────────────────────
 
+// ─── Assets & supplies (Phase 6) ─────────────────────────────────────────────
+
+enum AssetCategory {
+  EQUIPMENT
+  VEHICLE
+  MACHINE
+
+  @@schema("cleaning")
+}
+
+enum AssetStatus {
+  ACTIVE
+  MAINTENANCE
+  RETIRED
+
+  @@schema("cleaning")
+}
+
 // ─── CRM: leads & estimates (Phase 5) ────────────────────────────────────────
 
 enum LeadStatus {
@@ -195,6 +213,9 @@ model Organization {
   invoices            Invoice[]
   leads               Lead[]
   estimates           Estimate[]
+  assets              Asset[]
+  supplies            Supply[]
+  supplyUsages        SupplyUsage[]
 
   @@schema("cleaning")
 }
@@ -227,6 +248,10 @@ model User {
   issueComments   IssueComment[]   @relation("IssueCommentAuthor")
   inspections     Inspection[]     @relation("InspectionInspector")
   assignedLeads   Lead[]           @relation("LeadAssignee")
+  assignedAssets       Asset[]            @relation("AssetUser")
+  performedMaintenance AssetMaintenance[] @relation("MaintenancePerformer")
+  recordedSupplyUsages SupplyUsage[]      @relation("SupplyUsageRecorder")
+  supplyAdjustments    SupplyAdjustment[] @relation("SupplyAdjuster")
   passwordResetTokens PasswordResetToken[]
 
   @@index([organizationId])
@@ -340,6 +365,8 @@ model ServiceLocation {
   jobs         Job[]
   issues       Issue[]
   inspections  Inspection[]
+  assets       Asset[]       @relation("AssetSite")
+  supplyUsages SupplyUsage[] @relation("SupplyUsageSite")
 
   @@index([organizationId])
   @@index([customerId])
@@ -445,6 +472,7 @@ model Job {
   issues          Issue[]
   inspections     Inspection[]
   invoiceLines    InvoiceLine[]
+  supplyUsages    SupplyUsage[]
 
   // Idempotent generation: a plan can produce at most one Job per occurrence
   // start. Manual jobs have servicePlanId = NULL, which Postgres treats as
@@ -969,5 +997,109 @@ model EstimateLine {
   estimate Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
 
   @@index([estimateId])
+  @@schema("cleaning")
+}
+
+// ─── Assets & supplies (Phase 6) ─────────────────────────────────────────────
+// Deliberately minimal: an asset record + a maintenance log; a supply stock
+// level + a usage log + manual stock adjustments. NO purchasing/POs, vendors,
+// depreciation, or maintenance scheduling.
+
+model Asset {
+  id               String        @id @default(cuid())
+  organizationId   String
+  name             String
+  category         AssetCategory @default(EQUIPMENT)
+  serial           String?
+  purchaseDate     DateTime?
+  purchaseCost     Decimal?      @db.Decimal(12, 2)
+  status           AssetStatus   @default(ACTIVE)
+  assignedToSiteId String?
+  assignedToUserId String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignedToSite ServiceLocation?   @relation("AssetSite", fields: [assignedToSiteId], references: [id])
+  assignedToUser User?              @relation("AssetUser", fields: [assignedToUserId], references: [id])
+  maintenance    AssetMaintenance[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@schema("cleaning")
+}
+
+model AssetMaintenance {
+  id            String   @id @default(cuid())
+  assetId       String
+  date          DateTime @default(now())
+  type          String
+  cost          Decimal? @db.Decimal(12, 2)
+  notes         String?
+  performedById String?
+  createdAt     DateTime @default(now())
+
+  asset       Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  performedBy User? @relation("MaintenancePerformer", fields: [performedById], references: [id])
+
+  @@index([assetId])
+  @@schema("cleaning")
+}
+
+model Supply {
+  id               String   @id @default(cuid())
+  organizationId   String
+  name             String
+  unit             String   @default("unit")
+  currentStock     Decimal  @default(0) @db.Decimal(12, 2)
+  reorderThreshold Decimal  @default(0) @db.Decimal(12, 2)
+  costPerUnit      Decimal? @db.Decimal(12, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  usages       SupplyUsage[]
+  adjustments  SupplyAdjustment[]
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+model SupplyUsage {
+  id                String   @id @default(cuid())
+  organizationId    String
+  supplyId          String
+  quantity          Decimal  @db.Decimal(12, 2)
+  jobId             String?
+  serviceLocationId String?
+  recordedById      String
+  createdAt         DateTime @default(now())
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supply          Supply           @relation(fields: [supplyId], references: [id], onDelete: Cascade)
+  job             Job?             @relation(fields: [jobId], references: [id])
+  serviceLocation ServiceLocation? @relation("SupplyUsageSite", fields: [serviceLocationId], references: [id])
+  recordedBy      User             @relation("SupplyUsageRecorder", fields: [recordedById], references: [id])
+
+  @@index([organizationId])
+  @@index([supplyId])
+  @@index([jobId])
+  @@schema("cleaning")
+}
+
+// Manual stock corrections/restocks with a reason — the sanctioned way to
+// increase stock (no receipts/purchasing in this phase).
+model SupplyAdjustment {
+  id           String   @id @default(cuid())
+  supplyId     String
+  delta        Decimal  @db.Decimal(12, 2) // signed: + restock/correction, - shrinkage
+  reason       String
+  adjustedById String?
+  createdAt    DateTime @default(now())
+
+  supply     Supply @relation(fields: [supplyId], references: [id], onDelete: Cascade)
+  adjustedBy User?  @relation("SupplyAdjuster", fields: [adjustedById], references: [id])
+
+  @@index([supplyId])
   @@schema("cleaning")
 }

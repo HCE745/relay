@@ -31,6 +31,15 @@ export function getChecklistTemplate(orgId: string, id: string) {
   return orgDb(orgId).checklistTemplate.findFirst({ where: { id }, include: withItems })
 }
 
+/** Active templates with their item labels — used to seed estimate line items. */
+export function listActiveTemplatesWithItems(orgId: string) {
+  return orgDb(orgId).checklistTemplate.findMany({
+    where: { isActive: true },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, items: { orderBy: { sortOrder: "asc" }, select: { label: true } } },
+  })
+}
+
 export function createChecklistTemplate(orgId: string, input: CreateInput) {
   return orgDb(orgId).checklistTemplate.create({
     data: {

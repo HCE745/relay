@@ -339,3 +339,56 @@ export const invoicePaymentSchema = z.object({
   reference: optionalString,
 })
 export type InvoicePaymentInput = z.infer<typeof invoicePaymentSchema>
+
+// ─── Phase 5: leads & estimates ──────────────────────────────────────────────
+
+export const LEAD_STATUSES = ["NEW", "CONTACTED", "ESTIMATING", "WON", "LOST"] as const
+export const ESTIMATE_STATUSES = ["DRAFT", "SENT", "ACCEPTED", "DECLINED", "EXPIRED"] as const
+export const ESTIMATE_PRICING = ["PER_VISIT", "HOURLY"] as const
+
+export const leadCreateSchema = z.object({
+  name: z.string().trim().min(1, "Contact name is required").max(200),
+  company: optionalString,
+  email: optionalEmail,
+  phone: optionalString,
+  source: optionalString,
+  status: z.enum(LEAD_STATUSES).optional(),
+  notes: optionalString,
+  assignedToId: z.string().min(1).optional(),
+})
+export const leadUpdateSchema = leadCreateSchema.partial()
+export type LeadCreateInput = z.infer<typeof leadCreateSchema>
+
+const estimateLineSchema = z.object({
+  description: z.string().trim().min(1, "Line description is required").max(300),
+  quantity: money, // decimal string, e.g. "1" or "3.5"
+  unitRate: money,
+})
+
+export const estimateCreateSchema = z.object({
+  leadId: z.string().min(1).optional(),
+  customerId: z.string().min(1).optional(),
+  title: z.string().trim().min(1, "Estimate title is required").max(200),
+  contactName: optionalString,
+  contactEmail: optionalEmail,
+  contactPhone: optionalString,
+  siteName: optionalString,
+  addressLine1: optionalString,
+  city: optionalString,
+  state: optionalString,
+  postalCode: optionalString,
+  frequency: z.enum(SERVICE_FREQUENCIES).optional(),
+  pricing: z.enum(ESTIMATE_PRICING).optional(),
+  rate: optionalMoney,
+  currency: z.string().trim().length(3).toUpperCase().optional(),
+  checklistTemplateId: z.string().min(1).optional(),
+  validUntil: dateString.optional(),
+  notes: optionalString,
+  lines: z.array(estimateLineSchema).default([]),
+})
+export const estimateUpdateSchema = estimateCreateSchema.partial().extend({
+  status: z.enum(ESTIMATE_STATUSES).optional(),
+})
+export type EstimateCreateInput = z.infer<typeof estimateCreateSchema>
+
+export const estimateStatusSchema = z.object({ status: z.enum(ESTIMATE_STATUSES) })

@@ -107,6 +107,24 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               </tbody>
             </table>
           )}
+          {billing.payments.length > 0 ? (
+            <div className="mt-6 border-t border-slate-100 pt-4">
+              <h3 className="mb-2 text-sm font-semibold text-slate-700">Payment history</h3>
+              <ul className="divide-y divide-slate-100 text-sm">
+                {billing.payments.map((p) => (
+                  <li key={p.id} className="flex items-center justify-between py-2">
+                    <span className="text-slate-600">
+                      {fmtDate(p.receivedDate)} ·{" "}
+                      <Link href={`/billing/invoices/${p.invoiceId}`} className="hover:text-brand">{invoiceNo(p.invoiceNumber)}</Link>
+                      {p.method ? ` · ${p.method}` : ""}
+                      {p.reference ? ` · ${p.reference}` : ""}
+                    </span>
+                    <span className="tabular-nums text-emerald-700">{formatMoney(p.amount, p.currency)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </Card>
       ) : null}
 

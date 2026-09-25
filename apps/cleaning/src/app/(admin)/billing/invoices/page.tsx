@@ -22,7 +22,7 @@ const fmtDate = (d: Date) => new Date(d).toLocaleDateString("en-US", { month: "s
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; customerId?: string }>
+  searchParams: Promise<{ status?: string; customerId?: string; overdue?: string }>
 }) {
   const session = await getSession()
   if (!session) redirect("/login")
@@ -37,23 +37,32 @@ export default async function InvoicesPage({
   }
 
   const orgId = session.organizationId
-  const { status, customerId } = await searchParams
-  const [invoices, customers] = await Promise.all([
-    listInvoices(orgId, { status, customerId }),
+  const { status, customerId, overdue } = await searchParams
+  const showOverdue = overdue === "1"
+  const [customers, allForFilter] = await Promise.all([
     listCustomers(orgId),
+    listInvoices(orgId, showOverdue ? { customerId } : { status, customerId }),
   ])
   const customerOptions = customers.map((c) => ({ id: c.id, name: c.name }))
 
+  const OUTSTANDING = new Set(["SENT", "PARTIALLY_PAID"])
+  const now = Date.now()
+  const isOverdue = (i: (typeof allForFilter)[number]) =>
+    OUTSTANDING.has(i.status) && new Date(i.dueDate).getTime() < now && Number(i.balance) > 0
+  const invoices = showOverdue ? allForFilter.filter(isOverdue) : allForFilter
+
   const outstanding = invoices
-    .filter((i) => i.status === "SENT")
+    .filter((i) => OUTSTANDING.has(i.status))
     .reduce((acc, i) => acc + Number(i.balance.toFixed(2)), 0)
 
-  const chip = (label: string, s?: string) => {
+  const STATUS_LABEL: Record<string, string> = { DRAFT: "Draft", SENT: "Sent", PARTIALLY_PAID: "Partial", PAID: "Paid", VOID: "Void" }
+  const chip = (label: string, opts: { status?: string; overdue?: boolean } = {}) => {
     const params = new URLSearchParams()
-    if (s) params.set("status", s)
+    if (opts.status) params.set("status", opts.status)
+    if (opts.overdue) params.set("overdue", "1")
     if (customerId) params.set("customerId", customerId)
     const qs = params.toString()
-    const active = (s ?? undefined) === (status ?? undefined)
+    const active = opts.overdue ? showOverdue : !showOverdue && (opts.status ?? undefined) === (status ?? undefined)
     return (
       <Link
         key={label}
@@ -75,7 +84,7 @@ export default async function InvoicesPage({
 
       <Card className="mb-6 flex items-center justify-between p-5">
         <div>
-          <p className="text-sm text-slate-500">Outstanding (sent, unpaid)</p>
+          <p className="text-sm text-slate-500">Outstanding (unpaid balance)</p>
           <p className="mt-1 text-2xl font-semibold text-slate-900">{formatMoney(outstanding)}</p>
         </div>
         <Link href="/billing/ar-aging" className="text-sm font-medium text-brand hover:underline">
@@ -84,8 +93,9 @@ export default async function InvoicesPage({
       </Card>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {chip("All", undefined)}
-        {INVOICE_STATUSES.map((s) => chip(s.charAt(0) + s.slice(1).toLowerCase(), s))}
+        {chip("All", {})}
+        {INVOICE_STATUSES.map((s) => chip(STATUS_LABEL[s] ?? s, { status: s }))}
+        {chip("Overdue", { overdue: true })}
         <div className="ml-auto">
           <CustomerFilter customers={customerOptions} customerId={customerId} status={status} />
         </div>

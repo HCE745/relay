@@ -52,6 +52,9 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
           action={
             <div className="flex flex-col items-end gap-2">
               <div className="flex items-center gap-2">
+                <a href={`/api/estimates/${est.id}/pdf`} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                  Download PDF
+                </a>
                 <PrintButton />
                 {!converted ? (
                   <Link href={`/estimates/${est.id}/edit`} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">

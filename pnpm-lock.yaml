@@ -41,6 +41,9 @@ importers:
       next:
         specifier: 15.3.8
         version: 15.3.8(@opentelemetry/api@1.9.1)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      pdf-lib:
+        specifier: ^1.17.1
+        version: 1.17.1
       pg:
         specifier: 8.22.0
         version: 8.22.0

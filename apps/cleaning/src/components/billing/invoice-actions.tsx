@@ -6,7 +6,7 @@ import { Modal } from "@/components/ui/modal"
 import { Button, Field, Input, Select } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
 
-type Props = { invoiceId: string; status: string; balance: string }
+type Props = { invoiceId: string; status: string; balance: string; emailConfigured: boolean; hasBillingEmail: boolean }
 
 function PaymentForm({ invoiceId, balance, onDone }: { invoiceId: string; balance: string; onDone: () => void }) {
   const router = useRouter()
@@ -71,13 +71,14 @@ function PaymentForm({ invoiceId, balance, onDone }: { invoiceId: string; balanc
   )
 }
 
-export function InvoiceActions({ invoiceId, status, balance }: Props) {
+export function InvoiceActions({ invoiceId, status, balance, emailConfigured, hasBillingEmail }: Props) {
   const router = useRouter()
   const [payOpen, setPayOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [emailed, setEmailed] = useState(false)
 
-  async function setStatus(next: string, confirmMsg?: string) {
+  async function setStatus(next: "SENT" | "VOID", confirmMsg?: string) {
     if (confirmMsg && !window.confirm(confirmMsg)) return
     setBusy(true)
     setError(null)
@@ -87,34 +88,35 @@ export function InvoiceActions({ invoiceId, status, balance }: Props) {
     router.refresh()
   }
 
+  async function email() {
+    if (!window.confirm("Email this invoice (with the PDF attached) to the customer?")) return
+    setBusy(true)
+    setError(null)
+    const res = await apiSend(`/api/invoices/${invoiceId}/send-email`, "POST", {})
+    setBusy(false)
+    if (!res.ok) return setError(res.error)
+    setEmailed(true)
+    router.refresh()
+  }
+
+  const canPay = status === "SENT" || status === "PARTIALLY_PAID"
+
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      {status === "DRAFT" ? (
-        <Button size="sm" disabled={busy} onClick={() => setStatus("SENT")}>
-          Mark as sent
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      {status === "DRAFT" ? <Button size="sm" disabled={busy} onClick={() => setStatus("SENT")}>Mark as sent</Button> : null}
+      {canPay ? <Button size="sm" disabled={busy} onClick={() => setPayOpen(true)}>Record payment</Button> : null}
+      {/* Email is shown ONLY when a real sender is configured AND we have an address — never a dead Send. */}
+      {emailConfigured && hasBillingEmail && status !== "VOID" ? (
+        <Button size="sm" variant="secondary" disabled={busy || emailed} onClick={email}>
+          {emailed ? "Emailed ✓" : "Email to customer"}
         </Button>
       ) : null}
-      {status === "SENT" ? (
-        <>
-          <Button size="sm" disabled={busy} onClick={() => setPayOpen(true)}>
-            Record payment
-          </Button>
-          <Button size="sm" variant="secondary" disabled={busy} onClick={() => setStatus("PAID", "Mark this invoice fully paid?")}>
-            Mark as paid
-          </Button>
-        </>
-      ) : null}
       {status !== "VOID" ? (
-        <Button
-          size="sm"
-          variant="danger"
-          disabled={busy}
-          onClick={() => setStatus("VOID", "Void this invoice? Its jobs become billable again.")}
-        >
+        <Button size="sm" variant="danger" disabled={busy} onClick={() => setStatus("VOID", "Void this invoice? Its jobs become billable again.")}>
           Void
         </Button>
       ) : null}
-      {error ? <span className="text-sm text-red-700">{error}</span> : null}
+      {error ? <span className="w-full text-right text-sm text-red-700">{error}</span> : null}
 
       <Modal open={payOpen} onClose={() => setPayOpen(false)} title="Record payment">
         <PaymentForm invoiceId={invoiceId} balance={balance} onDone={() => setPayOpen(false)} />

@@ -69,6 +69,36 @@ export function entryLaborCost(
   return round2(hours.times(rate))
 }
 
+// ─── Invoice status & payments (Phase 7) ─────────────────────────────────────
+
+export type InvoiceStatusValue = "DRAFT" | "SENT" | "PARTIALLY_PAID" | "PAID" | "VOID"
+
+// Issued invoices that still owe money — the AR / outstanding set.
+export const OUTSTANDING_STATUSES = ["SENT", "PARTIALLY_PAID"] as const
+
+/**
+ * Status DERIVED from payments (never set manually). DRAFT and VOID are user
+ * lifecycle states and pass through unchanged. Otherwise: fully paid → PAID,
+ * some paid → PARTIALLY_PAID, none → SENT.
+ */
+export function deriveInvoiceStatus(current: string, total: Money, paid: Money): InvoiceStatusValue {
+  if (current === "DRAFT" || current === "VOID") return current as InvoiceStatusValue
+  if (paid.greaterThanOrEqualTo(total)) return "PAID"
+  if (paid.greaterThan(ZERO)) return "PARTIALLY_PAID"
+  return "SENT"
+}
+
+/** Remaining balance, never negative. */
+export function remainingBalance(total: Money, paid: Money): Money {
+  const r = total.minus(paid)
+  return r.lessThan(ZERO) ? ZERO : r
+}
+
+/** True if a new payment would push total payments past the invoice total. */
+export function overpays(total: Money, alreadyPaid: Money, newPayment: Money): boolean {
+  return alreadyPaid.plus(newPayment).greaterThan(total)
+}
+
 /** Gross margin percentage as a number (1 dp), or null when there is no revenue. */
 export function marginPct(revenue: Money, cost: Money): number | null {
   if (revenue.lessThanOrEqualTo(ZERO)) return null

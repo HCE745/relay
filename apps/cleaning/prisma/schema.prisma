@@ -173,6 +173,7 @@ enum PaymentTerms {
 enum InvoiceStatus {
   DRAFT
   SENT
+  PARTIALLY_PAID
   PAID
   VOID
 
@@ -853,6 +854,7 @@ model Invoice {
   taxTotal       Decimal       @default(0) @db.Decimal(12, 2) // always 0 for now
   total          Decimal       @db.Decimal(12, 2)
   notes          String?
+  emailedAt      DateTime? // last time it was emailed to the customer (Phase 7)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 

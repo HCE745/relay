@@ -319,7 +319,7 @@ export const issueCommentSchema = z.object({ body: z.string().trim().min(1, "Wri
 
 // ─── Phase 2: billing / invoices ─────────────────────────────────────────────
 
-export const INVOICE_STATUSES = ["DRAFT", "SENT", "PAID", "VOID"] as const
+export const INVOICE_STATUSES = ["DRAFT", "SENT", "PARTIALLY_PAID", "PAID", "VOID"] as const
 
 export const generateInvoiceSchema = z
   .object({
@@ -331,6 +331,8 @@ export const generateInvoiceSchema = z
 export type GenerateInvoiceInput = z.infer<typeof generateInvoiceSchema>
 
 export const invoiceStatusSchema = z.object({ status: z.enum(INVOICE_STATUSES) })
+// Manual transitions only — PAID / PARTIALLY_PAID derive from payments.
+export const invoiceStatusActionSchema = z.object({ status: z.enum(["SENT", "VOID"]) })
 
 export const invoicePaymentSchema = z.object({
   amount: money,

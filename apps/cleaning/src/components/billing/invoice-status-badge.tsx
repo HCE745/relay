@@ -3,10 +3,11 @@ import { StatusBadge, type BadgeTone } from "@/components/ui/controls"
 const TONE: Record<string, BadgeTone> = {
   DRAFT: "neutral",
   SENT: "info",
+  PARTIALLY_PAID: "warning",
   PAID: "success",
   VOID: "neutral",
 }
-const LABEL: Record<string, string> = { DRAFT: "Draft", SENT: "Sent", PAID: "Paid", VOID: "Void" }
+const LABEL: Record<string, string> = { DRAFT: "Draft", SENT: "Sent", PARTIALLY_PAID: "Partially paid", PAID: "Paid", VOID: "Void" }
 
 export function InvoiceStatusBadge({ status }: { status: string }) {
   return (

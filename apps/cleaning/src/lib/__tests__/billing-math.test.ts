@@ -15,6 +15,9 @@ import {
   marginPct,
   summarizeMargin,
   countsTowardMargin,
+  deriveInvoiceStatus,
+  remainingBalance,
+  overpays,
 } from "../billing-math"
 
 describe("round2", () => {
@@ -157,6 +160,34 @@ describe("summarizeMargin — uninvoiced excluded by default; salaried excluded 
     expect(countsTowardMargin({ invoiced: false, laborKnown: true }, false)).toBe(false)
     expect(countsTowardMargin({ invoiced: false, laborKnown: true }, true)).toBe(true)
     expect(countsTowardMargin({ invoiced: true, laborKnown: false }, true)).toBe(false) // salaried never
+  })
+})
+
+describe("deriveInvoiceStatus — status follows the payments, never set by hand", () => {
+  const d = (v: string) => dec(v)
+  it("DRAFT and VOID pass through unchanged", () => {
+    expect(deriveInvoiceStatus("DRAFT", d("100"), d("0"))).toBe("DRAFT")
+    expect(deriveInvoiceStatus("VOID", d("100"), d("50"))).toBe("VOID")
+  })
+  it("issued: none paid → SENT, some → PARTIALLY_PAID, full → PAID", () => {
+    expect(deriveInvoiceStatus("SENT", d("100"), d("0"))).toBe("SENT")
+    expect(deriveInvoiceStatus("SENT", d("100"), d("40"))).toBe("PARTIALLY_PAID")
+    expect(deriveInvoiceStatus("PARTIALLY_PAID", d("100"), d("100"))).toBe("PAID")
+    expect(deriveInvoiceStatus("SENT", d("100"), d("100"))).toBe("PAID")
+  })
+})
+
+describe("overpayment guard — never a negative balance", () => {
+  const d = (v: string) => dec(v)
+  it("remainingBalance never goes below 0", () => {
+    expect(remainingBalance(d("100"), d("40")).toFixed(2)).toBe("60.00")
+    expect(remainingBalance(d("100"), d("120")).toFixed(2)).toBe("0.00")
+  })
+  it("overpays flags a payment beyond the balance; exact payment is allowed", () => {
+    expect(overpays(d("100"), d("40"), d("60"))).toBe(false) // exactly to zero
+    expect(overpays(d("100"), d("40"), d("60.01"))).toBe(true) // one cent over
+    expect(overpays(d("100"), d("0"), d("100"))).toBe(false)
+    expect(overpays(d("100"), d("0"), d("100.01"))).toBe(true)
   })
 })
 

@@ -5,6 +5,7 @@ import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getInvoice } from "@/lib/data/invoices"
 import { getOrgSettings } from "@/lib/data/org"
+import { isEmailConfigured } from "@/lib/email"
 import { formatMoney, invoiceNo } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
@@ -48,9 +49,23 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           title={invoiceNo(invoice.invoiceNumber)}
           subtitle={invoice.customer.name}
           action={
-            <div className="flex items-center gap-2">
-              <PrintButton />
-              <InvoiceActions invoiceId={invoice.id} status={invoice.status} balance={balance.toFixed(2)} />
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-2">
+                <a
+                  href={`/api/invoices/${invoice.id}/pdf`}
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Download PDF
+                </a>
+                <PrintButton />
+              </div>
+              <InvoiceActions
+                invoiceId={invoice.id}
+                status={invoice.status}
+                balance={balance.toFixed(2)}
+                emailConfigured={isEmailConfigured()}
+                hasBillingEmail={!!(invoice.customer.billingEmail || invoice.customer.email)}
+              />
             </div>
           }
         />

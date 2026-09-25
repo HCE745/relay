@@ -4,6 +4,7 @@ import { getOrgTimezone } from "./org"
 import { Prisma } from "../../generated/prisma/client"
 import {
   type Money,
+  type InvoiceStatusValue,
   ZERO,
   billableMinutes,
   flatLine,
@@ -13,6 +14,10 @@ import {
   startOfUtcDay,
   endOfUtcDay,
   isInBillingPeriod,
+  deriveInvoiceStatus,
+  remainingBalance,
+  overpays,
+  OUTSTANDING_STATUSES,
 } from "../billing-math"
 
 // ─── Billing / invoicing (Phase 2) ───────────────────────────────────────────
@@ -236,16 +241,17 @@ export function getInvoice(orgId: string, id: string) {
   })
 }
 
+// MANUAL transitions only. PAID / PARTIALLY_PAID are never set by hand — they
+// derive from payments (see recordPayment). Users only "send" and "void".
 const ALLOWED_TRANSITIONS: Record<string, string[]> = {
   DRAFT: ["SENT", "VOID"],
-  SENT: ["PAID", "VOID"],
+  SENT: ["VOID"],
+  PARTIALLY_PAID: ["VOID"],
   PAID: ["VOID"],
   VOID: [],
 }
 
-type InvoiceStatusValue = "DRAFT" | "SENT" | "PAID" | "VOID"
-
-export async function setInvoiceStatus(orgId: string, id: string, status: InvoiceStatusValue) {
+export async function setInvoiceStatus(orgId: string, id: string, status: Extract<InvoiceStatusValue, "SENT" | "VOID">) {
   const db = orgDb(orgId)
   const invoice = await db.invoice.findFirst({ where: { id }, select: { id: true, status: true } })
   if (!invoice) return null
@@ -281,21 +287,29 @@ export async function addInvoicePayment(
   if (invoice.status === "DRAFT") throw new ConflictError("Send the invoice before recording a payment")
 
   const amount = new Prisma.Decimal(input.amount)
-  await db.invoicePayment.create({
-    data: {
-      invoiceId,
-      amount,
-      receivedDate: input.receivedDate ? startOfUtcDay(input.receivedDate) : new Date(),
-      method: input.method,
-      reference: input.reference,
-    },
-  })
-
-  // Auto-advance to PAID once the balance is covered.
-  const paid = invoice.payments.reduce((acc, p) => acc.plus(p.amount), ZERO).plus(amount)
-  if (invoice.status === "SENT" && paid.greaterThanOrEqualTo(invoice.total)) {
-    await db.invoice.updateMany({ where: { id: invoiceId }, data: { status: "PAID" } })
+  const alreadyPaid = invoice.payments.reduce((acc, p) => acc.plus(p.amount), ZERO)
+  // Refuse overpayment rather than silently creating a negative balance.
+  if (overpays(invoice.total, alreadyPaid, amount)) {
+    throw new ConflictError(
+      `Payment of ${amount.toFixed(2)} exceeds the remaining balance of ${remainingBalance(invoice.total, alreadyPaid).toFixed(2)}`,
+    )
   }
+
+  const paid = alreadyPaid.plus(amount)
+  const nextStatus = deriveInvoiceStatus(invoice.status, invoice.total, paid)
+  // Record the payment and set the DERIVED status atomically.
+  await db.$transaction([
+    db.invoicePayment.create({
+      data: {
+        invoiceId,
+        amount,
+        receivedDate: input.receivedDate ? startOfUtcDay(input.receivedDate) : new Date(),
+        method: input.method,
+        reference: input.reference,
+      },
+    }),
+    db.invoice.updateMany({ where: { id: invoiceId }, data: { status: nextStatus } }),
+  ])
   return getInvoice(orgId, invoiceId)
 }
 
@@ -313,9 +327,9 @@ export type AgingRow = {
 }
 
 export async function getArAging(orgId: string, now: Date = new Date()) {
-  // Outstanding AR = issued (SENT) invoices with a positive balance.
+  // Outstanding AR = issued invoices (SENT or PARTIALLY_PAID) with a balance.
   const invoices = await orgDb(orgId).invoice.findMany({
-    where: { status: "SENT" },
+    where: { status: { in: [...OUTSTANDING_STATUSES] } },
     include: { customer: { select: { id: true, name: true } }, payments: { select: { amount: true } } },
   })
 
@@ -380,16 +394,29 @@ export async function listRecentPayments(orgId: string, limit = 200) {
   return rows.slice(0, limit)
 }
 
-/** Customer billing summary — outstanding balance + invoice history. */
+/** Customer billing summary — outstanding balance, invoice history, payment history. */
 export async function getCustomerBilling(orgId: string, customerId: string) {
   const invoices = await orgDb(orgId).invoice.findMany({
     where: { customerId },
     orderBy: { invoiceNumber: "desc" },
-    include: { payments: { select: { amount: true } } },
+    include: { payments: { orderBy: { receivedDate: "desc" } } },
   })
   const withBalance = invoices.map((inv) => ({ ...inv, balance: balanceOf(inv.total, inv.payments) }))
   const outstanding = withBalance
-    .filter((inv) => inv.status === "SENT")
+    .filter((inv) => (OUTSTANDING_STATUSES as readonly string[]).includes(inv.status))
     .reduce((acc, inv) => acc.plus(inv.balance), ZERO)
-  return { invoices: withBalance, outstanding }
+  // Flattened payment history across the customer's invoices, newest first.
+  const payments = invoices
+    .flatMap((inv) => inv.payments.map((p) => ({ ...p, invoiceId: inv.id, invoiceNumber: inv.invoiceNumber, currency: inv.currency })))
+    .sort((a, b) => b.receivedDate.getTime() - a.receivedDate.getTime())
+  return { invoices: withBalance, outstanding, payments }
+}
+
+/** Overdue = issued, past due, still owing. For the dashboard indicator. */
+export async function countOverdue(orgId: string, now: Date = new Date()): Promise<number> {
+  const invoices = await orgDb(orgId).invoice.findMany({
+    where: { status: { in: [...OUTSTANDING_STATUSES] }, dueDate: { lt: now } },
+    select: { total: true, payments: { select: { amount: true } } },
+  })
+  return invoices.filter((inv) => balanceOf(inv.total, inv.payments).greaterThan(ZERO)).length
 }

@@ -108,7 +108,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   // Wash Essentials hides features that are out of scope for the car-wash product
   const WASH_ESSENTIALS_HIDDEN: Set<string> = new Set([
-    "departments", "sops", "purchase-requests", "approval-intelligence",
+    "departments", "sops", "purchase-requests", "vendors", "approval-intelligence",
   ])
   const baseFiltered = isWashEssentials(session.productLine)
     ? basePageKeys.filter(k => !WASH_ESSENTIALS_HIDDEN.has(k))

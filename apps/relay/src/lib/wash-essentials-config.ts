@@ -26,14 +26,39 @@ export function isWeLocationStripePrice(priceId: string): boolean {
   return !!loc && priceId === loc
 }
 
-// ── Nav / route blocking ──────────────────────────────────────────────────────
-// Paths not available in the Wash Essentials product line.
-// Kept in sync with the proxy middleware WASH_ESSENTIALS_BLOCKED list.
-export const WE_BLOCKED_PATHS = [
+// ── Nav / route blocking — SINGLE SOURCE OF TRUTH ────────────────────────────
+// All three layers (proxy middleware, sidebar nav, UI components) import from
+// here. Never duplicate this list elsewhere — edit only this file.
+//
+// Page paths (used by proxy middleware and UI components):
+export const WE_BLOCKED_PAGE_PATHS = [
   "/departments",
   "/sops",
   "/purchase-requests",
   "/vendors",
+  "/analytics/cross-location",
+  "/settings/api-keys",
+  "/settings/webhooks",
+  "/regions",
+  "/corporate",
+  "/executive-briefings",
+  "/approval-intelligence",
+] as const
+
+// Corresponding API prefixes blocked at the middleware layer:
+export const WE_BLOCKED_API_PATHS = [
+  "/api/departments",
+  "/api/sops",
+  "/api/purchase-requests",
+  "/api/vendors",
+  "/api/regions",
+  "/api/corporate",
+] as const
+
+// Combined list for proxy middleware (pages + API routes):
+export const WE_BLOCKED_PATHS = [
+  ...WE_BLOCKED_PAGE_PATHS,
+  ...WE_BLOCKED_API_PATHS,
 ] as const
 
 // ── Feature flags included in Wash Essentials ─────────────────────────────────

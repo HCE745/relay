@@ -74,19 +74,9 @@ export const CARWASH_QR_DEFAULT_CATEGORIES = [
   "CUSTOMER_REPORT",
 ]
 
-// Features blocked on Wash Essentials regardless of feature flags — prevents
-// repurposing as generic Relay. This matches the WashEssentialsBlock type in pricing.ts.
-export const WASH_ESSENTIALS_BLOCKED_PATHS = [
-  "/departments",
-  "/sops",
-  "/analytics/cross-location",
-  "/approval-intelligence",
-  "/settings/api-keys",
-  "/settings/webhooks",
-  "/regions",
-  "/corporate",
-  "/executive-briefings",
-] as const
+// Features blocked on Wash Essentials — re-exported from the single source of truth.
+// Edit src/lib/wash-essentials-config.ts, not this file.
+export { WE_BLOCKED_PAGE_PATHS as WASH_ESSENTIALS_BLOCKED_PATHS } from "@/lib/wash-essentials-config"
 
 // Default PM schedule titles for car-wash onboarding quick-setup
 export const CARWASH_DEFAULT_PM_SCHEDULES = [

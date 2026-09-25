@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { jwtVerify } from "jose"
 import type { SessionPayload } from "@/lib/session"
 import { checkLimit, getIP, limiters } from "@/lib/ratelimit"
+import { WE_BLOCKED_PATHS } from "@/lib/wash-essentials-config"
 
 const SECRET = new TextEncoder().encode(
   process.env.SESSION_SECRET ?? "relay-secret-key-change-in-production-32ch"
@@ -56,17 +57,9 @@ const PUBLIC_PATHS = [
 const ONBOARDING_PATHS = ["/onboarding",  "/api/onboarding"]
 const BILLING_PATHS    = ["/billing",     "/api/billing"]
 
-// Paths not included in the Wash Essentials product line
-const WASH_ESSENTIALS_BLOCKED = [
-  "/departments",
-  "/sops",
-  "/purchase-requests",
-  "/vendors",
-  "/api/departments",
-  "/api/sops",
-  "/api/purchase-requests",
-  "/api/vendors",
-]
+// Paths not included in the Wash Essentials product line.
+// Source of truth: src/lib/wash-essentials-config.ts — do not duplicate here.
+const WASH_ESSENTIALS_BLOCKED = WE_BLOCKED_PATHS
 // Super admin API routes guard themselves; middleware just lets them through
 const SA_API_PATHS     = ["/api/super-admin"]
 

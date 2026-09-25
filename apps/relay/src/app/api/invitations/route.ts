@@ -71,8 +71,21 @@ export async function POST(request: NextRequest) {
 
   const org = await prisma.organization.findUnique({
     where: { id: session.organizationId },
-    select: { name: true },
+    select: { name: true, employeeLimit: true },
   })
+
+  // Enforce employee cap for plans that set a limit (null = unlimited)
+  if (org?.employeeLimit != null) {
+    const activeCount = await prisma.user.count({
+      where: { organizationId: session.organizationId, isActive: true },
+    })
+    if (activeCount >= org.employeeLimit) {
+      return NextResponse.json(
+        { error: "You have reached your plan employee limit. Upgrade to Professional for unlimited team members." },
+        { status: 403 },
+      )
+    }
+  }
 
   const token = randomUUID()
   const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000) // 72 hours

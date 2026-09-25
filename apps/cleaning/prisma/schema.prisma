@@ -105,6 +105,28 @@ enum TimeEntryStatus {
 
 // ─── Tenant + identity ───────────────────────────────────────────────────────
 
+// ─── Contracts / service agreements (Phase 8) ────────────────────────────────
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  CANCELLED
+
+  @@schema("cleaning")
+}
+
+// How the agreement is billed — informational cadence. Invoicing still generates
+// from jobs/service plans; a contract is NOT a billing source.
+enum ContractBillingFrequency {
+  MONTHLY
+  QUARTERLY
+  ANNUALLY
+  ONE_TIME
+
+  @@schema("cleaning")
+}
+
 // ─── Assets & supplies (Phase 6) ─────────────────────────────────────────────
 
 enum AssetCategory {
@@ -192,6 +214,8 @@ model Organization {
 
   onboardingCompletedAt DateTime?
   trialEndsAt           DateTime?
+  // Dashboard warning lead time for expiring contracts (Phase 8), configurable.
+  contractExpiryLeadDays Int @default(60)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")
@@ -217,6 +241,7 @@ model Organization {
   assets              Asset[]
   supplies            Supply[]
   supplyUsages        SupplyUsage[]
+  contracts           Contract[]
 
   @@schema("cleaning")
 }
@@ -305,6 +330,7 @@ model Customer {
   invoices         Invoice[]
   estimates              Estimate[] @relation("EstimateCustomer")
   convertedFromEstimates Estimate[] @relation("EstimateConvertedCustomer")
+  contracts        Contract[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -429,6 +455,7 @@ model ServicePlan {
   billingType        BillingType      @default(FLAT_PER_JOB)
   rate               Decimal?         @db.Decimal(12, 2)
   currency           String           @default("USD")
+  contractId         String? // OPTIONAL link to a commercial contract (Phase 8)
   isActive           Boolean          @default(true)
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
@@ -436,10 +463,12 @@ model ServicePlan {
   organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   serviceLocation   ServiceLocation    @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
   checklistTemplate ChecklistTemplate? @relation(fields: [checklistTemplateId], references: [id])
+  contract          Contract?          @relation(fields: [contractId], references: [id])
   jobs              Job[]
 
   @@index([organizationId])
   @@index([serviceLocationId])
+  @@index([contractId])
   @@schema("cleaning")
 }
 
@@ -1103,5 +1132,36 @@ model SupplyAdjustment {
   adjustedBy User?  @relation("SupplyAdjuster", fields: [adjustedById], references: [id])
 
   @@index([supplyId])
+  @@schema("cleaning")
+}
+
+// ─── Contracts / service agreements (Phase 8) ────────────────────────────────
+// A container for commercial terms — NOT a billing source. Invoicing still
+// generates from jobs/service plans; a contract just holds the deal and lets us
+// compare its value to actual invoiced revenue. Linking service plans is
+// optional; a customer with plans and no contract is unaffected.
+model Contract {
+  id               String                   @id @default(cuid())
+  organizationId   String
+  customerId       String
+  title            String
+  startDate        DateTime
+  endDate          DateTime?
+  autoRenew        Boolean                  @default(false)
+  contractValue    Decimal?                 @db.Decimal(12, 2)
+  billingFrequency ContractBillingFrequency @default(MONTHLY)
+  status           ContractStatus           @default(DRAFT)
+  documentUrl      String? // reference to an external document — no upload/generation
+  notes            String?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  servicePlans ServicePlan[]
+
+  @@index([organizationId])
+  @@index([customerId])
+  @@index([status])
   @@schema("cleaning")
 }

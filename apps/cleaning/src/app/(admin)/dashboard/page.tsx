@@ -7,6 +7,8 @@ import { getOrgTimezone } from "@/lib/data/org"
 import { getDashboardMetrics } from "@/lib/data/dashboard"
 import { countLowStock } from "@/lib/data/supplies"
 import { countOverdue } from "@/lib/data/invoices"
+import { countExpiring } from "@/lib/data/contracts"
+import { getContractExpiryLeadDays } from "@/lib/data/org"
 import { getSetupProgress } from "@/lib/data/setup"
 import { isSetupGuideDismissed } from "@/lib/setup-actions"
 import { PageHeader } from "@/components/ui/placeholder"
@@ -64,6 +66,10 @@ export default async function DashboardPage() {
     }
     if (await orgHasCapability(orgId, "supplies.inventory")) {
       needsAttention.push({ label: "Low stock", value: await countLowStock(orgId), href: "/supplies?filter=low", alert: true })
+    }
+    if (await orgHasCapability(orgId, "crm.contracts")) {
+      const leadDays = await getContractExpiryLeadDays(orgId)
+      needsAttention.push({ label: "Contracts expiring", value: await countExpiring(orgId, leadDays), href: "/contracts?filter=expiring", alert: true })
     }
   }
   const overview: Tile[] = [

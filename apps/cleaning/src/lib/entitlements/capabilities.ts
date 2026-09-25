@@ -30,6 +30,7 @@ export const CAPABILITIES = [
   "billing.arAging", // accounts-receivable aging report
   "reporting.profitability", // site/customer/plan margin (pay-rate-derived)
   "crm.estimates", // leads, estimates, estimate→customer conversion
+  "crm.contracts", // service agreements / contracts
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",

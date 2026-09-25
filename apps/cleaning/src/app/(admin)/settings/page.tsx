@@ -7,7 +7,9 @@ import { isSetupGuideDismissed, restoreSetupGuide } from "@/lib/setup-actions"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
 import { OrgTimezoneForm } from "@/components/settings/org-timezone-form"
+import { ContractExpiryForm } from "@/components/settings/contract-expiry-form"
 import { ChangePasswordForm } from "@/components/settings/change-password-form"
+import { orgHasCapability } from "@/lib/page-guards"
 
 export const dynamic = "force-dynamic"
 
@@ -16,6 +18,7 @@ export default async function SettingsPage() {
   if (!session) redirect("/login")
   const org = await getOrgSettings(session.organizationId)
   const isOrgAdmin = canManageOrg(session.role)
+  const showContracts = await orgHasCapability(session.organizationId, "crm.contracts")
 
   const canSetup = canManageAccounts(session.role)
   const [setup, setupDismissed] = canSetup
@@ -84,6 +87,21 @@ export default async function SettingsPage() {
           </p>
         )}
       </Card>
+
+      {showContracts ? (
+        <Card className="p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Contract expiry warning</h2>
+          {isOrgAdmin ? (
+            <div className="mt-3">
+              <ContractExpiryForm current={org?.contractExpiryLeadDays ?? 60} />
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-slate-600">
+              Warning lead time: <span className="font-medium">{org?.contractExpiryLeadDays ?? 60} days</span>. Only owners and admins can change it.
+            </p>
+          )}
+        </Card>
+      ) : null}
     </div>
   )
 }

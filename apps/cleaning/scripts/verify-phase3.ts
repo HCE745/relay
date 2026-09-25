@@ -13,7 +13,7 @@ import { clockIn, clockOut, toggleChecklistItem } from "../src/lib/scheduling/ex
 import { uploadJobPhoto, getPhotoForServe } from "../src/lib/data/photos"
 import { reportProblem, listJobIssues } from "../src/lib/data/issues"
 import { getFieldJob } from "../src/lib/data/field"
-import { getOrgTimezone, updateOrgTimezone } from "../src/lib/data/org"
+import { getOrgTimezone, updateOrgSettings } from "../src/lib/data/org"
 import { validatePhoto } from "../src/lib/storage"
 
 let failures = 0
@@ -154,11 +154,11 @@ async function main() {
 
   console.log("\nTimezone config:")
   const before = await getOrgTimezone(sparkle.id)
-  await updateOrgTimezone(sparkle.id, "America/Chicago")
+  await updateOrgSettings(sparkle.id, { timezone: "America/Chicago" })
   check("org timezone update persists", (await getOrgTimezone(sparkle.id)) === "America/Chicago", `was ${before}`)
   const laSite = await createServiceLocation(sparkle.id, { customerId: customer.id, name: "LA site", timezone: "America/Los_Angeles" })
   check("site timezone override stored", laSite.timezone === "America/Los_Angeles")
-  await updateOrgTimezone(sparkle.id, before) // restore
+  await updateOrgSettings(sparkle.id, { timezone: before }) // restore
 
   console.log(`\n${failures === 0 ? "ALL PHASE 3 CHECKS PASSED" : `${failures} PHASE 3 CHECK(S) FAILED`}`)
 }

@@ -182,7 +182,8 @@ export const assignCleanerSchema = z.object({
 // ─── Phase 3: field execution ────────────────────────────────────────────────
 
 export const orgSettingsSchema = z.object({
-  timezone: ianaTimezone,
+  timezone: ianaTimezone.optional(),
+  contractExpiryLeadDays: z.coerce.number().int().min(1).max(365).optional(),
 })
 
 // Location is best-effort — clock-in/out succeeds even when it is absent.
@@ -394,6 +395,29 @@ export const estimateUpdateSchema = estimateCreateSchema.partial().extend({
 export type EstimateCreateInput = z.infer<typeof estimateCreateSchema>
 
 export const estimateStatusSchema = z.object({ status: z.enum(ESTIMATE_STATUSES) })
+
+// ─── Phase 8: contracts / service agreements ─────────────────────────────────
+
+export const CONTRACT_STATUSES = ["DRAFT", "ACTIVE", "EXPIRED", "CANCELLED"] as const
+export const CONTRACT_BILLING_FREQUENCIES = ["MONTHLY", "QUARTERLY", "ANNUALLY", "ONE_TIME"] as const
+
+export const contractCreateSchema = z.object({
+  customerId: z.string().min(1),
+  title: z.string().trim().min(1, "Contract title is required").max(200),
+  startDate: dateString,
+  endDate: dateString.optional(),
+  autoRenew: z.boolean().optional(),
+  contractValue: optionalMoney,
+  billingFrequency: z.enum(CONTRACT_BILLING_FREQUENCIES).optional(),
+  status: z.enum(CONTRACT_STATUSES).optional(),
+  documentUrl: optionalString,
+  notes: optionalString,
+})
+export const contractUpdateSchema = contractCreateSchema.omit({ customerId: true }).partial()
+export type ContractCreateInput = z.infer<typeof contractCreateSchema>
+
+// Replace the set of service plans linked to a contract (optional linking).
+export const contractPlansSchema = z.object({ planIds: z.array(z.string().min(1)) })
 
 // ─── Phase 6: assets & supplies ──────────────────────────────────────────────
 

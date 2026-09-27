@@ -5,6 +5,7 @@ import { getOrgSettings } from "@/lib/data/org"
 import { getSetupProgress } from "@/lib/data/setup"
 import { isSetupGuideDismissed, restoreSetupGuide } from "@/lib/setup-actions"
 import { PageHeader } from "@/components/ui/placeholder"
+import { CogIcon } from "@/components/ui/icons"
 import { Card } from "@/components/ui/controls"
 import { OrgTimezoneForm } from "@/components/settings/org-timezone-form"
 import { ContractExpiryForm } from "@/components/settings/contract-expiry-form"
@@ -28,7 +29,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Settings" subtitle="Organization & workspace configuration" />
+      <PageHeader title="Settings" subtitle="Organization & workspace configuration" icon={<CogIcon />} />
 
       <Card className="p-6">
         <dl className="grid gap-4 sm:grid-cols-3">

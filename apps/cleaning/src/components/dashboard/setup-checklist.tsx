@@ -28,7 +28,7 @@ export function SetupChecklist({ progress }: { progress: SetupProgress }) {
     <Card className="mb-8 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
             <SparklesIcon className="h-5 w-5" />
           </div>
           <div>

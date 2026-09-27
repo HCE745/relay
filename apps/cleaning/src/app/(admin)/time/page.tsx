@@ -54,6 +54,7 @@ export default async function TimePage({ searchParams }: { searchParams: Promise
       <PageHeader
         title="Time"
         subtitle={`Labor records — last 30 days${pending ? ` · ${pending} awaiting approval` : ""}. Not payroll.`}
+        icon={<ClockIcon />}
         action={canApprove ? <ExportBar /> : undefined}
       />
 

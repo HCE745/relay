@@ -6,7 +6,7 @@ import { orgHasCapability } from "@/lib/page-guards"
 import { listEstimates } from "@/lib/data/estimates"
 import { formatMoney } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
-import { Card, EmptyState, StatusBadge, type BadgeTone } from "@/components/ui/controls"
+import { Card, EmptyState, StatusBadge, LinkButton, type BadgeTone } from "@/components/ui/controls"
 import { ReceiptIcon } from "@/components/ui/icons"
 
 export const dynamic = "force-dynamic"
@@ -30,15 +30,11 @@ export default async function EstimatesPage() {
   }
 
   const estimates = await listEstimates(session.organizationId)
-  const newButton = (
-    <Link href="/estimates/new" className="inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:opacity-90">
-      New estimate
-    </Link>
-  )
+  const newButton = <LinkButton href="/estimates/new">New estimate</LinkButton>
 
   return (
     <div>
-      <PageHeader title="Estimates" subtitle="Quotes that convert into customers" action={newButton} />
+      <PageHeader title="Estimates" subtitle="Quotes that convert into customers" icon={<ReceiptIcon />} action={newButton} />
 
       {estimates.length === 0 ? (
         <EmptyState

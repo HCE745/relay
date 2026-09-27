@@ -33,7 +33,7 @@ export default async function LeadsPage() {
 
   return (
     <div>
-      <PageHeader title="Leads" subtitle="Prospects at the front of the pipeline" action={<NewLeadButton assignees={assignees} />} />
+      <PageHeader title="Leads" subtitle="Prospects at the front of the pipeline" icon={<UsersIcon />} action={<NewLeadButton assignees={assignees} />} />
 
       {leads.length === 0 ? (
         <EmptyState

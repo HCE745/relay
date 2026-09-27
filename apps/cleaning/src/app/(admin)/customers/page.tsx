@@ -29,7 +29,7 @@ export default async function CustomersPage() {
 
   return (
     <div>
-      <PageHeader title="Customers" subtitle="The companies you clean for" action={<NewCustomerButton />} />
+      <PageHeader title="Customers" subtitle="The companies you clean for" icon={<BuildingIcon />} action={<NewCustomerButton />} />
 
       {customers.length === 0 ? (
         <EmptyState
@@ -39,34 +39,30 @@ export default async function CustomersPage() {
           action={<NewCustomerButton />}
         />
       ) : (
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-2.5 font-medium">Customer</th>
-                <th className="px-4 py-2.5 font-medium">Primary contact</th>
-                <th className="px-4 py-2.5 font-medium">Sites</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {customers.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">
-                    <Link href={`/customers/${c.id}`} className="font-medium text-slate-900 hover:text-brand">
-                      {c.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{c.primaryContactName || "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{c._count.serviceLocations}</td>
-                  <td className="px-4 py-3">
-                    <StatusPill active={c.isActive} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {customers.map((c) => (
+            <Link key={c.id} href={`/customers/${c.id}`} className="group">
+              <Card className="h-full p-5 transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-md">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                      <BuildingIcon className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-slate-900 group-hover:text-brand">{c.name}</div>
+                      <div className="truncate text-xs text-slate-500">{c.primaryContactName || "No primary contact"}</div>
+                    </div>
+                  </div>
+                  <StatusPill active={c.isActive} />
+                </div>
+                <div className="mt-4 flex items-center gap-5 border-t border-slate-100 pt-3 text-xs text-slate-500">
+                  <span><span className="font-semibold text-slate-700">{c._count.serviceLocations}</span> {c._count.serviceLocations === 1 ? "site" : "sites"}</span>
+                  <span><span className="font-semibold text-slate-700">{c._count.contacts}</span> {c._count.contacts === 1 ? "contact" : "contacts"}</span>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
       )}
     </div>
   )

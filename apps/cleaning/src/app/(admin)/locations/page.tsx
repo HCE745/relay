@@ -28,7 +28,7 @@ export default async function LocationsPage() {
 
   return (
     <div>
-      <PageHeader title="Service locations" subtitle="Every site you service, across all customers" />
+      <PageHeader title="Service locations" subtitle="Every site you service, across all customers" icon={<MapPinIcon />} />
       {sites.length === 0 ? (
         <EmptyState
           icon={<MapPinIcon />}
@@ -38,37 +38,29 @@ export default async function LocationsPage() {
           actionHref="/customers"
         />
       ) : (
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-2.5 font-medium">Site</th>
-                <th className="px-4 py-2.5 font-medium">Customer</th>
-                <th className="px-4 py-2.5 font-medium">Location</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {sites.map((s) => (
-                <tr key={s.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/customers/${s.customerId}/sites/${s.id}`}
-                      className="font-medium text-slate-900 hover:text-brand"
-                    >
-                      {s.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{s.customer.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{[s.city, s.state].filter(Boolean).join(", ") || "—"}</td>
-                  <td className="px-4 py-3">
-                    <StatusPill active={s.isActive} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {sites.map((s) => (
+            <Link key={s.id} href={`/customers/${s.customerId}/sites/${s.id}`} className="group">
+              <Card className="h-full p-5 transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-md">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                      <MapPinIcon className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-slate-900 group-hover:text-brand">{s.name}</div>
+                      <div className="truncate text-xs text-slate-500">{s.customer.name}</div>
+                    </div>
+                  </div>
+                  <StatusPill active={s.isActive} />
+                </div>
+                <div className="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500">
+                  {[s.city, s.state].filter(Boolean).join(", ") || "No address on file"}
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
       )}
     </div>
   )

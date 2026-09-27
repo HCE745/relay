@@ -43,7 +43,7 @@ export default async function InspectionsPage({ searchParams }: { searchParams: 
   return (
     <div className="space-y-8">
       <div>
-        <PageHeader title="Inspections" subtitle="Quality control" />
+        <PageHeader title="Inspections" subtitle="Quality control" icon={<ClipboardCheckIcon />} />
         {failOnly ? (
           <div className="mb-4 flex items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">

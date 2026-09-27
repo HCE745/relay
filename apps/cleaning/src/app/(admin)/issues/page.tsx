@@ -42,7 +42,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
 
   return (
     <div>
-      <PageHeader title="Issues" subtitle="Problems reported from the field and failed inspections" />
+      <PageHeader title="Issues" subtitle="Problems reported from the field and failed inspections" icon={<InboxIcon />} />
 
       <div className="mb-4 flex flex-wrap gap-2">
         <FilterChip label="All" href="/issues" active={!status} />

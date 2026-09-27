@@ -37,7 +37,7 @@ export default async function TeamPage() {
 
   return (
     <div>
-      <PageHeader title="Team" subtitle="Employees & user accounts" action={<NewUserButton roles={roles} />} />
+      <PageHeader title="Team" subtitle="Employees & user accounts" icon={<UsersIcon />} action={<NewUserButton roles={roles} />} />
 
       {users.length === 0 ? (
         <EmptyState

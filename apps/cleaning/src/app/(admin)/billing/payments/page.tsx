@@ -7,7 +7,7 @@ import { listRecentPayments } from "@/lib/data/invoices"
 import { formatMoney, invoiceNo } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, EmptyState } from "@/components/ui/controls"
-import { DollarIcon } from "@/components/ui/icons"
+import { DollarIcon, CreditCardIcon } from "@/components/ui/icons"
 
 export const dynamic = "force-dynamic"
 const CAP = "billing.invoicing"
@@ -32,7 +32,7 @@ export default async function PaymentsPage() {
 
   return (
     <div>
-      <PageHeader title="Payments" subtitle="Payments recorded against invoices" />
+      <PageHeader title="Payments" subtitle="Payments recorded against invoices" icon={<CreditCardIcon />} />
 
       {payments.length === 0 ? (
         <EmptyState

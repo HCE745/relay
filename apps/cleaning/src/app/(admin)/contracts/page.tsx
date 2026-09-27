@@ -10,7 +10,7 @@ import { isExpiringSoon } from "@/lib/contract-terms"
 import { formatMoney } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, EmptyState, StatusBadge, type BadgeTone } from "@/components/ui/controls"
-import { ReceiptIcon } from "@/components/ui/icons"
+import { ReceiptIcon, FileTextIcon } from "@/components/ui/icons"
 import { NewContractButton } from "@/components/contracts/contract-dialogs"
 
 export const dynamic = "force-dynamic"
@@ -52,6 +52,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
       <PageHeader
         title="Contracts"
         subtitle="Commercial terms and agreements — contract value vs. what you've actually invoiced"
+        icon={<FileTextIcon />}
         action={<NewContractButton customers={customerOptions} />}
       />
 
@@ -74,42 +75,48 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
           />
         )
       ) : (
-        <Card className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-2.5 font-medium">Contract</th>
-                <th className="px-4 py-2.5 font-medium">Customer</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
-                <th className="px-4 py-2.5 font-medium">Term</th>
-                <th className="px-4 py-2.5 text-right font-medium">Value</th>
-                <th className="px-4 py-2.5 text-right font-medium">Invoiced</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {contracts.map((c) => {
-                const expiring = c.status === "ACTIVE" && isExpiringSoon(c.endDate, leadDays, now)
-                return (
-                  <tr key={c.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3">
-                      <Link href={`/contracts/${c.id}`} className="font-medium text-slate-900 hover:text-brand">{c.title}</Link>
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{c.customer?.name ?? "—"}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <StatusBadge tone={TONE[c.status] ?? "neutral"}>{LABEL[c.status] ?? c.status}</StatusBadge>
-                        {expiring ? <StatusBadge tone="warning">Expiring</StatusBadge> : null}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {contracts.map((c) => {
+            const expiring = c.status === "ACTIVE" && isExpiringSoon(c.endDate, leadDays, now)
+            const value = c.contractValue != null ? Number(c.contractValue) : null
+            const invoiced = Number(c.invoiced)
+            const pct = value && value > 0 ? Math.max(0, Math.min(100, Math.round((invoiced / value) * 100))) : null
+            return (
+              <Link key={c.id} href={`/contracts/${c.id}`} className="group">
+                <Card className="h-full p-5 transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-md">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-slate-900 group-hover:text-brand">{c.title}</div>
+                      <div className="truncate text-xs text-slate-500">{c.customer?.name ?? "—"}</div>
+                    </div>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <StatusBadge tone={TONE[c.status] ?? "neutral"}>{LABEL[c.status] ?? c.status}</StatusBadge>
+                      {expiring ? <StatusBadge tone="warning">Expiring</StatusBadge> : null}
+                    </div>
+                  </div>
+                  <div className="mt-4 border-t border-slate-100 pt-3">
+                    <div className="flex items-baseline justify-between text-sm">
+                      <span className="text-slate-500">Invoiced</span>
+                      <span className="tabular-nums font-semibold text-slate-900">
+                        {formatMoney(c.invoiced)}{value != null ? <span className="font-normal text-slate-400"> / {formatMoney(c.contractValue!)}</span> : null}
+                      </span>
+                    </div>
+                    {pct != null ? (
+                      <div className="mt-2">
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                          <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
+                        </div>
+                        <div className="mt-1 text-[11px] text-slate-500">{pct}% of contract value · {fmtDate(c.startDate)} – {fmtDate(c.endDate)}</div>
                       </div>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">{fmtDate(c.startDate)} – {fmtDate(c.endDate)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-700">{c.contractValue != null ? formatMoney(c.contractValue) : "—"}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-700">{formatMoney(c.invoiced)}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </Card>
+                    ) : (
+                      <div className="mt-1 text-[11px] text-slate-500">No contract value set · {fmtDate(c.startDate)} – {fmtDate(c.endDate)}</div>
+                    )}
+                  </div>
+                </Card>
+              </Link>
+            )
+          })}
+        </div>
       )}
     </div>
   )

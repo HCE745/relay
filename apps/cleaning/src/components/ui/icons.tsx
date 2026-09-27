@@ -170,3 +170,76 @@ export function SparklesIcon({ className }: IconProps) {
     className,
   )
 }
+
+export function HomeIcon({ className }: IconProps) {
+  return base(
+    <>
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" />
+      <path d="M9.5 21v-6h5v6" />
+    </>,
+    className,
+  )
+}
+
+export function CogIcon({ className }: IconProps) {
+  return base(
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" />
+    </>,
+    className,
+  )
+}
+
+export function ChartBarIcon({ className }: IconProps) {
+  return base(
+    <>
+      <path d="M3 3v18h18" />
+      <rect x="7" y="11" width="3" height="6" rx="0.5" />
+      <rect x="12" y="7" width="3" height="10" rx="0.5" />
+      <rect x="17" y="13" width="3" height="4" rx="0.5" />
+    </>,
+    className,
+  )
+}
+
+export function BoxIcon({ className }: IconProps) {
+  return base(
+    <>
+      <path d="M12 3 3 7.5v9L12 21l9-4.5v-9L12 3Z" />
+      <path d="m3 7.5 9 4.5 9-4.5M12 12v9" />
+    </>,
+    className,
+  )
+}
+
+export function TagIcon({ className }: IconProps) {
+  return base(
+    <>
+      <path d="M3 12V4a1 1 0 0 1 1-1h8l8 8-9 9-8-8Z" />
+      <circle cx="7.5" cy="7.5" r="1.25" />
+    </>,
+    className,
+  )
+}
+
+export function FileTextIcon({ className }: IconProps) {
+  return base(
+    <>
+      <path d="M6 2h8l4 4v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z" />
+      <path d="M13 2v5h5M8 13h8M8 17h8M8 9h3" />
+    </>,
+    className,
+  )
+}
+
+export function CreditCardIcon({ className }: IconProps) {
+  return base(
+    <>
+      <rect x="2.5" y="5" width="19" height="14" rx="2.5" />
+      <path d="M2.5 9.5h19M6 15h4" />
+    </>,
+    className,
+  )
+}

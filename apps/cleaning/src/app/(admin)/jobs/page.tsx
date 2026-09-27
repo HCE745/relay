@@ -95,6 +95,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
       <PageHeader
         title="Jobs"
         subtitle={activeFilter ? FILTER_LABELS[activeFilter] : "Today and the next 30 days"}
+        icon={<BriefcaseIcon />}
         action={newJobButton}
       />
 

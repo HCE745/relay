@@ -6,7 +6,7 @@ import { getArAging } from "@/lib/data/invoices"
 import { formatMoney } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, EmptyState } from "@/components/ui/controls"
-import { DollarIcon } from "@/components/ui/icons"
+import { DollarIcon, ChartBarIcon } from "@/components/ui/icons"
 
 export const dynamic = "force-dynamic"
 const CAP = "billing.arAging"
@@ -28,7 +28,7 @@ export default async function ArAgingPage() {
 
   return (
     <div>
-      <PageHeader title="AR Aging" subtitle="Outstanding receivables by customer and age" />
+      <PageHeader title="AR Aging" subtitle="Outstanding receivables by customer and age" icon={<ChartBarIcon />} />
 
       {rows.length === 0 ? (
         <EmptyState

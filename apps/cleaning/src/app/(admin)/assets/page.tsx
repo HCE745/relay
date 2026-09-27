@@ -8,7 +8,7 @@ import { listAllSites } from "@/lib/data/service-locations"
 import { listUsers } from "@/lib/data/users"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, EmptyState, StatusBadge, type BadgeTone } from "@/components/ui/controls"
-import { BriefcaseIcon } from "@/components/ui/icons"
+import { BoxIcon } from "@/components/ui/icons"
 import { NewAssetButton } from "@/components/assets/asset-dialogs"
 
 export const dynamic = "force-dynamic"
@@ -38,44 +38,40 @@ export default async function AssetsPage() {
 
   return (
     <div>
-      <PageHeader title="Assets" subtitle="Equipment, vehicles and machines" action={<NewAssetButton sites={siteOpts} users={userOpts} />} />
+      <PageHeader title="Assets" subtitle="Equipment, vehicles and machines" icon={<BoxIcon />} action={<NewAssetButton sites={siteOpts} users={userOpts} />} />
 
       {assets.length === 0 ? (
         <EmptyState
-          icon={<BriefcaseIcon />}
+          icon={<BoxIcon />}
           title="No assets yet"
           description="Track your equipment, vehicles and machines here, with a maintenance log for each."
           action={<NewAssetButton sites={siteOpts} users={userOpts} />}
         />
       ) : (
-        <Card className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-2.5 font-medium">Asset</th>
-                <th className="px-4 py-2.5 font-medium">Category</th>
-                <th className="px-4 py-2.5 font-medium">Serial</th>
-                <th className="px-4 py-2.5 font-medium">Assigned</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
-                <th className="px-4 py-2.5 text-right font-medium">Maintenance</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {assets.map((a) => (
-                <tr key={a.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">
-                    <Link href={`/assets/${a.id}`} className="font-medium text-slate-900 hover:text-brand">{a.name}</Link>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{CAT[a.category] ?? a.category}</td>
-                  <td className="px-4 py-3 text-slate-500">{a.serial || "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{a.assignedToSite?.name ?? a.assignedToUser?.name ?? "—"}</td>
-                  <td className="px-4 py-3"><StatusBadge tone={TONE[a.status] ?? "neutral"}>{STATUS[a.status] ?? a.status}</StatusBadge></td>
-                  <td className="px-4 py-3 text-right tabular-nums text-slate-500">{a._count.maintenance}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {assets.map((a) => (
+            <Link key={a.id} href={`/assets/${a.id}`} className="group">
+              <Card className="h-full p-5 transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-md">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                      <BoxIcon className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-slate-900 group-hover:text-brand">{a.name}</div>
+                      <div className="truncate text-xs text-slate-500">{CAT[a.category] ?? a.category}{a.serial ? ` · ${a.serial}` : ""}</div>
+                    </div>
+                  </div>
+                  <StatusBadge tone={TONE[a.status] ?? "neutral"}>{STATUS[a.status] ?? a.status}</StatusBadge>
+                </div>
+                <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
+                  <span className="truncate">{a.assignedToSite?.name ?? a.assignedToUser?.name ?? "Unassigned"}</span>
+                  <span className="shrink-0">{a._count.maintenance} log{a._count.maintenance === 1 ? "" : "s"}</span>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
       )}
     </div>
   )

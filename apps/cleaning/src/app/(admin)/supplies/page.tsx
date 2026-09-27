@@ -36,7 +36,7 @@ export default async function SuppliesPage({ searchParams }: { searchParams: Pro
 
   return (
     <div>
-      <PageHeader title="Supplies" subtitle="Stock levels and usage" action={<NewSupplyButton />} />
+      <PageHeader title="Supplies" subtitle="Stock levels and usage" icon={<InboxIcon />} action={<NewSupplyButton />} />
 
       <div className="mb-4 flex gap-2">
         <Link href="/supplies" className={`rounded-full px-3 py-1 text-sm font-medium ${!lowOnly ? "bg-brand text-white" : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}>All</Link>

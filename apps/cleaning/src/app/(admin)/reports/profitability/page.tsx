@@ -5,8 +5,8 @@ import { orgHasCapability } from "@/lib/page-guards"
 import { getProfitability, type ProfitRow } from "@/lib/data/profitability"
 import { formatMoney } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
-import { Card, EmptyState, StatusBadge } from "@/components/ui/controls"
-import { DollarIcon } from "@/components/ui/icons"
+import { Card, EmptyState, StatusBadge, buttonClasses } from "@/components/ui/controls"
+import { DollarIcon, ChartBarIcon } from "@/components/ui/icons"
 
 export const dynamic = "force-dynamic"
 const CAP = "reporting.profitability"
@@ -94,7 +94,7 @@ export default async function ProfitabilityPage({
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Profitability" subtitle="Invoiced revenue vs. approved hourly labor" />
+      <PageHeader title="Profitability" subtitle="Invoiced revenue vs. approved hourly labor" icon={<ChartBarIcon />} />
 
       {/* Date range + low-margin threshold + include-uninvoiced toggle */}
       <form method="get" className="flex flex-wrap items-end gap-3">
@@ -114,7 +114,7 @@ export default async function ProfitabilityPage({
           <input type="checkbox" name="include" value="1" defaultChecked={includeUninvoiced} className="h-4 w-4 rounded border-slate-300" />
           Include uninvoiced jobs
         </label>
-        <button type="submit" className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:opacity-90">
+        <button type="submit" className={buttonClasses("primary", "md")}>
           Apply
         </button>
       </form>

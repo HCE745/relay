@@ -12,7 +12,7 @@ export type ButtonSize = "sm" | "md" | "lg"
 // secondary is a quiet outline; danger is a clear destructive outline; ghost is
 // chrome-free for toolbars.
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
-  primary: "bg-brand text-white shadow-sm hover:bg-brand-700 focus-visible:ring-brand/40",
+  primary: "bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus-visible:ring-brand/40",
   secondary: "border border-slate-300 bg-white text-slate-700 shadow-xs hover:bg-slate-50 focus-visible:ring-slate-300",
   danger: "border border-red-300 bg-white text-red-700 shadow-xs hover:bg-red-50 focus-visible:ring-red-300",
   ghost: "text-slate-600 hover:bg-slate-100 focus-visible:ring-slate-300",

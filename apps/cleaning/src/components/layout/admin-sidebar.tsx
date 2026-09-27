@@ -65,7 +65,7 @@ export function AdminSidebar({
               aria-current={active ? "page" : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition ${
                 active
-                  ? "bg-brand text-white shadow-sm"
+                  ? "bg-brand-700 text-white shadow-sm"
                   : "text-slate-300 hover:bg-white/10 hover:text-white"
               }`}
             >

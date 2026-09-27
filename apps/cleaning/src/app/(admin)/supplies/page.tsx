@@ -39,8 +39,8 @@ export default async function SuppliesPage({ searchParams }: { searchParams: Pro
       <PageHeader title="Supplies" subtitle="Stock levels and usage" icon={<InboxIcon />} action={<NewSupplyButton />} />
 
       <div className="mb-4 flex gap-2">
-        <Link href="/supplies" className={`rounded-full px-3 py-1 text-sm font-medium ${!lowOnly ? "bg-brand text-white" : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}>All</Link>
-        <Link href="/supplies?filter=low" className={`rounded-full px-3 py-1 text-sm font-medium ${lowOnly ? "bg-brand text-white" : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}>Low stock</Link>
+        <Link href="/supplies" className={`rounded-full px-3 py-1 text-sm font-medium ${!lowOnly ? "bg-brand-700 text-white" : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}>All</Link>
+        <Link href="/supplies?filter=low" className={`rounded-full px-3 py-1 text-sm font-medium ${lowOnly ? "bg-brand-700 text-white" : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}>Low stock</Link>
       </div>
 
       {supplies.length === 0 ? (

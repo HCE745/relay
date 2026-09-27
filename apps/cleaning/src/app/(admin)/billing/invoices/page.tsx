@@ -67,7 +67,7 @@ export default async function InvoicesPage({
       <Link
         key={label}
         href={`/billing/invoices${qs ? `?${qs}` : ""}`}
-        className={`rounded-full px-3 py-1 text-sm font-medium ${active ? "bg-brand text-white" : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}
+        className={`rounded-full px-3 py-1 text-sm font-medium ${active ? "bg-brand-700 text-white" : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}
       >
         {label}
       </Link>

@@ -57,8 +57,17 @@ async function main() {
   check("linking plans writes no invoice", (await invoiceCount(org.id)) === before)
   // Invoices still come only from generateInvoice over jobs/plans.
   const gen = await generateInvoice(org.id, { customerId: customer.id, periodStart: "2026-03-01", periodEnd: "2026-03-31" })
-  await setInvoiceStatus(org.id, gen.invoiceId, "SENT")
-  check("invoices still generate from jobs exactly as before", gen.created && (await invoiceCount(org.id)) === before + 1)
+  if (!gen.created) {
+    // The whole phase's revenue attribution depends on this invoice existing —
+    // if generation was skipped, fail loudly with the reason, don't press on.
+    check(`invoices still generate from jobs exactly as before — generation FAILED: ${gen.reason}`, false)
+    await systemDb.organization.delete({ where: { id: org.id } })
+    console.log(`\n${failures} CHECK(S) FAILED`)
+    process.exit(1)
+  }
+  const genInvoiceId = gen.invoiceId
+  await setInvoiceStatus(org.id, genInvoiceId, "SENT")
+  check("invoices still generate from jobs exactly as before", (await invoiceCount(org.id)) === before + 1)
 
   console.log("Contract value vs. invoiced is accurate (the $24k vs. $18.4k idea):")
   const r1 = await getContract(org.id, k.id)
@@ -73,7 +82,7 @@ async function main() {
   check("only in-term lines count after narrowing the window", r2!.progress.invoiced.toString() === "1000", r2!.progress.invoiced.toString())
 
   console.log("VOID invoices are excluded from attributed revenue:")
-  await setInvoiceStatus(org.id, gen.invoiceId, "VOID")
+  await setInvoiceStatus(org.id, genInvoiceId, "VOID")
   await updateContract(org.id, k.id, { startDate: "2026-01-01", endDate: "2026-12-31" })
   const r3 = await getContract(org.id, k.id)
   check("voided invoice contributes nothing", r3!.progress.invoiced.toString() === "0", r3!.progress.invoiced.toString())

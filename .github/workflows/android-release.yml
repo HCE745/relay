@@ -1,0 +1,137 @@
+name: Android Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: "Version name (e.g. 1.2.0) — overrides tag when run manually"
+        required: false
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-and-deploy:
+    name: Build, Sign & Upload AAB
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to create GitHub releases
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Resolve version strings ──────────────────────────────────────────────
+      - name: Resolve version name
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version_name }}" ]; then
+            VERSION_NAME="${{ github.event.inputs.version_name }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION_NAME="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION_NAME="0.0.0-dev"
+          fi
+          echo "version_name=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
+          echo "Resolved versionName: ${VERSION_NAME}"
+
+      # ── Java 21 ─────────────────────────────────────────────────────────────
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      # ── Node + pnpm ──────────────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.34.5"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: .
+
+      # ── Next.js build + Capacitor sync ────────────────────────────────────────
+      - name: Build Next.js app
+        run: pnpm --filter relay build
+        working-directory: .
+
+      - name: Sync Capacitor Android project
+        run: npx cap sync android
+        working-directory: apps/relay
+
+      # ── Auto-increment versionCode ────────────────────────────────────────────
+      - name: Bump versionCode and set versionName
+        id: bump
+        working-directory: apps/relay/android/app
+        run: |
+          CURRENT=$(grep -oP 'versionCode \K\d+' build.gradle)
+          NEW_CODE=$((CURRENT + 1))
+          # Patch versionCode
+          sed -i "s/versionCode ${CURRENT}/versionCode ${NEW_CODE}/" build.gradle
+          # Patch versionName
+          sed -i "s/versionName \"[^\"]*\"/versionName \"${{ steps.version.outputs.version_name }}\"/" build.gradle
+          echo "version_code=${NEW_CODE}" >> "$GITHUB_OUTPUT"
+          echo "Bumped versionCode: ${CURRENT} → ${NEW_CODE}"
+          echo "Set versionName: ${{ steps.version.outputs.version_name }}"
+
+      # ── Decode keystore from secret ───────────────────────────────────────────
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > apps/relay/android/relay-release.keystore
+
+      # ── Build release AAB ────────────────────────────────────────────────────
+      - name: Build release AAB
+        working-directory: apps/relay/android
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/apps/relay/android/relay-release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file="$KEYSTORE_PATH" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+
+      # ── Locate signed AAB ─────────────────────────────────────────────────────
+      - name: Locate signed AAB
+        id: aab
+        run: |
+          AAB_PATH=$(find apps/relay/android/app/build/outputs/bundle/release -name "*.aab" | head -1)
+          echo "path=${AAB_PATH}" >> "$GITHUB_OUTPUT"
+          echo "Found AAB: ${AAB_PATH}"
+
+      # ── Upload to Google Play (internal testing track) ───────────────────────
+      - name: Upload AAB to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: io.getrelay.app
+          releaseFiles: ${{ steps.aab.outputs.path }}
+          track: internal
+          status: completed
+          changesNotSentForReview: false
+
+      # ── Create GitHub release ─────────────────────────────────────────────────
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Relay Android v${{ steps.version.outputs.version_name }}"
+          body: |
+            **versionCode**: ${{ steps.bump.outputs.version_code }}
+            **versionName**: ${{ steps.version.outputs.version_name }}
+
+            Uploaded to Google Play internal testing track.
+          files: ${{ steps.aab.outputs.path }}
+          draft: false
+          prerelease: false

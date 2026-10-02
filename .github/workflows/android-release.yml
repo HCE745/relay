@@ -110,16 +110,129 @@ jobs:
           echo "path=${AAB_PATH}" >> "$GITHUB_OUTPUT"
           echo "Found AAB: ${AAB_PATH}"
 
+      # ── Authenticate with Google Play Developer API ──────────────────────────
+      # The service account JSON is used to create a self-signed JWT (RS256),
+      # which is exchanged for a short-lived OAuth2 bearer token.
+      # Python's `cryptography` package is pre-installed on ubuntu-latest.
+      - name: Get Google Play API access token
+        id: gplay_auth
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          ACCESS_TOKEN=$(python3 - <<'PYEOF'
+          import json, time, base64, os, urllib.request, urllib.parse
+          from cryptography.hazmat.primitives import hashes, serialization
+          from cryptography.hazmat.primitives.asymmetric import padding
+          from cryptography.hazmat.backends import default_backend
+
+          def b64url(data):
+              if isinstance(data, str):
+                  data = data.encode("utf-8")
+              return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
+
+          sa = json.loads(os.environ["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"])
+          token_uri = sa.get("token_uri", "https://oauth2.googleapis.com/token")
+          now = int(time.time())
+
+          header  = b64url(json.dumps({"alg": "RS256", "typ": "JWT"}))
+          payload = b64url(json.dumps({
+              "iss":   sa["client_email"],
+              "scope": "https://www.googleapis.com/auth/androidpublisher",
+              "aud":   token_uri,
+              "iat":   now,
+              "exp":   now + 3600,
+          }))
+
+          signing_input = f"{header}.{payload}".encode("utf-8")
+          private_key   = serialization.load_pem_private_key(
+              sa["private_key"].encode("utf-8"), password=None, backend=default_backend()
+          )
+          sig = private_key.sign(signing_input, padding.PKCS1v15(), hashes.SHA256())
+          jwt = f"{header}.{payload}.{b64url(sig)}"
+
+          data = urllib.parse.urlencode({
+              "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+              "assertion":  jwt,
+          }).encode("utf-8")
+          req = urllib.request.Request(token_uri, data=data, method="POST")
+          req.add_header("Content-Type", "application/x-www-form-urlencoded")
+          with urllib.request.urlopen(req) as resp:
+              print(json.loads(resp.read())["access_token"])
+          PYEOF
+          )
+          echo "access_token=${ACCESS_TOKEN}" >> "$GITHUB_OUTPUT"
+
       # ── Upload to Google Play (internal testing track) ───────────────────────
-      - name: Upload AAB to Google Play
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: io.getrelay.app
-          releaseFiles: ${{ steps.aab.outputs.path }}
-          track: internal
-          status: completed
-          changesNotSentForReview: false
+      # Step 1: open an edit session
+      - name: Create Google Play edit
+        id: gplay_edit
+        env:
+          TOKEN: ${{ steps.gplay_auth.outputs.access_token }}
+        run: |
+          RESPONSE=$(curl --silent --fail \
+            -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/io.getrelay.app/edits")
+          EDIT_ID=$(echo "${RESPONSE}" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+          echo "edit_id=${EDIT_ID}" >> "$GITHUB_OUTPUT"
+          echo "Opened edit: ${EDIT_ID}"
+
+      # Step 2: upload the AAB into the edit
+      - name: Upload AAB
+        id: gplay_upload
+        env:
+          TOKEN: ${{ steps.gplay_auth.outputs.access_token }}
+          EDIT_ID: ${{ steps.gplay_edit.outputs.edit_id }}
+          AAB_PATH: ${{ steps.aab.outputs.path }}
+        run: |
+          RESPONSE=$(curl --silent --fail \
+            -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@${AAB_PATH}" \
+            "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/io.getrelay.app/edits/${EDIT_ID}/bundles?uploadType=media")
+          echo "Upload response: ${RESPONSE}"
+          VERSION_CODE=$(echo "${RESPONSE}" | python3 -c "import sys,json; print(json.load(sys.stdin)['versionCode'])")
+          echo "Uploaded versionCode: ${VERSION_CODE}"
+
+      # Step 3: assign the AAB to the internal track
+      - name: Assign to internal track
+        env:
+          TOKEN: ${{ steps.gplay_auth.outputs.access_token }}
+          EDIT_ID: ${{ steps.gplay_edit.outputs.edit_id }}
+          VERSION_CODE: ${{ steps.bump.outputs.version_code }}
+          VERSION_NAME: ${{ steps.version.outputs.version_name }}
+        run: |
+          TRACK_BODY=$(python3 -c "
+          import json, sys
+          print(json.dumps({
+              'track': 'internal',
+              'releases': [{
+                  'name':         '${VERSION_NAME}',
+                  'versionCodes': ['${VERSION_CODE}'],
+                  'status':       'completed',
+              }]
+          }))
+          ")
+          curl --silent --fail \
+            -X PUT \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "${TRACK_BODY}" \
+            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/io.getrelay.app/edits/${EDIT_ID}/tracks/internal"
+
+      # Step 4: commit the edit to make the release live on the track
+      - name: Commit edit
+        env:
+          TOKEN: ${{ steps.gplay_auth.outputs.access_token }}
+          EDIT_ID: ${{ steps.gplay_edit.outputs.edit_id }}
+        run: |
+          curl --silent --fail \
+            -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/io.getrelay.app/edits/${EDIT_ID}:commit"
+          echo "Edit committed — build is live on internal testing track"
 
       # ── Create GitHub release ─────────────────────────────────────────────────
       - name: Create GitHub release

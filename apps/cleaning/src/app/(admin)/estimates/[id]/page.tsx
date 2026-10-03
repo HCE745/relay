@@ -34,7 +34,7 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
   }
 
   const { id } = await params
-  const [est, org] = await Promise.all([getEstimate(orgId, id), getOrgSettings(orgId)])
+  const [est, org, canBid] = await Promise.all([getEstimate(orgId, id), getOrgSettings(orgId), orgHasCapability(orgId, "crm.bidCalculator")])
   if (!est) notFound()
 
   const converted = !!est.convertedCustomerId
@@ -56,6 +56,11 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
                   Download PDF
                 </a>
                 <PrintButton />
+                {!converted && canBid ? (
+                  <Link href={`/estimates/${est.id}/bid`} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Bid calculator
+                  </Link>
+                ) : null}
                 {!converted ? (
                   <Link href={`/estimates/${est.id}/edit`} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
                     Edit

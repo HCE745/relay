@@ -32,6 +32,7 @@ export const CAPABILITIES = [
   "reporting.profitability", // site/customer/plan margin (pay-rate-derived)
   "crm.estimates", // leads, estimates, estimate→customer conversion
   "crm.contracts", // service agreements / contracts
+  "crm.bidCalculator", // production-rate bid worksheet on estimates
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",

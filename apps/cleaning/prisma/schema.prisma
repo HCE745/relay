@@ -260,6 +260,7 @@ model Organization {
   supplies            Supply[]
   supplyUsages        SupplyUsage[]
   contracts           Contract[]
+  productionRates     ProductionRate[]
 
   @@schema("cleaning")
 }
@@ -1027,6 +1028,9 @@ model Estimate {
   // bound to the customer it created (snapshot pattern, like invoices).
   convertedCustomerId String?
   convertedAt         DateTime?
+  // Bid calculator worksheet snapshot (Phase 10): the full inputs + computed
+  // breakdown at the time the price was produced. JSON, never re-derived.
+  bidWorksheet        Json?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
@@ -1058,6 +1062,25 @@ model EstimateLine {
   estimate Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
 
   @@index([estimateId])
+  @@schema("cleaning")
+}
+
+// Org-editable production-rate library (Phase 10): how fast a task/surface can be
+// cleaned (sq ft per hour), the basis of the bid calculator. Seeded from
+// industry defaults, then tuned per org.
+model ProductionRate {
+  id             String   @id @default(cuid())
+  organizationId String
+  taskType       String
+  surfaceType    String
+  sqftPerHour    Decimal  @db.Decimal(12, 2)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
   @@schema("cleaning")
 }
 

@@ -414,6 +414,29 @@ export const estimateStatusSchema = z.object({ status: z.enum(ESTIMATE_STATUSES)
 // ─── Phase 8: contracts / service agreements ─────────────────────────────────
 
 export const CONTRACT_STATUSES = ["DRAFT", "ACTIVE", "EXPIRED", "CANCELLED"] as const
+// ─── Bid calculator (Phase 10) ───
+export const productionRateCreateSchema = z.object({
+  taskType: z.string().trim().min(1).max(100),
+  surfaceType: z.string().trim().min(1).max(100),
+  sqftPerHour: z.coerce.number().positive().max(1_000_000),
+})
+export const productionRateUpdateSchema = productionRateCreateSchema.partial().extend({ isActive: z.boolean().optional() })
+
+export const bidAreaSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  sqft: z.coerce.number().min(0).max(100_000_000),
+  surfaceType: z.string().trim().max(100).default(""),
+  sqftPerHour: z.coerce.number().positive().max(1_000_000),
+  frequency: z.enum(SERVICE_FREQUENCIES),
+})
+export const bidInputsSchema = z.object({
+  areas: z.array(bidAreaSchema).min(1, "Add at least one area"),
+  laborRate: z.coerce.number().min(0).max(100_000),
+  suppliesPct: z.coerce.number().min(0).max(100),
+  overheadPct: z.coerce.number().min(0).max(100),
+  targetMarginPct: z.coerce.number().min(0).max(99.9),
+})
+
 export const CONTRACT_BILLING_FREQUENCIES = ["MONTHLY", "QUARTERLY", "ANNUALLY", "ONE_TIME"] as const
 
 export const contractCreateSchema = z.object({

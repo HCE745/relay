@@ -37,6 +37,7 @@ const TEAM_CAPS: Capability[] = [
   "reporting.profitability",
   "crm.estimates",
   "crm.contracts",
+  "crm.bidCalculator",
 ]
 
 const BUSINESS_CAPS: Capability[] = [

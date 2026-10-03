@@ -6,6 +6,7 @@ import {
   type Money,
   type InvoiceStatusValue,
   ZERO,
+  round2,
   billableMinutes,
   flatLine,
   hourlyLine,
@@ -19,6 +20,7 @@ import {
   overpays,
   OUTSTANDING_STATUSES,
 } from "../billing-math"
+import { periodsInWindow } from "../billing-periods"
 
 // ─── Billing / invoicing (Phase 2) ───────────────────────────────────────────
 //
@@ -36,9 +38,38 @@ export type GenerateInvoiceResult =
   | { created: true; invoiceId: string; invoiceNumber: number; lineCount: number; total: string; excluded: InvoiceExclusion[] }
   | { created: false; reason: string; excluded: InvoiceExclusion[] }
 
+// A single prospective invoice line. `billable` lines sum to the total; the
+// non-billable "covered service" detail lines under a flat charge are amount 0.
+// Exactly one of activeJobId / activePeriodKey claims the thing being billed so
+// it can never be billed twice on a non-VOID invoice.
+type LineDraft = {
+  jobId: string | null
+  activeJobId: string | null
+  activePeriodKey: string | null
+  billable: boolean
+  description: string
+  siteName: string
+  serviceDate: Date
+  quantity: Money
+  unitRate: Money
+  amount: Money
+}
+
+/**
+ * Generate a DRAFT invoice for a customer over a period.
+ *
+ * PER_JOB plans bill each completed visit (flat or hourly) as today. FLAT_PERIOD
+ * plans bill one flat charge per billing period they overlap, and list the
+ * visits they covered as non-billable detail — those visits are claimed so they
+ * can't also be billed per-job. Never auto-sends (status DRAFT).
+ *
+ * `opts.flatOnly` (cron) skips per-job billing entirely; `opts.endedOnly` only
+ * bills periods that have fully ended as of `opts.now`.
+ */
 export async function generateInvoice(
   orgId: string,
   input: { customerId: string; periodStart: string; periodEnd: string },
+  opts: { flatOnly?: boolean; endedOnly?: boolean; now?: Date } = {},
 ): Promise<GenerateInvoiceResult> {
   const db = orgDb(orgId)
   const customer = await db.customer.findFirst({
@@ -47,14 +78,14 @@ export async function generateInvoice(
   })
   assertFound(customer, "Customer")
 
+  const now = opts.now ?? new Date()
   const periodStart = startOfUtcDay(input.periodStart)
   const periodEnd = endOfUtcDay(input.periodEnd)
 
-  // Period membership is decided by the site's LOCAL wall-clock day (below), the
-  // same timezone resolution the scheduler uses (site override, else org
-  // default). We therefore fetch a widened UTC window — ±1 day covers every real
-  // timezone offset — and let isInBillingPeriod() make the exact call, so a job
-  // at 8pm local on the 31st stays on that month's invoice.
+  // Period membership is decided by the site's LOCAL wall-clock day, the same
+  // timezone resolution the scheduler uses (site override, else org default). We
+  // fetch a widened UTC window — ±1 day covers every real offset — and let
+  // isInBillingPeriod() make the exact call.
   const orgTz = await getOrgTimezone(orgId)
   const windowStart = new Date(periodStart.getTime() - 86_400_000)
   const windowEnd = new Date(periodEnd.getTime() + 86_400_000)
@@ -68,37 +99,53 @@ export async function generateInvoice(
     orderBy: { scheduledStart: "asc" },
     include: {
       serviceLocation: { select: { name: true, timezone: true } },
-      servicePlan: { select: { name: true, billingType: true, rate: true, currency: true } },
+      servicePlan: { select: { id: true, name: true, billingMode: true, billingType: true, rate: true, currency: true } },
       timeEntries: { select: { status: true, clockInAt: true, clockOutAt: true, breakMinutes: true } },
       // Non-empty only when this job already sits on a non-VOID invoice.
       invoiceLines: { where: { activeJobId: { not: null } }, select: { id: true } },
     },
   })
 
+  // Active flat-period plans for this customer — billed even with zero visits.
+  const flatPlans = await db.servicePlan.findMany({
+    where: { billingMode: "FLAT_PERIOD", isActive: true, serviceLocation: { customerId: input.customerId } },
+    select: {
+      id: true,
+      name: true,
+      periodAmount: true,
+      periodFrequency: true,
+      currency: true,
+      serviceLocation: { select: { name: true, timezone: true } },
+    },
+  })
+
   const excluded: InvoiceExclusion[] = []
-  type Draft = {
-    jobId: string
-    description: string
-    siteName: string
-    serviceDate: Date
-    quantity: Money
-    unitRate: Money
-    amount: Money
-  }
-  const drafts: Draft[] = []
-  // The first billable job (ordered by scheduledStart) sets the invoice currency;
-  // jobs whose plan is in a different currency can't be summed onto it, so they
-  // are excluded and reported back rather than silently mixed. One invoice is
-  // one currency.
+  const drafts: LineDraft[] = []
+  // The first billable line sets the invoice currency; anything in another
+  // currency can't be summed onto it and is excluded. One invoice, one currency.
   let currency: string | null = null
 
+  // Visits covered by a flat plan — collected for detail lines regardless of
+  // flatOnly, and kept out of per-job billing.
+  type CoveredJob = { id: string; title: string; siteName: string; serviceDate: Date; scheduledStart: Date; siteTz: string; claimed: boolean }
+  const coveredByPlan = new Map<string, CoveredJob[]>()
+
+  // ── Per-visit lines (and flat-plan visit collection) ──
   for (const job of jobs) {
-    // Exact period membership by the site's local day (the window fetch above is
-    // deliberately wider than the period).
     const siteTz = job.serviceLocation.timezone ?? orgTz
     if (!isInBillingPeriod(job.scheduledStart, siteTz, input.periodStart, input.periodEnd)) continue
-    if (job.invoiceLines.length > 0) continue // already on a non-VOID invoice — idempotent skip
     const plan = job.servicePlan
+    const serviceDate = job.actualEnd ?? job.scheduledStart
+    const siteName = job.serviceLocation.name
+
+    if (plan?.billingMode === "FLAT_PERIOD") {
+      const arr = coveredByPlan.get(plan.id) ?? coveredByPlan.set(plan.id, []).get(plan.id)!
+      arr.push({ id: job.id, title: job.title, siteName, serviceDate, scheduledStart: job.scheduledStart, siteTz, claimed: job.invoiceLines.length > 0 })
+      continue // never per-job billed
+    }
+
+    if (opts.flatOnly) continue
+    if (job.invoiceLines.length > 0) continue // already on a non-VOID invoice
     if (!plan || plan.rate == null) {
       excluded.push({ jobId: job.id, title: job.title, reason: "No billing rate on the service plan" })
       continue
@@ -110,8 +157,6 @@ export async function generateInvoice(
       excluded.push({ jobId: job.id, title: job.title, reason: `Different currency (${jobCurrency}) — invoice separately` })
       continue
     }
-    const serviceDate = job.actualEnd ?? job.scheduledStart
-    const siteName = job.serviceLocation.name
 
     if (plan.billingType === "HOURLY") {
       const pending = job.timeEntries.filter((e) => e.status === "OPEN" || e.status === "COMPLETED")
@@ -119,33 +164,84 @@ export async function generateInvoice(
         excluded.push({ jobId: job.id, title: job.title, reason: "Has unapproved time — approve it first" })
         continue
       }
-      const minutes = job.timeEntries
-        .filter((e) => e.status === "APPROVED")
-        .reduce((sum, e) => sum + billableMinutes(e), 0)
+      const minutes = job.timeEntries.filter((e) => e.status === "APPROVED").reduce((sum, e) => sum + billableMinutes(e), 0)
       if (minutes <= 0) {
         excluded.push({ jobId: job.id, title: job.title, reason: "No approved time to bill" })
         continue
       }
       const { quantity, amount } = hourlyLine(minutes, rate)
-      drafts.push({ jobId: job.id, description: job.title, siteName, serviceDate, quantity, unitRate: rate, amount })
+      drafts.push({ jobId: job.id, activeJobId: job.id, activePeriodKey: null, billable: true, description: job.title, siteName, serviceDate, quantity, unitRate: rate, amount })
     } else {
-      // FLAT_PER_JOB
       const { quantity, amount } = flatLine(rate)
-      drafts.push({ jobId: job.id, description: job.title, siteName, serviceDate, quantity, unitRate: rate, amount })
+      drafts.push({ jobId: job.id, activeJobId: job.id, activePeriodKey: null, billable: true, description: job.title, siteName, serviceDate, quantity, unitRate: rate, amount })
     }
   }
 
-  if (drafts.length === 0) {
-    return { created: false, reason: "No billable completed jobs in this period", excluded }
+  // ── Flat-period charges ──
+  for (const plan of flatPlans) {
+    const siteTz = plan.serviceLocation.timezone ?? orgTz
+    if (plan.periodAmount == null || plan.periodFrequency == null) {
+      excluded.push({ jobId: plan.id, title: plan.name, reason: "Flat plan missing a period amount or frequency" })
+      continue
+    }
+    const planCurrency = plan.currency ?? "USD"
+    if (currency === null) currency = planCurrency
+    else if (planCurrency !== currency) {
+      excluded.push({ jobId: plan.id, title: plan.name, reason: `Different currency (${planCurrency}) — invoice separately` })
+      continue
+    }
+    const amount = round2(plan.periodAmount as Money)
+    const covered = coveredByPlan.get(plan.id) ?? []
+    const periods = periodsInWindow(plan.periodFrequency, input.periodStart, input.periodEnd, siteTz)
+    for (const period of periods) {
+      if (opts.endedOnly && period.end.getTime() > now.getTime()) continue // period hasn't ended yet
+      const periodKey = `${plan.id}:${period.key}`
+      // Flat charge (billable).
+      drafts.push({
+        jobId: null,
+        activeJobId: null,
+        activePeriodKey: periodKey,
+        billable: true,
+        description: `${plan.name} — ${period.label}`,
+        siteName: plan.serviceLocation.name,
+        serviceDate: period.end,
+        quantity: new Prisma.Decimal(1),
+        unitRate: amount,
+        amount,
+      })
+      // Covered visits for this period (non-billable detail; claim them).
+      for (const cj of covered) {
+        if (cj.claimed) continue
+        if (!isInBillingPeriod(cj.scheduledStart, cj.siteTz, period.startISO, period.endISO)) continue
+        drafts.push({
+          jobId: cj.id,
+          activeJobId: cj.id,
+          activePeriodKey: null,
+          billable: false,
+          description: `Visit: ${cj.title}`,
+          siteName: cj.siteName,
+          serviceDate: cj.serviceDate,
+          quantity: new Prisma.Decimal(1),
+          unitRate: ZERO,
+          amount: ZERO,
+        })
+      }
+    }
   }
-  const invoiceCurrency = currency ?? "USD" // guaranteed set when drafts is non-empty
+
+  const hasBillable = (ls: LineDraft[]) => ls.some((l) => l.billable)
+  if (!hasBillable(drafts)) {
+    return { created: false, reason: opts.flatOnly ? "No flat-period charges due in this window" : "No billable work in this period", excluded }
+  }
+  const invoiceCurrency = currency ?? "USD"
 
   const issueDate = new Date()
   const dueDate = dueDateFromTerms(issueDate, customer!.paymentTerms)
 
-  // Create with retry: a P2002 is either an invoiceNumber race (retry with a new
-  // number) or an activeJobId race (another invoice claimed a job — drop it and
-  // retry). Both converge without duplicates.
+  // Create with retry. A P2002 is an invoiceNumber race (retry a fresh number),
+  // an activeJobId race (a visit was claimed elsewhere), or an activePeriodKey
+  // race (a flat period was billed elsewhere). Drop the contested lines (and a
+  // flat charge's orphaned detail) and retry — never double-bills.
   let lines = drafts
   for (let attempt = 0; attempt < 5; attempt++) {
     const subtotal = lines.reduce((acc, l) => acc.plus(l.amount), ZERO)
@@ -169,7 +265,9 @@ export async function generateInvoice(
           lines: {
             create: lines.map((l) => ({
               jobId: l.jobId,
-              activeJobId: l.jobId,
+              activeJobId: l.activeJobId,
+              activePeriodKey: l.activePeriodKey,
+              billable: l.billable,
               description: l.description,
               siteName: l.siteName,
               serviceDate: l.serviceDate,
@@ -191,19 +289,30 @@ export async function generateInvoice(
       }
     } catch (e) {
       if (!isUniqueViolation(e)) throw e
-      // Drop any job that got claimed by another non-VOID invoice, then retry.
-      const jobIds = lines.map((l) => l.jobId)
-      const taken = await db.invoiceLine.findMany({
-        where: { activeJobId: { in: jobIds } },
-        select: { activeJobId: true },
-      })
-      const takenSet = new Set(taken.map((t) => t.activeJobId))
-      if (takenSet.size > 0) {
+      const jobIds = lines.map((l) => l.activeJobId).filter((x): x is string => !!x)
+      const periodKeys = lines.map((l) => l.activePeriodKey).filter((x): x is string => !!x)
+      const [takenJobs, takenPeriods] = await Promise.all([
+        jobIds.length ? db.invoiceLine.findMany({ where: { activeJobId: { in: jobIds } }, select: { activeJobId: true } }) : Promise.resolve([]),
+        periodKeys.length ? db.invoiceLine.findMany({ where: { activePeriodKey: { in: periodKeys } }, select: { activePeriodKey: true } }) : Promise.resolve([]),
+      ])
+      const takenJobSet = new Set(takenJobs.map((t) => t.activeJobId))
+      const takenPeriodSet = new Set(takenPeriods.map((t) => t.activePeriodKey))
+      if (takenJobSet.size > 0 || takenPeriodSet.size > 0) {
         for (const l of lines) {
-          if (takenSet.has(l.jobId)) excluded.push({ jobId: l.jobId, title: l.description, reason: "Already invoiced" })
+          if (l.billable && l.activeJobId && takenJobSet.has(l.activeJobId)) excluded.push({ jobId: l.activeJobId, title: l.description, reason: "Already invoiced" })
+          if (l.activePeriodKey && takenPeriodSet.has(l.activePeriodKey)) excluded.push({ jobId: l.activePeriodKey, title: l.description, reason: "Period already invoiced" })
         }
-        lines = lines.filter((l) => !takenSet.has(l.jobId))
-        if (lines.length === 0) return { created: false, reason: "All jobs were already invoiced", excluded }
+        // Drop contested period charges and contested visit claims.
+        const droppedPeriods = new Set(lines.filter((l) => l.activePeriodKey && takenPeriodSet.has(l.activePeriodKey)).map((l) => l.activePeriodKey))
+        lines = lines.filter((l) => {
+          if (l.activePeriodKey && takenPeriodSet.has(l.activePeriodKey)) return false
+          if (l.activeJobId && takenJobSet.has(l.activeJobId)) return false
+          return true
+        })
+        // A dropped flat charge may leave detail lines whose period is gone —
+        // they're harmless (amount 0, still claim the visit), so keep them.
+        void droppedPeriods
+        if (!hasBillable(lines)) return { created: false, reason: "Everything was already invoiced", excluded }
       }
       // else: pure invoiceNumber race — loop retries with a fresh number.
     }
@@ -261,10 +370,11 @@ export async function setInvoiceStatus(orgId: string, id: string, status: Extrac
     throw new ConflictError(`Cannot move an invoice from ${invoice.status} to ${status}`)
   }
   if (status === "VOID") {
-    // Release the jobs so they can be re-invoiced (activeJobId → NULL), atomically.
+    // Release the claims so visits and flat periods can be re-invoiced
+    // (activeJobId / activePeriodKey → NULL), atomically.
     await db.$transaction([
       db.invoice.updateMany({ where: { id }, data: { status } }),
-      db.invoiceLine.updateMany({ where: { invoiceId: id }, data: { activeJobId: null } }),
+      db.invoiceLine.updateMany({ where: { invoiceId: id }, data: { activeJobId: null, activePeriodKey: null } }),
     ])
   } else {
     await db.invoice.updateMany({ where: { id }, data: { status } })

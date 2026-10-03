@@ -121,18 +121,35 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {invoice.lines.map((l) => (
-              <tr key={l.id}>
-                <td className="py-3">
-                  <div className="text-slate-800">{l.description}</div>
-                  {l.siteName ? <div className="text-xs text-slate-400">{l.siteName}</div> : null}
-                </td>
-                <td className="py-3 text-slate-500">{fmtDate(l.serviceDate)}</td>
-                <td className="py-3 text-right tabular-nums text-slate-600">{Number(l.quantity)}</td>
-                <td className="py-3 text-right tabular-nums text-slate-600">{formatMoney(l.unitRate, cur)}</td>
-                <td className="py-3 text-right tabular-nums text-slate-800">{formatMoney(l.amount, cur)}</td>
-              </tr>
-            ))}
+            {invoice.lines.map((l) =>
+              l.billable ? (
+                <tr key={l.id}>
+                  <td className="py-3">
+                    <div className="text-slate-800">{l.description}</div>
+                    {l.siteName ? <div className="text-xs text-slate-400">{l.siteName}</div> : null}
+                  </td>
+                  <td className="py-3 text-slate-500">{fmtDate(l.serviceDate)}</td>
+                  <td className="py-3 text-right tabular-nums text-slate-600">{Number(l.quantity)}</td>
+                  <td className="py-3 text-right tabular-nums text-slate-600">{formatMoney(l.unitRate, cur)}</td>
+                  <td className="py-3 text-right tabular-nums text-slate-800">{formatMoney(l.amount, cur)}</td>
+                </tr>
+              ) : (
+                // Non-billable "covered service" detail under a flat-period charge.
+                <tr key={l.id} className="text-slate-500">
+                  <td className="py-2 pl-4">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-slate-400">↳</span>
+                      <span>{l.description}</span>
+                      {l.siteName ? <span className="text-slate-400">· {l.siteName}</span> : null}
+                    </div>
+                  </td>
+                  <td className="py-2 text-xs text-slate-400">{fmtDate(l.serviceDate)}</td>
+                  <td className="py-2" />
+                  <td className="py-2" />
+                  <td className="py-2 text-right text-xs text-slate-400">included</td>
+                </tr>
+              ),
+            )}
           </tbody>
         </table>
 

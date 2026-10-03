@@ -184,6 +184,24 @@ enum BillingType {
   @@schema("cleaning")
 }
 
+// How a service plan's work is invoiced (Phase 9). PER_JOB = bill each completed
+// visit (the existing behavior). FLAT_PERIOD = one flat charge per billing
+// period regardless of visit count, listing the covered visits as detail.
+enum BillingMode {
+  PER_JOB
+  FLAT_PERIOD
+
+  @@schema("cleaning")
+}
+
+// Cadence of a flat-period charge (Phase 9).
+enum PeriodFrequency {
+  MONTHLY
+  QUARTERLY
+
+  @@schema("cleaning")
+}
+
 enum PaymentTerms {
   DUE_ON_RECEIPT
   NET_15
@@ -455,6 +473,11 @@ model ServicePlan {
   billingType        BillingType      @default(FLAT_PER_JOB)
   rate               Decimal?         @db.Decimal(12, 2)
   currency           String           @default("USD")
+  // Period-based billing (Phase 9). FLAT_PERIOD bills periodAmount every
+  // periodFrequency regardless of visit count; billingType/rate are ignored then.
+  billingMode        BillingMode      @default(PER_JOB)
+  periodAmount       Decimal?         @db.Decimal(12, 2)
+  periodFrequency    PeriodFrequency?
   contractId         String? // OPTIONAL link to a commercial contract (Phase 8)
   isActive           Boolean          @default(true)
   createdAt          DateTime         @default(now())
@@ -908,6 +931,13 @@ model InvoiceLine {
   // when the invoice is voided — so a job appears on at most one non-VOID
   // invoice, but can be re-invoiced after a void. DB-enforced by @unique.
   activeJobId String? @unique
+  // Flat-period idempotency guard (Phase 9): "<planId>:<periodKey>" while the
+  // invoice is non-VOID, NULL when voided — so a plan-period is billed on at
+  // most one non-VOID invoice. Mirrors activeJobId.
+  activePeriodKey String? @unique
+  // False for the non-billable "covered service" detail lines listed under a
+  // flat-period charge (amount 0). Billable lines sum to the invoice total.
+  billable    Boolean @default(true)
   // Snapshotted at generation — never re-derived from the plan/site/job.
   description String
   siteName    String?

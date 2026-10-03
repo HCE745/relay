@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import { Modal } from "@/components/ui/modal"
 import { Button, Card, Field, Input, Select, StatusPill, EmptyState } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
-import { SERVICE_FREQUENCIES } from "@/lib/zod-schemas"
+import { SERVICE_FREQUENCIES, PERIOD_FREQUENCIES } from "@/lib/zod-schemas"
+import { useCanUse } from "@/lib/entitlements"
 
 export type PlanValue = {
   id: string
@@ -22,6 +23,9 @@ export type PlanValue = {
   billingType: string
   rate: string | null
   currency: string
+  billingMode: string
+  periodAmount: string | null
+  periodFrequency: string | null
 }
 type TemplateOption = { id: string; name: string }
 
@@ -35,12 +39,26 @@ const FREQ_LABEL: Record<string, string> = {
 }
 
 const BILLING_LABEL: Record<string, string> = { FLAT_PER_JOB: "Flat per job", HOURLY: "Hourly" }
+const PERIOD_LABEL: Record<string, string> = { MONTHLY: "Monthly", QUARTERLY: "Quarterly" }
+const PERIOD_SUFFIX: Record<string, string> = { MONTHLY: "/mo", QUARTERLY: "/qtr" }
+
+function fmtAmount(raw: string | null): string {
+  if (!raw) return "no rate set"
+  const n = Number(raw)
+  return Number.isFinite(n) ? `$${n.toFixed(2)}` : `$${raw}`
+}
 
 function billingSummary(p: PlanValue): string {
+  if (p.billingMode === "FLAT_PERIOD") {
+    const freq = p.periodFrequency ?? "MONTHLY"
+    return p.periodAmount ? `${fmtAmount(p.periodAmount)}${PERIOD_SUFFIX[freq] ?? ""} (flat)` : "no period amount set"
+  }
   if (!p.rate) return "no rate set"
-  const n = Number(p.rate)
-  const amount = Number.isFinite(n) ? `$${n.toFixed(2)}` : `$${p.rate}`
-  return p.billingType === "HOURLY" ? `${amount}/hr` : `${amount}/job`
+  return p.billingType === "HOURLY" ? `${fmtAmount(p.rate)}/hr` : `${fmtAmount(p.rate)}/job`
+}
+
+function billingModeLabel(p: PlanValue): string {
+  return p.billingMode === "FLAT_PERIOD" ? "Flat period" : BILLING_LABEL[p.billingType] ?? p.billingType
 }
 
 const toDateInput = (d: string | Date | null): string => {
@@ -61,6 +79,8 @@ function PlanForm({
   onDone: () => void
 }) {
   const router = useRouter()
+  const canUse = useCanUse()
+  const canPeriod = canUse("billing.periodInvoicing")
   const [v, setV] = useState({
     name: initial?.name ?? "",
     frequency: initial?.frequency ?? "WEEKLY",
@@ -74,6 +94,9 @@ function PlanForm({
     billingType: initial?.billingType ?? "FLAT_PER_JOB",
     rate: initial?.rate ?? "",
     currency: initial?.currency ?? "USD",
+    billingMode: initial?.billingMode ?? "PER_JOB",
+    periodAmount: initial?.periodAmount ?? "",
+    periodFrequency: initial?.periodFrequency ?? "MONTHLY",
   })
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -96,9 +119,16 @@ function PlanForm({
     if (v.startDate) payload.startDate = v.startDate
     if (v.endDate) payload.endDate = v.endDate
     if (v.frequency === "CUSTOM" && v.rrule) payload.rrule = v.rrule
-    payload.billingType = v.billingType
     payload.currency = v.currency || "USD"
-    if (v.rate.trim()) payload.rate = v.rate.trim()
+    const mode = canPeriod ? v.billingMode : "PER_JOB"
+    payload.billingMode = mode
+    if (mode === "FLAT_PERIOD") {
+      if (v.periodAmount.trim()) payload.periodAmount = v.periodAmount.trim()
+      payload.periodFrequency = v.periodFrequency
+    } else {
+      payload.billingType = v.billingType
+      if (v.rate.trim()) payload.rate = v.rate.trim()
+    }
 
     const res = initial
       ? await apiSend(`/api/service-plans/${initial.id}`, "PATCH", payload)
@@ -159,20 +189,46 @@ function PlanForm({
           ))}
         </Select>
       </Field>
-      <div className="grid grid-cols-3 gap-4">
-        <Field label="Billing" htmlFor="p-billtype">
-          <Select id="p-billtype" value={v.billingType} onChange={set("billingType")}>
-            <option value="FLAT_PER_JOB">Flat per job</option>
-            <option value="HOURLY">Hourly</option>
+      {canPeriod ? (
+        <Field label="Billing mode" htmlFor="p-billmode" hint="Flat period bills a fixed amount each period regardless of visit count">
+          <Select id="p-billmode" value={v.billingMode} onChange={set("billingMode")}>
+            <option value="PER_JOB">Per job / visit</option>
+            <option value="FLAT_PERIOD">Flat period (recurring)</option>
           </Select>
         </Field>
-        <Field label={v.billingType === "HOURLY" ? "Rate / hour" : "Rate / job"} htmlFor="p-rate" hint="e.g. 120 or 120.50">
-          <Input id="p-rate" inputMode="decimal" value={v.rate} onChange={set("rate")} placeholder="0.00" />
-        </Field>
-        <Field label="Currency" htmlFor="p-cur">
-          <Input id="p-cur" value={v.currency} onChange={set("currency")} maxLength={3} />
-        </Field>
-      </div>
+      ) : null}
+      {canPeriod && v.billingMode === "FLAT_PERIOD" ? (
+        <div className="grid grid-cols-3 gap-4">
+          <Field label="Period frequency" htmlFor="p-perfreq">
+            <Select id="p-perfreq" value={v.periodFrequency} onChange={set("periodFrequency")}>
+              {PERIOD_FREQUENCIES.map((f) => (
+                <option key={f} value={f}>{PERIOD_LABEL[f]}</option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Amount / period" htmlFor="p-peramt" hint="e.g. 2000">
+            <Input id="p-peramt" inputMode="decimal" value={v.periodAmount} onChange={set("periodAmount")} placeholder="0.00" />
+          </Field>
+          <Field label="Currency" htmlFor="p-cur">
+            <Input id="p-cur" value={v.currency} onChange={set("currency")} maxLength={3} />
+          </Field>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          <Field label="Billing" htmlFor="p-billtype">
+            <Select id="p-billtype" value={v.billingType} onChange={set("billingType")}>
+              <option value="FLAT_PER_JOB">Flat per job</option>
+              <option value="HOURLY">Hourly</option>
+            </Select>
+          </Field>
+          <Field label={v.billingType === "HOURLY" ? "Rate / hour" : "Rate / job"} htmlFor="p-rate" hint="e.g. 120 or 120.50">
+            <Input id="p-rate" inputMode="decimal" value={v.rate} onChange={set("rate")} placeholder="0.00" />
+          </Field>
+          <Field label="Currency" htmlFor="p-cur2">
+            <Input id="p-cur2" value={v.currency} onChange={set("currency")} maxLength={3} />
+          </Field>
+        </div>
+      )}
       {error ? <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>
@@ -270,7 +326,7 @@ export function ServicePlansSection({
                   {FREQ_LABEL[p.frequency] ?? p.frequency} at {p.startTime ?? "09:00"} · crew of {p.crewSize}
                   {p.checklistTemplate ? ` · ${p.checklistTemplate.name} (v${p.checklistTemplate.version})` : " · no checklist"}
                   {" · "}
-                  {BILLING_LABEL[p.billingType] ?? p.billingType} · {billingSummary(p)}
+                  {billingModeLabel(p)} · {billingSummary(p)}
                 </div>
               </div>
               <div className="flex gap-1">

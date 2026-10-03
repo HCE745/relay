@@ -121,23 +121,38 @@ const timeString = z.string().regex(/^\d{1,2}:\d{2}$/, "Use HH:mm")
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD")
 
 export const BILLING_TYPES = ["FLAT_PER_JOB", "HOURLY"] as const
+export const BILLING_MODES = ["PER_JOB", "FLAT_PERIOD"] as const
+export const PERIOD_FREQUENCIES = ["MONTHLY", "QUARTERLY"] as const
 
-export const servicePlanCreateSchema = z.object({
-  serviceLocationId: z.string().min(1),
-  name: z.string().trim().min(1, "Service plan name is required").max(200),
-  frequency: z.enum(SERVICE_FREQUENCIES).default("WEEKLY"),
-  rrule: optionalString,
-  startTime: timeString.optional(),
-  crewSize: z.coerce.number().int().min(1).max(100).default(1),
-  defaultDurationMin: z.coerce.number().int().min(1).max(1440).optional(),
-  checklistTemplateId: z.string().min(1).optional(),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
-  billingType: z.enum(BILLING_TYPES).optional(),
-  rate: optionalMoney,
-  currency: z.string().trim().length(3).toUpperCase().optional(),
-})
+export const servicePlanCreateSchema = z
+  .object({
+    serviceLocationId: z.string().min(1),
+    name: z.string().trim().min(1, "Service plan name is required").max(200),
+    frequency: z.enum(SERVICE_FREQUENCIES).default("WEEKLY"),
+    rrule: optionalString,
+    startTime: timeString.optional(),
+    crewSize: z.coerce.number().int().min(1).max(100).default(1),
+    defaultDurationMin: z.coerce.number().int().min(1).max(1440).optional(),
+    checklistTemplateId: z.string().min(1).optional(),
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+    billingType: z.enum(BILLING_TYPES).optional(),
+    rate: optionalMoney,
+    currency: z.string().trim().length(3).toUpperCase().optional(),
+    billingMode: z.enum(BILLING_MODES).optional(),
+    periodAmount: optionalMoney,
+    periodFrequency: z.enum(PERIOD_FREQUENCIES).optional(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.billingMode === "FLAT_PERIOD") {
+      if (v.periodAmount == null)
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["periodAmount"], message: "A period amount is required for flat-period billing" })
+      if (v.periodFrequency == null)
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["periodFrequency"], message: "A billing frequency is required for flat-period billing" })
+    }
+  })
 export const servicePlanUpdateSchema = servicePlanCreateSchema
+  .innerType()
   .omit({ serviceLocationId: true })
   .partial()
   .extend({ isActive: z.boolean().optional() })

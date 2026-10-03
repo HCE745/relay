@@ -27,6 +27,7 @@ export const CAPABILITIES = [
   "operations.correctiveActions",
   "workforce.payrollExport", // export/integration only — never payroll processing
   "billing.invoicing", // invoices, payments, AR
+  "billing.periodInvoicing", // flat-period (recurring) invoicing + auto-draft cron
   "billing.arAging", // accounts-receivable aging report
   "reporting.profitability", // site/customer/plan margin (pay-rate-derived)
   "crm.estimates", // leads, estimates, estimate→customer conversion

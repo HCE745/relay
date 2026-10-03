@@ -125,6 +125,9 @@ export default async function SiteDetailPage({
           billingType: p.billingType,
           rate: p.rate ? p.rate.toString() : null,
           currency: p.currency,
+          billingMode: p.billingMode,
+          periodAmount: p.periodAmount ? p.periodAmount.toString() : null,
+          periodFrequency: p.periodFrequency,
         }))}
         templates={templates.filter((t) => t.isActive).map((t) => ({ id: t.id, name: t.name }))}
       />

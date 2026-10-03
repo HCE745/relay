@@ -1219,6 +1219,9 @@ model SupplyUsage {
   organizationId    String
   supplyId          String
   quantity          Decimal  @db.Decimal(12, 2)
+  // Cost per unit SNAPSHOTTED at the time of use (Phase 12) — never re-derived
+  // from the supply's current cost. Line cost = quantity × costPerUnit.
+  costPerUnit       Decimal? @db.Decimal(12, 2)
   jobId             String?
   serviceLocationId String?
   recordedById      String

@@ -51,30 +51,40 @@ function jobLabor(entries: ApprovedEntry[]): { known: boolean; labor: Money; sal
   return { known, labor, salaried }
 }
 
-type Row = { id: string; name: string; detail?: string; revenue: Money; laborCost: Money; jobs: number }
+type Row = { id: string; name: string; detail?: string; revenue: Money; laborCost: Money; suppliesCost: Money; jobs: number }
 export type ProfitRow = {
   id: string
   name: string
   detail?: string
   revenue: Money
   laborCost: Money
+  suppliesCost: Money
   margin: Money
   marginPct: number | null
   jobs: number
 }
 
-function upsert(map: Map<string, Row>, id: string, name: string, detail: string | undefined, billed: Money, labor: Money) {
-  const row = map.get(id) ?? { id, name, detail, revenue: ZERO, laborCost: ZERO, jobs: 0 }
+function upsert(map: Map<string, Row>, id: string, name: string, detail: string | undefined, billed: Money, labor: Money, supplies: Money) {
+  const row = map.get(id) ?? { id, name, detail, revenue: ZERO, laborCost: ZERO, suppliesCost: ZERO, jobs: 0 }
   row.revenue = row.revenue.plus(billed)
   row.laborCost = row.laborCost.plus(labor)
+  row.suppliesCost = row.suppliesCost.plus(supplies)
   row.jobs += 1
   map.set(id, row)
 }
 
 function finalize(map: Map<string, Row>): ProfitRow[] {
   return [...map.values()]
-    .map((r) => ({ ...r, margin: r.revenue.minus(r.laborCost), marginPct: marginPct(r.revenue, r.laborCost) }))
+    .map((r) => {
+      const cost = r.laborCost.plus(r.suppliesCost)
+      return { ...r, margin: r.revenue.minus(cost), marginPct: marginPct(r.revenue, cost) }
+    })
     .sort((a, b) => Number(b.revenue.minus(a.revenue))) // biggest accounts first
+}
+
+/** Sum a job's allocated supply cost from snapshotted usage (Phase 12). */
+function jobSupplies(usages: { quantity: Money; costPerUnit: Money | null }[]): Money {
+  return usages.reduce((a, u) => (u.costPerUnit ? a.plus(u.quantity.times(u.costPerUnit)) : a), ZERO)
 }
 
 export type Profitability = {
@@ -112,6 +122,7 @@ export async function getProfitability(
         },
       },
       invoiceLines: { where: { activeJobId: { not: null } }, select: { amount: true } },
+      supplyUsages: { select: { quantity: true, costPerUnit: true } },
     },
   })
 
@@ -127,15 +138,16 @@ export async function getProfitability(
     const billed = job.invoiceLines.reduce((a, l) => a.plus(l.amount), ZERO)
     const invoiced = job.invoiceLines.length > 0
     const { known, labor } = jobLabor(job.timeEntries)
+    const supplies = jobSupplies(job.supplyUsages)
 
-    summaryInputs.push({ invoiced, laborKnown: known, billed, labor })
+    summaryInputs.push({ invoiced, laborKnown: known, billed, labor, supplies })
 
     // Rows include only jobs that count toward margin, so row sums match totals.
     if (countsTowardMargin({ invoiced, laborKnown: known }, includeUninvoiced)) {
       const site = job.serviceLocation
-      upsert(bySite, site.id, site.name, site.customer.name, billed, labor)
-      upsert(byCustomer, site.customer.id, site.customer.name, undefined, billed, labor)
-      upsert(byPlan, job.servicePlan?.id ?? "__none__", job.servicePlan?.name ?? "One-off / no plan", undefined, billed, labor)
+      upsert(bySite, site.id, site.name, site.customer.name, billed, labor, supplies)
+      upsert(byCustomer, site.customer.id, site.customer.name, undefined, billed, labor, supplies)
+      upsert(byPlan, job.servicePlan?.id ?? "__none__", job.servicePlan?.name ?? "One-off / no plan", undefined, billed, labor, supplies)
     }
   }
 
@@ -165,6 +177,7 @@ export async function getJobProfitability(orgId: string, jobId: string) {
         },
       },
       invoiceLines: { where: { activeJobId: { not: null } }, select: { amount: true } },
+      supplyUsages: { select: { quantity: true, costPerUnit: true } },
     },
   })
   if (!job) return null
@@ -172,6 +185,8 @@ export async function getJobProfitability(orgId: string, jobId: string) {
   const billedAmount = job.invoiceLines.reduce((a, l) => a.plus(l.amount), ZERO)
   const invoiced = job.invoiceLines.length > 0
   const { known, labor, salaried } = jobLabor(job.timeEntries)
+  const supplies = jobSupplies(job.supplyUsages)
+  const totalCost = labor.plus(supplies)
 
   return {
     billedAmount,
@@ -179,9 +194,49 @@ export async function getJobProfitability(orgId: string, jobId: string) {
     laborAvailable: known,
     salaried,
     laborCost: known ? labor : null,
+    suppliesCost: supplies,
     // Margin only when we have both real revenue and a known labor cost.
-    grossMargin: known && invoiced ? billedAmount.minus(labor) : null,
-    marginPct: known && invoiced ? marginPct(billedAmount, labor) : null,
+    grossMargin: known && invoiced ? billedAmount.minus(totalCost) : null,
+    marginPct: known && invoiced ? marginPct(billedAmount, totalCost) : null,
     approvedEntries: job.timeEntries.length,
   }
+}
+
+/**
+ * Supply spend by site (Phase 12): total allocated supply cost per site in a
+ * period, from snapshotted usage. Independent of invoicing — shows where
+ * consumables actually go. Rides reporting.profitability.
+ */
+export async function getSupplySpendBySite(orgId: string, input: { periodStart: string; periodEnd: string }) {
+  const db = orgDb(orgId)
+  const start = startOfUtcDay(input.periodStart)
+  const end = endOfUtcDay(input.periodEnd)
+  // Spend is dated by the job's service date when the usage is tied to a job,
+  // else by when it was recorded — matching how profitability dates work.
+  const usages = await db.supplyUsage.findMany({
+    where: {
+      costPerUnit: { not: null },
+      OR: [{ job: { scheduledStart: { gte: start, lte: end } } }, { jobId: null, createdAt: { gte: start, lte: end } }],
+    },
+    select: {
+      quantity: true,
+      costPerUnit: true,
+      job: { select: { serviceLocation: { select: { id: true, name: true, customer: { select: { name: true } } } } } },
+      serviceLocation: { select: { id: true, name: true, customer: { select: { name: true } } } },
+    },
+  })
+  const map = new Map<string, { id: string; name: string; detail?: string; cost: Money; items: number }>()
+  let total = ZERO
+  for (const u of usages) {
+    const line = u.costPerUnit ? u.quantity.times(u.costPerUnit) : ZERO
+    total = total.plus(line)
+    const site = u.job?.serviceLocation ?? u.serviceLocation
+    const id = site?.id ?? "__none__"
+    const row = map.get(id) ?? { id, name: site?.name ?? "No site", detail: site?.customer?.name, cost: ZERO, items: 0 }
+    row.cost = row.cost.plus(line)
+    row.items += 1
+    map.set(id, row)
+  }
+  const rows = [...map.values()].sort((a, b) => Number(b.cost.minus(a.cost)))
+  return { rows, total }
 }

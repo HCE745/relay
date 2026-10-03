@@ -57,6 +57,7 @@ export default async function ProfitabilityPage({
               <th className="px-4 py-2.5 text-right font-medium">Jobs</th>
               <th className="px-4 py-2.5 text-right font-medium">Revenue</th>
               <th className="px-4 py-2.5 text-right font-medium">Labor cost</th>
+              <th className="px-4 py-2.5 text-right font-medium">Supplies</th>
               <th className="px-4 py-2.5 text-right font-medium">Margin</th>
               <th className="px-4 py-2.5 text-right font-medium">Margin %</th>
             </tr>
@@ -73,6 +74,7 @@ export default async function ProfitabilityPage({
                   <td className="px-4 py-3 text-right tabular-nums text-slate-600">{r.jobs}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-slate-700">{formatMoney(r.revenue)}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-slate-700">{formatMoney(r.laborCost)}</td>
+                  <td className="px-4 py-3 text-right tabular-nums text-slate-700">{formatMoney(r.suppliesCost)}</td>
                   <td className={`px-4 py-3 text-right tabular-nums font-medium ${Number(r.margin) < 0 ? "text-red-700" : "text-slate-900"}`}>
                     {formatMoney(r.margin)}
                   </td>
@@ -123,6 +125,7 @@ export default async function ProfitabilityPage({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryTile label={`Revenue${includeUninvoiced ? "" : " (invoiced)"}`} value={formatMoney(summary.revenue)} />
         <SummaryTile label="Labor cost" value={formatMoney(summary.laborCost)} />
+        <SummaryTile label="Supplies" value={formatMoney(summary.suppliesCost)} />
         <SummaryTile label="Gross margin" value={formatMoney(summary.margin)} accent={Number(summary.margin) < 0} />
         <SummaryTile label="Margin %" value={pctText(summary.marginPct)} accent={summary.marginPct !== null && summary.marginPct < below} />
       </div>

@@ -111,6 +111,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           <div className="grid gap-4 sm:grid-cols-4">
             <Detail label="Billed" value={profit.invoiced ? formatMoney(profit.billedAmount) : "—"} />
             <Detail label="Labor cost" value={profit.laborCost === null ? "Unavailable" : formatMoney(profit.laborCost)} />
+            <Detail label="Supplies" value={formatMoney(profit.suppliesCost)} />
             <Detail label="Gross margin" value={profit.grossMargin === null ? "—" : formatMoney(profit.grossMargin)} />
             <Detail label="Margin %" value={profit.marginPct === null ? "—" : `${profit.marginPct.toFixed(1)}%`} />
           </div>

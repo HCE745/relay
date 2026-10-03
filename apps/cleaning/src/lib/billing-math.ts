@@ -108,11 +108,13 @@ export function marginPct(revenue: Money, cost: Money): number | null {
 // One completed job's inputs to a margin aggregate.
 //  - laborKnown = false when any of its approved time is salaried/unpriceable
 //  - invoiced   = it has a non-void invoice line (i.e. real revenue)
-export type JobMarginInput = { invoiced: boolean; laborKnown: boolean; billed: Money; labor: Money }
+//  - supplies   = allocated supply cost (Phase 12); optional, defaults to 0
+export type JobMarginInput = { invoiced: boolean; laborKnown: boolean; billed: Money; labor: Money; supplies?: Money }
 
 export type MarginSummary = {
   revenue: Money
   laborCost: Money
+  suppliesCost: Money
   margin: Money
   marginPct: number | null
   jobs: number
@@ -131,6 +133,7 @@ export type MarginSummary = {
 export function summarizeMargin(jobs: JobMarginInput[], includeUninvoiced: boolean): MarginSummary {
   let revenue = ZERO
   let laborCost = ZERO
+  let suppliesCost = ZERO
   let counted = 0
   let uninvoicedLabor = ZERO
   let uninvoicedJobs = 0
@@ -148,15 +151,18 @@ export function summarizeMargin(jobs: JobMarginInput[], includeUninvoiced: boole
     if (j.invoiced || includeUninvoiced) {
       revenue = revenue.plus(j.billed)
       laborCost = laborCost.plus(j.labor)
+      suppliesCost = suppliesCost.plus(j.supplies ?? ZERO)
       counted += 1
     }
   }
 
+  const totalCost = laborCost.plus(suppliesCost)
   return {
     revenue,
     laborCost,
-    margin: revenue.minus(laborCost),
-    marginPct: marginPct(revenue, laborCost),
+    suppliesCost,
+    margin: revenue.minus(totalCost),
+    marginPct: marginPct(revenue, totalCost),
     jobs: counted,
     uninvoicedLabor,
     uninvoicedJobs,

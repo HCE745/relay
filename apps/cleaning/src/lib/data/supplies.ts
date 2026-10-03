@@ -100,7 +100,7 @@ export async function recordSupplyUsage(
     select: { id: true, serviceLocationId: true },
   })
   if (!job) return null // not assigned / not found
-  const supply = await db.supply.findFirst({ where: { id: input.supplyId }, select: { id: true, currentStock: true } })
+  const supply = await db.supply.findFirst({ where: { id: input.supplyId }, select: { id: true, currentStock: true, costPerUnit: true } })
   assertFound(supply, "Supply")
 
   const qty = new Prisma.Decimal(input.quantity)
@@ -108,7 +108,9 @@ export async function recordSupplyUsage(
   const clamped = next.lessThan(ZERO) ? ZERO : next
   await db.$transaction([
     db.supplyUsage.create({
-      data: { organizationId: orgId, supplyId: input.supplyId, quantity: qty, jobId, serviceLocationId: job.serviceLocationId, recordedById: userId },
+      // Snapshot the supply's current cost so allocation never shifts when the
+      // supply is later re-priced (Phase 12).
+      data: { organizationId: orgId, supplyId: input.supplyId, quantity: qty, costPerUnit: supply!.costPerUnit, jobId, serviceLocationId: job.serviceLocationId, recordedById: userId },
     }),
     db.supply.updateMany({ where: { id: input.supplyId }, data: { currentStock: clamped } }),
   ])

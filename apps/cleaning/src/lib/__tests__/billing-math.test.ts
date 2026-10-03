@@ -146,6 +146,21 @@ describe("summarizeMargin — uninvoiced excluded by default; salaried excluded 
     expect(s.unavailableJobs).toBe(1) // salaried job excluded
   })
 
+  it("subtracts allocated supply cost from margin (Phase 12)", () => {
+    const withSupplies = { invoiced: true, laborKnown: true, billed: dec("200"), labor: dec("45"), supplies: dec("15") }
+    const s = summarizeMargin([withSupplies], false)
+    expect(s.laborCost.toFixed(2)).toBe("45.00")
+    expect(s.suppliesCost.toFixed(2)).toBe("15.00")
+    expect(s.margin.toFixed(2)).toBe("140.00") // 200 - 45 - 15
+    expect(s.marginPct).toBe(70) // 140/200
+  })
+
+  it("treats missing supplies as zero (back-compat)", () => {
+    const s = summarizeMargin([{ invoiced: true, laborKnown: true, billed: dec("100"), labor: dec("40") }], false)
+    expect(s.suppliesCost.toFixed(2)).toBe("0.00")
+    expect(s.margin.toFixed(2)).toBe("60.00")
+  })
+
   it("include-uninvoiced folds unbilled work in (opt-in), still excludes salaried", () => {
     const s = summarizeMargin([billed, uninvoiced, salaried], true)
     expect(s.revenue.toFixed(2)).toBe("200.00") // uninvoiced adds $0 revenue

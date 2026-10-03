@@ -202,6 +202,22 @@ enum PeriodFrequency {
   @@schema("cleaning")
 }
 
+// Shift coverage (Phase 11).
+enum AvailabilitySource {
+  MANAGER // a manager marked the cleaner unavailable
+  TIME_OFF // created from an approved time-off request
+
+  @@schema("cleaning")
+}
+
+enum TimeOffStatus {
+  PENDING
+  APPROVED
+  DENIED
+
+  @@schema("cleaning")
+}
+
 enum PaymentTerms {
   DUE_ON_RECEIPT
   NET_15
@@ -261,6 +277,8 @@ model Organization {
   supplyUsages        SupplyUsage[]
   contracts           Contract[]
   productionRates     ProductionRate[]
+  availabilities      Availability[]
+  timeOffRequests     TimeOffRequest[]
 
   @@schema("cleaning")
 }
@@ -298,6 +316,8 @@ model User {
   recordedSupplyUsages SupplyUsage[]      @relation("SupplyUsageRecorder")
   supplyAdjustments    SupplyAdjustment[] @relation("SupplyAdjuster")
   passwordResetTokens PasswordResetToken[]
+  availabilities       Availability[]     @relation("UserAvailability")
+  timeOffRequests      TimeOffRequest[]   @relation("UserTimeOff")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -1062,6 +1082,51 @@ model EstimateLine {
   estimate Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
 
   @@index([estimateId])
+  @@schema("cleaning")
+}
+
+// A window during which a cleaner is unavailable (Phase 11) — set by a manager
+// or created from an approved time-off request. Dates are inclusive.
+model Availability {
+  id             String             @id @default(cuid())
+  organizationId String
+  userId         String
+  startDate      DateTime
+  endDate        DateTime
+  reason         String?
+  source         AvailabilitySource @default(MANAGER)
+  createdById    String?
+  createdAt      DateTime           @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation("UserAvailability", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@schema("cleaning")
+}
+
+// A cleaner-initiated time-off request (Phase 11). On approval a manager creates
+// a matching Availability block.
+model TimeOffRequest {
+  id             String        @id @default(cuid())
+  organizationId String
+  userId         String
+  startDate      DateTime
+  endDate        DateTime
+  reason         String?
+  status         TimeOffStatus @default(PENDING)
+  reviewedById   String?
+  reviewedAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation("UserTimeOff", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([status])
   @@schema("cleaning")
 }
 

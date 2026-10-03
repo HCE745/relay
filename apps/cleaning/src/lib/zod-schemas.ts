@@ -414,6 +414,28 @@ export const estimateStatusSchema = z.object({ status: z.enum(ESTIMATE_STATUSES)
 // ─── Phase 8: contracts / service agreements ─────────────────────────────────
 
 export const CONTRACT_STATUSES = ["DRAFT", "ACTIVE", "EXPIRED", "CANCELLED"] as const
+// ─── Shift coverage (Phase 11) ───
+export const unavailabilityCreateSchema = z
+  .object({
+    userId: z.string().min(1),
+    startDate: dateString,
+    endDate: dateString,
+    reason: optionalString,
+  })
+  .refine((v) => v.endDate >= v.startDate, { path: ["endDate"], message: "End date must be on or after the start date" })
+
+export const timeOffRequestSchema = z
+  .object({
+    startDate: dateString,
+    endDate: dateString,
+    reason: optionalString,
+  })
+  .refine((v) => v.endDate >= v.startDate, { path: ["endDate"], message: "End date must be on or after the start date" })
+
+export const timeOffReviewSchema = z.object({ action: z.enum(["approve", "deny"]) })
+
+export const reassignSchema = z.object({ fromUserId: z.string().min(1).optional(), toUserId: z.string().min(1) })
+
 // ─── Bid calculator (Phase 10) ───
 export const productionRateCreateSchema = z.object({
   taskType: z.string().trim().min(1).max(100),

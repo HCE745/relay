@@ -9,6 +9,7 @@ import { countLowStock } from "@/lib/data/supplies"
 import { countOverdue } from "@/lib/data/invoices"
 import { countExpiring } from "@/lib/data/contracts"
 import { getContractExpiryLeadDays } from "@/lib/data/org"
+import { countUncoveredShifts } from "@/lib/data/coverage"
 import { getSetupProgress } from "@/lib/data/setup"
 import { isSetupGuideDismissed } from "@/lib/setup-actions"
 import { PageHeader } from "@/components/ui/placeholder"
@@ -70,6 +71,9 @@ export default async function DashboardPage() {
     if (await orgHasCapability(orgId, "crm.contracts")) {
       const leadDays = await getContractExpiryLeadDays(orgId)
       needsAttention.push({ label: "Contracts expiring", value: await countExpiring(orgId, leadDays), href: "/contracts?filter=expiring", alert: true })
+    }
+    if (await orgHasCapability(orgId, "workforce.coverage")) {
+      needsAttention.push({ label: "Uncovered shifts (48h)", value: await countUncoveredShifts(orgId, { hoursAhead: 48 }), href: "/coverage", alert: true })
     }
   }
   const overview: Tile[] = [

@@ -26,6 +26,7 @@ export const CAPABILITIES = [
   "operations.issues",
   "operations.correctiveActions",
   "workforce.payrollExport", // export/integration only — never payroll processing
+  "workforce.coverage", // shift coverage: availability, callouts, reassignment
   "billing.invoicing", // invoices, payments, AR
   "billing.periodInvoicing", // flat-period (recurring) invoicing + auto-draft cron
   "billing.arAging", // accounts-receivable aging report

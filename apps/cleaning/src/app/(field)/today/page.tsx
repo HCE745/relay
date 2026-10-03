@@ -5,6 +5,8 @@ import { getSession } from "@/lib/session"
 import { listCleanerDayJobs } from "@/lib/data/field"
 import { getOrgTimezone } from "@/lib/data/org"
 import { formatTimeInZone } from "@/lib/scheduling/time"
+import { orgHasCapability } from "@/lib/page-guards"
+import { TimeOffRequest } from "@/components/field/time-off-request"
 
 export const dynamic = "force-dynamic"
 
@@ -56,7 +58,10 @@ export default async function TodayPage() {
   const dayStart = now.startOf("day").toJSDate()
   const dayEnd = now.endOf("day").toJSDate()
 
-  const jobs = await listCleanerDayJobs(orgId, session.userId, dayStart, dayEnd)
+  const [jobs, canCoverage] = await Promise.all([
+    listCleanerDayJobs(orgId, session.userId, dayStart, dayEnd),
+    orgHasCapability(orgId, "workforce.coverage"),
+  ])
   const inProgress = jobs.filter((j) => j.status === "IN_PROGRESS")
   const completed = jobs.filter((j) => j.status === "COMPLETED")
   const upcoming = jobs.filter((j) => j.status === "SCHEDULED" || j.status === "ASSIGNED")
@@ -90,6 +95,8 @@ export default async function TodayPage() {
           <Section title="Completed today" list={completed} />
         </>
       )}
+
+      {canCoverage ? <TimeOffRequest /> : null}
     </div>
   )
 }

@@ -220,6 +220,23 @@ export const credentialUpdateSchema = credentialCreateSchema.omit({ userId: true
 
 export const siteRequirementsSchema = z.object({ types: z.array(z.enum(CREDENTIAL_TYPES)) })
 
+// ─── Key & access management (Phase 14) ───
+export const ACCESS_ITEM_TYPES = ["KEY", "FOB", "CODE", "BADGE", "ALARM_CODE"] as const
+export const accessItemCreateSchema = z.object({
+  serviceLocationId: z.string().min(1),
+  type: z.enum(ACCESS_ITEM_TYPES),
+  identifier: z.string().trim().min(1).max(200),
+  description: optionalString,
+  secret: z.string().trim().min(1).max(500).optional(), // only for CODE/ALARM_CODE
+})
+export const accessItemUpdateSchema = z.object({
+  identifier: z.string().trim().min(1).max(200).optional(),
+  description: optionalString,
+  secret: z.string().trim().min(1).max(500).optional(),
+})
+export const accessIssueSchema = z.object({ userId: z.string().min(1) })
+export const accessActionSchema = z.object({ action: z.enum(["issue", "return", "lost"]), userId: z.string().min(1).optional() })
+
 // Location is best-effort — clock-in/out succeeds even when it is absent.
 export const clockSchema = z.object({
   lat: z.coerce.number().min(-90).max(90).optional(),

@@ -238,6 +238,26 @@ enum CredentialStatus {
   @@schema("cleaning")
 }
 
+// Key & access management (Phase 14).
+enum AccessItemType {
+  KEY
+  FOB
+  CODE
+  BADGE
+  ALARM_CODE
+
+  @@schema("cleaning")
+}
+
+enum AccessItemStatus {
+  AVAILABLE
+  ISSUED
+  LOST
+  RETURNED
+
+  @@schema("cleaning")
+}
+
 enum PaymentTerms {
   DUE_ON_RECEIPT
   NET_15
@@ -305,6 +325,7 @@ model Organization {
   timeOffRequests     TimeOffRequest[]
   credentials         Credential[]
   siteCredentialRequirements SiteCredentialRequirement[]
+  accessItems         AccessItem[]
 
   @@schema("cleaning")
 }
@@ -345,6 +366,7 @@ model User {
   availabilities       Availability[]     @relation("UserAvailability")
   timeOffRequests      TimeOffRequest[]   @relation("UserTimeOff")
   credentials          Credential[]       @relation("UserCredential")
+  heldAccessItems      AccessItem[]       @relation("AccessHolder")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -461,6 +483,7 @@ model ServiceLocation {
   assets       Asset[]       @relation("AssetSite")
   supplyUsages SupplyUsage[] @relation("SupplyUsageSite")
   credentialRequirements SiteCredentialRequirement[]
+  accessItems  AccessItem[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -1155,6 +1178,33 @@ model TimeOffRequest {
   @@index([organizationId])
   @@index([userId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// A physical/logical access item for a site (Phase 14). The human `identifier`
+// is a non-secret label; CODE/ALARM_CODE secret values live ENCRYPTED in
+// `secretCiphertext` and are never returned in lists — revealed only on an
+// explicit, audited action by OWNER/ADMIN/MANAGER. Custody is `holderUserId`;
+// every transfer/reveal is logged to AuditEvent.
+model AccessItem {
+  id                String           @id @default(cuid())
+  organizationId    String
+  serviceLocationId String
+  type              AccessItemType
+  identifier        String
+  description       String?
+  status            AccessItemStatus @default(AVAILABLE)
+  holderUserId      String?
+  secretCiphertext  String? // AES-256-GCM blob for CODE/ALARM_CODE; never listed
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  holder          User?           @relation("AccessHolder", fields: [holderUserId], references: [id])
+
+  @@index([organizationId])
+  @@index([serviceLocationId])
   @@schema("cleaning")
 }
 

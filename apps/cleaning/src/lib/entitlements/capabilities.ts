@@ -25,6 +25,7 @@ export const CAPABILITIES = [
   "quality.inspections",
   "operations.issues",
   "operations.correctiveActions",
+  "operations.accessControl", // key & access management (encrypted codes)
   "workforce.payrollExport", // export/integration only — never payroll processing
   "workforce.coverage", // shift coverage: availability, callouts, reassignment
   "billing.invoicing", // invoices, payments, AR

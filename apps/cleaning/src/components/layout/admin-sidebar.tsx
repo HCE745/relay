@@ -22,6 +22,7 @@ const NAV_ICON: Record<string, (p: { className?: string }) => React.ReactNode> =
   time: ClockIcon,
   coverage: AlertTriangleIcon,
   compliance: ClipboardCheckIcon,
+  access: TagIcon,
   inspections: ClipboardCheckIcon,
   issues: AlertTriangleIcon,
   leads: SparklesIcon,

@@ -8,7 +8,7 @@
 // Usage: DATABASE_URL=... tsx scripts/verify-phase16-portal-security.ts
 
 import { systemDb } from "../src/lib/org-db"
-import { createPortalInvite, acceptPortalInvite, portalLogin, getPortalDashboard, reportPortalIssue, getPortalPhoto } from "../src/lib/data/portal"
+import { createPortalInvite, acceptPortalInvite, portalLogin, getPortalDashboard, reportPortalIssue, getPortalPhoto, getPortalInvoiceById, getPortalJobById, getPortalInspectionById } from "../src/lib/data/portal"
 
 let failures = 0
 function check(name: string, ok: boolean, detail = "") {
@@ -39,12 +39,12 @@ async function main() {
   const photoA = await systemDb.jobPhoto.create({ data: { organizationId: org.id, jobId: jobA.id, storageKey: "k/a.jpg", contentType: "image/jpeg", sizeBytes: 10, uploadedById: cleaner.id } })
   const photoB = await systemDb.jobPhoto.create({ data: { organizationId: org.id, jobId: jobB.id, storageKey: "k/b.jpg", contentType: "image/jpeg", sizeBytes: 10, uploadedById: cleaner.id } })
   await systemDb.inspection.create({ data: { organizationId: org.id, serviceLocationId: siteA.id, inspectorId: cleaner.id, templateName: "QC", passThreshold: 80, status: "FINALIZED", score: 92, outcome: "PASS", finalizedAt: new Date() } })
-  await systemDb.inspection.create({ data: { organizationId: org.id, serviceLocationId: siteB.id, inspectorId: cleaner.id, templateName: "QC", passThreshold: 80, status: "FINALIZED", score: 41, outcome: "FAIL", finalizedAt: new Date() } })
+  const inspB = await systemDb.inspection.create({ data: { organizationId: org.id, serviceLocationId: siteB.id, inspectorId: cleaner.id, templateName: "QC", passThreshold: 80, status: "FINALIZED", score: 41, outcome: "FAIL", finalizedAt: new Date() } })
   await systemDb.issue.create({ data: { organizationId: org.id, serviceLocationId: siteB.id, reportedById: mgr.id, description: "B SECRET issue", status: "OPEN" } })
   const mkInvoice = (customerId: string, num: number) =>
     systemDb.invoice.create({ data: { organizationId: org.id, customerId, invoiceNumber: num, status: "SENT", issueDate: new Date(), dueDate: new Date(), periodStart: new Date(), periodEnd: new Date(), subtotal: "100", total: "100" } })
   await mkInvoice(custA.id, 1)
-  await mkInvoice(custB.id, 2)
+  const invB = await mkInvoice(custB.id, 2)
 
   console.log("Invite → accept → login binds the user to exactly one customer:")
   const invite = await createPortalInvite(org.id, custA.id, `client-${stamp}@acme.co`, mgr.id, "https://app.test")
@@ -84,6 +84,16 @@ async function main() {
   check("CANNOT report an issue against another customer's site", crossErr !== null)
   const leaked = await systemDb.issue.findFirst({ where: { serviceLocationId: siteB.id, description: "hack" } })
   check("no cross-customer issue row was created", leaked === null)
+
+  console.log("DIRECT-BY-ID attack: as customer A, request B's records by their real IDs:")
+  // Sanity: B's rows really exist (valid ids), so a null below is isolation, not a bad id.
+  check("B's invoice/job/inspection/photo really exist at the org level", !!(await systemDb.invoice.findUnique({ where: { id: invB.id } })) && !!(await systemDb.job.findUnique({ where: { id: jobB.id } })) && !!(await systemDb.inspection.findUnique({ where: { id: inspB.id } })) && !!(await systemDb.jobPhoto.findUnique({ where: { id: photoB.id } })))
+  check("GET B's invoice by id as A → null (not a filtered object)", (await getPortalInvoiceById(org.id, custA.id, invB.id)) === null)
+  check("GET B's job by id as A → null", (await getPortalJobById(org.id, custA.id, jobB.id)) === null)
+  check("GET B's inspection by id as A → null", (await getPortalInspectionById(org.id, custA.id, inspB.id)) === null)
+  check("GET B's photo by id as A → null", (await getPortalPhoto(org.id, custA.id, photoB.id)) === null)
+  // And A's own records by id ARE retrievable (proves the by-id path works at all).
+  check("GET A's own invoice by id as A → returned", (await getPortalInvoiceById(org.id, custA.id, (await systemDb.invoice.findFirstOrThrow({ where: { customerId: custA.id } })).id)) !== null)
 
   console.log("Proof photos are isolated by customer:")
   check("own photo is retrievable", (await getPortalPhoto(org.id, custA.id, photoA.id)) !== null)

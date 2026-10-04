@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto"
 import bcrypt from "bcryptjs"
-import { orgDb, systemDb } from "../org-db"
+import { orgDb, customerDb, systemDb } from "../org-db"
 import { invoiceNo } from "../money"
 import { ReferenceError, ForbiddenActionError } from "./errors"
 import { Prisma } from "../../generated/prisma/client"
@@ -19,19 +19,20 @@ function balance(total: Prisma.Decimal, payments: { amount: Prisma.Decimal }[]):
 }
 
 export async function getPortalDashboard(orgId: string, customerId: string) {
-  const db = orgDb(orgId)
+  // customerDb AND-s `customerId` (via serviceLocation/customerId) into every
+  // query's where — isolation is enforced here, not by field-filtering results.
+  const db = customerDb(orgId, customerId)
   const now = new Date()
-  const siteScope = { serviceLocation: { customerId } }
 
   const [upcoming, completed, inspections, issues, invoicesRaw, customer] = await Promise.all([
     db.job.findMany({
-      where: { ...siteScope, status: { in: ["SCHEDULED", "ASSIGNED"] }, scheduledStart: { gte: now } },
+      where: { status: { in: ["SCHEDULED", "ASSIGNED"] }, scheduledStart: { gte: now } },
       orderBy: { scheduledStart: "asc" },
       take: 25,
       select: { id: true, title: true, scheduledStart: true, serviceLocation: { select: { name: true } } },
     }),
     db.job.findMany({
-      where: { ...siteScope, status: "COMPLETED" },
+      where: { status: "COMPLETED" },
       orderBy: { scheduledStart: "desc" },
       take: 25,
       select: {
@@ -41,24 +42,23 @@ export async function getPortalDashboard(orgId: string, customerId: string) {
       },
     }),
     db.inspection.findMany({
-      where: { ...siteScope, status: "FINALIZED" },
+      where: { status: "FINALIZED" },
       orderBy: { finalizedAt: "desc" },
       take: 25,
       select: { id: true, score: true, outcome: true, finalizedAt: true, serviceLocation: { select: { name: true } } },
     }),
     db.issue.findMany({
-      where: siteScope,
       orderBy: { createdAt: "desc" },
       take: 50,
       select: { id: true, title: true, description: true, status: true, source: true, createdAt: true, resolvedAt: true, serviceLocation: { select: { name: true } } },
     }),
     db.invoice.findMany({
-      where: { customerId, status: { not: "VOID" } },
+      where: { status: { not: "VOID" } },
       orderBy: { invoiceNumber: "desc" },
       take: 50,
       select: { id: true, invoiceNumber: true, status: true, total: true, currency: true, issueDate: true, dueDate: true, payments: { select: { amount: true } } },
     }),
-    db.customer.findFirst({ where: { id: customerId }, select: { id: true, name: true } }),
+    db.customer.findFirst({ select: { id: true, name: true } }),
   ])
 
   const invoices = invoicesRaw.map((inv) => ({
@@ -71,7 +71,7 @@ export async function getPortalDashboard(orgId: string, customerId: string) {
 
 /** The customer's sites — for the report-issue picker. */
 export function listPortalSites(orgId: string, customerId: string) {
-  return orgDb(orgId).serviceLocation.findMany({ where: { customerId, isActive: true }, select: { id: true, name: true }, orderBy: { name: "asc" } })
+  return customerDb(orgId, customerId).serviceLocation.findMany({ where: { isActive: true }, select: { id: true, name: true }, orderBy: { name: "asc" } })
 }
 
 /** A portal user reports an issue — only against a site they own. Source CUSTOMER. */
@@ -81,10 +81,11 @@ export async function reportPortalIssue(
   reporterId: string,
   input: { serviceLocationId: string; title?: string; description: string },
 ) {
-  const db = orgDb(orgId)
-  const site = await db.serviceLocation.findFirst({ where: { id: input.serviceLocationId, customerId }, select: { id: true } })
+  // Ownership is proven by a customer-scoped read (returns null for a site that
+  // isn't this customer's); the write then goes through orgDb.
+  const site = await customerDb(orgId, customerId).serviceLocation.findFirst({ where: { id: input.serviceLocationId }, select: { id: true } })
   if (!site) throw new ReferenceError("That site is not on your account")
-  const issue = await db.issue.create({
+  const issue = await orgDb(orgId).issue.create({
     data: {
       organizationId: orgId, serviceLocationId: input.serviceLocationId, reportedById: reporterId,
       source: "CUSTOMER", title: input.title ?? null, description: input.description, status: "OPEN",
@@ -94,19 +95,20 @@ export async function reportPortalIssue(
   return { id: issue.id }
 }
 
-/** Serve a proof photo ONLY if it belongs to the portal user's customer. */
-export async function getPortalPhoto(orgId: string, customerId: string, photoId: string) {
-  const photo = await orgDb(orgId).jobPhoto.findFirst({
-    where: {
-      id: photoId,
-      OR: [
-        { job: { serviceLocation: { customerId } } },
-        { inspection: { serviceLocation: { customerId } } },
-      ],
-    },
-    select: { storageKey: true, contentType: true },
-  })
-  return photo
+// ── Direct by-ID portal reads (customer-scoped at the query level) ──
+// Each returns null when the id belongs to another customer — a direct request
+// cannot read across customers, it does not return a filtered object.
+export function getPortalPhoto(orgId: string, customerId: string, photoId: string) {
+  return customerDb(orgId, customerId).jobPhoto.findFirst({ where: { id: photoId }, select: { storageKey: true, contentType: true } })
+}
+export function getPortalInvoiceById(orgId: string, customerId: string, id: string) {
+  return customerDb(orgId, customerId).invoice.findFirst({ where: { id }, select: { id: true, invoiceNumber: true, total: true } })
+}
+export function getPortalJobById(orgId: string, customerId: string, id: string) {
+  return customerDb(orgId, customerId).job.findFirst({ where: { id }, select: { id: true, title: true } })
+}
+export function getPortalInspectionById(orgId: string, customerId: string, id: string) {
+  return customerDb(orgId, customerId).inspection.findFirst({ where: { id }, select: { id: true, score: true } })
 }
 
 // ── Portal authentication ──

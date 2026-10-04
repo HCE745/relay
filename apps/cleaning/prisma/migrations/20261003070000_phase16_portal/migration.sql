@@ -1,6 +1,3 @@
--- AlterEnum
-ALTER TYPE "cleaning"."UserRole" ADD VALUE 'CLIENT';
-
 -- CreateEnum
 CREATE TYPE "cleaning"."IssueSource" AS ENUM ('STAFF', 'CUSTOMER', 'INSPECTION');
 

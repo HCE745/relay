@@ -139,3 +139,64 @@ export function orgDb(organizationId: string) {
 }
 
 export type OrgDb = ReturnType<typeof orgDb>
+
+// ─── Customer-scoped (portal) client — Phase 16 ──────────────────────────────
+//
+// The customer portal is a SECOND isolation boundary INSIDE a tenant: a CLIENT
+// user may read only their own customer's data. `customerDb(orgId, customerId)`
+// enforces this the SAME way `orgDb` enforces org isolation — the customer
+// predicate is AND-ed into every query's `where` at the data layer, never
+// filtered on results fetched by id. It is READ-ONLY and exposes ONLY the
+// portal-safe models; any other model, any write, and any by-unique op throw.
+// So a findFirst({ where: { id } }) for another customer's row returns null.
+
+type CustomerFilter = (customerId: string) => Record<string, unknown>
+export const PORTAL_CUSTOMER_MODELS: Record<string, CustomerFilter> = {
+  Customer: (c) => ({ id: c }),
+  ServiceLocation: (c) => ({ customerId: c }),
+  Invoice: (c) => ({ customerId: c }),
+  Job: (c) => ({ serviceLocation: { customerId: c } }),
+  Inspection: (c) => ({ serviceLocation: { customerId: c } }),
+  Issue: (c) => ({ serviceLocation: { customerId: c } }),
+  JobPhoto: (c) => ({
+    OR: [{ job: { serviceLocation: { customerId: c } } }, { inspection: { serviceLocation: { customerId: c } } }],
+  }),
+}
+
+// Pure reads only — no writes, no by-unique ops (whose where can't carry the
+// predicate). Writes/admin work use orgDb with explicit validation.
+const PORTAL_READ_OPS: ReadonlySet<string> = new Set(["findFirst", "findFirstOrThrow", "findMany", "aggregate", "count", "groupBy"])
+
+/** Pure transform for the portal client. Exported for unit testing isolation. */
+export function scopeCustomerArgs(
+  model: string,
+  operation: string,
+  args: AnyArgs,
+  orgId: string,
+  customerId: string,
+): AnyArgs {
+  const filter = PORTAL_CUSTOMER_MODELS[model]
+  if (!filter) {
+    throw new OrgScopeError(`${model} is not reachable from the customer-portal client (portal can read only its own customer's data).`)
+  }
+  if (!PORTAL_READ_OPS.has(operation)) {
+    throw new OrgScopeError(`${operation} on ${model} is not allowed on the read-only customer-portal client. Use findFirst/findMany; writes go through orgDb with explicit validation.`)
+  }
+  const a = (args ?? {}) as Record<string, unknown>
+  const existing = a.where as Record<string, unknown> | undefined
+  // org AND customer AND the caller's own predicate — a mismatched id matches nothing.
+  return { ...a, where: { AND: [{ organizationId: orgId }, filter(customerId), ...(existing ? [existing] : [])] } }
+}
+
+/** Build a customer-scoped, read-only portal client. */
+export function customerDb(organizationId: string, customerId: string) {
+  return prisma.$extends({
+    query: {
+      $allModels: {
+        $allOperations({ model, operation, args, query }) {
+          return query(scopeCustomerArgs(model, operation, args as AnyArgs, organizationId, customerId) as never)
+        },
+      },
+    },
+  })
+}

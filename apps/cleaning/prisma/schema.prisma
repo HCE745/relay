@@ -29,6 +29,16 @@ enum UserRole {
   MANAGER
   SUPERVISOR
   CLEANER
+  CLIENT // customer-portal user (Phase 16): belongs to a Customer, not staff
+
+  @@schema("cleaning")
+}
+
+// Where an issue originated (Phase 16). CUSTOMER = reported via the portal.
+enum IssueSource {
+  STAFF
+  CUSTOMER
+  INSPECTION
 
   @@schema("cleaning")
 }
@@ -339,6 +349,7 @@ model Organization {
   siteCredentialRequirements SiteCredentialRequirement[]
   accessItems         AccessItem[]
   exportRuns          ExportRun[]
+  portalInvites       PortalInvite[]
 
   @@schema("cleaning")
 }
@@ -353,6 +364,7 @@ model User {
   isActive       Boolean  @default(true)
   organizationId String
   managerId      String?
+  customerId     String? // set for CLIENT portal users (Phase 16)
   lastLoginAt    DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -380,6 +392,7 @@ model User {
   timeOffRequests      TimeOffRequest[]   @relation("UserTimeOff")
   credentials          Credential[]       @relation("UserCredential")
   heldAccessItems      AccessItem[]       @relation("AccessHolder")
+  portalCustomer       Customer?          @relation("CustomerPortalUsers", fields: [customerId], references: [id])
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -432,6 +445,8 @@ model Customer {
   estimates              Estimate[] @relation("EstimateCustomer")
   convertedFromEstimates Estimate[] @relation("EstimateConvertedCustomer")
   contracts        Contract[]
+  portalUsers      User[]         @relation("CustomerPortalUsers")
+  portalInvites    PortalInvite[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -798,6 +813,7 @@ model Issue {
   reportedById      String
   assignedToId      String?
   category          IssueCategory @default(OTHER)
+  source            IssueSource   @default(STAFF)
   title             String?
   description       String
   status            IssueStatus   @default(OPEN)
@@ -1191,6 +1207,30 @@ model TimeOffRequest {
   @@index([organizationId])
   @@index([userId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// Customer-portal invite (Phase 16). A manager invites a contact by email; the
+// token lets them set a password and activate their CLIENT user. Degrades to a
+// copyable link when email is unconfigured.
+model PortalInvite {
+  id              String   @id @default(cuid())
+  organizationId  String
+  customerId      String
+  email           String
+  token           String   @unique
+  status          String   @default("PENDING") // PENDING | ACCEPTED | REVOKED
+  invitedById     String?
+  acceptedUserId  String?
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([customerId])
   @@schema("cleaning")
 }
 

@@ -5,6 +5,8 @@ import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getCustomer } from "@/lib/data/customers"
 import { getCustomerBilling } from "@/lib/data/invoices"
+import { listPortalUsers, listPortalInvites } from "@/lib/data/portal"
+import { PortalAccess } from "@/components/portal/portal-access"
 import { formatMoney, invoiceNo } from "@/lib/money"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card, StatusPill } from "@/components/ui/controls"
@@ -34,6 +36,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
   const hasBilling = await orgHasCapability(session.organizationId, "billing.invoicing")
   const billing = hasBilling ? await getCustomerBilling(session.organizationId, id) : null
+  const hasPortal = await orgHasCapability(session.organizationId, "portal.customerAccess")
+  const [portalUsers, portalInvites] = hasPortal
+    ? await Promise.all([listPortalUsers(session.organizationId, id), listPortalInvites(session.organizationId, id)])
+    : [[], []]
 
   return (
     <div className="space-y-6">
@@ -130,6 +136,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
       <ContactsSection customerId={customer.id} contacts={customer.contacts} />
       <SitesSection customerId={customer.id} sites={customer.serviceLocations} />
+      {hasPortal ? (
+        <PortalAccess
+          customerId={customer.id}
+          users={portalUsers.map((u) => ({ id: u.id, name: u.name, email: u.email, isActive: u.isActive }))}
+          invites={portalInvites.map((i) => ({ id: i.id, email: i.email, status: i.status, expiresAt: i.expiresAt.toISOString() }))}
+        />
+      ) : null}
     </div>
   )
 }

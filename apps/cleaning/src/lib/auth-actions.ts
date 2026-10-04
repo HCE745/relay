@@ -22,6 +22,8 @@ export async function login(_prev: LoginResult, formData: FormData): Promise<Log
     include: { organization: { select: { packageTier: true, onboardingCompletedAt: true } } },
   })
   if (!user || !user.isActive) return { error: "Invalid credentials" }
+  // Portal (CLIENT) users must use the customer portal, never the staff app.
+  if (user.role === "CLIENT") return { error: "Please sign in at the customer portal" }
 
   const valid = await bcrypt.compare(password, user.password)
   if (!valid) return { error: "Invalid credentials" }

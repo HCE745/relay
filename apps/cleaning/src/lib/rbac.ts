@@ -3,7 +3,7 @@
 // only when BOTH the role permits the route AND the org has any capability the
 // route requires. The two systems are deliberately orthogonal.
 
-export const ROLES = ["OWNER", "ADMIN", "MANAGER", "SUPERVISOR", "CLEANER"] as const
+export const ROLES = ["OWNER", "ADMIN", "MANAGER", "SUPERVISOR", "CLEANER", "CLIENT"] as const
 export type Role = (typeof ROLES)[number]
 
 export function isRole(value: string): value is Role {
@@ -74,6 +74,7 @@ const ROLE_ROUTE_ACCESS: Record<Role, string[] | "*"> = {
   MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "coverage", "compliance", "access", "inspections", "issues", "leads", "estimates", "contracts", "invoices", "payments", "ar-aging", "profitability", "supply-spend", "exports", "assets", "supplies"],
   SUPERVISOR: ["dashboard", "schedule", "jobs", "time", "inspections", "issues"],
   CLEANER: [], // cleaners have no admin routes; they use the field app
+  CLIENT: [], // portal users have NO admin routes; they live under /portal
 }
 
 /** True if the role may access the given admin route key (ignores capability). */
@@ -94,6 +95,7 @@ export function navForRole(role: string, hasCapability: (cap: string) => boolean
 
 /** Where a freshly-authenticated user should land, by role. */
 export function landingPathForRole(role: string): string {
+  if (role === "CLIENT") return "/portal"
   return experienceForRole(role) === "field" ? "/today" : "/dashboard"
 }
 

@@ -310,6 +310,13 @@ model Organization {
 
   onboardingCompletedAt DateTime?
   trialEndsAt           DateTime?
+  // Public sandbox demo (Phase: demo). A demo org is a normal org with isDemo
+  // set — isolation still runs through orgDb. Excluded from all cross-org work
+  // (crons, future billing/analytics) and purged after demoExpiresAt. demoIpHash
+  // is a salted hash of the creator's IP, for per-IP rate limiting.
+  isDemo                Boolean   @default(false)
+  demoExpiresAt         DateTime?
+  demoIpHash            String?
   // Dashboard warning lead time for expiring contracts (Phase 8), configurable.
   contractExpiryLeadDays Int @default(60)
   // Compliance (Phase 13): warning lead time + whether to BLOCK assigning a
@@ -351,6 +358,7 @@ model Organization {
   exportRuns          ExportRun[]
   portalInvites       PortalInvite[]
 
+  @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
 }
 

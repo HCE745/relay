@@ -39,7 +39,7 @@ export async function generatePeriodInvoicesForOrg(
 }
 
 export async function generatePeriodInvoicesAllOrgs(opts: { windowDays?: number; now?: Date } = {}): Promise<PeriodInvoiceResult[]> {
-  const orgs = await systemDb.organization.findMany({ select: { id: true } })
+  const orgs = await systemDb.organization.findMany({ where: { isDemo: false }, select: { id: true } })
   const results: PeriodInvoiceResult[] = []
   for (const org of orgs) {
     try {

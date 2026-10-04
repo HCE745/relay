@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/period-invoices",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/purge-demo",
+      "schedule": "0 * * * *"
     }
   ]
 }

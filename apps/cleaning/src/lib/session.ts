@@ -32,6 +32,7 @@ export type SessionPayload = {
   organizationId: string
   packageTier: string
   onboardingCompleted?: boolean
+  isDemo?: boolean // set only for public sandbox demo sessions (separate cookie)
   exp?: number
 }
 
@@ -47,8 +48,15 @@ export async function createSession(payload: SessionPayload) {
 
 export async function getSession(): Promise<SessionPayload | null> {
   const token = await getSessionToken(COOKIE_NAME)
-  if (!token) return null
-  return verifyJwt<SessionPayload>(token, getSecret())
+  if (token) {
+    const s = await verifyJwt<SessionPayload>(token, getSecret())
+    // A real staff token must never carry the demo flag.
+    if (s && !s.isDemo) return s
+  }
+  // Fall back to a public sandbox demo session (own cookie + secret). The whole
+  // admin app then renders for the demo OWNER, scoped to their demo org.
+  const { getDemoSession } = await import("./demo-session")
+  return getDemoSession()
 }
 
 export async function deleteSession() {

@@ -14,9 +14,9 @@ import {
 // (Next 16 renames this file to `proxy.ts`; Cleaning targets Next 15, so it is
 //  `middleware.ts`.)
 
-const SECRET = new TextEncoder().encode(
-  process.env.CLEANING_SESSION_SECRET ?? "cleaning-dev-secret-change-me-in-production-32ch",
-)
+const RAW_SECRET = process.env.CLEANING_SESSION_SECRET ?? "cleaning-dev-secret-change-me-in-production-32ch"
+const SECRET = new TextEncoder().encode(RAW_SECRET)
+const DEMO_SECRET = new TextEncoder().encode(`demo:${RAW_SECRET}`) // matches demo-session.ts
 
 const PUBLIC_PATHS = [
   "/login",
@@ -25,6 +25,8 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/portal", // customer portal — SEPARATE trust boundary, guards via its own session
   "/api/portal", // portal API — self-guards via getPortalSession
+  "/demo", // public sandbox landing — provisions a throwaway demo org
+  "/api/demo", // demo provisioning — self rate-limits + caps
   "/api/auth", // forgot/reset — self-contained, token-based
   "/api/cron", // self-guards via CRON_SECRET
   "/api/health",
@@ -50,12 +52,21 @@ export async function middleware(request: NextRequest) {
   }
 
   const token = request.cookies.get("cln_session")?.value
-  if (!token) return toLogin(request)
+  const demoToken = request.cookies.get("cln_demo")?.value
 
   let role: string
   try {
-    const { payload } = await jwtVerify(token, SECRET)
-    role = String((payload as Record<string, unknown>).role ?? "")
+    if (token) {
+      const { payload } = await jwtVerify(token, SECRET)
+      role = String((payload as Record<string, unknown>).role ?? "")
+    } else if (demoToken) {
+      // Public sandbox demo session (own cookie + domain-separated secret).
+      const { payload } = await jwtVerify(demoToken, DEMO_SECRET)
+      if (!(payload as Record<string, unknown>).isDemo) return toLogin(request)
+      role = String((payload as Record<string, unknown>).role ?? "")
+    } else {
+      return toLogin(request)
+    }
   } catch {
     return toLogin(request)
   }

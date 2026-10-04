@@ -60,6 +60,9 @@ export async function getInvoicePdf(orgId: string, id: string): Promise<{ buffer
 /** Email the invoice PDF to the customer's billing email. Caller gates on isEmailConfigured(). */
 export async function sendInvoiceEmail(orgId: string, id: string): Promise<{ sent: boolean; error?: string } | null> {
   if (!isEmailConfigured()) throw new ConflictError("Email delivery is not configured")
+  // Demo orgs never send real email (fake addresses / public sandbox).
+  const { isDemoOrg } = await import("../demo/provision")
+  if (await isDemoOrg(orgId)) throw new ConflictError("Email delivery is disabled in the demo")
   const [inv, org] = await Promise.all([getInvoice(orgId, id), getOrgSettings(orgId)])
   if (!inv) return null
   if (inv.status === "VOID") throw new ConflictError("Cannot email a voided invoice")

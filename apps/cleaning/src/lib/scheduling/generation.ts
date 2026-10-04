@@ -116,7 +116,7 @@ export type OrgGenerationResult = { orgId: string; created?: number; skipped?: n
 
 /** Roll the schedule forward for EVERY organization — the cron entry point. */
 export async function generateUpcomingAllOrgs(days: number, now: Date = new Date()): Promise<OrgGenerationResult[]> {
-  const orgs = await systemDb.organization.findMany({ select: { id: true } })
+  const orgs = await systemDb.organization.findMany({ where: { isDemo: false }, select: { id: true } })
   const results: OrgGenerationResult[] = []
   for (const org of orgs) {
     try {

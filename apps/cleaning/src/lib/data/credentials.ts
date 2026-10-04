@@ -82,15 +82,14 @@ export async function setSiteRequirements(orgId: string, serviceLocationId: stri
   const site = await db.serviceLocation.findFirst({ where: { id: serviceLocationId }, select: { id: true } })
   assertFound(site, "Service location")
   const unique = [...new Set(types)]
+  // Replace the whole set: clear the site's requirements, then create the
+  // desired ones. deleteMany/createMany are auto-scoped by orgDb (upsert is a
+  // blocked by-unique op on scoped models — see org-db.ts).
   await db.$transaction([
-    db.siteCredentialRequirement.deleteMany({ where: { serviceLocationId, type: { notIn: unique as never } } }),
-    ...unique.map((type) =>
-      db.siteCredentialRequirement.upsert({
-        where: { serviceLocationId_type: { serviceLocationId, type: type as never } },
-        create: { organizationId: orgId, serviceLocationId, type: type as never },
-        update: {},
-      }),
-    ),
+    db.siteCredentialRequirement.deleteMany({ where: { serviceLocationId } }),
+    ...(unique.length
+      ? [db.siteCredentialRequirement.createMany({ data: unique.map((type) => ({ organizationId: orgId, serviceLocationId, type: type as never })) })]
+      : []),
   ])
   return listSiteRequirements(orgId, serviceLocationId)
 }

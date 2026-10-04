@@ -48,6 +48,38 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "Supply",
   "SupplyUsage",
   "Contract",
+  // Phases 10–16 — every one carries organizationId and MUST be scoped.
+  "ProductionRate",
+  "Availability",
+  "TimeOffRequest",
+  "Credential",
+  "SiteCredentialRequirement",
+  "AccessItem",
+  "ExportRun",
+  "PortalInvite",
+])
+
+// Models that are DELIBERATELY not org-scoped, each with a stated reason. A
+// model belongs here ONLY if it has no `organizationId` column — either it is
+// the tenant root, a pre-auth/global record, or a child row reached through a
+// parent whose org is already enforced. The model-scoping test asserts that
+// every Prisma model is in exactly one of ORG_SCOPED_MODELS or SYSTEM_MODELS,
+// partitioned by whether it has an organizationId — so a new model can never
+// land unprotected by omission.
+export const SYSTEM_MODELS: ReadonlySet<string> = new Set([
+  "Organization", // the tenant root itself
+  "PasswordResetToken", // pre-auth, looked up by single-use token
+  // Child/line rows with no organizationId — scoped via their parent, which IS
+  // org-scoped (the parent's id filter carries the tenant boundary):
+  "ChecklistTemplateItem", // → ChecklistTemplate
+  "JobChecklistItem", // → Job
+  "InspectionTemplateItem", // → InspectionTemplate
+  "InspectionItemResult", // → Inspection
+  "EstimateLine", // → Estimate
+  "InvoiceLine", // → Invoice
+  "InvoicePayment", // → Invoice
+  "SupplyAdjustment", // → Supply
+  "AssetMaintenance", // → Asset
 ])
 
 const WHERE_OPS: ReadonlySet<string> = new Set([

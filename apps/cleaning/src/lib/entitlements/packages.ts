@@ -36,6 +36,7 @@ const TEAM_CAPS: Capability[] = [
   "billing.invoicing",
   "billing.periodInvoicing",
   "billing.arAging",
+  "integrations.exports",
   "reporting.profitability",
   "crm.estimates",
   "crm.contracts",

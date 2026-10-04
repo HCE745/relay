@@ -258,6 +258,18 @@ enum AccessItemStatus {
   @@schema("cleaning")
 }
 
+// Accounting / payroll CSV exports (Phase 15).
+enum ExportType {
+  QBO_INVOICES
+  QBO_CUSTOMERS
+  XERO_INVOICES
+  XERO_CONTACTS
+  GUSTO_HOURS
+  ADP_HOURS
+
+  @@schema("cleaning")
+}
+
 enum PaymentTerms {
   DUE_ON_RECEIPT
   NET_15
@@ -326,6 +338,7 @@ model Organization {
   credentials         Credential[]
   siteCredentialRequirements SiteCredentialRequirement[]
   accessItems         AccessItem[]
+  exportRuns          ExportRun[]
 
   @@schema("cleaning")
 }
@@ -1178,6 +1191,24 @@ model TimeOffRequest {
   @@index([organizationId])
   @@index([userId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// A record of a CSV export (Phase 15) — what, when, by whom. No API integration.
+model ExportRun {
+  id             String     @id @default(cuid())
+  organizationId String
+  type           ExportType
+  periodStart    DateTime?
+  periodEnd      DateTime?
+  rowCount       Int        @default(0)
+  createdById    String?
+  createdByName  String?
+  createdAt      DateTime   @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
   @@schema("cleaning")
 }
 

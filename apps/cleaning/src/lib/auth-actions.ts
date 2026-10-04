@@ -1,11 +1,11 @@
 "use server"
 
-import bcrypt from "bcryptjs"
 import { redirect } from "next/navigation"
 import { prisma } from "./prisma"
 import { createSession, deleteSession } from "./session"
 import { loginSchema } from "./zod-schemas"
 import { landingPathForRole } from "./rbac"
+import { authenticate } from "./auth-core"
 
 export type LoginResult = { error: string } | undefined
 
@@ -17,29 +17,20 @@ export async function login(_prev: LoginResult, formData: FormData): Promise<Log
   if (!parsed.success) return { error: "Email and password are required" }
   const { email, password } = parsed.data
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-    include: { organization: { select: { packageTier: true, onboardingCompletedAt: true } } },
-  })
-  if (!user || !user.isActive) return { error: "Invalid credentials" }
-  // Portal (CLIENT) users must use the customer portal, never the staff app.
-  if (user.role === "CLIENT") return { error: "Please sign in at the customer portal" }
-
-  const valid = await bcrypt.compare(password, user.password)
-  if (!valid) return { error: "Invalid credentials" }
+  const result = await authenticate(email, password)
+  if (!result.ok) return { error: result.error }
+  const user = result.user
 
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
-
   await createSession({
     userId: user.id,
     email: user.email,
     name: user.name,
     role: user.role,
     organizationId: user.organizationId,
-    packageTier: user.organization.packageTier,
-    onboardingCompleted: !!user.organization.onboardingCompletedAt,
+    packageTier: user.packageTier,
+    onboardingCompleted: user.onboardingCompleted,
   })
-
   redirect(landingPathForRole(user.role))
 }
 

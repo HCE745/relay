@@ -199,7 +199,26 @@ export const assignCleanerSchema = z.object({
 export const orgSettingsSchema = z.object({
   timezone: ianaTimezone.optional(),
   contractExpiryLeadDays: z.coerce.number().int().min(1).max(365).optional(),
+  credentialExpiryLeadDays: z.coerce.number().int().min(1).max(365).optional(),
+  blockAssignmentOnExpiredCredential: z.boolean().optional(),
 })
+
+// ─── Compliance & credentials (Phase 13) ───
+export const CREDENTIAL_TYPES = ["BACKGROUND_CHECK", "INSURANCE", "I9", "BONDING", "CERTIFICATION", "LICENSE", "TRAINING"] as const
+export const CREDENTIAL_STATUSES = ["ACTIVE", "REVOKED"] as const
+
+export const credentialCreateSchema = z.object({
+  userId: z.string().min(1),
+  type: z.enum(CREDENTIAL_TYPES),
+  issueDate: dateString.optional(),
+  expiryDate: dateString.optional(),
+  documentRef: optionalString,
+  status: z.enum(CREDENTIAL_STATUSES).optional(),
+  notes: optionalString,
+})
+export const credentialUpdateSchema = credentialCreateSchema.omit({ userId: true }).partial()
+
+export const siteRequirementsSchema = z.object({ types: z.array(z.enum(CREDENTIAL_TYPES)) })
 
 // Location is best-effort — clock-in/out succeeds even when it is absent.
 export const clockSchema = z.object({

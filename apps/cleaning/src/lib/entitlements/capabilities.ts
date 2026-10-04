@@ -37,6 +37,7 @@ export const CAPABILITIES = [
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",
+  "workforce.compliance", // employee credentials + site requirements (BUSINESS)
   "erp.advancedRoles",
   "erp.laborBudgets",
   "erp.siteProfitability",

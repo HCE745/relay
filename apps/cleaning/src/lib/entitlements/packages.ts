@@ -43,6 +43,7 @@ const TEAM_CAPS: Capability[] = [
 
 const BUSINESS_CAPS: Capability[] = [
   "operations.escalations",
+  "workforce.compliance",
   "erp.advancedRoles",
   "erp.laborBudgets",
   "erp.siteProfitability",

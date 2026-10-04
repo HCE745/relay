@@ -10,6 +10,8 @@ import { countOverdue } from "@/lib/data/invoices"
 import { countExpiring } from "@/lib/data/contracts"
 import { getContractExpiryLeadDays } from "@/lib/data/org"
 import { countUncoveredShifts } from "@/lib/data/coverage"
+import { countCredentialAlerts } from "@/lib/data/credentials"
+import { getComplianceConfig } from "@/lib/data/compliance"
 import { getSetupProgress } from "@/lib/data/setup"
 import { isSetupGuideDismissed } from "@/lib/setup-actions"
 import { PageHeader } from "@/components/ui/placeholder"
@@ -74,6 +76,10 @@ export default async function DashboardPage() {
     }
     if (await orgHasCapability(orgId, "workforce.coverage")) {
       needsAttention.push({ label: "Uncovered shifts (48h)", value: await countUncoveredShifts(orgId, { hoursAhead: 48 }), href: "/coverage", alert: true })
+    }
+    if (await orgHasCapability(orgId, "workforce.compliance")) {
+      const cfg = await getComplianceConfig(orgId)
+      needsAttention.push({ label: "Credential alerts", value: await countCredentialAlerts(orgId, cfg.leadDays), href: "/compliance", alert: true })
     }
   }
   const overview: Tile[] = [

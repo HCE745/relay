@@ -9,6 +9,7 @@ import { CogIcon } from "@/components/ui/icons"
 import { Card } from "@/components/ui/controls"
 import { OrgTimezoneForm } from "@/components/settings/org-timezone-form"
 import { ContractExpiryForm } from "@/components/settings/contract-expiry-form"
+import { ComplianceForm } from "@/components/settings/compliance-form"
 import { ChangePasswordForm } from "@/components/settings/change-password-form"
 import { orgHasCapability } from "@/lib/page-guards"
 
@@ -20,6 +21,7 @@ export default async function SettingsPage() {
   const org = await getOrgSettings(session.organizationId)
   const isOrgAdmin = canManageOrg(session.role)
   const showContracts = await orgHasCapability(session.organizationId, "crm.contracts")
+  const showCompliance = await orgHasCapability(session.organizationId, "workforce.compliance")
 
   const canSetup = canManageAccounts(session.role)
   const [setup, setupDismissed] = canSetup
@@ -100,6 +102,19 @@ export default async function SettingsPage() {
             <p className="mt-2 text-sm text-slate-600">
               Warning lead time: <span className="font-medium">{org?.contractExpiryLeadDays ?? 60} days</span>. Only owners and admins can change it.
             </p>
+          )}
+        </Card>
+      ) : null}
+
+      {showCompliance ? (
+        <Card className="p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Compliance</h2>
+          {isOrgAdmin ? (
+            <div className="mt-3">
+              <ComplianceForm currentLeadDays={org?.credentialExpiryLeadDays ?? 30} currentBlock={org?.blockAssignmentOnExpiredCredential ?? false} />
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-slate-600">Credential warning lead time: <span className="font-medium">{org?.credentialExpiryLeadDays ?? 30} days</span>. Only owners and admins can change compliance settings.</p>
           )}
         </Card>
       ) : null}

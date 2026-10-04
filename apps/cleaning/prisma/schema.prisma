@@ -218,6 +218,26 @@ enum TimeOffStatus {
   @@schema("cleaning")
 }
 
+// Compliance & credentials (Phase 13).
+enum CredentialType {
+  BACKGROUND_CHECK
+  INSURANCE
+  I9
+  BONDING
+  CERTIFICATION
+  LICENSE
+  TRAINING
+
+  @@schema("cleaning")
+}
+
+enum CredentialStatus {
+  ACTIVE
+  REVOKED
+
+  @@schema("cleaning")
+}
+
 enum PaymentTerms {
   DUE_ON_RECEIPT
   NET_15
@@ -250,6 +270,10 @@ model Organization {
   trialEndsAt           DateTime?
   // Dashboard warning lead time for expiring contracts (Phase 8), configurable.
   contractExpiryLeadDays Int @default(60)
+  // Compliance (Phase 13): warning lead time + whether to BLOCK assigning a
+  // cleaner missing/expired on a site-required credential (warn by default).
+  credentialExpiryLeadDays Int @default(30)
+  blockAssignmentOnExpiredCredential Boolean @default(false)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")
@@ -279,6 +303,8 @@ model Organization {
   productionRates     ProductionRate[]
   availabilities      Availability[]
   timeOffRequests     TimeOffRequest[]
+  credentials         Credential[]
+  siteCredentialRequirements SiteCredentialRequirement[]
 
   @@schema("cleaning")
 }
@@ -318,6 +344,7 @@ model User {
   passwordResetTokens PasswordResetToken[]
   availabilities       Availability[]     @relation("UserAvailability")
   timeOffRequests      TimeOffRequest[]   @relation("UserTimeOff")
+  credentials          Credential[]       @relation("UserCredential")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -433,6 +460,7 @@ model ServiceLocation {
   inspections  Inspection[]
   assets       Asset[]       @relation("AssetSite")
   supplyUsages SupplyUsage[] @relation("SupplyUsageSite")
+  credentialRequirements SiteCredentialRequirement[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -1127,6 +1155,45 @@ model TimeOffRequest {
   @@index([organizationId])
   @@index([userId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// An employee credential (Phase 13). Expiry drives dashboard warnings and
+// assignment compliance; status REVOKED invalidates it regardless of date.
+model Credential {
+  id             String           @id @default(cuid())
+  organizationId String
+  userId         String
+  type           CredentialType
+  issueDate      DateTime?
+  expiryDate     DateTime?
+  documentRef    String?
+  status         CredentialStatus @default(ACTIVE)
+  notes          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation("UserCredential", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@schema("cleaning")
+}
+
+// A credential a site requires of any cleaner assigned there (Phase 13).
+model SiteCredentialRequirement {
+  id                String         @id @default(cuid())
+  organizationId    String
+  serviceLocationId String
+  type              CredentialType
+  createdAt         DateTime       @default(now())
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceLocationId, type])
+  @@index([organizationId])
   @@schema("cleaning")
 }
 

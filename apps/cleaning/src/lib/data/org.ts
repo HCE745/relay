@@ -9,7 +9,10 @@ export async function getOrgTimezone(orgId: string): Promise<string> {
 export async function getOrgSettings(orgId: string) {
   return systemDb.organization.findUnique({
     where: { id: orgId },
-    select: { id: true, name: true, packageTier: true, timezone: true, contractExpiryLeadDays: true },
+    select: {
+      id: true, name: true, packageTier: true, timezone: true, contractExpiryLeadDays: true,
+      credentialExpiryLeadDays: true, blockAssignmentOnExpiredCredential: true,
+    },
   })
 }
 
@@ -20,9 +23,14 @@ export async function getContractExpiryLeadDays(orgId: string): Promise<number> 
 }
 
 /** Update org workspace settings (OWNER/ADMIN only, enforced in the route). */
-export async function updateOrgSettings(orgId: string, input: { timezone?: string; contractExpiryLeadDays?: number }) {
+export async function updateOrgSettings(
+  orgId: string,
+  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean },
+) {
   const data: Record<string, unknown> = {}
   if (input.timezone !== undefined) data.timezone = input.timezone
   if (input.contractExpiryLeadDays !== undefined) data.contractExpiryLeadDays = input.contractExpiryLeadDays
+  if (input.credentialExpiryLeadDays !== undefined) data.credentialExpiryLeadDays = input.credentialExpiryLeadDays
+  if (input.blockAssignmentOnExpiredCredential !== undefined) data.blockAssignmentOnExpiredCredential = input.blockAssignmentOnExpiredCredential
   return systemDb.organization.update({ where: { id: orgId }, data })
 }

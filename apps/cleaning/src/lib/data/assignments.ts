@@ -1,6 +1,8 @@
 import { orgDb, isUniqueViolation } from "../org-db"
-import { assertFound } from "./errors"
+import { assertFound, RequirementsError } from "./errors"
 import { notifyUser } from "../notify"
+import { getComplianceConfig, checkAssignmentCompliance } from "./compliance"
+import { CREDENTIAL_TYPE_LABELS } from "../credential-status"
 
 // Cleaner ↔ Job assignment management. Validates that both the Job and the
 // cleaner belong to the authenticated org and that the cleaner is an active
@@ -8,7 +10,7 @@ import { notifyUser } from "../notify"
 // availability optimization is out of scope.
 
 export type Conflict = { jobId: string; title: string; start: Date }
-export type AssignResult = { assigned: boolean; alreadyAssigned: boolean; conflicts: Conflict[] }
+export type AssignResult = { assigned: boolean; alreadyAssigned: boolean; conflicts: Conflict[]; credentialWarnings: string[] }
 
 export function listAssignableCleaners(orgId: string) {
   return orgDb(orgId).user.findMany({
@@ -25,7 +27,7 @@ export async function assignCleaner(orgId: string, jobId: string, userId: string
 
   const job = await db.job.findFirst({
     where: { id: jobId },
-    select: { id: true, status: true, scheduledStart: true, scheduledEnd: true },
+    select: { id: true, status: true, scheduledStart: true, scheduledEnd: true, serviceLocationId: true },
   })
   assertFound(job, "Job")
   // Cleaner must belong to this org and be an active CLEANER.
@@ -55,17 +57,30 @@ export async function assignCleaner(orgId: string, jobId: string, userId: string
     })
     .map((a) => ({ jobId: a.job.id, title: a.job.title, start: a.job.scheduledStart }))
 
+  // Credential compliance against the SITE's requirements (Phase 13). Warn by
+  // default; block only when the org opts in. Checked before we create the row.
+  const credentialWarnings: string[] = []
+  const compliance = await checkAssignmentCompliance(orgId, userId, job!.serviceLocationId)
+  if (compliance.unmet.length > 0) {
+    const msgs = compliance.unmet.map((u) => `${CREDENTIAL_TYPE_LABELS[u.type] ?? u.type} (${u.reason})`)
+    const cfg = await getComplianceConfig(orgId)
+    if (cfg.block) {
+      throw new RequirementsError("This cleaner is missing a credential required by the site", msgs)
+    }
+    credentialWarnings.push(...msgs)
+  }
+
   try {
     await db.jobAssignment.create({ data: { organizationId: orgId, jobId, userId, status: "ASSIGNED" } })
   } catch (e) {
-    if (isUniqueViolation(e)) return { assigned: false, alreadyAssigned: true, conflicts }
+    if (isUniqueViolation(e)) return { assigned: false, alreadyAssigned: true, conflicts, credentialWarnings }
     throw e
   }
 
   // Advance SCHEDULED → ASSIGNED (never touch IN_PROGRESS/COMPLETED/etc.).
   await db.job.updateMany({ where: { id: jobId, status: "SCHEDULED" }, data: { status: "ASSIGNED" } })
   await notifyUser(orgId, userId, "You've been assigned a job", `You have a new cleaning job assignment. Check Today's Work in the app.`)
-  return { assigned: true, alreadyAssigned: false, conflicts }
+  return { assigned: true, alreadyAssigned: false, conflicts, credentialWarnings }
 }
 
 export async function removeAssignment(orgId: string, jobId: string, userId: string): Promise<boolean> {

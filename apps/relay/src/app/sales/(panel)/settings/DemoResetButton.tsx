@@ -1,29 +1,27 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { RefreshCw } from "lucide-react"
 
 export function DemoResetButton() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [done, setDone] = useState(false)
   const [error, setError] = useState("")
 
   async function handleReset() {
     if (!confirm("This will delete all current demo data and restore the original sample dataset. Continue?")) return
     setLoading(true)
     setError("")
-    setDone(false)
     try {
       const res = await fetch("/api/sales/demo/reset", { method: "POST" })
       if (!res.ok) {
         const d = await res.json() as { error?: string }
         throw new Error(d.error ?? "Reset failed")
       }
-      setDone(true)
-      setTimeout(() => setDone(false), 4000)
+      router.push("/sales")
     } catch (e) {
       setError(e instanceof Error ? e.message : "Reset failed")
-    } finally {
       setLoading(false)
     }
   }
@@ -42,9 +40,6 @@ export function DemoResetButton() {
 
       {error && (
         <p className="text-xs text-red-400 mb-3">{error}</p>
-      )}
-      {done && (
-        <p className="text-xs text-emerald-400 mb-3">Demo data restored successfully.</p>
       )}
 
       <button

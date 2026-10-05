@@ -157,7 +157,7 @@ export default function SalesEmailPage() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res  = await fetch("/api/super-admin/crm/emails?all=true")
+      const res  = await fetch("/api/sales/emails?all=true")
       const data = await res.json() as { emails: CrmEmail[] }
       setEmails(data.emails ?? [])
     } finally {

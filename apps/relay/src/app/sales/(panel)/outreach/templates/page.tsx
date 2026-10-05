@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic"
 
 export default async function TemplatesPage() {
   const session = await getSession()
-  if (!session?.superAdmin) redirect("/sales/login")
+  if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
 
   const templates = await prisma.crmEmailTemplate.findMany({
     orderBy: { createdAt: "desc" },

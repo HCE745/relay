@@ -81,7 +81,7 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
   ]
 }
 
-export function SalesSidebar({ name, email, isManager }: { name: string; email: string; isManager: boolean }) {
+export function SalesSidebar({ name, email, isManager, isDemo }: { name: string; email: string; isManager: boolean; isDemo?: boolean }) {
   const pathname       = usePathname()
   const router         = useRouter()
   const [open, setOpen]               = useState(false)
@@ -208,6 +208,12 @@ export function SalesSidebar({ name, email, isManager }: { name: string; email: 
             <p className="text-xs text-gray-500 truncate">{email}</p>
           </div>
         </div>
+        {isDemo && (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 mb-1 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+            <span className="text-[10px] font-medium text-amber-400/80 tracking-wide">Demo Account</span>
+          </div>
+        )}
         <button
           onClick={logout}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"

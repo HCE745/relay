@@ -7,6 +7,7 @@ import { setWorkforceCommsPlanFlags } from "@/lib/workforce-comms"
 import * as Sentry from "@sentry/nextjs"
 import type Stripe from "stripe"
 import { logActivationEvent } from "@/lib/analytics"
+import { createCommissionPaymentFromStripe } from "@/lib/commission"
 
 export const dynamic = "force-dynamic"
 
@@ -123,6 +124,16 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
   })
 
   logActivationEvent(org.id, "trial_converted_to_paid", { plan: org.plan }).catch(() => {})
+
+  // Generate commission payment for any active attribution linked to this org
+  createCommissionPaymentFromStripe({
+    orgId: org.id,
+    stripePaymentIntentId: null,
+    grossRevenueCents: invoice.amount_paid,
+    periodStart: invoice.period_start ? new Date(invoice.period_start * 1000) : null,
+    periodEnd:   invoice.period_end   ? new Date(invoice.period_end   * 1000) : null,
+    paymentReceivedAt: new Date(),
+  }).catch(() => {})
 
   await sendEmail({
     to:      admin.email,

@@ -12,7 +12,8 @@ export async function PATCH(
 
   const { id } = await params
   const body = await req.json() as {
-    action?: unknown; isActive?: unknown; password?: unknown; role?: unknown; name?: unknown
+    action?: unknown; isActive?: unknown; password?: unknown; role?: unknown; name?: unknown;
+    employmentStatus?: unknown; commissionRate?: unknown; commissionEligible?: unknown;
   }
 
   const user = await prisma.salesUser.findUnique({ where: { id } })
@@ -25,7 +26,7 @@ export async function PATCH(
     const updated = await prisma.salesUser.update({
       where:  { id },
       data:   { isActive: false },
-      select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true, updatedAt: true },
+      select: { id: true, email: true, name: true, role: true, isActive: true, employmentStatus: true, commissionRate: true, commissionEligible: true, createdAt: true, updatedAt: true },
     })
     return NextResponse.json(updated)
   }
@@ -34,7 +35,25 @@ export async function PATCH(
     const updated = await prisma.salesUser.update({
       where:  { id },
       data:   { isActive: true },
-      select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true, updatedAt: true },
+      select: { id: true, email: true, name: true, role: true, isActive: true, employmentStatus: true, commissionRate: true, commissionEligible: true, createdAt: true, updatedAt: true },
+    })
+    return NextResponse.json(updated)
+  }
+
+  if (action === "set_inactive") {
+    const updated = await prisma.salesUser.update({
+      where: { id },
+      data:  { employmentStatus: "INACTIVE", inactiveAt: new Date(), commissionEligible: false },
+      select: { id: true, email: true, name: true, role: true, isActive: true, employmentStatus: true, commissionRate: true, commissionEligible: true, createdAt: true, updatedAt: true },
+    })
+    return NextResponse.json(updated)
+  }
+
+  if (action === "set_active") {
+    const updated = await prisma.salesUser.update({
+      where: { id },
+      data:  { employmentStatus: "ACTIVE", inactiveAt: null, commissionEligible: true },
+      select: { id: true, email: true, name: true, role: true, isActive: true, employmentStatus: true, commissionRate: true, commissionEligible: true, createdAt: true, updatedAt: true },
     })
     return NextResponse.json(updated)
   }
@@ -53,11 +72,15 @@ export async function PATCH(
     return NextResponse.json(updated)
   }
 
-  // Generic field patch (name, role)
+  // Generic field patch (name, role, commissionRate, commissionEligible)
   const data: Record<string, unknown> = {}
   if (typeof body.name === "string" && body.name.trim()) data.name = body.name.trim()
   if (body.role === "admin_sales" || body.role === "sales_rep") data.role = body.role
   if (typeof body.isActive === "boolean") data.isActive = body.isActive
+  if (typeof body.commissionRate === "number" && body.commissionRate >= 0 && body.commissionRate <= 100) {
+    data.commissionRate = body.commissionRate
+  }
+  if (typeof body.commissionEligible === "boolean") data.commissionEligible = body.commissionEligible
 
   if (Object.keys(data).length === 0) {
     return NextResponse.json({ error: "No valid fields to update" }, { status: 400 })
@@ -66,7 +89,7 @@ export async function PATCH(
   const updated = await prisma.salesUser.update({
     where:  { id },
     data,
-    select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true, updatedAt: true },
+    select: { id: true, email: true, name: true, role: true, isActive: true, employmentStatus: true, commissionRate: true, commissionEligible: true, createdAt: true, updatedAt: true },
   })
   return NextResponse.json(updated)
 }

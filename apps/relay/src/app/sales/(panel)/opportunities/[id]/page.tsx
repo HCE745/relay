@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   ArrowLeft, CheckCircle2, Circle, Clock, DollarSign,
-  User, Calendar, FileText, Loader2, AlertCircle, Plus, RefreshCw,
+  User, Calendar, FileText, Loader2, AlertCircle, Plus, RefreshCw, Lock, ShieldAlert,
 } from "lucide-react"
 
 type Task = {
@@ -24,6 +24,17 @@ type CommissionEvent = {
   salesUser: { name: string } | null
 }
 
+type Attribution = {
+  id: string
+  commissionRate: string | number
+  attributionStatus: string
+  attributionReason: string
+  isLocked: boolean
+  attributionLockedAt: string | null
+  notes: string | null
+  commissionOwner: { id: string; name: string }
+}
+
 type Opportunity = {
   id: string
   title: string
@@ -31,6 +42,10 @@ type Opportunity = {
   value: number | null
   product: string | null
   closeDate: string | null
+  closedAt: string | null
+  leadSource: string | null
+  sourceDetail: string | null
+  commissionEligible: boolean
   notes: string | null
   nextStep: string | null
   nextStepDate: string | null
@@ -40,6 +55,7 @@ type Opportunity = {
   demoCallId: string | null
   tasks: Task[]
   commissionEvents: CommissionEvent[]
+  attribution: Attribution | null
 }
 
 type AuthInfo = { superAdmin?: boolean; salesUserId?: string; salesUserRole?: string }
@@ -480,6 +496,75 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Attribution */}
+      {(opp.attribution || opp.stage === "Closed Won") && (
+        <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <DollarSign className="w-4 h-4 text-emerald-400" />
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Commission Attribution</p>
+            {opp.attribution?.isLocked && (
+              <span className="flex items-center gap-1 text-xs text-amber-400 ml-auto">
+                <Lock className="w-3 h-3" /> Locked
+              </span>
+            )}
+          </div>
+          {opp.attribution ? (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                <div>
+                  <p className="text-xs text-gray-500">Commission Owner</p>
+                  <p className="text-gray-200 font-medium">{opp.attribution.commissionOwner.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Rate</p>
+                  <p className="text-gray-200 font-medium">{Number(opp.attribution.commissionRate).toFixed(0)}%</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Status</p>
+                  <p className={`font-medium ${
+                    opp.attribution.attributionStatus === "APPROVED" ? "text-blue-400" :
+                    opp.attribution.attributionStatus === "PENDING"  ? "text-amber-400" :
+                    opp.attribution.attributionStatus === "REVOKED"  ? "text-red-400" : "text-gray-300"
+                  }`}>{opp.attribution.attributionStatus}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Reason</p>
+                  <p className={`font-medium ${
+                    opp.attribution.attributionReason !== "NORMAL_CLOSE" ? "text-amber-400" : "text-gray-300"
+                  }`}>{opp.attribution.attributionReason.replace(/_/g, " ")}</p>
+                </div>
+                {opp.attribution.attributionLockedAt && (
+                  <div>
+                    <p className="text-xs text-gray-500">Lock Date</p>
+                    <p className="text-gray-400">{fmtDate(opp.attribution.attributionLockedAt) ?? "—"}</p>
+                  </div>
+                )}
+              </div>
+              {opp.attribution.notes && (
+                <p className="text-xs text-gray-500 bg-gray-900/50 rounded p-2 mt-1">{opp.attribution.notes}</p>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-amber-500" />
+              No attribution created — this rep may not be commission-eligible.
+            </p>
+          )}
+
+          {/* Lead Source */}
+          <div className="mt-4 pt-4 border-t border-gray-700 grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Lead Source</p>
+              <p className="text-gray-300">{opp.leadSource ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Source Detail</p>
+              <p className="text-gray-300">{opp.sourceDetail ?? "—"}</p>
+            </div>
           </div>
         </div>
       )}

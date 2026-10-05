@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
   Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
-  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2, Compass,
+  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2, Compass, DollarSign,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -53,6 +53,13 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
       label: "Intelligence",
       items: [
         { label: "Marketing Intelligence", href: "/sales/marketing-intelligence", icon: Eye },
+      ],
+    },
+    {
+      label: "Finance",
+      items: [
+        { label: "My Commission",   href: "/sales/commission",           icon: DollarSign },
+        ...(isManager ? [{ label: "Commission Ledger", href: "/sales/manager/commissions", icon: DollarSign }] : []),
       ],
     },
     ...(isManager ? [{

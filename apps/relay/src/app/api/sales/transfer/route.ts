@@ -39,6 +39,19 @@ export async function POST(req: NextRequest) {
         await prisma.crmOpportunity.update({ where: { id: recordId }, data: { assignedToId: toSalesUserId } });
       }
 
+      // Audit trail
+      await prisma.accountAssignmentHistory.create({
+        data: {
+          recordType,
+          recordId,
+          previousOwnerId: fromSalesUserId,
+          newOwnerId: toSalesUserId,
+          changedById: info.salesUserId ?? "unknown",
+          changedByType: info.isSuperAdmin ? "SUPER_ADMIN" : "SALES_USER",
+          reason: reason ?? null,
+        },
+      });
+
       await prisma.crmTransferLog.create({
         data: {
           recordType,

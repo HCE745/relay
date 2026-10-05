@@ -3,13 +3,22 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSalesSession, salesRepFilter } from "@/lib/sales-auth";
 import { prisma } from "@/lib/prisma";
+import { createAttribution } from "@/lib/commission";
 
 const opportunityIncludes = {
   assignedTo: { select: { id: true, name: true } },
-  prospect: { select: { id: true, companyName: true, contactName: true } },
-  demoCall: { select: { id: true, contactName: true, companyName: true } },
+  closedBy:   { select: { id: true, name: true } },
+  prospect:   { select: { id: true, companyName: true, contactName: true } },
+  demoCall:   { select: { id: true, contactName: true, companyName: true } },
   commissionEvents: {
     select: { id: true, salesUserId: true, role: true, splitPercent: true, amount: true },
+  },
+  attribution: {
+    select: {
+      id: true, commissionOwnerId: true, commissionRate: true, attributionStatus: true,
+      attributionReason: true, isLocked: true, attributionLockedAt: true, notes: true,
+      commissionOwner: { select: { id: true, name: true } },
+    },
   },
   tasks: {
     select: { id: true, title: true, taskType: true, completedAt: true, dueAt: true, priority: true },
@@ -57,7 +66,9 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { title, product, stage, value, closeDate, lostReason, notes, assignedToId, organizationId, nextStep, nextStepDate } = body;
+    const { title, product, stage, value, closeDate, lostReason, notes, assignedToId, organizationId,
+            customerOrganizationId, leadSource, sourceDetail, estimatedValue, commissionEligible,
+            nextStep, nextStepDate } = body;
 
     const updateData: Record<string, unknown> = {};
 
@@ -71,12 +82,36 @@ export async function PATCH(
     if (organizationId !== undefined) updateData.organizationId = organizationId;
     if (nextStep !== undefined) updateData.nextStep = nextStep;
     if (nextStepDate !== undefined) updateData.nextStepDate = nextStepDate ? new Date(nextStepDate) : null;
+    if (leadSource !== undefined) updateData.leadSource = leadSource;
+    if (sourceDetail !== undefined) updateData.sourceDetail = sourceDetail;
+    if (estimatedValue !== undefined) updateData.estimatedValue = estimatedValue;
+    if (commissionEligible !== undefined && (info.isManager || info.isSuperAdmin)) {
+      updateData.commissionEligible = commissionEligible;
+    }
+    if (customerOrganizationId !== undefined && (info.isManager || info.isSuperAdmin)) {
+      updateData.customerOrganizationId = customerOrganizationId;
+    }
     if (assignedToId !== undefined && (info.isManager || info.isSuperAdmin)) {
+      // Record assignment history before changing
+      await prisma.accountAssignmentHistory.create({
+        data: {
+          recordType: "opportunity",
+          recordId: id,
+          previousOwnerId: opportunity.assignedToId,
+          newOwnerId: assignedToId,
+          changedById: info.salesUserId ?? "unknown",
+          changedByType: info.isSuperAdmin ? "SUPER_ADMIN" : "SALES_USER",
+          reason: body.reason ?? null,
+        },
+      });
       updateData.assignedToId = assignedToId;
     }
 
-    if (stage === "Closed Won" && !opportunity.wonAt) {
-      updateData.wonAt = new Date();
+    const isNewWin = stage === "Closed Won" && !opportunity.wonAt;
+    if (isNewWin) {
+      updateData.wonAt    = new Date();
+      updateData.closedAt = new Date();
+      updateData.closedById = info.salesUserId ?? null;
     }
     if (stage === "Closed Lost" && !opportunity.lostAt) {
       updateData.lostAt = new Date();
@@ -87,6 +122,11 @@ export async function PATCH(
       data: updateData,
       include: opportunityIncludes,
     });
+
+    // Auto-create commission attribution on first Closed Won transition
+    if (isNewWin && updated.commissionEligible) {
+      await createAttribution(id, updated.assignedToId).catch(() => {});
+    }
 
     return NextResponse.json(updated);
   } catch (e) {

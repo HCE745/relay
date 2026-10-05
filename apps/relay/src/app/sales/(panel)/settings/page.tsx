@@ -2,12 +2,14 @@ import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Settings, ExternalLink, Mail, Users, Bell, Layers } from "lucide-react"
+import { DemoResetButton } from "./DemoResetButton"
 
 export const dynamic = "force-dynamic"
 
 export default async function SettingsPage() {
   const session = await getSession()
   if (!session?.superAdmin && !session?.salesUserId) redirect("/sales/login")
+  const isDemo = session.isDemo === true
 
   const settingsLinks = [
     {
@@ -85,10 +87,16 @@ export default async function SettingsPage() {
         </Link>
       </div>
 
+      {isDemo && (
+        <div className="mt-6">
+          <DemoResetButton />
+        </div>
+      )}
+
       {/* Session info */}
       <div className="mt-6 px-1">
         <p className="text-xs text-gray-600">
-          Logged in as super admin · Sales section uses your super admin session
+          {isDemo ? "Demo account · Sample data only" : "Logged in as super admin · Sales section uses your super admin session"}
         </p>
       </div>
     </div>

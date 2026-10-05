@@ -7,6 +7,7 @@ export interface SalesSessionInfo {
   isSuperAdmin: boolean
   isManager: boolean    // admin_sales or superAdmin
   isRep: boolean
+  isDemo: boolean
 }
 
 export async function getSalesSession(): Promise<SalesSessionInfo | null> {
@@ -21,6 +22,7 @@ export async function getSalesSession(): Promise<SalesSessionInfo | null> {
       isSuperAdmin: true,
       isManager: true,
       isRep: false,
+      isDemo: false,
     }
   }
 
@@ -33,6 +35,7 @@ export async function getSalesSession(): Promise<SalesSessionInfo | null> {
       isSuperAdmin: false,
       isManager: role === "admin_sales",
       isRep: role === "sales_rep",
+      isDemo: session.isDemo ?? false,
     }
   }
 

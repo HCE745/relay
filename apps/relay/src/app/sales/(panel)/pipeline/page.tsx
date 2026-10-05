@@ -73,12 +73,6 @@ export default async function PipelinePage() {
             <h1 className="text-2xl font-bold text-white">Pipeline</h1>
             <p className="text-gray-400 text-sm mt-0.5">{totalActive} active leads</p>
           </div>
-          <Link
-            href="/super-admin/crm/demo-calls"
-            className="text-xs text-gray-500 hover:text-gray-300 underline underline-offset-2"
-          >
-            Manage in CRM ↗
-          </Link>
         </div>
       </div>
 

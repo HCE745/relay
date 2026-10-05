@@ -2650,6 +2650,7 @@ model SalesUser {
   name             String
   role             String    @default("admin_sales") // "admin_sales" | "sales_rep"
   isActive         Boolean   @default(true)
+  isDemo           Boolean   @default(false)
   // Commission fields
   employmentStatus String    @default("ACTIVE")     // ACTIVE | INACTIVE
   inactiveAt       DateTime?

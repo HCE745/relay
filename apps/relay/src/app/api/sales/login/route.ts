@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
     salesUserId:    salesUser.id,
     salesUserRole:  salesUser.role,
     salesUserName:  salesUser.name,
+    ...(salesUser.isDemo ? { isDemo: true } : {}),
   })
 
   return NextResponse.json({ ok: true, role: salesUser.role })

@@ -16,7 +16,7 @@ async function clientIp(): Promise<string> {
 
 function parseMix(v: FormDataEntryValue | null): DemoMix {
   const n = Number(v)
-  return (n === 0 || n === 1 || n === 2 || n === 3 ? n : 1) as DemoMix
+  return (n >= 0 && n <= 4 ? n : 2) as DemoMix
 }
 
 async function startSession(d: DemoOwner) {

@@ -24,8 +24,9 @@ async function main() {
 
   // A demo org with its 11 seeded staff (all password "demo1234").
   const demo = await createDemoOrg("5.5.5.5", 2)
-  const demoStaff = await systemDb.user.findMany({ where: { organizationId: demo.orgId }, select: { email: true, role: true } })
-  check("demo seeded 11 staff accounts", demoStaff.length === 11, `count=${demoStaff.length}`)
+  const demoAll = await systemDb.user.findMany({ where: { organizationId: demo.orgId }, select: { email: true, role: true } })
+  const demoStaff = demoAll.filter((u) => u.role !== "CLIENT")
+  check("demo seeded 11 staff accounts", demoStaff.length === 11, `staff=${demoStaff.length} total=${demoAll.length}`)
 
   console.log("A real staff account authenticates normally (positive control):")
   const realOk = await authenticate(realOwner.email, "realpass123")

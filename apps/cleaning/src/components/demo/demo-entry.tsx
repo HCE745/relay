@@ -6,8 +6,9 @@ import { enterDemo, reseedDemo } from "@/lib/demo/actions"
 const MIX = [
   { v: 0, label: "All residential", desc: "Homes only — biweekly & monthly cleans" },
   { v: 1, label: "Mostly residential", desc: "75% homes, 25% commercial" },
-  { v: 2, label: "Mostly commercial", desc: "25% homes, 75% offices, clinics, schools" },
-  { v: 3, label: "All commercial", desc: "Offices, clinics, schools, light industrial" },
+  { v: 2, label: "Even mix", desc: "50/50 homes and commercial" },
+  { v: 3, label: "Mostly commercial", desc: "25% homes, 75% offices, clinics, schools" },
+  { v: 4, label: "All commercial", desc: "Offices, clinics, schools, light industrial" },
 ]
 
 // Shared slider + submit. `mode="enter"` provisions a new demo org; `mode="reseed"`
@@ -15,7 +16,7 @@ const MIX = [
 export function DemoEntry({ mode }: { mode: "enter" | "reseed" }) {
   const action = mode === "enter" ? enterDemo : reseedDemo
   const [state, formAction, pending] = useActionState(action, undefined)
-  const [mix, setMix] = useState(2)
+  const [mix, setMix] = useState(3)
   const [confirming, setConfirming] = useState(false)
 
   return (
@@ -23,7 +24,7 @@ export function DemoEntry({ mode }: { mode: "enter" | "reseed" }) {
       <input type="hidden" name="mix" value={mix} />
       <div className="space-y-2">
         <label className="block text-sm font-medium text-slate-700">Data mix</label>
-        <input type="range" min={0} max={3} step={1} value={mix} onChange={(e) => setMix(Number(e.target.value))} className="w-full accent-brand-700" />
+        <input type="range" min={0} max={4} step={1} value={mix} onChange={(e) => setMix(Number(e.target.value))} className="w-full accent-brand-700" />
         <div className="flex justify-between text-[10px] text-slate-400"><span>Residential</span><span>Commercial</span></div>
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <div className="text-sm font-semibold text-slate-800">{MIX[mix].label}</div>

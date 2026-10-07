@@ -8,6 +8,7 @@
 import { systemDb } from "../src/lib/org-db"
 import { createDemoOrg, purgeExpiredDemoOrgs, DemoLimitError } from "../src/lib/demo/provision"
 import { generatePeriodInvoicesAllOrgs } from "../src/lib/data/period-invoicing"
+import { listUncoveredShifts } from "../src/lib/data/coverage"
 
 let failures = 0
 function check(name: string, ok: boolean, detail = "") {
@@ -17,7 +18,7 @@ function check(name: string, ok: boolean, detail = "") {
 async function threw(fn: () => Promise<unknown>) { try { await fn(); return null } catch (e) { return e } }
 
 async function main() {
-  console.log("Seed produces a realistic, live-dated, non-empty org (mostly-commercial):")
+  console.log("Seed produces a realistic, live-dated, non-empty org (even mix):")
   const d = await createDemoOrg("1.1.1.1", 2)
   const orgId = d.orgId
   const org = await systemDb.organization.findUniqueOrThrow({ where: { id: orgId } })
@@ -25,7 +26,7 @@ async function main() {
   check("owner identity returned for the session", !!d.owner.id && !!d.owner.email && !!d.owner.name)
 
   const count = (m: string, where: object = {}) => (systemDb as unknown as Record<string, { count: (a: unknown) => Promise<number> }>)[m].count({ where: { organizationId: orgId, ...where } })
-  const users = await count("user")
+  const users = await count("user", { role: { not: "CLIENT" } }) // staff only; a portal CLIENT invitee is separate
   const customers = await count("customer")
   const jobs = await count("job")
   const completed = await count("job", { status: "COMPLETED" })
@@ -45,6 +46,32 @@ async function main() {
   const jobDates = await systemDb.job.findMany({ where: { organizationId: orgId }, select: { scheduledStart: true }, take: 100 })
   const nowY = new Date().getUTCFullYear()
   check("jobs are dated around now (this year)", jobDates.every((j) => j.scheduledStart.getUTCFullYear() === nowY))
+
+  console.log("Every previously-empty screen is now populated (no empty admin screen):")
+  const now2 = new Date()
+  const in30 = new Date(now2.getTime() + 30 * 86_400_000)
+  const in60 = new Date(now2.getTime() + 60 * 86_400_000)
+  check("Leads — multiple statuses", (await count("lead")) >= 4)
+  check("Estimates — DRAFT, SENT, ACCEPTED", (await count("estimate", { status: "DRAFT" })) >= 1 && (await count("estimate", { status: "SENT" })) >= 1 && (await count("estimate", { status: "ACCEPTED" })) >= 1)
+  check("bid worksheet saved on an estimate", (await count("estimate", { bidWorksheet: { not: null } })) >= 1)
+  check("a contract expiring within the 60-day warning window", (await count("contract", { status: "ACTIVE", endDate: { gt: now2, lte: in60 } })) >= 1)
+  check("Assets with maintenance history", (await count("asset")) >= 2 && (await systemDb.assetMaintenance.count({ where: { asset: { organizationId: orgId } } })) >= 1)
+  const sup = await systemDb.supply.findMany({ where: { organizationId: orgId }, select: { currentStock: true, reorderThreshold: true } })
+  check("Supplies incl. at least one below reorder threshold", sup.length >= 3 && sup.some((s) => Number(s.currentStock) < Number(s.reorderThreshold)), `low=${sup.filter((s) => Number(s.currentStock) < Number(s.reorderThreshold)).length}`)
+  check("Supply usage recorded against jobs (→ profitability supplies)", (await count("supplyUsage")) > 0)
+  const expiring = await count("credential", { status: "ACTIVE", expiryDate: { gt: now2, lte: in30 } })
+  const expired = await count("credential", { status: "ACTIVE", expiryDate: { lt: now2 } })
+  check("Credentials — one expiring soon AND one expired", expiring >= 1 && expired >= 1, `expiring=${expiring} expired=${expired}`)
+  const access = await count("accessItem")
+  const codes = await count("accessItem", { secretCiphertext: { not: null } })
+  check("Access items (key/fob/badge) with NO encrypted codes", access >= 3 && codes === 0, `items=${access} codes=${codes}`)
+  check("Cleaner availability + pending time-off", (await count("availability")) >= 1 && (await count("timeOffRequest", { status: "PENDING" })) >= 1)
+  check("at least one uncovered shift in next 48h", (await listUncoveredShifts(orgId, { hoursAhead: 48 })).length >= 1)
+  check("Export history", (await count("exportRun")) >= 2)
+  check("Portal invite present", (await count("portalInvite")) >= 1)
+  for (const st of ["DRAFT", "SENT", "PARTIALLY_PAID", "PAID", "VOID"]) check(`Invoice status present: ${st}`, (await count("invoice", { status: st })) >= 1)
+  check("an overdue invoice (outstanding, past due)", (await count("invoice", { status: { in: ["SENT", "PARTIALLY_PAID"] }, dueDate: { lt: now2 } })) >= 1)
+  check("both billing modes present (per-job + flat-period)", (await count("servicePlan", { billingMode: "PER_JOB" })) >= 1 && (await count("servicePlan", { billingMode: "FLAT_PERIOD" })) >= 1)
 
   console.log("Demo orgs are excluded from cross-org crons:")
   const periodResults = await generatePeriodInvoicesAllOrgs()

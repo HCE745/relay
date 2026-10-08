@@ -50,6 +50,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "access",      label: "Access & keys", href: "/access",     requiredCap: "operations.accessControl" },
   { key: "inspections", label: "Inspections", href: "/inspections", requiredCap: "quality.inspections" },
   { key: "issues",      label: "Issues",      href: "/issues",      requiredCap: "operations.issues" },
+  { key: "quotes",      label: "Quotes",      href: "/quotes",      requiredCap: "crm.quoting", section: "Sales" },
   { key: "leads",       label: "Leads",       href: "/leads",       requiredCap: "crm.estimates", section: "Sales" },
   { key: "estimates",   label: "Estimates",   href: "/estimates",   requiredCap: "crm.estimates", section: "Sales" },
   { key: "contracts",   label: "Contracts",   href: "/contracts",   requiredCap: "crm.contracts", section: "Sales" },
@@ -71,7 +72,7 @@ export const ADMIN_ROUTE_KEYS: ReadonlySet<string> = new Set(ADMIN_NAV.map((i) =
 const ROLE_ROUTE_ACCESS: Record<Role, string[] | "*"> = {
   OWNER: "*",
   ADMIN: "*",
-  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "coverage", "compliance", "access", "inspections", "issues", "leads", "estimates", "contracts", "invoices", "payments", "ar-aging", "profitability", "supply-spend", "exports", "assets", "supplies"],
+  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "coverage", "compliance", "access", "inspections", "issues", "quotes", "leads", "estimates", "contracts", "invoices", "payments", "ar-aging", "profitability", "supply-spend", "exports", "assets", "supplies"],
   SUPERVISOR: ["dashboard", "schedule", "jobs", "time", "inspections", "issues"],
   CLEANER: [], // cleaners have no admin routes; they use the field app
   CLIENT: [], // portal users have NO admin routes; they live under /portal

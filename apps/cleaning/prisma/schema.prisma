@@ -43,6 +43,33 @@ enum IssueSource {
   @@schema("cleaning")
 }
 
+// Multi-channel quoting (Phase 17).
+enum QuoteSource {
+  PHONE
+  ONLINE
+  IN_PERSON
+  REFERRAL
+
+  @@schema("cleaning")
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+
+  @@schema("cleaning")
+}
+
+enum QuoteRequestStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  WON
+  LOST
+
+  @@schema("cleaning")
+}
+
 // Commercial package. Employee counts are advisory only — capability access is
 // derived from this tier plus per-org overrides (see src/lib/entitlements).
 enum PackageTier {
@@ -357,6 +384,7 @@ model Organization {
   accessItems         AccessItem[]
   exportRuns          ExportRun[]
   portalInvites       PortalInvite[]
+  quoteRequests       QuoteRequest[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -1214,6 +1242,43 @@ model TimeOffRequest {
 
   @@index([organizationId])
   @@index([userId])
+  @@index([status])
+  @@schema("cleaning")
+}
+
+// An inbound quote request (Phase 17) — phone, online booking, in-person
+// walkthrough, or referral. Converts to a Lead and/or Estimate. `walkthrough`
+// holds room-by-room areas captured in the field, used to prefill the bid
+// calculator. `ipHash` is set for public (online) submissions, for rate limits.
+model QuoteRequest {
+  id                 String             @id @default(cuid())
+  organizationId     String
+  source             QuoteSource
+  contactName        String
+  contactEmail       String?
+  contactPhone       String?
+  addressLine1       String?
+  city               String?
+  state              String?
+  postalCode         String?
+  propertyType       PropertyType       @default(RESIDENTIAL)
+  sqft               Int?
+  frequency          ServiceFrequency?
+  notes              String?
+  requestedDate      DateTime?
+  status             QuoteRequestStatus @default(NEW)
+  walkthrough        Json?
+  outsideServiceArea Boolean            @default(false)
+  convertedLeadId    String?
+  convertedEstimateId String?
+  ipHash             String?
+  createdById        String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
   @@index([status])
   @@schema("cleaning")
 }

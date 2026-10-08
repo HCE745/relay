@@ -411,6 +411,47 @@ export const LEAD_STATUSES = ["NEW", "CONTACTED", "ESTIMATING", "WON", "LOST"] a
 export const ESTIMATE_STATUSES = ["DRAFT", "SENT", "ACCEPTED", "DECLINED", "EXPIRED"] as const
 export const ESTIMATE_PRICING = ["PER_VISIT", "HOURLY"] as const
 
+// ─── Multi-channel quoting (Phase 17) ───
+export const QUOTE_SOURCES = ["PHONE", "ONLINE", "IN_PERSON", "REFERRAL"] as const
+export const PROPERTY_TYPES = ["RESIDENTIAL", "COMMERCIAL"] as const
+export const QUOTE_REQUEST_STATUSES = ["NEW", "CONTACTED", "QUOTED", "WON", "LOST"] as const
+
+const walkthroughAreaSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  sqft: z.coerce.number().min(0).max(100_000_000),
+  surface: z.string().trim().max(100).default(""),
+  notes: optionalString,
+})
+
+const quoteBase = {
+  contactName: z.string().trim().min(1, "Contact name is required").max(200),
+  contactEmail: z.string().trim().email().optional().or(z.literal("").transform(() => undefined)),
+  contactPhone: optionalString,
+  addressLine1: optionalString,
+  city: optionalString,
+  state: optionalString,
+  postalCode: optionalString,
+  propertyType: z.enum(PROPERTY_TYPES).default("RESIDENTIAL"),
+  sqft: z.coerce.number().int().min(0).max(100_000_000).optional(),
+  frequency: z.enum(SERVICE_FREQUENCIES).optional(),
+  notes: optionalString,
+  requestedDate: dateString.optional(),
+}
+
+// Staff intake (phone / in-person / referral). `walkthrough` prefills the bid.
+export const quoteRequestCreateSchema = z.object({
+  source: z.enum(QUOTE_SOURCES).default("PHONE"),
+  ...quoteBase,
+  walkthrough: z.array(walkthroughAreaSchema).optional(),
+})
+export const quoteRequestUpdateSchema = z.object({ status: z.enum(QUOTE_REQUEST_STATUSES) })
+
+// Public online booking — honeypot `website` must be empty; source forced ONLINE.
+export const publicQuoteSchema = z.object({
+  ...quoteBase,
+  website: z.string().optional(), // honeypot
+})
+
 export const leadCreateSchema = z.object({
   name: z.string().trim().min(1, "Contact name is required").max(200),
   company: optionalString,

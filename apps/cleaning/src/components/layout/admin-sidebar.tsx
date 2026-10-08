@@ -7,7 +7,7 @@ import { logout } from "@/lib/auth-actions"
 import type { AdminNavItem } from "@/lib/rbac"
 import {
   HomeIcon, CalendarIcon, BriefcaseIcon, BuildingIcon, MapPinIcon, UsersIcon, ClockIcon,
-  ClipboardCheckIcon, AlertTriangleIcon, SparklesIcon, ReceiptIcon, FileTextIcon,
+  ClipboardCheckIcon, ClipboardListIcon, AlertTriangleIcon, SparklesIcon, ReceiptIcon, FileTextIcon,
   CreditCardIcon, DollarIcon, ChartBarIcon, BoxIcon, TagIcon, CogIcon, CircleIcon,
 } from "@/components/ui/icons"
 
@@ -25,6 +25,7 @@ const NAV_ICON: Record<string, (p: { className?: string }) => React.ReactNode> =
   access: TagIcon,
   inspections: ClipboardCheckIcon,
   issues: AlertTriangleIcon,
+  quotes: ClipboardListIcon,
   leads: SparklesIcon,
   estimates: ReceiptIcon,
   contracts: FileTextIcon,

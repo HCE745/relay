@@ -26,6 +26,9 @@ const PUBLIC_PATHS = [
   "/portal", // customer portal — SEPARATE trust boundary, guards via its own session
   "/api/portal", // portal API — self-guards via getPortalSession
   "/demo", // public sandbox landing — provisions a throwaway demo org
+  "/book", // public per-org online booking
+  "/apply", // public per-org job application (Phase 18)
+  "/api/public", // public intake endpoints — self rate-limit + honeypot
   "/api/demo", // demo provisioning — self rate-limits + caps
   "/api/auth", // forgot/reset — self-contained, token-based
   "/api/cron", // self-guards via CRON_SECRET

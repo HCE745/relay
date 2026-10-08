@@ -388,17 +388,22 @@ async function seedExtras(
   await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "BADGE", identifier: "Visitor badge 12", status: "AVAILABLE" } })
 
   // ── Coverage: an upcoming job whose assigned cleaner is unavailable → NEEDS COVERAGE ──
+  // Anchor to tomorrow's UTC midnight so the job's date and the availability day
+  // always match (adding hours to `now` could roll past midnight).
+  const tomorrow = new Date(now)
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1)
+  tomorrow.setUTCHours(0, 0, 0, 0)
+  const coverStart = new Date(tomorrow.getTime() + 19 * 3600_000) // tomorrow 19:00 UTC — within 48h
+  const coverDayKey = tomorrow.toISOString().slice(0, 10)
   const coverJob = await systemDb.job.create({
     data: {
       organizationId: orgId, serviceLocationId: commSite.id, title: "Tomorrow night — needs coverage", status: "ASSIGNED",
-      scheduledStart: new Date(now.getTime() + DAY + 19 * 3600_000), scheduledEnd: new Date(now.getTime() + DAY + 22 * 3600_000), crewSize: 2, createdById: staff.managerId,
+      scheduledStart: coverStart, scheduledEnd: new Date(coverStart.getTime() + 3 * 3600_000), crewSize: 2, createdById: staff.managerId,
       assignments: { create: [{ organizationId: orgId, userId: cleaner, status: "ASSIGNED" }] },
     },
     select: { id: true },
   })
   void coverJob
-  const coverDay = new Date(now.getTime() + DAY)
-  const coverDayKey = coverDay.toISOString().slice(0, 10)
   await systemDb.availability.create({ data: { organizationId: orgId, userId: cleaner, startDate: new Date(`${coverDayKey}T00:00:00.000Z`), endDate: new Date(`${coverDayKey}T00:00:00.000Z`), reason: "Out sick", source: "MANAGER", createdById: staff.managerId } })
   // A pending time-off request to approve.
   await systemDb.timeOffRequest.create({ data: { organizationId: orgId, userId: cleaner2, startDate: days(6), endDate: days(8), reason: "Family trip", status: "PENDING" } })
@@ -438,5 +443,26 @@ async function seedExtras(
   void understaffed
   if (ctx.completedJobIds.length > 0) {
     await systemDb.timeEntry.create({ data: { organizationId: orgId, jobId: ctx.completedJobIds[ctx.completedJobIds.length - 1], userId: staff.cleanerIds[2], clockInAt: new Date(week.getTime() + todayOffset * DAY - DAY + 19 * 3600_000), clockOutAt: new Date(week.getTime() + todayOffset * DAY - DAY + 22 * 3600_000), breakMinutes: 15, status: "COMPLETED", clockInSource: "mobile_gps" } })
+  }
+
+  // ── Quote requests across sources + statuses (Phase 17) ──
+  const quoteDefs: { source: "PHONE" | "ONLINE" | "IN_PERSON" | "REFERRAL"; contactName: string; status: "NEW" | "CONTACTED" | "QUOTED" | "WON" | "LOST"; propertyType: "RESIDENTIAL" | "COMMERCIAL"; sqft: number; city: string; walk?: boolean }[] = [
+    { source: "PHONE", contactName: "Jordan Blake", status: "NEW", propertyType: "RESIDENTIAL", sqft: 2200, city: "Austin" },
+    { source: "ONLINE", contactName: "Westside Clinic", status: "CONTACTED", propertyType: "COMMERCIAL", sqft: 14000, city: "Round Rock" },
+    { source: "IN_PERSON", contactName: "Lakeview Offices", status: "QUOTED", propertyType: "COMMERCIAL", sqft: 30000, city: "Austin", walk: true },
+    { source: "REFERRAL", contactName: "The Okafors", status: "WON", propertyType: "RESIDENTIAL", sqft: 1800, city: "Cedar Park" },
+    { source: "ONLINE", contactName: "Old Mill Lofts", status: "LOST", propertyType: "COMMERCIAL", sqft: 9000, city: "Austin" },
+  ]
+  for (const q of quoteDefs) {
+    await systemDb.quoteRequest.create({
+      data: {
+        organizationId: orgId, source: q.source, contactName: q.contactName, contactPhone: "512-555-0147",
+        contactEmail: `${q.contactName.toLowerCase().replace(/[^a-z]/g, "")}-${stamp}@quote.demo`,
+        addressLine1: "500 Demo Ave", city: q.city, state: "TX", postalCode: "78701",
+        propertyType: q.propertyType, sqft: q.sqft, frequency: q.propertyType === "COMMERCIAL" ? "WEEKLY" : "BIWEEKLY",
+        status: q.status, notes: "Interested in a recurring plan.",
+        walkthrough: q.walk ? [{ name: "Lobby", sqft: 4000, surface: "Hard floor" }, { name: "Open office", sqft: 20000, surface: "Carpet" }, { name: "Restrooms", sqft: 1200, surface: "Restroom" }] : undefined,
+      },
+    })
   }
 }

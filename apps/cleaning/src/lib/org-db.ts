@@ -58,6 +58,9 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "ExportRun",
   "PortalInvite",
   "QuoteRequest",
+  "JobPosting",
+  "Applicant",
+  "Interview",
 ])
 
 // Models that are DELIBERATELY not org-scoped, each with a stated reason. A

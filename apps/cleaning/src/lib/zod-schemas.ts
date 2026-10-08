@@ -411,6 +411,55 @@ export const LEAD_STATUSES = ["NEW", "CONTACTED", "ESTIMATING", "WON", "LOST"] a
 export const ESTIMATE_STATUSES = ["DRAFT", "SENT", "ACCEPTED", "DECLINED", "EXPIRED"] as const
 export const ESTIMATE_PRICING = ["PER_VISIT", "HOURLY"] as const
 
+// ─── Hiring / applicant tracking (Phase 18) ───
+export const JOB_POSTING_STATUSES = ["DRAFT", "OPEN", "CLOSED"] as const
+export const APPLICANT_STATUSES = ["NEW", "SCREENING", "INTERVIEW", "OFFER", "HIRED", "REJECTED"] as const
+export const EMPLOYMENT_TYPES = ["Full-time", "Part-time", "Contract", "Seasonal"] as const
+
+export const jobPostingCreateSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200),
+  description: optionalString,
+  payRange: optionalString,
+  employmentType: optionalString,
+  locations: optionalString,
+  status: z.enum(JOB_POSTING_STATUSES).optional(),
+})
+export const jobPostingUpdateSchema = jobPostingCreateSchema.partial()
+
+export const applicantCreateSchema = z.object({
+  jobPostingId: z.string().min(1).optional(),
+  name: z.string().trim().min(1, "Name is required").max(200),
+  email: z.string().trim().email().optional().or(z.literal("").transform(() => undefined)),
+  phone: optionalString,
+  source: optionalString,
+  appliedFor: optionalString,
+  status: z.enum(APPLICANT_STATUSES).optional(),
+  notes: optionalString,
+  resumeRef: optionalString,
+  availability: optionalString,
+})
+export const applicantUpdateSchema = z.object({ status: z.enum(APPLICANT_STATUSES).optional(), notes: optionalString })
+export const publicApplicationSchema = z.object({
+  jobPostingId: z.string().min(1).optional(),
+  appliedFor: optionalString,
+  name: z.string().trim().min(1).max(200),
+  email: z.string().trim().email(),
+  phone: optionalString,
+  resumeRef: optionalString,
+  availability: optionalString,
+  website: z.string().optional(), // honeypot
+})
+export const interviewCreateSchema = z.object({
+  date: dateString,
+  interviewerId: z.string().min(1).optional(),
+  outcomeNotes: optionalString,
+})
+export const convertApplicantSchema = z.object({
+  role: z.enum(["CLEANER", "SUPERVISOR", "MANAGER"]).optional(),
+  payType: z.enum(["HOURLY", "SALARY"]).optional(),
+  payRate: optionalMoney,
+})
+
 // ─── Multi-channel quoting (Phase 17) ───
 export const QUOTE_SOURCES = ["PHONE", "ONLINE", "IN_PERSON", "REFERRAL"] as const
 export const PROPERTY_TYPES = ["RESIDENTIAL", "COMMERCIAL"] as const

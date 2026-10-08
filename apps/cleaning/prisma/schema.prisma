@@ -70,6 +70,26 @@ enum QuoteRequestStatus {
   @@schema("cleaning")
 }
 
+// Hiring / applicant tracking (Phase 18).
+enum JobPostingStatus {
+  DRAFT
+  OPEN
+  CLOSED
+
+  @@schema("cleaning")
+}
+
+enum ApplicantStatus {
+  NEW
+  SCREENING
+  INTERVIEW
+  OFFER
+  HIRED
+  REJECTED
+
+  @@schema("cleaning")
+}
+
 // Commercial package. Employee counts are advisory only — capability access is
 // derived from this tier plus per-org overrides (see src/lib/entitlements).
 enum PackageTier {
@@ -385,6 +405,9 @@ model Organization {
   exportRuns          ExportRun[]
   portalInvites       PortalInvite[]
   quoteRequests       QuoteRequest[]
+  jobPostings         JobPosting[]
+  applicants          Applicant[]
+  interviews          Interview[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -446,6 +469,7 @@ model EmployeeProfile {
   payRate          Decimal?         @db.Decimal(10, 2)
   employmentStatus EmploymentStatus @default(ACTIVE)
   hireDate         DateTime?
+  availability     String? // carried over from an Applicant on hire (Phase 18)
   emergencyContactName  String?
   emergencyContactPhone String?
   createdAt        DateTime         @default(now())
@@ -1280,6 +1304,74 @@ model QuoteRequest {
 
   @@index([organizationId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// A job posting (Phase 18).
+model JobPosting {
+  id             String           @id @default(cuid())
+  organizationId String
+  title          String
+  description    String?
+  payRange       String?
+  employmentType String?
+  locations      String?
+  status         JobPostingStatus @default(OPEN)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  applicants   Applicant[]
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// An applicant (Phase 18). A HIRED applicant converts to a User + EmployeeProfile
+// atomically and becomes read-only, permanently linked via convertedUserId.
+model Applicant {
+  id             String          @id @default(cuid())
+  organizationId String
+  jobPostingId   String?
+  name           String
+  email          String?
+  phone          String?
+  source         String?
+  appliedFor     String?
+  status         ApplicantStatus @default(NEW)
+  notes          String?
+  resumeRef      String?
+  availability   String?
+  convertedUserId String?
+  convertedAt    DateTime?
+  ipHash         String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  jobPosting   JobPosting?  @relation(fields: [jobPostingId], references: [id], onDelete: SetNull)
+  interviews   Interview[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@schema("cleaning")
+}
+
+// An interview on an applicant (Phase 18). No calendar integration.
+model Interview {
+  id             String   @id @default(cuid())
+  organizationId String
+  applicantId    String
+  date           DateTime
+  interviewerId  String?
+  outcomeNotes   String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  applicant    Applicant    @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([applicantId])
   @@schema("cleaning")
 }
 

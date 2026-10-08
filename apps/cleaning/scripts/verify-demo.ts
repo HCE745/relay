@@ -36,7 +36,7 @@ async function main() {
   const failInsp = await count("inspection", { outcome: "FAIL" })
   const contracts = await count("contract")
   const photos = await count("jobPhoto")
-  check("staff: 11 users (owner, manager, 2 sup, 7 cleaners)", users === 11, `users=${users}`)
+  check("staff: 12 users (owner, manager, 2 sup, 7 cleaners, 1 hired applicant)", users === 12, `users=${users}`)
   check("customers seeded", customers >= 4, `customers=${customers}`)
   check("calendar populated: completed AND upcoming jobs", completed > 0 && upcoming > 0, `done=${completed} upcoming=${upcoming}`)
   check("invoices: at least one SENT and one PARTIALLY_PAID", invSent > 0 && invPartial > 0, `sent=${invSent} partial=${invPartial}`)

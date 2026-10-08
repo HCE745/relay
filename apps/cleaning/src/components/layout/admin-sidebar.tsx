@@ -29,6 +29,7 @@ const NAV_ICON: Record<string, (p: { className?: string }) => React.ReactNode> =
   leads: SparklesIcon,
   estimates: ReceiptIcon,
   contracts: FileTextIcon,
+  hiring: UsersIcon,
   invoices: CreditCardIcon,
   payments: DollarIcon,
   "ar-aging": ChartBarIcon,

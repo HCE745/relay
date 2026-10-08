@@ -465,4 +465,67 @@ async function seedExtras(
       },
     })
   }
+
+  // ── Hiring: job postings + applicant pipeline + interviews (Phase 18) ──
+  const postingDefs: { title: string; status: "DRAFT" | "OPEN" | "CLOSED"; employmentType: string; payRange: string }[] = [
+    { title: "Residential Cleaner", status: "OPEN", employmentType: "Full-time", payRange: "$18–$22/hr" },
+    { title: "Night Crew Lead", status: "OPEN", employmentType: "Full-time", payRange: "$24–$28/hr" },
+    { title: "Weekend Part-time Cleaner", status: "DRAFT", employmentType: "Part-time", payRange: "$17–$20/hr" },
+  ]
+  const postings: { id: string; title: string }[] = []
+  for (const p of postingDefs) {
+    const created = await systemDb.jobPosting.create({
+      data: { organizationId: orgId, title: p.title, status: p.status, employmentType: p.employmentType, payRange: p.payRange, locations: "Austin, TX", description: "Join our crew — reliable scheduling, paid training, growth to lead roles." },
+      select: { id: true, title: true },
+    })
+    postings.push(created)
+  }
+  const openPosting = postings[0]
+
+  const applicantDefs: { name: string; status: "NEW" | "SCREENING" | "INTERVIEW" | "OFFER" | "HIRED" | "REJECTED"; source: string; availability: string; interview?: { days: number; notes: string } }[] = [
+    { name: "Maria Gonzalez", status: "NEW", source: "ONLINE", availability: "Weekdays, mornings" },
+    { name: "Derek Wells", status: "SCREENING", source: "REFERRAL", availability: "Flexible" },
+    { name: "Aisha Rahman", status: "INTERVIEW", source: "ONLINE", availability: "Evenings", interview: { days: -2, notes: "Strong communication; scheduling second round." } },
+    { name: "Tom Becker", status: "OFFER", source: "PHONE", availability: "Full-time", interview: { days: -5, notes: "Great fit — extended offer." } },
+    { name: "Priya Shah", status: "REJECTED", source: "ONLINE", availability: "Weekends only" },
+  ]
+  for (const a of applicantDefs) {
+    const slug = a.name.toLowerCase().replace(/[^a-z]/g, "")
+    const applicant = await systemDb.applicant.create({
+      data: {
+        organizationId: orgId, jobPostingId: openPosting.id, name: a.name, source: a.source,
+        email: `${slug}-${stamp}@applicant.demo`, phone: "512-555-0188", appliedFor: openPosting.title,
+        availability: a.availability, status: a.status, notes: "Applied via demo pipeline.",
+      },
+      select: { id: true },
+    })
+    if (a.interview) {
+      await systemDb.interview.create({
+        data: { organizationId: orgId, applicantId: applicant.id, date: days(a.interview.days), interviewerId: staff.managerId, outcomeNotes: a.interview.notes },
+      })
+    }
+  }
+
+  // One HIRED applicant already converted to an employee (User + EmployeeProfile linked). ──
+  const hiredPw = await bcrypt.hash("demo1234", 10)
+  const hiredUser = await systemDb.user.create({
+    data: {
+      organizationId: orgId, name: "Sam Carter", email: `samcarter-${stamp}@applicant.demo`, phone: "512-555-0199",
+      password: hiredPw, role: "CLEANER", isActive: true,
+      employeeProfile: { create: { organizationId: orgId, payType: "HOURLY", payRate: "20.00", hireDate: days(-7), availability: "Full-time" } },
+    },
+    select: { id: true },
+  })
+  const hiredApplicant = await systemDb.applicant.create({
+    data: {
+      organizationId: orgId, jobPostingId: openPosting.id, name: "Sam Carter", source: "ONLINE",
+      email: `samcarter-${stamp}@applicant.demo`, phone: "512-555-0199", appliedFor: openPosting.title,
+      availability: "Full-time", status: "HIRED", convertedUserId: hiredUser.id, convertedAt: days(-7),
+      notes: "Hired and converted to employee.",
+    },
+    select: { id: true },
+  })
+  await systemDb.interview.create({
+    data: { organizationId: orgId, applicantId: hiredApplicant.id, date: days(-10), interviewerId: staff.managerId, outcomeNotes: "Excellent — recommended hire." },
+  })
 }

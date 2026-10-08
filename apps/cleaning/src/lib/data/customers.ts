@@ -1,4 +1,6 @@
 import { orgDb } from "../org-db"
+import { evaluateIntake } from "./intake-eval"
+import { acknowledgeIntakeFlags } from "./service-areas"
 import type { z } from "zod"
 import type { customerCreateSchema, customerUpdateSchema } from "../zod-schemas"
 
@@ -22,10 +24,20 @@ export function getCustomer(orgId: string, id: string) {
   })
 }
 
-export function createCustomer(orgId: string, input: CreateInput) {
+export async function createCustomer(orgId: string, input: CreateInput, actorId?: string) {
+  // Check the do-not-serve exclusion lists by contact (Customer has no
+  // structured address). WARN, never block — the customer is still created and
+  // staff see a clear flag with the reason.
+  const evalResult = await evaluateIntake(orgId, {
+    contactName: input.primaryContactName ?? input.name, contactEmail: input.email, contactPhone: input.phone,
+  })
   // organizationId is also force-set by the org-scoped client; passing it here
   // satisfies Prisma's create type and can never diverge from the session org.
-  return orgDb(orgId).customer.create({ data: { ...input, organizationId: orgId } })
+  const customer = await orgDb(orgId).customer.create({ data: { ...input, organizationId: orgId } })
+  if (actorId && evalResult.exclusions.length > 0) {
+    await acknowledgeIntakeFlags(orgId, actorId, "Customer", customer.id, evalResult)
+  }
+  return { ...customer, intakeExclusions: evalResult.exclusions }
 }
 
 export async function updateCustomer(orgId: string, id: string, input: UpdateInput) {

@@ -501,6 +501,55 @@ export const publicQuoteSchema = z.object({
   website: z.string().optional(), // honeypot
 })
 
+// ─── Service areas & exclusions (Phase 19) ───
+export const EXCLUSION_REASONS = [
+  "OUT_OF_RANGE", "NO_CREW_COVERAGE", "ASSIGNED_TO_OTHER_OFFICE",
+  "ACCESS_ISSUE", "SAFETY_INCIDENT", "NON_PAYMENT", "OTHER",
+] as const
+
+// Accept a comma/space/newline-separated list of ZIPs or an array; store as array.
+const zipList = z
+  .union([z.string(), z.array(z.string())])
+  .optional()
+  .transform((v) => {
+    const parts = Array.isArray(v) ? v : (v ?? "").split(/[\s,]+/)
+    return parts.map((s) => s.trim()).filter(Boolean)
+  })
+
+export const serviceAreaCreateSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(120),
+  zipCodes: zipList,
+  centerLat: z.coerce.number().min(-90).max(90).optional(),
+  centerLng: z.coerce.number().min(-180).max(180).optional(),
+  radiusMiles: z.coerce.number().min(0).max(10_000).optional(),
+  officeLabel: optionalString,
+  active: z.boolean().optional(),
+})
+export const serviceAreaUpdateSchema = serviceAreaCreateSchema.partial()
+
+const exclusionBase = {
+  reason: z.enum(EXCLUSION_REASONS),
+  note: optionalString,
+}
+export const excludedAddressSchema = z.object({
+  addressLine1: z.string().trim().min(1, "Address is required").max(300),
+  city: optionalString,
+  state: optionalString,
+  postalCode: optionalString,
+  ...exclusionBase,
+})
+export const excludedContactSchema = z
+  .object({ name: optionalString, phone: optionalString, email: optionalEmail, ...exclusionBase })
+  .refine((v) => v.name || v.phone || v.email, { message: "Provide a name, phone, or email" })
+export const excludedZoneSchema = z.object({
+  value: z.string().trim().min(1, "A ZIP or area name is required").max(120),
+  ...exclusionBase,
+})
+// Update schemas — plain partials (the contact create uses .refine, so it can't .partial()).
+export const excludedAddressUpdateSchema = excludedAddressSchema.partial()
+export const excludedContactUpdateSchema = z.object({ name: optionalString, phone: optionalString, email: optionalEmail, reason: z.enum(EXCLUSION_REASONS).optional(), note: optionalString })
+export const excludedZoneUpdateSchema = excludedZoneSchema.partial()
+
 export const leadCreateSchema = z.object({
   name: z.string().trim().min(1, "Contact name is required").max(200),
   company: optionalString,

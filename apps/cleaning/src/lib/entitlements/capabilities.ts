@@ -39,6 +39,7 @@ export const CAPABILITIES = [
   "crm.bidCalculator", // production-rate bid worksheet on estimates
   "crm.quoting", // multi-channel quote intake (phone/online/in-person)
   "workforce.hiring", // job postings, applicants, convert-to-employee
+  "operations.serviceAreas", // service areas + do-not-serve exclusions
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",

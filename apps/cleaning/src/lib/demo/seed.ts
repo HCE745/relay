@@ -528,4 +528,34 @@ async function seedExtras(
   await systemDb.interview.create({
     data: { organizationId: orgId, applicantId: hiredApplicant.id, date: days(-10), interviewerId: staff.managerId, outcomeNotes: "Excellent — recommended hire." },
   })
+
+  // ── Service areas + do-not-serve exclusions (Phase 19) ──
+  await systemDb.serviceArea.create({
+    data: { organizationId: orgId, name: "Central Austin", zipCodes: ["78701", "78702", "78703", "78704", "78705"], officeLabel: "HQ", active: true },
+  })
+  await systemDb.serviceArea.create({
+    data: { organizationId: orgId, name: "North suburbs", zipCodes: ["78613", "78664", "78681"], officeLabel: "North branch", active: true },
+  })
+  await systemDb.serviceArea.create({
+    data: { organizationId: orgId, name: "Metro radius (pending geocoding)", radiusMiles: "30.00", centerLat: "30.267200", centerLng: "-97.743100", officeLabel: "HQ", active: false },
+  })
+
+  // Exclusions across all three kinds + reasons, each with an audit record.
+  const exAddr = await systemDb.excludedAddress.create({
+    data: { organizationId: orgId, addressLine1: "4200 Red Zone Rd", city: "Austin", state: "TX", postalCode: "78701", reason: "SAFETY_INCIDENT", note: "Aggressive dog on prior visit.", createdById: staff.managerId },
+    select: { id: true },
+  })
+  const exContact = await systemDb.excludedContact.create({
+    data: { organizationId: orgId, name: "Old Mill Lofts", phone: "512-555-0147", reason: "NON_PAYMENT", note: "Two invoices charged back.", createdById: staff.managerId },
+    select: { id: true },
+  })
+  const exZone = await systemDb.excludedZone.create({
+    data: { organizationId: orgId, value: "78612", reason: "NO_CREW_COVERAGE", note: "No crew routed south yet.", createdById: staff.managerId },
+    select: { id: true },
+  })
+  for (const [entityType, id, reason] of [["ExcludedAddress", exAddr.id, "SAFETY_INCIDENT"], ["ExcludedContact", exContact.id, "NON_PAYMENT"], ["ExcludedZone", exZone.id, "NO_CREW_COVERAGE"]] as const) {
+    await systemDb.auditEvent.create({
+      data: { organizationId: orgId, actorUserId: staff.managerId, entityType, entityId: id, action: "create", newValue: reason, metadata: { reason } },
+    })
+  }
 }

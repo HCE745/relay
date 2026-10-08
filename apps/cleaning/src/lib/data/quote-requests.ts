@@ -1,6 +1,7 @@
 import { orgDb } from "../org-db"
 import { assertFound, ForbiddenActionError } from "./errors"
 import { evaluateIntake } from "./intake-eval"
+import { acknowledgeIntakeFlags } from "./service-areas"
 import { createLead } from "./leads"
 import { createEstimate } from "./estimates"
 import { enforceIntakeLimits, INTAKE_LIMITS } from "../public-intake"
@@ -31,6 +32,7 @@ export async function evaluateQuoteRequest(orgId: string, id: string) {
 
 export async function createQuoteRequest(orgId: string, input: StaffInput, createdById: string) {
   const evalResult = await evaluateIntake(orgId, input)
+  const primary = evalResult.exclusions[0]
   const created = await orgDb(orgId).quoteRequest.create({
     data: {
       organizationId: orgId, source: input.source ?? "PHONE", contactName: input.contactName,
@@ -39,10 +41,16 @@ export async function createQuoteRequest(orgId: string, input: StaffInput, creat
       propertyType: input.propertyType ?? "RESIDENTIAL", sqft: input.sqft, frequency: input.frequency,
       notes: input.notes, requestedDate: toDate(input.requestedDate),
       walkthrough: input.walkthrough ? (input.walkthrough as object) : undefined,
-      outsideServiceArea: evalResult.outsideServiceArea, createdById,
+      outsideServiceArea: evalResult.outsideServiceArea,
+      excluded: evalResult.exclusions.length > 0, exclusionReason: primary?.reason, exclusionNote: primary?.note,
+      createdById,
     },
     select: { id: true },
   })
+  // Staff created this knowing the warning (WARN, not block) — log the override.
+  if (evalResult.outsideServiceArea || evalResult.exclusions.length > 0) {
+    await acknowledgeIntakeFlags(orgId, createdById, "QuoteRequest", created.id, evalResult)
+  }
   return { id: created.id, outsideServiceArea: evalResult.outsideServiceArea, exclusions: evalResult.exclusions }
 }
 
@@ -72,7 +80,11 @@ export async function createPublicQuote(
   enforceIntakeLimits(recentIp, recentOrg) // throws IntakeRejected on abuse
 
   const evalResult = await evaluateIntake(orgId, input)
+  // Outside the service area → neutral out-of-area message. Exclusions are NEVER
+  // revealed to the public: an excluded submission is accepted normally and
+  // stored with a staff-only flag, so staff can decide how to handle it.
   if (evalResult.outsideServiceArea) return { accepted: false, reason: "out_of_area" }
+  const primary = evalResult.exclusions[0]
 
   const created = await db.quoteRequest.create({
     data: {
@@ -80,7 +92,9 @@ export async function createPublicQuote(
       contactEmail: input.contactEmail, contactPhone: input.contactPhone,
       addressLine1: input.addressLine1, city: input.city, state: input.state, postalCode: input.postalCode,
       propertyType: input.propertyType ?? "RESIDENTIAL", sqft: input.sqft, frequency: input.frequency, notes: input.notes,
-      outsideServiceArea: false, ipHash,
+      outsideServiceArea: false,
+      excluded: evalResult.exclusions.length > 0, exclusionReason: primary?.reason, exclusionNote: primary?.note,
+      ipHash,
     },
     select: { id: true },
   })

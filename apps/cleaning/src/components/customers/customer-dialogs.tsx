@@ -37,6 +37,7 @@ function CustomerForm({ initial, onDone }: { initial?: CustomerValues; onDone: (
     notes: initial?.notes ?? "",
   })
   const [error, setError] = useState<string | null>(null)
+  const [warnings, setWarnings] = useState<{ kind: string; reason: string; note?: string }[] | null>(null)
   const [saving, setSaving] = useState(false)
   const set =
     (k: keyof CustomerValues) =>
@@ -49,11 +50,35 @@ function CustomerForm({ initial, onDone }: { initial?: CustomerValues; onDone: (
     setError(null)
     const res = initial?.id
       ? await apiSend(`/api/customers/${initial.id}`, "PATCH", values)
-      : await apiSend("/api/customers", "POST", values)
+      : await apiSend<{ intakeExclusions?: { kind: string; reason: string; note?: string }[] }>("/api/customers", "POST", values)
     setSaving(false)
     if (!res.ok) return setError(res.error)
+    // Do-not-serve match — the customer WAS created; surface a clear flag for staff to acknowledge.
+    const flags = !initial?.id && res.ok ? (res.data as { intakeExclusions?: { kind: string; reason: string; note?: string }[] }).intakeExclusions : undefined
+    if (flags && flags.length > 0) {
+      setWarnings(flags)
+      router.refresh()
+      return
+    }
     onDone()
     router.refresh()
+  }
+
+  if (warnings) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-900">Heads up — this contact is on the do-not-serve list</p>
+          <p className="mt-1 text-sm text-amber-800">The customer was created, but review before scheduling work:</p>
+          <ul className="mt-2 space-y-1 text-sm text-amber-800">
+            {warnings.map((w, i) => (
+              <li key={i}>• {w.reason.replaceAll("_", " ").toLowerCase()}{w.note ? ` — ${w.note}` : ""}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex justify-end"><Button onClick={onDone}>Got it</Button></div>
+      </div>
+    )
   }
 
   return (

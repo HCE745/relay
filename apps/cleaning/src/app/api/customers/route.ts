@@ -16,5 +16,5 @@ export async function POST(request: Request) {
   if (!g.ok) return g.response
   const body = await parseBody(customerCreateSchema, request)
   if (!body.ok) return body.response
-  return runWrite(() => createCustomer(g.orgId, body.data), { created: true })
+  return runWrite(() => createCustomer(g.orgId, body.data, g.session.userId), { created: true })
 }

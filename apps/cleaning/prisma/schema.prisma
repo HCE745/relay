@@ -408,6 +408,10 @@ model Organization {
   jobPostings         JobPosting[]
   applicants          Applicant[]
   interviews          Interview[]
+  serviceAreas        ServiceArea[]
+  excludedAddresses   ExcludedAddress[]
+  excludedContacts    ExcludedContact[]
+  excludedZones       ExcludedZone[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -1293,6 +1297,9 @@ model QuoteRequest {
   status             QuoteRequestStatus @default(NEW)
   walkthrough        Json?
   outsideServiceArea Boolean            @default(false)
+  excluded           Boolean            @default(false)
+  exclusionReason    String?
+  exclusionNote      String?
   convertedLeadId    String?
   convertedEstimateId String?
   ipHash             String?
@@ -1372,6 +1379,100 @@ model Interview {
 
   @@index([organizationId])
   @@index([applicantId])
+  @@schema("cleaning")
+}
+
+// ─── Service areas & exclusions (Phase 19) ───────────────────────────────────
+// Why an exclusion is on file — a required, auditable reason, never free-form only.
+enum ExclusionReason {
+  OUT_OF_RANGE
+  NO_CREW_COVERAGE
+  ASSIGNED_TO_OTHER_OFFICE
+  ACCESS_ISSUE
+  SAFETY_INCIDENT
+  NON_PAYMENT
+  OTHER
+
+  @@schema("cleaning")
+}
+
+// A serviceable area: a set of ZIP codes and/or a radius from a point, tied to
+// an office/branch label. An address matching no active area is flagged (never
+// silently refused). Radius evaluation requires geocoding (not wired) — ZIP
+// matching is the active path; see evaluateIntake.
+model ServiceArea {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  zipCodes       String[]
+  centerLat      Decimal? @db.Decimal(9, 6)
+  centerLng      Decimal? @db.Decimal(9, 6)
+  radiusMiles    Decimal? @db.Decimal(6, 2)
+  officeLabel    String?
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// Do-not-serve list: a specific address.
+model ExcludedAddress {
+  id             String          @id @default(cuid())
+  organizationId String
+  addressLine1   String
+  city           String?
+  state          String?
+  postalCode     String?
+  reason         ExclusionReason
+  note           String?
+  createdById    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([postalCode])
+  @@schema("cleaning")
+}
+
+// Do-not-serve list: a specific person (phone/email/name).
+model ExcludedContact {
+  id             String          @id @default(cuid())
+  organizationId String
+  name           String?
+  phone          String?
+  email          String?
+  reason         ExclusionReason
+  note           String?
+  createdById    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// Do-not-serve list: a ZIP or named area.
+model ExcludedZone {
+  id             String          @id @default(cuid())
+  organizationId String
+  value          String // a ZIP code or a named area
+  reason         ExclusionReason
+  note           String?
+  createdById    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
   @@schema("cleaning")
 }
 

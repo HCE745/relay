@@ -198,7 +198,7 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
         const job = await systemDb.job.create({
           data: {
             organizationId: orgId, serviceLocationId: site.id, servicePlanId: plan.id, title: `${acct.name} — ${siteSpec.name}`,
-            status: status as "COMPLETED", scheduledStart: start, scheduledEnd: end,
+            status: status as "COMPLETED", plannedStart: start, scheduledStart: start, scheduledEnd: end,
             actualStart: past || isToday ? start : null, actualEnd: past ? end : null, crewSize: isComm ? 2 : 1,
             createdById: staff.managerId,
             assignments: { create: crew.map((uid) => ({ organizationId: orgId, userId: uid, status: past ? "COMPLETED" : "ASSIGNED" })) },

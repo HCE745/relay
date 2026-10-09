@@ -5,9 +5,12 @@ import { generateOccurrences, type Frequency, type PlanRecurrence } from "./recu
 // Deliberate, idempotent, concurrency-safe Job generation from ServicePlans.
 //
 // Idempotency is enforced at TWO levels: (1) the DB unique constraint
-// (servicePlanId, scheduledStart), which is the source of truth, and (2) this
+// (servicePlanId, plannedStart) — keyed on the IMMUTABLE occurrence instant, not
+// the mutable scheduledStart — which is the source of truth, and (2) this
 // service catching the resulting P2002 and counting it as "skipped". Two
-// concurrent runs therefore converge without duplicates or crashes.
+// concurrent runs therefore converge without duplicates or crashes, and
+// rescheduling a job (which moves scheduledStart only) can never cause the next
+// run to recreate a ghost in the vacated slot.
 
 export type GenerationResult = {
   planId: string
@@ -74,6 +77,7 @@ export async function generateJobsForServicePlan(
           servicePlanId: plan!.id,
           title: plan!.name,
           status: "SCHEDULED",
+          plannedStart: start, // immutable occurrence identity (survives reschedule)
           scheduledStart: start,
           scheduledEnd: durationMs ? new Date(start.getTime() + durationMs) : null,
           crewSize: plan!.crewSize,

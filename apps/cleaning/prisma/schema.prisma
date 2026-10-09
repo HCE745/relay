@@ -670,6 +670,11 @@ model Job {
   status            JobStatus @default(SCHEDULED)
   scheduledStart    DateTime
   scheduledEnd      DateTime?
+  // The ORIGINAL recurrence instant this job was generated for (plan jobs only;
+  // NULL for manual jobs). Immutable occurrence identity: rescheduling moves
+  // scheduledStart but never plannedStart, so generation can't recreate a ghost
+  // in the vacated slot. See generation.ts and the reschedule-duplicate fix.
+  plannedStart      DateTime?
   crewSize          Int?      // required/default crew size (copied from the plan)
   actualStart       DateTime?
   actualEnd         DateTime?
@@ -691,10 +696,11 @@ model Job {
   invoiceLines    InvoiceLine[]
   supplyUsages    SupplyUsage[]
 
-  // Idempotent generation: a plan can produce at most one Job per occurrence
-  // start. Manual jobs have servicePlanId = NULL, which Postgres treats as
-  // distinct, so they never collide here.
-  @@unique([servicePlanId, scheduledStart])
+  // Idempotent generation: a plan produces at most one Job per occurrence,
+  // keyed on the IMMUTABLE plannedStart (not the mutable scheduledStart, which a
+  // reschedule moves). Manual jobs have servicePlanId = NULL, which Postgres
+  // treats as distinct, so they never collide here.
+  @@unique([servicePlanId, plannedStart])
   @@index([organizationId])
   @@index([serviceLocationId])
   @@index([status])

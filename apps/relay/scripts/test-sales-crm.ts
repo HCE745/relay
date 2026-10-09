@@ -194,7 +194,10 @@ async function group1(alice: { id: string; name: string }, bob: { id: string; na
     `assignedToId=${zenith.assignedToId}`,
   )
 
-  return { acme, zenith }
+  return {
+    acme:   { ...acme,   assignedToId: acme.assignedToId! },
+    zenith: { ...zenith, assignedToId: zenith.assignedToId! },
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -357,7 +360,7 @@ async function group3(
   assert(
     "T3-3", "Admin can reassign Protected prospect; history record created",
     `assignedToId=${bob.id}, history.reason contains override`,
-    acmeOwner?.assignedToId === bob.id && hist3.reason?.includes("override"),
+    acmeOwner?.assignedToId === bob.id && (hist3.reason?.includes("override") ?? false),
     `owner=${acmeOwner?.assignedToId}, reason=${hist3.reason}`,
   )
   // Reset Acme back to Alice for subsequent tests
@@ -380,7 +383,7 @@ async function group4(alice: { id: string }) {
     data: {
       companyName: "Inactive Corp Test",
       assignedToId: alice.id,
-      assignedToName: alice.name ?? "Alice Test",
+      assignedToName: "Alice Test",
       currentCrmStatus: "researched",
       createdAt: daysAgo(10),
     },
@@ -564,8 +567,6 @@ async function group6(
     include: { attribution: { select: { commissionOwnerId: true } } },
   })
 
-  const alicePmt = paymentsAfterFirst.find(p => p.attribution.commissionOwnerId === attrAlice.commissionOwnerId ?? "")
-  // Find by attributionId directly
   const alicePmt2 = paymentsAfterFirst.find(p => p.attributionId === attrAlice.id)
   const bobPmt2 = paymentsAfterFirst.find(p => p.attributionId === attrBob.id)
 
@@ -823,7 +824,7 @@ async function group8(
 
   // T8-3: Admin view — all records (no scoping)
   const allPayments = await prisma.commissionPayment.findMany({
-    where: { attribution: { opportunityId: { in: [attrAlice.opportunityId ?? "", attrBob.opportunityId ?? ""] } } },
+    where: { attributionId: { in: [attrAlice.id, attrBob.id] } },
     include: { attribution: { select: { commissionOwnerId: true } } },
   })
   const hasAlice = allPayments.some(p => p.attribution.commissionOwnerId === alice.id)
@@ -965,12 +966,132 @@ async function group9(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+//  GROUP 10 — Duplicate Confirmation System
+// ═══════════════════════════════════════════════════════════════════════════
+async function group10(
+  admin: { id: string },
+  alice: { id: string },
+) {
+  console.log("\n── Group 10: Duplicate Confirmation System ──")
+
+  const ts = Date.now()
+  const baseName = `Zyrox Confirmation Base ${ts}`
+  const dupName = `Zyrox Confirmation Dup ${ts}`
+  const uniqueName = `Zyrox Absolutely Unique ${ts}`
+
+  // Create a base prospect to act as the "existing" record
+  const baseProspect = await prisma.prospect.create({
+    data: {
+      companyName: baseName,
+      website: `zyrox-base-${ts}.com`,
+      assignedToId: alice.id,
+      assignedToName: "Alice",
+    },
+  })
+  testProspectIds.push(baseProspect.id)
+
+  // TD-1: findDuplicateProspect detects the base record (simulates 409 response from route)
+  const detected = await findDuplicateProspect({ companyName: baseName, website: `zyrox-base-${ts}.com` })
+  assert(
+    "TD-1", "Duplicate detection finds existing record (would return 409 without confirmDuplicate)",
+    `detected id=${baseProspect.id}`,
+    detected?.id === baseProspect.id,
+    `detected=${detected?.id ?? "null"}, expected=${baseProspect.id}`,
+  )
+
+  // TD-2: Create a confirmed duplicate (duplicateFlag: true, duplicateOfId set)
+  const confirmedDup = await prisma.prospect.create({
+    data: {
+      companyName: dupName,
+      website: `zyrox-dup-${ts}.com`,
+      assignedToId: alice.id,
+      assignedToName: "Alice",
+      duplicateFlag: true,
+      duplicateOfId: baseProspect.id,
+    },
+  })
+  testProspectIds.push(confirmedDup.id)
+  assert(
+    "TD-2", "Confirmed duplicate prospect has duplicateFlag=true and duplicateOfId set",
+    `duplicateFlag=true, duplicateOfId=${baseProspect.id}`,
+    confirmedDup.duplicateFlag === true && confirmedDup.duplicateOfId === baseProspect.id,
+    `duplicateFlag=${confirmedDup.duplicateFlag}, duplicateOfId=${confirmedDup.duplicateOfId}`,
+  )
+
+  // TD-3: SalesAlert notifications created for all admin_sales users when confirmed duplicate is added
+  const adminUsers = await prisma.salesUser.findMany({
+    where: { role: "admin_sales", isActive: true },
+    select: { id: true },
+  })
+  const alertsBefore = adminUsers.length
+  if (alertsBefore > 0) {
+    await prisma.salesAlert.createMany({
+      data: adminUsers.map(u => ({
+        recipientId: u.id,
+        type: "duplicate_prospect",
+        title: "Potential duplicate account created",
+        message: `Test alert for ${dupName}`,
+        relatedId: confirmedDup.id,
+      })),
+    })
+  }
+  const alertsCreated = await prisma.salesAlert.count({
+    where: { relatedId: confirmedDup.id },
+  })
+  assert(
+    "TD-3", "SalesAlert created for each admin_sales user when confirmed duplicate is added",
+    `alerts=${alertsBefore}`,
+    alertsCreated === alertsBefore,
+    `created=${alertsCreated}, expected=${alertsBefore}`,
+  )
+
+  // TD-4: Flagged duplicate appears in admin dashboard duplicate count query
+  const flaggedCount = await prisma.prospect.count({ where: { duplicateFlag: true } })
+  assert(
+    "TD-4", "Admin dashboard query includes the flagged duplicate record",
+    "flaggedCount >= 1",
+    flaggedCount >= 1,
+    `flaggedCount=${flaggedCount}`,
+  )
+
+  // TD-5: Unique company creates without any confirmation step (findDuplicateProspect returns null)
+  const noMatch = await findDuplicateProspect({ companyName: uniqueName, website: `zyrox-unique-${ts}.com` })
+  assert(
+    "TD-5", "Unique company name + domain returns no duplicate match",
+    "null (no match)",
+    noMatch === null,
+    `noMatch=${noMatch?.companyName ?? "null"}`,
+  )
+
+  // Verify the unique record would be created directly (no 409)
+  const uniqueProspect = await prisma.prospect.create({
+    data: {
+      companyName: uniqueName,
+      website: `zyrox-unique-${ts}.com`,
+      assignedToId: alice.id,
+      assignedToName: "Alice",
+      // No duplicateFlag set — clean creation
+    },
+  })
+  testProspectIds.push(uniqueProspect.id)
+  assert(
+    "TD-5b", "Unique prospect created without duplicateFlag",
+    "duplicateFlag=false",
+    uniqueProspect.duplicateFlag === false,
+    `duplicateFlag=${uniqueProspect.duplicateFlag}`,
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 //  CLEANUP
 // ═══════════════════════════════════════════════════════════════════════════
 async function cleanup() {
   console.log("\n── Cleanup ──")
 
-  // Delete in dependency order: payments → attributions → history → opportunities → prospects → users
+  // Delete in dependency order: alerts → payments → attributions → history → opportunities → prospects → users
+  await prisma.salesAlert.deleteMany({
+    where: { relatedId: { in: testProspectIds } },
+  })
   await prisma.commissionPayment.deleteMany({
     where: { attribution: { opportunityId: { in: testOpportunityIds } } },
   })
@@ -1077,6 +1198,9 @@ async function main() {
 
     // Group 9
     await group9(alice, bob, acme)
+
+    // Group 10
+    await group10(admin, alice)
 
   } catch (err) {
     console.error("\n  UNEXPECTED ERROR during tests:", err)

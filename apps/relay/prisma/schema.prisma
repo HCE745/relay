@@ -2679,6 +2679,23 @@ model SalesUser {
   transferRequestsMade CrmTransferRequest[] @relation("TransferRequester")
   transferRequestsTo   CrmTransferRequest[] @relation("TransferTo2")
   transferRequestsReviewed CrmTransferRequest[] @relation("TransferReviewer")
+  salesAlerts              SalesAlert[]         @relation("SalesAlertRecipient")
+}
+
+model SalesAlert {
+  id          String   @id @default(cuid())
+  recipientId String
+  type        String   // "duplicate_prospect"
+  title       String
+  message     String
+  isRead      Boolean  @default(false)
+  relatedId   String?  // prospect.id or other record
+  createdAt   DateTime @default(now())
+
+  recipient SalesUser @relation("SalesAlertRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId])
+  @@index([isRead])
 }
 
 model CrmOpportunity {

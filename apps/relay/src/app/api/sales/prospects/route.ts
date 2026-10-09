@@ -79,22 +79,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "companyName is required" }, { status: 400 })
   }
 
-  // Duplicate detection
-  if (!body.confirmDuplicate) {
-    const duplicate = await findDuplicateProspect({
-      companyName: body.companyName,
-      website: body.website,
-    })
-    if (duplicate) {
-      return NextResponse.json(
-        {
-          warning: "duplicate_detected",
-          message: `A prospect named "${duplicate.companyName}" already exists (owned by ${duplicate.assignedToName ?? "unassigned"}, status: ${duplicate.currentCrmStatus}).`,
-          existing: duplicate,
-        },
-        { status: 409 }
-      )
-    }
+  // Duplicate detection — hard block without confirmation flag
+  const duplicate = await findDuplicateProspect({
+    companyName: body.companyName,
+    website: body.website,
+  })
+  if (duplicate && !body.confirmDuplicate) {
+    return NextResponse.json(
+      {
+        warning: "duplicate_detected",
+        message: `A similar company already exists — "${duplicate.companyName}" owned by ${duplicate.assignedToName ?? "unassigned"}, current status: ${duplicate.currentCrmStatus}. Are you sure this is a different company?`,
+        existing: duplicate,
+      },
+      { status: 409 }
+    )
   }
 
   const assignedToId = body.assignedToId ?? info.salesUserId
@@ -120,6 +118,11 @@ export async function POST(req: NextRequest) {
       assignedToId,
       assignedToName: assignedUser?.name ?? null,
       source: "manual",
+      // Mark as confirmed duplicate for admin review
+      ...(duplicate && body.confirmDuplicate ? {
+        duplicateFlag: true,
+        duplicateOfId: duplicate.id,
+      } : {}),
     },
     select: PROSPECT_SELECT,
   })
@@ -137,5 +140,27 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return NextResponse.json({ prospect }, { status: 201 })
+  // Notify all admin_sales users when a confirmed duplicate is created
+  if (duplicate && body.confirmDuplicate) {
+    const admins = await prisma.salesUser.findMany({
+      where: { role: "admin_sales", isActive: true },
+      select: { id: true },
+    })
+    if (admins.length > 0) {
+      await prisma.salesAlert.createMany({
+        data: admins.map(admin => ({
+          recipientId: admin.id,
+          type: "duplicate_prospect",
+          title: "Potential duplicate account created",
+          message: `A potential duplicate account was created: "${body.companyName.trim()}" may duplicate "${duplicate.companyName}" owned by ${duplicate.assignedToName ?? "unassigned"}. Please review.`,
+          relatedId: prospect.id,
+        })),
+      })
+    }
+  }
+
+  return NextResponse.json(
+    { prospect, confirmedDuplicate: !!(duplicate && body.confirmDuplicate) },
+    { status: 201 }
+  )
 }

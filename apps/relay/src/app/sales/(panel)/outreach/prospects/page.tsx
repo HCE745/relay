@@ -3,7 +3,8 @@ import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
-import { Search, Building2, ExternalLink, Star, Compass } from "lucide-react"
+import { Search, Building2, ExternalLink, Star, Compass, AlertTriangle } from "lucide-react"
+import { AddProspectModal } from "./AddProspectModal"
 
 export const dynamic = "force-dynamic"
 
@@ -39,6 +40,7 @@ export default async function ProspectsPage() {
       researchSummary:       true,
       lastOutreachDate:      true,
       createdAt:             true,
+      duplicateFlag:         true,
       contacts: {
         take: 1,
         select: { name: true, title: true, email: true },
@@ -54,6 +56,7 @@ export default async function ProspectsPage() {
           <p className="text-gray-400 text-sm mt-0.5">{prospects.length} prospects in database</p>
         </div>
         <div className="flex items-center gap-3">
+          <AddProspectModal />
           <Link
             href="/sales/outreach/prospects/discover"
             className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg transition-colors"
@@ -96,8 +99,13 @@ export default async function ProspectsPage() {
                           <Building2 className="w-3 h-3 text-gray-500" />
                         </div>
                         <div>
-                          <p className="font-medium text-white group-hover:text-emerald-300 transition-colors">
+                          <p className="font-medium text-white group-hover:text-emerald-300 transition-colors flex items-center gap-1.5">
                             {p.companyName}
+                            {p.duplicateFlag && (
+                              <span title="Flagged for admin review — possible duplicate">
+                                <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0" />
+                              </span>
+                            )}
                           </p>
                           {p.website && (
                             <p className="text-xs text-gray-600">{p.website.replace(/^https?:\/\//, "")}</p>

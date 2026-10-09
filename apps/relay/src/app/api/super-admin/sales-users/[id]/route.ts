@@ -14,6 +14,7 @@ export async function PATCH(
   const body = await req.json() as {
     action?: unknown; isActive?: unknown; password?: unknown; role?: unknown; name?: unknown;
     employmentStatus?: unknown; commissionRate?: unknown; commissionEligible?: unknown;
+    commissionDuration?: unknown;
   }
 
   const user = await prisma.salesUser.findUnique({ where: { id } })
@@ -81,6 +82,9 @@ export async function PATCH(
     data.commissionRate = body.commissionRate
   }
   if (typeof body.commissionEligible === "boolean") data.commissionEligible = body.commissionEligible
+  if (body.commissionDuration === "LIFETIME" || body.commissionDuration === "FIRST_YEAR" || body.commissionDuration === "CUSTOM") {
+    data.commissionDuration = body.commissionDuration
+  }
 
   if (Object.keys(data).length === 0) {
     return NextResponse.json({ error: "No valid fields to update" }, { status: 400 })

@@ -2655,9 +2655,10 @@ model SalesUser {
   employmentStatus String    @default("ACTIVE")     // ACTIVE | INACTIVE
   inactiveAt       DateTime?
   commissionEligible Boolean @default(true)
-  commissionRate   Decimal   @default(33.00) @db.Decimal(5,2)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  commissionRate     Decimal @default(33.00) @db.Decimal(5,2)
+  commissionDuration String  @default("LIFETIME") // LIFETIME | FIRST_YEAR | CUSTOM
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   // Phase 2: ownership
   assignedDemoCalls   DemoCall[]   @relation("DemoCallAssigned")
@@ -2713,7 +2714,7 @@ model CrmOpportunity {
   closedBy      SalesUser? @relation("OpportunityClosedBy",  fields: [closedById],  references: [id])
   tasks         CrmTask[]
   commissions   CrmCommissionEvent[]
-  attribution   CommissionAttribution?
+  attributions  CommissionAttribution[]
   transferLogs  CrmTransferLog[]    @relation("OpportunityTransferLogs")
   transferReqs  CrmTransferRequest[] @relation("OpportunityTransferReqs")
 
@@ -2816,9 +2817,12 @@ model CrmTransferRequest {
 
 model CommissionAttribution {
   id                      String    @id @default(cuid())
-  opportunityId           String    @unique
+  opportunityId           String
   commissionOwnerId       String
   commissionRate          Decimal   @default(33.00) @db.Decimal(5,2)
+  splitPercent            Int       @default(100)    // portion of revenue this rep is attributed; all splits for one opp must sum to 100
+  commissionStartDate     DateTime?                  // if set, payments before this date are excluded
+  commissionEndDate       DateTime?                  // if set, payments after this date are excluded
   attributionStatus       String    @default("PENDING") // PENDING|APPROVED|DISPUTED|REVOKED
   attributionApprovedById String?
   attributionApprovedAt   DateTime?
@@ -2833,6 +2837,7 @@ model CommissionAttribution {
   commissionOwner SalesUser      @relation("CommissionOwner", fields: [commissionOwnerId], references: [id])
   payments        CommissionPayment[]
 
+  @@index([opportunityId])
   @@index([commissionOwnerId])
   @@index([attributionStatus])
 }

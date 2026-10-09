@@ -12,7 +12,8 @@
     "seed": "tsx prisma/seed.ts",
     "imap-sync": "tsx scripts/imap-sync.ts",
     "tour-audio": "node scripts/generate-tour-audio.js",
-    "tour-audio-new": "node scripts/generate-tour-audio-new-steps.js"
+    "tour-audio-new": "node scripts/generate-tour-audio-new-steps.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.111.0",
@@ -84,7 +85,8 @@
     "playwright": "1.61.1",
     "tailwindcss": "4.3.0",
     "tsx": "4.22.4",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "3.0.5"
   },
   "allowScripts": {
     "@prisma/engines@7.8.0": true,

@@ -55,7 +55,7 @@ type Opportunity = {
   demoCallId: string | null
   tasks: Task[]
   commissionEvents: CommissionEvent[]
-  attribution: Attribution | null
+  attributions: Attribution[]
 }
 
 type AuthInfo = { superAdmin?: boolean; salesUserId?: string; salesUserRole?: string }
@@ -252,6 +252,8 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
       </div>
     )
   }
+
+  const attr = opp.attributions[0] ?? null
 
   return (
     <div className="p-6 max-w-4xl space-y-6">
@@ -501,51 +503,51 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
       )}
 
       {/* Attribution */}
-      {(opp.attribution || opp.stage === "Closed Won") && (
+      {(attr || opp.stage === "Closed Won") && (
         <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
             <DollarSign className="w-4 h-4 text-emerald-400" />
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Commission Attribution</p>
-            {opp.attribution?.isLocked && (
+            {attr?.isLocked && (
               <span className="flex items-center gap-1 text-xs text-amber-400 ml-auto">
                 <Lock className="w-3 h-3" /> Locked
               </span>
             )}
           </div>
-          {opp.attribution ? (
+          {attr ? (
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                 <div>
                   <p className="text-xs text-gray-500">Commission Owner</p>
-                  <p className="text-gray-200 font-medium">{opp.attribution.commissionOwner.name}</p>
+                  <p className="text-gray-200 font-medium">{attr.commissionOwner.name}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Rate</p>
-                  <p className="text-gray-200 font-medium">{Number(opp.attribution.commissionRate).toFixed(0)}%</p>
+                  <p className="text-gray-200 font-medium">{Number(attr.commissionRate).toFixed(0)}%</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Status</p>
                   <p className={`font-medium ${
-                    opp.attribution.attributionStatus === "APPROVED" ? "text-blue-400" :
-                    opp.attribution.attributionStatus === "PENDING"  ? "text-amber-400" :
-                    opp.attribution.attributionStatus === "REVOKED"  ? "text-red-400" : "text-gray-300"
-                  }`}>{opp.attribution.attributionStatus}</p>
+                    attr.attributionStatus === "APPROVED" ? "text-blue-400" :
+                    attr.attributionStatus === "PENDING"  ? "text-amber-400" :
+                    attr.attributionStatus === "REVOKED"  ? "text-red-400" : "text-gray-300"
+                  }`}>{attr.attributionStatus}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Reason</p>
                   <p className={`font-medium ${
-                    opp.attribution.attributionReason !== "NORMAL_CLOSE" ? "text-amber-400" : "text-gray-300"
-                  }`}>{opp.attribution.attributionReason.replace(/_/g, " ")}</p>
+                    attr.attributionReason !== "NORMAL_CLOSE" ? "text-amber-400" : "text-gray-300"
+                  }`}>{attr.attributionReason.replace(/_/g, " ")}</p>
                 </div>
-                {opp.attribution.attributionLockedAt && (
+                {attr.attributionLockedAt && (
                   <div>
                     <p className="text-xs text-gray-500">Lock Date</p>
-                    <p className="text-gray-400">{fmtDate(opp.attribution.attributionLockedAt) ?? "—"}</p>
+                    <p className="text-gray-400">{fmtDate(attr.attributionLockedAt) ?? "—"}</p>
                   </div>
                 )}
               </div>
-              {opp.attribution.notes && (
-                <p className="text-xs text-gray-500 bg-gray-900/50 rounded p-2 mt-1">{opp.attribution.notes}</p>
+              {attr.notes && (
+                <p className="text-xs text-gray-500 bg-gray-900/50 rounded p-2 mt-1">{attr.notes}</p>
               )}
             </div>
           ) : (

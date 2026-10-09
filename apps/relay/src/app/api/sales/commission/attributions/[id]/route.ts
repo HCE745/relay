@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSalesSession } from "@/lib/sales-auth";
 import { prisma } from "@/lib/prisma";
+import { validateCommissionSplits } from "@/lib/prospect-utils";
 
 export async function PATCH(
   req: NextRequest,
@@ -16,6 +17,9 @@ export async function PATCH(
   const body = await req.json() as {
     commissionOwnerId?: string;
     commissionRate?: number;
+    splitPercent?: number;
+    commissionStartDate?: string | null;
+    commissionEndDate?: string | null;
     attributionStatus?: string;
     attributionReason?: string;
     notes?: string;
@@ -41,11 +45,30 @@ export async function PATCH(
     return NextResponse.json({ error: "A reason is required to modify a locked attribution." }, { status: 422 });
   }
 
+  // Validate split percentages when splitPercent is changing
+  if (body.splitPercent !== undefined && (info.isManager || info.isSuperAdmin)) {
+    const sibling = await prisma.commissionAttribution.findMany({
+      where: { opportunityId: attribution.opportunityId, id: { not: id } },
+      select: { splitPercent: true },
+    });
+    const splitError = validateCommissionSplits([
+      { splitPercent: body.splitPercent },
+      ...sibling,
+    ]);
+    if (splitError) return NextResponse.json({ error: splitError }, { status: 400 });
+  }
+
   const updateData: Record<string, unknown> = {};
   if (body.commissionOwnerId !== undefined && (info.isManager || info.isSuperAdmin))
     updateData.commissionOwnerId = body.commissionOwnerId;
   if (body.commissionRate !== undefined && (info.isManager || info.isSuperAdmin))
     updateData.commissionRate = body.commissionRate;
+  if (body.splitPercent !== undefined && (info.isManager || info.isSuperAdmin))
+    updateData.splitPercent = body.splitPercent;
+  if (body.commissionStartDate !== undefined && (info.isManager || info.isSuperAdmin))
+    updateData.commissionStartDate = body.commissionStartDate ? new Date(body.commissionStartDate) : null;
+  if (body.commissionEndDate !== undefined && (info.isManager || info.isSuperAdmin))
+    updateData.commissionEndDate = body.commissionEndDate ? new Date(body.commissionEndDate) : null;
   if (body.attributionStatus !== undefined && (info.isManager || info.isSuperAdmin))
     updateData.attributionStatus = body.attributionStatus;
   if (body.attributionReason !== undefined && (info.isManager || info.isSuperAdmin))

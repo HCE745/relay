@@ -13,10 +13,11 @@ const opportunityIncludes = {
   commissionEvents: {
     select: { id: true, salesUserId: true, role: true, splitPercent: true, amount: true },
   },
-  attribution: {
+  attributions: {
     select: {
-      id: true, commissionOwnerId: true, commissionRate: true, attributionStatus: true,
-      attributionReason: true, isLocked: true, attributionLockedAt: true, notes: true,
+      id: true, commissionOwnerId: true, commissionRate: true, splitPercent: true,
+      attributionStatus: true, attributionReason: true, isLocked: true,
+      attributionLockedAt: true, commissionStartDate: true, commissionEndDate: true, notes: true,
       commissionOwner: { select: { id: true, name: true } },
     },
   },

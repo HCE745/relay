@@ -85,7 +85,7 @@ export default async function ManagerPage() {
   return (
     <div className="p-6 max-w-6xl space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-center justify-between flex-wrap gap-4" data-tour="mgr-dashboard-header">
         <div>
           <h1 className="text-2xl font-bold text-white">Manager Dashboard</h1>
           <p className="text-sm text-gray-400 mt-0.5">{salesUsers.length} active reps</p>
@@ -93,6 +93,7 @@ export default async function ManagerPage() {
         {duplicateCount > 0 && (
           <Link
             href="/sales/manager/duplicates"
+            data-tour="mgr-dup-banner"
             className="flex items-center gap-2 px-4 py-2 bg-amber-900/30 border border-amber-700/40 hover:border-amber-500/60 rounded-lg transition-colors"
           >
             <AlertTriangle className="w-4 h-4 text-amber-400" />
@@ -139,7 +140,7 @@ export default async function ManagerPage() {
       </div>
 
       {/* Rep table */}
-      <div>
+      <div data-tour="mgr-overdue-section">
         <div className="flex items-center gap-2 mb-4">
           <Users className="w-4 h-4 text-gray-400" />
           <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Team Performance</h2>

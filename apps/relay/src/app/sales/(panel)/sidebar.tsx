@@ -211,7 +211,14 @@ export function SalesSidebar({ name, email, isManager, isDemo }: { name: string;
         {isDemo && (
           <div className="flex items-center gap-1.5 px-3 py-1.5 mb-1 rounded-lg bg-amber-500/10 border border-amber-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-            <span className="text-[10px] font-medium text-amber-400/80 tracking-wide">Demo Account</span>
+            <span className="text-[10px] font-medium text-amber-400/80 tracking-wide flex-1">Demo Account</span>
+            <button
+              data-action="restart-sales-tour"
+              className="text-[10px] font-medium text-amber-400 hover:text-amber-300 transition-colors px-1.5 py-0.5 rounded hover:bg-amber-500/10"
+              title="Restart guided tour"
+            >
+              Tour
+            </button>
           </div>
         )}
         <button

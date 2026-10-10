@@ -584,7 +584,7 @@ export default async function SalesDashboardPage({
       {/* ══════════════════════════════════════════════════════════════════════════
           TODAY — Action-first sales view
       ══════════════════════════════════════════════════════════════════════════ */}
-      <div>
+      <div data-tour="rep-action-center">
         <div className="flex items-center gap-2 mb-5">
           <Zap className="w-4 h-4 text-amber-400" />
           <h2 className="text-lg font-bold text-white">Today</h2>

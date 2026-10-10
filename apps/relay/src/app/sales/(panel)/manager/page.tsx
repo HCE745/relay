@@ -108,7 +108,7 @@ export default async function ManagerPage() {
       </div>
 
       {/* Team summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4" data-tour="mgr-funnel">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-blue-400" />
@@ -194,11 +194,13 @@ export default async function ManagerPage() {
       </div>
 
       {/* Pending transfer requests */}
-      {pendingRequests.length > 0 && (
-        <div>
-          <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-4">
-            Pending Transfer Requests ({pendingRequests.length})
-          </h2>
+      <div data-tour="mgr-transfers">
+        <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-4">
+          Pending Transfer Requests {pendingRequests.length > 0 && `(${pendingRequests.length})`}
+        </h2>
+        {pendingRequests.length === 0 ? (
+          <p className="text-sm text-gray-600 px-1">No pending transfer requests</p>
+        ) : (
           <div className="space-y-3">
             {pendingRequests.map(req => (
               <div key={req.id} className="bg-gray-900 border border-yellow-900/50 rounded-xl p-4 flex items-center gap-4 flex-wrap">
@@ -219,8 +221,8 @@ export default async function ManagerPage() {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

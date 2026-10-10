@@ -408,7 +408,7 @@ export default function SalesEmailPage() {
           selected ? "hidden md:flex md:w-72 lg:w-80 shrink-0" : "flex-1 md:w-80 lg:w-96 shrink-0",
         )}>
           {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-800">
+          <div className="px-4 py-3 border-b border-gray-800" data-tour="rep-link-tracking">
             <div className="flex items-center justify-between mb-3">
               <h1 className="text-base font-bold text-white">Email</h1>
               <div className="flex items-center gap-1.5">

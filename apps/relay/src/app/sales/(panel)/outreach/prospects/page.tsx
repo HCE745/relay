@@ -50,7 +50,7 @@ export default async function ProspectsPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between" data-tour="rep-research-hint">
         <div>
           <h1 className="text-2xl font-bold text-white">Prospects</h1>
           <p className="text-gray-400 text-sm mt-0.5">{prospects.length} prospects in database</p>

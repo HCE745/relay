@@ -139,7 +139,7 @@ export default function FollowUpsPage() {
         "flex flex-col border-r border-gray-800 bg-gray-900 overflow-y-auto",
         selected ? "hidden md:flex md:w-80 lg:w-96 shrink-0" : "flex-1",
       )}>
-        <div className="px-5 py-4 border-b border-gray-800 shrink-0">
+        <div className="px-5 py-4 border-b border-gray-800 shrink-0" data-tour="rep-stage-system">
           <h1 className="text-base font-bold text-white">Follow-Ups</h1>
           <p className="text-xs text-gray-500 mt-0.5">
             {loading ? "Loading…" :

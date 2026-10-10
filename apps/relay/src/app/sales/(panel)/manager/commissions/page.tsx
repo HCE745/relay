@@ -284,7 +284,7 @@ export default function CommissionLedgerPage() {
       )}
 
       {/* Per-rep rows */}
-      <div className="space-y-3">
+      <div className="space-y-3" data-tour="mgr-commission-history">
         {repSummaries.map(r => {
           const isOpen = expanded[r.rep.id];
           const allPayments = r.attributions.flatMap(a => a.payments);

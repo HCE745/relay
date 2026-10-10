@@ -10,7 +10,30 @@ export const INTAKE_LIMITS = {
   ipWindowMs: 60 * 60 * 1000, // 1 hour
   ipMax: 5, // submissions per IP per hour
   orgWindowMs: 60 * 60 * 1000,
-  orgMax: 60, // submissions per org per hour (hard cap)
+  orgMax: 40, // DURABLE cross-instance hard ceiling on persisted rows per org/hr
+}
+
+/**
+ * The client's IP from a trusted source, resistant to header spoofing.
+ *
+ * `x-forwarded-for` is client-controllable (its LEFTMOST entry is whatever the
+ * caller sent), which previously let an attacker rotate the header to defeat
+ * per-IP limiting. On Vercel, `x-vercel-forwarded-for` and `x-real-ip` are set
+ * by the platform edge and overwrite client input, so we trust those first. As
+ * a last resort we take the RIGHTMOST `x-forwarded-for` entry (the hop closest
+ * to our infrastructure), never the leftmost.
+ */
+export function clientIpFromHeaders(h: Headers): string {
+  const vercel = h.get("x-vercel-forwarded-for")
+  if (vercel) return vercel.split(",")[0]!.trim()
+  const real = h.get("x-real-ip")
+  if (real && real.trim()) return real.trim()
+  const xff = h.get("x-forwarded-for")
+  if (xff) {
+    const parts = xff.split(",").map((s) => s.trim()).filter(Boolean)
+    if (parts.length) return parts[parts.length - 1]! // rightmost = closest trusted hop
+  }
+  return "0.0.0.0"
 }
 
 export class IntakeRejected extends Error {

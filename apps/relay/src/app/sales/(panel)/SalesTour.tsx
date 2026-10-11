@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { ChevronLeft, ChevronRight, X, Users, TrendingUp } from "lucide-react"
 
@@ -32,80 +32,86 @@ function ssSet(key: string, val: string) {
 
 const REP_STEPS: Step[] = [
   {
-    title: "Welcome to Relay CRM",
-    body: "This is your sales workspace. Everything you need to prospect, outreach, follow up, and close deals is here. Let us show you around.",
+    title: "Here is how your day works",
+    body: "Start on this dashboard every morning. Your action center at the top tells you exactly who to contact today and what needs attention.",
     path: "/sales",
     selector: null,
   },
   {
-    title: "Start here every morning",
-    body: "Your action center shows exactly who needs attention today — overdue follow-ups, replies waiting, engaged prospects, and upcoming demos.",
+    title: "Check this first every morning",
+    body: "Work through these in order — reply to anyone who responded, then handle overdue follow-ups, then contact prospects who engaged with your tour link.",
     path: "/sales",
     selector: "[data-tour='rep-action-center']",
   },
   {
-    title: "Find new accounts",
-    body: "Tell the AI what kind of company you are looking for. It finds real companies, researches them, and drafts your first email — all automatically.",
-    path: "/sales",
+    title: "This is how you find companies to contact",
+    body: "Click Find New Prospects, describe the type of company you are looking for, and the system returns real companies with research already done. Check the badges — companies already in the CRM are marked so you do not contact someone another rep is working.",
+    path: "/sales/outreach/prospects",
     selector: "a[href='/sales/outreach/prospects/discover']",
   },
   {
-    title: "AI researches every company",
-    body: "Click any prospect to see an AI-generated research summary — pain points, why they are a fit for Relay, and a suggested outreach angle. You never go into a call blind.",
+    title: "Read this before every call",
+    body: "Open any prospect to see what the AI found — their pain points, why Relay fits them, and what angle to lead with. Use this to personalize your outreach instead of sending a generic email.",
     path: "/sales/outreach/prospects",
     selector: "[data-tour='rep-research-hint']",
   },
   {
-    title: "Every account has one owner",
-    body: "When you claim an account it is yours. Other reps cannot contact companies you are actively working without a collision warning.",
+    title: "Claim accounts before you contact them",
+    body: "When you add a company it is assigned to you. Other reps will see your name on it and cannot contact them without a collision warning. Add the company first, then reach out.",
     path: "/sales/outreach/prospects",
-    selector: "a[href='/sales/outreach/prospects']",
+    selector: "[data-tour='rep-research-hint']",
   },
   {
-    title: "Send and track outreach",
-    body: "Send personalized emails directly from the CRM. You will see when prospects open emails, click your tour link, and how far they get through the demo.",
+    title: "Send emails from here, not your personal inbox",
+    body: "All outreach goes through this email section so your activity is tracked. You can see replies, opens, and link clicks in one place without switching between tools.",
     path: "/sales/outreach/email",
     selector: "[data-tour='rep-link-tracking']",
   },
   {
-    title: "See exactly what they clicked",
-    body: "Every link in your emails is tracked. You can see if they clicked your tour link, how many steps they completed, how long they spent, and whether they viewed pricing.",
-    path: "/sales/outreach/email",
-    selector: "[data-tour='rep-link-tracking']",
+    title: "Check this before you make a call",
+    body: "When a prospect clicks your email link you can see exactly how far they got through the demo and whether they viewed pricing. Prospects who completed the tour are your warmest leads — call them first.",
+    path: "/sales/outreach/prospects",
+    selector: "[data-tour='rep-research-hint']",
   },
   {
-    title: "Know who is interested",
-    body: "When a prospect completes the demo tour or views pricing, they appear here as a hot lead. Call them first.",
+    title: "Work this queue every day",
+    body: "This shows everyone who is due for a follow-up today. Click Compose Follow-Up to write a message with their context already loaded. Do not let anything sit in overdue for more than 24 hours.",
+    path: "/sales/outreach/follow-ups",
+    selector: "[data-tour='rep-stage-system']",
+  },
+  {
+    title: "Update this after every interaction",
+    body: "Each prospect shows which follow-up stage they are in. After you send a follow-up the system moves them to the next stage automatically. If you have a call or meeting log it as a note so the record stays current.",
+    path: "/sales/outreach/follow-ups",
+    selector: "[data-tour='rep-stage-system']",
+  },
+  {
+    title: "These people are interested — contact them today",
+    body: "Prospects who clicked your tour link appear here with their engagement score. Sort by engagement to find who spent the most time in the demo. These are your priority calls.",
     path: "/sales/demo-analytics",
     selector: "a[href='/sales/demo-analytics']",
   },
   {
-    title: "Never miss a follow-up",
-    body: "The system tracks where each prospect is in your sequence and tells you exactly when to follow up and what to say.",
+    title: "Never lose track of where you left off",
+    body: "Each follow-up shows the last email sent, how many days since contact, and what stage you are in with that prospect. Click Compose Follow-Up and the context is already there.",
     path: "/sales/outreach/follow-ups",
     selector: "[data-tour='rep-stage-system']",
   },
   {
-    title: "Know where every prospect stands",
-    body: "The system tracks which follow-up stage each prospect is in — first email, first follow-up, second follow-up. You always know the history without reading every email thread.",
-    path: "/sales/outreach/follow-ups",
-    selector: "[data-tour='rep-stage-system']",
+    title: "Move deals here as they progress",
+    body: "When a prospect agrees to a discovery call or demo create an opportunity and move it to the right stage. Keep every active deal updated so your manager can see where things stand.",
+    path: "/sales/opportunities",
+    selector: "a[href='/sales/opportunities']",
   },
   {
-    title: "Manage your deals",
-    body: "Move opportunities through stages as deals progress. Each card shows the next action due and flags anything overdue.",
-    path: "/sales/pipeline",
-    selector: "a[href='/sales/pipeline']",
-  },
-  {
-    title: "Your earnings",
-    body: "Every customer you close generates commission automatically based on your agreement. You can see pending, approved, and paid commissions here at any time.",
+    title: "This is how your commission is calculated",
+    body: "Every customer you close is linked to your account. When they pay Relay your commission is calculated automatically based on your agreement and shows up here as pending until your manager approves it.",
     path: "/sales/commission",
     selector: "a[href='/sales/commission']",
   },
   {
-    title: "You are ready",
-    body: "That covers the essentials. Explore the sidebar to see everything else available. Your manager can answer any questions about your specific territory or targets.",
+    title: "That covers your daily workflow",
+    body: "Find prospects, claim accounts, send outreach, work your follow-up queue, move deals through the pipeline. Your manager can answer questions about your specific targets and territory.",
     path: "/sales",
     selector: null,
   },
@@ -149,7 +155,7 @@ const MANAGER_STEPS: Step[] = [
     selector: "[data-tour='mgr-dup-banner']",
   },
   {
-    title: "Transfer accounts",
+    title: "Transfer accounts between reps",
     body: "Only managers and admins can reassign accounts. Every transfer is logged with the reason and timestamp for a permanent audit trail.",
     path: "/sales/outreach/prospects",
     selector: "a[href='/sales/outreach/prospects']",
@@ -226,55 +232,76 @@ function getRect(el: Element): Rect {
   return { top: r.top, left: r.left, width: r.width, height: r.height }
 }
 
-const CARD_W = 360
-const CARD_H = 300
+const CARD_W       = 360
+const CARD_H       = 300
+const GAP          = 20
+const SIDEBAR_W    = 256  // matches w-64 sidebar
 
 function cardPos(rect: Rect): React.CSSProperties {
-  const PAD = 16
   const vw = window.innerWidth
   const vh = window.innerHeight
 
-  const elCenterX = rect.left + rect.width / 2
-  const elCenterY = rect.top + rect.height / 2
+  const elCenterX = rect.left + rect.width  / 2
+  const elCenterY = rect.top  + rect.height / 2
 
-  // Right side: element is in left half AND there's room
-  if (elCenterX < vw / 2 && rect.left + rect.width + PAD + CARD_W <= vw) {
+  function clampTop(t: number) {
+    return Math.max(GAP, Math.min(t, vh - CARD_H - GAP))
+  }
+
+  // Sidebar element: always right of the sidebar panel
+  if (rect.left < SIDEBAR_W && SIDEBAR_W + GAP + CARD_W <= vw) {
     return {
       position: "fixed",
-      top: Math.max(PAD, Math.min(elCenterY - CARD_H / 2, vh - CARD_H - PAD)),
-      left: rect.left + rect.width + PAD,
+      top:   clampTop(elCenterY - CARD_H / 2),
+      left:  SIDEBAR_W + GAP,
       width: CARD_W,
     }
   }
 
-  // Left side: element is in right half AND there's room
-  if (elCenterX >= vw / 2 && rect.left - PAD - CARD_W >= 0) {
+  // Element in left half of main content → card to the right
+  if (elCenterX < vw / 2) {
+    const cardLeft = rect.left + rect.width + GAP
+    if (cardLeft + CARD_W <= vw) {
+      return {
+        position: "fixed",
+        top:   clampTop(elCenterY - CARD_H / 2),
+        left:  cardLeft,
+        width: CARD_W,
+      }
+    }
+  }
+
+  // Element in right half of main content → card to the left
+  if (elCenterX >= vw / 2) {
+    const cardLeft = rect.left - GAP - CARD_W
+    if (cardLeft >= GAP) {
+      return {
+        position: "fixed",
+        top:   clampTop(elCenterY - CARD_H / 2),
+        left:  cardLeft,
+        width: CARD_W,
+      }
+    }
+  }
+
+  // Fallback: above or below, centered on element
+  const centeredLeft = Math.max(GAP, Math.min(elCenterX - CARD_W / 2, vw - CARD_W - GAP))
+
+  // Element in top half → card below
+  if (elCenterY < vh / 2) {
     return {
       position: "fixed",
-      top: Math.max(PAD, Math.min(elCenterY - CARD_H / 2, vh - CARD_H - PAD)),
-      left: rect.left - PAD - CARD_W,
+      top:   clampTop(rect.top + rect.height + GAP),
+      left:  centeredLeft,
       width: CARD_W,
     }
   }
 
-  // Above or below: full-width or centered element
-  const centeredLeft = Math.max(PAD, Math.min(elCenterX - CARD_W / 2, vw - CARD_W - PAD))
-
-  // Above: element is in the lower half
-  if (elCenterY > vh / 2 && rect.top - PAD - CARD_H >= PAD) {
-    return {
-      position: "fixed",
-      top: rect.top - PAD - CARD_H,
-      left: centeredLeft,
-      width: CARD_W,
-    }
-  }
-
-  // Below: default
+  // Element in bottom half → card above
   return {
     position: "fixed",
-    top: Math.min(rect.top + rect.height + PAD, vh - CARD_H - PAD),
-    left: centeredLeft,
+    top:   clampTop(rect.top - GAP - CARD_H),
+    left:  centeredLeft,
     width: CARD_W,
   }
 }
@@ -284,8 +311,8 @@ function fallbackPos(): React.CSSProperties {
   const vh = typeof window !== "undefined" ? window.innerHeight : 900
   return {
     position: "fixed",
-    top:  Math.max(16, vh - CARD_H - 24),
-    left: Math.max(16, vw - CARD_W - 24),
+    top:   Math.max(GAP, vh - CARD_H - 24),
+    left:  Math.max(GAP, vw - CARD_W - 24),
     width: CARD_W,
   }
 }
@@ -306,7 +333,7 @@ function RolePicker({ defaultRole, onSelect, onSkip }: {
             <span className="text-xs text-emerald-300 font-medium tracking-wide">Relay CRM — Guided Tour</span>
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">How would you like to explore?</h1>
-          <p className="text-sm text-gray-400">Choose a role to see the features most relevant to you.</p>
+          <p className="text-sm text-gray-400">Choose your role to see the workflow that applies to you.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
@@ -325,7 +352,7 @@ function RolePicker({ defaultRole, onSelect, onSkip }: {
               <p className="font-semibold text-white text-sm mb-1">Sales Rep</p>
               <p className="text-xs text-gray-400 leading-relaxed">I prospect and close deals</p>
             </div>
-            <p className="text-[11px] text-gray-600">13 steps · ~4 min</p>
+            <p className="text-[11px] text-gray-600">14 steps · ~5 min</p>
           </button>
 
           <button
@@ -372,10 +399,10 @@ export function SalesTour({ isDemo, defaultRole }: { isDemo: boolean; defaultRol
   const [rect, setRect]       = useState<Rect | null>(null)
   const [navigating, setNav]  = useState(false)
 
-  const steps   = role === "rep" ? REP_STEPS : MANAGER_STEPS
-  const step    = steps[stepIdx]
-  const total   = steps.length
-  const isLast  = stepIdx === total - 1
+  const steps      = role === "rep" ? REP_STEPS : MANAGER_STEPS
+  const step       = steps[stepIdx]
+  const total      = steps.length
+  const isLast     = stepIdx === total - 1
   const isCentered = step?.selector === null
 
   // ── Boot ─────────────────────────────────────────────────────────────────────

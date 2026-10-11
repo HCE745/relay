@@ -5,6 +5,7 @@ import { getOrgCapabilities } from "@/lib/entitlements-server"
 import { CapabilityProvider } from "@/lib/entitlements"
 import { AdminSidebar } from "@/components/layout/admin-sidebar"
 import { DemoBanner } from "@/components/demo/demo-banner"
+import { ProductTour } from "@/components/demo/tour/product-tour"
 
 export const dynamic = "force-dynamic"
 
@@ -30,6 +31,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           {session.isDemo ? <DemoBanner /> : null}
           <main className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
         </div>
+        {session.isDemo ? <ProductTour isDemo /> : null}
       </div>
     </CapabilityProvider>
   )

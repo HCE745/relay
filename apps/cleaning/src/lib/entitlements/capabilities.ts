@@ -41,6 +41,7 @@ export const CAPABILITIES = [
   "workforce.hiring", // job postings, applicants, convert-to-employee
   "operations.serviceAreas", // service areas + do-not-serve exclusions
   "operations.workOrders", // billable one-time/extra work: manual-job rates, work orders, change orders
+  "workforce.notifications", // email/SMS notifications + per-user channel preferences
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",

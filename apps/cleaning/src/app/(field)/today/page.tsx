@@ -6,7 +6,10 @@ import { listCleanerDayJobs } from "@/lib/data/field"
 import { getOrgTimezone } from "@/lib/data/org"
 import { formatTimeInZone } from "@/lib/scheduling/time"
 import { orgHasCapability } from "@/lib/page-guards"
+import { isSmsConfigured } from "@/lib/sms"
+import { getUserPrefs } from "@/lib/data/notifications"
 import { TimeOffRequest } from "@/components/field/time-off-request"
+import { NotificationPrefs } from "@/components/notifications/notification-prefs"
 
 export const dynamic = "force-dynamic"
 
@@ -58,10 +61,13 @@ export default async function TodayPage() {
   const dayStart = now.startOf("day").toJSDate()
   const dayEnd = now.endOf("day").toJSDate()
 
-  const [jobs, canCoverage] = await Promise.all([
+  const [jobs, canCoverage, hasNotifications, prefs] = await Promise.all([
     listCleanerDayJobs(orgId, session.userId, dayStart, dayEnd),
     orgHasCapability(orgId, "workforce.coverage"),
+    orgHasCapability(orgId, "workforce.notifications"),
+    getUserPrefs(orgId, session.userId),
   ])
+  const cleanerPrefs = prefs.filter((p) => p.roles === "all") // staff-wide events only for cleaners
   const inProgress = jobs.filter((j) => j.status === "IN_PROGRESS")
   const completed = jobs.filter((j) => j.status === "COMPLETED")
   const upcoming = jobs.filter((j) => j.status === "SCHEDULED" || j.status === "ASSIGNED")
@@ -97,6 +103,15 @@ export default async function TodayPage() {
       )}
 
       {canCoverage ? <TimeOffRequest /> : null}
+
+      {hasNotifications ? (
+        <details className="rounded-2xl border border-slate-200 bg-white p-4">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-700">Notification preferences</summary>
+          <div className="mt-3">
+            <NotificationPrefs initial={cleanerPrefs} smsAvailable={isSmsConfigured()} />
+          </div>
+        </details>
+      ) : null}
     </div>
   )
 }

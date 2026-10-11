@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { canManageOrg, canManageAccounts } from "@/lib/rbac"
@@ -53,6 +54,12 @@ export default async function SettingsPage() {
       <Card className="p-6">
         <h2 className="mb-3 text-sm font-semibold text-slate-700">Your password</h2>
         <ChangePasswordForm />
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="mb-1 text-sm font-semibold text-slate-700">Notifications</h2>
+        <p className="mb-3 text-sm text-slate-500">Choose which alerts you get by email or text.</p>
+        <Link href="/settings/notifications" className="text-sm font-medium text-brand hover:underline">Manage notification preferences →</Link>
       </Card>
 
       {canSetup && setup ? (

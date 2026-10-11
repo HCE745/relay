@@ -30,6 +30,8 @@ const PUBLIC_PATHS = [
   "/apply", // public per-org job application (Phase 18)
   "/api/public", // public intake endpoints — self rate-limit + honeypot
   "/api/demo", // demo provisioning — self rate-limits + caps
+  "/api/sms/inbound", // Twilio inbound webhook — verified by X-Twilio-Signature
+  "/api/stripe/webhook", // Stripe webhook — verified by signature (Phase 22)
   "/api/auth", // forgot/reset — self-contained, token-based
   "/api/cron", // self-guards via CRON_SECRET
   "/api/health",

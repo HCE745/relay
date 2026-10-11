@@ -1,6 +1,6 @@
 import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound, RequirementsError } from "./errors"
-import { notifyUser } from "../notify"
+import { notifyUserEventSafe } from "../notifications/dispatch"
 import { getComplianceConfig, checkAssignmentCompliance } from "./compliance"
 import { CREDENTIAL_TYPE_LABELS } from "../credential-status"
 
@@ -79,7 +79,7 @@ export async function assignCleaner(orgId: string, jobId: string, userId: string
 
   // Advance SCHEDULED → ASSIGNED (never touch IN_PROGRESS/COMPLETED/etc.).
   await db.job.updateMany({ where: { id: jobId, status: "SCHEDULED" }, data: { status: "ASSIGNED" } })
-  await notifyUser(orgId, userId, "You've been assigned a job", `You have a new cleaning job assignment. Check Today's Work in the app.`)
+  notifyUserEventSafe(orgId, userId, "JOB_ASSIGNED", { subject: "You've been assigned a job", body: "You have a new cleaning job assignment. Check Today's Work in the app." })
   return { assigned: true, alreadyAssigned: false, conflicts, credentialWarnings }
 }
 
@@ -97,5 +97,6 @@ export async function removeAssignment(orgId: string, jobId: string, userId: str
   if (remaining === 0) {
     await db.job.updateMany({ where: { id: jobId, status: "ASSIGNED" }, data: { status: "SCHEDULED" } })
   }
+  notifyUserEventSafe(orgId, userId, "ASSIGNMENT_CHANGED", { subject: "You were removed from a job", body: "One of your job assignments was removed. Check Today's Work for your current schedule." })
   return true
 }

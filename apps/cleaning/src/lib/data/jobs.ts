@@ -2,6 +2,7 @@ import { orgDb, systemDb } from "../org-db"
 import { assertFound, ConflictError } from "./errors"
 import { recordAudit } from "./audit"
 import { wallTimeToInstant } from "../scheduling/time"
+import { notifyUserEventSafe, type NotificationEventKey } from "../notifications/dispatch"
 import type { z } from "zod"
 import type { manualJobCreateSchema, jobUpdateSchema } from "../zod-schemas"
 
@@ -132,19 +133,28 @@ export async function updateJob(orgId: string, id: string, input: UpdateInput) {
   if (input.notes !== undefined) data.notes = input.notes
   if (input.crewSize !== undefined) data.crewSize = input.crewSize
   // Rescheduling a single Job is a per-Job change and never affects the plan.
-  if (input.date && input.startTime) {
+  const rescheduled = !!(input.date && input.startTime)
+  if (rescheduled) {
     const tz = await effectiveTimezone(orgId, job.serviceLocation.timezone)
-    data.scheduledStart = wallTimeToInstant(input.date, input.startTime, tz)
+    data.scheduledStart = wallTimeToInstant(input.date!, input.startTime!, tz)
   }
 
   const { count } = await db.job.updateMany({ where: { id }, data })
   if (count === 0) return null
+  if (rescheduled) await notifyJobCrew(orgId, id, "SCHEDULE_CHANGED", { subject: "A job was rescheduled", body: "One of your jobs was moved to a new time. Check Today's Work for the updated schedule." })
   return getJob(orgId, id)
 }
 
 export async function cancelJob(orgId: string, id: string) {
   const { count } = await orgDb(orgId).job.updateMany({ where: { id }, data: { status: "CANCELLED" } })
+  if (count > 0) await notifyJobCrew(orgId, id, "SCHEDULE_CHANGED", { subject: "A job was cancelled", body: "One of your scheduled jobs was cancelled. Check Today's Work for your current schedule." })
   return count > 0
+}
+
+// Notify every currently-assigned cleaner of a schedule change on a job.
+async function notifyJobCrew(orgId: string, jobId: string, event: NotificationEventKey, msg: { subject: string; body: string }) {
+  const assignments = await orgDb(orgId).jobAssignment.findMany({ where: { jobId }, select: { userId: true } })
+  for (const a of assignments) notifyUserEventSafe(orgId, a.userId, event, msg)
 }
 
 /** Manually mark an uncompleted job MISSED (audited). No automated MISSED logic. */

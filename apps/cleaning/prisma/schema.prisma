@@ -414,6 +414,8 @@ model Organization {
   excludedZones       ExcludedZone[]
   workOrders          WorkOrder[]
   changeOrders        ChangeOrder[]
+  notificationPrefs   NotificationPreference[]
+  notificationLogs    NotificationLog[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -426,6 +428,8 @@ model User {
   password       String
   role           UserRole @default(CLEANER)
   phone          String?
+  // SMS opt-out (STOP keyword / manual). Honored before any SMS send (Phase 21).
+  smsOptOut      Boolean  @default(false)
   isActive       Boolean  @default(true)
   organizationId String
   managerId      String?
@@ -458,6 +462,8 @@ model User {
   credentials          Credential[]       @relation("UserCredential")
   heldAccessItems      AccessItem[]       @relation("AccessHolder")
   portalCustomer       Customer?          @relation("CustomerPortalUsers", fields: [customerId], references: [id])
+  notificationPrefs    NotificationPreference[]
+  notificationLogs     NotificationLog[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -1019,6 +1025,82 @@ model ChangeOrder {
   @@index([organizationId])
   @@index([status])
   @@index([jobId])
+  @@schema("cleaning")
+}
+
+// ─── Notifications (Phase 21; events reused by Phases 25/26) ─────────────────
+enum NotificationEvent {
+  JOB_ASSIGNED
+  ASSIGNMENT_CHANGED
+  SCHEDULE_CHANGED
+  SHIFT_UNCOVERED
+  TIMEOFF_APPROVED
+  TIMEOFF_DECLINED
+  MISSED_CLOCK_IN
+  CREDENTIAL_EXPIRING
+  VISIT_REMINDER
+  SERVICE_SUMMARY
+  PAYMENT_REMINDER
+  CUSTOMER_MESSAGE
+
+  @@schema("cleaning")
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+
+  @@schema("cleaning")
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
+  SKIPPED
+
+  @@schema("cleaning")
+}
+
+// Per-user, per-event channel choice. Absence = sensible default (email on, SMS
+// off). SMS additionally requires a phone, no opt-out, and Twilio configured.
+model NotificationPreference {
+  id             String            @id @default(cuid())
+  organizationId String
+  userId         String
+  event          NotificationEvent
+  email          Boolean           @default(true)
+  sms            Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, event])
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// Permanent record of every notification attempt (and why it was skipped).
+model NotificationLog {
+  id             String              @id @default(cuid())
+  organizationId String
+  userId         String?
+  channel        NotificationChannel
+  event          NotificationEvent
+  toAddress      String
+  subject        String?
+  body           String
+  status         NotificationStatus
+  detail         String? // error text or skip reason (e.g. rate_limited, sms_unconfigured)
+  providerId     String?
+  createdAt      DateTime            @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([userId, event, channel, createdAt])
   @@schema("cleaning")
 }
 

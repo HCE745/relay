@@ -1,4 +1,5 @@
 import { orgDb } from "../org-db"
+import { notifyUserEventSafe } from "../notifications/dispatch"
 
 const toDate = (d: string) => new Date(`${d}T00:00:00.000Z`)
 
@@ -45,5 +46,12 @@ export async function reviewTimeOff(orgId: string, id: string, opts: { approve: 
   } else {
     await db.timeOffRequest.updateMany({ where: { id }, data: { status: "DENIED", reviewedById: opts.reviewerId, reviewedAt: new Date() } })
   }
+  notifyUserEventSafe(
+    orgId, req.userId,
+    opts.approve ? "TIMEOFF_APPROVED" : "TIMEOFF_DECLINED",
+    opts.approve
+      ? { subject: "Time off approved", body: "Your time-off request was approved." }
+      : { subject: "Time off not approved", body: "Your time-off request was not approved. Talk to your manager if you have questions." },
+  )
   return db.timeOffRequest.findFirst({ where: { id } })
 }

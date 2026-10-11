@@ -2,6 +2,7 @@ import { orgDb } from "../org-db"
 import { getOrgTimezone } from "./org"
 import { isUnavailableOn } from "./availability"
 import { assertFound, ReferenceError } from "./errors"
+import { notifyUserEventSafe } from "../notifications/dispatch"
 
 // Shift coverage (Phase 11). An assignment on an unavailable cleaner's job needs
 // coverage; the finder ranks available cleaners by prior work at the site; a
@@ -160,5 +161,8 @@ export async function reassignJob(
       },
     })
   })
+  // Tell the covering cleaner they're on, and the removed cleaner they're off.
+  notifyUserEventSafe(orgId, input.toUserId, "ASSIGNMENT_CHANGED", { subject: "You've been assigned to cover a job", body: "You've been assigned to cover a cleaning job. Check Today's Work in the app." })
+  if (input.fromUserId) notifyUserEventSafe(orgId, input.fromUserId, "ASSIGNMENT_CHANGED", { subject: "A job was reassigned", body: "One of your jobs was reassigned to another cleaner. Check Today's Work for your current schedule." })
   return { ok: true }
 }

@@ -601,4 +601,16 @@ async function seedExtras(
       data: { organizationId: orgId, jobId: extraJob, description: "Spot-treat carpet stains in corridor", amount: "140.00", requiresCustomerApproval: true, status: "APPROVED", approvedByPortal: true, approvedAt: days(-1), createdById: staff.managerId },
     })
   }
+
+  // ── Notifications (Phase 21): a preference + a short delivery log ──
+  await systemDb.notificationPreference.create({
+    data: { organizationId: orgId, userId: cleaner, event: "JOB_ASSIGNED", email: true, sms: true },
+  })
+  await systemDb.notificationLog.createMany({
+    data: [
+      { organizationId: orgId, userId: cleaner, channel: "EMAIL", event: "JOB_ASSIGNED", toAddress: "cleaner@demo", subject: "You've been assigned a job", body: "You have a new cleaning job assignment.", status: "SENT" },
+      { organizationId: orgId, userId: cleaner, channel: "SMS", event: "SCHEDULE_CHANGED", toAddress: "+15125550100", subject: "A job was rescheduled", body: "One of your jobs moved to a new time.", status: "SKIPPED", detail: "sms_unconfigured" },
+      { organizationId: orgId, userId: staff.managerId, channel: "EMAIL", event: "SHIFT_UNCOVERED", toAddress: "manager@demo", subject: "Uncovered shift", body: "A shift needs coverage in the next 24h.", status: "SENT" },
+    ],
+  })
 }

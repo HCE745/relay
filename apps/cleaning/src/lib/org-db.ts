@@ -67,6 +67,8 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "ExcludedZone",
   "WorkOrder",
   "ChangeOrder",
+  "NotificationPreference",
+  "NotificationLog",
 ])
 
 // Models that are DELIBERATELY not org-scoped, each with a stated reason. A

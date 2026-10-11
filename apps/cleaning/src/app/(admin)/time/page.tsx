@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session"
 import { canViewSchedule, canApproveTime } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { listTimeEntries } from "@/lib/data/time-entries"
+import { getPeriodOvertime } from "@/lib/data/labor"
 import { getOrgTimezone } from "@/lib/data/org"
 import { formatTimeInZone } from "@/lib/scheduling/time"
 import Link from "next/link"
@@ -44,6 +45,9 @@ export default async function TimePage({ searchParams }: { searchParams: Promise
   const end = new Date(now.getTime() + 86_400_000)
   const all = await listTimeEntries(orgId, start, end)
   const pending = all.filter((e) => e.status === "COMPLETED").length
+  // Overtime from APPROVED time over the same window (Phase 24).
+  const overtime = await getPeriodOvertime(orgId, { start, end })
+  const otUsers = overtime.byUser.filter((u) => u.otHours > 0)
 
   const { status } = await searchParams
   const pendingOnly = status === "pending"
@@ -57,6 +61,18 @@ export default async function TimePage({ searchParams }: { searchParams: Promise
         icon={<ClockIcon />}
         action={canApprove ? <ExportBar /> : undefined}
       />
+
+      {otUsers.length > 0 ? (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <div className="text-sm font-semibold text-amber-900">Overtime in this window ({overtime.totalOtHours.toFixed(2)}h total)</div>
+          <ul className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-sm text-amber-800">
+            {otUsers.map((u) => (
+              <li key={u.userId}>{u.name}: <span className="font-medium">{u.otHours.toFixed(2)}h OT</span>{u.premium ? ` (+$${u.premium.toFixed(2)})` : ""}</li>
+            ))}
+          </ul>
+          <p className="mt-1 text-xs text-amber-700">Computed from approved time against your overtime rules. Flows to the payroll export.</p>
+        </div>
+      ) : null}
 
       {pendingOnly ? (
         <div className="mb-4 flex items-center gap-2">

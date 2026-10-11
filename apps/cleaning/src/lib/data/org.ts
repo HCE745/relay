@@ -12,8 +12,22 @@ export async function getOrgSettings(orgId: string) {
     select: {
       id: true, name: true, packageTier: true, timezone: true, contractExpiryLeadDays: true,
       credentialExpiryLeadDays: true, blockAssignmentOnExpiredCredential: true,
+      otWeeklyThresholdHours: true, otDailyThresholdHours: true, otMultiplier: true,
     },
   })
+}
+
+/** Overtime rules for the org (Phase 24). */
+export async function getOvertimeRules(orgId: string) {
+  const org = await systemDb.organization.findUnique({
+    where: { id: orgId },
+    select: { otWeeklyThresholdHours: true, otDailyThresholdHours: true, otMultiplier: true },
+  })
+  return {
+    dailyThresholdHours: org?.otDailyThresholdHours ?? null,
+    weeklyThresholdHours: org?.otWeeklyThresholdHours ?? null,
+    multiplier: org ? Number(org.otMultiplier) : 1.5,
+  }
 }
 
 /** The configurable lead time for the expiring-contracts dashboard warning. */
@@ -25,12 +39,15 @@ export async function getContractExpiryLeadDays(orgId: string): Promise<number> 
 /** Update org workspace settings (OWNER/ADMIN only, enforced in the route). */
 export async function updateOrgSettings(
   orgId: string,
-  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean },
+  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string },
 ) {
   const data: Record<string, unknown> = {}
   if (input.timezone !== undefined) data.timezone = input.timezone
   if (input.contractExpiryLeadDays !== undefined) data.contractExpiryLeadDays = input.contractExpiryLeadDays
   if (input.credentialExpiryLeadDays !== undefined) data.credentialExpiryLeadDays = input.credentialExpiryLeadDays
   if (input.blockAssignmentOnExpiredCredential !== undefined) data.blockAssignmentOnExpiredCredential = input.blockAssignmentOnExpiredCredential
+  if (input.otWeeklyThresholdHours !== undefined) data.otWeeklyThresholdHours = input.otWeeklyThresholdHours
+  if (input.otDailyThresholdHours !== undefined) data.otDailyThresholdHours = input.otDailyThresholdHours
+  if (input.otMultiplier !== undefined) data.otMultiplier = input.otMultiplier
   return systemDb.organization.update({ where: { id: orgId }, data })
 }

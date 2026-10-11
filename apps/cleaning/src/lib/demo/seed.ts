@@ -632,4 +632,17 @@ async function seedExtras(
     })
     void c
   }
+
+  // ── Overtime (Phase 24): enable a daily rule + one long approved shift ──
+  await systemDb.organization.updateMany({ where: { id: orgId }, data: { otDailyThresholdHours: 8, otWeeklyThresholdHours: 40 } })
+  if (ctx.completedJobIds.length > 0) {
+    const otStart = new Date(week.getTime() + todayOffset * DAY - DAY + 8 * 3600_000) // yesterday 08:00
+    await systemDb.timeEntry.create({
+      data: {
+        organizationId: orgId, jobId: ctx.completedJobIds[0], userId: cleaner,
+        clockInAt: otStart, clockOutAt: new Date(otStart.getTime() + 10 * 3600_000), breakMinutes: 0,
+        status: "APPROVED", approvedById: staff.managerId, approvedAt: new Date(), approvedPayRate: "22.00", approvedPayType: "HOURLY", clockInSource: "mobile_gps",
+      },
+    })
+  }
 }

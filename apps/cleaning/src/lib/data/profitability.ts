@@ -1,5 +1,6 @@
 import { orgDb } from "../org-db"
 import { getOrgTimezone } from "./org"
+import { getPeriodOvertime } from "./labor"
 import {
   type Money,
   type JobMarginInput,
@@ -92,6 +93,10 @@ export type Profitability = {
   byCustomer: ProfitRow[]
   byPlan: ProfitRow[]
   summary: MarginSummary
+  // Period overtime premium (extra over straight time) across all employees.
+  // Surfaced here rather than per-site: OT is a weekly-per-employee figure that
+  // can span multiple sites, so it is not attributed to a single row.
+  overtimePremium: Money
   includeUninvoiced: boolean
 }
 
@@ -151,11 +156,14 @@ export async function getProfitability(
     }
   }
 
+  const ot = await getPeriodOvertime(orgId, { start: windowStart, end: windowEnd })
+
   return {
     bySite: finalize(bySite),
     byCustomer: finalize(byCustomer),
     byPlan: finalize(byPlan),
     summary: summarizeMargin(summaryInputs, includeUninvoiced),
+    overtimePremium: ot.totalPremium,
     includeUninvoiced,
   }
 }

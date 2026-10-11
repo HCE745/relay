@@ -9,6 +9,7 @@ import { countLowStock } from "@/lib/data/supplies"
 import { countOverdue } from "@/lib/data/invoices"
 import { countExpiring } from "@/lib/data/contracts"
 import { getContractExpiryLeadDays } from "@/lib/data/org"
+import { countApproachingOvertime } from "@/lib/data/labor"
 import { countUncoveredShifts } from "@/lib/data/coverage"
 import { countCredentialAlerts } from "@/lib/data/credentials"
 import { getComplianceConfig } from "@/lib/data/compliance"
@@ -76,6 +77,10 @@ export default async function DashboardPage() {
     }
     if (await orgHasCapability(orgId, "workforce.coverage")) {
       needsAttention.push({ label: "Uncovered shifts (48h)", value: await countUncoveredShifts(orgId, { hoursAhead: 48 }), href: "/coverage", alert: true })
+    }
+    if (await orgHasCapability(orgId, "workforce.timeTracking")) {
+      const approaching = await countApproachingOvertime(orgId)
+      if (approaching > 0) needsAttention.push({ label: "Approaching overtime", value: approaching, href: "/time", alert: true })
     }
     if (await orgHasCapability(orgId, "workforce.compliance")) {
       const cfg = await getComplianceConfig(orgId)

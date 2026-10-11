@@ -1,6 +1,7 @@
 import { orgDb } from "../org-db"
 import { invoiceNo } from "../money"
-import { billableMinutes, hoursFromMinutes, startOfUtcDay, endOfUtcDay } from "../billing-math"
+import { startOfUtcDay, endOfUtcDay } from "../billing-math"
+import { getPeriodOvertime } from "./labor"
 import {
   qboInvoicesCsv, xeroInvoicesCsv, qboCustomersCsv, xeroContactsCsv, gustoHoursCsv, adpHoursCsv,
   type ExportInvoice, type ExportCustomer, type ExportHours,
@@ -32,25 +33,25 @@ async function customerRows(orgId: string): Promise<ExportCustomer[]> {
 }
 
 async function hoursRows(orgId: string, start: Date, end: Date): Promise<ExportHours[]> {
-  const entries = await orgDb(orgId).timeEntry.findMany({
-    where: { status: "APPROVED", clockInAt: { gte: start, lte: end } },
-    select: { clockInAt: true, clockOutAt: true, breakMinutes: true, user: { select: { id: true, name: true, email: true } } },
-  })
-  const byUser = new Map<string, { name: string; email: string | null; minutes: number }>()
-  for (const e of entries) {
-    const row = byUser.get(e.user.id) ?? { name: e.user.name, email: e.user.email, minutes: 0 }
-    row.minutes += billableMinutes(e)
-    byUser.set(e.user.id, row)
-  }
-  return [...byUser.entries()].map(([id, r]) => {
-    const [firstName, ...rest] = r.name.split(" ")
+  // Regular vs OT hours now come from the org's overtime rules (Phase 24).
+  const [entries, ot] = await Promise.all([
+    orgDb(orgId).timeEntry.findMany({
+      where: { status: "APPROVED", clockInAt: { gte: start, lte: end } },
+      select: { user: { select: { id: true, name: true, email: true } } },
+    }),
+    getPeriodOvertime(orgId, { start, end }),
+  ])
+  const email = new Map(entries.map((e) => [e.user.id, { name: e.user.name, email: e.user.email }]))
+  return ot.byUser.map((u) => {
+    const meta = email.get(u.userId)
+    const [firstName, ...rest] = (meta?.name ?? u.name).split(" ")
     return {
-      employeeId: id,
+      employeeId: u.userId,
       firstName,
       lastName: rest.join(" "),
-      email: r.email,
-      regularHours: hoursFromMinutes(r.minutes).toString(),
-      overtimeHours: "0", // we do not compute overtime — no OT ruleset in-app
+      email: meta?.email ?? null,
+      regularHours: String(u.regularHours),
+      overtimeHours: String(u.otHours),
     }
   })
 }

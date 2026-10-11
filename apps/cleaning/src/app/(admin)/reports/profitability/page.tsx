@@ -125,6 +125,7 @@ export default async function ProfitabilityPage({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryTile label={`Revenue${includeUninvoiced ? "" : " (invoiced)"}`} value={formatMoney(summary.revenue)} />
         <SummaryTile label="Labor cost" value={formatMoney(summary.laborCost)} />
+        {Number(data.overtimePremium) > 0 ? <SummaryTile label="Overtime premium" value={formatMoney(data.overtimePremium)} /> : null}
         <SummaryTile label="Supplies" value={formatMoney(summary.suppliesCost)} />
         <SummaryTile label="Gross margin" value={formatMoney(summary.margin)} accent={Number(summary.margin) < 0} />
         <SummaryTile label="Margin %" value={pctText(summary.marginPct)} accent={summary.marginPct !== null && summary.marginPct < below} />

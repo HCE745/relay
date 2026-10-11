@@ -370,6 +370,12 @@ model Organization {
   // cleaner missing/expired on a site-required credential (warn by default).
   credentialExpiryLeadDays Int @default(30)
   blockAssignmentOnExpiredCredential Boolean @default(false)
+  // Overtime rules (Phase 24). OT hours only — never payroll processing. A null
+  // daily threshold disables daily OT; weekly defaults to 40h; multiplier is the
+  // OT premium factor (1.5 = time-and-a-half).
+  otWeeklyThresholdHours Int?    @default(40)
+  otDailyThresholdHours  Int?
+  otMultiplier           Decimal @default(1.5) @db.Decimal(4, 2)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")

@@ -204,6 +204,10 @@ export const orgSettingsSchema = z.object({
   contractExpiryLeadDays: z.coerce.number().int().min(1).max(365).optional(),
   credentialExpiryLeadDays: z.coerce.number().int().min(1).max(365).optional(),
   blockAssignmentOnExpiredCredential: z.boolean().optional(),
+  // Overtime rules (Phase 24). null disables daily OT; weekly 0 = off.
+  otWeeklyThresholdHours: z.coerce.number().int().min(0).max(168).nullable().optional(),
+  otDailyThresholdHours: z.coerce.number().int().min(0).max(24).nullable().optional(),
+  otMultiplier: money.optional(), // Decimal string, e.g. "1.5"
 })
 
 // ─── Compliance & credentials (Phase 13) ───

@@ -434,6 +434,8 @@ model Organization {
   exceptionAlerts     ExceptionAlert[]
   customerMessages    CustomerMessage[]
   proposals           Proposal[]
+  serviceRequests     ServiceRequest[]
+  surveyResponses     SurveyResponse[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -544,6 +546,8 @@ model Customer {
   serviceSummariesOptIn Boolean @default(true)
   contracts        Contract[]
   messages         CustomerMessage[]
+  serviceRequests  ServiceRequest[]
+  surveyResponses  SurveyResponse[]
   portalUsers      User[]         @relation("CustomerPortalUsers")
   portalInvites    PortalInvite[]
   workOrders       WorkOrder[]
@@ -742,6 +746,8 @@ model Job {
   supplyUsages    SupplyUsage[]
   changeOrders    ChangeOrder[]
   workOrder       WorkOrder?         @relation("WorkOrderJob")
+  serviceRequests ServiceRequest[]
+  survey          SurveyResponse?
 
   // Idempotent generation: a plan produces at most one Job per occurrence,
   // keyed on the IMMUTABLE plannedStart (not the mutable scheduledStart, which a
@@ -1130,6 +1136,64 @@ model NotificationLog {
 
   @@index([organizationId])
   @@index([userId, event, channel, createdAt])
+  @@schema("cleaning")
+}
+
+// Portal self-service (Phase 28). A customer-initiated reschedule/cancel is a
+// REQUEST for staff approval — it never mutates the schedule directly.
+enum ServiceRequestType {
+  RESCHEDULE
+  CANCEL
+
+  @@schema("cleaning")
+}
+
+enum ServiceRequestStatus {
+  PENDING
+  APPROVED
+  DECLINED
+
+  @@schema("cleaning")
+}
+
+model ServiceRequest {
+  id               String               @id @default(cuid())
+  organizationId   String
+  customerId       String
+  jobId            String
+  type             ServiceRequestType
+  requestedDate    String? // wall-clock date for a reschedule (YYYY-MM-DD)
+  requestedTime    String? // wall-clock time for a reschedule (HH:mm)
+  note             String?
+  status           ServiceRequestStatus @default(PENDING)
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  createdAt        DateTime             @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  job          Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([status])
+  @@schema("cleaning")
+}
+
+// Post-service satisfaction survey (Phase 28): one rating per completed job.
+model SurveyResponse {
+  id             String   @id @default(cuid())
+  organizationId String
+  jobId          String   @unique
+  customerId     String
+  rating         Int // 1..5
+  comment        String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  job          Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
   @@schema("cleaning")
 }
 

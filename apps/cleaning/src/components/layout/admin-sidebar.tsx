@@ -8,7 +8,7 @@ import type { AdminNavItem } from "@/lib/rbac"
 import {
   HomeIcon, CalendarIcon, BriefcaseIcon, BuildingIcon, MapPinIcon, UsersIcon, ClockIcon,
   ClipboardCheckIcon, ClipboardListIcon, AlertTriangleIcon, SparklesIcon, ReceiptIcon, FileTextIcon,
-  CreditCardIcon, DollarIcon, ChartBarIcon, BoxIcon, TagIcon, CogIcon, CircleIcon,
+  CreditCardIcon, DollarIcon, ChartBarIcon, BoxIcon, TagIcon, CogIcon, CircleIcon, InboxIcon,
 } from "@/components/ui/icons"
 
 // Icon per nav key — keeps the rail scannable and matches the app's icon system.
@@ -26,6 +26,8 @@ const NAV_ICON: Record<string, (p: { className?: string }) => React.ReactNode> =
   inspections: ClipboardCheckIcon,
   issues: AlertTriangleIcon,
   "service-areas": MapPinIcon,
+  "service-requests": InboxIcon,
+  satisfaction: ChartBarIcon,
   quotes: ClipboardListIcon,
   leads: SparklesIcon,
   estimates: ReceiptIcon,

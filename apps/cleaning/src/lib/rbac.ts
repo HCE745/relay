@@ -50,6 +50,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "access",      label: "Access & keys", href: "/access",     requiredCap: "operations.accessControl" },
   { key: "inspections", label: "Inspections", href: "/inspections", requiredCap: "quality.inspections" },
   { key: "issues",      label: "Issues",      href: "/issues",      requiredCap: "operations.issues" },
+  { key: "service-requests", label: "Service requests", href: "/service-requests", requiredCap: "core.jobs" },
   { key: "service-areas", label: "Service areas", href: "/service-areas", requiredCap: "operations.serviceAreas" },
   { key: "quotes",      label: "Quotes",      href: "/quotes",      requiredCap: "crm.quoting", section: "Sales" },
   { key: "leads",       label: "Leads",       href: "/leads",       requiredCap: "crm.estimates", section: "Sales" },
@@ -61,6 +62,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "payments",    label: "Payments",    href: "/billing/payments",  requiredCap: "billing.invoicing", section: "Billing" },
   { key: "ar-aging",    label: "AR Aging",    href: "/billing/ar-aging",  requiredCap: "billing.arAging",   section: "Billing" },
   { key: "profitability", label: "Profitability", href: "/reports/profitability", requiredCap: "reporting.profitability", section: "Reports" },
+  { key: "satisfaction", label: "Satisfaction", href: "/reports/satisfaction", requiredCap: "quality.inspections", section: "Reports" },
   { key: "supply-spend", label: "Supply spend", href: "/reports/supply-spend", requiredCap: "reporting.profitability", section: "Reports" },
   { key: "exports",     label: "Exports",     href: "/exports",     requiredCap: "integrations.exports", section: "Reports" },
   { key: "import",      label: "Import",      href: "/import",      requiredCap: "operations.dataImport", section: "Reports" },
@@ -76,8 +78,8 @@ export const ADMIN_ROUTE_KEYS: ReadonlySet<string> = new Set(ADMIN_NAV.map((i) =
 const ROLE_ROUTE_ACCESS: Record<Role, string[] | "*"> = {
   OWNER: "*",
   ADMIN: "*",
-  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "coverage", "compliance", "access", "inspections", "issues", "service-areas", "quotes", "leads", "estimates", "contracts", "work-orders", "hiring", "invoices", "payments", "ar-aging", "profitability", "supply-spend", "exports", "import", "assets", "supplies"],
-  SUPERVISOR: ["dashboard", "schedule", "jobs", "time", "inspections", "issues"],
+  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "coverage", "compliance", "access", "inspections", "issues", "service-requests", "satisfaction", "service-areas", "quotes", "leads", "estimates", "contracts", "work-orders", "hiring", "invoices", "payments", "ar-aging", "profitability", "supply-spend", "exports", "import", "assets", "supplies"],
+  SUPERVISOR: ["dashboard", "schedule", "jobs", "time", "inspections", "issues", "service-requests"],
   CLEANER: [], // cleaners have no admin routes; they use the field app
   CLIENT: [], // portal users have NO admin routes; they live under /portal
 }

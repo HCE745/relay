@@ -644,6 +644,20 @@ async function seedExtras(
     ],
   })
 
+  // ── Portal self-service & feedback (Phase 28) ──
+  const upcomingJob = await systemDb.job.findFirst({ where: { organizationId: orgId, status: { in: ["SCHEDULED", "ASSIGNED"] } }, select: { id: true, serviceLocation: { select: { customerId: true } } } })
+  if (upcomingJob) {
+    await systemDb.serviceRequest.create({
+      data: { organizationId: orgId, customerId: upcomingJob.serviceLocation.customerId, jobId: upcomingJob.id, type: "RESCHEDULE", requestedDate: days(2).toISOString().slice(0, 10), requestedTime: "10:00", note: "Could we move this to mid-morning?", status: "PENDING" },
+    })
+  }
+  const ratings = [5, 4, 5, 3]
+  for (let i = 0; i < Math.min(4, ctx.completedJobIds.length); i++) {
+    const jid = ctx.completedJobIds[i]
+    const j = await systemDb.job.findUnique({ where: { id: jid }, select: { serviceLocation: { select: { customerId: true } } } })
+    if (j) await systemDb.surveyResponse.create({ data: { organizationId: orgId, jobId: jid, customerId: j.serviceLocation.customerId, rating: ratings[i], comment: i === 3 ? "Missed the break room." : "Great work, thank you!" } }).catch(() => {})
+  }
+
   // ── Proposals & e-signature (Phase 27): one sent, one signed+attached ──
   const estsForProp = await systemDb.estimate.findMany({ where: { organizationId: orgId }, select: { id: true, convertedCustomerId: true }, orderBy: { createdAt: "asc" } })
   const draftEst = estsForProp.find((e) => !e.convertedCustomerId)

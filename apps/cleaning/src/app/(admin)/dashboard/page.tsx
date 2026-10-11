@@ -10,6 +10,7 @@ import { countOverdue } from "@/lib/data/invoices"
 import { countExpiring } from "@/lib/data/contracts"
 import { getContractExpiryLeadDays } from "@/lib/data/org"
 import { countApproachingOvertime } from "@/lib/data/labor"
+import { countPendingServiceRequests } from "@/lib/data/service-requests"
 import { countUncoveredShifts } from "@/lib/data/coverage"
 import { countCredentialAlerts } from "@/lib/data/credentials"
 import { getComplianceConfig } from "@/lib/data/compliance"
@@ -82,6 +83,8 @@ export default async function DashboardPage() {
       const approaching = await countApproachingOvertime(orgId)
       if (approaching > 0) needsAttention.push({ label: "Approaching overtime", value: approaching, href: "/time", alert: true })
     }
+    const pendingRequests = await countPendingServiceRequests(orgId)
+    if (pendingRequests > 0) needsAttention.push({ label: "Service requests", value: pendingRequests, href: "/service-requests", alert: true })
     if (await orgHasCapability(orgId, "workforce.compliance")) {
       const cfg = await getComplianceConfig(orgId)
       needsAttention.push({ label: "Credential alerts", value: await countCredentialAlerts(orgId, cfg.leadDays), href: "/compliance", alert: true })

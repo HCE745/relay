@@ -10,6 +10,11 @@ import { portalLogout } from "@/lib/portal-actions"
 import { ReportIssue } from "@/components/portal/report-issue"
 import { PortalExtras } from "@/components/portal/portal-extras"
 import { MessageThread } from "@/components/messages/message-thread"
+import { listSurveyableJobs } from "@/lib/data/surveys"
+import { listPortalQuotes } from "@/lib/data/portal-quotes"
+import { listProposalsForCustomer } from "@/lib/data/proposals"
+import { formatMoney as fmtMoney } from "@/lib/money"
+import { PortalRequestChange, PortalSurvey, PortalQuoteDecision } from "@/components/portal/portal-self-service"
 
 export const dynamic = "force-dynamic"
 
@@ -30,11 +35,14 @@ export default async function PortalDashboard() {
   const s = await getPortalSession()
   if (!s) redirect("/portal/login")
 
-  const [data, sites, pendingExtras, canPayOnline] = await Promise.all([
+  const [data, sites, pendingExtras, canPayOnline, surveyable, quotes, documents] = await Promise.all([
     getPortalDashboard(s.organizationId, s.customerId),
     listPortalSites(s.organizationId, s.customerId),
     listPendingExtrasForCustomer(s.organizationId, s.customerId),
     orgHasCapability(s.organizationId, "billing.onlinePayments"),
+    listSurveyableJobs(s.organizationId, s.customerId),
+    listPortalQuotes(s.organizationId, s.customerId),
+    listProposalsForCustomer(s.organizationId, s.customerId),
   ])
   // Pre-mint pay links for outstanding invoices when online payments are on.
   const payTokens = new Map<string, string>()
@@ -60,6 +68,45 @@ export default async function PortalDashboard() {
         </div>
       </header>
 
+      {quotes.length > 0 ? (
+        <Card title="Quotes to review">
+          <ul className="divide-y divide-slate-100">
+            {quotes.map((q) => (
+              <li key={q.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+                <span><span className="font-medium text-slate-800">{q.title}</span> <span className="tabular-nums text-slate-600">{fmtMoney(q.total, q.currency)}</span></span>
+                <PortalQuoteDecision estimateId={q.id} />
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
+
+      {surveyable.length > 0 ? (
+        <Card title="Rate your recent visits">
+          <ul className="divide-y divide-slate-100">
+            {surveyable.map((j) => (
+              <li key={j.id} className="py-2.5 text-sm">
+                <div className="mb-1 text-slate-700">{j.serviceLocation.name} · {j.title} <span className="text-xs text-slate-400">{fmtD(j.actualEnd ?? j.scheduledStart)}</span></div>
+                <PortalSurvey jobId={j.id} />
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
+
+      {documents.length > 0 ? (
+        <Card title="Your documents">
+          <ul className="divide-y divide-slate-100">
+            {documents.map((p) => (
+              <li key={p.id} className="flex items-center justify-between py-2 text-sm">
+                <span className="text-slate-700">Signed proposal{p.signedAt ? ` · ${fmtD(p.signedAt)}` : ""}</span>
+                <a href={`/api/public/proposal/${p.token}/pdf`} target="_blank" rel="noreferrer" className="font-medium text-brand hover:underline">Download PDF</a>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
+
       {pendingExtras.length > 0 ? (
         <Card title="Extra work awaiting your approval">
           <PortalExtras extras={pendingExtras.map((e) => ({ id: e.id, description: e.description, amount: e.amount.toFixed(2) }))} />
@@ -71,9 +118,12 @@ export default async function PortalDashboard() {
           {data.upcoming.length === 0 ? <p className="text-sm text-slate-500">No upcoming visits scheduled.</p> : (
             <ul className="divide-y divide-slate-100">
               {data.upcoming.map((j) => (
-                <li key={j.id} className="flex items-center justify-between py-2 text-sm">
-                  <span><span className="font-medium text-slate-800">{j.serviceLocation.name}</span> · {j.title}</span>
-                  <span className="text-slate-500">{fmtDT(j.scheduledStart)}</span>
+                <li key={j.id} className="py-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span><span className="font-medium text-slate-800">{j.serviceLocation.name}</span> · {j.title}</span>
+                    <span className="text-slate-500">{fmtDT(j.scheduledStart)}</span>
+                  </div>
+                  <div className="mt-1"><PortalRequestChange jobId={j.id} label={j.title} /></div>
                 </li>
               ))}
             </ul>

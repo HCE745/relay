@@ -381,6 +381,9 @@ model Organization {
   // in alerts the supervisor + managers.
   uncoveredAlertLeadHours Int @default(24)
   missedClockInGraceMin   Int @default(30)
+  // Customer communications (Phase 26).
+  visitReminderLeadHours  Int     @default(24)
+  paymentRemindersEnabled Boolean @default(true)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")
@@ -429,6 +432,7 @@ model Organization {
   notificationLogs    NotificationLog[]
   importBatches       ImportBatch[]
   exceptionAlerts     ExceptionAlert[]
+  customerMessages    CustomerMessage[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -533,7 +537,12 @@ model Customer {
   // auto-charge without explicit customer authorization.
   stripeCustomerId String?
   importBatchId    String? // set when created by a CSV import (Phase 23); enables rollback
+  // Customer communications (Phase 26). Visit reminders are opt-IN; completion
+  // summaries are on by default (opt-out).
+  visitRemindersOptIn   Boolean @default(false)
+  serviceSummariesOptIn Boolean @default(true)
   contracts        Contract[]
+  messages         CustomerMessage[]
   portalUsers      User[]         @relation("CustomerPortalUsers")
   portalInvites    PortalInvite[]
   workOrders       WorkOrder[]
@@ -1120,6 +1129,34 @@ model NotificationLog {
 
   @@index([organizationId])
   @@index([userId, event, channel, createdAt])
+  @@schema("cleaning")
+}
+
+// Two-way customer message thread (Phase 26). Visible in the portal and to
+// staff on the customer page. A staff message optionally emails the customer.
+enum MessageSender {
+  STAFF
+  CUSTOMER
+
+  @@schema("cleaning")
+}
+
+model CustomerMessage {
+  id              String        @id @default(cuid())
+  organizationId  String
+  customerId      String
+  sender          MessageSender
+  authorUserId    String? // the staff or portal user who wrote it
+  body            String
+  readByStaffAt   DateTime?
+  readByCustomerAt DateTime?
+  createdAt       DateTime      @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([customerId, createdAt])
   @@schema("cleaning")
 }
 

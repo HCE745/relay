@@ -47,6 +47,8 @@ export const customerCreateSchema = z.object({
   billingEmail: optionalEmail,
   paymentTerms: z.enum(PAYMENT_TERMS).optional(),
   notes: optionalString,
+  visitRemindersOptIn: z.boolean().optional(),
+  serviceSummariesOptIn: z.boolean().optional(),
 })
 export const customerUpdateSchema = customerCreateSchema.partial().extend({
   isActive: z.boolean().optional(),

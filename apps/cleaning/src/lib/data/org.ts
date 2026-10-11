@@ -14,6 +14,7 @@ export async function getOrgSettings(orgId: string) {
       credentialExpiryLeadDays: true, blockAssignmentOnExpiredCredential: true,
       otWeeklyThresholdHours: true, otDailyThresholdHours: true, otMultiplier: true,
       uncoveredAlertLeadHours: true, missedClockInGraceMin: true,
+      visitReminderLeadHours: true, paymentRemindersEnabled: true,
     },
   })
 }
@@ -28,6 +29,18 @@ export async function getOvertimeRules(orgId: string) {
     dailyThresholdHours: org?.otDailyThresholdHours ?? null,
     weeklyThresholdHours: org?.otWeeklyThresholdHours ?? null,
     multiplier: org ? Number(org.otMultiplier) : 1.5,
+  }
+}
+
+/** Customer communications config (Phase 26). */
+export async function getCommsConfig(orgId: string) {
+  const org = await systemDb.organization.findUnique({
+    where: { id: orgId },
+    select: { visitReminderLeadHours: true, paymentRemindersEnabled: true },
+  })
+  return {
+    visitReminderLeadHours: org?.visitReminderLeadHours ?? 24,
+    paymentRemindersEnabled: org?.paymentRemindersEnabled ?? true,
   }
 }
 

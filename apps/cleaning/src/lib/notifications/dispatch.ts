@@ -68,6 +68,20 @@ async function deliver(
   }
 }
 
+/** Notify a CUSTOMER by email (Phase 26). Customers aren't staff users — we send
+ *  to the customer's email (or primary contact), and log it like any other. */
+export async function notifyCustomer(orgId: string, customerId: string, event: NotificationEventKey, msg: NotifyMessage, deps: NotifyDeps = defaultDeps): Promise<void> {
+  const db = orgDb(orgId)
+  const c = await db.customer.findFirst({ where: { id: customerId }, select: { email: true, contacts: { where: { isPrimary: true }, select: { email: true }, take: 1 } } })
+  const to = c?.email || c?.contacts[0]?.email || null
+  const log = (status: "SENT" | "FAILED" | "SKIPPED", detail?: string, providerId?: string) =>
+    db.notificationLog.create({ data: { organizationId: orgId, userId: null, channel: "EMAIL", event, toAddress: to ?? "(none)", subject: msg.subject, body: msg.body, status, detail, providerId } })
+  if (!to) { await log("SKIPPED", "no_customer_email"); return }
+  if (!deps.isEmailConfigured()) { await log("SKIPPED", "email_unconfigured"); return }
+  const r = await deps.sendEmail({ to, subject: msg.subject, text: msg.body })
+  await log(r.delivered ? "SENT" : "FAILED", r.error)
+}
+
 /** Notify a single user of an event across their chosen channels. */
 export async function notifyUserEvent(orgId: string, userId: string, event: NotificationEventKey, msg: NotifyMessage, deps: NotifyDeps = defaultDeps): Promise<void> {
   const db = orgDb(orgId)

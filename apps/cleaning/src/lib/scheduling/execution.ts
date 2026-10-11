@@ -1,5 +1,6 @@
 import { orgDb } from "../org-db"
 import { assertFound, ForbiddenActionError, ConflictError, RequirementsError } from "../data/errors"
+import { sendServiceSummarySafe } from "../data/customer-comms"
 import type { ClockInput } from "../zod-schemas"
 
 // ─── Field execution: clock in/out, checklist, completion ────────────────────
@@ -136,11 +137,13 @@ export async function clockOut(orgId: string, jobId: string, userId: string, loc
   const notDone = await db.jobAssignment.count({ where: { jobId, status: { not: "COMPLETED" } } })
   let jobCompleted = false
   if (openCount === 0 && notDone === 0) {
-    await db.job.updateMany({
+    const { count } = await db.job.updateMany({
       where: { id: jobId, status: { notIn: ["CANCELLED", "COMPLETED"] } },
       data: { status: "COMPLETED", actualEnd: now },
     })
     jobCompleted = true
+    // Best-effort customer service-completion summary (Phase 26); idempotent.
+    if (count > 0) sendServiceSummarySafe(orgId, jobId)
   }
   return { closed: true, jobCompleted }
 }

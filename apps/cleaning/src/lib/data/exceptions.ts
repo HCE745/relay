@@ -9,7 +9,11 @@ import { notifyManagersEvent, notifyRolesEvent, type NotificationEventKey } from
 // re-detection on the next run does not re-notify. Delivery routes through the
 // Phase 21 system (per-user channel prefs, opt-out, degrade when unconfigured).
 
-/** Claim an alert for (event, entityId). Returns true the FIRST time only. */
+/** Claim an alert for (event, entityId). Returns true the FIRST time only.
+ *  Shared idempotency guard — also used by customer comms (Phase 26). */
+export async function claimAlert(orgId: string, event: NotificationEventKey, entityId: string): Promise<boolean> {
+  return claim(orgId, event, entityId)
+}
 async function claim(orgId: string, event: NotificationEventKey, entityId: string): Promise<boolean> {
   try {
     await orgDb(orgId).exceptionAlert.create({ data: { organizationId: orgId, event: event as "SHIFT_UNCOVERED", entityId } })

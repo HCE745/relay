@@ -7,6 +7,7 @@ import { getCustomer } from "@/lib/data/customers"
 import { getCustomerBilling } from "@/lib/data/invoices"
 import { listPortalUsers, listPortalInvites } from "@/lib/data/portal"
 import { PortalAccess } from "@/components/portal/portal-access"
+import { MessageThread } from "@/components/messages/message-thread"
 import { formatMoney, invoiceNo } from "@/lib/money"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card, StatusPill } from "@/components/ui/controls"
@@ -143,6 +144,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           invites={portalInvites.map((i) => ({ id: i.id, email: i.email, status: i.status, expiresAt: i.expiresAt.toISOString() }))}
         />
       ) : null}
+
+      <Card className="p-5">
+        <h2 className="mb-3 text-sm font-semibold text-slate-700">Messages</h2>
+        <MessageThread endpoint={`/api/customers/${customer.id}/messages`} mine="STAFF" />
+      </Card>
     </div>
   )
 }

@@ -22,6 +22,8 @@ export type CustomerValues = {
   billingEmail?: string | null
   paymentTerms?: string | null
   notes?: string | null
+  visitRemindersOptIn?: boolean
+  serviceSummariesOptIn?: boolean
 }
 
 function CustomerForm({ initial, onDone }: { initial?: CustomerValues; onDone: () => void }) {
@@ -35,6 +37,8 @@ function CustomerForm({ initial, onDone }: { initial?: CustomerValues; onDone: (
     billingEmail: initial?.billingEmail ?? "",
     paymentTerms: initial?.paymentTerms ?? "DUE_ON_RECEIPT",
     notes: initial?.notes ?? "",
+    visitRemindersOptIn: initial?.visitRemindersOptIn ?? false,
+    serviceSummariesOptIn: initial?.serviceSummariesOptIn ?? true,
   })
   const [error, setError] = useState<string | null>(null)
   const [warnings, setWarnings] = useState<{ kind: string; reason: string; note?: string }[] | null>(null)
@@ -97,6 +101,11 @@ function CustomerForm({ initial, onDone }: { initial?: CustomerValues; onDone: (
       <Field label="Email" htmlFor="c-email">
         <Input id="c-email" type="email" value={values.email ?? ""} onChange={set("email")} />
       </Field>
+      <div className="space-y-1.5 rounded-lg bg-slate-50 p-3">
+        <div className="text-xs font-medium uppercase tracking-wide text-slate-400">Customer notifications</div>
+        <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={!!values.visitRemindersOptIn} onChange={(e) => setValues((v) => ({ ...v, visitRemindersOptIn: e.target.checked }))} /> Send pre-visit reminders</label>
+        <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={values.serviceSummariesOptIn !== false} onChange={(e) => setValues((v) => ({ ...v, serviceSummariesOptIn: e.target.checked }))} /> Send service-completion summaries</label>
+      </div>
       <Field label="Billing / contact address" htmlFor="c-addr">
         <Textarea id="c-addr" value={values.billingAddress ?? ""} onChange={set("billingAddress")} />
       </Field>

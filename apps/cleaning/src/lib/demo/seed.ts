@@ -633,6 +633,15 @@ async function seedExtras(
     void c
   }
 
+  // ── Customer communications (Phase 26): opt-in + a message thread ──
+  await systemDb.customer.updateMany({ where: { id: commCustomer.id }, data: { visitRemindersOptIn: true, serviceSummariesOptIn: true } })
+  await systemDb.customerMessage.createMany({
+    data: [
+      { organizationId: orgId, customerId: commCustomer.id, sender: "CUSTOMER", body: "Could the crew pay extra attention to the lobby glass this week?", createdAt: days(-2) },
+      { organizationId: orgId, customerId: commCustomer.id, sender: "STAFF", authorUserId: staff.managerId, body: "Absolutely — I've noted it for tonight's crew. Thanks for letting us know!", readByStaffAt: days(-2), createdAt: days(-2) },
+    ],
+  })
+
   // ── Overtime (Phase 24): enable a daily rule + one long approved shift ──
   await systemDb.organization.updateMany({ where: { id: orgId }, data: { otDailyThresholdHours: 8, otWeeklyThresholdHours: 40 } })
   if (ctx.completedJobIds.length > 0) {

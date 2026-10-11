@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/money"
 import { portalLogout } from "@/lib/portal-actions"
 import { ReportIssue } from "@/components/portal/report-issue"
 import { PortalExtras } from "@/components/portal/portal-extras"
+import { MessageThread } from "@/components/messages/message-thread"
 
 export const dynamic = "force-dynamic"
 
@@ -97,6 +98,10 @@ export default async function PortalDashboard() {
           )}
         </Card>
       </div>
+
+      <Card title="Messages">
+        <MessageThread endpoint="/api/portal/messages" mine="CUSTOMER" />
+      </Card>
 
       <Card title="Completed service">
         {data.completed.length === 0 ? <p className="text-sm text-slate-500">No completed visits yet.</p> : (

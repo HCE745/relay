@@ -12,6 +12,7 @@ import { OrgTimezoneForm } from "@/components/settings/org-timezone-form"
 import { ContractExpiryForm } from "@/components/settings/contract-expiry-form"
 import { OvertimeForm } from "@/components/settings/overtime-form"
 import { AlertsForm } from "@/components/settings/alerts-form"
+import { CommsForm } from "@/components/settings/comms-form"
 import { ComplianceForm } from "@/components/settings/compliance-form"
 import { ChangePasswordForm } from "@/components/settings/change-password-form"
 import { orgHasCapability } from "@/lib/page-guards"
@@ -105,6 +106,15 @@ export default async function SettingsPage() {
           <h2 className="mb-1 text-sm font-semibold text-slate-700">Overtime rules</h2>
           <div className="mt-3">
             <OvertimeForm weekly={org?.otWeeklyThresholdHours ?? null} daily={org?.otDailyThresholdHours ?? null} multiplier={org ? Number(org.otMultiplier).toString() : "1.5"} />
+          </div>
+        </Card>
+      ) : null}
+
+      {isOrgAdmin ? (
+        <Card className="p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Customer communications</h2>
+          <div className="mt-3">
+            <CommsForm visitReminderLeadHours={org?.visitReminderLeadHours ?? 24} paymentRemindersEnabled={org?.paymentRemindersEnabled ?? true} />
           </div>
         </Card>
       ) : null}

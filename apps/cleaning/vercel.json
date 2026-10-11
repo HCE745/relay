@@ -16,6 +16,10 @@
     {
       "path": "/api/cron/exception-alerts",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/customer-comms",
+      "schedule": "0 * * * *"
     }
   ]
 }

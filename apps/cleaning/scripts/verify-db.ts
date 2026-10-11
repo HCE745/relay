@@ -54,7 +54,7 @@ async function main() {
     capabilityOverrides: parseOverrides(rival.capabilityOverrides),
   })
   check("Sparkle (TEAM) has workforce.timeTracking", sparkleCaps.has("workforce.timeTracking"))
-  check("Sparkle (TEAM) lacks procurement.purchaseOrders", !sparkleCaps.has("procurement.purchaseOrders"))
+  check("Sparkle (TEAM) lacks assets.management", !sparkleCaps.has("assets.management"))
   check("Rival (SOLO) lacks workforce.timeTracking", !rivalCaps.has("workforce.timeTracking"))
 
   console.log("\nTenant isolation — org-scoped queries never leak across orgs:")

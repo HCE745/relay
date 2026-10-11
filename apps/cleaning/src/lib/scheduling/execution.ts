@@ -1,6 +1,24 @@
-import { orgDb } from "../org-db"
+import { orgDb, systemDb } from "../org-db"
 import { assertFound, ForbiddenActionError, ConflictError, RequirementsError } from "../data/errors"
 import { sendServiceSummarySafe } from "../data/customer-comms"
+import { resolveCapabilities, parseOverrides, type PackageTier } from "../entitlements"
+
+// Geofencing capability check without the server-only page-guards import.
+async function orgHasGeofencing(orgId: string): Promise<boolean> {
+  const org = await systemDb.organization.findUnique({ where: { id: orgId }, select: { packageTier: true, capabilityOverrides: true } })
+  if (!org) return false
+  return resolveCapabilities({ packageTier: org.packageTier as PackageTier, capabilityOverrides: parseOverrides(org.capabilityOverrides) }).has("workforce.geofencing")
+}
+
+// Great-circle distance in meters (geofence check).
+function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6_371_000
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(a)))
+}
 import type { ClockInput } from "../zod-schemas"
 
 // ─── Field execution: clock in/out, checklist, completion ────────────────────
@@ -59,10 +77,26 @@ export async function checklistRequirementsUnmet(orgId: string, jobId: string): 
 
 export async function clockIn(orgId: string, jobId: string, userId: string, loc: Loc) {
   const db = orgDb(orgId)
-  const job = await db.job.findFirst({ where: { id: jobId }, select: { id: true, status: true, actualStart: true } })
+  const job = await db.job.findFirst({
+    where: { id: jobId },
+    select: { id: true, status: true, actualStart: true, serviceLocation: { select: { latitude: true, longitude: true, geofenceRadiusM: true } } },
+  })
   assertFound(job, "Job")
   if (job!.status === "CANCELLED") throw new ConflictError("This job has been cancelled")
   await assertAssigned(db, jobId, userId)
+
+  // Geofence enforcement (Phase 29): only when the org has the capability, the
+  // site has a geofence, AND a location was actually captured. We never block on
+  // a missing GPS fix (that would strand cleaners with poor signal).
+  const site = job!.serviceLocation
+  if (site.latitude != null && site.longitude != null && site.geofenceRadiusM != null && loc.lat != null && loc.lng != null) {
+    if (await orgHasGeofencing(orgId)) {
+      const meters = haversineMeters(loc.lat, loc.lng, site.latitude, site.longitude)
+      if (meters > site.geofenceRadiusM) {
+        throw new ForbiddenActionError(`You appear to be ${Math.round(meters)}m from the site (outside the ${site.geofenceRadiusM}m clock-in area). Move closer and try again, or contact your supervisor.`)
+      }
+    }
+  }
 
   // Idempotent: already clocked into THIS job.
   const existing = await db.timeEntry.findFirst({ where: { jobId, userId, status: "OPEN" }, select: { id: true } })
@@ -128,6 +162,7 @@ export async function clockOut(orgId: string, jobId: string, userId: string, loc
       clockOutLng: loc.lng,
       clockOutAccuracyM: loc.accuracyM,
       clockOutSource: sourceFor(loc),
+      ...(loc.breakMinutes != null ? { breakMinutes: loc.breakMinutes } : {}),
     },
   })
   await db.jobAssignment.updateMany({ where: { jobId, userId }, data: { status: "COMPLETED" } })

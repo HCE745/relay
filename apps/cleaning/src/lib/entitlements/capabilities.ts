@@ -24,7 +24,6 @@ export const CAPABILITIES = [
   "workforce.geofencing", // architecture present; enforcement gated + off by default
   "quality.inspections",
   "operations.issues",
-  "operations.correctiveActions",
   "operations.accessControl", // key & access management (encrypted codes)
   "workforce.payrollExport", // export/integration only — never payroll processing
   "workforce.coverage", // shift coverage: availability, callouts, reassignment
@@ -46,13 +45,10 @@ export const CAPABILITIES = [
   "operations.dataImport", // CSV import of customers/sites/contacts with preview + rollback
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
-  "operations.escalations",
   "workforce.compliance", // employee credentials + site requirements (BUSINESS)
   "erp.advancedRoles",
   "erp.laborBudgets",
   "erp.siteProfitability",
-  "procurement.purchaseOrders",
-  "procurement.inventory",
   "assets.management", // asset register + maintenance log
   "supplies.inventory", // supply stock + usage log
   "core.reporting.advanced",

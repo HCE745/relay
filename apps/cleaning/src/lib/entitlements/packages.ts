@@ -29,7 +29,6 @@ const TEAM_CAPS: Capability[] = [
   "workforce.geofencing",
   "quality.inspections",
   "operations.issues",
-  "operations.correctiveActions",
   "operations.accessControl",
   "workforce.payrollExport",
   "workforce.coverage",
@@ -52,13 +51,10 @@ const TEAM_CAPS: Capability[] = [
 ]
 
 const BUSINESS_CAPS: Capability[] = [
-  "operations.escalations",
   "workforce.compliance",
   "erp.advancedRoles",
   "erp.laborBudgets",
   "erp.siteProfitability",
-  "procurement.purchaseOrders",
-  "procurement.inventory",
   "assets.management",
   "supplies.inventory",
   "core.reporting.advanced",

@@ -265,6 +265,9 @@ export const clockSchema = z.object({
   lng: z.coerce.number().min(-180).max(180).optional(),
   accuracyM: z.coerce.number().min(0).optional(),
   source: z.enum(["web", "native", "manual"]).optional(),
+  // Unpaid break/meal minutes, entered at clock-out (Phase 29). Subtracted from
+  // billable/worked time via billableMinutes.
+  breakMinutes: z.coerce.number().int().min(0).max(1440).optional(),
 })
 export type ClockInput = z.infer<typeof clockSchema>
 

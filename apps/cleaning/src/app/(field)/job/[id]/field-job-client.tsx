@@ -51,6 +51,7 @@ export function FieldJobClient(props: {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [unmet, setUnmet] = useState<string[] | null>(null)
+  const [breakMin, setBreakMin] = useState("")
   const done = props.checklist.filter((i) => i.isComplete).length
 
   async function clock(kind: "in" | "out") {
@@ -58,7 +59,8 @@ export function FieldJobClient(props: {
     setError(null)
     setUnmet(null)
     const loc = await getLocation()
-    const res = await apiSend<{ unmet?: string[] }>(`/api/jobs/${props.jobId}/clock-${kind}`, "POST", loc)
+    const payload = kind === "out" && breakMin ? { ...loc, breakMinutes: Number(breakMin) } : loc
+    const res = await apiSend<{ unmet?: string[] }>(`/api/jobs/${props.jobId}/clock-${kind}`, "POST", payload)
     setBusy(false)
     if (!res.ok) {
       // 422 requirements block on clock-out carries `unmet`.
@@ -136,13 +138,19 @@ export function FieldJobClient(props: {
         ) : cancelled ? (
           <div className="rounded-2xl bg-slate-400 py-4 text-center text-base font-semibold text-white">Job cancelled</div>
         ) : props.isClockedIn ? (
-          <button
-            disabled={busy}
-            onClick={() => clock("out")}
-            className="w-full rounded-2xl bg-brand py-4 text-center text-base font-semibold text-white disabled:opacity-60"
-          >
-            {busy ? "Clocking out…" : "Clock out & finish"}
-          </button>
+          <div className="space-y-2">
+            <label className="flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-2 text-sm text-slate-600">
+              <span>Unpaid break (min)</span>
+              <input type="number" min={0} inputMode="numeric" value={breakMin} onChange={(e) => setBreakMin(e.target.value)} placeholder="0" className="w-20 rounded-lg border border-slate-300 px-2 py-1 text-right text-base" />
+            </label>
+            <button
+              disabled={busy}
+              onClick={() => clock("out")}
+              className="w-full rounded-2xl bg-brand py-4 text-center text-base font-semibold text-white disabled:opacity-60"
+            >
+              {busy ? "Clocking out…" : "Clock out & finish"}
+            </button>
+          </div>
         ) : (
           <button
             disabled={busy}

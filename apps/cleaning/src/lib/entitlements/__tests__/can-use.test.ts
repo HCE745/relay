@@ -21,9 +21,9 @@ describe("package inheritance (SOLO ⊂ TEAM ⊂ BUSINESS ⊂ ENTERPRISE)", () =
   })
 
   it("TEAM cannot use a Business capability but BUSINESS and ENTERPRISE can", () => {
-    expect(canUse({ packageTier: "TEAM" }, "procurement.purchaseOrders")).toBe(false)
-    expect(canUse({ packageTier: "BUSINESS" }, "procurement.purchaseOrders")).toBe(true)
-    expect(canUse({ packageTier: "ENTERPRISE" }, "procurement.purchaseOrders")).toBe(true)
+    expect(canUse({ packageTier: "TEAM" }, "assets.management")).toBe(false)
+    expect(canUse({ packageTier: "BUSINESS" }, "assets.management")).toBe(true)
+    expect(canUse({ packageTier: "ENTERPRISE" }, "assets.management")).toBe(true)
   })
 
   it("ENTERPRISE-only capability is gated below ENTERPRISE", () => {

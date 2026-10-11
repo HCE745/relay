@@ -13,6 +13,7 @@ export async function getOrgSettings(orgId: string) {
       id: true, name: true, packageTier: true, timezone: true, contractExpiryLeadDays: true,
       credentialExpiryLeadDays: true, blockAssignmentOnExpiredCredential: true,
       otWeeklyThresholdHours: true, otDailyThresholdHours: true, otMultiplier: true,
+      uncoveredAlertLeadHours: true, missedClockInGraceMin: true,
     },
   })
 }
@@ -30,6 +31,19 @@ export async function getOvertimeRules(orgId: string) {
   }
 }
 
+/** Exception-alert config (Phase 25). */
+export async function getAlertConfig(orgId: string) {
+  const org = await systemDb.organization.findUnique({
+    where: { id: orgId },
+    select: { uncoveredAlertLeadHours: true, missedClockInGraceMin: true, credentialExpiryLeadDays: true },
+  })
+  return {
+    uncoveredAlertLeadHours: org?.uncoveredAlertLeadHours ?? 24,
+    missedClockInGraceMin: org?.missedClockInGraceMin ?? 30,
+    credentialLeadDays: org?.credentialExpiryLeadDays ?? 30,
+  }
+}
+
 /** The configurable lead time for the expiring-contracts dashboard warning. */
 export async function getContractExpiryLeadDays(orgId: string): Promise<number> {
   const org = await systemDb.organization.findUnique({ where: { id: orgId }, select: { contractExpiryLeadDays: true } })
@@ -39,7 +53,7 @@ export async function getContractExpiryLeadDays(orgId: string): Promise<number> 
 /** Update org workspace settings (OWNER/ADMIN only, enforced in the route). */
 export async function updateOrgSettings(
   orgId: string,
-  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string },
+  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string; uncoveredAlertLeadHours?: number; missedClockInGraceMin?: number },
 ) {
   const data: Record<string, unknown> = {}
   if (input.timezone !== undefined) data.timezone = input.timezone
@@ -49,5 +63,7 @@ export async function updateOrgSettings(
   if (input.otWeeklyThresholdHours !== undefined) data.otWeeklyThresholdHours = input.otWeeklyThresholdHours
   if (input.otDailyThresholdHours !== undefined) data.otDailyThresholdHours = input.otDailyThresholdHours
   if (input.otMultiplier !== undefined) data.otMultiplier = input.otMultiplier
+  if (input.uncoveredAlertLeadHours !== undefined) data.uncoveredAlertLeadHours = input.uncoveredAlertLeadHours
+  if (input.missedClockInGraceMin !== undefined) data.missedClockInGraceMin = input.missedClockInGraceMin
   return systemDb.organization.update({ where: { id: orgId }, data })
 }

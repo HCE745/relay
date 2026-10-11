@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/purge-demo",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/exception-alerts",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

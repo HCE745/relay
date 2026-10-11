@@ -208,6 +208,8 @@ export const orgSettingsSchema = z.object({
   otWeeklyThresholdHours: z.coerce.number().int().min(0).max(168).nullable().optional(),
   otDailyThresholdHours: z.coerce.number().int().min(0).max(24).nullable().optional(),
   otMultiplier: money.optional(), // Decimal string, e.g. "1.5"
+  uncoveredAlertLeadHours: z.coerce.number().int().min(1).max(336).optional(),
+  missedClockInGraceMin: z.coerce.number().int().min(0).max(1440).optional(),
 })
 
 // ─── Compliance & credentials (Phase 13) ───

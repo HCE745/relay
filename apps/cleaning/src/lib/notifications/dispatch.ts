@@ -87,8 +87,13 @@ export function notifyUserEventSafe(orgId: string, userId: string, event: Notifi
   void notifyUserEvent(orgId, userId, event, msg).catch(() => {})
 }
 
+/** Notify every active user in the given roles. */
+export async function notifyRolesEvent(orgId: string, roles: string[], event: NotificationEventKey, msg: NotifyMessage, deps: NotifyDeps = defaultDeps): Promise<void> {
+  const users = await orgDb(orgId).user.findMany({ where: { role: { in: roles as ("OWNER")[] }, isActive: true }, select: { id: true } })
+  for (const u of users) await notifyUserEvent(orgId, u.id, event, msg, deps)
+}
+
 /** Notify every active OWNER/ADMIN/MANAGER (used for uncovered-shift etc.). */
 export async function notifyManagersEvent(orgId: string, event: NotificationEventKey, msg: NotifyMessage, deps: NotifyDeps = defaultDeps): Promise<void> {
-  const managers = await orgDb(orgId).user.findMany({ where: { role: { in: ["OWNER", "ADMIN", "MANAGER"] }, isActive: true }, select: { id: true } })
-  for (const m of managers) await notifyUserEvent(orgId, m.id, event, msg, deps)
+  return notifyRolesEvent(orgId, ["OWNER", "ADMIN", "MANAGER"], event, msg, deps)
 }

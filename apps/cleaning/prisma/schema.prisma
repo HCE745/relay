@@ -376,6 +376,11 @@ model Organization {
   otWeeklyThresholdHours Int?    @default(40)
   otDailyThresholdHours  Int?
   otMultiplier           Decimal @default(1.5) @db.Decimal(4, 2)
+  // Exception-alert tuning (Phase 25). Uncovered shifts within this many hours
+  // alert managers; a job this many minutes past its start with nobody clocked
+  // in alerts the supervisor + managers.
+  uncoveredAlertLeadHours Int @default(24)
+  missedClockInGraceMin   Int @default(30)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")
@@ -423,6 +428,7 @@ model Organization {
   notificationPrefs   NotificationPreference[]
   notificationLogs    NotificationLog[]
   importBatches       ImportBatch[]
+  exceptionAlerts     ExceptionAlert[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -1114,6 +1120,23 @@ model NotificationLog {
 
   @@index([organizationId])
   @@index([userId, event, channel, createdAt])
+  @@schema("cleaning")
+}
+
+// Idempotency ledger for exception alerts (Phase 25): one alert per (event,
+// entity) ever — a cron that re-detects the same uncovered shift / missed
+// clock-in / expiring credential won't re-notify.
+model ExceptionAlert {
+  id             String            @id @default(cuid())
+  organizationId String
+  event          NotificationEvent
+  entityId       String
+  createdAt      DateTime          @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, event, entityId])
+  @@index([organizationId])
   @@schema("cleaning")
 }
 

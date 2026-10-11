@@ -92,6 +92,7 @@ export const SYSTEM_MODELS: ReadonlySet<string> = new Set([
   "InvoicePayment", // → Invoice
   "SupplyAdjustment", // → Supply
   "AssetMaintenance", // → Asset
+  "ProcessedStripeEvent", // platform webhook-dedupe ledger (no tenant data)
 ])
 
 const WHERE_OPS: ReadonlySet<string> = new Set([

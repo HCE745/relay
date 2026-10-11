@@ -613,4 +613,8 @@ async function seedExtras(
       { organizationId: orgId, userId: staff.managerId, channel: "EMAIL", event: "SHIFT_UNCOVERED", toAddress: "manager@demo", subject: "Uncovered shift", body: "A shift needs coverage in the next 24h.", status: "SENT" },
     ],
   })
+
+  // ── Online payments (Phase 22): a pay link on an outstanding invoice ──
+  const outstanding = await systemDb.invoice.findFirst({ where: { organizationId: orgId, status: { in: ["SENT", "PARTIALLY_PAID"] } }, select: { id: true } })
+  if (outstanding) await systemDb.invoice.updateMany({ where: { id: outstanding.id }, data: { payLinkToken: `demo-pay-${stamp}` } })
 }

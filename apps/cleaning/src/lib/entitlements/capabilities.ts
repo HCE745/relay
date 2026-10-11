@@ -42,6 +42,7 @@ export const CAPABILITIES = [
   "operations.serviceAreas", // service areas + do-not-serve exclusions
   "operations.workOrders", // billable one-time/extra work: manual-job rates, work orders, change orders
   "workforce.notifications", // email/SMS notifications + per-user channel preferences
+  "billing.onlinePayments", // Stripe card/ACH payment links + portal pay
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",

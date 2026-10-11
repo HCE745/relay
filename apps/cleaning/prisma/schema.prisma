@@ -516,6 +516,9 @@ model Customer {
   invoices         Invoice[]
   estimates              Estimate[] @relation("EstimateCustomer")
   convertedFromEstimates Estimate[] @relation("EstimateConvertedCustomer")
+  // Stripe customer id for reusing a saved payment method (Phase 22). We never
+  // auto-charge without explicit customer authorization.
+  stripeCustomerId String?
   contracts        Contract[]
   portalUsers      User[]         @relation("CustomerPortalUsers")
   portalInvites    PortalInvite[]
@@ -1104,6 +1107,18 @@ model NotificationLog {
   @@schema("cleaning")
 }
 
+// Webhook idempotency ledger (Phase 22). Keyed by the Stripe event id so a
+// retried/duplicate webhook never double-applies a payment. Not tenant data —
+// a platform-level dedupe record (SYSTEM_MODELS).
+model ProcessedStripeEvent {
+  id        String   @id // the Stripe event id (evt_...)
+  type      String
+  invoiceId String?
+  createdAt DateTime @default(now())
+
+  @@schema("cleaning")
+}
+
 model IssueComment {
   id             String   @id @default(cuid())
   organizationId String
@@ -1274,6 +1289,9 @@ model Invoice {
   total          Decimal       @db.Decimal(12, 2)
   notes          String?
   emailedAt      DateTime? // last time it was emailed to the customer (Phase 7)
+  // Unguessable token for a login-free public pay link (Phase 22). Null until a
+  // pay link is generated; stable thereafter.
+  payLinkToken   String?       @unique
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 

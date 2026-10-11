@@ -12,6 +12,8 @@ import { Card } from "@/components/ui/controls"
 import { InvoiceStatusBadge } from "@/components/billing/invoice-status-badge"
 import { InvoiceActions } from "@/components/billing/invoice-actions"
 import { PrintButton } from "@/components/billing/print-button"
+import { SharePayLink } from "@/components/pay/share-pay-link"
+import { isStripeConfigured } from "@/lib/stripe"
 
 export const dynamic = "force-dynamic"
 const CAP = "billing.invoicing"
@@ -32,8 +34,13 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   }
 
   const { id } = await params
-  const [invoice, org] = await Promise.all([getInvoice(session.organizationId, id), getOrgSettings(session.organizationId)])
+  const [invoice, org, canPayOnline] = await Promise.all([
+    getInvoice(session.organizationId, id),
+    getOrgSettings(session.organizationId),
+    orgHasCapability(session.organizationId, "billing.onlinePayments"),
+  ])
   if (!invoice) notFound()
+  const showPayLink = canPayOnline && isStripeConfigured() && ["SENT", "PARTIALLY_PAID"].includes(invoice.status)
 
   const cur = invoice.currency
   const paid = invoice.payments.reduce((acc, p) => acc + Number(p.amount.toFixed(2)), 0)
@@ -59,6 +66,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                 </a>
                 <PrintButton />
               </div>
+              {showPayLink ? <SharePayLink invoiceId={invoice.id} /> : null}
               <InvoiceActions
                 invoiceId={invoice.id}
                 status={invoice.status}

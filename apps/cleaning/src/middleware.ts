@@ -28,6 +28,7 @@ const PUBLIC_PATHS = [
   "/demo", // public sandbox landing — provisions a throwaway demo org
   "/book", // public per-org online booking
   "/apply", // public per-org job application (Phase 18)
+  "/pay", // public login-free invoice pay link (Phase 22)
   "/api/public", // public intake endpoints — self rate-limit + honeypot
   "/api/demo", // demo provisioning — self rate-limits + caps
   "/api/sms/inbound", // Twilio inbound webhook — verified by X-Twilio-Signature

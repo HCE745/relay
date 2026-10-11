@@ -2,6 +2,9 @@ import { redirect } from "next/navigation"
 import { getPortalSession } from "@/lib/portal-session"
 import { getPortalDashboard, listPortalSites } from "@/lib/data/portal"
 import { listPendingExtrasForCustomer } from "@/lib/data/change-orders"
+import { ensurePayLink } from "@/lib/data/payments"
+import { orgHasCapability } from "@/lib/page-guards"
+import { isStripeConfigured } from "@/lib/stripe"
 import { formatMoney } from "@/lib/money"
 import { portalLogout } from "@/lib/portal-actions"
 import { ReportIssue } from "@/components/portal/report-issue"
@@ -26,11 +29,22 @@ export default async function PortalDashboard() {
   const s = await getPortalSession()
   if (!s) redirect("/portal/login")
 
-  const [data, sites, pendingExtras] = await Promise.all([
+  const [data, sites, pendingExtras, canPayOnline] = await Promise.all([
     getPortalDashboard(s.organizationId, s.customerId),
     listPortalSites(s.organizationId, s.customerId),
     listPendingExtrasForCustomer(s.organizationId, s.customerId),
+    orgHasCapability(s.organizationId, "billing.onlinePayments"),
   ])
+  // Pre-mint pay links for outstanding invoices when online payments are on.
+  const payTokens = new Map<string, string>()
+  if (canPayOnline && isStripeConfigured()) {
+    for (const inv of data.invoices) {
+      if (Number(inv.balance) > 0) {
+        const token = await ensurePayLink(s.organizationId, inv.id)
+        if (token) payTokens.set(inv.id, token)
+      }
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -75,6 +89,7 @@ export default async function PortalDashboard() {
                     <td className="py-2 text-slate-500">{inv.status}</td>
                     <td className="py-2 text-right tabular-nums text-slate-600">{formatMoney(inv.total, inv.currency)}</td>
                     <td className="py-2 text-right tabular-nums font-medium text-slate-900">{Number(inv.balance) > 0 ? `${formatMoney(inv.balance, inv.currency)} due` : "Paid"}</td>
+                    <td className="py-2 pl-3 text-right">{payTokens.has(inv.id) ? <a href={`/pay/${payTokens.get(inv.id)}`} className="text-sm font-semibold text-brand hover:underline">Pay now →</a> : null}</td>
                   </tr>
                 ))}
               </tbody>

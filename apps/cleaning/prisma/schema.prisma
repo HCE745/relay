@@ -433,6 +433,7 @@ model Organization {
   importBatches       ImportBatch[]
   exceptionAlerts     ExceptionAlert[]
   customerMessages    CustomerMessage[]
+  proposals           Proposal[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -1132,6 +1133,44 @@ model NotificationLog {
   @@schema("cleaning")
 }
 
+// A branded proposal generated from an estimate (Phase 27). The `snapshot` is
+// the estimate's content frozen at send time; once ACCEPTED the proposal + the
+// typed-name signature are immutable and permanently attached to the customer.
+enum ProposalStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  DECLINED
+
+  @@schema("cleaning")
+}
+
+model Proposal {
+  id                  String         @id @default(cuid())
+  organizationId      String
+  estimateId          String         @unique
+  token               String         @unique // public tokenized accept link
+  status              ProposalStatus @default(DRAFT)
+  terms               String?
+  snapshot            Json // frozen EstimatePdfData at send time (immutable record)
+  signerName          String?
+  signerIp            String?
+  signerUserAgent     String?
+  signedAt            DateTime?
+  convertedCustomerId String?
+  sentAt              DateTime?
+  createdById         String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  estimate     Estimate     @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([convertedCustomerId])
+  @@schema("cleaning")
+}
+
 // Two-way customer message thread (Phase 26). Visible in the portal and to
 // staff on the customer page. A staff message optionally emails the customer.
 enum MessageSender {
@@ -1519,6 +1558,7 @@ model Estimate {
   convertedCustomer Customer?          @relation("EstimateConvertedCustomer", fields: [convertedCustomerId], references: [id])
   checklistTemplate ChecklistTemplate? @relation(fields: [checklistTemplateId], references: [id])
   lines             EstimateLine[]
+  proposal          Proposal?
 
   @@index([organizationId])
   @@index([leadId])

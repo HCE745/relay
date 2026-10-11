@@ -36,6 +36,20 @@ function truncate(font: PDFFont, str: string, size: number, maxW: number): strin
   return out + "…"
 }
 
+// Word-wrap text to a max width, preserving explicit newlines.
+function wrap(font: PDFFont, str: string, size: number, maxW: number): string[] {
+  const lines: string[] = []
+  for (const para of str.split("\n")) {
+    let cur = ""
+    for (const word of para.split(/\s+/)) {
+      const next = cur ? `${cur} ${word}` : word
+      if (cur && font.widthOfTextAtSize(next, size) > maxW) { lines.push(cur); cur = word } else cur = next
+    }
+    lines.push(cur)
+  }
+  return lines
+}
+
 function docHeader(page: PDFPage, f: Fonts, orgName: string, kind: string, docTitle: string, statusLabel: string, meta: [string, string][]) {
   const y = PH - M
   page.drawText(orgName, { x: M, y: y - 12, size: 15, font: f.bold, color: INK })
@@ -143,6 +157,62 @@ export type EstimatePdfData = {
   subtotal: string
   total: string
   notes?: string
+}
+
+export type ProposalPdfData = EstimatePdfData & {
+  terms?: string
+  signature?: { name: string; signedAt: string; ip: string }
+}
+
+// A proposal is a branded estimate + terms + an acceptance/signature block.
+export async function renderProposalPdf(d: ProposalPdfData): Promise<Buffer> {
+  const doc = await PDFDocument.create()
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold)
+  let page = doc.addPage([PW, PH])
+  let y = docHeader(page, { font, bold }, d.orgName, "Proposal", d.title, d.statusLabel, [
+    ["Frequency", d.frequency],
+    ["Pricing", d.pricing],
+    ["Valid until", d.validUntil],
+  ])
+  page.drawText("PREPARED FOR", { x: M, y, size: 8, font, color: FAINT })
+  y -= 12
+  d.preparedFor.forEach((l, i) => { page.drawText(truncate(i === 0 ? bold : font, l, 10, 260), { x: M, y, size: 10, font: i === 0 ? bold : font, color: i === 0 ? INK : MUT }); y -= 12 })
+  hline(page, y - 4); y -= 22
+
+  y = tableHeader(page, { font, bold }, y, false)
+  if (d.lines.length === 0) { page.drawText("No line items.", { x: M, y, size: 10, font, color: MUT }); y -= 18 }
+  for (const l of d.lines) {
+    if (y < 160) { page = doc.addPage([PW, PH]); y = PH - M - 20; y = tableHeader(page, { font, bold }, y, false) }
+    page.drawText(truncate(font, l.description, 10, DESC_MAX + 58), { x: M, y, size: 10, font, color: INK })
+    rightText(page, l.qty, QTY_R, y, 9, font, MUT); rightText(page, l.rate, RATE_R, y, 9, font, MUT); rightText(page, l.amount, AMT_R, y, 10, font, INK)
+    hline(page, y - 6); y -= 18
+  }
+  y -= 6
+  rightText(page, "Subtotal", AMT_R - 120, y, 10, font, MUT); rightText(page, d.subtotal, AMT_R, y, 10, font, INK); y -= 16
+  hline(page, y + 12, RULE)
+  rightText(page, "Total", AMT_R - 120, y, 10, bold, INK); rightText(page, d.total, AMT_R, y, 10, bold, INK); y -= 26
+
+  if (d.terms) {
+    page.drawText("TERMS", { x: M, y, size: 8, font, color: FAINT }); y -= 14
+    for (const line of wrap(font, d.terms, 9, PW - 2 * M)) {
+      if (y < 140) { page = doc.addPage([PW, PH]); y = PH - M - 20 }
+      page.drawText(line, { x: M, y, size: 9, font, color: MUT }); y -= 12
+    }
+    y -= 10
+  }
+
+  if (y < 130) { page = doc.addPage([PW, PH]); y = PH - M - 20 }
+  hline(page, y); y -= 16
+  page.drawText("ACCEPTANCE", { x: M, y, size: 8, font, color: FAINT }); y -= 16
+  if (d.signature) {
+    page.drawText(`Accepted by ${d.signature.name}`, { x: M, y, size: 11, font: bold, color: INK }); y -= 14
+    page.drawText(`Signed ${d.signature.signedAt}  ·  IP ${d.signature.ip}`, { x: M, y, size: 9, font, color: MUT }); y -= 14
+    page.drawText("Typed-name electronic signature (ESIGN/UETA intent-to-sign record).", { x: M, y, size: 8, font, color: FAINT })
+  } else {
+    page.drawText("Accept online using the secure link provided. Signature: ____________________   Date: __________", { x: M, y, size: 9, font, color: MUT })
+  }
+  return Buffer.from(await doc.save())
 }
 
 export async function renderEstimatePdf(d: EstimatePdfData): Promise<Buffer> {

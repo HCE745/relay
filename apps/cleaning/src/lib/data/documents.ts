@@ -91,7 +91,7 @@ export async function sendInvoiceEmail(orgId: string, id: string): Promise<{ sen
 
 // ─── Estimate PDF ────────────────────────────────────────────────────────────
 
-async function estimatePdfData(orgId: string, id: string): Promise<{ data: EstimatePdfData; title: string } | null> {
+export async function estimatePdfData(orgId: string, id: string): Promise<{ data: EstimatePdfData; title: string } | null> {
   const [est, org] = await Promise.all([getEstimate(orgId, id), getOrgSettings(orgId)])
   if (!est) return null
   const cur = est.currency

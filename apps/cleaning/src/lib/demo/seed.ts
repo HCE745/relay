@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs"
 import { systemDb } from "../org-db"
+import { estimatePdfData } from "../data/documents"
+import type { Prisma } from "../../generated/prisma/client"
 
 // Purpose-built demo seed (NOT prisma/seed.ts / Summit). Builds a realistic,
 // fully-populated Cleaning ERP for one throwaway demo org, dated relative to
@@ -641,6 +643,19 @@ async function seedExtras(
       { organizationId: orgId, customerId: commCustomer.id, sender: "STAFF", authorUserId: staff.managerId, body: "Absolutely — I've noted it for tonight's crew. Thanks for letting us know!", readByStaffAt: days(-2), createdAt: days(-2) },
     ],
   })
+
+  // ── Proposals & e-signature (Phase 27): one sent, one signed+attached ──
+  const estsForProp = await systemDb.estimate.findMany({ where: { organizationId: orgId }, select: { id: true, convertedCustomerId: true }, orderBy: { createdAt: "asc" } })
+  const draftEst = estsForProp.find((e) => !e.convertedCustomerId)
+  const convEst = estsForProp.find((e) => e.convertedCustomerId)
+  if (draftEst) {
+    const r = await estimatePdfData(orgId, draftEst.id)
+    if (r) await systemDb.proposal.create({ data: { organizationId: orgId, estimateId: draftEst.id, token: `demo-prop-${stamp}`, status: "SENT", snapshot: r.data as unknown as Prisma.InputJsonValue, sentAt: days(-1) } })
+  }
+  if (convEst?.convertedCustomerId) {
+    const r = await estimatePdfData(orgId, convEst.id)
+    if (r) await systemDb.proposal.create({ data: { organizationId: orgId, estimateId: convEst.id, token: `demo-prop2-${stamp}`, status: "ACCEPTED", snapshot: r.data as unknown as Prisma.InputJsonValue, signerName: "Lena Park", signerIp: "203.0.113.10", signerUserAgent: "Mozilla/5.0", signedAt: days(-5), convertedCustomerId: convEst.convertedCustomerId } })
+  }
 
   // ── Overtime (Phase 24): enable a daily rule + one long approved shift ──
   await systemDb.organization.updateMany({ where: { id: orgId }, data: { otDailyThresholdHours: 8, otWeeklyThresholdHours: 40 } })

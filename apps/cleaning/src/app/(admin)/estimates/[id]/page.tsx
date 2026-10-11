@@ -4,6 +4,8 @@ import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getEstimate } from "@/lib/data/estimates"
+import { getProposalForEstimate } from "@/lib/data/proposals"
+import { ProposalControl } from "@/components/proposals/proposal-control"
 import { getOrgSettings } from "@/lib/data/org"
 import { formatMoney } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
@@ -34,7 +36,7 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
   }
 
   const { id } = await params
-  const [est, org, canBid] = await Promise.all([getEstimate(orgId, id), getOrgSettings(orgId), orgHasCapability(orgId, "crm.bidCalculator")])
+  const [est, org, canBid, proposal] = await Promise.all([getEstimate(orgId, id), getOrgSettings(orgId), orgHasCapability(orgId, "crm.bidCalculator"), getProposalForEstimate(orgId, id)])
   if (!est) notFound()
 
   const converted = !!est.convertedCustomerId
@@ -68,6 +70,7 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
                 ) : null}
               </div>
               {!converted ? <EstimateActions estimateId={est.id} status={est.status} /> : null}
+              {!converted ? <ProposalControl estimateId={est.id} proposal={proposal} /> : null}
             </div>
           }
         />

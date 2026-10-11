@@ -8,6 +8,7 @@ import { getCustomerBilling } from "@/lib/data/invoices"
 import { listPortalUsers, listPortalInvites } from "@/lib/data/portal"
 import { PortalAccess } from "@/components/portal/portal-access"
 import { MessageThread } from "@/components/messages/message-thread"
+import { listProposalsForCustomer } from "@/lib/data/proposals"
 import { formatMoney, invoiceNo } from "@/lib/money"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card, StatusPill } from "@/components/ui/controls"
@@ -38,6 +39,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const hasBilling = await orgHasCapability(session.organizationId, "billing.invoicing")
   const billing = hasBilling ? await getCustomerBilling(session.organizationId, id) : null
   const hasPortal = await orgHasCapability(session.organizationId, "portal.customerAccess")
+  const signedProposals = await listProposalsForCustomer(session.organizationId, id)
   const [portalUsers, portalInvites] = hasPortal
     ? await Promise.all([listPortalUsers(session.organizationId, id), listPortalInvites(session.organizationId, id)])
     : [[], []]
@@ -143,6 +145,20 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           users={portalUsers.map((u) => ({ id: u.id, name: u.name, email: u.email, isActive: u.isActive }))}
           invites={portalInvites.map((i) => ({ id: i.id, email: i.email, status: i.status, expiresAt: i.expiresAt.toISOString() }))}
         />
+      ) : null}
+
+      {signedProposals.length > 0 ? (
+        <Card className="p-5">
+          <h2 className="mb-3 text-sm font-semibold text-slate-700">Signed proposals</h2>
+          <ul className="divide-y divide-slate-100">
+            {signedProposals.map((p) => (
+              <li key={p.id} className="flex items-center justify-between py-2 text-sm">
+                <span className="text-slate-700">Accepted by {p.signerName ?? "customer"}{p.signedAt ? ` · ${new Date(p.signedAt).toLocaleDateString()}` : ""}</span>
+                <a href={`/api/proposals/${p.id}/pdf`} className="font-medium text-brand hover:underline">PDF</a>
+              </li>
+            ))}
+          </ul>
+        </Card>
       ) : null}
 
       <Card className="p-5">

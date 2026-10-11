@@ -416,6 +416,7 @@ model Organization {
   changeOrders        ChangeOrder[]
   notificationPrefs   NotificationPreference[]
   notificationLogs    NotificationLog[]
+  importBatches       ImportBatch[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -519,6 +520,7 @@ model Customer {
   // Stripe customer id for reusing a saved payment method (Phase 22). We never
   // auto-charge without explicit customer authorization.
   stripeCustomerId String?
+  importBatchId    String? // set when created by a CSV import (Phase 23); enables rollback
   contracts        Contract[]
   portalUsers      User[]         @relation("CustomerPortalUsers")
   portalInvites    PortalInvite[]
@@ -537,6 +539,7 @@ model Contact {
   email          String?
   phone          String?
   isPrimary      Boolean  @default(false)
+  importBatchId  String? // set when created by a CSV import (Phase 23)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -572,6 +575,7 @@ model ServiceLocation {
   parentId       String?
   // Access instructions / site notes (gate codes, alarm, parking, etc.).
   notes          String?
+  importBatchId  String? // set when created by a CSV import (Phase 23)
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -1104,6 +1108,25 @@ model NotificationLog {
 
   @@index([organizationId])
   @@index([userId, event, channel, createdAt])
+  @@schema("cleaning")
+}
+
+// A committed CSV import (Phase 23). Records created rows are tagged with its id
+// so the most recent import can be rolled back cleanly.
+model ImportBatch {
+  id                String    @id @default(cuid())
+  organizationId    String
+  filename          String?
+  customersCreated  Int       @default(0)
+  sitesCreated      Int       @default(0)
+  contactsCreated   Int       @default(0)
+  createdById       String?
+  createdAt         DateTime  @default(now())
+  rolledBackAt      DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
   @@schema("cleaning")
 }
 

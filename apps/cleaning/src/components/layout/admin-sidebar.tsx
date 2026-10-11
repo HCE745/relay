@@ -38,6 +38,7 @@ const NAV_ICON: Record<string, (p: { className?: string }) => React.ReactNode> =
   profitability: ChartBarIcon,
   "supply-spend": DollarIcon,
   exports: FileTextIcon,
+  import: FileTextIcon,
   assets: BoxIcon,
   supplies: TagIcon,
   settings: CogIcon,

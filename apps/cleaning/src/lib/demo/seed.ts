@@ -617,4 +617,19 @@ async function seedExtras(
   // ── Online payments (Phase 22): a pay link on an outstanding invoice ──
   const outstanding = await systemDb.invoice.findFirst({ where: { organizationId: orgId, status: { in: ["SENT", "PARTIALLY_PAID"] } }, select: { id: true } })
   if (outstanding) await systemDb.invoice.updateMany({ where: { id: outstanding.id }, data: { payLinkToken: `demo-pay-${stamp}` } })
+
+  // ── Customer import (Phase 23): one committed batch in the history ──
+  const batch = await systemDb.importBatch.create({
+    data: { organizationId: orgId, filename: "spring-accounts.csv", customersCreated: 2, sitesCreated: 2, contactsCreated: 2 },
+    select: { id: true },
+  })
+  for (const n of ["Riverside Dental", "Maple Street Montessori"]) {
+    const c = await systemDb.customer.create({
+      data: { organizationId: orgId, name: `${n} (${stamp})`, email: `${n.toLowerCase().replace(/[^a-z]/g, "")}@imported.demo`, importBatchId: batch.id, primaryContactName: "Office Manager",
+        contacts: { create: [{ organizationId: orgId, name: "Office Manager", email: `om-${n.toLowerCase().replace(/[^a-z]/g, "")}@imported.demo`, isPrimary: true, importBatchId: batch.id }] },
+        serviceLocations: { create: [{ organizationId: orgId, name: `${n} — main`, city: "Austin", state: "TX", importBatchId: batch.id }] } },
+      select: { id: true },
+    })
+    void c
+  }
 }

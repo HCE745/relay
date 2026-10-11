@@ -17,6 +17,8 @@ import { JobStatusBadge } from "@/components/jobs/job-status"
 import { AssignmentsPanel } from "@/components/jobs/assignments-panel"
 import { JobActions } from "@/components/jobs/job-actions"
 import { InspectButton } from "@/components/inspections/inspect-button"
+import { ChangeOrdersPanel } from "@/components/work-orders/change-orders-panel"
+import { listChangeOrders } from "@/lib/data/change-orders"
 
 export const dynamic = "force-dynamic"
 
@@ -57,6 +59,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   // Pay-rate-derived: OWNER/ADMIN/MANAGER only (canManage), gated by capability.
   const showProfit = canManage && (await orgHasCapability(orgId, "reporting.profitability"))
   const profit = showProfit ? await getJobProfitability(orgId, id) : null
+
+  // Billable extras (Phase 20) — managers only, gated by capability.
+  const showExtras = canManage && (await orgHasCapability(orgId, "operations.workOrders"))
+  const changeOrders = showExtras ? await listChangeOrders(orgId, { jobId: id }) : []
 
   return (
     <div className="space-y-6">
@@ -132,6 +138,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         cleaners={cleaners}
         canManage={canManage}
       />
+
+      {showExtras ? (
+        <ChangeOrdersPanel
+          jobId={job.id}
+          changeOrders={changeOrders.map((co) => ({ id: co.id, description: co.description, amount: co.amount.toFixed(2), status: co.status, requiresCustomerApproval: co.requiresCustomerApproval, approvedByPortal: co.approvedByPortal }))}
+        />
+      ) : null}
 
       {/* Time entries */}
       <Card className="p-5">

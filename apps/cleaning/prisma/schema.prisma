@@ -412,6 +412,8 @@ model Organization {
   excludedAddresses   ExcludedAddress[]
   excludedContacts    ExcludedContact[]
   excludedZones       ExcludedZone[]
+  workOrders          WorkOrder[]
+  changeOrders        ChangeOrder[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -511,6 +513,7 @@ model Customer {
   contracts        Contract[]
   portalUsers      User[]         @relation("CustomerPortalUsers")
   portalInvites    PortalInvite[]
+  workOrders       WorkOrder[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -576,6 +579,7 @@ model ServiceLocation {
   supplyUsages SupplyUsage[] @relation("SupplyUsageSite")
   credentialRequirements SiteCredentialRequirement[]
   accessItems  AccessItem[]
+  workOrders   WorkOrder[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -679,6 +683,12 @@ model Job {
   actualStart       DateTime?
   actualEnd         DateTime?
   notes             String?
+  // Per-job billing for MANUAL (plan-less) jobs — one-time & extra work. A plan
+  // job ignores these (the plan's rate wins); a manual job with a rate becomes
+  // billable, one without a rate is excluded-and-reported like the plan case.
+  billingType       BillingType? // FLAT_PER_JOB | HOURLY
+  rate              Decimal?  @db.Decimal(12, 2)
+  currency          String?
   createdById       String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -695,6 +705,8 @@ model Job {
   inspections     Inspection[]
   invoiceLines    InvoiceLine[]
   supplyUsages    SupplyUsage[]
+  changeOrders    ChangeOrder[]
+  workOrder       WorkOrder?         @relation("WorkOrderJob")
 
   // Idempotent generation: a plan produces at most one Job per occurrence,
   // keyed on the IMMUTABLE plannedStart (not the mutable scheduledStart, which a
@@ -901,10 +913,112 @@ model Issue {
   assignedTo      User?            @relation("IssueAssignee", fields: [assignedToId], references: [id])
   comments        IssueComment[]
   photos          JobPhoto[]
+  workOrder       WorkOrder?       @relation("WorkOrderIssue")
 
   @@index([organizationId])
   @@index([jobId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// ─── Billable one-time & extra work (Phase 20) ───────────────────────────────
+enum WorkOrderType {
+  EMERGENCY
+  ONE_TIME
+  ADDITIONAL
+  DEEP_CLEAN
+
+  @@schema("cleaning")
+}
+
+enum WorkOrderPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+
+  @@schema("cleaning")
+}
+
+enum WorkOrderStatus {
+  REQUESTED
+  QUOTED
+  APPROVED
+  SCHEDULED
+  COMPLETED
+  DECLINED
+
+  @@schema("cleaning")
+}
+
+// An ad-hoc, billable request (emergency/one-time/additional/deep clean) that
+// converts atomically into a scheduled, billable Job. May originate from an Issue.
+model WorkOrder {
+  id                String            @id @default(cuid())
+  organizationId    String
+  customerId        String
+  serviceLocationId String?
+  type              WorkOrderType
+  description       String
+  requestedBy       String? // the customer contact who asked
+  requestedAt       DateTime          @default(now())
+  priority          WorkOrderPriority @default(NORMAL)
+  quotedAmount      Decimal?          @db.Decimal(12, 2)
+  status            WorkOrderStatus   @default(REQUESTED)
+  approvedById      String?
+  approvedAt        DateTime?
+  issueId           String?           @unique // origin complaint (one WO per issue)
+  convertedJobId    String?           @unique // the scheduled billable job
+  createdById       String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer        Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
+  issue           Issue?           @relation("WorkOrderIssue", fields: [issueId], references: [id], onDelete: SetNull)
+  convertedJob    Job?             @relation("WorkOrderJob", fields: [convertedJobId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([status])
+  @@schema("cleaning")
+}
+
+enum ChangeOrderStatus {
+  PENDING
+  APPROVED
+  DECLINED
+
+  @@schema("cleaning")
+}
+
+// A billable extra / change order added to a job or a contract. When APPROVED it
+// flows onto the next invoice as a distinct line (claimed via
+// InvoiceLine.activeChangeOrderId, so it bills at most once per non-VOID invoice).
+model ChangeOrder {
+  id                       String            @id @default(cuid())
+  organizationId           String
+  jobId                    String?
+  contractId               String?
+  description              String
+  amount                   Decimal           @db.Decimal(12, 2)
+  requiresCustomerApproval Boolean           @default(true)
+  status                   ChangeOrderStatus @default(PENDING)
+  approvedByUserId         String? // manager who recorded the approval
+  approvedByPortal         Boolean           @default(false) // customer approved via portal
+  approvedAt               DateTime?
+  declinedAt               DateTime?
+  createdById              String?
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  job          Job?         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  contract     Contract?    @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([jobId])
   @@schema("cleaning")
 }
 
@@ -1106,6 +1220,12 @@ model InvoiceLine {
   // invoice is non-VOID, NULL when voided — so a plan-period is billed on at
   // most one non-VOID invoice. Mirrors activeJobId.
   activePeriodKey String? @unique
+  // Snapshot link to a billable extra (change order), NULL for other lines.
+  changeOrderId   String?
+  // Change-order idempotency guard (Phase 20): equals changeOrderId while the
+  // invoice is non-VOID, NULL when voided — a change order bills at most once on
+  // a non-VOID invoice. Mirrors activeJobId.
+  activeChangeOrderId String? @unique
   // False for the non-billable "covered service" detail lines listed under a
   // flat-period charge (amount 0). Billable lines sum to the invoice total.
   billable    Boolean @default(true)
@@ -1740,6 +1860,7 @@ model Contract {
   organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   customer     Customer      @relation(fields: [customerId], references: [id])
   servicePlans ServicePlan[]
+  changeOrders ChangeOrder[]
 
   @@index([organizationId])
   @@index([customerId])

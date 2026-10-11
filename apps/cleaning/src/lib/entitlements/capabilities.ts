@@ -40,6 +40,7 @@ export const CAPABILITIES = [
   "crm.quoting", // multi-channel quote intake (phone/online/in-person)
   "workforce.hiring", // job postings, applicants, convert-to-employee
   "operations.serviceAreas", // service areas + do-not-serve exclusions
+  "operations.workOrders", // billable one-time/extra work: manual-job rates, work orders, change orders
 
   // ── ERP (Business and up) ────────────────────────────────────────────────
   "operations.escalations",

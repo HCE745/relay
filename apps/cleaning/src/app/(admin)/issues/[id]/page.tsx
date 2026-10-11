@@ -2,13 +2,15 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
-import { canViewSchedule } from "@/lib/rbac"
+import { canViewSchedule, canManageAccounts } from "@/lib/rbac"
 import { getIssue, listIssueActivity } from "@/lib/data/issues"
 import { listUsers } from "@/lib/data/users"
 import { getOrgTimezone } from "@/lib/data/org"
+import { orgHasCapability } from "@/lib/page-guards"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
 import { IssueStatusBar, IssueAssignee, IssueCommentBox } from "@/components/issues/issue-actions"
+import { IssueToWorkOrderButton } from "@/components/issues/issue-to-work-order"
 
 export const dynamic = "force-dynamic"
 
@@ -29,11 +31,12 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
   const issue = await getIssue(orgId, id)
   if (!issue) notFound()
 
-  const [tz, activity, users] = await Promise.all([
+  const [tz, activity, users, canMakeWorkOrder] = await Promise.all([
     getOrgTimezone(orgId),
     listIssueActivity(orgId, id),
     // Assignable = active team members (managers assign to anyone active).
     listUsers(orgId).then((all) => all.filter((u) => u.isActive).map((u) => ({ id: u.id, name: u.name }))),
+    canManageAccounts(session.role) ? orgHasCapability(orgId, "operations.workOrders") : Promise.resolve(false),
   ])
 
   return (
@@ -47,7 +50,10 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
             title={issue.title ?? "Reported problem"}
             subtitle={issue.serviceLocation ? `${issue.serviceLocation.customer.name} · ${issue.serviceLocation.name}` : undefined}
           />
-          <span className={`rounded-full px-3 py-1 text-sm font-semibold ${STATUS_STYLE[issue.status]}`}>{issue.status}</span>
+          <div className="flex items-center gap-3">
+            {canMakeWorkOrder ? <IssueToWorkOrderButton issueId={issue.id} /> : null}
+            <span className={`rounded-full px-3 py-1 text-sm font-semibold ${STATUS_STYLE[issue.status]}`}>{issue.status}</span>
+          </div>
         </div>
       </div>
 

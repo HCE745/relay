@@ -173,6 +173,9 @@ export const manualJobCreateSchema = z.object({
   crewSize: z.coerce.number().int().min(1).max(100).optional(),
   checklistTemplateId: z.string().min(1).optional(),
   notes: optionalString,
+  // Optional per-job billing (Phase 20) — makes a one-off job billable.
+  billingType: z.enum(["FLAT_PER_JOB", "HOURLY"]).optional(),
+  rate: optionalMoney,
 })
 export type ManualJobCreateInput = z.infer<typeof manualJobCreateSchema>
 
@@ -716,3 +719,51 @@ export const supplyUsageSchema = z.object({
   jobId: z.string().min(1).optional(),
 })
 export type SupplyUsageInput = z.infer<typeof supplyUsageSchema>
+
+// ─── Billable one-time & extra work (Phase 20) ───
+export const WORK_ORDER_TYPES = ["EMERGENCY", "ONE_TIME", "ADDITIONAL", "DEEP_CLEAN"] as const
+export const WORK_ORDER_PRIORITIES = ["LOW", "NORMAL", "HIGH", "URGENT"] as const
+export const WORK_ORDER_STATUSES = ["REQUESTED", "QUOTED", "APPROVED", "SCHEDULED", "COMPLETED", "DECLINED"] as const
+
+export const workOrderCreateSchema = z.object({
+  customerId: z.string().min(1),
+  serviceLocationId: z.string().min(1).optional(),
+  type: z.enum(WORK_ORDER_TYPES),
+  description: z.string().trim().min(1, "Describe the work").max(2000),
+  requestedBy: optionalString,
+  priority: z.enum(WORK_ORDER_PRIORITIES).optional(),
+  quotedAmount: optionalMoney,
+})
+export const workOrderUpdateSchema = z.object({
+  type: z.enum(WORK_ORDER_TYPES).optional(),
+  description: z.string().trim().min(1).max(2000).optional(),
+  requestedBy: optionalString,
+  priority: z.enum(WORK_ORDER_PRIORITIES).optional(),
+  quotedAmount: optionalMoney,
+  status: z.enum(WORK_ORDER_STATUSES).optional(),
+})
+export const workOrderConvertSchema = z.object({
+  date: dateString,
+  startTime: timeString,
+  durationMin: z.coerce.number().int().min(1).max(1440).optional(),
+  crewSize: z.coerce.number().int().min(1).max(100).optional(),
+  billingType: z.enum(["FLAT_PER_JOB", "HOURLY"]).optional(),
+  rate: optionalMoney, // defaults to the work order's quotedAmount
+})
+export const issueToWorkOrderSchema = z.object({
+  type: z.enum(WORK_ORDER_TYPES).optional(),
+  description: optionalString, // defaults to the issue's description
+  priority: z.enum(WORK_ORDER_PRIORITIES).optional(),
+  quotedAmount: optionalMoney,
+})
+
+export const changeOrderCreateSchema = z
+  .object({
+    jobId: z.string().min(1).optional(),
+    contractId: z.string().min(1).optional(),
+    description: z.string().trim().min(1, "Describe the extra").max(500),
+    amount: money,
+    requiresCustomerApproval: z.boolean().optional(),
+  })
+  .refine((v) => v.jobId || v.contractId, { message: "Attach the extra to a job or a contract" })
+export const changeOrderDecisionSchema = z.object({ decision: z.enum(["APPROVED", "DECLINED"]) })

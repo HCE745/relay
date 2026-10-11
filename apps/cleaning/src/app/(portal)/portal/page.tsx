@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation"
 import { getPortalSession } from "@/lib/portal-session"
 import { getPortalDashboard, listPortalSites } from "@/lib/data/portal"
+import { listPendingExtrasForCustomer } from "@/lib/data/change-orders"
 import { formatMoney } from "@/lib/money"
 import { portalLogout } from "@/lib/portal-actions"
 import { ReportIssue } from "@/components/portal/report-issue"
+import { PortalExtras } from "@/components/portal/portal-extras"
 
 export const dynamic = "force-dynamic"
 
@@ -24,7 +26,11 @@ export default async function PortalDashboard() {
   const s = await getPortalSession()
   if (!s) redirect("/portal/login")
 
-  const [data, sites] = await Promise.all([getPortalDashboard(s.organizationId, s.customerId), listPortalSites(s.organizationId, s.customerId)])
+  const [data, sites, pendingExtras] = await Promise.all([
+    getPortalDashboard(s.organizationId, s.customerId),
+    listPortalSites(s.organizationId, s.customerId),
+    listPendingExtrasForCustomer(s.organizationId, s.customerId),
+  ])
 
   return (
     <div className="space-y-6">
@@ -38,6 +44,12 @@ export default async function PortalDashboard() {
           <form action={portalLogout}><button className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700">Sign out</button></form>
         </div>
       </header>
+
+      {pendingExtras.length > 0 ? (
+        <Card title="Extra work awaiting your approval">
+          <PortalExtras extras={pendingExtras.map((e) => ({ id: e.id, description: e.description, amount: e.amount.toFixed(2) }))} />
+        </Card>
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title="Upcoming service">

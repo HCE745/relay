@@ -113,6 +113,10 @@ export async function createManualJob(orgId: string, input: ManualInput) {
       scheduledEnd: end,
       crewSize: input.crewSize,
       notes: input.notes,
+      // Per-job billing for one-time/extra work: only when a rate is given.
+      billingType: input.rate != null ? (input.billingType ?? "FLAT_PER_JOB") : null,
+      rate: input.rate ?? null,
+      currency: input.rate != null ? "USD" : null,
       checklistItems: snapshot.length ? { create: snapshot } : undefined,
     },
   })

@@ -558,4 +558,47 @@ async function seedExtras(
       data: { organizationId: orgId, actorUserId: staff.managerId, entityType, entityId: id, action: "create", newValue: reason, metadata: { reason } },
     })
   }
+
+  // ── Billable one-time & extra work (Phase 20) ──
+  // A completed, billable one-off job (earns margin outside any plan).
+  await systemDb.job.create({
+    data: {
+      organizationId: orgId, serviceLocationId: commSite.id, servicePlanId: null,
+      title: "Strip & wax — main lobby", status: "COMPLETED",
+      plannedStart: days(-3), scheduledStart: days(-3), scheduledEnd: new Date(days(-3).getTime() + 4 * 3600_000),
+      actualStart: days(-3), actualEnd: new Date(days(-3).getTime() + 4 * 3600_000),
+      billingType: "FLAT_PER_JOB", rate: "650.00", currency: "USD", crewSize: 2, createdById: staff.managerId,
+      assignments: { create: [{ organizationId: orgId, userId: cleaner, status: "COMPLETED" }] },
+    },
+  })
+
+  // Work orders across the lifecycle, including one already converted to a job.
+  await systemDb.workOrder.create({
+    data: { organizationId: orgId, customerId: commCustomer.id, serviceLocationId: commSite.id, type: "EMERGENCY", description: "Water intrusion in server room — extract & dry tonight.", priority: "URGENT", requestedBy: "Facilities manager", status: "REQUESTED", createdById: staff.managerId },
+  })
+  await systemDb.workOrder.create({
+    data: { organizationId: orgId, customerId: commCustomer.id, serviceLocationId: commSite.id, type: "DEEP_CLEAN", description: "Post-construction clean of the 3rd floor.", priority: "HIGH", quotedAmount: "2400.00", status: "QUOTED", createdById: staff.managerId },
+  })
+  const woJob = await systemDb.job.create({
+    data: {
+      organizationId: orgId, serviceLocationId: commSite.id, servicePlanId: null, title: "Flood response — carpet extraction", status: "SCHEDULED",
+      plannedStart: days(1), scheduledStart: days(1), scheduledEnd: new Date(days(1).getTime() + 5 * 3600_000),
+      billingType: "FLAT_PER_JOB", rate: "1800.00", currency: "USD", crewSize: 3, createdById: staff.managerId,
+    },
+    select: { id: true },
+  })
+  await systemDb.workOrder.create({
+    data: { organizationId: orgId, customerId: commCustomer.id, serviceLocationId: commSite.id, type: "ONE_TIME", description: "Emergency callout — restroom overflow.", priority: "URGENT", quotedAmount: "1800.00", status: "SCHEDULED", approvedById: staff.managerId, approvedAt: days(-1), convertedJobId: woJob.id, createdById: staff.managerId },
+  })
+
+  // Billable extras on a completed job: one pending (awaiting customer), one approved.
+  if (ctx.completedJobIds.length > 0) {
+    const extraJob = ctx.completedJobIds[0]
+    await systemDb.changeOrder.create({
+      data: { organizationId: orgId, jobId: extraJob, description: "Clean interior of breakroom fridge", amount: "75.00", requiresCustomerApproval: true, status: "PENDING", createdById: staff.managerId },
+    })
+    await systemDb.changeOrder.create({
+      data: { organizationId: orgId, jobId: extraJob, description: "Spot-treat carpet stains in corridor", amount: "140.00", requiresCustomerApproval: true, status: "APPROVED", approvedByPortal: true, approvedAt: days(-1), createdById: staff.managerId },
+    })
+  }
 }

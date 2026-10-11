@@ -45,6 +45,7 @@ const TEAM_CAPS: Capability[] = [
   "crm.quoting",
   "workforce.hiring",
   "operations.serviceAreas",
+  "operations.workOrders",
 ]
 
 const BUSINESS_CAPS: Capability[] = [

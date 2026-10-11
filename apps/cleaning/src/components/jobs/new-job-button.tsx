@@ -20,6 +20,8 @@ export function NewJobButton({ sites, templates }: { sites: Option[]; templates:
     crewSize: "1",
     checklistTemplateId: "",
     notes: "",
+    billingType: "FLAT_PER_JOB",
+    rate: "",
   })
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -41,6 +43,7 @@ export function NewJobButton({ sites, templates }: { sites: Option[]; templates:
     if (v.durationMin) payload.durationMin = Number(v.durationMin)
     if (v.checklistTemplateId) payload.checklistTemplateId = v.checklistTemplateId
     if (v.notes) payload.notes = v.notes
+    if (v.rate) { payload.rate = v.rate; payload.billingType = v.billingType }
     const res = await apiSend<{ id: string }>("/api/jobs", "POST", payload)
     setSaving(false)
     if (!res.ok) return setError(res.error)
@@ -95,6 +98,18 @@ export function NewJobButton({ sites, templates }: { sites: Option[]; templates:
           <Field label="Notes" htmlFor="j-notes">
             <Textarea id="j-notes" value={v.notes} onChange={set("notes")} />
           </Field>
+          {/* Optional billing — a rate makes this one-off job billable (Phase 20). */}
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Billing" htmlFor="j-billing" hint="leave rate blank for non-billable">
+              <Select id="j-billing" value={v.billingType} onChange={set("billingType")}>
+                <option value="FLAT_PER_JOB">Flat per job</option>
+                <option value="HOURLY">Hourly</option>
+              </Select>
+            </Field>
+            <Field label="Rate ($)" htmlFor="j-rate" hint="per job, or per hour">
+              <Input id="j-rate" value={v.rate} onChange={set("rate")} inputMode="decimal" placeholder="e.g. 450.00" />
+            </Field>
+          </div>
           {error ? <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>

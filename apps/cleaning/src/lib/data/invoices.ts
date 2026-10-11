@@ -46,6 +46,8 @@ type LineDraft = {
   jobId: string | null
   activeJobId: string | null
   activePeriodKey: string | null
+  changeOrderId?: string | null
+  activeChangeOrderId?: string | null
   billable: boolean
   description: string
   siteName: string
@@ -146,19 +148,27 @@ export async function generateInvoice(
 
     if (opts.flatOnly) continue
     if (job.invoiceLines.length > 0) continue // already on a non-VOID invoice
-    if (!plan || plan.rate == null) {
-      excluded.push({ jobId: job.id, title: job.title, reason: "No billing rate on the service plan" })
+    // Effective billing: a service plan's rate wins; a MANUAL (plan-less) job
+    // bills from its OWN rate (Phase 20 one-time/extra work). Either way, no
+    // rate means excluded-and-reported by name — never silently dropped.
+    const effective = plan && plan.rate != null
+      ? { billingType: plan.billingType, rate: plan.rate as Money, currency: plan.currency ?? "USD" }
+      : !plan && job.rate != null
+        ? { billingType: job.billingType ?? "FLAT_PER_JOB", rate: job.rate as Money, currency: job.currency ?? "USD" }
+        : null
+    if (!effective) {
+      excluded.push({ jobId: job.id, title: job.title, reason: plan ? "No billing rate on the service plan" : "Manual job has no billing rate" })
       continue
     }
-    const rate = plan.rate as Money
-    const jobCurrency = plan.currency ?? "USD"
+    const rate = effective.rate
+    const jobCurrency = effective.currency
     if (currency === null) currency = jobCurrency
     else if (jobCurrency !== currency) {
       excluded.push({ jobId: job.id, title: job.title, reason: `Different currency (${jobCurrency}) — invoice separately` })
       continue
     }
 
-    if (plan.billingType === "HOURLY") {
+    if (effective.billingType === "HOURLY") {
       const pending = job.timeEntries.filter((e) => e.status === "OPEN" || e.status === "COMPLETED")
       if (pending.length > 0) {
         excluded.push({ jobId: job.id, title: job.title, reason: "Has unapproved time — approve it first" })
@@ -229,6 +239,43 @@ export async function generateInvoice(
     }
   }
 
+  // ── Approved billable extras (change orders) — distinct lines, bill once ──
+  // Flow any APPROVED, not-yet-invoiced extra for this customer onto this invoice.
+  const approvedExtras = await db.changeOrder.findMany({
+    where: {
+      status: "APPROVED",
+      OR: [
+        { job: { serviceLocation: { customerId: input.customerId } } },
+        { contract: { customerId: input.customerId } },
+      ],
+    },
+    select: {
+      id: true, description: true, amount: true, approvedAt: true,
+      job: { select: { serviceLocation: { select: { name: true } } } },
+      contract: { select: { title: true } },
+    },
+  })
+  if (approvedExtras.length) {
+    const taken = new Set(
+      (await db.invoiceLine.findMany({ where: { activeChangeOrderId: { in: approvedExtras.map((c) => c.id) } }, select: { activeChangeOrderId: true } }))
+        .map((l) => l.activeChangeOrderId),
+    )
+    for (const co of approvedExtras) {
+      if (taken.has(co.id)) continue
+      if (currency === null) currency = "USD" // extras are in the org's currency
+      const amount = round2(co.amount as Money)
+      drafts.push({
+        jobId: null, activeJobId: null, activePeriodKey: null,
+        changeOrderId: co.id, activeChangeOrderId: co.id,
+        billable: true,
+        description: `Extra: ${co.description}`,
+        siteName: co.job?.serviceLocation.name ?? co.contract?.title ?? "—",
+        serviceDate: co.approvedAt ?? now,
+        quantity: new Prisma.Decimal(1), unitRate: amount, amount,
+      })
+    }
+  }
+
   const hasBillable = (ls: LineDraft[]) => ls.some((l) => l.billable)
   if (!hasBillable(drafts)) {
     return { created: false, reason: opts.flatOnly ? "No flat-period charges due in this window" : "No billable work in this period", excluded }
@@ -267,6 +314,8 @@ export async function generateInvoice(
               jobId: l.jobId,
               activeJobId: l.activeJobId,
               activePeriodKey: l.activePeriodKey,
+              changeOrderId: l.changeOrderId ?? null,
+              activeChangeOrderId: l.activeChangeOrderId ?? null,
               billable: l.billable,
               description: l.description,
               siteName: l.siteName,
@@ -291,22 +340,27 @@ export async function generateInvoice(
       if (!isUniqueViolation(e)) throw e
       const jobIds = lines.map((l) => l.activeJobId).filter((x): x is string => !!x)
       const periodKeys = lines.map((l) => l.activePeriodKey).filter((x): x is string => !!x)
-      const [takenJobs, takenPeriods] = await Promise.all([
+      const coIds = lines.map((l) => l.activeChangeOrderId).filter((x): x is string => !!x)
+      const [takenJobs, takenPeriods, takenCos] = await Promise.all([
         jobIds.length ? db.invoiceLine.findMany({ where: { activeJobId: { in: jobIds } }, select: { activeJobId: true } }) : Promise.resolve([]),
         periodKeys.length ? db.invoiceLine.findMany({ where: { activePeriodKey: { in: periodKeys } }, select: { activePeriodKey: true } }) : Promise.resolve([]),
+        coIds.length ? db.invoiceLine.findMany({ where: { activeChangeOrderId: { in: coIds } }, select: { activeChangeOrderId: true } }) : Promise.resolve([]),
       ])
       const takenJobSet = new Set(takenJobs.map((t) => t.activeJobId))
       const takenPeriodSet = new Set(takenPeriods.map((t) => t.activePeriodKey))
-      if (takenJobSet.size > 0 || takenPeriodSet.size > 0) {
+      const takenCoSet = new Set(takenCos.map((t) => t.activeChangeOrderId))
+      if (takenJobSet.size > 0 || takenPeriodSet.size > 0 || takenCoSet.size > 0) {
         for (const l of lines) {
           if (l.billable && l.activeJobId && takenJobSet.has(l.activeJobId)) excluded.push({ jobId: l.activeJobId, title: l.description, reason: "Already invoiced" })
           if (l.activePeriodKey && takenPeriodSet.has(l.activePeriodKey)) excluded.push({ jobId: l.activePeriodKey, title: l.description, reason: "Period already invoiced" })
+          if (l.activeChangeOrderId && takenCoSet.has(l.activeChangeOrderId)) excluded.push({ jobId: l.activeChangeOrderId, title: l.description, reason: "Extra already invoiced" })
         }
         // Drop contested period charges and contested visit claims.
         const droppedPeriods = new Set(lines.filter((l) => l.activePeriodKey && takenPeriodSet.has(l.activePeriodKey)).map((l) => l.activePeriodKey))
         lines = lines.filter((l) => {
           if (l.activePeriodKey && takenPeriodSet.has(l.activePeriodKey)) return false
           if (l.activeJobId && takenJobSet.has(l.activeJobId)) return false
+          if (l.activeChangeOrderId && takenCoSet.has(l.activeChangeOrderId)) return false
           return true
         })
         // A dropped flat charge may leave detail lines whose period is gone —
@@ -374,7 +428,7 @@ export async function setInvoiceStatus(orgId: string, id: string, status: Extrac
     // (activeJobId / activePeriodKey → NULL), atomically.
     await db.$transaction([
       db.invoice.updateMany({ where: { id }, data: { status } }),
-      db.invoiceLine.updateMany({ where: { invoiceId: id }, data: { activeJobId: null, activePeriodKey: null } }),
+      db.invoiceLine.updateMany({ where: { invoiceId: id }, data: { activeJobId: null, activePeriodKey: null, activeChangeOrderId: null } }),
     ])
   } else {
     await db.invoice.updateMany({ where: { id }, data: { status } })

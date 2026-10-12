@@ -2,6 +2,7 @@ import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound, ConflictError, RequirementsError } from "../data/errors"
 import { recordAudit } from "../data/audit"
 import { issueSlaFields } from "../data/issues"
+import { applyRouting } from "../data/issue-routing"
 import { notifyManagers } from "../notify"
 import { scoreInspection, type ResultValue } from "./scoring"
 
@@ -158,6 +159,7 @@ export async function finalizeInspection(
         },
       })
       issueId = issue.id
+      await applyRouting(orgId, issue.id, actorId, { category: "QUALITY", severity: sla.severity, source: "INSPECTION", serviceLocationId: insp!.serviceLocationId })
     } catch (e) {
       if (isUniqueViolation(e)) {
         const existing = await db.issue.findFirst({ where: { inspectionId }, select: { id: true } })

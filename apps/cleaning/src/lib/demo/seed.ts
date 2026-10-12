@@ -251,6 +251,11 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     // A RESOLVED issue awaiting verification by someone other than the resolver.
     await systemDb.issue.create({ data: { organizationId: orgId, serviceLocationId: firstSite.id, reportedById: staff.managerId, assignedToId: staff.cleanerIds[0], source: "INSPECTION", category: "QUALITY", severity: "HIGH", title: "Entry mat replaced", description: "Worn entry mat flagged and replaced.", status: "RESOLVED", resolvedAt: new Date(now.getTime() - 2 * DAY), ackDeadline: new Date(now.getTime() - 3 * DAY), resolveDeadline: new Date(now.getTime() - 1 * DAY) } })
 
+    // Routing (Phase 31): safety issues go straight to a supervisor; otherwise
+    // the default owner (also a supervisor) picks them up.
+    await systemDb.issueRoutingRule.create({ data: { organizationId: orgId, name: "Safety → supervisor", priority: 10, isActive: true, category: "SAFETY", assignToId: staff.supervisorIds[0] } })
+    await systemDb.organization.update({ where: { id: orgId }, data: { defaultIssueAssigneeId: staff.supervisorIds[0] } })
+
     // Invoices (commercial): one SENT, one PARTIALLY_PAID.
     if (isComm) {
       const total1 = acct.periodAmount ?? acct.rate

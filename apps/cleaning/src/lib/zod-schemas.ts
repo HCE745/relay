@@ -213,6 +213,8 @@ export const orgSettingsSchema = z.object({
   uncoveredAlertLeadHours: z.coerce.number().int().min(1).max(336).optional(),
   missedClockInGraceMin: z.coerce.number().int().min(0).max(1440).optional(),
   issueEscalationEnabled: z.boolean().optional(),
+  // Issue routing fallback (Phase 31): empty string clears it (leave unassigned).
+  defaultIssueAssigneeId: z.string().optional().or(z.literal("").transform(() => null)).nullable(),
 })
 
 // ─── Compliance & credentials (Phase 13) ───
@@ -297,6 +299,31 @@ export const reportProblemSchema = z.object({
   description: z.string().trim().min(1, "Describe the problem").max(2000),
 })
 export type ReportProblemInput = z.infer<typeof reportProblemSchema>
+
+// ─── Issue routing rules (Phase 31) ─────────────────────────────────────────
+export const ISSUE_SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const
+export const ISSUE_SOURCES = ["STAFF", "CUSTOMER", "INSPECTION"] as const
+const nullableEnum = <T extends readonly [string, ...string[]]>(vals: T) =>
+  z.enum(vals).nullable().optional().or(z.literal("").transform(() => null))
+
+export const routingRuleSchema = z.object({
+  name: z.string().trim().min(1, "Name the rule").max(120),
+  priority: z.coerce.number().int().min(1).max(9999).default(100),
+  isActive: z.boolean().default(true),
+  category: nullableEnum(ISSUE_CATEGORIES),
+  severity: nullableEnum(ISSUE_SEVERITIES),
+  source: nullableEnum(ISSUE_SOURCES),
+  serviceLocationId: z.string().optional().or(z.literal("").transform(() => null)).nullable(),
+  assignToId: z.string().min(1, "Choose who it routes to"),
+})
+export type RoutingRuleFormInput = z.infer<typeof routingRuleSchema>
+
+export const routingPreviewSchema = z.object({
+  category: z.enum(ISSUE_CATEGORIES).default("OTHER"),
+  severity: z.enum(ISSUE_SEVERITIES).default("MEDIUM"),
+  source: z.enum(ISSUE_SOURCES).default("STAFF"),
+  serviceLocationId: z.string().optional().or(z.literal("").transform(() => undefined)),
+})
 
 // ─── Phase 4: inspections, time approval/correction, missed ──────────────────
 

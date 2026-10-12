@@ -385,6 +385,8 @@ model Organization {
   visitReminderLeadHours  Int     @default(24)
   paymentRemindersEnabled Boolean @default(true)
   issueEscalationEnabled  Boolean @default(true)
+  // Issue routing (Phase 31): fallback owner when no rule matches (null = leave unassigned).
+  defaultIssueAssigneeId  String?
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")
@@ -438,6 +440,7 @@ model Organization {
   serviceRequests     ServiceRequest[]
   surveyResponses     SurveyResponse[]
   issueSlaRules       IssueSlaRule[]
+  issueRoutingRules   IssueRoutingRule[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -472,6 +475,7 @@ model User {
   reportedIssues  Issue[]          @relation("IssueReporter")
   assignedIssues  Issue[]          @relation("IssueAssignee")
   verifiedIssues  Issue[]          @relation("IssueVerifier")
+  routingRules    IssueRoutingRule[] @relation("RoutingRuleAssignee")
   issueComments   IssueComment[]   @relation("IssueCommentAuthor")
   inspections     Inspection[]     @relation("InspectionInspector")
   assignedLeads   Lead[]           @relation("LeadAssignee")
@@ -616,6 +620,7 @@ model ServiceLocation {
   servicePlans ServicePlan[]
   jobs         Job[]
   issues       Issue[]
+  routingRules IssueRoutingRule[]
   inspections  Inspection[]
   assets       Asset[]       @relation("AssetSite")
   supplyUsages SupplyUsage[] @relation("SupplyUsageSite")
@@ -953,6 +958,34 @@ model IssueSlaRule {
 
   @@unique([organizationId, severity])
   @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// Issue routing (Phase 31): priority-ordered, first-match assignment applied on
+// creation from every intake source. A rule matches when each set condition
+// matches (null = "any"); the first active rule in priority order wins, else the
+// org default. Every decision is logged on the issue (AuditEvent "route").
+model IssueRoutingRule {
+  id                String         @id @default(cuid())
+  organizationId    String
+  name              String
+  priority          Int            @default(100) // lower = evaluated first
+  isActive          Boolean        @default(true)
+  // Conditions (all optional; null means "matches any").
+  category          IssueCategory?
+  severity          IssueSeverity?
+  source            IssueSource?
+  serviceLocationId String?
+  // Action: the owner this rule assigns to.
+  assignToId        String
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  assignTo        User             @relation("RoutingRuleAssignee", fields: [assignToId], references: [id])
+
+  @@index([organizationId, isActive, priority])
   @@schema("cleaning")
 }
 

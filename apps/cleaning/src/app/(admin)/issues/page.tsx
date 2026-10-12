@@ -44,11 +44,12 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
     <div>
       <PageHeader title="Issues" subtitle="Problems reported from the field and failed inspections" icon={<InboxIcon />} />
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         <FilterChip label="All" href="/issues" active={!status} />
         {STATUSES.map((s) => (
           <FilterChip key={s} label={s.charAt(0) + s.slice(1).toLowerCase()} href={`/issues?status=${s}`} active={status === s} />
         ))}
+        <Link href="/issues/routing" className="ml-auto text-sm font-medium text-brand hover:underline">Routing rules →</Link>
       </div>
 
       {issues.length === 0 ? (

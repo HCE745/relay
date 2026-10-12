@@ -4,6 +4,8 @@ import { orgDb, customerDb, systemDb } from "../org-db"
 import { invoiceNo } from "../money"
 import { ReferenceError, ForbiddenActionError } from "./errors"
 import { Prisma } from "../../generated/prisma/client"
+import { issueSlaFields } from "./issues"
+import { applyRouting } from "./issue-routing"
 
 // Customer portal data access (Phase 16). THE ISOLATION BOUNDARY: every query
 // goes through orgDb(orgId) (tenant isolation) AND is additionally constrained
@@ -85,13 +87,17 @@ export async function reportPortalIssue(
   // isn't this customer's); the write then goes through orgDb.
   const site = await customerDb(orgId, customerId).serviceLocation.findFirst({ where: { id: input.serviceLocationId }, select: { id: true } })
   if (!site) throw new ReferenceError("That site is not on your account")
+  const sla = await issueSlaFields(orgId, "CUSTOMER")
   const issue = await orgDb(orgId).issue.create({
     data: {
       organizationId: orgId, serviceLocationId: input.serviceLocationId, reportedById: reporterId,
-      source: "CUSTOMER", title: input.title ?? null, description: input.description, status: "OPEN",
+      source: "CUSTOMER", category: "CUSTOMER", severity: sla.severity,
+      ackDeadline: sla.ackDeadline, resolveDeadline: sla.resolveDeadline,
+      title: input.title ?? null, description: input.description, status: "OPEN",
     },
     select: { id: true },
   })
+  await applyRouting(orgId, issue.id, reporterId, { category: "CUSTOMER", severity: sla.severity, source: "CUSTOMER", serviceLocationId: input.serviceLocationId })
   return { id: issue.id }
 }
 

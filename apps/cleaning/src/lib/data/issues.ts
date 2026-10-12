@@ -4,6 +4,7 @@ import { recordAudit } from "./audit"
 import { notifyManagers } from "../notify"
 import { notifyUserEventSafe } from "../notifications/dispatch"
 import { getIssueSla, deadlinesFor, severityForCategory, type Severity } from "./issue-sla"
+import { applyRouting } from "./issue-routing"
 import type { ReportProblemInput } from "../zod-schemas"
 
 /**
@@ -46,6 +47,7 @@ export async function reportProblem(orgId: string, jobId: string, reporterId: st
       status: "OPEN",
     },
   })
+  await applyRouting(orgId, issue.id, reporterId, { category: input.category, severity: sla.severity, source: "STAFF", serviceLocationId: job!.serviceLocationId })
   await notifyManagers(
     orgId,
     `New problem reported: ${input.category}`,

@@ -306,7 +306,7 @@ export const issueAssetSchema = z.object({ assetId: z.string().optional().or(z.l
 
 // ─── Issue routing rules (Phase 31) ─────────────────────────────────────────
 export const ISSUE_SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const
-export const ISSUE_SOURCES = ["STAFF", "CUSTOMER", "INSPECTION", "QR"] as const
+export const ISSUE_SOURCES = ["STAFF", "CUSTOMER", "INSPECTION", "QR", "SMS"] as const
 const nullableEnum = <T extends readonly [string, ...string[]]>(vals: T) =>
   z.enum(vals).nullable().optional().or(z.literal("").transform(() => null))
 

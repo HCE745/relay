@@ -110,7 +110,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
                       {i.title ?? i.description.slice(0, 60)}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{i.source === "QR" ? "QR (external)" : i.source === "CUSTOMER" ? "Customer" : i.inspection ? "Inspection" : "Field report"}</td>
+                  <td className="px-4 py-3 text-slate-500">{i.source === "QR" ? "QR (external)" : i.source === "SMS" ? "SMS" : i.source === "CUSTOMER" ? "Customer" : i.inspection ? "Inspection" : "Field report"}</td>
                   <td className="px-4 py-3 text-slate-600">
                     {i.serviceLocation ? `${i.serviceLocation.customer.name} · ${i.serviceLocation.name}` : "—"}
                   </td>

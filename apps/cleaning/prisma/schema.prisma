@@ -40,6 +40,7 @@ enum IssueSource {
   CUSTOMER
   INSPECTION
   QR
+  SMS
 
   @@schema("cleaning")
 }

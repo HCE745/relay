@@ -64,7 +64,7 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
       </div>
 
       <Card className="grid gap-4 p-5 sm:grid-cols-2">
-        <Detail label="Source" value={issue.externalReporter ? `External · ${issue.externalReporter}` : issue.inspection ? "Failed inspection" : "Field report"} />
+        <Detail label="Source" value={issue.externalReporter ? `${issue.source === "SMS" ? "SMS" : issue.source === "QR" ? "QR" : "External"} · ${issue.externalReporter}` : issue.source === "SMS" ? "SMS" : issue.inspection ? "Failed inspection" : "Field report"} />
         <Detail label="Category" value={issue.category} />
         <Detail label="Severity" value={issue.severity} />
         <Detail label="Reported by" value={issue.reportedBy?.name ?? (issue.source === "QR" ? "External occupant (QR)" : "—")} />

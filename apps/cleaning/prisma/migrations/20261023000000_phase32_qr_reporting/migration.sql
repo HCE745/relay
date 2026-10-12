@@ -1,5 +1,6 @@
 -- Phase 32: QR operational reporting. Additive.
-ALTER TYPE "cleaning"."IssueSource" ADD VALUE 'QR';
+-- NB: the IssueSource 'QR' value is added in its own migration
+-- (20261022500000_phase32_qr_source) so the ADD VALUE commits before it's used.
 
 -- External (QR/occupant) reports have no internal reporter.
 ALTER TABLE "cleaning"."Issue" ALTER COLUMN "reportedById" DROP NOT NULL;

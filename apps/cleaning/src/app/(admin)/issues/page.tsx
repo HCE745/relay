@@ -21,7 +21,7 @@ const STATUS_TONE: Record<string, BadgeTone> = {
   CLOSED: "neutral",
 }
 
-export default async function IssuesPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+export default async function IssuesPage({ searchParams }: { searchParams: Promise<{ status?: string; category?: string; severity?: string; assignee?: string; overdue?: string; escalated?: string }> }) {
   const session = await getSession()
   if (!session) redirect("/login")
   if (!canViewSchedule(session.role)) redirect("/dashboard")
@@ -34,10 +34,18 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
     )
   }
 
-  const { status } = await searchParams
+  const { status, category, severity, assignee, overdue, escalated } = await searchParams
+  const filtered = !!(category || severity || assignee || overdue || escalated)
   const [tz, issues] = await Promise.all([
     getOrgTimezone(session.organizationId),
-    listIssues(session.organizationId, status ? { status } : {}),
+    listIssues(session.organizationId, {
+      ...(status ? { status } : {}),
+      ...(category ? { category } : {}),
+      ...(severity ? { severity } : {}),
+      ...(assignee ? { assignee } : {}),
+      ...(overdue ? { overdue: true } : {}),
+      ...(escalated ? { escalated: true } : {}),
+    }),
   ])
 
   return (
@@ -45,11 +53,18 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
       <PageHeader title="Issues" subtitle="Problems reported from the field and failed inspections" icon={<InboxIcon />} />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <FilterChip label="All" href="/issues" active={!status} />
+        <FilterChip label="All" href="/issues" active={!status && !filtered} />
         {STATUSES.map((s) => (
-          <FilterChip key={s} label={s.charAt(0) + s.slice(1).toLowerCase()} href={`/issues?status=${s}`} active={status === s} />
+          <FilterChip key={s} label={s.charAt(0) + s.slice(1).toLowerCase()} href={`/issues?status=${s}`} active={status === s && !filtered} />
         ))}
-        <Link href="/issues/qr" className="ml-auto text-sm font-medium text-brand hover:underline">QR codes →</Link>
+        {overdue ? <FilterChip label="Overdue" href="/issues?overdue=1" active /> : null}
+        {escalated ? <FilterChip label="Escalated" href="/issues?escalated=1" active /> : null}
+        {assignee === "none" ? <FilterChip label="Unassigned" href="/issues?assignee=none" active /> : null}
+        {assignee && assignee !== "none" ? <FilterChip label="Owner" href={`/issues?assignee=${assignee}`} active /> : null}
+        {severity ? <FilterChip label={severity.charAt(0) + severity.slice(1).toLowerCase()} href={`/issues?severity=${severity}`} active /> : null}
+        {category ? <FilterChip label={category.charAt(0) + category.slice(1).toLowerCase()} href={`/issues?category=${category}`} active /> : null}
+        <Link href="/issues/dashboard" className="ml-auto text-sm font-medium text-brand hover:underline">Dashboard →</Link>
+        <Link href="/issues/qr" className="text-sm font-medium text-brand hover:underline">QR codes →</Link>
         <Link href="/issues/routing" className="text-sm font-medium text-brand hover:underline">Routing rules →</Link>
       </div>
 

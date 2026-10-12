@@ -68,12 +68,25 @@ const listInclude = {
 
 export function listIssues(
   orgId: string,
-  filters: { status?: string; category?: string; serviceLocationId?: string } = {},
+  filters: { status?: string; category?: string; serviceLocationId?: string; severity?: string; assignee?: string; overdue?: boolean; escalated?: boolean } = {},
 ) {
   const where: Record<string, unknown> = {}
   if (filters.status) where.status = filters.status
   if (filters.category) where.category = filters.category
+  if (filters.severity) where.severity = filters.severity
   if (filters.serviceLocationId) where.serviceLocationId = filters.serviceLocationId
+  // "none" → unassigned; any other value → that specific owner.
+  if (filters.assignee === "none") where.assignedToId = null
+  else if (filters.assignee) where.assignedToId = filters.assignee
+  // Overdue / escalated are only meaningful on still-open issues.
+  if (filters.overdue) {
+    where.resolveDeadline = { lt: new Date() }
+    where.status = { in: ["OPEN", "ACKNOWLEDGED"] }
+  }
+  if (filters.escalated) {
+    where.escalationLevel = { gt: 0 }
+    where.status = { in: ["OPEN", "ACKNOWLEDGED"] }
+  }
   return orgDb(orgId).issue.findMany({
     where,
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],

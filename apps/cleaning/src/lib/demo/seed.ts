@@ -256,6 +256,11 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     await systemDb.issueRoutingRule.create({ data: { organizationId: orgId, name: "Safety → supervisor", priority: 10, isActive: true, category: "SAFETY", assignToId: staff.supervisorIds[0] } })
     await systemDb.organization.update({ where: { id: orgId }, data: { defaultIssueAssigneeId: staff.supervisorIds[0] } })
 
+    // QR reporting (Phase 32): a posted code at the first site, plus one external
+    // (occupant) report already filed through it.
+    const qr = await systemDb.qrCode.create({ data: { organizationId: orgId, serviceLocationId: firstSite.id, token: `demo-${firstSite.id.slice(-10)}`, label: "Main lobby restroom", scanCount: 12 } })
+    await systemDb.issue.create({ data: { organizationId: orgId, serviceLocationId: firstSite.id, qrCodeId: qr.id, source: "QR", category: "SUPPLIES", severity: "LOW", title: null, description: "Soap dispenser by the door is empty.", externalReporter: "Anonymous (QR)", status: "OPEN", ackDeadline: new Date(now.getTime() + 20 * 3600_000), resolveDeadline: new Date(now.getTime() + 68 * 3600_000) } })
+
     // Invoices (commercial): one SENT, one PARTIALLY_PAID.
     if (isComm) {
       const total1 = acct.periodAmount ?? acct.rate

@@ -61,7 +61,7 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
         <Detail label="Source" value={issue.externalReporter ? `External · ${issue.externalReporter}` : issue.inspection ? "Failed inspection" : "Field report"} />
         <Detail label="Category" value={issue.category} />
         <Detail label="Severity" value={issue.severity} />
-        <Detail label="Reported by" value={issue.reportedBy.name} />
+        <Detail label="Reported by" value={issue.reportedBy?.name ?? (issue.source === "QR" ? "External occupant (QR)" : "—")} />
         <Detail
           label="Opened"
           value={DateTime.fromJSDate(issue.createdAt, { zone: tz }).toFormat("MMM d, yyyy · h:mm a")}

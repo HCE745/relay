@@ -302,7 +302,7 @@ export type ReportProblemInput = z.infer<typeof reportProblemSchema>
 
 // ─── Issue routing rules (Phase 31) ─────────────────────────────────────────
 export const ISSUE_SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const
-export const ISSUE_SOURCES = ["STAFF", "CUSTOMER", "INSPECTION"] as const
+export const ISSUE_SOURCES = ["STAFF", "CUSTOMER", "INSPECTION", "QR"] as const
 const nullableEnum = <T extends readonly [string, ...string[]]>(vals: T) =>
   z.enum(vals).nullable().optional().or(z.literal("").transform(() => null))
 
@@ -317,6 +317,22 @@ export const routingRuleSchema = z.object({
   assignToId: z.string().min(1, "Choose who it routes to"),
 })
 export type RoutingRuleFormInput = z.infer<typeof routingRuleSchema>
+
+// QR operational reporting (Phase 32).
+export const qrCodeCreateSchema = z.object({
+  serviceLocationId: z.string().min(1, "Choose a site"),
+  label: z.string().trim().min(1, "Describe where it's posted").max(120),
+})
+export const qrActiveSchema = z.object({ isActive: z.boolean() })
+
+const PUBLIC_QR_CATEGORIES = ["QUALITY", "SUPPLIES", "SAFETY", "ACCESS", "OTHER"] as const
+export const publicQrIssueSchema = z.object({
+  category: z.enum(PUBLIC_QR_CATEGORIES).optional(),
+  description: z.string().trim().min(1, "Please describe the problem").max(2000),
+  reporterName: optionalString,
+  reporterContact: optionalString,
+  website: z.string().optional(), // honeypot — real users never fill it
+})
 
 export const routingPreviewSchema = z.object({
   category: z.enum(ISSUE_CATEGORIES).default("OTHER"),

@@ -97,7 +97,7 @@ async function main() {
   const commented = await addIssueComment(sparkle.id, fieldIssue.id, admin.id, "Ordered a replacement mop.")
   check("note recorded", !!commented?.comments.some((c) => c.body.includes("replacement")))
   const detail = await getIssue(sparkle.id, fieldIssue.id)
-  check("source context retained (job + reporter)", detail?.job?.id === job.id && detail?.reportedBy.name === nc.name)
+  check("source context retained (job + reporter)", detail?.job?.id === job.id && detail?.reportedBy?.name === nc.name)
 
   // Failed-inspection issue behaves identically.
   const inspTpl = await createInspectionTemplate(sparkle.id, { name: "I", items: [{ label: "Restroom", isCritical: true }] })

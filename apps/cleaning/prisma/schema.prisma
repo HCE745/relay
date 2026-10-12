@@ -39,6 +39,7 @@ enum IssueSource {
   STAFF
   CUSTOMER
   INSPECTION
+  QR
 
   @@schema("cleaning")
 }
@@ -441,6 +442,7 @@ model Organization {
   surveyResponses     SurveyResponse[]
   issueSlaRules       IssueSlaRule[]
   issueRoutingRules   IssueRoutingRule[]
+  qrCodes             QrCode[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -621,6 +623,7 @@ model ServiceLocation {
   jobs         Job[]
   issues       Issue[]
   routingRules IssueRoutingRule[]
+  qrCodes      QrCode[]
   inspections  Inspection[]
   assets       Asset[]       @relation("AssetSite")
   supplyUsages SupplyUsage[] @relation("SupplyUsageSite")
@@ -995,7 +998,9 @@ model Issue {
   jobId             String?
   serviceLocationId String?
   inspectionId      String?       @unique // at most one Issue per inspection (idempotent finalize)
-  reportedById      String
+  reportedById      String? // null for external (QR/occupant) reports — no internal user
+  qrCodeId          String? // set when filed via a posted QR code (Phase 32)
+  reporterIpHash    String? // hashed IP of an external reporter — for durable per-IP intake caps
   assignedToId      String? // the RESOLVER / owner
   verifierId        String? // the VERIFIER — must differ from the resolver (Phase 30)
   category          IssueCategory @default(OTHER)
@@ -1021,7 +1026,8 @@ model Issue {
   job             Job?             @relation(fields: [jobId], references: [id], onDelete: SetNull)
   serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
   inspection      Inspection?      @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
-  reportedBy      User             @relation("IssueReporter", fields: [reportedById], references: [id])
+  reportedBy      User?            @relation("IssueReporter", fields: [reportedById], references: [id])
+  qrCode          QrCode?          @relation(fields: [qrCodeId], references: [id], onDelete: SetNull)
   assignedTo      User?            @relation("IssueAssignee", fields: [assignedToId], references: [id])
   verifier        User?            @relation("IssueVerifier", fields: [verifierId], references: [id])
   comments        IssueComment[]
@@ -1030,7 +1036,35 @@ model Issue {
 
   @@index([organizationId])
   @@index([jobId])
+  @@index([qrCodeId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// A posted QR code (Phase 32): occupants scan it to report a problem at a
+// specific site/location with no login. The token is the PUBLIC identifier and
+// is globally unique (the public route resolves the org from it). Each code is
+// independently revocable (isActive) — revoking one leaked code never affects
+// the others, so there is no need to reprint a whole building.
+model QrCode {
+  id                String   @id @default(cuid())
+  organizationId    String
+  serviceLocationId String
+  token             String   @unique // URL-safe public identifier
+  label             String // where it's posted, e.g. "2nd floor men's restroom"
+  isActive          Boolean  @default(true)
+  scanCount         Int      @default(0)
+  lastScanAt        DateTime?
+  createdById       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  issues          Issue[]
+
+  @@index([organizationId])
+  @@index([serviceLocationId])
   @@schema("cleaning")
 }
 

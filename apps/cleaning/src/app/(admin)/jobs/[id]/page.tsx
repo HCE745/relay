@@ -260,7 +260,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               <li key={iss.id} className="rounded-lg border border-red-100 bg-red-50 p-3">
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">{iss.category}</span>
-                  <span className="text-xs text-slate-500">by {iss.reportedBy.name}</span>
+                  <span className="text-xs text-slate-500">by {iss.reportedBy?.name ?? "external (QR)"}</span>
                 </div>
                 <p className="mt-1 text-sm text-slate-800">{iss.description}</p>
               </li>

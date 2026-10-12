@@ -5,7 +5,7 @@ import { orgDb } from "../org-db"
 // session. We deliberately do NOT log routine UI activity.
 export function recordAudit(
   orgId: string,
-  actorUserId: string,
+  actorUserId: string | null,
   entityType: string,
   entityId: string,
   action: string,

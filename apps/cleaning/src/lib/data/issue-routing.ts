@@ -79,7 +79,7 @@ async function isActiveUser(orgId: string, userId: string): Promise<boolean> {
  * Apply routing to a just-created issue: assign the chosen owner (if any) and
  * ALWAYS log the decision. Called by every intake path right after create().
  */
-export async function applyRouting(orgId: string, issueId: string, actorId: string, facts: RoutingFacts): Promise<RoutingDecision> {
+export async function applyRouting(orgId: string, issueId: string, actorId: string | null, facts: RoutingFacts): Promise<RoutingDecision> {
   const decision = await routeIssue(orgId, facts)
   if (decision.assignToId) {
     await orgDb(orgId).issue.updateMany({ where: { id: issueId }, data: { assignedToId: decision.assignToId, escalationLevel: 0 } })

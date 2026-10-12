@@ -49,7 +49,8 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
         {STATUSES.map((s) => (
           <FilterChip key={s} label={s.charAt(0) + s.slice(1).toLowerCase()} href={`/issues?status=${s}`} active={status === s} />
         ))}
-        <Link href="/issues/routing" className="ml-auto text-sm font-medium text-brand hover:underline">Routing rules →</Link>
+        <Link href="/issues/qr" className="ml-auto text-sm font-medium text-brand hover:underline">QR codes →</Link>
+        <Link href="/issues/routing" className="text-sm font-medium text-brand hover:underline">Routing rules →</Link>
       </div>
 
       {issues.length === 0 ? (
@@ -94,7 +95,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
                       {i.title ?? i.description.slice(0, 60)}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{i.inspection ? "Inspection" : "Field report"}</td>
+                  <td className="px-4 py-3 text-slate-500">{i.source === "QR" ? "QR (external)" : i.source === "CUSTOMER" ? "Customer" : i.inspection ? "Inspection" : "Field report"}</td>
                   <td className="px-4 py-3 text-slate-600">
                     {i.serviceLocation ? `${i.serviceLocation.customer.name} · ${i.serviceLocation.name}` : "—"}
                   </td>

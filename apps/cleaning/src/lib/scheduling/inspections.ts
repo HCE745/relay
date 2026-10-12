@@ -159,6 +159,7 @@ export async function finalizeInspection(
         },
       })
       issueId = issue.id
+      await recordAudit(orgId, actorId, "Issue", issue.id, "report", { metadata: { source: "INSPECTION", inspectionId } })
       await applyRouting(orgId, issue.id, actorId, { category: "QUALITY", severity: sla.severity, source: "INSPECTION", serviceLocationId: insp!.serviceLocationId })
     } catch (e) {
       if (isUniqueViolation(e)) {

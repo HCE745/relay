@@ -31,6 +31,11 @@ export async function reportProblem(orgId: string, jobId: string, reporterId: st
     select: { id: true, serviceLocationId: true, title: true, serviceLocation: { select: { name: true } } },
   })
   assertFound(job, "Job")
+  // An optional linked asset must belong to this org.
+  if (input.assetId) {
+    const asset = await db.asset.findFirst({ where: { id: input.assetId }, select: { id: true } })
+    assertFound(asset, "Asset")
+  }
   const sla = await issueSlaFields(orgId, input.category)
   const issue = await db.issue.create({
     data: {
@@ -38,6 +43,7 @@ export async function reportProblem(orgId: string, jobId: string, reporterId: st
       jobId,
       serviceLocationId: job!.serviceLocationId,
       reportedById: reporterId,
+      assetId: input.assetId ?? null,
       category: input.category,
       severity: sla.severity,
       ackDeadline: sla.ackDeadline,
@@ -47,6 +53,7 @@ export async function reportProblem(orgId: string, jobId: string, reporterId: st
       status: "OPEN",
     },
   })
+  await recordAudit(orgId, reporterId, "Issue", issue.id, "report", { metadata: { source: "STAFF", category: input.category } })
   await applyRouting(orgId, issue.id, reporterId, { category: input.category, severity: sla.severity, source: "STAFF", serviceLocationId: job!.serviceLocationId })
   await notifyManagers(
     orgId,
@@ -101,6 +108,7 @@ const detailInclude = {
   serviceLocation: { select: { id: true, name: true, customer: { select: { name: true } } } },
   job: { select: { id: true, title: true } },
   inspection: { select: { id: true, templateName: true, score: true, outcome: true } },
+  asset: { select: { id: true, name: true, category: true, status: true } },
   photos: { select: { id: true, caption: true } },
   comments: { orderBy: { createdAt: "asc" }, include: { author: { select: { name: true } } } },
 } as const
@@ -170,7 +178,32 @@ export async function addIssueComment(orgId: string, id: string, authorId: strin
   const issue = await db.issue.findFirst({ where: { id }, select: { id: true } })
   assertFound(issue, "Issue")
   await db.issueComment.create({ data: { organizationId: orgId, issueId: id, authorId, body } })
+  await recordAudit(orgId, authorId, "Issue", id, "comment")
   return getIssue(orgId, id)
+}
+
+/** Link (or clear) the asset an issue is about — recorded on the issue timeline. */
+export async function setIssueAsset(orgId: string, id: string, actorId: string, assetId: string | null) {
+  const db = orgDb(orgId)
+  const issue = await db.issue.findFirst({ where: { id }, select: { id: true, assetId: true } })
+  assertFound(issue, "Issue")
+  if (assetId) {
+    const asset = await db.asset.findFirst({ where: { id: assetId }, select: { id: true } })
+    assertFound(asset, "Asset")
+  }
+  await db.issue.updateMany({ where: { id }, data: { assetId } })
+  await recordAudit(orgId, actorId, "Issue", id, assetId ? "link-asset" : "unlink-asset", { oldValue: issue!.assetId ?? undefined, newValue: assetId ?? undefined })
+  return getIssue(orgId, id)
+}
+
+/** An asset's issue history — reported problems about this equipment. Distinct
+ *  from its maintenance log (planned/performed service); not a duplicate of it. */
+export function listAssetIssues(orgId: string, assetId: string) {
+  return orgDb(orgId).issue.findMany({
+    where: { assetId },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, title: true, description: true, category: true, severity: true, status: true, createdAt: true, closedAt: true },
+  })
 }
 
 export function listJobIssues(orgId: string, jobId: string) {

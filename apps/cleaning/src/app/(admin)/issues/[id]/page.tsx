@@ -5,11 +5,12 @@ import { getSession } from "@/lib/session"
 import { canViewSchedule, canManageAccounts } from "@/lib/rbac"
 import { getIssue, listIssueActivity } from "@/lib/data/issues"
 import { listUsers } from "@/lib/data/users"
+import { listAssets } from "@/lib/data/assets"
 import { getOrgTimezone } from "@/lib/data/org"
 import { orgHasCapability } from "@/lib/page-guards"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
-import { IssueStatusBar, IssueAssignee, IssueCommentBox } from "@/components/issues/issue-actions"
+import { IssueStatusBar, IssueAssignee, IssueCommentBox, IssueAssetLink } from "@/components/issues/issue-actions"
 import { IssueToWorkOrderButton } from "@/components/issues/issue-to-work-order"
 
 export const dynamic = "force-dynamic"
@@ -31,13 +32,18 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
   const issue = await getIssue(orgId, id)
   if (!issue) notFound()
 
-  const [tz, activity, users, canMakeWorkOrder] = await Promise.all([
+  const [tz, activity, users, canMakeWorkOrder, hasAssets] = await Promise.all([
     getOrgTimezone(orgId),
     listIssueActivity(orgId, id),
     // Assignable = active team members (managers assign to anyone active).
     listUsers(orgId).then((all) => all.filter((u) => u.isActive).map((u) => ({ id: u.id, name: u.name }))),
     canManageAccounts(session.role) ? orgHasCapability(orgId, "operations.workOrders") : Promise.resolve(false),
+    orgHasCapability(orgId, "assets.management"),
   ])
+  // Asset linking only when the org has the asset register.
+  const assets = hasAssets
+    ? (await listAssets(orgId)).map((a) => ({ id: a.id, name: a.name }))
+    : []
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -91,6 +97,15 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
             </dd>
           </div>
         ) : null}
+        {issue.asset ? (
+          <div>
+            <dt className="text-xs uppercase tracking-wide text-slate-400">Asset</dt>
+            <dd className="text-sm">
+              <Link href={`/assets/${issue.asset.id}`} className="text-brand hover:underline">{issue.asset.name}</Link>
+              <span className="ml-1 text-slate-400">· {issue.asset.status.toLowerCase()}</span>
+            </dd>
+          </div>
+        ) : null}
       </Card>
 
       <Card className="p-5">
@@ -116,6 +131,14 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
               <IssueAssignee issueId={issue.id} current={issue.assignedTo?.id ?? null} users={users} />
             </div>
           </div>
+          {assets.length > 0 ? (
+            <div>
+              <div className="text-xs uppercase tracking-wide text-slate-400">Asset</div>
+              <div className="mt-1 w-56">
+                <IssueAssetLink issueId={issue.id} current={issue.asset?.id ?? null} assets={assets} />
+              </div>
+            </div>
+          ) : null}
           <div>
             <div className="mb-1 text-xs uppercase tracking-wide text-slate-400">Move to</div>
             <IssueStatusBar issueId={issue.id} status={issue.status} />
@@ -139,7 +162,7 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
           ))}
           {activity.map((a) => (
             <li key={a.id} className="px-1 text-xs text-slate-500">
-              {a.action === "status" ? `Status → ${a.newValue}` : a.action === "assign" ? "Assignment changed" : a.action} ·{" "}
+              {lifecycleLabel(a.action, a.newValue)} ·{" "}
               {DateTime.fromJSDate(a.createdAt, { zone: tz }).toFormat("MMM d, h:mm a")}
             </li>
           ))}
@@ -150,6 +173,26 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
       </Card>
     </div>
   )
+}
+
+// Human labels for the full issue lifecycle, all drawn from the one AuditEvent
+// stream (Phase 34) — report → route → assign/reassign → status → resolve →
+// verify → reopen → escalate → asset link → comment.
+function lifecycleLabel(action: string, newValue: string | null): string {
+  switch (action) {
+    case "report": return "Reported"
+    case "route": return newValue ? "Auto-routed to an owner" : "Auto-routed (left unassigned)"
+    case "assign": return "Assigned to an owner"
+    case "reassign": return "Reassigned"
+    case "status": return `Status → ${newValue}`
+    case "reopen": return "Reopened"
+    case "verify": return "Verified & closed"
+    case "escalate": return "Escalated"
+    case "comment": return "Note added"
+    case "link-asset": return "Linked to an asset"
+    case "unlink-asset": return "Asset unlinked"
+    default: return action
+  }
 }
 
 function Detail({ label, value }: { label: string; value: string }) {

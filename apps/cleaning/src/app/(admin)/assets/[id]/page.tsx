@@ -4,7 +4,9 @@ import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getAsset } from "@/lib/data/assets"
+import { listAssetIssues } from "@/lib/data/issues"
 import { listAllSites } from "@/lib/data/service-locations"
+import { DateTime } from "luxon"
 import { listUsers } from "@/lib/data/users"
 import { formatMoney } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
@@ -34,7 +36,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
   }
 
   const { id } = await params
-  const [asset, sites, users] = await Promise.all([getAsset(orgId, id), listAllSites(orgId), listUsers(orgId)])
+  const [asset, sites, users, issues] = await Promise.all([getAsset(orgId, id), listAllSites(orgId), listUsers(orgId), listAssetIssues(orgId, id)])
   if (!asset) notFound()
   const siteOpts = sites.map((s) => ({ id: s.id, name: s.name }))
   const userOpts = users.filter((u) => u.isActive).map((u) => ({ id: u.id, name: u.name }))
@@ -89,6 +91,28 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
                   </div>
                 </div>
                 {m.cost ? <div className="tabular-nums text-slate-600">{formatMoney(m.cost)}</div> : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      <Card className="p-5">
+        <h2 className="mb-3 text-sm font-semibold text-slate-700">Issue history</h2>
+        {issues.length === 0 ? (
+          <p className="text-sm text-slate-500">No problems reported about this asset.</p>
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {issues.map((i) => (
+              <li key={i.id} className="flex items-start justify-between gap-4 py-3 text-sm">
+                <div>
+                  <Link href={`/issues/${i.id}`} className="font-medium text-slate-800 hover:text-brand">
+                    <span className="mr-2 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">{i.severity}</span>
+                    {i.title ?? i.description.slice(0, 60)}
+                  </Link>
+                  <div className="text-xs text-slate-500">{i.category.toLowerCase()} · reported {DateTime.fromJSDate(i.createdAt).toFormat("MMM d, yyyy")}</div>
+                </div>
+                <StatusBadge tone={i.status === "CLOSED" ? "neutral" : i.status === "RESOLVED" ? "success" : i.status === "OPEN" ? "danger" : "warning"}>{i.status}</StatusBadge>
               </li>
             ))}
           </ul>

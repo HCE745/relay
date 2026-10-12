@@ -387,7 +387,11 @@ async function seedExtras(
       select: { id: true },
     })
     await systemDb.assetMaintenance.create({ data: { assetId: asset.id, date: days(-45), type: "Routine service", cost: "180.00", notes: "Filters replaced; pads rotated.", performedById: staff.supervisorIds[0] } })
-    if (a.status === "MAINTENANCE") await systemDb.assetMaintenance.create({ data: { assetId: asset.id, date: days(-3), type: "Repair", cost: "640.00", notes: "Brake service — in shop.", performedById: staff.managerId } })
+    if (a.status === "MAINTENANCE") {
+      await systemDb.assetMaintenance.create({ data: { assetId: asset.id, date: days(-3), type: "Repair", cost: "640.00", notes: "Brake service — in shop.", performedById: staff.managerId } })
+      // Asset-linked issue history (Phase 34): the problem that sent it to the shop.
+      await systemDb.issue.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, reportedById: staff.supervisorIds[0], assignedToId: staff.managerId, assetId: asset.id, source: "STAFF", category: "EQUIPMENT", severity: "HIGH", title: "Grinding noise from brakes", description: "Driver reported grinding from the front brakes.", status: "RESOLVED", resolvedAt: days(-2), ackDeadline: days(-4), resolveDeadline: days(-1) } })
+    }
   }
 
   // ── Credentials: expiring soon + expired + valid; a site requirement ──

@@ -73,6 +73,28 @@ export function IssueAssignee({ issueId, current, users }: { issueId: string; cu
   )
 }
 
+type AssetOption = { id: string; name: string }
+export function IssueAssetLink({ issueId, current, assets }: { issueId: string; current: string | null; assets: AssetOption[] }) {
+  const router = useRouter()
+  const [value, setValue] = useState(current ?? "")
+  const [busy, setBusy] = useState(false)
+  async function save(v: string) {
+    setValue(v)
+    setBusy(true)
+    const res = await apiSend(`/api/issues/${issueId}/asset`, "PATCH", { assetId: v })
+    setBusy(false)
+    if (res.ok) router.refresh()
+  }
+  return (
+    <Select value={value} disabled={busy} onChange={(e) => save(e.target.value)}>
+      <option value="">No asset</option>
+      {assets.map((a) => (
+        <option key={a.id} value={a.id}>{a.name}</option>
+      ))}
+    </Select>
+  )
+}
+
 export function IssueCommentBox({ issueId }: { issueId: string }) {
   const router = useRouter()
   const [body, setBody] = useState("")

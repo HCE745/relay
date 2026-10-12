@@ -124,6 +124,7 @@ export async function submitQrIssue(token: string, input: PublicQrIssueInput, ip
     },
     select: { id: true },
   })
+  await recordAudit(orgId, null, "Issue", issue.id, "report", { metadata: { source: "QR", qrCodeId: code.id } })
   await applyRouting(orgId, issue.id, null, { category, severity: sla.severity, source: "QR", serviceLocationId: code.serviceLocationId })
   await notifyManagers(orgId, "New QR-reported problem", `An occupant reported a problem via a posted QR code. Open Issues to triage.`)
   return { reference: issue.id.slice(-6).toUpperCase() }

@@ -1000,6 +1000,7 @@ model Issue {
   inspectionId      String?       @unique // at most one Issue per inspection (idempotent finalize)
   reportedById      String? // null for external (QR/occupant) reports — no internal user
   qrCodeId          String? // set when filed via a posted QR code (Phase 32)
+  assetId           String? // the equipment this problem is about (Phase 34)
   reporterIpHash    String? // hashed IP of an external reporter — for durable per-IP intake caps
   assignedToId      String? // the RESOLVER / owner
   verifierId        String? // the VERIFIER — must differ from the resolver (Phase 30)
@@ -1028,6 +1029,7 @@ model Issue {
   inspection      Inspection?      @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
   reportedBy      User?            @relation("IssueReporter", fields: [reportedById], references: [id])
   qrCode          QrCode?          @relation(fields: [qrCodeId], references: [id], onDelete: SetNull)
+  asset           Asset?           @relation(fields: [assetId], references: [id], onDelete: SetNull)
   assignedTo      User?            @relation("IssueAssignee", fields: [assignedToId], references: [id])
   verifier        User?            @relation("IssueVerifier", fields: [verifierId], references: [id])
   comments        IssueComment[]
@@ -1037,6 +1039,7 @@ model Issue {
   @@index([organizationId])
   @@index([jobId])
   @@index([qrCodeId])
+  @@index([assetId])
   @@index([status])
   @@schema("cleaning")
 }
@@ -2160,6 +2163,7 @@ model Asset {
   assignedToSite ServiceLocation?   @relation("AssetSite", fields: [assignedToSiteId], references: [id])
   assignedToUser User?              @relation("AssetUser", fields: [assignedToUserId], references: [id])
   maintenance    AssetMaintenance[]
+  issues         Issue[]
 
   @@index([organizationId])
   @@index([status])

@@ -6,6 +6,7 @@ import { ReferenceError, ForbiddenActionError } from "./errors"
 import { Prisma } from "../../generated/prisma/client"
 import { issueSlaFields } from "./issues"
 import { applyRouting } from "./issue-routing"
+import { recordAudit } from "./audit"
 
 // Customer portal data access (Phase 16). THE ISOLATION BOUNDARY: every query
 // goes through orgDb(orgId) (tenant isolation) AND is additionally constrained
@@ -97,6 +98,7 @@ export async function reportPortalIssue(
     },
     select: { id: true },
   })
+  await recordAudit(orgId, reporterId, "Issue", issue.id, "report", { metadata: { source: "CUSTOMER" } })
   await applyRouting(orgId, issue.id, reporterId, { category: "CUSTOMER", severity: sla.severity, source: "CUSTOMER", serviceLocationId: input.serviceLocationId })
   return { id: issue.id }
 }

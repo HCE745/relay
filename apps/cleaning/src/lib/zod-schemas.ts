@@ -297,8 +297,12 @@ export const reportProblemSchema = z.object({
   category: z.enum(ISSUE_CATEGORIES).default("OTHER"),
   title: optionalString,
   description: z.string().trim().min(1, "Describe the problem").max(2000),
+  assetId: z.string().optional().or(z.literal("").transform(() => undefined)),
 })
 export type ReportProblemInput = z.infer<typeof reportProblemSchema>
+
+// Link/clear the asset an issue is about (Phase 34). "" clears it.
+export const issueAssetSchema = z.object({ assetId: z.string().optional().or(z.literal("").transform(() => null)).nullable() })
 
 // ─── Issue routing rules (Phase 31) ─────────────────────────────────────────
 export const ISSUE_SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const

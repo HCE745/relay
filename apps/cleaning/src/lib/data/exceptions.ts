@@ -1,28 +1,21 @@
-import { orgDb, isUniqueViolation } from "../org-db"
+import { orgDb } from "../org-db"
 import { getAlertConfig } from "./org"
 import { listUncoveredShifts } from "./coverage"
 import { listExpiringCredentials } from "./credentials"
 import { notifyManagersEvent, notifyRolesEvent, type NotificationEventKey } from "../notifications/dispatch"
+import { claimOnce } from "./idempotency"
 
 // Operational exception detection + push alerting (Phase 25). Runs from a cron.
-// Each (event, entity) alerts AT MOST ONCE, guarded by ExceptionAlert — a
-// re-detection on the next run does not re-notify. Delivery routes through the
-// Phase 21 system (per-user channel prefs, opt-out, degrade when unconfigured).
+// Each (event, entity) alerts AT MOST ONCE, guarded by the shared claimOnce
+// ledger — a re-detection on the next run does not re-notify. Delivery routes
+// through the Phase 21 system (per-user channel prefs, opt-out, degrade).
 
 /** Claim an alert for (event, entityId). Returns true the FIRST time only.
- *  Shared idempotency guard — also used by customer comms (Phase 26). */
+ *  Thin specialization of claimOnce — the event name is the claim scope. */
 export async function claimAlert(orgId: string, event: NotificationEventKey, entityId: string): Promise<boolean> {
-  return claim(orgId, event, entityId)
+  return claimOnce(orgId, event, entityId)
 }
-async function claim(orgId: string, event: NotificationEventKey, entityId: string): Promise<boolean> {
-  try {
-    await orgDb(orgId).exceptionAlert.create({ data: { organizationId: orgId, event: event as "SHIFT_UNCOVERED", entityId } })
-    return true
-  } catch (e) {
-    if (isUniqueViolation(e)) return false
-    throw e
-  }
-}
+const claim = claimAlert
 
 export async function runExceptionAlerts(orgId: string, now: Date = new Date()): Promise<{ uncovered: number; missed: number; credentials: number }> {
   const cfg = await getAlertConfig(orgId)

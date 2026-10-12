@@ -38,7 +38,7 @@ async function main() {
   check("missed clock-in detected", r1.missed === 1, `missed=${r1.missed}`)
   check("uncovered shift detected", r1.uncovered === 1, `uncovered=${r1.uncovered}`)
   check("expiring credential detected", r1.credentials === 1, `credentials=${r1.credentials}`)
-  check("one ExceptionAlert per exception", (await systemDb.exceptionAlert.count({ where: { organizationId: org.id } })) === 3)
+  check("one claim per exception", (await systemDb.idempotencyClaim.count({ where: { organizationId: org.id } })) === 3)
 
   const missedAlertUsers = await systemDb.notificationLog.count({ where: { organizationId: org.id, event: "MISSED_CLOCK_IN" } })
   check("missed clock-in alerted supervisor + managers (owner+sup ≥ 2 logs)", missedAlertUsers >= 2, `logs=${missedAlertUsers}`)
@@ -50,7 +50,7 @@ async function main() {
   const r2 = await runExceptionAlerts(org.id, now)
   check("no new alerts on the second run", r2.missed === 0 && r2.uncovered === 0 && r2.credentials === 0)
   check("no new notification logs", (await systemDb.notificationLog.count({ where: { organizationId: org.id } })) === logsBefore)
-  check("still exactly 3 ExceptionAlert rows", (await systemDb.exceptionAlert.count({ where: { organizationId: org.id } })) === 3)
+  check("still exactly 3 claim rows", (await systemDb.idempotencyClaim.count({ where: { organizationId: org.id } })) === 3)
 
   await systemDb.organization.delete({ where: { id: org.id } })
   console.log(`\n${failures === 0 ? "ALL ALERT CHECKS PASSED" : `${failures} CHECK(S) FAILED`}`)

@@ -434,7 +434,7 @@ model Organization {
   notificationPrefs   NotificationPreference[]
   notificationLogs    NotificationLog[]
   importBatches       ImportBatch[]
-  exceptionAlerts     ExceptionAlert[]
+  idempotencyClaims   IdempotencyClaim[]
   customerMessages    CustomerMessage[]
   proposals           Proposal[]
   serviceRequests     ServiceRequest[]
@@ -1342,16 +1342,21 @@ model CustomerMessage {
 // Idempotency ledger for exception alerts (Phase 25): one alert per (event,
 // entity) ever — a cron that re-detects the same uncovered shift / missed
 // clock-in / expiring credential won't re-notify.
-model ExceptionAlert {
-  id             String            @id @default(cuid())
+// General "do this at most once" ledger (generalized from the Phase 25
+// ExceptionAlert): a (scope, key) pair claimed per org exactly once. Used for
+// exception-alert dedupe, issue escalation steps, customer-comms sends, and —
+// Phases 32/35 — public QR/SMS intake dedupe. claimOnce() returns true only the
+// first time; a repeat hits the unique constraint and returns false.
+model IdempotencyClaim {
+  id             String   @id @default(cuid())
   organizationId String
-  event          NotificationEvent
-  entityId       String
-  createdAt      DateTime          @default(now())
+  scope          String
+  key            String
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@unique([organizationId, event, entityId])
+  @@unique([organizationId, scope, key])
   @@index([organizationId])
   @@schema("cleaning")
 }

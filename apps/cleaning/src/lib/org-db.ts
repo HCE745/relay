@@ -70,7 +70,7 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "NotificationPreference",
   "NotificationLog",
   "ImportBatch",
-  "ExceptionAlert",
+  "IdempotencyClaim",
   "CustomerMessage",
   "Proposal",
   "ServiceRequest",

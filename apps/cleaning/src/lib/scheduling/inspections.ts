@@ -1,6 +1,7 @@
 import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound, ConflictError, RequirementsError } from "../data/errors"
 import { recordAudit } from "../data/audit"
+import { issueSlaFields } from "../data/issues"
 import { notifyManagers } from "../notify"
 import { scoreInspection, type ResultValue } from "./scoring"
 
@@ -138,6 +139,7 @@ export async function finalizeInspection(
     const description =
       `Failed inspection (${score}%). ` +
       (failed.length ? `Failed items: ${failed.map((f) => f.label).join(", ")}.` : "Below passing threshold.")
+    const sla = await issueSlaFields(orgId, "QUALITY", "HIGH")
     try {
       const issue = await db.issue.create({
         data: {
@@ -147,6 +149,9 @@ export async function finalizeInspection(
           inspectionId,
           reportedById: actorId,
           category: "QUALITY",
+          severity: sla.severity,
+          ackDeadline: sla.ackDeadline,
+          resolveDeadline: sla.resolveDeadline,
           title: "Failed inspection",
           description,
           status: "OPEN",

@@ -212,6 +212,7 @@ export const orgSettingsSchema = z.object({
   otMultiplier: money.optional(), // Decimal string, e.g. "1.5"
   uncoveredAlertLeadHours: z.coerce.number().int().min(1).max(336).optional(),
   missedClockInGraceMin: z.coerce.number().int().min(0).max(1440).optional(),
+  issueEscalationEnabled: z.boolean().optional(),
 })
 
 // ─── Compliance & credentials (Phase 13) ───
@@ -390,7 +391,7 @@ export const changePasswordSchema = z.object({
   newPassword: password,
 })
 
-export const assignIssueSchema = z.object({ assigneeId: z.string().min(1).nullable() })
+export const assignIssueSchema = z.object({ assigneeId: z.string().min(1).nullable(), reason: optionalString })
 export const issueStatusSchema = z.object({ status: z.enum(["OPEN", "ACKNOWLEDGED", "RESOLVED", "CLOSED"]) })
 export const issueCommentSchema = z.object({ body: z.string().trim().min(1, "Write a note").max(2000) })
 

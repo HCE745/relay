@@ -6,9 +6,11 @@ import { Button, Select } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
 
 type Assignee = { id: string; name: string }
+// CLOSED is reached only by VERIFICATION (a different person), via a separate
+// endpoint — so it's never offered from OPEN/ACKNOWLEDGED (Phase 30).
 const NEXT: Record<string, string[]> = {
-  OPEN: ["ACKNOWLEDGED", "RESOLVED", "CLOSED"],
-  ACKNOWLEDGED: ["RESOLVED", "CLOSED", "OPEN"],
+  OPEN: ["ACKNOWLEDGED", "RESOLVED"],
+  ACKNOWLEDGED: ["RESOLVED", "OPEN"],
   RESOLVED: ["CLOSED", "OPEN"],
   CLOSED: ["OPEN"],
 }
@@ -16,7 +18,7 @@ const LABEL: Record<string, string> = {
   OPEN: "Reopen",
   ACKNOWLEDGED: "Acknowledge",
   RESOLVED: "Resolve",
-  CLOSED: "Close",
+  CLOSED: "Verify & close",
 }
 
 export function IssueStatusBar({ issueId, status }: { issueId: string; status: string }) {
@@ -24,7 +26,10 @@ export function IssueStatusBar({ issueId, status }: { issueId: string; status: s
   const [busy, setBusy] = useState(false)
   async function set(next: string) {
     setBusy(true)
-    const res = await apiSend(`/api/issues/${issueId}/status`, "PATCH", { status: next })
+    // Closing goes through verification (resolver ≠ verifier, enforced server-side).
+    const res = next === "CLOSED"
+      ? await apiSend(`/api/issues/${issueId}/verify`, "POST")
+      : await apiSend(`/api/issues/${issueId}/status`, "PATCH", { status: next })
     setBusy(false)
     if (res.ok) router.refresh()
     else alert(res.error)
@@ -45,9 +50,14 @@ export function IssueAssignee({ issueId, current, users }: { issueId: string; cu
   const [value, setValue] = useState(current ?? "")
   const [busy, setBusy] = useState(false)
   async function save(v: string) {
+    // Reassigning an already-owned issue records a reason (tracked in the audit log).
+    let reason: string | undefined
+    if (current && v !== current) {
+      reason = window.prompt("Reason for reassigning this issue?") ?? undefined
+    }
     setValue(v)
     setBusy(true)
-    const res = await apiSend(`/api/issues/${issueId}/assign`, "PATCH", { assigneeId: v || null })
+    const res = await apiSend(`/api/issues/${issueId}/assign`, "PATCH", { assigneeId: v || null, reason })
     setBusy(false)
     if (res.ok) router.refresh()
   }

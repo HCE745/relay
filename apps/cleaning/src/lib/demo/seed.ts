@@ -246,8 +246,10 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
 
     // Issues: one open, one resolved, per account.
     const firstSite = await systemDb.serviceLocation.findFirstOrThrow({ where: { organizationId: orgId, customerId: customer.id }, select: { id: true } })
-    await systemDb.issue.create({ data: { organizationId: orgId, serviceLocationId: firstSite.id, reportedById: staff.supervisorIds[0], source: "STAFF", title: "Supply shortage", description: "Running low on paper towels at this site.", status: "OPEN" } })
-    await systemDb.issue.create({ data: { organizationId: orgId, serviceLocationId: firstSite.id, reportedById: staff.managerId, source: "INSPECTION", title: "Entry mat replaced", description: "Worn entry mat flagged and replaced.", status: "RESOLVED", resolvedAt: new Date(now.getTime() - 2 * DAY) } })
+    // An OPEN issue past its deadline, assigned → escalation has something to act on (Phase 30).
+    await systemDb.issue.create({ data: { organizationId: orgId, serviceLocationId: firstSite.id, reportedById: staff.supervisorIds[0], assignedToId: staff.cleanerIds[0], source: "STAFF", category: "SUPPLIES", severity: "MEDIUM", title: "Supply shortage", description: "Running low on paper towels at this site.", status: "OPEN", ackDeadline: new Date(now.getTime() - 6 * 3600_000), resolveDeadline: new Date(now.getTime() - 2 * 3600_000), escalationLevel: 1 } })
+    // A RESOLVED issue awaiting verification by someone other than the resolver.
+    await systemDb.issue.create({ data: { organizationId: orgId, serviceLocationId: firstSite.id, reportedById: staff.managerId, assignedToId: staff.cleanerIds[0], source: "INSPECTION", category: "QUALITY", severity: "HIGH", title: "Entry mat replaced", description: "Worn entry mat flagged and replaced.", status: "RESOLVED", resolvedAt: new Date(now.getTime() - 2 * DAY), ackDeadline: new Date(now.getTime() - 3 * DAY), resolveDeadline: new Date(now.getTime() - 1 * DAY) } })
 
     // Invoices (commercial): one SENT, one PARTIALLY_PAID.
     if (isComm) {

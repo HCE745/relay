@@ -384,6 +384,7 @@ model Organization {
   // Customer communications (Phase 26).
   visitReminderLeadHours  Int     @default(24)
   paymentRemindersEnabled Boolean @default(true)
+  issueEscalationEnabled  Boolean @default(true)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")
@@ -436,6 +437,7 @@ model Organization {
   proposals           Proposal[]
   serviceRequests     ServiceRequest[]
   surveyResponses     SurveyResponse[]
+  issueSlaRules       IssueSlaRule[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -469,6 +471,7 @@ model User {
   uploadedPhotos  JobPhoto[]       @relation("PhotoUploader")
   reportedIssues  Issue[]          @relation("IssueReporter")
   assignedIssues  Issue[]          @relation("IssueAssignee")
+  verifiedIssues  Issue[]          @relation("IssueVerifier")
   issueComments   IssueComment[]   @relation("IssueCommentAuthor")
   inspections     Inspection[]     @relation("InspectionInspector")
   assignedLeads   Lead[]           @relation("LeadAssignee")
@@ -927,6 +930,32 @@ enum IssueStatus {
   @@schema("cleaning")
 }
 
+enum IssueSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+
+  @@schema("cleaning")
+}
+
+// Org-configurable SLA per severity (Phase 30): minutes to acknowledge + resolve.
+model IssueSlaRule {
+  id             String        @id @default(cuid())
+  organizationId String
+  severity       IssueSeverity
+  ackMinutes     Int
+  resolveMinutes Int
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, severity])
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
 model Issue {
   id                String        @id @default(cuid())
   organizationId    String
@@ -934,8 +963,10 @@ model Issue {
   serviceLocationId String?
   inspectionId      String?       @unique // at most one Issue per inspection (idempotent finalize)
   reportedById      String
-  assignedToId      String?
+  assignedToId      String? // the RESOLVER / owner
+  verifierId        String? // the VERIFIER — must differ from the resolver (Phase 30)
   category          IssueCategory @default(OTHER)
+  severity          IssueSeverity @default(MEDIUM)
   source            IssueSource   @default(STAFF)
   title             String?
   description       String
@@ -943,6 +974,13 @@ model Issue {
   acknowledgedAt    DateTime?
   resolvedAt        DateTime?
   closedAt          DateTime?
+  // SLA deadlines derived from severity at report time (Phase 30).
+  ackDeadline       DateTime?
+  resolveDeadline   DateTime?
+  escalationLevel   Int           @default(0) // 0 assignee → 1 supervisor → 2 managers → 3 owners
+  reopenCount       Int           @default(0)
+  // Externally reported (QR / occupant) — marked, data-isolated (Phase 32).
+  externalReporter  String?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
@@ -952,6 +990,7 @@ model Issue {
   inspection      Inspection?      @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
   reportedBy      User             @relation("IssueReporter", fields: [reportedById], references: [id])
   assignedTo      User?            @relation("IssueAssignee", fields: [assignedToId], references: [id])
+  verifier        User?            @relation("IssueVerifier", fields: [verifierId], references: [id])
   comments        IssueComment[]
   photos          JobPhoto[]
   workOrder       WorkOrder?       @relation("WorkOrderIssue")
@@ -1077,6 +1116,10 @@ enum NotificationEvent {
   SERVICE_SUMMARY
   PAYMENT_REMINDER
   CUSTOMER_MESSAGE
+  ISSUE_ASSIGNED
+  ISSUE_UNACKED
+  ISSUE_OVERDUE
+  ISSUE_ESCALATED
 
   @@schema("cleaning")
 }

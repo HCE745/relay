@@ -14,7 +14,7 @@ export async function getOrgSettings(orgId: string) {
       credentialExpiryLeadDays: true, blockAssignmentOnExpiredCredential: true,
       otWeeklyThresholdHours: true, otDailyThresholdHours: true, otMultiplier: true,
       uncoveredAlertLeadHours: true, missedClockInGraceMin: true,
-      visitReminderLeadHours: true, paymentRemindersEnabled: true,
+      visitReminderLeadHours: true, paymentRemindersEnabled: true, issueEscalationEnabled: true,
     },
   })
 }
@@ -66,7 +66,7 @@ export async function getContractExpiryLeadDays(orgId: string): Promise<number> 
 /** Update org workspace settings (OWNER/ADMIN only, enforced in the route). */
 export async function updateOrgSettings(
   orgId: string,
-  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string; uncoveredAlertLeadHours?: number; missedClockInGraceMin?: number },
+  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string; uncoveredAlertLeadHours?: number; missedClockInGraceMin?: number; issueEscalationEnabled?: boolean },
 ) {
   const data: Record<string, unknown> = {}
   if (input.timezone !== undefined) data.timezone = input.timezone
@@ -78,5 +78,6 @@ export async function updateOrgSettings(
   if (input.otMultiplier !== undefined) data.otMultiplier = input.otMultiplier
   if (input.uncoveredAlertLeadHours !== undefined) data.uncoveredAlertLeadHours = input.uncoveredAlertLeadHours
   if (input.missedClockInGraceMin !== undefined) data.missedClockInGraceMin = input.missedClockInGraceMin
+  if (input.issueEscalationEnabled !== undefined) data.issueEscalationEnabled = input.issueEscalationEnabled
   return systemDb.organization.update({ where: { id: orgId }, data })
 }

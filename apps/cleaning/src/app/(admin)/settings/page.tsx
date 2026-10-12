@@ -123,7 +123,7 @@ export default async function SettingsPage() {
         <Card className="p-6">
           <h2 className="mb-1 text-sm font-semibold text-slate-700">Exception alerts</h2>
           <div className="mt-3">
-            <AlertsForm uncoveredLeadHours={org?.uncoveredAlertLeadHours ?? 24} missedGraceMin={org?.missedClockInGraceMin ?? 30} />
+            <AlertsForm uncoveredLeadHours={org?.uncoveredAlertLeadHours ?? 24} missedGraceMin={org?.missedClockInGraceMin ?? 30} issueEscalationEnabled={org?.issueEscalationEnabled ?? true} />
           </div>
         </Card>
       ) : null}

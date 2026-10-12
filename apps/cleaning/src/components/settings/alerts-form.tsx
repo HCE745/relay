@@ -6,17 +6,18 @@ import { Button, Field, Input } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
 
 // Exception-alert tuning (Phase 25): uncovered-shift lead time + missed-clock-in grace.
-export function AlertsForm({ uncoveredLeadHours, missedGraceMin }: { uncoveredLeadHours: number; missedGraceMin: number }) {
+export function AlertsForm({ uncoveredLeadHours, missedGraceMin, issueEscalationEnabled }: { uncoveredLeadHours: number; missedGraceMin: number; issueEscalationEnabled: boolean }) {
   const router = useRouter()
   const [lead, setLead] = useState(String(uncoveredLeadHours))
   const [grace, setGrace] = useState(String(missedGraceMin))
+  const [escalate, setEscalate] = useState(issueEscalationEnabled)
   const [busy, setBusy] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function save() {
     setBusy(true); setSaved(false); setError(null)
-    const res = await apiSend("/api/org/settings", "PATCH", { uncoveredAlertLeadHours: Number(lead), missedClockInGraceMin: Number(grace) })
+    const res = await apiSend("/api/org/settings", "PATCH", { uncoveredAlertLeadHours: Number(lead), missedClockInGraceMin: Number(grace), issueEscalationEnabled: escalate })
     setBusy(false)
     if (!res.ok) return setError(res.error)
     setSaved(true); router.refresh()
@@ -28,6 +29,9 @@ export function AlertsForm({ uncoveredLeadHours, missedGraceMin }: { uncoveredLe
         <Field label="Alert on uncovered shifts within (hours)" htmlFor="al-lead"><Input id="al-lead" type="number" min={1} max={336} value={lead} onChange={(e) => { setLead(e.target.value); setSaved(false) }} /></Field>
         <Field label="Missed clock-in grace (minutes)" htmlFor="al-grace" hint="after scheduled start"><Input id="al-grace" type="number" min={0} max={1440} value={grace} onChange={(e) => { setGrace(e.target.value); setSaved(false) }} /></Field>
       </div>
+      <label className="flex items-center gap-2 text-sm text-slate-700">
+        <input type="checkbox" checked={escalate} onChange={(e) => { setEscalate(e.target.checked); setSaved(false) }} /> Escalate overdue issues up the chain (assignee → supervisor → manager → owner)
+      </label>
       <div className="flex items-center gap-3">
         <Button onClick={save} disabled={busy}>{busy ? "Saving…" : "Save alert settings"}</Button>
         {saved ? <span className="text-sm text-emerald-600">Saved</span> : null}

@@ -12,5 +12,5 @@ export async function PATCH(request: Request, { params }: Ctx) {
   const { id } = await params
   const body = await parseBody(assignIssueSchema, request)
   if (!body.ok) return body.response
-  return runWrite(() => assignIssue(g.orgId, id, g.userId, body.data.assigneeId))
+  return runWrite(() => assignIssue(g.orgId, id, g.userId, body.data.assigneeId, body.data.reason))
 }

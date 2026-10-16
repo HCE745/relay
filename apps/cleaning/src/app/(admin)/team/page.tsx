@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session"
 import { canManageTeam, assignableRoles } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { listUsers } from "@/lib/data/users"
+import { countUserHeldItems } from "@/lib/data/custody"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, EmptyState } from "@/components/ui/controls"
 import { UsersIcon } from "@/components/ui/icons"
@@ -34,6 +35,11 @@ export default async function TeamPage() {
 
   const users = await listUsers(session.organizationId)
   const roles = assignableRoles(session.role)
+  // Custody held-counts, so offboarding sees who still holds keys/assets (Phase 36).
+  const showHolds = await orgHasCapability(session.organizationId, "operations.accessControl")
+  const heldCounts = showHolds
+    ? Object.fromEntries(await Promise.all(users.map(async (u) => [u.id, await countUserHeldItems(session.organizationId, u.id)] as const)))
+    : {}
 
   return (
     <div>
@@ -55,6 +61,7 @@ export default async function TeamPage() {
                 <th className="px-4 py-2.5 font-medium">Email</th>
                 <th className="px-4 py-2.5 font-medium">Role</th>
                 <th className="px-4 py-2.5 font-medium">Code</th>
+                {showHolds ? <th className="px-4 py-2.5 font-medium">Holds</th> : null}
                 <th className="px-4 py-2.5 font-medium">Status</th>
                 <th className="px-4 py-2.5 font-medium"></th>
               </tr>
@@ -66,6 +73,15 @@ export default async function TeamPage() {
                   <td className="px-4 py-3 text-slate-600">{u.email}</td>
                   <td className="px-4 py-3 text-slate-600">{ROLE_LABEL[u.role] ?? u.role}</td>
                   <td className="px-4 py-3 text-slate-500">{u.employeeProfile?.employeeCode ?? "-"}</td>
+                  {showHolds ? (
+                    <td className="px-4 py-3">
+                      {heldCounts[u.id] ? (
+                        <a href="/access/outstanding" className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.isActive ? "bg-amber-50 text-amber-700" : "bg-red-50 text-red-700"}`} title="Holds keys/assets; check in before offboarding">
+                          {heldCounts[u.id]} held
+                        </a>
+                      ) : <span className="text-xs text-slate-400">-</span>}
+                    </td>
+                  ) : null}
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}

@@ -125,8 +125,19 @@ export function UserRowActions({ user, roles, canManage }: { user: TeamUser; rol
 
   async function toggleActive() {
     setBusy(true)
-    await apiSend(`/api/team/${user.id}`, "PATCH", { isActive: !user.isActive })
+    const res = await apiSend(`/api/team/${user.id}`, "PATCH", { isActive: !user.isActive })
     setBusy(false)
+    if (res.ok) { router.refresh(); return }
+    // Blocked because they still hold keys/assets: an owner/admin can override by
+    // giving a reason, which marks those items unrecovered.
+    const blocked = typeof res.error === "string" && res.error.toLowerCase().includes("override")
+    if (!user.isActive || !blocked) { alert(res.error); return }
+    const reason = window.prompt(`${res.error}\n\nTo deactivate anyway, enter a reason (this marks their items unrecovered):`)
+    if (!reason || !reason.trim()) return
+    setBusy(true)
+    const retry = await apiSend(`/api/team/${user.id}`, "PATCH", { isActive: false, custodyOverride: true, custodyOverrideReason: reason.trim() })
+    setBusy(false)
+    if (!retry.ok) { alert(retry.error); return }
     router.refresh()
   }
 

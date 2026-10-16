@@ -19,6 +19,7 @@ import { JobActions } from "@/components/jobs/job-actions"
 import { InspectButton } from "@/components/inspections/inspect-button"
 import { ChangeOrdersPanel } from "@/components/work-orders/change-orders-panel"
 import { listChangeOrders } from "@/lib/data/change-orders"
+import { listJobCustody } from "@/lib/data/custody"
 
 export const dynamic = "force-dynamic"
 
@@ -63,6 +64,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   // Billable extras (Phase 20) — managers only, gated by capability.
   const showExtras = canManage && (await orgHasCapability(orgId, "operations.workOrders"))
   const changeOrders = showExtras ? await listChangeOrders(orgId, { jobId: id }) : []
+
+  // Access items checked out for this job (Phase 36), gated by capability.
+  const showCustody = await orgHasCapability(orgId, "operations.accessControl")
+  const custodyItems = showCustody ? await listJobCustody(orgId, id) : []
 
   return (
     <div className="space-y-6">
@@ -144,6 +149,23 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           jobId={job.id}
           changeOrders={changeOrders.map((co) => ({ id: co.id, description: co.description, amount: co.amount.toFixed(2), status: co.status, requiresCustomerApproval: co.requiresCustomerApproval, approvedByPortal: co.approvedByPortal }))}
         />
+      ) : null}
+
+      {showCustody && custodyItems.length > 0 ? (
+        <Card className="p-5">
+          <h2 className="mb-3 text-sm font-semibold text-slate-700">Access items checked out for this job</h2>
+          <ul className="divide-y divide-slate-100">
+            {custodyItems.map((e) => (
+              <li key={e.id} className="flex items-center justify-between py-2.5 text-sm">
+                <div>
+                  <span className="font-medium text-slate-800">{e.accessItem ? e.accessItem.identifier : e.asset?.name}</span>
+                  {e.accessItem ? <span className="ml-2 text-xs text-slate-400">{e.accessItem.status === "ISSUED" ? "still out" : e.accessItem.status.toLowerCase()}</span> : null}
+                </div>
+                <span className="text-xs text-slate-500">to {e.holder?.name ?? "someone"} · {DateTime.fromJSDate(e.createdAt, { zone: jtz }).toFormat("MMM d, h:mm a")}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
       ) : null}
 
       {/* Time entries */}

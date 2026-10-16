@@ -12,5 +12,5 @@ export async function PATCH(request: Request, { params }: Ctx) {
   const { id } = await params
   const body = await parseBody(userUpdateSchema, request)
   if (!body.ok) return body.response
-  return runWrite(() => updateUser(g.orgId, g.session.role, id, body.data))
+  return runWrite(() => updateUser(g.orgId, g.session.role, id, body.data, g.session.userId))
 }

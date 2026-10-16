@@ -387,6 +387,11 @@ async function seedExtras(
       select: { id: true },
     })
     await systemDb.assetMaintenance.create({ data: { assetId: asset.id, date: days(-45), type: "Routine service", cost: "180.00", notes: "Filters replaced; pads rotated.", performedById: staff.supervisorIds[0] } })
+    // One active asset is checked out to a cleaner (an outstanding asset + custody history).
+    if (a.name.startsWith("Backpack vacuum")) {
+      await systemDb.asset.updateMany({ where: { id: asset.id }, data: { custodyUserId: cleaner, custodySince: days(-2) } })
+      await systemDb.custodyEvent.create({ data: { organizationId: orgId, assetId: asset.id, action: "CHECKED_OUT", holderUserId: cleaner, notes: "Taken for the nightly route", recordedById: staff.supervisorIds[0], createdAt: days(-2) } })
+    }
     if (a.status === "MAINTENANCE") {
       await systemDb.assetMaintenance.create({ data: { assetId: asset.id, date: days(-3), type: "Repair", cost: "640.00", notes: "Brake service, in shop.", performedById: staff.managerId } })
       // Asset-linked issue history (Phase 34): the problem that sent it to the shop.
@@ -401,9 +406,19 @@ async function seedExtras(
   await systemDb.siteCredentialRequirement.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "BACKGROUND_CHECK" } })
 
   // ── Access items (keys/fobs/badges — NO codes; ACCESS_ENCRYPTION_KEY unset) ──
-  await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "KEY", identifier: "Front door key #3", status: "ISSUED", holderUserId: cleaner, description: "Main entrance" } })
-  await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "FOB", identifier: "Elevator fob A", status: "AVAILABLE" } })
+  // Front door key: checked out to a cleaner 3 days ago (an outstanding item).
+  const frontKey = await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "KEY", identifier: "Front door key #3", status: "ISSUED", holderUserId: cleaner, heldSince: days(-3), description: "Main entrance" }, select: { id: true } })
+  await systemDb.custodyEvent.create({ data: { organizationId: orgId, accessItemId: frontKey.id, action: "CHECKED_OUT", holderUserId: cleaner, serviceLocationId: commSite.id, notes: "Nightly route", recordedById: staff.supervisorIds[0], createdAt: days(-3) } })
+  // Elevator fob: checked out then transferred between two cleaners (custody chain).
+  const fob = await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "FOB", identifier: "Elevator fob A", status: "ISSUED", holderUserId: cleaner2, heldSince: days(-1) }, select: { id: true } })
+  await systemDb.custodyEvent.create({ data: { organizationId: orgId, accessItemId: fob.id, action: "CHECKED_OUT", holderUserId: cleaner, serviceLocationId: commSite.id, recordedById: staff.supervisorIds[0], createdAt: days(-2) } })
+  await systemDb.custodyEvent.create({ data: { organizationId: orgId, accessItemId: fob.id, action: "TRANSFERRED", fromUserId: cleaner, holderUserId: cleaner2, serviceLocationId: commSite.id, notes: "Shift handoff", recordedById: staff.supervisorIds[0], createdAt: days(-1) } })
+  // A visitor badge, available. And a key that was lost and re-cut (replacement chain).
   await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "BADGE", identifier: "Visitor badge 12", status: "AVAILABLE" } })
+  const lostKey = await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "KEY", identifier: "Side door key #1", status: "LOST", description: "Reported lost on site" }, select: { id: true } })
+  await systemDb.custodyEvent.create({ data: { organizationId: orgId, accessItemId: lostKey.id, action: "REPORTED_LOST", fromUserId: cleaner, serviceLocationId: commSite.id, notes: "Could not locate after shift", recordedById: staff.managerId, createdAt: days(-5) } })
+  const recut = await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "KEY", identifier: "Side door key #2", status: "AVAILABLE", replacesId: lostKey.id, description: "Re-cut replacement" }, select: { id: true } })
+  await systemDb.custodyEvent.create({ data: { organizationId: orgId, accessItemId: recut.id, action: "REPLACED", serviceLocationId: commSite.id, notes: "Replaces Side door key #1", recordedById: staff.managerId, createdAt: days(-4) } })
 
   // ── Coverage: an upcoming job whose assigned cleaner is unavailable → NEEDS COVERAGE ──
   // Anchor to tomorrow's UTC midnight so the job's date and the availability day

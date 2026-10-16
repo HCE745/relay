@@ -11,9 +11,10 @@ const SECRET_TYPES = new Set(["CODE", "ALARM_CODE"])
 // Public projection — NEVER selects secretCiphertext.
 const listSelect = {
   id: true, type: true, identifier: true, description: true, status: true, serviceLocationId: true,
-  holderUserId: true, secretCiphertext: true, createdAt: true,
+  holderUserId: true, heldSince: true, secretCiphertext: true, createdAt: true,
   serviceLocation: { select: { name: true } },
   holder: { select: { id: true, name: true } },
+  replaces: { select: { id: true, identifier: true } },
 } as const
 
 export async function listAccessItems(orgId: string) {

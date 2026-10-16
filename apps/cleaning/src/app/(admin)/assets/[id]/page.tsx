@@ -5,13 +5,16 @@ import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getAsset } from "@/lib/data/assets"
 import { listAssetIssues } from "@/lib/data/issues"
+import { listCheckoutJobs } from "@/lib/data/custody"
 import { listAllSites } from "@/lib/data/service-locations"
 import { DateTime } from "luxon"
 import { listUsers } from "@/lib/data/users"
+import { getOrgTimezone } from "@/lib/data/org"
 import { formatMoney } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, StatusBadge, type BadgeTone } from "@/components/ui/controls"
 import { EditAssetButton, AddMaintenanceButton } from "@/components/assets/asset-dialogs"
+import { AssetCustodyPanel } from "@/components/custody/asset-custody-panel"
 
 export const dynamic = "force-dynamic"
 const CAP = "assets.management"
@@ -36,10 +39,15 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
   }
 
   const { id } = await params
-  const [asset, sites, users, issues] = await Promise.all([getAsset(orgId, id), listAllSites(orgId), listUsers(orgId), listAssetIssues(orgId, id)])
+  const showCustody = await orgHasCapability(orgId, "operations.accessControl")
+  const [asset, sites, users, issues, jobRows, tz] = await Promise.all([
+    getAsset(orgId, id), listAllSites(orgId), listUsers(orgId), listAssetIssues(orgId, id),
+    showCustody ? listCheckoutJobs(orgId) : Promise.resolve([]), getOrgTimezone(orgId),
+  ])
   if (!asset) notFound()
   const siteOpts = sites.map((s) => ({ id: s.id, name: s.name }))
   const userOpts = users.filter((u) => u.isActive).map((u) => ({ id: u.id, name: u.name }))
+  const jobOpts = jobRows.map((j) => ({ id: j.id, label: `${j.title} (${DateTime.fromJSDate(j.scheduledStart, { zone: tz }).toFormat("MMM d")})` }))
 
   return (
     <div className="space-y-6">
@@ -70,6 +78,19 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
         <Detail label="Assigned to site" value={asset.assignedToSite?.name || "-"} />
         <Detail label="Assigned to person" value={asset.assignedToUser?.name || "-"} />
       </Card>
+
+      {showCustody ? (
+        <Card className="p-5">
+          <h2 className="mb-3 text-sm font-semibold text-slate-700">Custody</h2>
+          <AssetCustodyPanel
+            assetId={asset.id}
+            holder={asset.custodyHolder ? { name: asset.custodyHolder.name } : null}
+            since={asset.custodySince ? asset.custodySince.toISOString() : null}
+            members={userOpts}
+            jobs={jobOpts}
+          />
+        </Card>
+      ) : null}
 
       <Card className="p-5">
         <div className="mb-3 flex items-center justify-between">

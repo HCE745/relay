@@ -33,6 +33,7 @@ export function getAsset(orgId: string, id: string) {
     include: {
       assignedToSite: { select: { id: true, name: true } },
       assignedToUser: { select: { id: true, name: true } },
+      custodyHolder: { select: { id: true, name: true } },
       maintenance: { orderBy: { date: "desc" }, include: { performedBy: { select: { name: true } } } },
     },
   })

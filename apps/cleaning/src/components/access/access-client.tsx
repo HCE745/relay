@@ -5,10 +5,23 @@ import { useRouter } from "next/navigation"
 import { Button, Card, Field, Input, Select, StatusBadge, type BadgeTone } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
 import { ACCESS_ITEM_TYPES } from "@/lib/zod-schemas"
+import { CustodyHistory } from "@/components/custody/custody-history"
 
 type Site = { id: string; name: string }
 type Member = { id: string; name: string }
-type Item = { id: string; type: string; identifier: string; description: string | null; status: string; serviceLocation: { name: string } | null; holder: { id: string; name: string } | null; hasSecret: boolean }
+type JobOpt = { id: string; label: string }
+type Item = { id: string; type: string; identifier: string; description: string | null; status: string; serviceLocation: { name: string } | null; holder: { id: string; name: string } | null; heldSince: string | Date | null; replaces: { id: string; identifier: string } | null; hasSecret: boolean }
+
+// Compact "how long held" from a checkout timestamp.
+function heldFor(since: string | Date | null): string | null {
+  if (!since) return null
+  const ms = Date.now() - new Date(since).getTime()
+  if (ms < 0) return null
+  const h = Math.floor(ms / 3_600_000)
+  if (h < 1) return `${Math.max(1, Math.floor(ms / 60_000))}m`
+  if (h < 48) return `${h}h`
+  return `${Math.floor(h / 24)}d`
+}
 
 const TYPE_LABEL: Record<string, string> = { KEY: "Key", FOB: "Fob", CODE: "Code", BADGE: "Badge", ALARM_CODE: "Alarm code" }
 const STATUS_TONE: Record<string, BadgeTone> = { AVAILABLE: "neutral", ISSUED: "info", LOST: "danger", RETURNED: "success" }
@@ -55,20 +68,22 @@ function AddItem({ sites }: { sites: Site[] }) {
   )
 }
 
-function ItemRow({ item, members }: { item: Item; members: Member[] }) {
+function ItemRow({ item, members, jobs }: { item: Item; members: Member[]; jobs: JobOpt[] }) {
   const router = useRouter()
-  const [issueOpen, setIssueOpen] = useState(false)
+  const [panel, setPanel] = useState<null | "out" | "transfer">(null)
   const [toUser, setToUser] = useState(members[0]?.id ?? "")
+  const [jobId, setJobId] = useState("")
+  const [notes, setNotes] = useState("")
   const [revealed, setRevealed] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function act(action: "issue" | "return" | "lost", userId?: string) {
+  async function custody(action: string, extra: Record<string, unknown> = {}) {
     setBusy(true); setError(null)
-    const res = await apiSend(`/api/access-items/${item.id}`, "POST", { action, userId })
+    const res = await apiSend("/api/custody", "POST", { kind: "ACCESS", itemId: item.id, action, ...extra })
     setBusy(false)
     if (!res.ok) return setError(res.error)
-    setIssueOpen(false); router.refresh()
+    setPanel(null); setNotes(""); setJobId(""); router.refresh()
   }
   async function reveal() {
     setBusy(true); setError(null); setRevealed(null)
@@ -77,50 +92,87 @@ function ItemRow({ item, members }: { item: Item; members: Member[] }) {
     if (!res.ok) return setError(res.error)
     setRevealed(res.data.secret)
   }
+  function reportLost() {
+    if (!confirm("Report this item lost? It will be removed from its holder and marked lost.")) return
+    const note = window.prompt("Notes (optional): what happened?") ?? undefined
+    custody("REPORTED_LOST", { notes: note })
+  }
+  function replace() {
+    const identifier = window.prompt("Identifier for the replacement item (e.g. Front door key #4):")
+    if (!identifier || !identifier.trim()) return
+    custody("REPLACED", { identifier: identifier.trim() })
+  }
 
+  const held = heldFor(item.heldSince)
   return (
-    <tr className="hover:bg-slate-50">
+    <tr className="hover:bg-slate-50 align-top">
       <td className="px-4 py-3">
         <div className="font-medium text-slate-900">{item.identifier}</div>
         {item.description ? <div className="text-xs text-slate-500">{item.description}</div> : null}
+        {item.replaces ? <div className="text-xs text-slate-400">Replaces {item.replaces.identifier}</div> : null}
         {revealed ? (
           <div className="mt-1 inline-flex items-center gap-2 rounded-lg bg-amber-50 px-2 py-1 font-mono text-sm text-amber-900">
             {revealed}
             <button onClick={() => setRevealed(null)} className="text-amber-500 hover:text-amber-700" aria-label="Hide">✕</button>
           </div>
         ) : null}
+        <div className="mt-1"><CustodyHistory kind="ACCESS" itemId={item.id} /></div>
         {error ? <div className="mt-1 text-xs text-red-600">{error}</div> : null}
       </td>
       <td className="px-4 py-3 text-slate-600">{TYPE_LABEL[item.type] ?? item.type}</td>
       <td className="px-4 py-3 text-slate-600">{item.serviceLocation?.name ?? "-"}</td>
       <td className="px-4 py-3"><StatusBadge tone={STATUS_TONE[item.status] ?? "neutral"}>{item.status}</StatusBadge></td>
-      <td className="px-4 py-3 text-slate-600">{item.holder?.name ?? "-"}</td>
+      <td className="px-4 py-3 text-slate-600">{item.holder?.name ?? "-"}{held ? <span className="ml-1 text-xs text-slate-400">({held})</span> : null}</td>
       <td className="px-4 py-3">
-        <div className="flex flex-wrap items-center justify-end gap-1.5">
-          {item.hasSecret ? <Button size="sm" variant="secondary" onClick={reveal} disabled={busy}>Reveal</Button> : null}
-          {issueOpen ? (
-            <>
-              <Select value={toUser} onChange={(e) => setToUser(e.target.value)} className="w-36">{members.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}</Select>
-              <Button size="sm" onClick={() => act("issue", toUser)} disabled={busy || !toUser}>Confirm</Button>
-              <Button size="sm" variant="ghost" onClick={() => setIssueOpen(false)}>Cancel</Button>
-            </>
-          ) : (
-            <>
-              {item.status !== "LOST" ? <Button size="sm" variant="secondary" onClick={() => setIssueOpen(true)}>Issue</Button> : null}
-              {item.holder ? <Button size="sm" variant="secondary" onClick={() => act("return")} disabled={busy}>Return</Button> : null}
-              {item.status !== "LOST" ? <Button size="sm" variant="danger" onClick={() => act("lost")} disabled={busy}>Lost</Button> : null}
-            </>
-          )}
-        </div>
+        {panel === "out" ? (
+          <div className="flex flex-col items-end gap-1.5">
+            <Select value={toUser} onChange={(e) => setToUser(e.target.value)} className="w-44">{members.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}</Select>
+            <Select value={jobId} onChange={(e) => setJobId(e.target.value)} className="w-44"><option value="">No job (standing hold)</option>{jobs.map((j) => (<option key={j.id} value={j.id}>{j.label}</option>))}</Select>
+            <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes (optional)" className="w-44" />
+            <div className="flex gap-1.5">
+              <Button size="sm" onClick={() => custody("CHECKED_OUT", { toUserId: toUser, jobId: jobId || undefined, notes: notes || undefined })} disabled={busy || !toUser}>Check out</Button>
+              <Button size="sm" variant="ghost" onClick={() => setPanel(null)}>Cancel</Button>
+            </div>
+          </div>
+        ) : panel === "transfer" ? (
+          <div className="flex flex-col items-end gap-1.5">
+            <Select value={toUser} onChange={(e) => setToUser(e.target.value)} className="w-44">{members.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}</Select>
+            <div className="flex gap-1.5">
+              <Button size="sm" onClick={() => custody("TRANSFERRED", { toUserId: toUser })} disabled={busy || !toUser}>Transfer</Button>
+              <Button size="sm" variant="ghost" onClick={() => setPanel(null)}>Cancel</Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            {item.hasSecret ? <Button size="sm" variant="secondary" onClick={reveal} disabled={busy}>Reveal</Button> : null}
+            {item.status === "LOST" ? (
+              <Button size="sm" onClick={replace} disabled={busy}>Replace</Button>
+            ) : item.holder ? (
+              <>
+                <Button size="sm" variant="secondary" onClick={() => custody("CHECKED_IN")} disabled={busy}>Check in</Button>
+                <Button size="sm" variant="secondary" onClick={() => setPanel("transfer")}>Transfer</Button>
+                <Button size="sm" variant="danger" onClick={reportLost} disabled={busy}>Lost</Button>
+              </>
+            ) : (
+              <>
+                <Button size="sm" variant="secondary" onClick={() => setPanel("out")}>Check out</Button>
+                <Button size="sm" variant="danger" onClick={reportLost} disabled={busy}>Lost</Button>
+              </>
+            )}
+          </div>
+        )}
       </td>
     </tr>
   )
 }
 
-export function AccessClient({ sites, members, items }: { sites: Site[]; members: Member[]; items: Item[] }) {
+export function AccessClient({ sites, members, items, jobs }: { sites: Site[]; members: Member[]; items: Item[]; jobs: JobOpt[] }) {
   return (
     <div className="space-y-5">
-      <div className="flex justify-end"><AddItem sites={sites} /></div>
+      <div className="flex items-center justify-between">
+        <a href="/access/outstanding" className="text-sm font-medium text-brand hover:underline">Outstanding items report →</a>
+        <AddItem sites={sites} />
+      </div>
       {items.length === 0 ? (
         <Card className="p-6 text-center text-sm text-slate-500">No access items yet. Add keys, fobs, badges or codes per site.</Card>
       ) : (
@@ -130,7 +182,7 @@ export function AccessClient({ sites, members, items }: { sites: Site[]; members
               <tr><th className="px-4 py-2.5 font-medium">Item</th><th className="px-4 py-2.5 font-medium">Type</th><th className="px-4 py-2.5 font-medium">Site</th><th className="px-4 py-2.5 font-medium">Status</th><th className="px-4 py-2.5 font-medium">Holder</th><th className="px-4 py-2.5 text-right font-medium">Actions</th></tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {items.map((i) => <ItemRow key={i.id} item={i} members={members} />)}
+              {items.map((i) => <ItemRow key={i.id} item={i} members={members} jobs={jobs} />)}
             </tbody>
           </table>
         </Card>

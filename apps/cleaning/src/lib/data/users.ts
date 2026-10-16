@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs"
 import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound, ForbiddenActionError, ConflictError } from "./errors"
+import { countUserHeldItems, markUnrecoveredForUser } from "./custody"
 import type { z } from "zod"
 import type { userCreateSchema, userUpdateSchema } from "../zod-schemas"
 
@@ -64,12 +65,31 @@ export async function createUser(orgId: string, actorRole: string, input: Create
   }
 }
 
-export async function updateUser(orgId: string, actorRole: string, id: string, input: UpdateInput) {
+export async function updateUser(orgId: string, actorRole: string, id: string, input: UpdateInput, actorUserId?: string) {
   const db = orgDb(orgId)
   const existing = await db.user.findFirst({ where: { id }, select: { id: true, role: true } })
   if (!existing) return null
   assertCanManageTarget(actorRole, existing.role)
   if (input.role) assertCanAssign(actorRole, input.role)
+
+  // Offboarding guard (Phase 36): do not deactivate someone who still holds keys
+  // or assets. Keys are a security matter: check them in or transfer them first.
+  // An OWNER/ADMIN can override (for someone who quit without returning them),
+  // which marks those items unrecovered and records the reason.
+  if (input.isActive === false) {
+    const held = await countUserHeldItems(orgId, id)
+    if (held > 0) {
+      if (!input.custodyOverride) {
+        throw new ForbiddenActionError(`This person still holds ${held} access ${held === 1 ? "item/asset" : "items/assets"}. Check them in or transfer them first, or an owner/admin can override.`)
+      }
+      if (actorRole !== "OWNER" && actorRole !== "ADMIN") {
+        throw new ForbiddenActionError("Only an owner or admin can override the custody block.")
+      }
+      const reason = input.custodyOverrideReason?.trim()
+      if (!reason) throw new ForbiddenActionError("A reason is required to override and deactivate.")
+      await markUnrecoveredForUser(orgId, id, reason, actorUserId ?? id)
+    }
+  }
 
   const userData: Record<string, unknown> = {}
   if (input.name !== undefined) userData.name = input.name

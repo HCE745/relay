@@ -317,6 +317,20 @@ enum AccessItemStatus {
   @@schema("cleaning")
 }
 
+// Custody chain of custody for keys/fobs/badges and assets (Phase 36). Every
+// movement is a permanent event; current holder is denormalized onto the item
+// for at-a-glance lists and the outstanding report.
+enum CustodyAction {
+  CHECKED_OUT
+  CHECKED_IN
+  TRANSFERRED
+  REPORTED_LOST
+  REPLACED
+  NOT_RETURNED // employee left holding it; owner/admin override at offboarding
+
+  @@schema("cleaning")
+}
+
 // Accounting / payroll CSV exports (Phase 15).
 enum ExportType {
   QBO_INVOICES
@@ -444,6 +458,7 @@ model Organization {
   issueSlaRules       IssueSlaRule[]
   issueRoutingRules   IssueRoutingRule[]
   qrCodes             QrCode[]
+  custodyEvents       CustodyEvent[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -483,6 +498,10 @@ model User {
   inspections     Inspection[]     @relation("InspectionInspector")
   assignedLeads   Lead[]           @relation("LeadAssignee")
   assignedAssets       Asset[]            @relation("AssetUser")
+  custodyAssets        Asset[]            @relation("AssetCustody")
+  custodyHeld          CustodyEvent[]     @relation("CustodyHolder")
+  custodyFrom          CustodyEvent[]     @relation("CustodyFromUser")
+  custodyRecorded      CustodyEvent[]     @relation("CustodyRecorder")
   performedMaintenance AssetMaintenance[] @relation("MaintenancePerformer")
   recordedSupplyUsages SupplyUsage[]      @relation("SupplyUsageRecorder")
   supplyAdjustments    SupplyAdjustment[] @relation("SupplyAdjuster")
@@ -625,6 +644,7 @@ model ServiceLocation {
   issues       Issue[]
   routingRules IssueRoutingRule[]
   qrCodes      QrCode[]
+  custodyEvents CustodyEvent[]
   inspections  Inspection[]
   assets       Asset[]       @relation("AssetSite")
   supplyUsages SupplyUsage[] @relation("SupplyUsageSite")
@@ -753,6 +773,7 @@ model Job {
   timeEntries     TimeEntry[]
   photos          JobPhoto[]
   issues          Issue[]
+  custodyEvents   CustodyEvent[]
   inspections     Inspection[]
   invoiceLines    InvoiceLine[]
   supplyUsages    SupplyUsage[]
@@ -2070,6 +2091,9 @@ model AccessItem {
   description       String?
   status            AccessItemStatus @default(AVAILABLE)
   holderUserId      String?
+  heldSince         DateTime? // when the current holder took it (for "how long out"); null when not out (Phase 36)
+  custodyNotReturned Boolean  @default(false) // holder left without returning it (offboarding override); stays outstanding, flagged
+  replacesId        String?   @unique // this item was cut to replace a lost one — the chain stays intact (Phase 36)
   secretCiphertext  String? // AES-256-GCM blob for CODE/ALARM_CODE; never listed
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
@@ -2077,9 +2101,46 @@ model AccessItem {
   organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   serviceLocation ServiceLocation @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
   holder          User?           @relation("AccessHolder", fields: [holderUserId], references: [id])
+  replaces        AccessItem?     @relation("AccessReplacement", fields: [replacesId], references: [id], onDelete: SetNull)
+  replacedBy      AccessItem?     @relation("AccessReplacement")
+  custodyEvents   CustodyEvent[]
 
   @@index([organizationId])
   @@index([serviceLocationId])
+  @@schema("cleaning")
+}
+
+// One permanent custody movement for an AccessItem or an Asset (Phase 36). The
+// item reference is exactly one of accessItemId / assetId. holderUserId is who
+// holds it AFTER this event (null for check-in / lost / replaced); fromUserId is
+// the giver on a transfer (or the returner on a check-in). Mirrored to
+// AuditEvent for the permanent security record.
+model CustodyEvent {
+  id                String        @id @default(cuid())
+  organizationId    String
+  accessItemId      String?
+  assetId           String?
+  action            CustodyAction
+  holderUserId      String? // who holds it after this event
+  fromUserId        String? // giver (TRANSFERRED) / returner (CHECKED_IN)
+  jobId             String? // set when checked out for specific scheduled work
+  serviceLocationId String?
+  notes             String?
+  recordedById      String
+  createdAt         DateTime      @default(now())
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  accessItem      AccessItem?      @relation(fields: [accessItemId], references: [id], onDelete: Cascade)
+  asset           Asset?           @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  holder          User?            @relation("CustodyHolder", fields: [holderUserId], references: [id])
+  fromUser        User?            @relation("CustodyFromUser", fields: [fromUserId], references: [id])
+  job             Job?             @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
+  recordedBy      User             @relation("CustodyRecorder", fields: [recordedById], references: [id])
+
+  @@index([organizationId])
+  @@index([accessItemId])
+  @@index([assetId])
   @@schema("cleaning")
 }
 
@@ -2157,14 +2218,19 @@ model Asset {
   status           AssetStatus   @default(ACTIVE)
   assignedToSiteId String?
   assignedToUserId String?
+  custodyUserId    String? // current custody holder (checkout), distinct from long-term assignment (Phase 36)
+  custodySince     DateTime? // when the current holder checked it out
+  custodyNotReturned Boolean @default(false) // holder left without returning it (offboarding override); stays outstanding, flagged
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   assignedToSite ServiceLocation?   @relation("AssetSite", fields: [assignedToSiteId], references: [id])
   assignedToUser User?              @relation("AssetUser", fields: [assignedToUserId], references: [id])
+  custodyHolder  User?              @relation("AssetCustody", fields: [custodyUserId], references: [id])
   maintenance    AssetMaintenance[]
   issues         Issue[]
+  custodyEvents  CustodyEvent[]
 
   @@index([organizationId])
   @@index([status])

@@ -250,6 +250,19 @@ export const accessItemUpdateSchema = z.object({
 })
 export const accessIssueSchema = z.object({ userId: z.string().min(1) })
 
+// Custody actions (Phase 36). One endpoint dispatches on action; the data layer
+// enforces which fields each action needs.
+export const CUSTODY_ACTIONS = ["CHECKED_OUT", "CHECKED_IN", "TRANSFERRED", "REPORTED_LOST", "REPLACED"] as const
+export const custodyActionSchema = z.object({
+  kind: z.enum(["ACCESS", "ASSET"]),
+  itemId: z.string().min(1),
+  action: z.enum(CUSTODY_ACTIONS),
+  toUserId: z.string().optional(), // CHECKED_OUT / TRANSFERRED
+  jobId: z.string().optional().or(z.literal("").transform(() => undefined)), // optional job link on checkout
+  identifier: z.string().trim().min(1).max(200).optional(), // REPLACED: the new item's identifier
+  notes: optionalString,
+})
+
 // ─── Customer portal (Phase 16) ───
 export const portalIssueSchema = z.object({
   serviceLocationId: z.string().min(1),
@@ -419,6 +432,10 @@ export const userUpdateSchema = z.object({
   payRate: z.coerce.number().min(0).max(1_000_000).optional(),
   hireDate: z.coerce.date().optional(),
   employmentStatus: z.enum(["ACTIVE", "INACTIVE", "TERMINATED"]).optional(),
+  // Offboarding override (Phase 36): deactivate someone still holding keys/assets.
+  // OWNER/ADMIN only (enforced in the data layer); a reason is required.
+  custodyOverride: z.boolean().optional(),
+  custodyOverrideReason: optionalString,
 })
 export const setPasswordSchema = z.object({ password })
 

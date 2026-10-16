@@ -6,7 +6,8 @@ import { STEPS, type Step } from "./steps"
 
 // Guided demo tour engine. Mounted in the admin layout, demo-only. Spotlights a
 // real element per step, shows a short tooltip, persists position across
-// navigation (sessionStorage), and is dismissible/restartable. Hand-rolled (no
+// navigation (sessionStorage) while active, and closes cleanly on dismiss with
+// no leftover step state (the "Take the tour" button reopens from step 1). Hand-rolled (no
 // tour library) to match the app's light design and avoid a new dependency.
 
 const SK_DISMISSED = "cln-tour-dismissed"
@@ -103,11 +104,12 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
     }
   }, [isDemo])
 
-  // Restart from the persistent "Take the tour" button.
+  // The persistent "Take the tour" entry point ALWAYS starts fresh from step 1.
   useEffect(() => {
     function onClick(e: MouseEvent) {
-      if ((e.target as HTMLElement).closest("[data-action='restart-cln-tour']")) {
+      if ((e.target as HTMLElement).closest("[data-action='start-cln-tour']")) {
         ssSet(SK_DISMISSED, "")
+        ssSet(SK_STARTED, "1")
         ssSet(SK_STEP, "0")
         setIdx(0)
         setRect(null)
@@ -152,7 +154,16 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
     return () => { window.removeEventListener("scroll", update, true); window.removeEventListener("resize", update) }
   }, [step?.selector])
 
-  const dismiss = useCallback(() => { ssSet(SK_DISMISSED, "1"); setPhase("hidden"); setRect(null) }, [])
+  // Dismissing CLOSES the tour (it is not pausing): mark it done and clear the
+  // step state so there is nothing to resume. The banner's "Take the tour"
+  // entry point reopens it from step 1.
+  const dismiss = useCallback(() => {
+    ssSet(SK_DISMISSED, "1")
+    ssSet(SK_STEP, "0")
+    setIdx(0)
+    setPhase("hidden")
+    setRect(null)
+  }, [])
   const go = useCallback((n: number) => { setIdx(n); ssSet(SK_STEP, String(n)); setRect(null) }, [])
   const next = useCallback(() => { if (isLast) dismiss(); else go(idx + 1) }, [isLast, idx, go, dismiss])
   const prev = useCallback(() => { if (idx > 0) go(idx - 1) }, [idx, go])

@@ -33,7 +33,22 @@ type ApprovedEntry = {
   breakMinutes: number
   approvedPayRate: Money | null
   approvedPayType: string | null
-  user: { employeeProfile: { payRate: Money | null; payType: string | null } | null }
+  user: { id: string; employeeProfile: { payRate: Money | null; payType: string | null } | null }
+}
+
+type JobEarningRow = { userId: string; amount: Money }
+
+/**
+ * Labor cost folding in commission (Phase 37): a worker with a computed earning
+ * is costed by that earning, NOT their hours (no double count). Hourly workers
+ * keep the time-based cost. `known` stays false if any non-commission worker is
+ * salaried/unknown; an all-commission job is fully known.
+ */
+function jobLaborWithCommission(entries: ApprovedEntry[], earnings: JobEarningRow[]): { known: boolean; labor: Money; salaried: boolean } {
+  const commissionUsers = new Set(earnings.map((e) => e.userId))
+  const hourly = jobLabor(entries.filter((e) => !commissionUsers.has(e.user.id)))
+  const commission = earnings.reduce((a, e) => a.plus(e.amount), ZERO)
+  return { known: hourly.known, labor: hourly.labor.plus(commission), salaried: hourly.salaried }
 }
 
 /** Job labor: total known (hourly) cost, whether it is fully known, and whether any salaried time is present. */
@@ -123,9 +138,10 @@ export async function getProfitability(
           breakMinutes: true,
           approvedPayRate: true,
           approvedPayType: true,
-          user: { select: { employeeProfile: { select: { payRate: true, payType: true } } } },
+          user: { select: { id: true, employeeProfile: { select: { payRate: true, payType: true } } } },
         },
       },
+      earnings: { where: { status: "CALCULATED" }, select: { userId: true, amount: true } },
       invoiceLines: { where: { activeJobId: { not: null } }, select: { amount: true } },
       supplyUsages: { select: { quantity: true, costPerUnit: true } },
     },
@@ -142,7 +158,7 @@ export async function getProfitability(
 
     const billed = job.invoiceLines.reduce((a, l) => a.plus(l.amount), ZERO)
     const invoiced = job.invoiceLines.length > 0
-    const { known, labor } = jobLabor(job.timeEntries)
+    const { known, labor } = jobLaborWithCommission(job.timeEntries, job.earnings)
     const supplies = jobSupplies(job.supplyUsages)
 
     summaryInputs.push({ invoiced, laborKnown: known, billed, labor, supplies })
@@ -181,9 +197,10 @@ export async function getJobProfitability(orgId: string, jobId: string) {
           breakMinutes: true,
           approvedPayRate: true,
           approvedPayType: true,
-          user: { select: { employeeProfile: { select: { payRate: true, payType: true } } } },
+          user: { select: { id: true, employeeProfile: { select: { payRate: true, payType: true } } } },
         },
       },
+      earnings: { where: { status: "CALCULATED" }, select: { userId: true, amount: true } },
       invoiceLines: { where: { activeJobId: { not: null } }, select: { amount: true } },
       supplyUsages: { select: { quantity: true, costPerUnit: true } },
     },
@@ -192,7 +209,7 @@ export async function getJobProfitability(orgId: string, jobId: string) {
 
   const billedAmount = job.invoiceLines.reduce((a, l) => a.plus(l.amount), ZERO)
   const invoiced = job.invoiceLines.length > 0
-  const { known, labor, salaried } = jobLabor(job.timeEntries)
+  const { known, labor, salaried } = jobLaborWithCommission(job.timeEntries, job.earnings)
   const supplies = jobSupplies(job.supplyUsages)
   const totalCost = labor.plus(supplies)
 

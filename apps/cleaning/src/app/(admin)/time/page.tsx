@@ -5,6 +5,8 @@ import { canViewSchedule, canApproveTime } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { listTimeEntries } from "@/lib/data/time-entries"
 import { getPeriodOvertime } from "@/lib/data/labor"
+import { earningsByWorker } from "@/lib/data/commission"
+import { formatMoney } from "@/lib/money"
 import { getOrgTimezone } from "@/lib/data/org"
 import { formatTimeInZone } from "@/lib/scheduling/time"
 import Link from "next/link"
@@ -49,6 +51,10 @@ export default async function TimePage({ searchParams }: { searchParams: Promise
   const overtime = await getPeriodOvertime(orgId, { start, end })
   const otUsers = overtime.byUser.filter((u) => u.otHours > 0)
 
+  // Commission/crew-based earnings in the window (Phase 37), managers only.
+  const showEarnings = canApprove && (await orgHasCapability(orgId, "workforce.commissionPay"))
+  const earners = showEarnings ? (await earningsByWorker(orgId, { start, end })).filter((e) => Number(e.total) > 0) : []
+
   const { status } = await searchParams
   const pendingOnly = status === "pending"
   const entries = pendingOnly ? all.filter((e) => e.status === "COMPLETED") : all
@@ -71,6 +77,18 @@ export default async function TimePage({ searchParams }: { searchParams: Promise
             ))}
           </ul>
           <p className="mt-1 text-xs text-amber-700">Computed from approved time against your overtime rules. Flows to the payroll export.</p>
+        </div>
+      ) : null}
+
+      {earners.length > 0 ? (
+        <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="text-sm font-semibold text-emerald-900">Commission &amp; flat earnings in this window</div>
+          <ul className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-sm text-emerald-800">
+            {earners.map((e) => (
+              <li key={e.userId}>{e.name}: <span className="font-medium">{formatMoney(e.total)}</span> <span className="text-emerald-600">({e.jobs} job{e.jobs === 1 ? "" : "s"})</span></li>
+            ))}
+          </ul>
+          <p className="mt-1 text-xs text-emerald-700">Computed from pay rules; flows to the hours + commission payroll export. Amounts for export only, not payroll processing.</p>
         </div>
       ) : null}
 

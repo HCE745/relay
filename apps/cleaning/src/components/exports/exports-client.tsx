@@ -9,6 +9,7 @@ const TYPE_LABEL: Record<string, string> = {
   QBO_INVOICES: "QuickBooks: Invoices", QBO_CUSTOMERS: "QuickBooks: Customers",
   XERO_INVOICES: "Xero: Invoices", XERO_CONTACTS: "Xero: Contacts",
   GUSTO_HOURS: "Gusto: Hours", ADP_HOURS: "ADP: Hours",
+  PAYROLL_EARNINGS: "Payroll: Hours + commission",
 }
 const fmtDT = (s: string) => new Date(s).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
 
@@ -23,7 +24,7 @@ function DownloadButton({ kind, label, from, to, periodic }: { kind: string; lab
   )
 }
 
-export function ExportsClient({ history }: { history: Row[] }) {
+export function ExportsClient({ history, showPayrollEarnings = false }: { history: Row[]; showPayrollEarnings?: boolean }) {
   const now = new Date()
   const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString().slice(0, 10)
   const today = now.toISOString().slice(0, 10)
@@ -56,8 +57,9 @@ export function ExportsClient({ history }: { history: Row[] }) {
           <div className="flex flex-wrap gap-2">
             <DownloadButton kind="GUSTO_HOURS" label="Gusto hours" from={from} to={to} periodic />
             <DownloadButton kind="ADP_HOURS" label="ADP hours" from={from} to={to} periodic />
+            {showPayrollEarnings ? <DownloadButton kind="PAYROLL_EARNINGS" label="Hours + commission" from={from} to={to} periodic /> : null}
           </div>
-          <p className="mt-3 text-xs text-slate-400">Approved time only. Overtime is left 0. The app has no OT ruleset; set OT in your payroll provider.</p>
+          <p className="mt-3 text-xs text-slate-400">Approved time only. Overtime is left 0. The app has no OT ruleset; set OT in your payroll provider.{showPayrollEarnings ? " The hours + commission export adds earnings as distinct columns (amounts for export; no tax or withholding)." : ""}</p>
         </Card>
       </div>
 

@@ -64,3 +64,21 @@ export function adpHoursCsv(rows: ExportHours[]): string {
   const headers = ["Employee ID", "Employee Name", "Regular Hours", "Overtime Hours"]
   return toCsv(headers, rows.map((r) => [r.employeeId, `${r.firstName} ${r.lastName}`.trim(), r.regularHours, r.overtimeHours]))
 }
+
+// Combined payroll earnings (Phase 37): hours AND commission/flat earnings as
+// DISTINCT columns, so a bookkeeper sees both without picking one format. This
+// is an amounts-for-export view, not payroll processing (no tax/withholding).
+export type ExportPayrollRow = {
+  employeeId: string
+  name: string
+  email: string | null
+  regularHours: string
+  overtimeHours: string
+  commissionEarnings: string // sum of CALCULATED commission/flat earnings
+  jobsWithEarnings: number
+  pendingEarnings: string // awaiting a billable amount (not yet payable)
+}
+export function payrollEarningsCsv(rows: ExportPayrollRow[]): string {
+  const headers = ["Employee ID", "Employee Name", "Email", "Regular Hours", "Overtime Hours", "Commission/Flat Earnings", "Jobs With Earnings", "Pending Earnings"]
+  return toCsv(headers, rows.map((r) => [r.employeeId, r.name, r.email, r.regularHours, r.overtimeHours, r.commissionEarnings, r.jobsWithEarnings, r.pendingEarnings]))
+}

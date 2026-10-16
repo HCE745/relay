@@ -20,6 +20,7 @@ import { InspectButton } from "@/components/inspections/inspect-button"
 import { ChangeOrdersPanel } from "@/components/work-orders/change-orders-panel"
 import { listChangeOrders } from "@/lib/data/change-orders"
 import { listJobCustody } from "@/lib/data/custody"
+import { listJobEarnings } from "@/lib/data/commission"
 
 export const dynamic = "force-dynamic"
 
@@ -68,6 +69,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   // Access items checked out for this job (Phase 36), gated by capability.
   const showCustody = await orgHasCapability(orgId, "operations.accessControl")
   const custodyItems = showCustody ? await listJobCustody(orgId, id) : []
+
+  // Commission/crew-based earnings (Phase 37), managers only, gated by capability.
+  const showEarnings = canManage && (await orgHasCapability(orgId, "workforce.commissionPay"))
+  const earnings = showEarnings ? await listJobEarnings(orgId, id) : []
 
   return (
     <div className="space-y-6">
@@ -162,6 +167,29 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                   {e.accessItem ? <span className="ml-2 text-xs text-slate-400">{e.accessItem.status === "ISSUED" ? "still out" : e.accessItem.status.toLowerCase()}</span> : null}
                 </div>
                 <span className="text-xs text-slate-500">to {e.holder?.name ?? "someone"} · {DateTime.fromJSDate(e.createdAt, { zone: jtz }).toFormat("MMM d, h:mm a")}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
+
+      {showEarnings && earnings.length > 0 ? (
+        <Card className="p-5">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Crew earnings</h2>
+          <p className="mb-3 text-xs text-slate-400">Computed from the pay rule in effect, the job&apos;s billable amount, and the crew size. Amounts for export only.</p>
+          <ul className="divide-y divide-slate-100">
+            {earnings.map((e) => (
+              <li key={e.id} className="flex items-center justify-between py-2.5 text-sm">
+                <div>
+                  <span className="font-medium text-slate-800">{e.user.name}</span>
+                  <span className="ml-2 text-xs text-slate-500">
+                    {e.basis === "PERCENT_OF_JOB_REVENUE" ? `${e.percentApplied}% of ${formatMoney(e.billableAmount)}${e.splitMode === "SPLIT_ACROSS_CREW" ? ` split ${e.crewSize}` : ""}` : e.basis === "FLAT_PER_JOB" ? `flat${e.splitMode === "SPLIT_ACROSS_CREW" ? ` split ${e.crewSize}` : ""}` : "hourly"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 tabular-nums">
+                  {e.status === "PENDING" ? <span className="text-xs text-amber-600">pending invoice</span> : e.status === "VOIDED" ? <span className="text-xs text-red-600">invoice voided</span> : null}
+                  <span className="font-medium text-slate-900">{formatMoney(e.amount)}</span>
+                </div>
               </li>
             ))}
           </ul>

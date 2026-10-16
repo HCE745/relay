@@ -21,6 +21,7 @@ import {
   OUTSTANDING_STATUSES,
 } from "../billing-math"
 import { periodsInWindow } from "../billing-periods"
+import { recomputeJobEarnings } from "./commission"
 
 // ─── Billing / invoicing (Phase 2) ───────────────────────────────────────────
 //
@@ -328,6 +329,10 @@ export async function generateInvoice(
         },
         select: { id: true, invoiceNumber: true, total: true },
       })
+      // Commission earnings now have a billable amount (Phase 37); recompute the
+      // billed jobs so PERCENT_OF_JOB_REVENUE earnings fill in. No-op if disabled.
+      const billedJobIds = [...new Set(lines.map((l) => l.jobId).filter((x): x is string => !!x))]
+      for (const jid of billedJobIds) await recomputeJobEarnings(orgId, jid).catch(() => {})
       return {
         created: true,
         invoiceId: invoice.id,
@@ -424,12 +429,17 @@ export async function setInvoiceStatus(orgId: string, id: string, status: Extrac
     throw new ConflictError(`Cannot move an invoice from ${invoice.status} to ${status}`)
   }
   if (status === "VOID") {
+    // Capture the billed jobs BEFORE voiding so commission earnings can be
+    // recomputed (they will reflect the voided revenue). jobId is immutable.
+    const voidedJobIds = [...new Set((await db.invoiceLine.findMany({ where: { invoiceId: id, jobId: { not: null } }, select: { jobId: true } })).map((l) => l.jobId!).filter(Boolean))]
     // Release the claims so visits and flat periods can be re-invoiced
     // (activeJobId / activePeriodKey → NULL), atomically.
     await db.$transaction([
       db.invoice.updateMany({ where: { id }, data: { status } }),
       db.invoiceLine.updateMany({ where: { invoiceId: id }, data: { activeJobId: null, activePeriodKey: null, activeChangeOrderId: null } }),
     ])
+    // Phase 37: recompute earnings for the affected jobs (percent → VOIDED/pending).
+    for (const jid of voidedJobIds) await recomputeJobEarnings(orgId, jid).catch(() => {})
   } else {
     await db.invoice.updateMany({ where: { id }, data: { status } })
   }

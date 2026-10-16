@@ -26,6 +26,7 @@ export const CAPABILITIES = [
   "operations.issues",
   "operations.accessControl", // key & access management (encrypted codes)
   "workforce.payrollExport", // export/integration only — never payroll processing
+  "workforce.commissionPay", // commission / crew-based pay rules + earnings (export only)
   "workforce.coverage", // shift coverage: availability, callouts, reassignment
   "billing.invoicing", // invoices, payments, AR
   "billing.periodInvoicing", // flat-period (recurring) invoicing + auto-draft cron

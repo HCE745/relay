@@ -1,6 +1,7 @@
 import { orgDb, systemDb } from "../org-db"
 import { assertFound, ForbiddenActionError, ConflictError, RequirementsError } from "../data/errors"
 import { sendServiceSummarySafe } from "../data/customer-comms"
+import { recomputeJobEarnings } from "../data/commission"
 import { resolveCapabilities, parseOverrides, type PackageTier } from "../entitlements"
 
 // Geofencing capability check without the server-only page-guards import.
@@ -178,7 +179,11 @@ export async function clockOut(orgId: string, jobId: string, userId: string, loc
     })
     jobCompleted = true
     // Best-effort customer service-completion summary (Phase 26); idempotent.
-    if (count > 0) sendServiceSummarySafe(orgId, jobId)
+    if (count > 0) {
+      sendServiceSummarySafe(orgId, jobId)
+      // Commission/crew-based earnings (Phase 37); no-op unless the org has it.
+      await recomputeJobEarnings(orgId, jobId).catch(() => {})
+    }
   }
   return { closed: true, jobCompleted }
 }

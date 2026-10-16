@@ -420,6 +420,20 @@ async function seedExtras(
   const recut = await systemDb.accessItem.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, type: "KEY", identifier: "Side door key #2", status: "AVAILABLE", replacesId: lostKey.id, description: "Re-cut replacement" }, select: { id: true } })
   await systemDb.custodyEvent.create({ data: { organizationId: orgId, accessItemId: recut.id, action: "REPLACED", serviceLocationId: commSite.id, notes: "Replaces Side door key #1", recordedById: staff.managerId, createdAt: days(-4) } })
 
+  // ── Commission & crew-based pay (Phase 37): a percent rule + earnings on a
+  // couple of completed jobs so the pay-rules screen, job detail, time screen,
+  // export and profitability all show real data. ──
+  await systemDb.payRule.create({ data: { organizationId: orgId, role: "CLEANER", basis: "PERCENT_OF_JOB_REVENUE", splitMode: "PER_PERSON", soloValue: "40", pairValue: "25", crewValue: "20", effectiveFrom: days(-60) } })
+  for (const jid of ctx.completedJobIds.slice(-2)) {
+    const crewAsg = await systemDb.jobAssignment.findMany({ where: { jobId: jid, status: "COMPLETED" }, select: { userId: true } })
+    if (crewAsg.length === 0) continue
+    const band = crewAsg.length <= 1 ? 40 : crewAsg.length === 2 ? 25 : 20
+    const billable = 320
+    for (const a of crewAsg) {
+      await systemDb.jobEarning.create({ data: { organizationId: orgId, jobId: jid, userId: a.userId, basis: "PERCENT_OF_JOB_REVENUE", splitMode: "PER_PERSON", crewSize: crewAsg.length, percentApplied: String(band), billableAmount: String(billable), amount: ((billable * band) / 100).toFixed(2), status: "CALCULATED" } })
+    }
+  }
+
   // ── Coverage: an upcoming job whose assigned cleaner is unavailable → NEEDS COVERAGE ──
   // Anchor to tomorrow's UTC midnight so the job's date and the availability day
   // always match (adding hours to `now` could roll past midnight).

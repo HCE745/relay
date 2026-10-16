@@ -20,10 +20,12 @@ export default async function ExportsPage() {
   }
 
   const history = await listExportHistory(orgId)
+  const showPayrollEarnings = await orgHasCapability(orgId, "workforce.commissionPay")
   return (
     <div>
       <PageHeader title="Exports" subtitle="QuickBooks, Xero, Gusto & ADP: CSV import files" icon={<FileTextIcon />} />
       <ExportsClient
+        showPayrollEarnings={showPayrollEarnings}
         history={history.map((r) => ({
           id: r.id, type: r.type, rowCount: r.rowCount, createdByName: r.createdByName,
           createdAt: r.createdAt.toISOString(), periodStart: r.periodStart?.toISOString() ?? null, periodEnd: r.periodEnd?.toISOString() ?? null,

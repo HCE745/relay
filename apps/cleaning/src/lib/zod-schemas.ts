@@ -253,6 +253,25 @@ export const accessIssueSchema = z.object({ userId: z.string().min(1) })
 // Custody actions (Phase 36). One endpoint dispatches on action; the data layer
 // enforces which fields each action needs.
 export const CUSTODY_ACTIONS = ["CHECKED_OUT", "CHECKED_IN", "TRANSFERRED", "REPORTED_LOST", "REPLACED"] as const
+// Commission & crew-based pay rules (Phase 37).
+export const PAY_BASES = ["HOURLY", "FLAT_PER_JOB", "PERCENT_OF_JOB_REVENUE"] as const
+export const PAY_SPLITS = ["PER_PERSON", "SPLIT_ACROSS_CREW"] as const
+const decStr = z.string().regex(/^\d{1,9}(\.\d{1,3})?$/, "Enter a number").optional().or(z.literal("").transform(() => null)).nullable()
+const optId = z.string().optional().or(z.literal("").transform(() => null)).nullable()
+export const payRuleSchema = z.object({
+  userId: optId,
+  role: z.enum(["OWNER", "ADMIN", "MANAGER", "SUPERVISOR", "CLEANER"]).optional().or(z.literal("").transform(() => null)).nullable(),
+  basis: z.enum(PAY_BASES),
+  splitMode: z.enum(PAY_SPLITS).default("PER_PERSON"),
+  soloValue: decStr,
+  pairValue: decStr,
+  crewValue: decStr,
+  customerId: optId,
+  serviceLocationId: optId,
+  servicePlanId: optId,
+  effectiveFrom: z.coerce.date().optional(),
+})
+
 export const custodyActionSchema = z.object({
   kind: z.enum(["ACCESS", "ASSET"]),
   itemId: z.string().min(1),

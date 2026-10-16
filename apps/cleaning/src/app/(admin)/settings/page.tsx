@@ -26,6 +26,7 @@ export default async function SettingsPage() {
   const isOrgAdmin = canManageOrg(session.role)
   const showContracts = await orgHasCapability(session.organizationId, "crm.contracts")
   const showCompliance = await orgHasCapability(session.organizationId, "workforce.compliance")
+  const showCommission = isOrgAdmin && (await orgHasCapability(session.organizationId, "workforce.commissionPay"))
 
   const canSetup = canManageAccounts(session.role)
   const [setup, setupDismissed] = canSetup
@@ -107,6 +108,14 @@ export default async function SettingsPage() {
           <div className="mt-3">
             <OvertimeForm weekly={org?.otWeeklyThresholdHours ?? null} daily={org?.otDailyThresholdHours ?? null} multiplier={org ? Number(org.otMultiplier).toString() : "1.5"} />
           </div>
+        </Card>
+      ) : null}
+
+      {showCommission ? (
+        <Card className="p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Commission &amp; crew-based pay</h2>
+          <p className="text-sm text-slate-600">Pay a percentage of job revenue or a flat amount, varying by crew size.</p>
+          <Link href="/pay-rules" className="mt-2 inline-block text-sm font-medium text-brand hover:underline">Manage pay rules →</Link>
         </Card>
       ) : null}
 

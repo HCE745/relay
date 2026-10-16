@@ -6,9 +6,10 @@ import { STEPS, type Step } from "./steps"
 
 // Guided demo tour engine. Mounted in the admin layout, demo-only. Spotlights a
 // real element per step, shows a short tooltip, persists position across
-// navigation (sessionStorage) while active, and closes cleanly on dismiss with
-// no leftover step state (the "Take the tour" button reopens from step 1). Hand-rolled (no
-// tour library) to match the app's light design and avoid a new dependency.
+// navigation (sessionStorage). Closing (X / Skip / Escape / click outside the
+// tooltip) PRESERVES the current step; "Take the tour" resumes from it, and a
+// separate "Restart tour" goes back to step 1. Hand-rolled (no tour library) to
+// match the app's light design and avoid a new dependency.
 
 const SK_DISMISSED = "cln-tour-dismissed"
 const SK_STEP = "cln-tour-step"
@@ -80,6 +81,8 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
   const [idx, setIdx] = useState(0)
   const [rect, setRect] = useState<Rect | null>(null)
   const [navigating, setNavigating] = useState(false)
+  // True when the tour was just reopened mid-way, so we can say "resuming".
+  const [resumed, setResumed] = useState(false)
 
   const step: Step | undefined = STEPS[idx]
   const total = STEPS.length
@@ -104,14 +107,26 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
     }
   }, [isDemo])
 
-  // The persistent "Take the tour" entry point ALWAYS starts fresh from step 1.
+  // Two entry points: "Take the tour" RESUMES from the preserved step (or starts
+  // at step 1 when nothing is saved); "Restart tour" always goes to step 1 and
+  // clears the saved step.
   useEffect(() => {
     function onClick(e: MouseEvent) {
-      if ((e.target as HTMLElement).closest("[data-action='start-cln-tour']")) {
+      const t = e.target as HTMLElement
+      if (t.closest("[data-action='start-cln-tour']")) {
+        ssSet(SK_DISMISSED, "")
+        ssSet(SK_STARTED, "1")
+        const saved = Math.min(parseInt(ss(SK_STEP) || "0", 10) || 0, STEPS.length - 1)
+        setIdx(saved)
+        setResumed(saved > 0) // show the "resuming" hint only when landing mid-tour
+        setRect(null)
+        setPhase("active")
+      } else if (t.closest("[data-action='restart-cln-tour']")) {
         ssSet(SK_DISMISSED, "")
         ssSet(SK_STARTED, "1")
         ssSet(SK_STEP, "0")
         setIdx(0)
+        setResumed(false)
         setRect(null)
         setPhase("active")
       }
@@ -154,17 +169,15 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
     return () => { window.removeEventListener("scroll", update, true); window.removeEventListener("resize", update) }
   }, [step?.selector])
 
-  // Dismissing CLOSES the tour (it is not pausing): mark it done and clear the
-  // step state so there is nothing to resume. The banner's "Take the tour"
-  // entry point reopens it from step 1.
+  // Closing (X, Skip, Escape, or a click outside the tooltip) PRESERVES the
+  // current step so "Take the tour" can resume from it. Only "Restart tour"
+  // clears it. Marking DISMISSED stops it auto-reopening on navigation.
   const dismiss = useCallback(() => {
     ssSet(SK_DISMISSED, "1")
-    ssSet(SK_STEP, "0")
-    setIdx(0)
     setPhase("hidden")
     setRect(null)
   }, [])
-  const go = useCallback((n: number) => { setIdx(n); ssSet(SK_STEP, String(n)); setRect(null) }, [])
+  const go = useCallback((n: number) => { setIdx(n); ssSet(SK_STEP, String(n)); setRect(null); setResumed(false) }, [])
   const next = useCallback(() => { if (isLast) dismiss(); else go(idx + 1) }, [isLast, idx, go, dismiss])
   const prev = useCallback(() => { if (idx > 0) go(idx - 1) }, [idx, go])
 
@@ -180,7 +193,8 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
   const pos = cardPos(showSpotlight ? rect : null)
 
   return (
-    <div className="fixed inset-0 z-[9000]" aria-live="polite" role="dialog" aria-label="Product tour">
+    <div className="fixed inset-0 z-[9000]" aria-live="polite" role="dialog" aria-label="Product tour" onClick={dismiss}>
+      {/* Clicking the dimmed area (outside the tooltip) closes the tour but keeps the step. */}
       {/* Dimmer with a spotlight cutout over the target (box-shadow trick). */}
       {showSpotlight ? (
         <div
@@ -194,8 +208,8 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
         <div className="pointer-events-none fixed inset-0 bg-slate-900/55" />
       )}
 
-      {/* Tooltip card */}
-      <div style={pos} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+      {/* Tooltip card — clicks inside must not close the tour. */}
+      <div style={pos} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 border-b border-slate-100 px-4 pb-2.5 pt-3">
           <span className="shrink-0 text-xs font-medium text-slate-400">Step {idx + 1} of {total}</span>
           <div className="h-1 flex-1 overflow-hidden rounded-full bg-slate-100">
@@ -206,6 +220,7 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
           </button>
         </div>
         <div className="px-4 py-3.5">
+          {resumed && !navigating ? <p className="mb-1.5 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">Resuming at step {idx + 1}</p> : null}
           <h3 className="mb-1.5 text-[15px] font-bold leading-snug text-slate-900">{step.title}</h3>
           {navigating ? (
             <p className="text-sm text-slate-400">Opening the screen…</p>

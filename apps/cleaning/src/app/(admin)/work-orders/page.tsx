@@ -31,7 +31,7 @@ export default async function WorkOrdersPage() {
     <div>
       <PageHeader
         title="Work orders"
-        subtitle="One-time & emergency work — quote, schedule, and bill it"
+        subtitle="One-time & emergency work: quote, schedule, and bill it"
         icon={<BriefcaseIcon />}
         action={<NewWorkOrderButton customers={customers.map((c) => ({ id: c.id, name: c.name, sites: c.serviceLocations }))} />}
       />

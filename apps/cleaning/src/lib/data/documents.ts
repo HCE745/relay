@@ -32,7 +32,7 @@ async function invoicePdfData(orgId: string, id: string): Promise<{ data: Invoic
       billTo,
       issueDate: fmtDate(inv.issueDate),
       dueDate: fmtDate(inv.dueDate),
-      period: `${fmtDate(inv.periodStart)} – ${fmtDate(inv.periodEnd)}`,
+      period: `${fmtDate(inv.periodStart)} to ${fmtDate(inv.periodEnd)}`,
       lines: inv.lines.map((l) => ({
         description: l.description,
         site: l.siteName ?? undefined,
@@ -97,7 +97,7 @@ export async function estimatePdfData(orgId: string, id: string): Promise<{ data
   const cur = est.currency
   const rate = est.rate ? formatMoney(est.rate, cur) : null
   const preparedFor = [
-    est.customer?.name ?? est.lead?.company ?? est.contactName ?? "—",
+    est.customer?.name ?? est.lead?.company ?? est.contactName ?? "-",
     est.contactName && (est.customer || est.lead?.company) ? est.contactName : "",
     est.contactEmail ?? "",
     [est.siteName, est.addressLine1, [est.city, est.state].filter(Boolean).join(", "), est.postalCode].filter(Boolean).join(" · "),
@@ -111,7 +111,7 @@ export async function estimatePdfData(orgId: string, id: string): Promise<{ data
       preparedFor,
       frequency: FREQ[est.frequency] ?? est.frequency,
       pricing: est.pricing === "HOURLY" ? `Hourly${rate ? ` · ${rate}/hr` : ""}` : `Per visit${rate ? ` · ${rate}` : ""}`,
-      validUntil: est.validUntil ? fmtDate(est.validUntil) : "—",
+      validUntil: est.validUntil ? fmtDate(est.validUntil) : "-",
       lines: est.lines.map((l) => ({ description: l.description, qty: num(l.quantity), rate: formatMoney(l.unitRate, cur), amount: formatMoney(l.amount, cur) })),
       subtotal: formatMoney(est.subtotal, cur),
       total: formatMoney(est.total, cur),

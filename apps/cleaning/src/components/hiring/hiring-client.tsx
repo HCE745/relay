@@ -39,7 +39,7 @@ export function NewPostingButton() {
             <Field label="Status" htmlFor="p-status"><Select id="p-status" value={v.status} onChange={set("status")}>{JOB_POSTING_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}</Select></Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Pay range" htmlFor="p-pay"><Input id="p-pay" value={v.payRange} onChange={set("payRange")} placeholder="$18–$24/hr" /></Field>
+            <Field label="Pay range" htmlFor="p-pay"><Input id="p-pay" value={v.payRange} onChange={set("payRange")} placeholder="$18-$24/hr" /></Field>
             <Field label="Locations" htmlFor="p-loc"><Input id="p-loc" value={v.locations} onChange={set("locations")} placeholder="Austin, TX" /></Field>
           </div>
           <Field label="Description" htmlFor="p-desc"><Textarea id="p-desc" value={v.description} onChange={set("description")} /></Field>
@@ -79,7 +79,7 @@ function ApplicantCard({ a, members }: { a: Applicant; members: Member[] }) {
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="truncate font-semibold text-slate-900">{a.name}</div>
-          <div className="truncate text-xs text-slate-500">{a.appliedFor ?? "—"}{a.email ? ` · ${a.email}` : ""}</div>
+          <div className="truncate text-xs text-slate-500">{a.appliedFor ?? "-"}{a.email ? ` · ${a.email}` : ""}</div>
           {a.interviews.length > 0 ? <div className="mt-0.5 text-xs text-slate-400">{a.interviews.length} interview{a.interviews.length === 1 ? "" : "s"}</div> : null}
         </div>
         {hired ? <StatusBadge tone="success">Hired ✓</StatusBadge> : null}
@@ -132,7 +132,7 @@ export function HiringClient({ postings, applicants, members }: { postings: Post
                   <div className="font-semibold text-slate-900">{p.title}</div>
                   <StatusBadge tone={P_TONE[p.status] ?? "neutral"}>{p.status}</StatusBadge>
                 </div>
-                <div className="mt-1 text-xs text-slate-500">{[p.employmentType, p.payRange, p.locations].filter(Boolean).join(" · ") || "—"}</div>
+                <div className="mt-1 text-xs text-slate-500">{[p.employmentType, p.payRange, p.locations].filter(Boolean).join(" · ") || "-"}</div>
                 <div className="mt-2 text-xs text-slate-400">{p.applicantCount} applicant{p.applicantCount === 1 ? "" : "s"}</div>
               </Card>
             ))}
@@ -147,7 +147,7 @@ export function HiringClient({ postings, applicants, members }: { postings: Post
               <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500"><StatusBadge tone={A_TONE[s]}>{s}</StatusBadge><span className="text-slate-400">{byStatus(s).length}</span></div>
               <div className="space-y-2">
                 {byStatus(s).map((a) => <ApplicantCard key={a.id} a={a} members={members} />)}
-                {byStatus(s).length === 0 ? <div className="rounded-lg border border-dashed border-slate-200 p-3 text-center text-xs text-slate-300">—</div> : null}
+                {byStatus(s).length === 0 ? <div className="rounded-lg border border-dashed border-slate-200 p-3 text-center text-xs text-slate-300">-</div> : null}
               </div>
             </div>
           ))}

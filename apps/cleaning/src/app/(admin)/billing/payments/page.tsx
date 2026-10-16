@@ -70,8 +70,8 @@ export default async function PaymentsPage() {
                         {invoiceNo(p.invoiceNumber)}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-slate-500">{p.method ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{p.reference ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-500">{p.method ?? "-"}</td>
+                    <td className="px-4 py-3 text-slate-500">{p.reference ?? "-"}</td>
                     <td className="px-4 py-3 text-right tabular-nums font-medium text-slate-900">
                       {formatMoney(p.amount, p.currency)}
                     </td>

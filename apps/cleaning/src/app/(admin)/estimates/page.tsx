@@ -14,7 +14,7 @@ const CAP = "crm.estimates"
 
 const TONE: Record<string, BadgeTone> = { DRAFT: "neutral", SENT: "info", ACCEPTED: "success", DECLINED: "danger", EXPIRED: "neutral" }
 const LABEL: Record<string, string> = { DRAFT: "Draft", SENT: "Sent", ACCEPTED: "Accepted", DECLINED: "Declined", EXPIRED: "Expired" }
-const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—")
+const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-")
 
 export default async function EstimatesPage() {
   const session = await getSession()
@@ -67,7 +67,7 @@ export default async function EstimatesPage() {
                     {e.convertedCustomer ? (
                       <span className="text-emerald-700">✓ {e.convertedCustomer.name}</span>
                     ) : (
-                      e.customer?.name ?? e.lead?.company ?? e.lead?.name ?? "—"
+                      e.customer?.name ?? e.lead?.company ?? e.lead?.name ?? "-"
                     )}
                   </td>
                   <td className="px-4 py-3">

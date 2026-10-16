@@ -54,7 +54,7 @@ export default async function IssueDashboardPage() {
   }
 
   const s = await getIssueResolutionStats(orgId)
-  const fmtHrs = (h: number | null) => (h == null ? "—" : h < 48 ? `${h.toFixed(1)}h` : `${(h / 24).toFixed(1)}d`)
+  const fmtHrs = (h: number | null) => (h == null ? "-" : h < 48 ? `${h.toFixed(1)}h` : `${(h / 24).toFixed(1)}d`)
 
   const tiles: Tile[] = [
     { label: "Open", value: s.tiles.open, href: "/issues?status=OPEN" },
@@ -81,7 +81,7 @@ export default async function IssueDashboardPage() {
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div><dt className="text-xs uppercase tracking-wide text-slate-400">Median to resolve</dt><dd className="mt-1 text-xl font-semibold text-slate-900">{fmtHrs(s.timing.medianResolveHrs)}</dd></div>
           <div><dt className="text-xs uppercase tracking-wide text-slate-400">Median to close</dt><dd className="mt-1 text-xl font-semibold text-slate-900">{fmtHrs(s.timing.medianCloseHrs)}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wide text-slate-400">On-time (SLA)</dt><dd className="mt-1 text-xl font-semibold text-slate-900">{s.timing.slaCompliancePct == null ? "—" : `${s.timing.slaCompliancePct}%`}</dd></div>
+          <div><dt className="text-xs uppercase tracking-wide text-slate-400">On-time (SLA)</dt><dd className="mt-1 text-xl font-semibold text-slate-900">{s.timing.slaCompliancePct == null ? "-" : `${s.timing.slaCompliancePct}%`}</dd></div>
           <div><dt className="text-xs uppercase tracking-wide text-slate-400">Reopened (open)</dt><dd className="mt-1 text-xl font-semibold text-slate-900">{s.timing.reopenedOpen}</dd></div>
         </dl>
         <p className="mt-3 text-xs text-slate-400">Based on {s.timing.closedCount} issue{s.timing.closedCount === 1 ? "" : "s"} closed in the last 30 days.</p>

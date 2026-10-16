@@ -110,7 +110,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
               <div className="flex justify-end gap-3">
                 <dt className="text-slate-400">Period</dt>
                 <dd className="w-28 text-slate-700">
-                  {fmtDate(invoice.periodStart)} – {fmtDate(invoice.periodEnd)}
+                  {fmtDate(invoice.periodStart)} to {fmtDate(invoice.periodEnd)}
                 </dd>
               </div>
             </dl>

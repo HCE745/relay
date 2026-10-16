@@ -19,7 +19,7 @@ export default async function WalkthroughPage() {
   return (
     <div>
       <Link href="/quotes" className="mb-4 inline-block text-sm text-slate-500 hover:text-brand">← Quotes</Link>
-      <PageHeader title="On-site walkthrough" subtitle="Capture areas room-by-room — feeds the bid calculator" />
+      <PageHeader title="On-site walkthrough" subtitle="Capture areas room-by-room, feeds the bid calculator" />
       <WalkthroughCapture />
     </div>
   )

@@ -67,14 +67,14 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
         <Detail label="Source" value={issue.externalReporter ? `${issue.source === "SMS" ? "SMS" : issue.source === "QR" ? "QR" : "External"} · ${issue.externalReporter}` : issue.source === "SMS" ? "SMS" : issue.inspection ? "Failed inspection" : "Field report"} />
         <Detail label="Category" value={issue.category} />
         <Detail label="Severity" value={issue.severity} />
-        <Detail label="Reported by" value={issue.reportedBy?.name ?? (issue.source === "QR" ? "External occupant (QR)" : "—")} />
+        <Detail label="Reported by" value={issue.reportedBy?.name ?? (issue.source === "QR" ? "External occupant (QR)" : "-")} />
         <Detail
           label="Opened"
           value={DateTime.fromJSDate(issue.createdAt, { zone: tz }).toFormat("MMM d, yyyy · h:mm a")}
         />
-        <Detail label="Resolve by" value={issue.resolveDeadline ? DateTime.fromJSDate(issue.resolveDeadline, { zone: tz }).toFormat("MMM d, h:mm a") + (issue.status !== "CLOSED" && issue.status !== "RESOLVED" && issue.resolveDeadline < new Date() ? " · OVERDUE" : "") : "—"} />
+        <Detail label="Resolve by" value={issue.resolveDeadline ? DateTime.fromJSDate(issue.resolveDeadline, { zone: tz }).toFormat("MMM d, h:mm a") + (issue.status !== "CLOSED" && issue.status !== "RESOLVED" && issue.resolveDeadline < new Date() ? " · OVERDUE" : "") : "-"} />
         <Detail label="Owner (resolver)" value={issue.assignedTo?.name ?? "Unassigned"} />
-        <Detail label="Verified by" value={issue.verifier?.name ?? (issue.status === "CLOSED" ? "—" : "Pending verification")} />
+        <Detail label="Verified by" value={issue.verifier?.name ?? (issue.status === "CLOSED" ? "-" : "Pending verification")} />
         {issue.escalationLevel > 0 ? <Detail label="Escalation level" value={String(issue.escalationLevel)} /> : null}
         {issue.reopenCount > 0 ? <Detail label="Reopened" value={`${issue.reopenCount}×`} /> : null}
         {issue.job ? (

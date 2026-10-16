@@ -44,7 +44,7 @@ export function planPricingFromEstimate(est: {
   if (est.pricing === "HOURLY") {
     if (est.rate == null || est.rate.lessThanOrEqualTo(ZERO)) {
       throw new RequirementsError("This hourly estimate has no hourly rate", [
-        "Set an hourly rate before converting — the visit total can't be assumed to be the hourly rate",
+        "Set an hourly rate before converting. The visit total can't be assumed to be the hourly rate",
       ])
     }
     return { billingType: "HOURLY", rate: round2(est.rate) }

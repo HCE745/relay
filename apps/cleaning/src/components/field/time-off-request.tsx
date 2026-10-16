@@ -37,7 +37,7 @@ export function TimeOffRequest() {
         <h2 className="text-sm font-semibold text-slate-800">Request time off</h2>
         <button type="button" onClick={() => setOpen(false)} className="text-sm text-slate-400">Close</button>
       </div>
-      {done ? <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Request sent — your manager will review it.</p> : null}
+      {done ? <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Request sent. Your manager will review it.</p> : null}
       <label className="block text-sm">
         <span className="mb-1 block font-medium text-slate-600">From</span>
         <input type="date" required value={startDate} onChange={(e) => setStart(e.target.value)} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-base" />

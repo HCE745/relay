@@ -80,13 +80,13 @@ function AssetForm({ initial, sites, users, onDone }: { initial?: AssetValues; s
         <div />
         <Field label="Assigned to site" htmlFor="a-site">
           <Select id="a-site" value={v.assignedToSiteId ?? ""} onChange={set("assignedToSiteId")}>
-            <option value="">— None —</option>
+            <option value="">None</option>
             {sites.map((s) => (<option key={s.id} value={s.id}>{s.name}</option>))}
           </Select>
         </Field>
         <Field label="Assigned to person" htmlFor="a-user">
           <Select id="a-user" value={v.assignedToUserId ?? ""} onChange={set("assignedToUserId")}>
-            <option value="">— None —</option>
+            <option value="">None</option>
             {users.map((u) => (<option key={u.id} value={u.id}>{u.name}</option>))}
           </Select>
         </Field>

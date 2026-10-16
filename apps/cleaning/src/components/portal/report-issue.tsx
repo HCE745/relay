@@ -36,7 +36,7 @@ export function ReportIssue({ sites }: { sites: Site[] }) {
         <h3 className="text-sm font-semibold text-slate-800">Report an issue</h3>
         <button type="button" onClick={() => setOpen(false)} className="text-sm text-slate-400">Close</button>
       </div>
-      {done ? <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Thanks — your issue has been sent to the team.</p> : null}
+      {done ? <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Thanks. Your issue has been sent to the team.</p> : null}
       <label className="block text-sm"><span className="mb-1 block font-medium text-slate-600">Site</span>
         <select value={serviceLocationId} onChange={(e) => setSite(e.target.value)} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">{sites.map((s) => (<option key={s.id} value={s.id}>{s.name}</option>))}</select></label>
       <label className="block text-sm"><span className="mb-1 block font-medium text-slate-600">Subject (optional)</span>

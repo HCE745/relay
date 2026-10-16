@@ -37,7 +37,7 @@ export function PortalAccess({ customerId, users, invites }: { customerId: strin
       {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
       {link ? (
         <div className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Email isn&apos;t configured — share this activation link with the contact:
+          Email isn&apos;t configured. Share this activation link with the contact:
           <div className="mt-1 break-all font-mono text-xs text-amber-900">{link}</div>
         </div>
       ) : null}

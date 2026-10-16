@@ -92,7 +92,7 @@ function TimeOffReview({ pending }: { pending: Pending[] }) {
         <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
           <div className="text-sm">
             <span className="font-medium text-slate-800">{p.userName}</span>
-            <span className="ml-2 text-slate-600">{fmtD(p.startDate)} – {fmtD(p.endDate)}</span>
+            <span className="ml-2 text-slate-600">{fmtD(p.startDate)} to {fmtD(p.endDate)}</span>
             {p.reason ? <div className="text-xs text-slate-500">{p.reason}</div> : null}
           </div>
           <div className="flex gap-2">
@@ -141,7 +141,7 @@ function AvailabilityManager({ members, blocks }: { members: Member[]; blocks: B
         <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
           {blocks.map((b) => (
             <li key={b.id} className="flex items-center justify-between px-3 py-2 text-sm">
-              <span><span className="font-medium text-slate-800">{b.userName}</span> <span className="text-slate-600">{fmtD(b.startDate)} – {fmtD(b.endDate)}</span>{b.reason ? <span className="text-slate-400"> · {b.reason}</span> : null}{b.source === "TIME_OFF" ? <StatusBadge tone="info" className="ml-2">time off</StatusBadge> : null}</span>
+              <span><span className="font-medium text-slate-800">{b.userName}</span> <span className="text-slate-600">{fmtD(b.startDate)} to {fmtD(b.endDate)}</span>{b.reason ? <span className="text-slate-400"> · {b.reason}</span> : null}{b.source === "TIME_OFF" ? <StatusBadge tone="info" className="ml-2">time off</StatusBadge> : null}</span>
               <button onClick={() => remove(b.id)} className="text-slate-400 hover:text-red-600" aria-label="Remove">✕</button>
             </li>
           ))}
@@ -155,7 +155,7 @@ export function CoverageClient({ shifts, pending, members, blocks }: { shifts: S
   return (
     <div className="space-y-8">
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">Uncovered shifts — next 48 hours</h2>
+        <h2 className="mb-3 text-sm font-semibold text-slate-700">Uncovered shifts: next 48 hours</h2>
         {shifts.length === 0 ? (
           <Card className="p-6 text-center text-sm text-slate-500">All upcoming shifts are covered.</Card>
         ) : (

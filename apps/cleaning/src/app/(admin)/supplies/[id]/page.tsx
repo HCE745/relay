@@ -57,7 +57,7 @@ export default async function SupplyDetailPage({ params }: { params: Promise<{ i
           </p>
         </Card>
         <Card className="p-5"><p className="text-sm text-slate-500">Reorder at</p><p className="mt-1 text-2xl font-semibold text-slate-900">{qty(supply.reorderThreshold)}</p></Card>
-        <Card className="p-5"><p className="text-sm text-slate-500">Cost / unit</p><p className="mt-1 text-2xl font-semibold text-slate-900">{supply.costPerUnit ? formatMoney(supply.costPerUnit) : "—"}</p></Card>
+        <Card className="p-5"><p className="text-sm text-slate-500">Cost / unit</p><p className="mt-1 text-2xl font-semibold text-slate-900">{supply.costPerUnit ? formatMoney(supply.costPerUnit) : "-"}</p></Card>
       </div>
 
       <Card className="p-5">

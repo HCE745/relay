@@ -55,7 +55,7 @@ export function ImportClient({ batches, latestId }: { batches: Batch[]; latestId
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold text-slate-700">Upload a CSV</h2>
-            <p className="text-xs text-slate-400">Customers, their sites and a contact — one row per site.</p>
+            <p className="text-xs text-slate-400">Customers, their sites and a contact: one row per site.</p>
           </div>
           <a href="/api/import/customers/template" className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Download template</a>
         </div>
@@ -81,7 +81,7 @@ export function ImportClient({ batches, latestId }: { batches: Batch[]; latestId
                 <span className="text-amber-600">{preview.summary.duplicates} duplicates (skipped)</span>
                 <span className={preview.summary.errors ? "font-semibold text-red-700" : "text-slate-400"}>{preview.summary.errors} errors</span>
               </div>
-              {preview.errorCount > 0 ? <p className="mb-2 text-xs text-red-600">Fix the errors and re-preview — the import is all-or-nothing.</p> : null}
+              {preview.errorCount > 0 ? <p className="mb-2 text-xs text-red-600">Fix the errors and re-preview. The import is all-or-nothing.</p> : null}
               <div className="max-h-96 overflow-auto rounded-lg border border-slate-200">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
@@ -92,8 +92,8 @@ export function ImportClient({ batches, latestId }: { batches: Batch[]; latestId
                       <tr key={r.line}>
                         <td className="px-3 py-2 text-slate-400">{r.line}</td>
                         <td className="px-3 py-2 text-slate-800">{r.customer}</td>
-                        <td className="px-3 py-2 text-slate-500">{r.site || "—"}</td>
-                        <td className="px-3 py-2 text-slate-500">{r.contact || "—"}</td>
+                        <td className="px-3 py-2 text-slate-500">{r.site || "-"}</td>
+                        <td className="px-3 py-2 text-slate-500">{r.contact || "-"}</td>
                         <td className="px-3 py-2"><StatusBadge tone={TONE[r.status]}>{r.status}</StatusBadge>{r.errors.length ? <span className="ml-2 text-xs text-red-600">{r.errors.join("; ")}</span> : null}</td>
                       </tr>
                     ))}

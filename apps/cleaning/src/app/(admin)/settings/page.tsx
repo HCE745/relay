@@ -72,8 +72,8 @@ export default async function SettingsPage() {
             {setup.allComplete
               ? "You've completed all setup steps."
               : setupVisibleOnDashboard
-                ? `The setup guide is on your dashboard — ${setup.completed} of ${setup.total} steps done.`
-                : `The setup guide is hidden — ${setup.completed} of ${setup.total} steps done.`}
+                ? `The setup guide is on your dashboard. ${setup.completed} of ${setup.total} steps done.`
+                : `The setup guide is hidden. ${setup.completed} of ${setup.total} steps done.`}
           </p>
           {!setupVisibleOnDashboard ? (
             <form action={restoreSetupGuide} className="mt-3">

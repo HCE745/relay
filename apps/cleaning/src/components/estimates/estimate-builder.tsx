@@ -136,23 +136,23 @@ export function EstimateBuilder({
   return (
     <form onSubmit={submit} className="space-y-6">
       <Card className="space-y-4 p-5">
-        <Field label="Estimate title" htmlFor="e-title" hint="e.g. Nightly janitorial — Acme HQ">
+        <Field label="Estimate title" htmlFor="e-title" hint="e.g. Nightly janitorial - Acme HQ">
           <Input id="e-title" required value={v.title} onChange={set("title")} />
         </Field>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="From lead" htmlFor="e-lead" hint="Optional — links this estimate to a lead">
+          <Field label="From lead" htmlFor="e-lead" hint="Optional: links this estimate to a lead">
             <Select id="e-lead" value={v.leadId} onChange={set("leadId")}>
-              <option value="">— None —</option>
+              <option value="">None</option>
               {leads.map((l) => (
                 <option key={l.id} value={l.id}>
-                  {l.company ? `${l.company} — ${l.name}` : l.name}
+                  {l.company ? `${l.company} - ${l.name}` : l.name}
                 </option>
               ))}
             </Select>
           </Field>
           <Field label="Existing customer" htmlFor="e-cust" hint="Set only if billing an existing customer">
             <Select id="e-cust" value={v.customerId} onChange={set("customerId")}>
-              <option value="">— New customer on convert —</option>
+              <option value="">New customer on convert</option>
               {customers.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -183,7 +183,7 @@ export function EstimateBuilder({
           <div className="flex items-end gap-2">
             <Field label="Scope of work" htmlFor="e-tpl" hint="Carries to the plan; can seed line items">
               <Select id="e-tpl" value={v.checklistTemplateId} onChange={set("checklistTemplateId")}>
-                <option value="">— None —</option>
+                <option value="">None</option>
                 {templates.map((t) => (
                   <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
@@ -208,7 +208,7 @@ export function EstimateBuilder({
           <Field
             label={v.pricing === "HOURLY" ? "Hourly rate" : "Per-visit price"}
             htmlFor="e-rate"
-            hint={v.pricing === "HOURLY" ? "Required to convert" : "Optional — defaults to total"}
+            hint={v.pricing === "HOURLY" ? "Required to convert" : "Optional: defaults to total"}
           >
             <Input id="e-rate" inputMode="decimal" value={v.rate} onChange={set("rate")} placeholder="0.00" />
           </Field>

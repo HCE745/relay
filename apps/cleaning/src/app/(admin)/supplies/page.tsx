@@ -77,7 +77,7 @@ export default async function SuppliesPage({ searchParams }: { searchParams: Pro
                       {low ? <StatusBadge tone="warning">{qty(s.currentStock)} · low</StatusBadge> : <span className="tabular-nums text-slate-700">{qty(s.currentStock)}</span>}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-slate-500">{qty(s.reorderThreshold)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-500">{s.costPerUnit ? formatMoney(s.costPerUnit) : "—"}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-slate-500">{s.costPerUnit ? formatMoney(s.costPerUnit) : "-"}</td>
                   </tr>
                 )
               })}

@@ -108,7 +108,7 @@ export function ServiceAreasClient({ areas, exclusions }: { areas: Area[]; exclu
     <div className="space-y-8">
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-700">Service areas</h2>
-        <p className="-mt-1 text-xs text-slate-400">Addresses matching no active ZIP area are flagged &ldquo;outside service area&rdquo; at intake — never silently refused. Radius areas require geocoding to evaluate.</p>
+        <p className="-mt-1 text-xs text-slate-400">Addresses matching no active ZIP area are flagged &ldquo;outside service area&rdquo; at intake. Never silently refused. Radius areas require geocoding to evaluate.</p>
         <ServiceAreaForm />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {areas.map((a) => (
@@ -117,7 +117,7 @@ export function ServiceAreasClient({ areas, exclusions }: { areas: Area[]; exclu
                 <div className="font-semibold text-slate-900">{a.name}</div>
                 <StatusBadge tone={a.active ? "success" : "neutral"}>{a.active ? "Active" : "Inactive"}</StatusBadge>
               </div>
-              <div className="mt-1 text-xs text-slate-500">{a.officeLabel ?? "—"}</div>
+              <div className="mt-1 text-xs text-slate-500">{a.officeLabel ?? "-"}</div>
               <div className="mt-2 text-xs text-slate-600">{a.zipCodes.length ? `ZIPs: ${a.zipCodes.join(", ")}` : a.radiusMiles ? `Radius: ${a.radiusMiles} mi` : "No coverage set"}</div>
               <div className="mt-3 flex gap-2">
                 <Button size="sm" variant="secondary" onClick={() => toggle(a)} disabled={busy}>{a.active ? "Deactivate" : "Activate"}</Button>
@@ -125,12 +125,12 @@ export function ServiceAreasClient({ areas, exclusions }: { areas: Area[]; exclu
               </div>
             </Card>
           ))}
-          {areas.length === 0 ? <Card className="p-5 text-center text-sm text-slate-500 sm:col-span-2 lg:col-span-3">No service areas yet — every address is treated as serviceable until you add one.</Card> : null}
+          {areas.length === 0 ? <Card className="p-5 text-center text-sm text-slate-500 sm:col-span-2 lg:col-span-3">No service areas yet. Every address is treated as serviceable until you add one.</Card> : null}
         </div>
       </section>
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-700">Exclusions (do-not-serve)</h2>
-        <p className="-mt-1 text-xs text-slate-400">Exclusions warn staff with a reason — they never hard-block, and every change is recorded to the audit log. Public booking never reveals an exclusion.</p>
+        <p className="-mt-1 text-xs text-slate-400">Exclusions warn staff with a reason. They never hard-block, and every change is recorded to the audit log. Public booking never reveals an exclusion.</p>
         <div className="grid gap-3 lg:grid-cols-3">
           <ExclusionList kind="address" title="Addresses" hint="A specific address" items={exclusions.addresses} />
           <ExclusionList kind="contact" title="Contacts" hint="A specific person" items={exclusions.contacts} />

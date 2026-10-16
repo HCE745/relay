@@ -99,7 +99,7 @@ export function BidWorksheet({
                 <div className="col-span-2"><Input inputMode="decimal" placeholder="Sq ft" value={a.sqft} onChange={(e) => setArea(i, { sqft: e.target.value })} /></div>
                 <div className="col-span-4">
                   <Select value={rates.find((r) => r.surfaceType === a.surfaceType && r.sqftPerHour === a.sqftPerHour)?.id ?? ""} onChange={(e) => pickSurface(i, e.target.value)}>
-                    <option value="">— Surface / task —</option>
+                    <option value="">Surface / task</option>
                     {rates.map((r) => (<option key={r.id} value={r.id}>{r.taskType} · {r.surfaceType} ({Number(r.sqftPerHour).toLocaleString()} sf/h)</option>))}
                   </Select>
                 </div>
@@ -144,7 +144,7 @@ export function BidWorksheet({
           {saved ? <span className="text-sm text-emerald-600">Saved</span> : null}
         </div>
         {error ? <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
-        <p className="mt-3 text-xs text-slate-400">Saving snapshots the full worksheet onto the estimate and sets its price. The server recomputes the total — this preview is for guidance.</p>
+        <p className="mt-3 text-xs text-slate-400">Saving snapshots the full worksheet onto the estimate and sets its price. The server recomputes the total. This preview is for guidance.</p>
       </Card>
     </div>
   )

@@ -46,7 +46,7 @@ function PaymentForm({ invoiceId, balance, onDone }: { invoiceId: string; balanc
       <div className="grid grid-cols-2 gap-4">
         <Field label="Method" htmlFor="pay-method">
           <Select id="pay-method" value={method} onChange={(e) => setMethod(e.target.value)}>
-            <option value="">—</option>
+            <option value="">-</option>
             <option value="Check">Check</option>
             <option value="ACH">ACH</option>
             <option value="Card">Card</option>

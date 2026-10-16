@@ -52,7 +52,7 @@ export async function getPeriodOvertime(orgId: string, window: { start: Date; en
       premium = m.rate.times(premiumFactor).times(new Prisma.Decimal(split.otMin).dividedBy(60))
       totalPremium = totalPremium.plus(premium)
     }
-    return { userId, name: m?.name ?? "—", regularHours: hoursFromMin(split.regularMin), otHours, premium }
+    return { userId, name: m?.name ?? "-", regularHours: hoursFromMin(split.regularMin), otHours, premium }
   }).filter((r) => r.otHours > 0 || r.regularHours > 0)
     .sort((a, b) => b.otHours - a.otHours)
 

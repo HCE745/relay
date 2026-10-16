@@ -6,7 +6,7 @@ import { ReferenceError, ConflictError } from "./errors"
 // site and per cleaner for staff.
 
 export async function submitSurvey(orgId: string, customerId: string, jobId: string, rating: number, comment?: string) {
-  if (rating < 1 || rating > 5) throw new ConflictError("Rating must be 1–5")
+  if (rating < 1 || rating > 5) throw new ConflictError("Rating must be 1 to 5")
   const job = await orgDb(orgId).job.findFirst({ where: { id: jobId, status: "COMPLETED", serviceLocation: { customerId } }, select: { id: true } })
   if (!job) throw new ReferenceError("That visit isn't available to rate")
   const existing = await orgDb(orgId).surveyResponse.findFirst({ where: { jobId }, select: { id: true } })

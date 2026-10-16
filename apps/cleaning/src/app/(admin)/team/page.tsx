@@ -65,7 +65,7 @@ export default async function TeamPage() {
                   <td className="px-4 py-3 font-medium text-slate-900">{u.name}</td>
                   <td className="px-4 py-3 text-slate-600">{u.email}</td>
                   <td className="px-4 py-3 text-slate-600">{ROLE_LABEL[u.role] ?? u.role}</td>
-                  <td className="px-4 py-3 text-slate-500">{u.employeeProfile?.employeeCode ?? "—"}</td>
+                  <td className="px-4 py-3 text-slate-500">{u.employeeProfile?.employeeCode ?? "-"}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}

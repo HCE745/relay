@@ -111,7 +111,7 @@ export async function commitImport(orgId: string, text: string, createdById: str
   const rowErrors = rows.filter((r) => r.errors.length)
   if (rowErrors.length) {
     throw new RequirementsError(
-      `Import aborted — ${rowErrors.length} row(s) have errors. Nothing was imported.`,
+      `Import aborted. ${rowErrors.length} row(s) have errors. Nothing was imported.`,
       rowErrors.map((r) => `Line ${r.line}: ${r.errors.join("; ")}`),
     )
   }
@@ -189,7 +189,7 @@ export async function rollbackImport(orgId: string, batchId: string) {
       db.job.count({ where: { serviceLocation: { customerId: { in: custIds } } } }),
       db.invoice.count({ where: { customerId: { in: custIds } } }),
     ])
-    if (jobs > 0 || invoices > 0) throw new ConflictError("Some imported customers already have jobs or invoices — roll back can't delete active data")
+    if (jobs > 0 || invoices > 0) throw new ConflictError("Some imported customers already have jobs or invoices. Roll back can't delete active data")
   }
   // Deleting customers cascades their sites + contacts (both FK onDelete:Cascade).
   await db.$transaction([

@@ -11,9 +11,9 @@ export default async function DemoLandingPage() {
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="mx-auto max-w-lg px-4 py-16">
-        <h1 className="text-center text-3xl font-bold tracking-tight text-slate-900">HCE Cleaning — Live Demo</h1>
+        <h1 className="text-center text-3xl font-bold tracking-tight text-slate-900">HCE Cleaning: Live Demo</h1>
         <p className="mx-auto mt-2 max-w-md text-center text-sm text-slate-500">
-          Explore a fully-working cleaning ERP with realistic data — schedule, jobs, inspections, invoices, reports and more.
+          Explore a fully-working cleaning ERP with realistic data: schedule, jobs, inspections, invoices, reports and more.
           Your demo is a private sandbox; click around and change anything. It disappears after 24 hours.
         </p>
 

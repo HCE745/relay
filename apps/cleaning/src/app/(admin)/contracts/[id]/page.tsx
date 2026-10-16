@@ -18,7 +18,7 @@ const CAP = "crm.contracts"
 const TONE: Record<string, BadgeTone> = { DRAFT: "neutral", ACTIVE: "success", EXPIRED: "warning", CANCELLED: "danger" }
 const LABEL: Record<string, string> = { DRAFT: "Draft", ACTIVE: "Active", EXPIRED: "Expired", CANCELLED: "Cancelled" }
 const FREQ_LABEL: Record<string, string> = { MONTHLY: "Monthly", QUARTERLY: "Quarterly", ANNUALLY: "Annually", ONE_TIME: "One-time" }
-const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—")
+const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-")
 const dateInput = (d: Date | null) => (d ? new Date(d).toISOString().slice(0, 10) : "")
 
 export default async function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -81,7 +81,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
 
       {expiring ? (
         <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          This contract ends {fmtDate(c.endDate)}{daysLeft != null ? ` — ${daysLeft} day${daysLeft === 1 ? "" : "s"} away` : ""}. Renewals are handled manually.
+          This contract ends {fmtDate(c.endDate)}{daysLeft != null ? `, ${daysLeft} day${daysLeft === 1 ? "" : "s"} away` : ""}. Renewals are handled manually.
         </div>
       ) : null}
 
@@ -92,7 +92,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
           <div className="mt-4 grid grid-cols-3 gap-4">
             <div>
               <div className="text-xs uppercase tracking-wide text-slate-400">Contract value</div>
-              <div className="mt-1 text-2xl font-semibold tabular-nums text-slate-900">{progress.value != null ? formatMoney(progress.value) : "—"}</div>
+              <div className="mt-1 text-2xl font-semibold tabular-nums text-slate-900">{progress.value != null ? formatMoney(progress.value) : "-"}</div>
             </div>
             <div>
               <div className="text-xs uppercase tracking-wide text-slate-400">Invoiced to date</div>
@@ -101,7 +101,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
             <div>
               <div className="text-xs uppercase tracking-wide text-slate-400">{over ? "Over by" : "Remaining"}</div>
               <div className={`mt-1 text-2xl font-semibold tabular-nums ${over ? "text-orange-600" : "text-slate-900"}`}>
-                {progress.remaining != null ? formatMoney(over ? progress.remaining.abs() : progress.remaining) : "—"}
+                {progress.remaining != null ? formatMoney(over ? progress.remaining.abs() : progress.remaining) : "-"}
               </div>
             </div>
           </div>

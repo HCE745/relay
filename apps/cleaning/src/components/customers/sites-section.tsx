@@ -45,7 +45,7 @@ export function SiteForm({ customerId, onDone }: { customerId: string; onDone: (
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <Field label="Site name" htmlFor="s-name" hint="e.g. Downtown Office — 4th Floor">
+      <Field label="Site name" htmlFor="s-name" hint="e.g. Downtown Office - 4th Floor">
         <Input id="s-name" required value={v.name} onChange={set("name")} />
       </Field>
       <Field label="Street address" htmlFor="s-addr">
@@ -107,7 +107,7 @@ export function SitesSection({ customerId, sites }: { customerId: string; sites:
                   <span className="text-sm font-medium text-slate-900 group-hover:text-brand">{s.name}</span>
                   <StatusPill active={s.isActive} />
                 </div>
-                <div className="text-xs text-slate-500">{[s.city, s.state].filter(Boolean).join(", ") || "—"}</div>
+                <div className="text-xs text-slate-500">{[s.city, s.state].filter(Boolean).join(", ") || "-"}</div>
               </Link>
               <Link
                 href={`/customers/${customerId}/sites/${s.id}`}

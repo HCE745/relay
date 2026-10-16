@@ -33,7 +33,7 @@ export default async function LocationsPage() {
         <EmptyState
           icon={<MapPinIcon />}
           title="No service locations yet"
-          description="Service locations are the sites you clean. Each one lives under a customer — open a customer to add their first site."
+          description="Service locations are the sites you clean. Each one lives under a customer. Open a customer to add their first site."
           actionLabel="Go to Customers"
           actionHref="/customers"
         />

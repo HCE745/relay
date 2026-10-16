@@ -112,7 +112,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
                   </td>
                   <td className="px-4 py-3 text-slate-500">{i.source === "QR" ? "QR (external)" : i.source === "SMS" ? "SMS" : i.source === "CUSTOMER" ? "Customer" : i.inspection ? "Inspection" : "Field report"}</td>
                   <td className="px-4 py-3 text-slate-600">
-                    {i.serviceLocation ? `${i.serviceLocation.customer.name} · ${i.serviceLocation.name}` : "—"}
+                    {i.serviceLocation ? `${i.serviceLocation.customer.name} · ${i.serviceLocation.name}` : "-"}
                   </td>
                   <td className="px-4 py-3 text-slate-600">{i.assignedTo?.name ?? <span className="text-slate-400">Unassigned</span>}</td>
                   <td className="px-4 py-3 text-slate-500">{DateTime.fromJSDate(i.createdAt, { zone: tz }).toFormat("MMM d")}</td>

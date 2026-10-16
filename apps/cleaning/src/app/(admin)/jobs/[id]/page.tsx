@@ -100,10 +100,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
       <Card className="grid gap-4 p-5 sm:grid-cols-2">
         <Detail label="Scheduled" value={`${startDT.toFormat("cccc, MMM d")} · ${formatTimeInZone(job.scheduledStart, jtz)} (${jtz})`} />
-        <Detail label="Ends (scheduled)" value={job.scheduledEnd ? formatTimeInZone(job.scheduledEnd, jtz) : "—"} />
-        <Detail label="Actual start" value={job.actualStart ? formatTimeInZone(job.actualStart, jtz) : "—"} />
-        <Detail label="Actual end" value={job.actualEnd ? formatTimeInZone(job.actualEnd, jtz) : "—"} />
-        <Detail label="Crew size" value={job.crewSize ? String(job.crewSize) : "—"} />
+        <Detail label="Ends (scheduled)" value={job.scheduledEnd ? formatTimeInZone(job.scheduledEnd, jtz) : "-"} />
+        <Detail label="Actual start" value={job.actualStart ? formatTimeInZone(job.actualStart, jtz) : "-"} />
+        <Detail label="Actual end" value={job.actualEnd ? formatTimeInZone(job.actualEnd, jtz) : "-"} />
+        <Detail label="Crew size" value={job.crewSize ? String(job.crewSize) : "-"} />
         <Detail label="Origin" value={job.servicePlan ? `Recurring · ${job.servicePlan.name}` : "One-time job"} />
         {job.notes ? <Detail label="Cleaner / job note" value={job.notes} /> : null}
       </Card>
@@ -115,19 +115,19 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             <span className="text-xs text-slate-400">Owners / admins / managers only</span>
           </div>
           <div className="grid gap-4 sm:grid-cols-4">
-            <Detail label="Billed" value={profit.invoiced ? formatMoney(profit.billedAmount) : "—"} />
+            <Detail label="Billed" value={profit.invoiced ? formatMoney(profit.billedAmount) : "-"} />
             <Detail label="Labor cost" value={profit.laborCost === null ? "Unavailable" : formatMoney(profit.laborCost)} />
             <Detail label="Supplies" value={formatMoney(profit.suppliesCost)} />
-            <Detail label="Gross margin" value={profit.grossMargin === null ? "—" : formatMoney(profit.grossMargin)} />
-            <Detail label="Margin %" value={profit.marginPct === null ? "—" : `${profit.marginPct.toFixed(1)}%`} />
+            <Detail label="Gross margin" value={profit.grossMargin === null ? "-" : formatMoney(profit.grossMargin)} />
+            <Detail label="Margin %" value={profit.marginPct === null ? "-" : `${profit.marginPct.toFixed(1)}%`} />
           </div>
           {profit.salaried ? (
-            <p className="mt-3 text-xs text-slate-500">Labor cost unavailable — salaried-worker time is not costed.</p>
+            <p className="mt-3 text-xs text-slate-500">Labor cost unavailable. Salaried-worker time is not costed.</p>
           ) : profit.laborAvailable && !profit.invoiced ? (
-            <p className="mt-3 text-xs text-amber-600">Not yet invoiced — this is uninvoiced labor; margin appears once the job is on an invoice.</p>
+            <p className="mt-3 text-xs text-amber-600">Not yet invoiced. This is uninvoiced labor; margin appears once the job is on an invoice.</p>
           ) : null}
           {profit.laborAvailable && profit.approvedEntries === 0 ? (
-            <p className="mt-1 text-xs text-slate-400">No approved time yet — labor cost stays $0 until time is approved.</p>
+            <p className="mt-1 text-xs text-slate-400">No approved time yet. Labor cost stays $0 until time is approved.</p>
           ) : null}
         </Card>
       ) : null}
@@ -162,7 +162,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                     <span className="font-medium text-slate-800">{t.user.name}</span>
                     <span className="ml-2 text-slate-500">
                       {formatTimeInZone(t.clockInAt, jtz)}
-                      {t.clockOutAt ? ` – ${formatTimeInZone(t.clockOutAt, jtz)}` : " – …"}
+                      {t.clockOutAt ? ` to ${formatTimeInZone(t.clockOutAt, jtz)}` : " to …"}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -229,7 +229,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         <h2 className="mb-3 text-sm font-semibold text-slate-700">Inspections</h2>
         {job.inspections.length === 0 ? (
           <p className="text-sm text-slate-500">
-            {showInspect ? "Not yet inspected — tap “Inspect work” above." : "No inspections."}
+            {showInspect ? "Not yet inspected. Tap “Inspect work” above." : "No inspections."}
           </p>
         ) : (
           <ul className="divide-y divide-slate-100">

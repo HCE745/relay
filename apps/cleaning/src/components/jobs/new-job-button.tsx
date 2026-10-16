@@ -58,7 +58,7 @@ export function NewJobButton({ sites, templates }: { sites: Option[]; templates:
         <form onSubmit={submit} className="space-y-4">
           <Field label="Service location" htmlFor="j-site">
             <Select id="j-site" value={v.serviceLocationId} onChange={set("serviceLocationId")}>
-              <option value="">— Choose a site —</option>
+              <option value="">Choose a site</option>
               {sites.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -87,7 +87,7 @@ export function NewJobButton({ sites, templates }: { sites: Option[]; templates:
           </div>
           <Field label="Scope of Work (optional)" htmlFor="j-tpl">
             <Select id="j-tpl" value={v.checklistTemplateId} onChange={set("checklistTemplateId")}>
-              <option value="">— None —</option>
+              <option value="">None</option>
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}

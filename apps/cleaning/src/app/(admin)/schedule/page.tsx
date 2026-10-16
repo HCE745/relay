@@ -134,7 +134,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
       ? anchor.toFormat("cccc, MMM d, yyyy")
       : view === "month" && monthAnchor
         ? monthAnchor.toFormat("MMMM yyyy")
-        : `${firstDay.toFormat("MMM d")} – ${lastDay.toFormat("MMM d, yyyy")}`
+        : `${firstDay.toFormat("MMM d")} to ${lastDay.toFormat("MMM d, yyyy")}`
 
   const newJob = canManage ? (
     <NewJobButton sites={sites.map((s) => ({ id: s.id, name: s.name }))} templates={templates.map((t) => ({ id: t.id, name: t.name }))} />

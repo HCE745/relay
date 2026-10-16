@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic"
 const CAP = "reporting.profitability"
 
 const isDate = (s: string | undefined): s is string => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s)
-const pctText = (p: number | null) => (p === null ? "—" : `${p.toFixed(1)}%`)
+const pctText = (p: number | null) => (p === null ? "-" : `${p.toFixed(1)}%`)
 
 export default async function ProfitabilityPage({
   searchParams,
@@ -137,7 +137,7 @@ export default async function ProfitabilityPage({
           {summary.uninvoicedJobs > 0 ? (
             <p>
               <span className="font-medium">{summary.uninvoicedJobs}</span> completed job
-              {summary.uninvoicedJobs === 1 ? "" : "s"} not yet invoiced —{" "}
+              {summary.uninvoicedJobs === 1 ? "" : "s"} not yet invoiced:{" "}
               <span className="font-medium">{formatMoney(summary.uninvoicedLabor)}</span> of uninvoiced labor{" "}
               {includeUninvoiced ? "(included above)" : "(excluded from margin)"}. Invoice the work, or use “Include uninvoiced jobs”.
             </p>
@@ -145,7 +145,7 @@ export default async function ProfitabilityPage({
           {summary.unavailableJobs > 0 ? (
             <p>
               <span className="font-medium">{summary.unavailableJobs}</span> job
-              {summary.unavailableJobs === 1 ? "" : "s"} used salaried labor — labor cost unavailable, excluded from margin.
+              {summary.unavailableJobs === 1 ? "" : "s"} used salaried labor. Labor cost unavailable, excluded from margin.
             </p>
           ) : null}
         </Card>
@@ -169,7 +169,7 @@ export default async function ProfitabilityPage({
 
       <p className="text-xs text-slate-400">
         Revenue counts only amounts on a non-void invoice. Uninvoiced completed jobs are excluded from margin by default
-        (shown above as uninvoiced labor). Salaried labor cannot be costed and is excluded — never estimated. Pay-rate
+        (shown above as uninvoiced labor). Salaried labor cannot be costed and is excluded, never estimated. Pay-rate
         data is visible to owners, admins and managers only.
       </p>
     </div>

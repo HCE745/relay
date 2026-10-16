@@ -13,7 +13,7 @@ type Site = { id: string; name: string; requiredTypes: string[] }
 
 const STATE_TONE: Record<string, BadgeTone> = { ACTIVE: "success", EXPIRING: "warning", EXPIRED: "danger", REVOKED: "neutral" }
 const STATE_LABEL: Record<string, string> = { ACTIVE: "Active", EXPIRING: "Expiring", EXPIRED: "Expired", REVOKED: "Revoked" }
-const fmtD = (s: string | null) => (s ? new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—")
+const fmtD = (s: string | null) => (s ? new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-")
 
 function AddCredential({ members }: { members: Member[] }) {
   const router = useRouter()

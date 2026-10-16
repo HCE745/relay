@@ -36,7 +36,7 @@ export default async function QrPage() {
 
   return (
     <div>
-      <PageHeader title="QR reporting" subtitle="Posted codes occupants scan to report a problem — no login" icon={<InboxIcon />} />
+      <PageHeader title="QR reporting" subtitle="Posted codes occupants scan to report a problem, no login" icon={<InboxIcon />} />
       <div className="mb-4">
         <Link href="/issues" className="text-sm font-medium text-brand hover:underline">← Back to issues</Link>
       </div>

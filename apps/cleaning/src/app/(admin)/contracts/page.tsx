@@ -18,7 +18,7 @@ const CAP = "crm.contracts"
 
 const TONE: Record<string, BadgeTone> = { DRAFT: "neutral", ACTIVE: "success", EXPIRED: "warning", CANCELLED: "danger" }
 const LABEL: Record<string, string> = { DRAFT: "Draft", ACTIVE: "Active", EXPIRED: "Expired", CANCELLED: "Cancelled" }
-const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—")
+const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-")
 
 export default async function ContractsPage({ searchParams }: { searchParams: Promise<{ filter?: string }> }) {
   const session = await getSession()
@@ -51,7 +51,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
     <div>
       <PageHeader
         title="Contracts"
-        subtitle="Commercial terms and agreements — contract value vs. what you've actually invoiced"
+        subtitle="Commercial terms and agreements: contract value vs. what you've actually invoiced"
         icon={<FileTextIcon />}
         action={<NewContractButton customers={customerOptions} />}
       />
@@ -70,7 +70,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
           <EmptyState
             icon={<ReceiptIcon />}
             title="No contracts yet"
-            description="Record a customer's commercial terms — value, term dates and billing frequency — then optionally link their service plans to track invoiced revenue against the contract value. Contracts never change how invoicing works."
+            description="Record a customer's commercial terms (value, term dates and billing frequency), then optionally link their service plans to track invoiced revenue against the contract value. Contracts never change how invoicing works."
             action={<NewContractButton customers={customerOptions} />}
           />
         )
@@ -87,7 +87,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="truncate font-semibold text-slate-900 group-hover:text-brand">{c.title}</div>
-                      <div className="truncate text-xs text-slate-500">{c.customer?.name ?? "—"}</div>
+                      <div className="truncate text-xs text-slate-500">{c.customer?.name ?? "-"}</div>
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
                       <StatusBadge tone={TONE[c.status] ?? "neutral"}>{LABEL[c.status] ?? c.status}</StatusBadge>
@@ -106,10 +106,10 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
                         <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
                           <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
                         </div>
-                        <div className="mt-1 text-[11px] text-slate-500">{pct}% of contract value · {fmtDate(c.startDate)} – {fmtDate(c.endDate)}</div>
+                        <div className="mt-1 text-[11px] text-slate-500">{pct}% of contract value · {fmtDate(c.startDate)} to {fmtDate(c.endDate)}</div>
                       </div>
                     ) : (
-                      <div className="mt-1 text-[11px] text-slate-500">No contract value set · {fmtDate(c.startDate)} – {fmtDate(c.endDate)}</div>
+                      <div className="mt-1 text-[11px] text-slate-500">No contract value set · {fmtDate(c.startDate)} to {fmtDate(c.endDate)}</div>
                     )}
                   </div>
                 </Card>

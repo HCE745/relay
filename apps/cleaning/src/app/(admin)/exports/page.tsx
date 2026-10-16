@@ -22,7 +22,7 @@ export default async function ExportsPage() {
   const history = await listExportHistory(orgId)
   return (
     <div>
-      <PageHeader title="Exports" subtitle="QuickBooks, Xero, Gusto & ADP — CSV import files" icon={<FileTextIcon />} />
+      <PageHeader title="Exports" subtitle="QuickBooks, Xero, Gusto & ADP: CSV import files" icon={<FileTextIcon />} />
       <ExportsClient
         history={history.map((r) => ({
           id: r.id, type: r.type, rowCount: r.rowCount, createdByName: r.createdByName,

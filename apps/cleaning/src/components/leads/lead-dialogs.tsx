@@ -88,7 +88,7 @@ function LeadForm({ initial, assignees, onDone }: { initial?: LeadValues; assign
         </Field>
         <Field label="Assigned to" htmlFor="l-assignee">
           <Select id="l-assignee" value={v.assignedToId ?? ""} onChange={set("assignedToId")}>
-            <option value="">— Unassigned —</option>
+            <option value="">Unassigned</option>
             {assignees.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}

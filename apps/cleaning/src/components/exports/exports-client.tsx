@@ -6,9 +6,9 @@ import { Card, Field, Input } from "@/components/ui/controls"
 type Row = { id: string; type: string; rowCount: number; createdByName: string | null; createdAt: string; periodStart: string | null; periodEnd: string | null }
 
 const TYPE_LABEL: Record<string, string> = {
-  QBO_INVOICES: "QuickBooks — Invoices", QBO_CUSTOMERS: "QuickBooks — Customers",
-  XERO_INVOICES: "Xero — Invoices", XERO_CONTACTS: "Xero — Contacts",
-  GUSTO_HOURS: "Gusto — Hours", ADP_HOURS: "ADP — Hours",
+  QBO_INVOICES: "QuickBooks: Invoices", QBO_CUSTOMERS: "QuickBooks: Customers",
+  XERO_INVOICES: "Xero: Invoices", XERO_CONTACTS: "Xero: Contacts",
+  GUSTO_HOURS: "Gusto: Hours", ADP_HOURS: "ADP: Hours",
 }
 const fmtDT = (s: string) => new Date(s).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
 
@@ -57,7 +57,7 @@ export function ExportsClient({ history }: { history: Row[] }) {
             <DownloadButton kind="GUSTO_HOURS" label="Gusto hours" from={from} to={to} periodic />
             <DownloadButton kind="ADP_HOURS" label="ADP hours" from={from} to={to} periodic />
           </div>
-          <p className="mt-3 text-xs text-slate-400">Approved time only. Overtime is left 0 — the app has no OT ruleset; set OT in your payroll provider.</p>
+          <p className="mt-3 text-xs text-slate-400">Approved time only. Overtime is left 0. The app has no OT ruleset; set OT in your payroll provider.</p>
         </Card>
       </div>
 
@@ -76,7 +76,7 @@ export function ExportsClient({ history }: { history: Row[] }) {
                   <tr key={r.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-900">{TYPE_LABEL[r.type] ?? r.type}</td>
                     <td className="px-4 py-3 text-slate-500">{fmtDT(r.createdAt)}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.createdByName ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-600">{r.createdByName ?? "-"}</td>
                     <td className="px-4 py-3 text-right tabular-nums text-slate-600">{r.rowCount}</td>
                   </tr>
                 ))}

@@ -26,7 +26,7 @@ export default async function AccessPage() {
 
   return (
     <div>
-      <PageHeader title="Access & keys" subtitle="Keys, fobs, badges and codes — custody and encrypted codes" icon={<TagIcon />} />
+      <PageHeader title="Access & keys" subtitle="Keys, fobs, badges and codes: custody and encrypted codes" icon={<TagIcon />} />
       <AccessClient sites={sites.map((s) => ({ id: s.id, name: s.name }))} members={members} items={items} />
     </div>
   )

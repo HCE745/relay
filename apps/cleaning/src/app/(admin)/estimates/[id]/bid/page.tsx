@@ -46,7 +46,7 @@ export default async function BidPage({ params }: { params: Promise<{ id: string
   return (
     <div>
       <Link href={`/estimates/${est.id}`} className="mb-4 inline-block text-sm text-slate-500 hover:text-brand">← {est.title}</Link>
-      <PageHeader title="Bid calculator" subtitle="Price from production rates — labor, supplies, overhead, margin" icon={<ChartBarIcon />} />
+      <PageHeader title="Bid calculator" subtitle="Price from production rates: labor, supplies, overhead, margin" icon={<ChartBarIcon />} />
 
       {est.convertedCustomerId ? (
         <Card className="p-5 text-sm text-slate-600">This estimate is converted and read-only.</Card>
@@ -54,7 +54,7 @@ export default async function BidPage({ params }: { params: Promise<{ id: string
         <EmptyState
           icon={<ChartBarIcon />}
           title="No production rates yet"
-          description="The bid calculator prices work from a library of production rates (sq ft per hour). Seed the industry-standard defaults to get started — you can tune them anytime."
+          description="The bid calculator prices work from a library of production rates (sq ft per hour). Seed the industry-standard defaults to get started. You can tune them anytime."
           action={<SeedRatesButton />}
         />
       ) : (

@@ -117,7 +117,7 @@ export async function convertQuoteRequest(orgId: string, id: string, opts: { toL
   if (opts.toEstimate) {
     const walk = (q!.walkthrough as { name: string; sqft: number; surface: string }[] | null) ?? null
     const est = await createEstimate(orgId, {
-      title: `${q!.contactName} — quote`, leadId, contactName: q!.contactName, contactEmail: q!.contactEmail ?? undefined, contactPhone: q!.contactPhone ?? undefined,
+      title: `${q!.contactName} - quote`, leadId, contactName: q!.contactName, contactEmail: q!.contactEmail ?? undefined, contactPhone: q!.contactPhone ?? undefined,
       siteName: q!.addressLine1 ?? undefined, addressLine1: q!.addressLine1 ?? undefined, city: q!.city ?? undefined, state: q!.state ?? undefined, postalCode: q!.postalCode ?? undefined,
       frequency: q!.frequency ?? undefined, notes: walk ? `Walkthrough:\n${walk.map((a) => `• ${a.name}: ${a.sqft} sqft ${a.surface}`).join("\n")}` : (q!.notes ?? undefined),
       lines: [],

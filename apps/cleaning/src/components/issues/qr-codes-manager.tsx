@@ -46,7 +46,7 @@ export function QrCodesManager({ codes, sites, baseUrl }: { codes: QrRow[]; site
     <div className="space-y-6">
       <Card className="p-6">
         <h3 className="mb-1 text-sm font-semibold text-slate-700">Create a QR code</h3>
-        <p className="mb-4 text-xs text-slate-500">Post it where occupants can scan to report a problem — one per restroom, entrance, floor, etc.</p>
+        <p className="mb-4 text-xs text-slate-500">Post it where occupants can scan to report a problem: one per restroom, entrance, floor, etc.</p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Site" htmlFor="qr-site"><Select id="qr-site" value={serviceLocationId} onChange={(e) => { setSite(e.target.value); setError(null) }}><option value="">Choose a site…</option>{sites.map((s) => <option key={s.id} value={s.id}>{s.customerName} · {s.name}</option>)}</Select></Field>
           <Field label="Where it's posted" htmlFor="qr-label"><Input id="qr-label" value={label} onChange={(e) => { setLabel(e.target.value); setError(null) }} placeholder="2nd floor men's restroom" /></Field>
@@ -90,7 +90,7 @@ export function QrCodesManager({ codes, sites, baseUrl }: { codes: QrRow[]; site
           </table>
         )}
       </Card>
-      <p className="text-xs text-slate-400">Public link format: {baseUrl}/r/&lt;code&gt;. Revoking one code never affects the others — no reprinting the whole building.</p>
+      <p className="text-xs text-slate-400">Public link format: {baseUrl}/r/&lt;code&gt;. Revoking one code never affects the others. No reprinting the whole building.</p>
     </div>
   )
 }

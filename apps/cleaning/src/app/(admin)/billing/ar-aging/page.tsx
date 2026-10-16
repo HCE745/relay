@@ -45,9 +45,9 @@ export default async function ArAgingPage() {
               <tr>
                 <th className="px-4 py-2.5 font-medium">Customer</th>
                 <th className="px-4 py-2.5 text-right font-medium">Current</th>
-                <th className="px-4 py-2.5 text-right font-medium">1–30</th>
-                <th className="px-4 py-2.5 text-right font-medium">31–60</th>
-                <th className="px-4 py-2.5 text-right font-medium">61–90</th>
+                <th className="px-4 py-2.5 text-right font-medium">1-30</th>
+                <th className="px-4 py-2.5 text-right font-medium">31-60</th>
+                <th className="px-4 py-2.5 text-right font-medium">61-90</th>
                 <th className="px-4 py-2.5 text-right font-medium">90+</th>
                 <th className="px-4 py-2.5 text-right font-medium">Total</th>
               </tr>

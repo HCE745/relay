@@ -31,7 +31,7 @@ export function OvertimeForm({ weekly, daily, multiplier }: { weekly: number | n
     <div className="space-y-3">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Field label="Weekly OT after (hours)" htmlFor="ot-w" hint="blank = off"><Input id="ot-w" type="number" min={0} max={168} value={w} onChange={(e) => { setW(e.target.value); setSaved(false) }} placeholder="40" /></Field>
-        <Field label="Daily OT after (hours)" htmlFor="ot-d" hint="blank = off"><Input id="ot-d" type="number" min={0} max={24} value={d} onChange={(e) => { setD(e.target.value); setSaved(false) }} placeholder="— off —" /></Field>
+        <Field label="Daily OT after (hours)" htmlFor="ot-d" hint="blank = off"><Input id="ot-d" type="number" min={0} max={24} value={d} onChange={(e) => { setD(e.target.value); setSaved(false) }} placeholder="off" /></Field>
         <Field label="OT multiplier" htmlFor="ot-m" hint="1.5 = time-and-a-half"><Input id="ot-m" value={m} onChange={(e) => { setM(e.target.value); setSaved(false) }} inputMode="decimal" /></Field>
       </div>
       <div className="flex items-center gap-3">
@@ -39,7 +39,7 @@ export function OvertimeForm({ weekly, daily, multiplier }: { weekly: number | n
         {saved ? <span className="text-sm text-emerald-600">Saved</span> : null}
         {error ? <span className="text-sm text-red-600">{error}</span> : null}
       </div>
-      <p className="text-xs text-slate-400">Overtime is computed from approved time per employee per week. Hours and premium only — payroll itself stays in your payroll system.</p>
+      <p className="text-xs text-slate-400">Overtime is computed from approved time per employee per week. Hours and premium only. Payroll itself stays in your payroll system.</p>
     </div>
   )
 }

@@ -185,7 +185,7 @@ export default async function PortalDashboard() {
               {data.inspections.map((i) => (
                 <li key={i.id} className="flex items-center justify-between py-2 text-sm">
                   <span><span className="font-medium text-slate-800">{i.serviceLocation.name}</span> · {i.finalizedAt ? fmtD(i.finalizedAt) : ""}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${i.outcome === "PASS" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{i.score != null ? `${i.score}%` : "—"} {i.outcome ?? ""}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${i.outcome === "PASS" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{i.score != null ? `${i.score}%` : "-"} {i.outcome ?? ""}</span>
                 </li>
               ))}
             </ul>

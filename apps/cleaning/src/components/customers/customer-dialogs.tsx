@@ -72,11 +72,11 @@ function CustomerForm({ initial, onDone }: { initial?: CustomerValues; onDone: (
     return (
       <div className="space-y-4">
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
-          <p className="text-sm font-semibold text-amber-900">Heads up — this contact is on the do-not-serve list</p>
+          <p className="text-sm font-semibold text-amber-900">Heads up: this contact is on the do-not-serve list</p>
           <p className="mt-1 text-sm text-amber-800">The customer was created, but review before scheduling work:</p>
           <ul className="mt-2 space-y-1 text-sm text-amber-800">
             {warnings.map((w, i) => (
-              <li key={i}>• {w.reason.replaceAll("_", " ").toLowerCase()}{w.note ? ` — ${w.note}` : ""}</li>
+              <li key={i}>• {w.reason.replaceAll("_", " ").toLowerCase()}{w.note ? `: ${w.note}` : ""}</li>
             ))}
           </ul>
         </div>

@@ -19,7 +19,7 @@ const CAP = "crm.estimates"
 const TONE: Record<string, BadgeTone> = { DRAFT: "neutral", SENT: "info", ACCEPTED: "success", DECLINED: "danger", EXPIRED: "neutral" }
 const LABEL: Record<string, string> = { DRAFT: "Draft", SENT: "Sent", ACCEPTED: "Accepted", DECLINED: "Declined", EXPIRED: "Expired" }
 const FREQ_LABEL: Record<string, string> = { ONE_TIME: "One-time", DAILY: "Daily", WEEKLY: "Weekly", BIWEEKLY: "Every 2 weeks", MONTHLY: "Monthly", CUSTOM: "Custom" }
-const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—")
+const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-")
 
 export default async function EstimateDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession()
@@ -42,7 +42,7 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
   const converted = !!est.convertedCustomerId
   const cur = est.currency
   const addr = [est.addressLine1, [est.city, est.state].filter(Boolean).join(", "), est.postalCode].filter(Boolean).join(" · ")
-  const rateText = est.rate ? formatMoney(est.rate, cur) : "—"
+  const rateText = est.rate ? formatMoney(est.rate, cur) : "-"
 
   return (
     <div>
@@ -77,7 +77,7 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
         {converted ? (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
             <p className="text-sm text-emerald-800">
-              Converted{est.convertedAt ? ` on ${fmtDate(est.convertedAt)}` : ""} — this estimate is now read-only and
+              Converted{est.convertedAt ? ` on ${fmtDate(est.convertedAt)}` : ""}. This estimate is now read-only and
               linked to the customer it created.
             </p>
             {est.convertedCustomer ? (
@@ -95,10 +95,10 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
             <div className="text-lg font-semibold text-slate-900">{org?.name ?? "HCE Cleaning"}</div>
             <div className="mt-1 text-xs uppercase tracking-wide text-slate-400">Estimate</div>
             <div className="mt-4 text-xs uppercase tracking-wide text-slate-400">Prepared for</div>
-            <div className="text-sm font-medium text-slate-800">{est.customer?.name ?? est.lead?.company ?? est.contactName ?? "—"}</div>
+            <div className="text-sm font-medium text-slate-800">{est.customer?.name ?? est.lead?.company ?? est.contactName ?? "-"}</div>
             {est.contactName && (est.customer || est.lead?.company) ? <div className="text-sm text-slate-500">{est.contactName}</div> : null}
             {est.contactEmail ? <div className="text-sm text-slate-500">{est.contactEmail}</div> : null}
-            {est.siteName || addr ? <div className="text-sm text-slate-500">{[est.siteName, addr].filter(Boolean).join(" — ")}</div> : null}
+            {est.siteName || addr ? <div className="text-sm text-slate-500">{[est.siteName, addr].filter(Boolean).join(", ")}</div> : null}
           </div>
           <div className="text-right">
             <div className="text-xl font-semibold text-slate-900">{est.title}</div>

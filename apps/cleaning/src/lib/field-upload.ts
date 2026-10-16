@@ -9,7 +9,7 @@
 
 export type UploadResult = { ok: true } | { ok: false; error: string }
 
-const NETWORK_ERROR = "Upload failed — check your connection and retry."
+const NETWORK_ERROR = "Upload failed. Check your connection and retry."
 
 export async function uploadPhoto(
   url: string,

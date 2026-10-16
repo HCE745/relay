@@ -31,7 +31,7 @@ export default async function ServiceAreasPage() {
         }))}
         exclusions={{
           addresses: exclusions.addresses.map((e) => ({ id: e.id, label: [e.addressLine1, e.city, e.postalCode].filter(Boolean).join(", "), reason: e.reason, note: e.note })),
-          contacts: exclusions.contacts.map((e) => ({ id: e.id, label: [e.name, e.phone, e.email].filter(Boolean).join(" · ") || "—", reason: e.reason, note: e.note })),
+          contacts: exclusions.contacts.map((e) => ({ id: e.id, label: [e.name, e.phone, e.email].filter(Boolean).join(" · ") || "-", reason: e.reason, note: e.note })),
           zones: exclusions.zones.map((e) => ({ id: e.id, label: e.value, reason: e.reason, note: e.note })),
         }}
       />

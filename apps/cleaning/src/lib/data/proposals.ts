@@ -57,7 +57,7 @@ export async function proposalPdfByToken(token: string): Promise<Buffer | null> 
   return renderProposalPdf({
     ...data,
     terms: p.terms ?? undefined,
-    signature: p.signerName && p.signedAt ? { name: p.signerName, signedAt: p.signedAt.toISOString().slice(0, 16).replace("T", " "), ip: p.signerIp ?? "—" } : undefined,
+    signature: p.signerName && p.signedAt ? { name: p.signerName, signedAt: p.signedAt.toISOString().slice(0, 16).replace("T", " "), ip: p.signerIp ?? "-" } : undefined,
   })
 }
 

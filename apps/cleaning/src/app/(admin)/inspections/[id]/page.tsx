@@ -57,7 +57,7 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
             <Detail label="Score" value={`${inspection.score}% (threshold ${inspection.passThreshold}%)`} />
             <Detail
               label="Finalized"
-              value={inspection.finalizedAt ? DateTime.fromJSDate(inspection.finalizedAt, { zone: tz }).toFormat("MMM d, yyyy · h:mm a") : "—"}
+              value={inspection.finalizedAt ? DateTime.fromJSDate(inspection.finalizedAt, { zone: tz }).toFormat("MMM d, yyyy · h:mm a") : "-"}
             />
           </dl>
           {inspection.comments ? <Detail label="Comments" value={inspection.comments} /> : null}

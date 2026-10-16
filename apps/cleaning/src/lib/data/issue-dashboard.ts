@@ -60,7 +60,7 @@ export async function getIssueResolutionStats(orgId: string, now: Date = new Dat
     : []
   const ownerName = new Map(owners.map((u) => [u.id, u.name]))
   const byOwner = byOwnerRaw
-    .map((o) => ({ id: o.assignedToId!, name: ownerName.get(o.assignedToId!) ?? "—", count: o._count }))
+    .map((o) => ({ id: o.assignedToId!, name: ownerName.get(o.assignedToId!) ?? "-", count: o._count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 8)
 

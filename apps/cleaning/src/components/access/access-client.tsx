@@ -92,9 +92,9 @@ function ItemRow({ item, members }: { item: Item; members: Member[] }) {
         {error ? <div className="mt-1 text-xs text-red-600">{error}</div> : null}
       </td>
       <td className="px-4 py-3 text-slate-600">{TYPE_LABEL[item.type] ?? item.type}</td>
-      <td className="px-4 py-3 text-slate-600">{item.serviceLocation?.name ?? "—"}</td>
+      <td className="px-4 py-3 text-slate-600">{item.serviceLocation?.name ?? "-"}</td>
       <td className="px-4 py-3"><StatusBadge tone={STATUS_TONE[item.status] ?? "neutral"}>{item.status}</StatusBadge></td>
-      <td className="px-4 py-3 text-slate-600">{item.holder?.name ?? "—"}</td>
+      <td className="px-4 py-3 text-slate-600">{item.holder?.name ?? "-"}</td>
       <td className="px-4 py-3">
         <div className="flex flex-wrap items-center justify-end gap-1.5">
           {item.hasSecret ? <Button size="sm" variant="secondary" onClick={reveal} disabled={busy}>Reveal</Button> : null}

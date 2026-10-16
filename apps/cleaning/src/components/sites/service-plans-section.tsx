@@ -159,7 +159,7 @@ function PlanForm({
         </Field>
       </div>
       {v.frequency === "CUSTOM" ? (
-        <Field label="Custom rule (RRULE)" htmlFor="p-rrule" hint="Advanced — e.g. FREQ=WEEKLY;BYDAY=MO,WE,FR">
+        <Field label="Custom rule (RRULE)" htmlFor="p-rrule" hint="Advanced: e.g. FREQ=WEEKLY;BYDAY=MO,WE,FR">
           <Input id="p-rrule" value={v.rrule} onChange={set("rrule")} />
         </Field>
       ) : null}
@@ -181,7 +181,7 @@ function PlanForm({
       </div>
       <Field label="Scope of Work" htmlFor="p-tpl" hint={templates.length ? undefined : "Create a checklist first to attach a scope"}>
         <Select id="p-tpl" value={v.checklistTemplateId} onChange={set("checklistTemplateId")}>
-          <option value="">— None —</option>
+          <option value="">None</option>
           {templates.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name}
@@ -266,7 +266,7 @@ function GenerateDialog({ plan, onDone }: { plan: PlanValue; onDone: () => void 
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-600">
-        Generate concrete jobs from <span className="font-medium">{plan.name}</span>. Re-running is safe — existing
+        Generate concrete jobs from <span className="font-medium">{plan.name}</span>. Re-running is safe. Existing
         jobs are never duplicated.
       </p>
       <Field label="Horizon" htmlFor="g-days">

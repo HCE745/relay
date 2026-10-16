@@ -43,7 +43,7 @@ export function NewWorkOrderButton({ customers }: { customers: Customer[] }) {
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Customer" htmlFor="wo-cust"><Select id="wo-cust" value={v.customerId} onChange={(e) => setV({ ...v, customerId: e.target.value, serviceLocationId: "" })}>{customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>
-            <Field label="Site (optional)" htmlFor="wo-site"><Select id="wo-site" value={v.serviceLocationId} onChange={set("serviceLocationId")}><option value="">—</option>{sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</Select></Field>
+            <Field label="Site (optional)" htmlFor="wo-site"><Select id="wo-site" value={v.serviceLocationId} onChange={set("serviceLocationId")}><option value="">-</option>{sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</Select></Field>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Field label="Type" htmlFor="wo-type"><Select id="wo-type" value={v.type} onChange={set("type")}>{WORK_ORDER_TYPES.map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}</Select></Field>

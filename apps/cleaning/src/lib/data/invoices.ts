@@ -164,14 +164,14 @@ export async function generateInvoice(
     const jobCurrency = effective.currency
     if (currency === null) currency = jobCurrency
     else if (jobCurrency !== currency) {
-      excluded.push({ jobId: job.id, title: job.title, reason: `Different currency (${jobCurrency}) — invoice separately` })
+      excluded.push({ jobId: job.id, title: job.title, reason: `Different currency (${jobCurrency}). Invoice separately` })
       continue
     }
 
     if (effective.billingType === "HOURLY") {
       const pending = job.timeEntries.filter((e) => e.status === "OPEN" || e.status === "COMPLETED")
       if (pending.length > 0) {
-        excluded.push({ jobId: job.id, title: job.title, reason: "Has unapproved time — approve it first" })
+        excluded.push({ jobId: job.id, title: job.title, reason: "Has unapproved time. Approve it first" })
         continue
       }
       const minutes = job.timeEntries.filter((e) => e.status === "APPROVED").reduce((sum, e) => sum + billableMinutes(e), 0)
@@ -197,7 +197,7 @@ export async function generateInvoice(
     const planCurrency = plan.currency ?? "USD"
     if (currency === null) currency = planCurrency
     else if (planCurrency !== currency) {
-      excluded.push({ jobId: plan.id, title: plan.name, reason: `Different currency (${planCurrency}) — invoice separately` })
+      excluded.push({ jobId: plan.id, title: plan.name, reason: `Different currency (${planCurrency}). Invoice separately` })
       continue
     }
     const amount = round2(plan.periodAmount as Money)
@@ -212,7 +212,7 @@ export async function generateInvoice(
         activeJobId: null,
         activePeriodKey: periodKey,
         billable: true,
-        description: `${plan.name} — ${period.label}`,
+        description: `${plan.name} - ${period.label}`,
         siteName: plan.serviceLocation.name,
         serviceDate: period.end,
         quantity: new Prisma.Decimal(1),
@@ -269,7 +269,7 @@ export async function generateInvoice(
         changeOrderId: co.id, activeChangeOrderId: co.id,
         billable: true,
         description: `Extra: ${co.description}`,
-        siteName: co.job?.serviceLocation.name ?? co.contract?.title ?? "—",
+        siteName: co.job?.serviceLocation.name ?? co.contract?.title ?? "-",
         serviceDate: co.approvedAt ?? now,
         quantity: new Prisma.Decimal(1), unitRate: amount, amount,
       })
@@ -371,7 +371,7 @@ export async function generateInvoice(
       // else: pure invoiceNumber race — loop retries with a fresh number.
     }
   }
-  throw new ConflictError("Could not assign an invoice number — please try again")
+  throw new ConflictError("Could not assign an invoice number. Please try again")
 }
 
 // ─── Reads ───────────────────────────────────────────────────────────────────

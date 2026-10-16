@@ -56,7 +56,7 @@ function GenerateForm({ customers, onDone }: { customers: CustomerOption[]; onDo
           </div>
         ) : (
           <div className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            No invoice created — {result.reason}.
+            No invoice created: {result.reason}.
           </div>
         )}
         {result.excluded.length > 0 ? (

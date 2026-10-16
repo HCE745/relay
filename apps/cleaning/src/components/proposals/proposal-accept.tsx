@@ -21,7 +21,7 @@ export function ProposalAccept({ token }: { token: string }) {
     setState(kind === "accept" ? "accepted" : "declined")
   }
 
-  if (state === "accepted") return <div className="rounded-xl bg-emerald-50 p-4 text-center text-sm text-emerald-800">Accepted — thank you! We&apos;ll be in touch to get started.</div>
+  if (state === "accepted") return <div className="rounded-xl bg-emerald-50 p-4 text-center text-sm text-emerald-800">Accepted. Thank you! We&apos;ll be in touch to get started.</div>
   if (state === "declined") return <div className="rounded-xl bg-slate-100 p-4 text-center text-sm text-slate-600">You declined this proposal. Contact us if you have questions.</div>
 
   return (

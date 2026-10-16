@@ -233,7 +233,7 @@ function ChecklistRow({ jobId, item, disabled }: { jobId: string; item: Item; di
                   item.hasPhoto ? "bg-emerald-50 text-emerald-700" : uploadError ? "bg-red-50 text-red-700" : "bg-slate-100 text-slate-600"
                 } disabled:opacity-50`}
               >
-                {busy ? "Uploading…" : item.hasPhoto ? "Photo added ✓ — retake" : "Add required photo"}
+                {busy ? "Uploading…" : item.hasPhoto ? "Photo added ✓, retake" : "Add required photo"}
               </button>
               {uploadError && !item.hasPhoto ? (
                 <div className="mt-2 rounded-lg bg-red-50 p-2 text-xs text-red-700">

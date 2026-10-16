@@ -29,7 +29,7 @@ export function BookingForm({ slug, orgName }: { slug: string; orgName: string }
   if (state === "done") {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-        <p className="text-base font-semibold text-slate-900">Thanks — we got your request!</p>
+        <p className="text-base font-semibold text-slate-900">Thanks, we got your request!</p>
         <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500">A member of the {orgName} team will reach out shortly to confirm details and provide a quote.</p>
       </div>
     )

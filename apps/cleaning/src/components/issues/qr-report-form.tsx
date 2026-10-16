@@ -42,7 +42,7 @@ export function QrReportForm({ token }: { token: string }) {
   if (reference) {
     return (
       <div className="text-center">
-        <p className="text-base font-semibold text-emerald-700">Thanks — we&apos;ve got it.</p>
+        <p className="text-base font-semibold text-emerald-700">Thanks, we&apos;ve got it.</p>
         <p className="mt-2 text-sm text-slate-600">Reference <span className="font-mono font-semibold">{reference}</span></p>
         <p className="mt-1 text-xs text-slate-400">The cleaning team has been notified.</p>
       </div>

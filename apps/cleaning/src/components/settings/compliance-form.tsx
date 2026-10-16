@@ -23,7 +23,7 @@ export function ComplianceForm({ currentLeadDays, currentBlock }: { currentLeadD
 
   return (
     <div className="space-y-3">
-      <Field label="Warn this many days before a credential expires" htmlFor="k-clead" hint="1–365">
+      <Field label="Warn this many days before a credential expires" htmlFor="k-clead" hint="1-365">
         <Input id="k-clead" type="number" min={1} max={365} value={days} onChange={(e) => { setDays(e.target.value); setSaved(false) }} className="w-32" />
       </Field>
       <label className="inline-flex items-center gap-2 text-sm text-slate-700">

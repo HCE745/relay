@@ -26,7 +26,7 @@ export function ContractExpiryForm({ current }: { current: number }) {
 
   return (
     <div className="space-y-3">
-      <Field label="Warn me this many days before a contract expires" htmlFor="k-lead" hint="Active contracts ending within this window show on the dashboard (1–365).">
+      <Field label="Warn me this many days before a contract expires" htmlFor="k-lead" hint="Active contracts ending within this window show on the dashboard (1-365).">
         <Input
           id="k-lead"
           type="number"

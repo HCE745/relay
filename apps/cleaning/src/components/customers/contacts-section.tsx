@@ -115,7 +115,7 @@ export function ContactsSection({ customerId, contacts }: { customerId: string; 
                   ) : null}
                 </div>
                 <div className="text-xs text-slate-500">
-                  {[c.title, c.email, c.phone].filter(Boolean).join(" · ") || "—"}
+                  {[c.title, c.email, c.phone].filter(Boolean).join(" · ") || "-"}
                 </div>
               </div>
               <div className="flex gap-1">

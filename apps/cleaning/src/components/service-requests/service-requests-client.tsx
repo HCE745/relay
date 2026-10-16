@@ -22,7 +22,7 @@ export function ServiceRequestsClient({ requests }: { requests: Req[] }) {
   const Row = ({ r }: { r: Req }) => (
     <li className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
       <div className="min-w-0">
-        <div className="font-medium text-slate-800">{r.customer} — {r.type === "CANCEL" ? "Cancel" : "Reschedule"}</div>
+        <div className="font-medium text-slate-800">{r.customer}: {r.type === "CANCEL" ? "Cancel" : "Reschedule"}</div>
         <div className="text-slate-500">{r.jobTitle} · {r.siteName} · currently {new Date(r.scheduledStart).toLocaleString()}</div>
         {r.type === "RESCHEDULE" && r.requestedDate ? <div className="text-xs text-brand">Requested: {r.requestedDate} {r.requestedTime ?? ""}</div> : null}
         {r.note ? <div className="text-xs text-slate-400">“{r.note}”</div> : null}

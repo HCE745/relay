@@ -19,7 +19,7 @@ export default async function BookingPage({ params }: { params: Promise<{ slug: 
       ) : (
         <>
           <h1 className="text-center text-2xl font-bold tracking-tight text-slate-900">{org.name}</h1>
-          <p className="mx-auto mt-1 mb-6 max-w-sm text-center text-sm text-slate-500">Request a free cleaning quote — tell us about your space and we&apos;ll be in touch.</p>
+          <p className="mx-auto mt-1 mb-6 max-w-sm text-center text-sm text-slate-500">Request a free cleaning quote. Tell us about your space and we&apos;ll be in touch.</p>
           <BookingForm slug={slug} orgName={org.name} />
         </>
       )}

@@ -46,7 +46,7 @@ async function checkStep(step: Step, idx: number, frame: HTMLIFrameElement): Pro
 
   // Field-app steps live on the phone and redirect an owner away — skip, don't fail.
   if (step.field) {
-    return { idx, title: step.title, path: step.path, selector: step.selector, verdict: "skip", notes: ["field app (phone) — not reachable in an owner session; shown as a centered explainer in the tour"] }
+    return { idx, title: step.title, path: step.path, selector: step.selector, verdict: "skip", notes: ["field app (phone), not reachable in an owner session; shown as a centered explainer in the tour"] }
   }
 
   const probe = await httpProbe(step.path)
@@ -82,7 +82,7 @@ async function checkStep(step: Step, idx: number, frame: HTMLIFrameElement): Pro
 
   // Field app: an owner can't enter it; a redirect away is expected → SKIP.
   if (step.field && (redirectedAway || probe.redirected)) {
-    notes.push(`field app (phone) — not reachable as owner; shown as an explainer in the tour`)
+    notes.push(`field app (phone), not reachable as owner; shown as an explainer in the tour`)
     return { idx, title: step.title, path: step.path, selector: step.selector, verdict: "skip", notes }
   }
 
@@ -155,7 +155,7 @@ export function TourCheck() {
         {running ? (
           <span className="text-slate-600">Checking step {current + 1} of {STEPS.length}…</span>
         ) : (
-          <span className="font-semibold text-slate-800">Done — <span className="text-emerald-700">{pass} pass</span> · <span className="text-red-700">{fail} fail</span> · <span className="text-slate-600">{skip} skip</span></span>
+          <span className="font-semibold text-slate-800">Done: <span className="text-emerald-700">{pass} pass</span> · <span className="text-red-700">{fail} fail</span> · <span className="text-slate-600">{skip} skip</span></span>
         )}
       </div>
 

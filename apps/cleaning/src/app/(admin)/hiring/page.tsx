@@ -42,7 +42,7 @@ export default async function HiringPage() {
         <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm">
           <span className="text-slate-500">Public application page:</span>
           <Link href={applyPath} target="_blank" className="font-medium text-brand hover:underline">{applyPath}</Link>
-          <span className="text-xs text-slate-400">— share this link for online applications</span>
+          <span className="text-xs text-slate-400">Share this link for online applications</span>
         </div>
       ) : null}
       <HiringClient

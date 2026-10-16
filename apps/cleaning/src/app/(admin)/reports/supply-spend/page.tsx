@@ -63,7 +63,7 @@ export default async function SupplySpendPage({ searchParams }: { searchParams: 
               {rows.map((r) => (
                 <tr key={r.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-900">{r.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{r.detail ?? "—"}</td>
+                  <td className="px-4 py-3 text-slate-600">{r.detail ?? "-"}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-slate-600">{r.items}</td>
                   <td className="px-4 py-3 text-right tabular-nums font-medium text-slate-900">{formatMoney(r.cost)}</td>
                 </tr>

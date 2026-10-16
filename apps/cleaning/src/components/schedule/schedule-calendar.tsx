@@ -164,7 +164,7 @@ export function ScheduleCalendar(props: Props) {
         </span>
         {unassignedCount > 0 ? (
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-800">
-            {unassignedCount} unassigned job{unassignedCount === 1 ? "" : "s"} — needs attention
+            {unassignedCount} unassigned job{unassignedCount === 1 ? "" : "s"}, needs attention
           </span>
         ) : (
           <span className="ml-auto text-xs text-slate-400">All jobs assigned</span>

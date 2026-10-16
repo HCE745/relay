@@ -85,7 +85,7 @@ function QuoteCard({ q }: { q: QuoteRow }) {
         <div className="min-w-0">
           <div className="truncate font-semibold text-slate-900">{q.contactName}</div>
           <div className="truncate text-xs text-slate-500">{SOURCE_LABEL[q.source]} · {q.propertyType === "COMMERCIAL" ? "Commercial" : "Residential"}{q.sqft ? ` · ${q.sqft.toLocaleString()} sqft` : ""}</div>
-          <div className="truncate text-xs text-slate-400">{[q.contactPhone, q.city && q.state ? `${q.city}, ${q.state}` : null].filter(Boolean).join(" · ") || "—"}</div>
+          <div className="truncate text-xs text-slate-400">{[q.contactPhone, q.city && q.state ? `${q.city}, ${q.state}` : null].filter(Boolean).join(" · ") || "-"}</div>
         </div>
         {q.outsideServiceArea ? <StatusBadge tone="warning">Outside area</StatusBadge> : null}
       </div>
@@ -117,7 +117,7 @@ export function QuotesClient({ quotes }: { quotes: QuoteRow[] }) {
             </div>
             <div className="space-y-2">
               {byStatus(s).map((q) => <QuoteCard key={q.id} q={q} />)}
-              {byStatus(s).length === 0 ? <div className="rounded-lg border border-dashed border-slate-200 p-3 text-center text-xs text-slate-300">—</div> : null}
+              {byStatus(s).length === 0 ? <div className="rounded-lg border border-dashed border-slate-200 p-3 text-center text-xs text-slate-300">-</div> : null}
             </div>
           </div>
         ))}

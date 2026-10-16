@@ -19,7 +19,7 @@ const CAP = "assets.management"
 const CAT: Record<string, string> = { EQUIPMENT: "Equipment", VEHICLE: "Vehicle", MACHINE: "Machine" }
 const TONE: Record<string, BadgeTone> = { ACTIVE: "success", MAINTENANCE: "warning", RETIRED: "neutral" }
 const STATUS: Record<string, string> = { ACTIVE: "Active", MAINTENANCE: "Maintenance", RETIRED: "Retired" }
-const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—")
+const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-")
 
 export default async function AssetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession()
@@ -64,11 +64,11 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
       </div>
 
       <Card className="grid gap-4 p-5 sm:grid-cols-3">
-        <Detail label="Serial" value={asset.serial || "—"} />
+        <Detail label="Serial" value={asset.serial || "-"} />
         <Detail label="Purchased" value={fmtDate(asset.purchaseDate)} />
-        <Detail label="Purchase cost" value={asset.purchaseCost ? formatMoney(asset.purchaseCost) : "—"} />
-        <Detail label="Assigned to site" value={asset.assignedToSite?.name || "—"} />
-        <Detail label="Assigned to person" value={asset.assignedToUser?.name || "—"} />
+        <Detail label="Purchase cost" value={asset.purchaseCost ? formatMoney(asset.purchaseCost) : "-"} />
+        <Detail label="Assigned to site" value={asset.assignedToSite?.name || "-"} />
+        <Detail label="Assigned to person" value={asset.assignedToUser?.name || "-"} />
       </Card>
 
       <Card className="p-5">

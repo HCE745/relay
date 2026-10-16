@@ -15,7 +15,7 @@ export default async function PublicPayPage({ params, searchParams }: { params: 
         <Card><p className="text-center text-sm text-slate-500">This payment link is not valid.</p></Card>
       ) : paid || !inv.payable ? (
         <Card>
-          <p className="text-center text-base font-semibold text-slate-900">{paid ? "Thank you — payment received" : `Invoice #${inv.invoiceNumber}`}</p>
+          <p className="text-center text-base font-semibold text-slate-900">{paid ? "Thank you, payment received" : `Invoice #${inv.invoiceNumber}`}</p>
           <p className="mt-1 text-center text-sm text-slate-500">
             {paid ? "Your payment is being confirmed and will post to your account shortly." : inv.status === "PAID" ? "This invoice is already paid." : "There is nothing due on this invoice."}
           </p>
@@ -32,7 +32,7 @@ export default async function PublicPayPage({ params, searchParams }: { params: 
           {isStripeConfigured() ? (
             <PayButton token={token} />
           ) : (
-            <p className="text-center text-sm text-slate-500">Online payment isn&apos;t available right now — please contact {inv.orgName}.</p>
+            <p className="text-center text-sm text-slate-500">Online payment isn&apos;t available right now. Please contact {inv.orgName}.</p>
           )}
           <p className="mt-3 text-center text-xs text-slate-400">Pay securely by card or bank (ACH) via Stripe.</p>
         </Card>

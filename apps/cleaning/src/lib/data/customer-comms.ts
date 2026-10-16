@@ -41,7 +41,7 @@ export async function sendServiceSummary(orgId: string, jobId: string): Promise<
     `Thank you for your business.`,
   ].filter(Boolean).join("\n")
 
-  await notifyCustomer(orgId, job.serviceLocation.customer.id, "SERVICE_SUMMARY", { subject: `Service complete — ${job.serviceLocation.name}`, body })
+  await notifyCustomer(orgId, job.serviceLocation.customer.id, "SERVICE_SUMMARY", { subject: `Service complete: ${job.serviceLocation.name}`, body })
 }
 
 /** Fire-and-forget wrapper for the completion hook. */
@@ -66,7 +66,7 @@ export async function runVisitReminders(orgId: string, now: Date = new Date()): 
     if (!(await claimAlert(orgId, "VISIT_REMINDER", job.id))) continue
     const siteTz = job.serviceLocation.timezone ?? tz
     const body = `Reminder: your cleaning at ${job.serviceLocation.name} is scheduled for ${DateTime.fromJSDate(job.scheduledStart, { zone: siteTz }).toFormat("cccc, LLL d")} at ${formatTimeInZone(job.scheduledStart, siteTz)}.`
-    await notifyCustomer(orgId, job.serviceLocation.customer.id, "VISIT_REMINDER", { subject: `Upcoming cleaning — ${job.serviceLocation.name}`, body })
+    await notifyCustomer(orgId, job.serviceLocation.customer.id, "VISIT_REMINDER", { subject: `Upcoming cleaning: ${job.serviceLocation.name}`, body })
     sent++
   }
   return sent
@@ -87,7 +87,7 @@ export async function runPaymentReminders(orgId: string, now: Date = new Date())
     if (balance.lte(0)) continue
     if (!(await claimAlert(orgId, "PAYMENT_REMINDER", inv.id))) continue
     const body = `This is a friendly reminder that invoice #${inv.invoiceNumber} has a balance of ${balance.toFixed(2)} ${inv.currency} that is now past due. Please arrange payment at your earliest convenience.`
-    await notifyCustomer(orgId, inv.customerId, "PAYMENT_REMINDER", { subject: `Payment reminder — invoice #${inv.invoiceNumber}`, body })
+    await notifyCustomer(orgId, inv.customerId, "PAYMENT_REMINDER", { subject: `Payment reminder: invoice #${inv.invoiceNumber}`, body })
     sent++
   }
   return sent

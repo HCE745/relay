@@ -4,7 +4,7 @@ import { useActionState, useState } from "react"
 import { enterDemo, reseedDemo } from "@/lib/demo/actions"
 
 const MIX = [
-  { v: 0, label: "All residential", desc: "Homes only — biweekly & monthly cleans" },
+  { v: 0, label: "All residential", desc: "Homes only: biweekly & monthly cleans" },
   { v: 1, label: "Mostly residential", desc: "75% homes, 25% commercial" },
   { v: 2, label: "Even mix", desc: "50/50 homes and commercial" },
   { v: 3, label: "Mostly commercial", desc: "25% homes, 75% offices, clinics, schools" },

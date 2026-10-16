@@ -35,8 +35,8 @@ export async function POST(request: Request) {
   const result = await intakeSmsIssue({ from, body, messageSid }, process.env.CLEANING_SMS_INBOX_ORG_ID ?? null)
   if (!result.filed) {
     if (result.reason === "duplicate") return twiml() // retry of an already-logged message
-    return twiml("Thanks — but we couldn't match your number to an account. Please contact the staff directly.")
+    return twiml("Thanks, but we couldn't match your number to an account. Please contact the staff directly.")
   }
 
-  return twiml(`Thanks — we logged your report. Reference ${result.reference}. The cleaning team has been notified.`)
+  return twiml(`Thanks, we logged your report. Reference ${result.reference}. The cleaning team has been notified.`)
 }

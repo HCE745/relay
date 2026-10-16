@@ -57,7 +57,7 @@ export default async function TimePage({ searchParams }: { searchParams: Promise
     <div>
       <PageHeader
         title="Time"
-        subtitle={`Labor records — last 30 days${pending ? ` · ${pending} awaiting approval` : ""}. Not payroll.`}
+        subtitle={`Labor records: last 30 days${pending ? ` · ${pending} awaiting approval` : ""}. Not payroll.`}
         icon={<ClockIcon />}
         action={canApprove ? <ExportBar /> : undefined}
       />
@@ -127,19 +127,19 @@ export default async function TimePage({ searchParams }: { searchParams: Promise
                   <tr key={t.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-800">{t.user.name}</td>
                     <td className="px-4 py-3 text-slate-600">
-                      <div>{t.job?.serviceLocation?.customer?.name ?? "—"}</div>
+                      <div>{t.job?.serviceLocation?.customer?.name ?? "-"}</div>
                       <div className="text-xs text-slate-400">{t.job?.serviceLocation?.name ?? t.job?.title ?? ""}</div>
                     </td>
                     <td className="px-4 py-3 text-slate-600">
                       {DateTime.fromJSDate(t.clockInAt, { zone: etz }).toFormat("MMM d")} · {formatTimeInZone(t.clockInAt, etz)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{t.clockOutAt ? formatTimeInZone(t.clockOutAt, etz) : "—"}</td>
+                    <td className="px-4 py-3 text-slate-600">{t.clockOutAt ? formatTimeInZone(t.clockOutAt, etz) : "-"}</td>
                     <td className="px-4 py-3 text-slate-600">
                       {t.clockOutAt ? fmtDuration(t.clockOutAt.getTime() - t.clockInAt.getTime()) : "open"}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`rounded-full px-2 py-0.5 text-xs ${located ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
-                        {located ? "GPS" : "—"}
+                        {located ? "GPS" : "-"}
                       </span>
                     </td>
                     <td className="px-4 py-3">

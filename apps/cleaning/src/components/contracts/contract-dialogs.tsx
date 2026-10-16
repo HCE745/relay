@@ -99,7 +99,7 @@ function ContractForm({ initial, customers, onDone }: { initial?: ContractValues
       </div>
       <label className="inline-flex items-center gap-2 text-sm text-slate-700">
         <input type="checkbox" checked={!!v.autoRenew} onChange={(e) => setV((p) => ({ ...p, autoRenew: e.target.checked }))} className="h-4 w-4 rounded border-slate-300" />
-        Auto-renews (informational — no automatic processing)
+        Auto-renews (informational, no automatic processing)
       </label>
       <Field label="Notes" htmlFor="k-notes"><Textarea id="k-notes" value={v.notes ?? ""} onChange={set("notes")} /></Field>
       {error ? <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}

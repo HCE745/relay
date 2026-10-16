@@ -95,7 +95,7 @@ export default async function SiteDetailPage({
             {site.inspections.map((ins) => (
               <li key={ins.id} className="flex items-center justify-between py-2 text-sm">
                 <Link href={`/inspections/${ins.id}`} className="text-slate-700 hover:text-brand">
-                  {ins.finalizedAt ? DateTime.fromJSDate(ins.finalizedAt, { zone: tz }).toFormat("MMM d, yyyy") : "—"} ·{" "}
+                  {ins.finalizedAt ? DateTime.fromJSDate(ins.finalizedAt, { zone: tz }).toFormat("MMM d, yyyy") : "-"} ·{" "}
                   {ins.inspector.name}
                 </Link>
                 <span className={ins.outcome === "PASS" ? "font-medium text-emerald-600" : "font-medium text-red-600"}>

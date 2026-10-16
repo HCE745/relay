@@ -63,7 +63,7 @@ export default async function LeadsPage() {
                     <div className="text-xs text-slate-500">{l.company ? l.name : l.email || l.phone || ""}</div>
                   </td>
                   <td className="px-4 py-3"><StatusBadge tone={TONE[l.status] ?? "neutral"}>{LABEL[l.status] ?? l.status}</StatusBadge></td>
-                  <td className="px-4 py-3 text-slate-600">{l.source || "—"}</td>
+                  <td className="px-4 py-3 text-slate-600">{l.source || "-"}</td>
                   <td className="px-4 py-3 text-slate-600">{l.assignedTo?.name ?? <span className="text-slate-400">Unassigned</span>}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-slate-600">{l._count.estimates}</td>
                   <td className="px-4 py-3">

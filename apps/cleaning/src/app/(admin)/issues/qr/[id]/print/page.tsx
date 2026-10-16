@@ -34,7 +34,7 @@ export default async function QrPrintPage({ params }: { params: Promise<{ id: st
         <p className="text-base font-semibold text-slate-800">Scan with your phone camera</p>
         <p className="mt-1 break-all text-xs text-slate-400">{url}</p>
       </div>
-      <p className="mt-4 text-xs text-slate-400 print:hidden">Use your browser&apos;s Print to post this. One code per location — revoke it any time without reprinting the others.</p>
+      <p className="mt-4 text-xs text-slate-400 print:hidden">Use your browser&apos;s Print to post this. One code per location. Revoke it any time without reprinting the others.</p>
     </div>
   )
 }

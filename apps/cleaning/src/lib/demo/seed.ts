@@ -92,7 +92,7 @@ type Account = {
 }
 
 const COMMERCIAL: Account[] = [
-  { name: "Northgate Office Tower", kind: "commercial", sites: [{ name: "Tower A Lobby & Floors 1–5", city: "Austin", state: "TX" }, { name: "Tower B Floors 1–4", city: "Austin", state: "TX" }], freq: "DAILY", billingMode: "FLAT_PERIOD", rate: "0", periodAmount: "6400.00", contractValue: "76800.00" },
+  { name: "Northgate Office Tower", kind: "commercial", sites: [{ name: "Tower A Lobby & Floors 1-5", city: "Austin", state: "TX" }, { name: "Tower B Floors 1-4", city: "Austin", state: "TX" }], freq: "DAILY", billingMode: "FLAT_PERIOD", rate: "0", periodAmount: "6400.00", contractValue: "76800.00" },
   { name: "Cedar Valley Medical Clinic", kind: "commercial", sites: [{ name: "Main Clinic", city: "Round Rock", state: "TX" }], freq: "DAILY", billingMode: "FLAT_PERIOD", rate: "0", periodAmount: "3800.00", contractValue: "45600.00" },
   { name: "Lincoln Elementary School", kind: "commercial", sites: [{ name: "Main Building", city: "Pflugerville", state: "TX" }, { name: "Gymnasium & Annex", city: "Pflugerville", state: "TX" }], freq: "WEEKLY", billingMode: "PER_JOB", rate: "900.00" },
   { name: "Summit Light Industrial", kind: "commercial", sites: [{ name: "Warehouse & Offices", city: "Austin", state: "TX" }], freq: "WEEKLY", billingMode: "PER_JOB", rate: "1200.00", contractValue: "62400.00" },
@@ -171,7 +171,7 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
       ctx.sites.push({ id: site.id, customerId: customer.id, isComm })
       const plan = await systemDb.servicePlan.create({
         data: {
-          organizationId: orgId, serviceLocationId: site.id, name: `${isComm ? "Janitorial" : "Home clean"} — ${acct.freq.toLowerCase()}`,
+          organizationId: orgId, serviceLocationId: site.id, name: `${isComm ? "Janitorial" : "Home clean"} - ${acct.freq.toLowerCase()}`,
           frequency: acct.freq, startTime: isComm ? "19:00" : "10:00", crewSize: isComm ? 2 : 1,
           checklistTemplateId: isComm ? commercialTplId : residentialTplId,
           billingType: "FLAT_PER_JOB", rate: acct.billingMode === "PER_JOB" ? acct.rate : null, currency: "USD",
@@ -199,7 +199,7 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
         const crew = isComm ? staff.cleanerIds.slice((((d % 3) + 3) % 3), (((d % 3) + 3) % 3) + 2) : [staff.cleanerIds[(((d % staff.cleanerIds.length) + staff.cleanerIds.length) % staff.cleanerIds.length)]]
         const job = await systemDb.job.create({
           data: {
-            organizationId: orgId, serviceLocationId: site.id, servicePlanId: plan.id, title: `${acct.name} — ${siteSpec.name}`,
+            organizationId: orgId, serviceLocationId: site.id, servicePlanId: plan.id, title: `${acct.name} - ${siteSpec.name}`,
             status: status as "COMPLETED", plannedStart: start, scheduledStart: start, scheduledEnd: end,
             actualStart: past || isToday ? start : null, actualEnd: past ? end : null, crewSize: isComm ? 2 : 1,
             createdById: staff.managerId,
@@ -270,7 +270,7 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
           issueDate: new Date(now.getTime() - 20 * DAY), dueDate: new Date(now.getTime() + 10 * DAY),
           periodStart: new Date(now.getTime() - 50 * DAY), periodEnd: new Date(now.getTime() - 20 * DAY),
           subtotal: total1, total: total1,
-          lines: { create: [{ description: `${acct.name} — monthly service`, serviceDate: new Date(now.getTime() - 25 * DAY), quantity: "1", unitRate: total1, amount: total1, billable: true }] },
+          lines: { create: [{ description: `${acct.name} - monthly service`, serviceDate: new Date(now.getTime() - 25 * DAY), quantity: "1", unitRate: total1, amount: total1, billable: true }] },
         },
         select: { id: true },
       })
@@ -282,7 +282,7 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
           issueDate: new Date(now.getTime() - 50 * DAY), dueDate: new Date(now.getTime() - 20 * DAY),
           periodStart: new Date(now.getTime() - 80 * DAY), periodEnd: new Date(now.getTime() - 50 * DAY),
           subtotal: total2, total: total2,
-          lines: { create: [{ description: `${acct.name} — prior month`, serviceDate: new Date(now.getTime() - 55 * DAY), quantity: "1", unitRate: total2, amount: total2, billable: true }] },
+          lines: { create: [{ description: `${acct.name} - prior month`, serviceDate: new Date(now.getTime() - 55 * DAY), quantity: "1", unitRate: total2, amount: total2, billable: true }] },
         },
         select: { id: true, total: true },
       })
@@ -345,7 +345,7 @@ async function seedExtras(
   // ── Estimates: DRAFT, SENT (with bid worksheet), ACCEPTED + converted ──
   await systemDb.estimate.create({
     data: {
-      organizationId: orgId, title: "Brightwork Coworking — nightly", status: "DRAFT", pricing: "PER_VISIT", rate: "650.00", total: "650.00", subtotal: "650.00",
+      organizationId: orgId, title: "Brightwork Coworking - nightly", status: "DRAFT", pricing: "PER_VISIT", rate: "650.00", total: "650.00", subtotal: "650.00",
       contactName: "Pat Nguyen", siteName: "Brightwork Downtown", city: "Austin", state: "TX",
       lines: { create: [{ description: "Nightly janitorial", quantity: "1", unitRate: "650.00", amount: "650.00", sortOrder: 0 }] },
     },
@@ -356,7 +356,7 @@ async function seedExtras(
   }
   await systemDb.estimate.create({
     data: {
-      organizationId: orgId, title: "TechNova HQ — 3x/week", status: "SENT", pricing: "PER_VISIT", rate: "1850.00", total: "1850.00", subtotal: "1850.00",
+      organizationId: orgId, title: "TechNova HQ - 3x/week", status: "SENT", pricing: "PER_VISIT", rate: "1850.00", total: "1850.00", subtotal: "1850.00",
       validUntil: days(14), contactName: "Omar Haddad", siteName: "TechNova HQ", city: "Austin", state: "TX",
       bidWorksheet: { inputs: bidInputs, result: { price: "1850.00", totalCost: "1202.50", margin: "647.50", marginPct: "35.0", monthlyHours: "48.2", laborCost: "1040.00", suppliesCost: "83.20", overheadCost: "168.48" }, computedAt: new Date().toISOString() },
       lines: { create: [{ description: "Office cleaning 3x/week", quantity: "1", unitRate: "1850.00", amount: "1850.00", sortOrder: 0 }] },
@@ -364,7 +364,7 @@ async function seedExtras(
   })
   await systemDb.estimate.create({
     data: {
-      organizationId: orgId, title: `${commCustomer.name} — accepted`, status: "ACCEPTED", pricing: "PER_VISIT", rate: "900.00", total: "900.00", subtotal: "900.00",
+      organizationId: orgId, title: `${commCustomer.name} - accepted`, status: "ACCEPTED", pricing: "PER_VISIT", rate: "900.00", total: "900.00", subtotal: "900.00",
       customerId: commCustomer.id, convertedCustomerId: commCustomer.id, convertedAt: days(-10),
       lines: { create: [{ description: "Accepted scope", quantity: "1", unitRate: "900.00", amount: "900.00", sortOrder: 0 }] },
     },
@@ -372,7 +372,7 @@ async function seedExtras(
 
   // ── A contract expiring within the warning window (default 60d) ──
   await systemDb.contract.create({
-    data: { organizationId: orgId, customerId: commCustomer.id, title: `${commCustomer.name} — renewal pending`, startDate: days(-320), endDate: days(28), contractValue: "48000.00", billingFrequency: "MONTHLY", status: "ACTIVE" },
+    data: { organizationId: orgId, customerId: commCustomer.id, title: `${commCustomer.name} - renewal pending`, startDate: days(-320), endDate: days(28), contractValue: "48000.00", billingFrequency: "MONTHLY", status: "ACTIVE" },
   })
 
   // ── Assets + maintenance (one in MAINTENANCE) ──
@@ -388,7 +388,7 @@ async function seedExtras(
     })
     await systemDb.assetMaintenance.create({ data: { assetId: asset.id, date: days(-45), type: "Routine service", cost: "180.00", notes: "Filters replaced; pads rotated.", performedById: staff.supervisorIds[0] } })
     if (a.status === "MAINTENANCE") {
-      await systemDb.assetMaintenance.create({ data: { assetId: asset.id, date: days(-3), type: "Repair", cost: "640.00", notes: "Brake service — in shop.", performedById: staff.managerId } })
+      await systemDb.assetMaintenance.create({ data: { assetId: asset.id, date: days(-3), type: "Repair", cost: "640.00", notes: "Brake service, in shop.", performedById: staff.managerId } })
       // Asset-linked issue history (Phase 34): the problem that sent it to the shop.
       await systemDb.issue.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, reportedById: staff.supervisorIds[0], assignedToId: staff.managerId, assetId: asset.id, source: "STAFF", category: "EQUIPMENT", severity: "HIGH", title: "Grinding noise from brakes", description: "Driver reported grinding from the front brakes.", status: "RESOLVED", resolvedAt: days(-2), ackDeadline: days(-4), resolveDeadline: days(-1) } })
     }
@@ -415,7 +415,7 @@ async function seedExtras(
   const coverDayKey = tomorrow.toISOString().slice(0, 10)
   const coverJob = await systemDb.job.create({
     data: {
-      organizationId: orgId, serviceLocationId: commSite.id, title: "Tomorrow night — needs coverage", status: "ASSIGNED",
+      organizationId: orgId, serviceLocationId: commSite.id, title: "Tomorrow night - needs coverage", status: "ASSIGNED",
       scheduledStart: coverStart, scheduledEnd: new Date(coverStart.getTime() + 3 * 3600_000), crewSize: 2, createdById: staff.managerId,
       assignments: { create: [{ organizationId: orgId, userId: cleaner, status: "ASSIGNED" }] },
     },
@@ -442,7 +442,7 @@ async function seedExtras(
         organizationId: orgId, customerId: commCustomer.id, invoiceNumber: nextInvoiceNo(), status,
         issueDate: opts.overdue ? days(-45) : days(-5), dueDate: opts.overdue ? days(-15) : days(25),
         periodStart: days(-35), periodEnd: days(-5), subtotal: amount, total: amount,
-        lines: { create: [{ description: `${commCustomer.name} — service`, serviceDate: days(-10), quantity: "1", unitRate: amount, amount, billable: true }] },
+        lines: { create: [{ description: `${commCustomer.name} - service`, serviceDate: days(-10), quantity: "1", unitRate: amount, amount, billable: true }] },
       },
       select: { id: true, total: true },
     })
@@ -456,8 +456,8 @@ async function seedExtras(
 
   // ── Dashboard-tile triggers: an unassigned upcoming job, an understaffed job,
   //    and one completed-but-unapproved time entry (Time to approve). ──
-  await systemDb.job.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, title: "Unassigned — needs scheduling", status: "SCHEDULED", scheduledStart: new Date(now.getTime() + 2 * DAY + 19 * 3600_000), scheduledEnd: new Date(now.getTime() + 2 * DAY + 22 * 3600_000), crewSize: 2, createdById: staff.managerId } })
-  const understaffed = await systemDb.job.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, title: "Understaffed — 1 of 2", status: "ASSIGNED", scheduledStart: new Date(now.getTime() + 3 * DAY + 19 * 3600_000), scheduledEnd: new Date(now.getTime() + 3 * DAY + 22 * 3600_000), crewSize: 2, createdById: staff.managerId, assignments: { create: [{ organizationId: orgId, userId: cleaner2, status: "ASSIGNED" }] } }, select: { id: true } })
+  await systemDb.job.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, title: "Unassigned - needs scheduling", status: "SCHEDULED", scheduledStart: new Date(now.getTime() + 2 * DAY + 19 * 3600_000), scheduledEnd: new Date(now.getTime() + 2 * DAY + 22 * 3600_000), crewSize: 2, createdById: staff.managerId } })
+  const understaffed = await systemDb.job.create({ data: { organizationId: orgId, serviceLocationId: commSite.id, title: "Understaffed - 1 of 2", status: "ASSIGNED", scheduledStart: new Date(now.getTime() + 3 * DAY + 19 * 3600_000), scheduledEnd: new Date(now.getTime() + 3 * DAY + 22 * 3600_000), crewSize: 2, createdById: staff.managerId, assignments: { create: [{ organizationId: orgId, userId: cleaner2, status: "ASSIGNED" }] } }, select: { id: true } })
   void understaffed
   if (ctx.completedJobIds.length > 0) {
     await systemDb.timeEntry.create({ data: { organizationId: orgId, jobId: ctx.completedJobIds[ctx.completedJobIds.length - 1], userId: staff.cleanerIds[2], clockInAt: new Date(week.getTime() + todayOffset * DAY - DAY + 19 * 3600_000), clockOutAt: new Date(week.getTime() + todayOffset * DAY - DAY + 22 * 3600_000), breakMinutes: 15, status: "COMPLETED", clockInSource: "mobile_gps" } })
@@ -486,14 +486,14 @@ async function seedExtras(
 
   // ── Hiring: job postings + applicant pipeline + interviews (Phase 18) ──
   const postingDefs: { title: string; status: "DRAFT" | "OPEN" | "CLOSED"; employmentType: string; payRange: string }[] = [
-    { title: "Residential Cleaner", status: "OPEN", employmentType: "Full-time", payRange: "$18–$22/hr" },
-    { title: "Night Crew Lead", status: "OPEN", employmentType: "Full-time", payRange: "$24–$28/hr" },
-    { title: "Weekend Part-time Cleaner", status: "DRAFT", employmentType: "Part-time", payRange: "$17–$20/hr" },
+    { title: "Residential Cleaner", status: "OPEN", employmentType: "Full-time", payRange: "$18-$22/hr" },
+    { title: "Night Crew Lead", status: "OPEN", employmentType: "Full-time", payRange: "$24-$28/hr" },
+    { title: "Weekend Part-time Cleaner", status: "DRAFT", employmentType: "Part-time", payRange: "$17-$20/hr" },
   ]
   const postings: { id: string; title: string }[] = []
   for (const p of postingDefs) {
     const created = await systemDb.jobPosting.create({
-      data: { organizationId: orgId, title: p.title, status: p.status, employmentType: p.employmentType, payRange: p.payRange, locations: "Austin, TX", description: "Join our crew — reliable scheduling, paid training, growth to lead roles." },
+      data: { organizationId: orgId, title: p.title, status: p.status, employmentType: p.employmentType, payRange: p.payRange, locations: "Austin, TX", description: "Join our crew: reliable scheduling, paid training, growth to lead roles." },
       select: { id: true, title: true },
     })
     postings.push(created)
@@ -504,7 +504,7 @@ async function seedExtras(
     { name: "Maria Gonzalez", status: "NEW", source: "ONLINE", availability: "Weekdays, mornings" },
     { name: "Derek Wells", status: "SCREENING", source: "REFERRAL", availability: "Flexible" },
     { name: "Aisha Rahman", status: "INTERVIEW", source: "ONLINE", availability: "Evenings", interview: { days: -2, notes: "Strong communication; scheduling second round." } },
-    { name: "Tom Becker", status: "OFFER", source: "PHONE", availability: "Full-time", interview: { days: -5, notes: "Great fit — extended offer." } },
+    { name: "Tom Becker", status: "OFFER", source: "PHONE", availability: "Full-time", interview: { days: -5, notes: "Great fit, extended offer." } },
     { name: "Priya Shah", status: "REJECTED", source: "ONLINE", availability: "Weekends only" },
   ]
   for (const a of applicantDefs) {
@@ -544,7 +544,7 @@ async function seedExtras(
     select: { id: true },
   })
   await systemDb.interview.create({
-    data: { organizationId: orgId, applicantId: hiredApplicant.id, date: days(-10), interviewerId: staff.managerId, outcomeNotes: "Excellent — recommended hire." },
+    data: { organizationId: orgId, applicantId: hiredApplicant.id, date: days(-10), interviewerId: staff.managerId, outcomeNotes: "Excellent, recommended hire." },
   })
 
   // ── Service areas + do-not-serve exclusions (Phase 19) ──
@@ -582,7 +582,7 @@ async function seedExtras(
   await systemDb.job.create({
     data: {
       organizationId: orgId, serviceLocationId: commSite.id, servicePlanId: null,
-      title: "Strip & wax — main lobby", status: "COMPLETED",
+      title: "Strip & wax - main lobby", status: "COMPLETED",
       plannedStart: days(-3), scheduledStart: days(-3), scheduledEnd: new Date(days(-3).getTime() + 4 * 3600_000),
       actualStart: days(-3), actualEnd: new Date(days(-3).getTime() + 4 * 3600_000),
       billingType: "FLAT_PER_JOB", rate: "650.00", currency: "USD", crewSize: 2, createdById: staff.managerId,
@@ -592,21 +592,21 @@ async function seedExtras(
 
   // Work orders across the lifecycle, including one already converted to a job.
   await systemDb.workOrder.create({
-    data: { organizationId: orgId, customerId: commCustomer.id, serviceLocationId: commSite.id, type: "EMERGENCY", description: "Water intrusion in server room — extract & dry tonight.", priority: "URGENT", requestedBy: "Facilities manager", status: "REQUESTED", createdById: staff.managerId },
+    data: { organizationId: orgId, customerId: commCustomer.id, serviceLocationId: commSite.id, type: "EMERGENCY", description: "Water intrusion in server room. Extract & dry tonight.", priority: "URGENT", requestedBy: "Facilities manager", status: "REQUESTED", createdById: staff.managerId },
   })
   await systemDb.workOrder.create({
     data: { organizationId: orgId, customerId: commCustomer.id, serviceLocationId: commSite.id, type: "DEEP_CLEAN", description: "Post-construction clean of the 3rd floor.", priority: "HIGH", quotedAmount: "2400.00", status: "QUOTED", createdById: staff.managerId },
   })
   const woJob = await systemDb.job.create({
     data: {
-      organizationId: orgId, serviceLocationId: commSite.id, servicePlanId: null, title: "Flood response — carpet extraction", status: "SCHEDULED",
+      organizationId: orgId, serviceLocationId: commSite.id, servicePlanId: null, title: "Flood response - carpet extraction", status: "SCHEDULED",
       plannedStart: days(1), scheduledStart: days(1), scheduledEnd: new Date(days(1).getTime() + 5 * 3600_000),
       billingType: "FLAT_PER_JOB", rate: "1800.00", currency: "USD", crewSize: 3, createdById: staff.managerId,
     },
     select: { id: true },
   })
   await systemDb.workOrder.create({
-    data: { organizationId: orgId, customerId: commCustomer.id, serviceLocationId: commSite.id, type: "ONE_TIME", description: "Emergency callout — restroom overflow.", priority: "URGENT", quotedAmount: "1800.00", status: "SCHEDULED", approvedById: staff.managerId, approvedAt: days(-1), convertedJobId: woJob.id, createdById: staff.managerId },
+    data: { organizationId: orgId, customerId: commCustomer.id, serviceLocationId: commSite.id, type: "ONE_TIME", description: "Emergency callout. Restroom overflow.", priority: "URGENT", quotedAmount: "1800.00", status: "SCHEDULED", approvedById: staff.managerId, approvedAt: days(-1), convertedJobId: woJob.id, createdById: staff.managerId },
   })
 
   // Billable extras on a completed job: one pending (awaiting customer), one approved.
@@ -645,7 +645,7 @@ async function seedExtras(
     const c = await systemDb.customer.create({
       data: { organizationId: orgId, name: `${n} (${stamp})`, email: `${n.toLowerCase().replace(/[^a-z]/g, "")}@imported.demo`, importBatchId: batch.id, primaryContactName: "Office Manager",
         contacts: { create: [{ organizationId: orgId, name: "Office Manager", email: `om-${n.toLowerCase().replace(/[^a-z]/g, "")}@imported.demo`, isPrimary: true, importBatchId: batch.id }] },
-        serviceLocations: { create: [{ organizationId: orgId, name: `${n} — main`, city: "Austin", state: "TX", importBatchId: batch.id }] } },
+        serviceLocations: { create: [{ organizationId: orgId, name: `${n} - main`, city: "Austin", state: "TX", importBatchId: batch.id }] } },
       select: { id: true },
     })
     void c
@@ -656,7 +656,7 @@ async function seedExtras(
   await systemDb.customerMessage.createMany({
     data: [
       { organizationId: orgId, customerId: commCustomer.id, sender: "CUSTOMER", body: "Could the crew pay extra attention to the lobby glass this week?", createdAt: days(-2) },
-      { organizationId: orgId, customerId: commCustomer.id, sender: "STAFF", authorUserId: staff.managerId, body: "Absolutely — I've noted it for tonight's crew. Thanks for letting us know!", readByStaffAt: days(-2), createdAt: days(-2) },
+      { organizationId: orgId, customerId: commCustomer.id, sender: "STAFF", authorUserId: staff.managerId, body: "Absolutely. I've noted it for tonight's crew. Thanks for letting us know!", readByStaffAt: days(-2), createdAt: days(-2) },
     ],
   })
 

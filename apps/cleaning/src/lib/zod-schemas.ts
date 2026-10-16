@@ -545,6 +545,7 @@ export const publicApplicationSchema = z.object({
   phone: optionalString,
   resumeRef: optionalString,
   availability: optionalString,
+  source: z.string().trim().max(60).optional(), // where they came from (Phase 38)
   website: z.string().optional(), // honeypot
 })
 export const interviewCreateSchema = z.object({

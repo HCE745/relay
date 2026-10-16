@@ -25,6 +25,28 @@ export async function updateJobPosting(orgId: string, id: string, input: Partial
   return orgDb(orgId).jobPosting.findFirst({ where: { id } })
 }
 
+// ── Public careers page (Phase 38): no login, no partnership needed ──
+/** The org (by slug) for a public careers page, or null. systemDb: no org ctx. */
+export async function getPublicCareersOrg(slug: string) {
+  return systemDb.organization.findUnique({ where: { slug }, select: { id: true, name: true } })
+}
+/** OPEN postings for the public jobs page. */
+export function listPublicPostings(orgId: string) {
+  return orgDb(orgId).jobPosting.findMany({
+    where: { status: "OPEN" },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, title: true, employmentType: true, payRange: true, locations: true, createdAt: true },
+  })
+}
+/** One OPEN posting for its public detail page (null when closed/missing, so the
+ *  page 404s and the Google for Jobs markup is removed when a role closes). */
+export function getPublicPosting(orgId: string, postingId: string) {
+  return orgDb(orgId).jobPosting.findFirst({
+    where: { id: postingId, status: "OPEN" },
+    select: { id: true, title: true, description: true, employmentType: true, payRange: true, locations: true, createdAt: true, updatedAt: true },
+  })
+}
+
 // ── Applicants ──
 export function listApplicants(orgId: string, opts: { status?: string; jobPostingId?: string } = {}) {
   return orgDb(orgId).applicant.findMany({
@@ -56,6 +78,15 @@ export async function addInterview(orgId: string, applicantId: string, input: In
 }
 
 /** Public job application (same hostile posture as online booking). */
+// Normalize a free-form ?src= into a tidy, known-ish source label (Phase 38).
+function sanitizeSource(src: string | undefined): string {
+  const s = (src ?? "").trim().toLowerCase().replace(/[^a-z0-9 _-]/g, "")
+  if (!s) return "careers_page" // came through the public jobs page with no tag
+  const known = ["indeed", "linkedin", "ziprecruiter", "google", "facebook", "craigslist", "nextdoor", "referral"]
+  const hit = known.find((k) => s.includes(k))
+  return (hit ?? s).slice(0, 60)
+}
+
 export async function createPublicApplication(orgId: string, input: PublicInput, ipHash: string) {
   const db = orgDb(orgId)
   const now = Date.now()
@@ -71,7 +102,7 @@ export async function createPublicApplication(orgId: string, input: PublicInput,
     appliedFor = posting.title
   }
   const created = await db.applicant.create({
-    data: { organizationId: orgId, jobPostingId: input.jobPostingId, name: input.name, email: input.email, phone: input.phone, source: "ONLINE", appliedFor, resumeRef: input.resumeRef, availability: input.availability, status: "NEW", ipHash },
+    data: { organizationId: orgId, jobPostingId: input.jobPostingId, name: input.name, email: input.email, phone: input.phone, source: sanitizeSource(input.source), appliedFor, resumeRef: input.resumeRef, availability: input.availability, status: "NEW", ipHash },
     select: { id: true },
   })
   return { id: created.id }

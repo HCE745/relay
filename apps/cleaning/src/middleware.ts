@@ -28,6 +28,8 @@ const PUBLIC_PATHS = [
   "/demo", // public sandbox landing — provisions a throwaway demo org
   "/book", // public per-org online booking
   "/apply", // public per-org job application (Phase 18)
+  "/careers", // public per-org careers page + Google for Jobs markup (Phase 38)
+  "/r", // public QR issue-report page occupants scan, no login (Phase 32)
   "/pay", // public login-free invoice pay link (Phase 22)
   "/proposal", // public proposal accept link (Phase 27)
   "/api/public", // public intake endpoints — self rate-limit + honeypot

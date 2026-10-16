@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 
-export function ApplyForm({ slug, orgName, postings }: { slug: string; orgName: string; postings: { id: string; title: string }[] }) {
-  const [v, setV] = useState({ name: "", email: "", phone: "", jobPostingId: postings[0]?.id ?? "", appliedFor: "", availability: "", resumeRef: "", website: "" })
+export function ApplyForm({ slug, orgName, postings, fixedPostingId, source }: { slug: string; orgName: string; postings: { id: string; title: string }[]; fixedPostingId?: string; source?: string }) {
+  const [v, setV] = useState({ name: "", email: "", phone: "", jobPostingId: fixedPostingId ?? postings[0]?.id ?? "", appliedFor: "", availability: "", resumeRef: "", website: "" })
   const [done, setDone] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -16,9 +16,10 @@ export function ApplyForm({ slug, orgName, postings }: { slug: string; orgName: 
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({
         name: v.name, email: v.email || undefined, phone: v.phone || undefined,
-        jobPostingId: postings.length ? v.jobPostingId : undefined,
-        appliedFor: postings.length ? undefined : (v.appliedFor || undefined),
-        availability: v.availability || undefined, resumeRef: v.resumeRef || undefined, website: v.website,
+        jobPostingId: fixedPostingId ?? (postings.length ? v.jobPostingId : undefined),
+        appliedFor: fixedPostingId || postings.length ? undefined : (v.appliedFor || undefined),
+        availability: v.availability || undefined, resumeRef: v.resumeRef || undefined,
+        source: source || undefined, website: v.website,
       }),
     })
     const data = await res.json().catch(() => null)
@@ -45,7 +46,7 @@ export function ApplyForm({ slug, orgName, postings }: { slug: string; orgName: 
         <label className="block text-sm"><span className="mb-1 block font-medium text-slate-600">Phone</span><input value={v.phone} onChange={set("phone")} inputMode="tel" className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base" /></label>
         <label className="block text-sm"><span className="mb-1 block font-medium text-slate-600">Email</span><input value={v.email} onChange={set("email")} inputMode="email" className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base" /></label>
       </div>
-      {postings.length ? (
+      {fixedPostingId ? null : postings.length ? (
         <label className="block text-sm"><span className="mb-1 block font-medium text-slate-600">Position</span><select value={v.jobPostingId} onChange={set("jobPostingId")} className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base">{postings.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}</select></label>
       ) : (
         <label className="block text-sm"><span className="mb-1 block font-medium text-slate-600">Position you&apos;re interested in</span><input value={v.appliedFor} onChange={set("appliedFor")} className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base" /></label>

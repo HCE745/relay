@@ -28,7 +28,7 @@ export default async function HiringPage() {
     listUsers(orgId),
     systemDb.organization.findUnique({ where: { id: orgId }, select: { slug: true } }),
   ])
-  const applyPath = org ? `/apply/${org.slug}` : null
+  const careersPath = org ? `/careers/${org.slug}` : null
 
   return (
     <div>
@@ -38,14 +38,15 @@ export default async function HiringPage() {
         icon={<UsersIcon />}
         action={<NewPostingButton />}
       />
-      {applyPath ? (
+      {careersPath ? (
         <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm">
-          <span className="text-slate-500">Public application page:</span>
-          <Link href={applyPath} target="_blank" className="font-medium text-brand hover:underline">{applyPath}</Link>
-          <span className="text-xs text-slate-400">Share this link for online applications</span>
+          <span className="text-slate-500">Public careers page:</span>
+          <Link href={careersPath} target="_blank" className="font-medium text-brand hover:underline">{careersPath}</Link>
+          <span className="text-xs text-slate-400">Indexed by Google for Jobs. Share a posting&apos;s link anywhere (Indeed, LinkedIn, texts). No partnership needed.</span>
         </div>
       ) : null}
       <HiringClient
+        slug={org?.slug ?? null}
         postings={postings.map((p) => ({
           id: p.id, title: p.title, status: p.status, employmentType: p.employmentType, payRange: p.payRange,
           locations: p.locations, applicantCount: p._count.applicants,

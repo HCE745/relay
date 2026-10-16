@@ -117,7 +117,16 @@ function ApplicantCard({ a, members }: { a: Applicant; members: Member[] }) {
   )
 }
 
-export function HiringClient({ postings, applicants, members }: { postings: Posting[]; applicants: Applicant[]; members: Member[] }) {
+function CopyPostingLink({ slug, postingId }: { slug: string; postingId: string }) {
+  const [copied, setCopied] = useState(false)
+  function copy() {
+    const url = `${window.location.origin}/careers/${slug}/${postingId}`
+    navigator.clipboard?.writeText(url).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500) }).catch(() => {})
+  }
+  return <button onClick={copy} className="text-xs font-medium text-brand hover:underline">{copied ? "Copied!" : "Copy apply link"}</button>
+}
+
+export function HiringClient({ postings, applicants, members, slug }: { postings: Posting[]; applicants: Applicant[]; members: Member[]; slug: string | null }) {
   const cols = APPLICANT_STATUSES
   const byStatus = (s: string) => applicants.filter((a) => a.status === s && !(a.convertedUserId && s !== "HIRED"))
   return (
@@ -133,7 +142,10 @@ export function HiringClient({ postings, applicants, members }: { postings: Post
                   <StatusBadge tone={P_TONE[p.status] ?? "neutral"}>{p.status}</StatusBadge>
                 </div>
                 <div className="mt-1 text-xs text-slate-500">{[p.employmentType, p.payRange, p.locations].filter(Boolean).join(" · ") || "-"}</div>
-                <div className="mt-2 text-xs text-slate-400">{p.applicantCount} applicant{p.applicantCount === 1 ? "" : "s"}</div>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-xs text-slate-400">{p.applicantCount} applicant{p.applicantCount === 1 ? "" : "s"}</span>
+                  {slug && p.status === "OPEN" ? <CopyPostingLink slug={slug} postingId={p.id} /> : null}
+                </div>
               </Card>
             ))}
           </div>

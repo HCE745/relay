@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm exec prisma generate && pnpm exec next build",
+  "buildCommand": "pnpm exec prisma migrate deploy && pnpm exec prisma generate && pnpm exec next build",
   "crons": [
     {
       "path": "/api/cron/generate-jobs",

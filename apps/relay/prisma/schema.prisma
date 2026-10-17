@@ -2680,6 +2680,49 @@ model SalesUser {
   transferRequestsTo   CrmTransferRequest[] @relation("TransferTo2")
   transferRequestsReviewed CrmTransferRequest[] @relation("TransferReviewer")
   salesAlerts              SalesAlert[]         @relation("SalesAlertRecipient")
+  sessions                 SalesSession[]       @relation("SalesUserSessions")
+  dailyActivity            SalesDailyActivity[] @relation("SalesUserDailyActivity")
+}
+
+model SalesSession {
+  id              String    @id @default(cuid())
+  salesUserId     String
+  loginAt         DateTime  @default(now())
+  lastActivityAt  DateTime  @default(now())
+  logoutAt        DateTime?
+  durationMinutes Int?
+  pagesVisited    Json      @default("[]")
+  createdAt       DateTime  @default(now())
+
+  salesUser SalesUser @relation("SalesUserSessions", fields: [salesUserId], references: [id], onDelete: Cascade)
+
+  @@index([salesUserId])
+  @@index([loginAt])
+  @@index([logoutAt])
+}
+
+model SalesDailyActivity {
+  id                   String    @id @default(cuid())
+  salesUserId          String
+  date                 DateTime  @db.Date
+  emailsSent           Int       @default(0)
+  followUpsWorked      Int       @default(0)
+  prospectsContacted   Int       @default(0)
+  prospectsAdded       Int       @default(0)
+  opportunitiesUpdated Int       @default(0)
+  tasksCompleted       Int       @default(0)
+  demosLogged          Int       @default(0)
+  timeInAppMinutes     Int       @default(0)
+  firstActivityAt      DateTime?
+  lastActivityAt       DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  salesUser SalesUser @relation("SalesUserDailyActivity", fields: [salesUserId], references: [id], onDelete: Cascade)
+
+  @@unique([salesUserId, date])
+  @@index([salesUserId])
+  @@index([date])
 }
 
 model SalesAlert {

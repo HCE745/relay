@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { TransferActions } from "./TransferActions"
+import { ManagerTabs } from "./ManagerTabs"
 import { Users, TrendingUp, CheckCircle2, AlertCircle, Trophy, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 
@@ -84,6 +85,7 @@ export default async function ManagerPage() {
 
   return (
     <div className="p-6 max-w-6xl space-y-8">
+      <ManagerTabs />
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4" data-tour="mgr-dashboard-header">
         <div>

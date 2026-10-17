@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSalesSession, salesRepFilter } from "@/lib/sales-auth";
 import { prisma } from "@/lib/prisma";
 import { createAttribution } from "@/lib/commission";
+import { trackActivity } from "@/lib/sales-activity";
 
 const opportunityIncludes = {
   assignedTo: { select: { id: true, name: true } },
@@ -128,6 +129,8 @@ export async function PATCH(
     if (isNewWin && updated.commissionEligible) {
       await createAttribution(id, updated.assignedToId).catch(() => {});
     }
+
+    if (info.salesUserId) trackActivity(info.salesUserId, "opportunitiesUpdated");
 
     return NextResponse.json(updated);
   } catch (e) {

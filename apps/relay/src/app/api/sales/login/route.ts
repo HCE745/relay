@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { createSession } from "@/lib/session"
+import { createSalesSession } from "@/lib/sales-activity"
 
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json() as { email?: string; password?: string }
@@ -50,6 +51,9 @@ export async function POST(request: NextRequest) {
     salesUserName:  salesUser.name,
     ...(salesUser.isDemo ? { isDemo: true } : {}),
   })
+
+  // Record session for activity tracking (fire-and-forget)
+  createSalesSession(salesUser.id).catch(() => {})
 
   return NextResponse.json({ ok: true, role: salesUser.role })
 }

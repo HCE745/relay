@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSalesSession } from "@/lib/sales-auth";
 import { prisma } from "@/lib/prisma";
+import { trackActivity } from "@/lib/sales-activity";
 
 const taskIncludes = {
   assignedTo: { select: { id: true, name: true } },
@@ -51,6 +52,10 @@ export async function PATCH(
       data: updateData,
       include: taskIncludes,
     });
+
+    if (info.salesUserId && complete === true && !task.completedAt) {
+      trackActivity(info.salesUserId, "tasksCompleted");
+    }
 
     return NextResponse.json(updated);
   } catch (e) {

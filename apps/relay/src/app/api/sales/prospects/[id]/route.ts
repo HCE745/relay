@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
 import { findDuplicateProspect } from "@/lib/prospect-utils"
+import { trackActivity } from "@/lib/sales-activity"
 
 type RouteCtx = { params: Promise<{ id: string }> }
 
@@ -132,5 +133,11 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
   }
 
   const updated = await prisma.prospect.update({ where: { id }, data, include: PROSPECT_INCLUDE })
+
+  // Track status changes as "contacted" activity
+  if (info.salesUserId && body.currentCrmStatus && body.currentCrmStatus !== prospect.currentCrmStatus) {
+    trackActivity(info.salesUserId, "prospectsContacted")
+  }
+
   return NextResponse.json({ prospect: updated })
 }

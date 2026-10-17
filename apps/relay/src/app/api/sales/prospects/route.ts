@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
 import { findDuplicateProspect } from "@/lib/prospect-utils"
+import { trackActivity } from "@/lib/sales-activity"
 import type { ProspectCrmStatus } from "@/generated/prisma/client"
 
 const PROSPECT_SELECT = {
@@ -158,6 +159,8 @@ export async function POST(req: NextRequest) {
       })
     }
   }
+
+  if (info.salesUserId) trackActivity(info.salesUserId, "prospectsAdded")
 
   return NextResponse.json(
     { prospect, confirmedDuplicate: !!(duplicate && body.confirmDuplicate) },

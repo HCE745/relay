@@ -1,3 +1,9 @@
+-- NOTE (2026-10-20): Supabase is changing Data API permissions on 2026-10-30.
+-- Tables created after that date need explicit GRANTs if PostgREST / supabase-js is used.
+-- Relay does NOT use the Supabase Data API — only a direct DATABASE_URL via Prisma —
+-- so these GRANTs are not required. See prisma/migrations/MIGRATION_TEMPLATE.sql
+-- for the pattern to add if this ever changes.
+
 -- CreateTable SalesSession
 CREATE TABLE "SalesSession" (
     "id"              TEXT NOT NULL,

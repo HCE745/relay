@@ -1,0 +1,18 @@
+-- ─────────────────────────────────────────────────────────────────────────────
+-- MIGRATION TEMPLATE
+--
+-- NOTE: Relay connects to Supabase via a direct DATABASE_URL (Prisma only).
+-- The Supabase Data API (PostgREST / supabase-js) is NOT used, so the GRANT
+-- statements below are NOT required for Relay to function.
+--
+-- If you ever add supabase-js or PostgREST usage, add these GRANTs to every
+-- migration that creates a new table (required for tables created after 2026-10-30):
+--
+--   grant select                          on public.your_table to anon;
+--   grant select, insert, update, delete  on public.your_table to authenticated;
+--   grant select, insert, update, delete  on public.your_table to service_role;
+--
+-- Replace "your_table" with the actual table name (lowercase, matching the SQL).
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Your migration SQL here:

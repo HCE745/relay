@@ -217,6 +217,7 @@ model Organization {
   customerSurveyResponses CustomerSurveyResponse[]
   analyticsEvents         OrgAnalyticsEvent[]
   redeemedOffers          SalesOffer[]             @relation("OrgRedeemedOffer")
+  dashboardLayouts        DashboardLayout[]
 }
 
 model CustomView {
@@ -350,6 +351,7 @@ model User {
   receivedRecognitions        Recognition[]            @relation("ReceivedRecognitions")
   grantedRecognitions         Recognition[]            @relation("GrantedRecognitions")
   createdCustomerSurveys      CustomerSurvey[]         @relation("CreatedCustomerSurveys")
+  dashboardLayouts            DashboardLayout[]
 }
 
 model PasswordResetToken {
@@ -3337,4 +3339,24 @@ model OrgAnalyticsEvent {
 
   @@index([organizationId, eventType])
   @@index([createdAt])
+}
+
+// ─── Analytics Dashboards ─────────────────────────────────────────────────────
+
+model DashboardLayout {
+  id             String   @id @default(cuid())
+  organizationId String
+  createdById    String
+  name           String
+  isDefault      Boolean  @default(false)
+  layoutType     String   @default("PERSONAL") // "PERSONAL" | "SHARED"
+  widgets        Json     @default("[]")        // WidgetConfig[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy      User         @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([createdById])
 }

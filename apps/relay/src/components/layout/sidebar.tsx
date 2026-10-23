@@ -19,6 +19,7 @@ import {
   Lightbulb,
   ClipboardList,
   BarChart2,
+  LayoutGrid,
   CalendarDays,
   BookOpen,
   ShoppingCart,
@@ -85,6 +86,7 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "corporate-dashboard", href: "/corporate-dashboard", label: "Corporate View",        icon: Globe2,          section: "INTELLIGENCE" },
   { key: "regional-dashboard",  href: "/regional-dashboard",  label: "Regional View",         icon: Building,        section: "INTELLIGENCE" },
   { key: "analytics",           href: "/analytics",           label: "Analytics",             icon: BarChart2,       section: "INTELLIGENCE" },
+  { key: "analytics-dashboard", href: "/analytics/dashboard", label: "Dashboard",             icon: LayoutGrid,      section: "INTELLIGENCE" },
 
   { key: "team",                href: "/team",                label: "Team",                  icon: Users,           section: "ADMINISTRATION" },
 ]

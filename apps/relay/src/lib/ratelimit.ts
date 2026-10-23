@@ -40,6 +40,9 @@ export const limiters = {
   // AI cost guard — org-based
   aiOrg:       make(100, "1 h"),   // 100 AI calls / hour / org
 
+  // Analytics widgets — org-based
+  analyticsWidget: make(60, "1 m"), // 60 widget requests / min / org
+
   // Global backstop — IP-based
   global:      make(500, "1 m"),   // 500 requests / min / IP
 

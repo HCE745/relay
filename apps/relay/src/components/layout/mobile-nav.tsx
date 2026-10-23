@@ -24,6 +24,7 @@ import {
   LogOut,
   Plus,
   BarChart2,
+  LayoutGrid,
   BookOpen,
   ShoppingCart,
   ClipboardCheck,
@@ -55,7 +56,8 @@ const ALL_NAV_ITEMS: Array<{ key: PageKey; href: string; label: string; icon: Re
   { key: "suggestions",     href: "/suggestions",       label: "Suggestions",    icon: Lightbulb },
   { key: "surveys",         href: "/surveys",           label: "Surveys",        icon: ClipboardList },
   { key: "recognition",    href: "/recognition",       label: "Recognition",    icon: Award },
-  { key: "analytics",       href: "/analytics",         label: "Analytics",      icon: BarChart2 },
+  { key: "analytics",           href: "/analytics",           label: "Analytics",   icon: BarChart2  },
+  { key: "analytics-dashboard", href: "/analytics/dashboard", label: "Dashboard",   icon: LayoutGrid },
   { key: "sops",            href: "/sops",              label: "SOPs",           icon: BookOpen },
   { key: "purchase-requests", href: "/purchase-requests", label: "Purchases",   icon: ShoppingCart },
 ]

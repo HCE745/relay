@@ -167,7 +167,11 @@ export function Sidebar({
   }, [])
 
   const visibleNavItems = industryNavItems
-    ? industryNavItems.filter(item => allowedSet.has(item.key))
+    ? industryNavItems.filter(item => {
+        if (!allowedSet.has(item.key)) return false
+        if ((item.key === "corporate-dashboard" || item.key === "regional-dashboard") && !corporateDashboardEnabled) return false
+        return true
+      })
     : ALL_NAV_ITEMS.filter(item => {
         if (!allowedSet.has(item.key)) return false
         if ((item.key === "corporate-dashboard" || item.key === "regional-dashboard") && !corporateDashboardEnabled) return false
@@ -289,6 +293,7 @@ export function Sidebar({
               return navLink(`/workspace/${page.id}`, page.name, Icon)
             })}
             {voiceExtras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
+            {intelligenceExtras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
             {customerVoiceExtras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
           </div>
         ) : (

@@ -176,6 +176,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         industry={org?.industry ?? undefined}
         corporateDashboardEnabled={org?.corporate_dashboard_enabled ?? false}
         regionsEnabled={org?.regions_enabled ?? false}
+        executiveBriefingsEnabled={org?.executive_briefings_enabled ?? false}
+        executiveGoalsEnabled={org?.executive_goals_enabled ?? false}
+        trendDetectionEnabled={org?.trend_detection_enabled ?? false}
         userName={session.name ?? ""}
         orgName={org?.name ?? ""}
         customerVoiceEnabled={org?.customer_voice_enabled ?? false}

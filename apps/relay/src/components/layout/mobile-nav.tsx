@@ -26,6 +26,9 @@ import {
   BarChart2,
   LayoutGrid,
   BookOpen,
+  FileText,
+  TrendingUp,
+  Target,
   ShoppingCart,
   ClipboardCheck,
   Radio,
@@ -123,6 +126,9 @@ interface MobileNavProps {
   industry?: string
   corporateDashboardEnabled?: boolean
   regionsEnabled?: boolean
+  executiveBriefingsEnabled?: boolean
+  executiveGoalsEnabled?: boolean
+  trendDetectionEnabled?: boolean
   userName?: string
   orgName?: string
   navLabelOverrides?: Record<string, string>
@@ -131,7 +137,7 @@ interface MobileNavProps {
   customerVoiceEnabled?: boolean
 }
 
-export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, userName, orgName, navLabelOverrides, customViewItems = [], customPageItems = [], customerVoiceEnabled }: MobileNavProps) {
+export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDashboardEnabled, regionsEnabled, executiveBriefingsEnabled, executiveGoalsEnabled, trendDetectionEnabled, userName, orgName, navLabelOverrides, customViewItems = [], customPageItems = [], customerVoiceEnabled }: MobileNavProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -194,7 +200,11 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
   const allowedSet       = new Set(allowedPageKeys)
   const industryNavItems = getIndustryNavItems(industry ?? "")
   const visibleItems = industryNavItems
-    ? industryNavItems.filter(i => allowedSet.has(i.key))
+    ? industryNavItems.filter(i => {
+        if (!allowedSet.has(i.key)) return false
+        if ((i.key === "corporate-dashboard" || i.key === "regional-dashboard") && !corporateDashboardEnabled) return false
+        return true
+      })
     : ALL_NAV_ITEMS.filter((i) => {
         if (!allowedSet.has(i.key)) return false
         if (i.key === "corporate-dashboard" && !corporateDashboardEnabled) return false
@@ -374,6 +384,48 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
               >
                 <MessageSquare className="w-5 h-5 flex-shrink-0" />
                 Customer Voice
+              </Link>
+            )}
+            {executiveBriefingsEnabled && (
+              <Link
+                href="/executive-briefings"
+                className={cn(
+                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                  isActive("/executive-briefings")
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                )}
+              >
+                <FileText className="w-5 h-5 flex-shrink-0" />
+                AI Briefings
+              </Link>
+            )}
+            {trendDetectionEnabled && (
+              <Link
+                href="/trend-alerts"
+                className={cn(
+                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                  isActive("/trend-alerts")
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                )}
+              >
+                <TrendingUp className="w-5 h-5 flex-shrink-0" />
+                Trend Alerts
+              </Link>
+            )}
+            {executiveGoalsEnabled && (
+              <Link
+                href="/executive-goals"
+                className={cn(
+                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                  isActive("/executive-goals")
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                )}
+              >
+                <Target className="w-5 h-5 flex-shrink-0" />
+                Goals & KPIs
               </Link>
             )}
           </nav>

@@ -45,7 +45,7 @@ import { logout } from "@/lib/auth-actions"
 import type { PageKey } from "@/lib/page-access"
 import { RelayWordmarkWhite } from "@/components/logo"
 import type { RecentlyViewedItem } from "@/components/layout/recently-viewed-tracker"
-import { getIndustryNavItems } from "@/lib/workspace-config"
+import { buildNav } from "@/lib/workspace-config"
 import { resolveViewIcon, type CustomViewSidebarItem } from "@/lib/custom-view-config"
 import type { CustomPageSidebarItem } from "@/lib/widget-registry"
 
@@ -135,7 +135,7 @@ export function Sidebar({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const allowedSet = new Set(allowedPageKeys)
-  const industryNavItems = getIndustryNavItems(industry ?? "")
+  const industryNavItems = industry ? buildNav(industry, allowedSet, { corporateDashboardEnabled }) : null
   const [recentItems, setRecentItems] = useState<RecentlyViewedItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
 
@@ -165,17 +165,11 @@ export function Sidebar({
     return () => window.removeEventListener("storage", load)
   }, [])
 
-  const visibleNavItems = industryNavItems
-    ? industryNavItems.filter(item => {
-        if (!allowedSet.has(item.key)) return false
-        if ((item.key === "corporate-dashboard" || item.key === "regional-dashboard") && !corporateDashboardEnabled) return false
-        return true
-      })
-    : ALL_NAV_ITEMS.filter(item => {
-        if (!allowedSet.has(item.key)) return false
-        if ((item.key === "corporate-dashboard" || item.key === "regional-dashboard") && !corporateDashboardEnabled) return false
-        return true
-      })
+  const visibleNavItems = industryNavItems ?? ALL_NAV_ITEMS.filter(item => {
+    if (!allowedSet.has(item.key)) return false
+    if ((item.key === "corporate-dashboard" || item.key === "regional-dashboard") && !corporateDashboardEnabled) return false
+    return true
+  })
 
   const isActive = (href: string) => {
     const qIdx = href.indexOf("?")

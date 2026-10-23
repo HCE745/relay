@@ -39,7 +39,7 @@ import {
 import type { PageKey } from "@/lib/page-access"
 import { RelayIconWhite, RelayWordmarkWhite } from "@/components/logo"
 import { SupportButton } from "@/components/support/support-button"
-import { getIndustryNavItems, INDUSTRY_SECTION_ORDER, type NavItem } from "@/lib/workspace-config"
+import { buildNav, INDUSTRY_SECTION_ORDER, type NavItem } from "@/lib/workspace-config"
 import { resolveViewIcon, type CustomViewSidebarItem } from "@/lib/custom-view-config"
 import type { CustomPageSidebarItem } from "@/lib/widget-registry"
 
@@ -198,19 +198,13 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
   }, [drawerOpen])
 
   const allowedSet       = new Set(allowedPageKeys)
-  const industryNavItems = getIndustryNavItems(industry ?? "")
-  const visibleItems = industryNavItems
-    ? industryNavItems.filter(i => {
-        if (!allowedSet.has(i.key)) return false
-        if ((i.key === "corporate-dashboard" || i.key === "regional-dashboard") && !corporateDashboardEnabled) return false
-        return true
-      })
-    : ALL_NAV_ITEMS.filter((i) => {
-        if (!allowedSet.has(i.key)) return false
-        if (i.key === "corporate-dashboard" && !corporateDashboardEnabled) return false
-        if (i.key === "regional-dashboard" && !corporateDashboardEnabled) return false
-        return true
-      })
+  const industryNavItems = industry ? buildNav(industry, allowedSet, { corporateDashboardEnabled }) : null
+  const visibleItems = industryNavItems ?? ALL_NAV_ITEMS.filter((i) => {
+    if (!allowedSet.has(i.key)) return false
+    if (i.key === "corporate-dashboard" && !corporateDashboardEnabled) return false
+    if (i.key === "regional-dashboard" && !corporateDashboardEnabled) return false
+    return true
+  })
   const pageTitle = getPageTitle(pathname, customPageItems)
 
   function isActive(href: string) {

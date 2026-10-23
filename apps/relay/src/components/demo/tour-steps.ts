@@ -809,9 +809,33 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
       "Over time, Relay's history shows which equipment fails most often, which sites have the slowest response times, and where recurring problems concentrate. That gives operators better information for maintenance scheduling, equipment replacement decisions, and vendor evaluation.",
   },
 
-  // Step 19: Employee Voice
+  // Step 19: Analytics Dashboard
   {
     id: 19,
+    path: "/analytics/dashboard",
+    targetSelector: "[data-tour='analytics-dashboard-grid']",
+    audioFile: null,
+    cue: "Build the exact operations view that matters to your wash.",
+    getTitle: () => "Track wash operations across all locations in one view.",
+    getExplain: () =>
+      "The analytics dashboard shows your key metrics in one place — issues by category, resolution rates, equipment downtime, top contributors, and more. Add any widget you need, arrange the layout, and save it as your default. Every manager sees the same picture without pulling a report.",
+  },
+
+  // Step 20: Customer Voice
+  {
+    id: 20,
+    path: "/customer-voice",
+    targetSelector: "[data-tour='customer-voice-inbox']",
+    audioFile: null,
+    cue: "Customer feedback arrives automatically — no manual collection required.",
+    getTitle: () => "See what customers are saying.",
+    getExplain: () =>
+      "Customer Voice collects feedback from Google reviews, QR scans, and feedback links and brings it into one inbox. AI classifies each submission and flags operational problems — a blocked nozzle, a vacuum with no suction, a pay station issue — so your team can act on customer reports the same way they act on staff-logged problems.",
+  },
+
+  // Step 21: Employee Voice
+  {
+    id: 21,
     path: "/voice",
     targetSelector: "[data-tour='voice-tiles']",
     audioFile: "/demo-audio/carwash-step-19.mp3",
@@ -821,9 +845,9 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
       "Technicians and site staff notice problems before management does. Relay gives every team member a channel to submit suggestions, share concerns, and complete quick surveys without a meeting. Managers see the patterns that surface across shifts and sites.",
   },
 
-  // Step 20: Completion
+  // Step 22: Completion
   {
-    id: 20,
+    id: 22,
     path: null,
     targetSelector: null,
     type: "completion",
@@ -1058,9 +1082,33 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
       "Relay's history shows which properties generate the most requests, which equipment keeps failing, which contractors are slowest to respond, and how quickly maintenance teams close tickets. That data supports better decisions on maintenance budgets, equipment replacement, and contractor evaluation.",
   },
 
-  // Step 19: Employee Voice
+  // Step 19: Analytics Dashboard
   {
     id: 19,
+    path: "/analytics/dashboard",
+    targetSelector: "[data-tour='analytics-dashboard-grid']",
+    audioFile: null,
+    cue: "Build the portfolio view that surfaces what actually needs attention.",
+    getTitle: () => "Your portfolio metrics in one customizable view.",
+    getExplain: () =>
+      "The analytics dashboard shows your key metrics in one place — open work orders by property, resolution rates, contractor response times, equipment failure trends, and more. Add any widget you need, arrange the layout, and save it as your default view across the team.",
+  },
+
+  // Step 20: Customer Voice
+  {
+    id: 20,
+    path: "/customer-voice",
+    targetSelector: "[data-tour='customer-voice-inbox']",
+    audioFile: null,
+    cue: "Tenant feedback surfaces operational problems before they escalate.",
+    getTitle: () => "See what customers are saying.",
+    getExplain: () =>
+      "Customer Voice collects tenant feedback from QR codes, feedback links, and review platforms and brings it into one inbox. AI classifies each submission and flags maintenance problems so your team can act on tenant reports the same way they handle staff-logged work orders.",
+  },
+
+  // Step 21: Employee Voice
+  {
+    id: 21,
     path: "/voice",
     targetSelector: "[data-tour='voice-tiles']",
     audioFile: "/demo-audio/property-step-19.mp3",
@@ -1070,9 +1118,9 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
       "Maintenance technicians notice recurring problems before property managers do — equipment that keeps failing, contractor coordination gaps, process improvements. Relay gives every team member a channel to submit ideas, flag concerns, and complete quick surveys. Managers see the patterns that emerge across the portfolio.",
   },
 
-  // Step 20: Completion
+  // Step 22: Completion
   {
-    id: 20,
+    id: 22,
     path: null,
     targetSelector: null,
     type: "completion",
@@ -1319,9 +1367,33 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
       "Relay's history shows which machines fail most often, which categories of issues take longest to resolve, and where recurring breakdowns concentrate across plants and lines. That data informs maintenance schedules, parts stocking decisions, capital equipment planning, and supplier evaluation.",
   },
 
-  // Step 20: Employee Voice
+  // Step 20: Analytics Dashboard
   {
     id: 20,
+    path: "/analytics/dashboard",
+    targetSelector: "[data-tour='analytics-dashboard-grid']",
+    audioFile: null,
+    cue: "Build the plant operations view your management team actually needs.",
+    getTitle: () => "Monitor your plant operations in one view.",
+    getExplain: () =>
+      "The analytics dashboard shows your key metrics in one place — equipment downtime by machine, issue resolution rates, breakdown frequency by line, maintenance team performance, and more. Add any widget you need and save your layout as the default view for managers across every plant.",
+  },
+
+  // Step 21: Customer Voice
+  {
+    id: 21,
+    path: "/customer-voice",
+    targetSelector: "[data-tour='customer-voice-inbox']",
+    audioFile: null,
+    cue: "External feedback surfaces quality and operational problems early.",
+    getTitle: () => "See what customers are saying.",
+    getExplain: () =>
+      "Customer Voice collects feedback from QR codes and external channels into one inbox. AI classifies each submission and flags operational or quality-related problems — so your team can act on customer-reported issues the same way they act on floor-reported ones.",
+  },
+
+  // Step 22: Employee Voice
+  {
+    id: 22,
     path: "/voice",
     targetSelector: "[data-tour='voice-tiles']",
     audioFile: "/demo-audio/manufacturing-step-20.mp3",
@@ -1331,9 +1403,9 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
       "Operators notice machine inefficiencies, near-misses, and quality issues before they appear in the data. Relay gives every team member a direct channel to submit a concern, suggest an improvement, or complete a quick safety survey. Managers see the patterns that emerge across shifts and plants — the kind of operational intelligence that does not show up in maintenance logs.",
   },
 
-  // Step 21: Completion
+  // Step 23: Completion
   {
-    id: 21,
+    id: 23,
     path: null,
     targetSelector: null,
     type: "completion",

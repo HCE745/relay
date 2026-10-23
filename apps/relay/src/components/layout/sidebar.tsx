@@ -45,7 +45,7 @@ import { logout } from "@/lib/auth-actions"
 import type { PageKey } from "@/lib/page-access"
 import { RelayWordmarkWhite } from "@/components/logo"
 import type { RecentlyViewedItem } from "@/components/layout/recently-viewed-tracker"
-import { CARWASH_NAV_ITEMS, PROPERTY_NAV_ITEMS, MANUFACTURING_NAV_ITEMS, getIndustryNavItems, isIndustryNavFlat } from "@/lib/workspace-config"
+import { getIndustryNavItems } from "@/lib/workspace-config"
 import { resolveViewIcon, type CustomViewSidebarItem } from "@/lib/custom-view-config"
 import type { CustomPageSidebarItem } from "@/lib/widget-registry"
 
@@ -136,7 +136,6 @@ export function Sidebar({
   const searchParams = useSearchParams()
   const allowedSet = new Set(allowedPageKeys)
   const industryNavItems = getIndustryNavItems(industry ?? "")
-  const isFlat = isIndustryNavFlat(industry ?? "")
   const [recentItems, setRecentItems] = useState<RecentlyViewedItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
 
@@ -279,25 +278,7 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 px-2 py-3 overflow-y-auto">
-        {isFlat ? (
-          <div className="mb-4 space-y-0.5">
-            {visibleNavItems.map(({ href, label, icon: Icon }) =>
-              navLink(href, navLabelOverrides?.[href] ?? label, Icon)
-            )}
-            {allowedSet.has("issues") && customViewItems.map(view => {
-              const Icon = resolveViewIcon(view.icon)
-              return navLink(`/issues?view=${view.id}`, view.name, Icon)
-            })}
-            {customPageItems.map(page => {
-              const Icon = resolveViewIcon(page.icon)
-              return navLink(`/workspace/${page.id}`, page.name, Icon)
-            })}
-            {voiceExtras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
-            {intelligenceExtras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
-            {customerVoiceExtras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
-          </div>
-        ) : (
-          SECTION_ORDER.map(section => {
+        {SECTION_ORDER.map(section => {
             const items = (visibleNavItems as Array<{ key: PageKey; href: string; label: string; icon: React.ElementType; section: string }>).filter(i => i.section === section)
             const extras = sectionExtras[section] ?? []
             if (items.length === 0 && extras.length === 0) return null
@@ -313,8 +294,7 @@ export function Sidebar({
                 </div>
               </div>
             )
-          })
-        )}
+          })}
 
         {/* Settings + Notifications in Admin section at bottom */}
         <div className="mb-4">

@@ -39,7 +39,7 @@ import {
 import type { PageKey } from "@/lib/page-access"
 import { RelayIconWhite, RelayWordmarkWhite } from "@/components/logo"
 import { SupportButton } from "@/components/support/support-button"
-import { getIndustryNavItems, CARWASH_NAV_ITEMS } from "@/lib/workspace-config"
+import { getIndustryNavItems, INDUSTRY_SECTION_ORDER, type NavItem } from "@/lib/workspace-config"
 import { resolveViewIcon, type CustomViewSidebarItem } from "@/lib/custom-view-config"
 import type { CustomPageSidebarItem } from "@/lib/widget-registry"
 
@@ -318,115 +318,195 @@ export function MobileNav({ allowedPageKeys, showRouting, industry, corporateDas
           </div>
 
           {/* Nav list */}
-          <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto overscroll-contain">
-            {visibleItems.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
-                  isActive(href)
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+          <nav className="flex-1 px-3 py-3 overflow-y-auto overscroll-contain">
+            {industryNavItems ? (
+              // Industry nav: grouped by section with headers
+              <>
+                {INDUSTRY_SECTION_ORDER.map(section => {
+                  const sectionItems = (visibleItems as NavItem[]).filter(i => i.section === section)
+                  const extras: Array<{ href: string; label: string; icon: React.ElementType }> =
+                    section === "INTELLIGENCE"
+                      ? [
+                          ...(executiveBriefingsEnabled ? [{ href: "/executive-briefings", label: "AI Briefings",  icon: FileText   }] : []),
+                          ...(trendDetectionEnabled     ? [{ href: "/trend-alerts",        label: "Trend Alerts",  icon: TrendingUp }] : []),
+                          ...(executiveGoalsEnabled     ? [{ href: "/executive-goals",     label: "Goals & KPIs",  icon: Target     }] : []),
+                        ]
+                      : section === "MAIN"
+                      ? [
+                          ...(allowedSet.has("issues") ? customViewItems.map(v => ({ href: `/issues?view=${v.id}`, label: v.name, icon: resolveViewIcon(v.icon) })) : []),
+                          ...customPageItems.map(p => ({ href: `/workspace/${p.id}`, label: p.name, icon: resolveViewIcon(p.icon) })),
+                        ]
+                      : []
+                  if (sectionItems.length === 0 && extras.length === 0) return null
+                  return (
+                    <div key={section} className="mb-1">
+                      <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase px-3.5 pb-1 pt-3">
+                        {section}
+                      </p>
+                      {sectionItems.map(({ href, label, icon: Icon }) => (
+                        <Link
+                          key={href}
+                          href={href}
+                          className={cn(
+                            "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                            isActive(href)
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                          )}
+                        >
+                          <Icon className="w-5 h-5 flex-shrink-0" />
+                          {navLabelOverrides?.[href] ?? label}
+                        </Link>
+                      ))}
+                      {extras.map(({ href, label, icon: Icon }) => (
+                        <Link
+                          key={href}
+                          href={href}
+                          className={cn(
+                            "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                            isActive(href)
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                          )}
+                        >
+                          <Icon className="w-5 h-5 flex-shrink-0" />
+                          {label}
+                        </Link>
+                      ))}
+                    </div>
+                  )
+                })}
+                {customerVoiceEnabled && (
+                  <div className="mb-1">
+                    <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase px-3.5 pb-1 pt-3">CUSTOMER VOICE</p>
+                    <Link
+                      href="/customer-voice"
+                      className={cn(
+                        "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                        isActive("/customer-voice")
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                      )}
+                    >
+                      <MessageSquare className="w-5 h-5 flex-shrink-0" />
+                      Customer Voice
+                    </Link>
+                  </div>
                 )}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {navLabelOverrides?.[href] ?? label}
-              </Link>
-            ))}
-            {allowedSet.has("issues") && customViewItems.map(view => {
-              const Icon = resolveViewIcon(view.icon)
-              const href = `/issues?view=${view.id}`
-              return (
-                <Link
-                  key={view.id}
-                  href={href}
-                  className={cn(
-                    "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
-                    isActive(href)
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
-                  )}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  {view.name}
-                </Link>
-              )
-            })}
-            {customPageItems.map(page => {
-              const Icon = resolveViewIcon(page.icon)
-              const href = `/workspace/${page.id}`
-              return (
-                <Link
-                  key={page.id}
-                  href={href}
-                  className={cn(
-                    "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
-                    isActive(href)
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
-                  )}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  {page.name}
-                </Link>
-              )
-            })}
-            {customerVoiceEnabled && (
-              <Link
-                href="/customer-voice"
-                className={cn(
-                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
-                  isActive("/customer-voice")
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+              </>
+            ) : (
+              // Generic nav: flat list
+              <div className="space-y-0.5">
+                {visibleItems.map(({ href, label, icon: Icon }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                      isActive(href)
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                    )}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {navLabelOverrides?.[href] ?? label}
+                  </Link>
+                ))}
+                {allowedSet.has("issues") && customViewItems.map(view => {
+                  const Icon = resolveViewIcon(view.icon)
+                  const href = `/issues?view=${view.id}`
+                  return (
+                    <Link
+                      key={view.id}
+                      href={href}
+                      className={cn(
+                        "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                        isActive(href)
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                      )}
+                    >
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                      {view.name}
+                    </Link>
+                  )
+                })}
+                {customPageItems.map(page => {
+                  const Icon = resolveViewIcon(page.icon)
+                  const href = `/workspace/${page.id}`
+                  return (
+                    <Link
+                      key={page.id}
+                      href={href}
+                      className={cn(
+                        "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                        isActive(href)
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                      )}
+                    >
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                      {page.name}
+                    </Link>
+                  )
+                })}
+                {customerVoiceEnabled && (
+                  <Link
+                    href="/customer-voice"
+                    className={cn(
+                      "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                      isActive("/customer-voice")
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                    )}
+                  >
+                    <MessageSquare className="w-5 h-5 flex-shrink-0" />
+                    Customer Voice
+                  </Link>
                 )}
-              >
-                <MessageSquare className="w-5 h-5 flex-shrink-0" />
-                Customer Voice
-              </Link>
-            )}
-            {executiveBriefingsEnabled && (
-              <Link
-                href="/executive-briefings"
-                className={cn(
-                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
-                  isActive("/executive-briefings")
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                {executiveBriefingsEnabled && (
+                  <Link
+                    href="/executive-briefings"
+                    className={cn(
+                      "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                      isActive("/executive-briefings")
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                    )}
+                  >
+                    <FileText className="w-5 h-5 flex-shrink-0" />
+                    AI Briefings
+                  </Link>
                 )}
-              >
-                <FileText className="w-5 h-5 flex-shrink-0" />
-                AI Briefings
-              </Link>
-            )}
-            {trendDetectionEnabled && (
-              <Link
-                href="/trend-alerts"
-                className={cn(
-                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
-                  isActive("/trend-alerts")
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                {trendDetectionEnabled && (
+                  <Link
+                    href="/trend-alerts"
+                    className={cn(
+                      "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                      isActive("/trend-alerts")
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                    )}
+                  >
+                    <TrendingUp className="w-5 h-5 flex-shrink-0" />
+                    Trend Alerts
+                  </Link>
                 )}
-              >
-                <TrendingUp className="w-5 h-5 flex-shrink-0" />
-                Trend Alerts
-              </Link>
-            )}
-            {executiveGoalsEnabled && (
-              <Link
-                href="/executive-goals"
-                className={cn(
-                  "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
-                  isActive("/executive-goals")
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                {executiveGoalsEnabled && (
+                  <Link
+                    href="/executive-goals"
+                    className={cn(
+                      "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                      isActive("/executive-goals")
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-300 hover:text-white hover:bg-gray-800 active:bg-gray-700",
+                    )}
+                  >
+                    <Target className="w-5 h-5 flex-shrink-0" />
+                    Goals & KPIs
+                  </Link>
                 )}
-              >
-                <Target className="w-5 h-5 flex-shrink-0" />
-                Goals & KPIs
-              </Link>
+              </div>
             )}
           </nav>
 

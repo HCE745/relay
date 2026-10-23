@@ -36,96 +36,121 @@ export interface NavItem {
   href: string
   label: string
   icon: ElementType
-  section?: string
+  section: string
 }
 
-// ── Industry nav arrays (flat) ────────────────────────────────────────────────
+// ── Shared section order (mirrors the generic nav) ───────────────────────────
+
+export const INDUSTRY_SECTION_ORDER = [
+  "MAIN",
+  "OPERATIONS",
+  "EMPLOYEE VOICE",
+  "INTELLIGENCE",
+  "ADMINISTRATION",
+]
+
+// ── Industry nav arrays ───────────────────────────────────────────────────────
 
 export const CARWASH_NAV_ITEMS: NavItem[] = [
-  { key: "dashboard",              href: "/dashboard",                       label: "Wash Overview",          icon: Droplets       },
-  { key: "issues",                 href: "/issues?category=CUSTOMER_REPORT", label: "Customer Reports",       icon: ClipboardList  },
-  { key: "issues",                 href: "/issues",                          label: "Issues",                 icon: AlertCircle    },
-  { key: "issues",                 href: "/issues?category=MAINTENANCE",     label: "Maintenance",            icon: Wrench         },
-  { key: "assignments",            href: "/assignments",                     label: "Assignments",            icon: ClipboardCheck },
-  { key: "communications",         href: "/communications",                  label: "Communications",         icon: Radio          },
-  { key: "assets",                 href: "/assets",                          label: "Equipment",              icon: Package        },
-  { key: "qr-codes",               href: "/qr-codes",                        label: "QR Codes",               icon: QrCode         },
-  { key: "locations",              href: "/locations",                       label: "Locations",              icon: MapPin         },
-  { key: "departments",            href: "/departments",                     label: "Departments",            icon: Building2      },
-  { key: "vendors",                href: "/vendors",                         label: "Vendors",                icon: Building2      },
-  { key: "sops",                   href: "/sops",                            label: "SOPs",                   icon: BookOpen       },
-  { key: "calendar",               href: "/calendar",                        label: "Calendar",               icon: CalendarDays   },
-  { key: "purchase-requests",      href: "/purchase-requests",               label: "Purchase Requests",      icon: ShoppingCart   },
-  { key: "approval-intelligence",  href: "/approval-intelligence",           label: "Approval Intelligence",  icon: CheckSquare    },
-  { key: "my-submissions",         href: "/my-submissions",                  label: "My Submissions",         icon: ClipboardList  },
-  { key: "archive",                href: "/archive",                         label: "Archive",                icon: Archive        },
-  { key: "voice",                  href: "/voice",                           label: "Employee Voice",         icon: Megaphone      },
-  { key: "suggestions",            href: "/suggestions",                     label: "Suggestions",            icon: Lightbulb      },
-  { key: "surveys",                href: "/surveys",                         label: "Surveys",                icon: ClipboardList  },
-  { key: "recognition",            href: "/recognition",                     label: "Recognition",            icon: Award          },
-  { key: "team",                   href: "/team",                            label: "Team",                   icon: Users          },
-  { key: "analytics",              href: "/analytics",                       label: "Reports",                icon: BarChart2      },
-  { key: "analytics-dashboard",    href: "/analytics/dashboard",             label: "Dashboard",              icon: LayoutGrid     },
-  { key: "corporate-dashboard",    href: "/corporate-dashboard",             label: "Corporate View",         icon: Globe2         },
-  { key: "regional-dashboard",     href: "/regional-dashboard",              label: "Regional View",          icon: Building       },
+  // ── MAIN ──────────────────────────────────────────────────────────────────
+  { key: "dashboard",             href: "/dashboard",                       label: "Wash Overview",         icon: Droplets,       section: "MAIN"          },
+  { key: "issues",                href: "/issues?category=CUSTOMER_REPORT", label: "Customer Reports",      icon: ClipboardList,  section: "MAIN"          },
+  { key: "issues",                href: "/issues",                          label: "Issues",                icon: AlertCircle,    section: "MAIN"          },
+  { key: "issues",                href: "/issues?category=MAINTENANCE",     label: "Maintenance",           icon: Wrench,         section: "MAIN"          },
+  // ── OPERATIONS ────────────────────────────────────────────────────────────
+  { key: "assignments",           href: "/assignments",                     label: "Assignments",           icon: ClipboardCheck, section: "OPERATIONS"    },
+  { key: "communications",        href: "/communications",                  label: "Communications",        icon: Radio,          section: "OPERATIONS"    },
+  { key: "assets",                href: "/assets",                          label: "Equipment",             icon: Package,        section: "OPERATIONS"    },
+  { key: "qr-codes",              href: "/qr-codes",                        label: "QR Codes",              icon: QrCode,         section: "OPERATIONS"    },
+  { key: "locations",             href: "/locations",                       label: "Locations",             icon: MapPin,         section: "OPERATIONS"    },
+  { key: "departments",           href: "/departments",                     label: "Departments",           icon: Building2,      section: "OPERATIONS"    },
+  { key: "vendors",               href: "/vendors",                         label: "Vendors",               icon: Building2,      section: "OPERATIONS"    },
+  { key: "sops",                  href: "/sops",                            label: "SOPs",                  icon: BookOpen,       section: "OPERATIONS"    },
+  { key: "calendar",              href: "/calendar",                        label: "Calendar",              icon: CalendarDays,   section: "OPERATIONS"    },
+  { key: "purchase-requests",     href: "/purchase-requests",               label: "Purchase Requests",     icon: ShoppingCart,   section: "OPERATIONS"    },
+  { key: "approval-intelligence", href: "/approval-intelligence",           label: "Approval Intelligence", icon: CheckSquare,    section: "OPERATIONS"    },
+  { key: "my-submissions",        href: "/my-submissions",                  label: "My Submissions",        icon: ClipboardList,  section: "OPERATIONS"    },
+  { key: "archive",               href: "/archive",                         label: "Archive",               icon: Archive,        section: "OPERATIONS"    },
+  // ── EMPLOYEE VOICE ────────────────────────────────────────────────────────
+  { key: "voice",                 href: "/voice",                           label: "Employee Voice",        icon: Megaphone,      section: "EMPLOYEE VOICE" },
+  { key: "suggestions",           href: "/suggestions",                     label: "Suggestions",           icon: Lightbulb,      section: "EMPLOYEE VOICE" },
+  { key: "surveys",               href: "/surveys",                         label: "Surveys",               icon: ClipboardList,  section: "EMPLOYEE VOICE" },
+  { key: "recognition",           href: "/recognition",                     label: "Recognition",           icon: Award,          section: "EMPLOYEE VOICE" },
+  // ── INTELLIGENCE ──────────────────────────────────────────────────────────
+  { key: "analytics",             href: "/analytics",                       label: "Reports",               icon: BarChart2,      section: "INTELLIGENCE"  },
+  { key: "analytics-dashboard",   href: "/analytics/dashboard",             label: "Dashboard",             icon: LayoutGrid,     section: "INTELLIGENCE"  },
+  { key: "corporate-dashboard",   href: "/corporate-dashboard",             label: "Corporate View",        icon: Globe2,         section: "INTELLIGENCE"  },
+  { key: "regional-dashboard",    href: "/regional-dashboard",              label: "Regional View",         icon: Building,       section: "INTELLIGENCE"  },
+  // ── ADMINISTRATION ────────────────────────────────────────────────────────
+  { key: "team",                  href: "/team",                            label: "Team",                  icon: Users,          section: "ADMINISTRATION" },
 ]
 
 export const PROPERTY_NAV_ITEMS: NavItem[] = [
-  { key: "dashboard",              href: "/dashboard",                          label: "Property Overview",      icon: LayoutDashboard },
-  { key: "issues",                 href: "/issues?category=TENANT_REQUEST",     label: "Tenant Requests",        icon: MessageSquare  },
-  { key: "issues",                 href: "/issues",                             label: "Property Issues",        icon: AlertCircle    },
-  { key: "issues",                 href: "/issues?category=MAINTENANCE",        label: "Maintenance",            icon: Wrench         },
-  { key: "assignments",            href: "/assignments",                        label: "Assignments",            icon: ClipboardCheck },
-  { key: "communications",         href: "/communications",                     label: "Communications",         icon: Radio          },
-  { key: "assets",                 href: "/assets",                             label: "Equipment",              icon: Package        },
-  { key: "locations",              href: "/locations",                          label: "Properties",             icon: MapPin         },
-  { key: "qr-codes",               href: "/qr-codes",                           label: "QR Codes",               icon: QrCode         },
-  { key: "departments",            href: "/departments",                        label: "Departments",            icon: Building2      },
-  { key: "vendors",                href: "/vendors",                            label: "Contractors",            icon: HardHat        },
-  { key: "sops",                   href: "/sops",                               label: "SOPs",                   icon: BookOpen       },
-  { key: "calendar",               href: "/calendar",                           label: "Calendar",               icon: CalendarDays   },
-  { key: "purchase-requests",      href: "/purchase-requests",                  label: "Purchase Requests",      icon: ShoppingCart   },
-  { key: "approval-intelligence",  href: "/approval-intelligence",              label: "Approval Intelligence",  icon: CheckSquare    },
-  { key: "my-submissions",         href: "/my-submissions",                     label: "My Submissions",         icon: ClipboardList  },
-  { key: "archive",                href: "/archive",                            label: "Archive",                icon: Archive        },
-  { key: "voice",                  href: "/voice",                              label: "Employee Voice",         icon: Megaphone      },
-  { key: "suggestions",            href: "/suggestions",                        label: "Suggestions",            icon: Lightbulb      },
-  { key: "surveys",                href: "/surveys",                            label: "Surveys",                icon: ClipboardList  },
-  { key: "recognition",            href: "/recognition",                        label: "Recognition",            icon: Award          },
-  { key: "team",                   href: "/team",                               label: "Team",                   icon: Users          },
-  { key: "analytics",              href: "/analytics",                          label: "Reports",                icon: BarChart2      },
-  { key: "analytics-dashboard",    href: "/analytics/dashboard",                label: "Dashboard",              icon: LayoutGrid     },
-  { key: "corporate-dashboard",    href: "/corporate-dashboard",                label: "Corporate View",         icon: Globe2         },
-  { key: "regional-dashboard",     href: "/regional-dashboard",                 label: "Regional View",          icon: Building       },
+  // ── MAIN ──────────────────────────────────────────────────────────────────
+  { key: "dashboard",             href: "/dashboard",                          label: "Property Overview",     icon: LayoutDashboard, section: "MAIN"          },
+  { key: "issues",                href: "/issues?category=TENANT_REQUEST",     label: "Tenant Requests",       icon: MessageSquare,   section: "MAIN"          },
+  { key: "issues",                href: "/issues",                             label: "Property Issues",       icon: AlertCircle,     section: "MAIN"          },
+  { key: "issues",                href: "/issues?category=MAINTENANCE",        label: "Maintenance",           icon: Wrench,          section: "MAIN"          },
+  // ── OPERATIONS ────────────────────────────────────────────────────────────
+  { key: "assignments",           href: "/assignments",                        label: "Assignments",           icon: ClipboardCheck,  section: "OPERATIONS"    },
+  { key: "communications",        href: "/communications",                     label: "Communications",        icon: Radio,           section: "OPERATIONS"    },
+  { key: "assets",                href: "/assets",                             label: "Equipment",             icon: Package,         section: "OPERATIONS"    },
+  { key: "locations",             href: "/locations",                          label: "Properties",            icon: MapPin,          section: "OPERATIONS"    },
+  { key: "qr-codes",              href: "/qr-codes",                           label: "QR Codes",              icon: QrCode,          section: "OPERATIONS"    },
+  { key: "departments",           href: "/departments",                        label: "Departments",           icon: Building2,       section: "OPERATIONS"    },
+  { key: "vendors",               href: "/vendors",                            label: "Contractors",           icon: HardHat,         section: "OPERATIONS"    },
+  { key: "sops",                  href: "/sops",                               label: "SOPs",                  icon: BookOpen,        section: "OPERATIONS"    },
+  { key: "calendar",              href: "/calendar",                           label: "Calendar",              icon: CalendarDays,    section: "OPERATIONS"    },
+  { key: "purchase-requests",     href: "/purchase-requests",                  label: "Purchase Requests",     icon: ShoppingCart,    section: "OPERATIONS"    },
+  { key: "approval-intelligence", href: "/approval-intelligence",              label: "Approval Intelligence", icon: CheckSquare,     section: "OPERATIONS"    },
+  { key: "my-submissions",        href: "/my-submissions",                     label: "My Submissions",        icon: ClipboardList,   section: "OPERATIONS"    },
+  { key: "archive",               href: "/archive",                            label: "Archive",               icon: Archive,         section: "OPERATIONS"    },
+  // ── EMPLOYEE VOICE ────────────────────────────────────────────────────────
+  { key: "voice",                 href: "/voice",                              label: "Employee Voice",        icon: Megaphone,       section: "EMPLOYEE VOICE" },
+  { key: "suggestions",           href: "/suggestions",                        label: "Suggestions",           icon: Lightbulb,       section: "EMPLOYEE VOICE" },
+  { key: "surveys",               href: "/surveys",                            label: "Surveys",               icon: ClipboardList,   section: "EMPLOYEE VOICE" },
+  { key: "recognition",           href: "/recognition",                        label: "Recognition",           icon: Award,           section: "EMPLOYEE VOICE" },
+  // ── INTELLIGENCE ──────────────────────────────────────────────────────────
+  { key: "analytics",             href: "/analytics",                          label: "Reports",               icon: BarChart2,       section: "INTELLIGENCE"  },
+  { key: "analytics-dashboard",   href: "/analytics/dashboard",                label: "Dashboard",             icon: LayoutGrid,      section: "INTELLIGENCE"  },
+  { key: "corporate-dashboard",   href: "/corporate-dashboard",                label: "Corporate View",        icon: Globe2,          section: "INTELLIGENCE"  },
+  { key: "regional-dashboard",    href: "/regional-dashboard",                 label: "Regional View",         icon: Building,        section: "INTELLIGENCE"  },
+  // ── ADMINISTRATION ────────────────────────────────────────────────────────
+  { key: "team",                  href: "/team",                               label: "Team",                  icon: Users,           section: "ADMINISTRATION" },
 ]
 
 export const MANUFACTURING_NAV_ITEMS: NavItem[] = [
-  { key: "dashboard",              href: "/dashboard",                               label: "Plant Overview",         icon: LayoutDashboard },
-  { key: "issues",                 href: "/issues?category=EQUIPMENT_BREAKDOWN",     label: "Equipment Issues",       icon: Wrench         },
-  { key: "issues",                 href: "/issues",                                  label: "Issues",                 icon: AlertCircle    },
-  { key: "issues",                 href: "/issues?category=SAFETY",                  label: "Safety Issues",          icon: HardHat        },
-  { key: "assignments",            href: "/assignments",                             label: "Assignments",            icon: ClipboardCheck },
-  { key: "communications",         href: "/communications",                          label: "Communications",         icon: Radio          },
-  { key: "assets",                 href: "/assets",                                  label: "Machines & Equipment",   icon: Package        },
-  { key: "locations",              href: "/locations",                               label: "Plants & Areas",         icon: MapPin         },
-  { key: "departments",            href: "/departments",                             label: "Departments",            icon: Building2      },
-  { key: "vendors",                href: "/vendors",                                 label: "Suppliers",              icon: Building2      },
-  { key: "qr-codes",               href: "/qr-codes",                                label: "QR Codes",               icon: QrCode         },
-  { key: "sops",                   href: "/sops",                                    label: "SOPs",                   icon: BookOpen       },
-  { key: "calendar",               href: "/calendar",                                label: "Calendar",               icon: CalendarDays   },
-  { key: "purchase-requests",      href: "/purchase-requests",                       label: "Purchase Requests",      icon: ShoppingCart   },
-  { key: "approval-intelligence",  href: "/approval-intelligence",                   label: "Approval Intelligence",  icon: CheckSquare    },
-  { key: "my-submissions",         href: "/my-submissions",                          label: "My Submissions",         icon: ClipboardList  },
-  { key: "archive",                href: "/archive",                                 label: "Archive",                icon: Archive        },
-  { key: "voice",                  href: "/voice",                                   label: "Employee Voice",         icon: Megaphone      },
-  { key: "suggestions",            href: "/suggestions",                             label: "Suggestions",            icon: Lightbulb      },
-  { key: "surveys",                href: "/surveys",                                 label: "Surveys",                icon: ClipboardList  },
-  { key: "recognition",            href: "/recognition",                             label: "Recognition",            icon: Award          },
-  { key: "team",                   href: "/team",                                    label: "Team",                   icon: Users          },
-  { key: "analytics",              href: "/analytics",                               label: "Reports",                icon: BarChart2      },
-  { key: "analytics-dashboard",    href: "/analytics/dashboard",                     label: "Dashboard",              icon: LayoutGrid     },
-  { key: "corporate-dashboard",    href: "/corporate-dashboard",                     label: "Corporate View",         icon: Globe2         },
-  { key: "regional-dashboard",     href: "/regional-dashboard",                      label: "Regional View",          icon: Building       },
+  // ── MAIN ──────────────────────────────────────────────────────────────────
+  { key: "dashboard",             href: "/dashboard",                               label: "Plant Overview",        icon: LayoutDashboard, section: "MAIN"          },
+  { key: "issues",                href: "/issues?category=EQUIPMENT_BREAKDOWN",     label: "Equipment Issues",      icon: Wrench,          section: "MAIN"          },
+  { key: "issues",                href: "/issues",                                  label: "Issues",                icon: AlertCircle,     section: "MAIN"          },
+  { key: "issues",                href: "/issues?category=SAFETY",                  label: "Safety Issues",         icon: HardHat,         section: "MAIN"          },
+  // ── OPERATIONS ────────────────────────────────────────────────────────────
+  { key: "assignments",           href: "/assignments",                             label: "Assignments",           icon: ClipboardCheck,  section: "OPERATIONS"    },
+  { key: "communications",        href: "/communications",                          label: "Communications",        icon: Radio,           section: "OPERATIONS"    },
+  { key: "assets",                href: "/assets",                                  label: "Machines & Equipment",  icon: Package,         section: "OPERATIONS"    },
+  { key: "locations",             href: "/locations",                               label: "Plants & Areas",        icon: MapPin,          section: "OPERATIONS"    },
+  { key: "departments",           href: "/departments",                             label: "Departments",           icon: Building2,       section: "OPERATIONS"    },
+  { key: "vendors",               href: "/vendors",                                 label: "Suppliers",             icon: Building2,       section: "OPERATIONS"    },
+  { key: "qr-codes",              href: "/qr-codes",                                label: "QR Codes",              icon: QrCode,          section: "OPERATIONS"    },
+  { key: "sops",                  href: "/sops",                                    label: "SOPs",                  icon: BookOpen,        section: "OPERATIONS"    },
+  { key: "calendar",              href: "/calendar",                                label: "Calendar",              icon: CalendarDays,    section: "OPERATIONS"    },
+  { key: "purchase-requests",     href: "/purchase-requests",                       label: "Purchase Requests",     icon: ShoppingCart,    section: "OPERATIONS"    },
+  { key: "approval-intelligence", href: "/approval-intelligence",                   label: "Approval Intelligence", icon: CheckSquare,     section: "OPERATIONS"    },
+  { key: "my-submissions",        href: "/my-submissions",                          label: "My Submissions",        icon: ClipboardList,   section: "OPERATIONS"    },
+  { key: "archive",               href: "/archive",                                 label: "Archive",               icon: Archive,         section: "OPERATIONS"    },
+  // ── EMPLOYEE VOICE ────────────────────────────────────────────────────────
+  { key: "voice",                 href: "/voice",                                   label: "Employee Voice",        icon: Megaphone,       section: "EMPLOYEE VOICE" },
+  { key: "suggestions",           href: "/suggestions",                             label: "Suggestions",           icon: Lightbulb,       section: "EMPLOYEE VOICE" },
+  { key: "surveys",               href: "/surveys",                                 label: "Surveys",               icon: ClipboardList,   section: "EMPLOYEE VOICE" },
+  { key: "recognition",           href: "/recognition",                             label: "Recognition",           icon: Award,           section: "EMPLOYEE VOICE" },
+  // ── INTELLIGENCE ──────────────────────────────────────────────────────────
+  { key: "analytics",             href: "/analytics",                               label: "Reports",               icon: BarChart2,       section: "INTELLIGENCE"  },
+  { key: "analytics-dashboard",   href: "/analytics/dashboard",                     label: "Dashboard",             icon: LayoutGrid,      section: "INTELLIGENCE"  },
+  { key: "corporate-dashboard",   href: "/corporate-dashboard",                     label: "Corporate View",        icon: Globe2,          section: "INTELLIGENCE"  },
+  { key: "regional-dashboard",    href: "/regional-dashboard",                      label: "Regional View",         icon: Building,        section: "INTELLIGENCE"  },
+  // ── ADMINISTRATION ────────────────────────────────────────────────────────
+  { key: "team",                  href: "/team",                                    label: "Team",                  icon: Users,           section: "ADMINISTRATION" },
 ]
 
 // ── Industry dispatch ─────────────────────────────────────────────────────────

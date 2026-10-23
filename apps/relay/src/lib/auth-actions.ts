@@ -59,6 +59,7 @@ export async function register(formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const orgName = formData.get("orgName") as string
+  const offerToken = (formData.get("offerToken") as string | null) || null
 
   if (!name || !email || !password || !orgName) {
     return { error: "All fields are required" }
@@ -66,6 +67,24 @@ export async function register(formData: FormData) {
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) return { error: "Email already registered" }
+
+  // Validate offer token if provided
+  let validOffer: { id: string; maxRedemptions: number; redemptionCount: number; expiresAt: Date | null; redeemedAt: Date | null } | null = null
+  if (offerToken) {
+    validOffer = await prisma.salesOffer.findUnique({
+      where: { token: offerToken },
+      select: { id: true, maxRedemptions: true, redemptionCount: true, expiresAt: true, redeemedAt: true },
+    })
+    // Silently ignore invalid/exhausted offers — don't block registration
+    if (
+      !validOffer ||
+      validOffer.redeemedAt ||
+      validOffer.redemptionCount >= validOffer.maxRedemptions ||
+      (validOffer.expiresAt && validOffer.expiresAt < new Date())
+    ) {
+      validOffer = null
+    }
+  }
 
   const slug = orgName
     .toLowerCase()
@@ -77,7 +96,14 @@ export async function register(formData: FormData) {
   const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
 
   const org = await prisma.organization.create({
-    data: { name: orgName, slug, trialEndsAt, subscriptionStatus: "trialing", plan: "essentials" },
+    data: {
+      name: orgName,
+      slug,
+      trialEndsAt,
+      subscriptionStatus: "trialing",
+      plan: "essentials",
+      ...(validOffer ? { pendingOfferToken: offerToken } : {}),
+    },
   })
 
   const headersList = await headers()

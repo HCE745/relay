@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
       discountExpiresAt: true,
       stripeCustomerId:  true,
       stripeCouponId:    true,
+      pendingOfferToken: true,
     },
   })
 
@@ -84,9 +85,70 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Create or reuse coupon for founding-customer discount
+    // Resolve pending sales offer
+    let pendingOffer: {
+      id: string
+      token: string
+      offerType: string
+      discountPercent: number | null
+      flatMonthlyPrice: number | null
+      freeMonths: number | null
+      durationMonths: number | null
+    } | null = null
+    if (org.pendingOfferToken) {
+      const found = await prisma.salesOffer.findUnique({
+        where: { token: org.pendingOfferToken },
+        select: {
+          id: true, token: true, offerType: true,
+          discountPercent: true, flatMonthlyPrice: true,
+          freeMonths: true, durationMonths: true,
+          maxRedemptions: true, redemptionCount: true,
+          expiresAt: true, redeemedAt: true,
+        },
+      })
+      if (
+        found &&
+        !found.redeemedAt &&
+        found.redemptionCount < found.maxRedemptions &&
+        (!found.expiresAt || found.expiresAt > new Date())
+      ) {
+        pendingOffer = {
+          id:               found.id,
+          token:            found.token,
+          offerType:        found.offerType,
+          discountPercent:  found.discountPercent ? Number(found.discountPercent) : null,
+          flatMonthlyPrice: found.flatMonthlyPrice ? Number(found.flatMonthlyPrice) : null,
+          freeMonths:       found.freeMonths,
+          durationMonths:   found.durationMonths,
+        }
+      }
+    }
+
+    // Create or reuse coupon — offer takes priority over founding-customer discount
     let couponId: string | undefined
-    if (org.discountPercent && org.discountPercent > 0) {
+
+    if (pendingOffer) {
+      // Sales offer pricing — create a one-time coupon or custom price
+      if (pendingOffer.offerType === "PERCENT_DISCOUNT" && pendingOffer.discountPercent) {
+        const months = pendingOffer.durationMonths ?? 12
+        const coupon = await stripe.coupons.create({
+          percent_off:        pendingOffer.discountPercent,
+          duration:           "repeating",
+          duration_in_months: months,
+          name:               `Sales Offer ${pendingOffer.token}`,
+        })
+        couponId = coupon.id
+      } else if (pendingOffer.offerType === "FREE_MONTHS" && pendingOffer.freeMonths) {
+        const coupon = await stripe.coupons.create({
+          percent_off:        100,
+          duration:           "repeating",
+          duration_in_months: pendingOffer.freeMonths,
+          name:               `${pendingOffer.freeMonths} Free Month${pendingOffer.freeMonths !== 1 ? "s" : ""} — ${pendingOffer.token}`,
+        })
+        couponId = coupon.id
+      }
+      // FLAT_PRICE handled below via price_data — no coupon needed
+    } else if (org.discountPercent && org.discountPercent > 0) {
       if (org.stripeCouponId) {
         couponId = org.stripeCouponId
       } else {
@@ -108,14 +170,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Build line items from pricing selections
-    const lineItems = buildLineItems({
-      plan:              body.plan,
-      employeeCount,
-      locationCount:     body.locationCount,
-      selectedModuleIds,
-      intelligenceSuite,
-    })
+    // Build line items — flat-price offers replace all line items with a single custom price
+    const isFlatPrice = pendingOffer?.offerType === "FLAT_PRICE" && pendingOffer.flatMonthlyPrice
+    const lineItems = isFlatPrice
+      ? [{
+          price_data: {
+            currency:    "usd",
+            unit_amount: Math.round(pendingOffer!.flatMonthlyPrice! * 100),
+            recurring:   { interval: "month" as const },
+            product_data: {
+              name:     `Relay ${body.plan.charAt(0).toUpperCase() + body.plan.slice(1).replace(/_/g, " ")} (Custom)`,
+              metadata: { salesOfferToken: pendingOffer!.token },
+            },
+          },
+          quantity: 1,
+        }]
+      : buildLineItems({
+          plan:              body.plan,
+          employeeCount,
+          locationCount:     body.locationCount,
+          selectedModuleIds,
+          intelligenceSuite,
+        })
 
     const isWashEssentials = body.plan === "wash_essentials"
 
@@ -124,10 +200,11 @@ export async function POST(req: NextRequest) {
       mode:     "subscription",
       customer: customerId,
       line_items: lineItems,
-      ...(couponId ? { discounts: [{ coupon: couponId }] } : { allow_promotion_codes: true }),
+      ...(couponId ? { discounts: [{ coupon: couponId }] } : (!pendingOffer ? { allow_promotion_codes: true } : {})),
       // Session-level metadata for checkout.session.completed webhook
       metadata: {
         organizationId: org.id,
+        ...(pendingOffer ? { salesOfferToken: pendingOffer.token } : {}),
         ...(isWashEssentials ? {
           productLine:   "WASH_ESSENTIALS",
           industry:      "CAR_WASH",

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   ArrowLeft, CheckCircle2, Circle, Clock, DollarSign,
-  User, Calendar, FileText, Loader2, AlertCircle, Plus, RefreshCw, Lock, ShieldAlert,
+  User, Calendar, FileText, Loader2, AlertCircle, Plus, RefreshCw, Lock, ShieldAlert, Tag, Copy,
 } from "lucide-react"
 
 type Task = {
@@ -116,6 +116,15 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
   const [transferSaving, setTransferSaving] = useState(false)
   const [showTransfer, setShowTransfer] = useState(false)
 
+  // Offer generation
+  const [showOffer, setShowOffer]           = useState(false)
+  const [offerDiscount, setOfferDiscount]   = useState("10")
+  const [offerDuration, setOfferDuration]   = useState("12")
+  const [offerPlan, setOfferPlan]           = useState("professional")
+  const [offerSaving, setOfferSaving]       = useState(false)
+  const [offerUrl, setOfferUrl]             = useState<string | null>(null)
+  const [offerCopied, setOfferCopied]       = useState(false)
+
   useEffect(() => {
     async function load() {
       try {
@@ -206,6 +215,42 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
     } finally {
       setNextStepSaving(false)
     }
+  }
+
+  async function generateOffer(e: React.FormEvent) {
+    e.preventDefault()
+    const pct = Number(offerDiscount)
+    if (!pct || pct < 1 || pct > 20) { alert("Discount must be 1–20%"); return }
+    setOfferSaving(true)
+    try {
+      const res = await fetch("/api/sales/offers", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          opportunityId:  params.id,
+          offerType:      "PERCENT_DISCOUNT",
+          discountPercent: pct,
+          durationMonths: Number(offerDuration) || null,
+          targetPlan:     offerPlan,
+          maxRedemptions: 1,
+        }),
+      })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "Failed") }
+      const data = await res.json()
+      setOfferUrl(data.offerUrl)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to create offer")
+    } finally {
+      setOfferSaving(false)
+    }
+  }
+
+  function copyOfferUrl() {
+    if (!offerUrl) return
+    navigator.clipboard.writeText(offerUrl).then(() => {
+      setOfferCopied(true)
+      setTimeout(() => setOfferCopied(false), 2000)
+    })
   }
 
   async function requestTransfer(e: React.FormEvent) {
@@ -570,6 +615,86 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
           </div>
         </div>
       )}
+
+      {/* Offer generation — available on any stage, discount capped at 20% for reps */}
+      <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Tag className="w-4 h-4 text-blue-400" />
+            <p className="text-xs font-semibold text-gray-400">Generate Offer Link</p>
+          </div>
+          <button
+            onClick={() => { setShowOffer(v => !v); setOfferUrl(null) }}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            {showOffer ? "Cancel" : "Create Offer"}
+          </button>
+        </div>
+        {offerUrl ? (
+          <div className="space-y-3">
+            <p className="text-xs text-gray-400">Share this link with the prospect. Pricing is applied automatically when they sign up.</p>
+            <div className="flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
+              <p className="text-xs text-emerald-300 font-mono flex-1 truncate">{offerUrl}</p>
+              <button onClick={copyOfferUrl} className="shrink-0 text-gray-400 hover:text-white transition-colors">
+                {offerCopied ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              </button>
+            </div>
+            <p className="text-xs text-gray-600">Link is single-use and expires if not redeemed.</p>
+          </div>
+        ) : showOffer ? (
+          <form onSubmit={generateOffer} className="space-y-3">
+            <p className="text-xs text-gray-500">Rep offers are limited to 20% discount.</p>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Discount %</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  step={1}
+                  value={offerDiscount}
+                  onChange={e => setOfferDiscount(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Duration (months)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={60}
+                  value={offerDuration}
+                  onChange={e => setOfferDuration(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Plan</label>
+                <select
+                  value={offerPlan}
+                  onChange={e => setOfferPlan(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-600"
+                >
+                  <option value="essentials">Essentials</option>
+                  <option value="professional">Professional</option>
+                  <option value="professional_plus">Professional Plus</option>
+                  <option value="wash_essentials">Wash Essentials</option>
+                </select>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={offerSaving}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5"
+            >
+              {offerSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Tag className="w-3.5 h-3.5" />}
+              Generate Link
+            </button>
+          </form>
+        ) : (
+          <p className="text-xs text-gray-600">Generate a one-time signup link with a discount for this prospect.</p>
+        )}
+      </div>
 
       {/* Transfer */}
       <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">

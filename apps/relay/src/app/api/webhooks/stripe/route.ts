@@ -81,8 +81,40 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       checkoutIntentStatus: "completed",
       stripeSubscriptionId: (session.subscription as string | null) ?? undefined,
       productLine,
+      pendingOfferToken:    null,
     },
   })
+
+  // Mark sales offer redeemed if one was used
+  const salesOfferToken = session.metadata?.salesOfferToken
+  if (salesOfferToken) {
+    try {
+      const now = new Date()
+      const offer = await prisma.salesOffer.findUnique({
+        where:  { token: salesOfferToken },
+        select: { id: true, opportunityId: true, redemptionCount: true, maxRedemptions: true, redeemedAt: true },
+      })
+      if (offer && !offer.redeemedAt && offer.redemptionCount < offer.maxRedemptions) {
+        await prisma.salesOffer.update({
+          where: { id: offer.id },
+          data: {
+            redeemedAt:     now,
+            redeemedByOrgId: orgId,
+            redemptionCount: { increment: 1 },
+          },
+        })
+        // Update linked opportunity to Closed Won if not already
+        if (offer.opportunityId) {
+          await prisma.crmOpportunity.updateMany({
+            where: { id: offer.opportunityId, stage: { not: "Closed Won" } },
+            data:  { stage: "Closed Won", wonAt: now, customerOrganizationId: orgId },
+          })
+        }
+      }
+    } catch (err) {
+      console.error("[Stripe webhook] Failed to mark sales offer redeemed:", err)
+    }
+  }
 
   if (org) {
     await setLifecycle(orgId, "Converted", "Stripe", org.lifecycleStatus)

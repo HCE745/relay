@@ -61,6 +61,7 @@ model Organization {
   currentPrice         Float?                         // USD per billing period; null = standard pricing
   priceLockedUntil     DateTime?                      // null = no lock
   intelligenceModules  String[]                       // e.g. ["ai_suggestions", "sop_management"]
+  pendingOfferToken    String?                        // offer token captured at registration, consumed at checkout
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -215,6 +216,7 @@ model Organization {
   customerSurveys       CustomerSurvey[]
   customerSurveyResponses CustomerSurveyResponse[]
   analyticsEvents         OrgAnalyticsEvent[]
+  redeemedOffers          SalesOffer[]             @relation("OrgRedeemedOffer")
 }
 
 model CustomView {
@@ -769,6 +771,7 @@ model SuperAdmin {
   supportReplies              SupportMessage[]
   broadcastsSent              Broadcast[]
   supportConvsAssigned        SupportConversation[] @relation("SupportAssignment")
+  createdOffers               SalesOffer[]          @relation("SACreatedOffers")
 }
 
 model ImpersonationLog {
@@ -2682,6 +2685,7 @@ model SalesUser {
   salesAlerts              SalesAlert[]         @relation("SalesAlertRecipient")
   sessions                 SalesSession[]       @relation("SalesUserSessions")
   dailyActivity            SalesDailyActivity[] @relation("SalesUserDailyActivity")
+  createdOffers            SalesOffer[]         @relation("SalesUserCreatedOffers")
 }
 
 model SalesSession {
@@ -2723,6 +2727,36 @@ model SalesDailyActivity {
   @@unique([salesUserId, date])
   @@index([salesUserId])
   @@index([date])
+}
+
+model SalesOffer {
+  id                   String    @id @default(cuid())
+  token                String    @unique
+  createdBySAId        String?
+  createdBySalesUserId String?
+  opportunityId        String?
+  offerType            String    // PERCENT_DISCOUNT | FLAT_PRICE | FREE_MONTHS
+  discountPercent      Decimal?  @db.Decimal(5,2)
+  flatMonthlyPrice     Decimal?  @db.Decimal(10,2)
+  freeMonths           Int?
+  durationMonths       Int?
+  targetPlan           String    // essentials | professional | professional_plus | wash_essentials
+  maxRedemptions       Int       @default(1)
+  redemptionCount      Int       @default(0)
+  expiresAt            DateTime?
+  redeemedAt           DateTime?
+  redeemedByOrgId      String?
+  notes                String?   @db.Text
+  createdAt            DateTime  @default(now())
+
+  createdBySA        SuperAdmin?      @relation("SACreatedOffers",          fields: [createdBySAId],        references: [id], onDelete: SetNull)
+  createdBySalesUser SalesUser?       @relation("SalesUserCreatedOffers",   fields: [createdBySalesUserId], references: [id], onDelete: SetNull)
+  opportunity        CrmOpportunity?  @relation("OpportunityOffers",        fields: [opportunityId],        references: [id], onDelete: SetNull)
+  redeemedByOrg      Organization?    @relation("OrgRedeemedOffer",         fields: [redeemedByOrgId],      references: [id], onDelete: SetNull)
+
+  @@index([createdBySalesUserId])
+  @@index([opportunityId])
+  @@index([redeemedByOrgId])
 }
 
 model SalesAlert {
@@ -2777,6 +2811,7 @@ model CrmOpportunity {
   attributions  CommissionAttribution[]
   transferLogs  CrmTransferLog[]    @relation("OpportunityTransferLogs")
   transferReqs  CrmTransferRequest[] @relation("OpportunityTransferReqs")
+  offers        SalesOffer[]        @relation("OpportunityOffers")
 
   @@index([assignedToId])
   @@index([stage])

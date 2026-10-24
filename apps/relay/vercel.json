@@ -48,6 +48,10 @@
     {
       "path":     "/api/cron/cleanup-device-tokens",
       "schedule": "0 4 1 * *"
+    },
+    {
+      "path":     "/api/cron/dashboard-reports",
+      "schedule": "* 6 * * *"
     }
   ]
 }

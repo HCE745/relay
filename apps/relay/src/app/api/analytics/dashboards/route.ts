@@ -18,9 +18,17 @@ export async function GET() {
   const layouts = await prisma.dashboardLayout.findMany({
     where: {
       organizationId,
-      OR: [{ createdById: userId }, { layoutType: "SHARED" }],
+      OR: [
+        { createdById: userId },
+        { layoutType: { in: ["ORG_SHARED", "ORG_DEFAULT"] } },
+      ],
     },
-    orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
+    orderBy: [{ isOrgDefault: "desc" }, { isDefault: "desc" }, { createdAt: "desc" }],
+    select: {
+      id: true, name: true, layoutType: true, isDefault: true, isOrgDefault: true,
+      widgets: true, sharedWith: true, templateCategory: true, createdById: true,
+      createdAt: true, updatedAt: true, createdByRole: true,
+    },
   })
 
   return NextResponse.json(layouts)
@@ -43,7 +51,6 @@ export async function POST(req: NextRequest) {
     layoutType?: string
   }
 
-  // Validate widgets
   const rawWidgets = Array.isArray(body.widgets) ? body.widgets : []
   const validatedWidgets: WidgetConfig[] = []
   for (const w of rawWidgets) {
@@ -52,10 +59,17 @@ export async function POST(req: NextRequest) {
     validatedWidgets.push(result.config)
   }
 
-  const name       = typeof body.name === "string" && body.name.trim() ? body.name.trim() : "My Dashboard"
-  const layoutType = body.layoutType === "SHARED" ? "SHARED" : "PERSONAL"
+  const name = typeof body.name === "string" && body.name.trim() ? body.name.trim() : "My Dashboard"
 
-  // Upsert: if id provided and owned by this user, update; else create
+  const allowedTypes = ["PERSONAL", "ORG_SHARED", "ORG_DEFAULT"]
+  let layoutType = "PERSONAL"
+  if (body.layoutType && allowedTypes.includes(body.layoutType)) {
+    layoutType = body.layoutType
+  }
+  if ((layoutType === "ORG_SHARED" || layoutType === "ORG_DEFAULT") && role !== "ADMIN") {
+    return NextResponse.json({ error: "Only admins can create shared or org-default dashboards" }, { status: 403 })
+  }
+
   if (body.id) {
     const existing = await prisma.dashboardLayout.findFirst({
       where: { id: body.id, organizationId, createdById: userId },
@@ -69,7 +83,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(updated)
   }
 
-  // If marking as default, clear existing defaults for this user
   if (body.isDefault) {
     await prisma.dashboardLayout.updateMany({
       where: { createdById: userId, isDefault: true },
@@ -81,6 +94,7 @@ export async function POST(req: NextRequest) {
     data: {
       organizationId,
       createdById: userId,
+      createdByRole: role,
       name,
       widgets: validatedWidgets as object[],
       layoutType,

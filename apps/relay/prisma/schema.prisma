@@ -218,6 +218,8 @@ model Organization {
   analyticsEvents         OrgAnalyticsEvent[]
   redeemedOffers          SalesOffer[]             @relation("OrgRedeemedOffer")
   dashboardLayouts        DashboardLayout[]
+  dashboardReports        DashboardReport[]
+  dashboardAlerts         DashboardAlert[]
 }
 
 model CustomView {
@@ -352,6 +354,8 @@ model User {
   grantedRecognitions         Recognition[]            @relation("GrantedRecognitions")
   createdCustomerSurveys      CustomerSurvey[]         @relation("CreatedCustomerSurveys")
   dashboardLayouts            DashboardLayout[]
+  dashboardReports            DashboardReport[]
+  dashboardAlerts             DashboardAlert[]
 }
 
 model PasswordResetToken {
@@ -3344,19 +3348,71 @@ model OrgAnalyticsEvent {
 // ─── Analytics Dashboards ─────────────────────────────────────────────────────
 
 model DashboardLayout {
-  id             String   @id @default(cuid())
-  organizationId String
-  createdById    String
-  name           String
-  isDefault      Boolean  @default(false)
-  layoutType     String   @default("PERSONAL") // "PERSONAL" | "SHARED"
-  widgets        Json     @default("[]")        // WidgetConfig[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id               String   @id @default(cuid())
+  organizationId   String
+  createdById      String
+  name             String
+  isDefault        Boolean  @default(false)
+  isOrgDefault     Boolean  @default(false)
+  layoutType       String   @default("PERSONAL") // "PERSONAL" | "ORG_DEFAULT" | "ORG_SHARED" | "TEMPLATE"
+  widgets          Json     @default("[]")        // WidgetConfig[]
+  sharedWith       String[] @default([])          // user IDs for targeted sharing
+  templateCategory String?                        // OPERATIONS | SAFETY | TEAM | QUALITY | CUSTOM
+  createdByRole    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  createdBy      User         @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy       User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  dashboardReports DashboardReport[]
 
   @@index([organizationId])
+  @@index([organizationId, isOrgDefault])
   @@index([createdById])
+}
+
+model DashboardReport {
+  id                String    @id @default(cuid())
+  organizationId    String
+  dashboardLayoutId String
+  name              String
+  frequency         String    // DAILY | WEEKLY | MONTHLY
+  dayOfWeek         Int?      // 0-6 for weekly
+  dayOfMonth        Int?      // 1-31 for monthly
+  sendTime          String    // HH:MM UTC
+  recipients        Json      // string[] of user IDs
+  lastSentAt        DateTime?
+  isActive          Boolean   @default(true)
+  createdById       String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  dashboardLayout DashboardLayout @relation(fields: [dashboardLayoutId], references: [id], onDelete: Cascade)
+  createdBy       User            @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([isActive, frequency])
+}
+
+model DashboardAlert {
+  id              String    @id @default(cuid())
+  organizationId  String
+  name            String
+  metricKey       String
+  condition       String    // GREATER_THAN | LESS_THAN | EQUALS
+  threshold       Decimal
+  dateRange       String    @default("30d")
+  locationId      String?
+  notifyUserIds   Json      // string[]
+  isActive        Boolean   @default(true)
+  lastTriggeredAt DateTime?
+  createdById     String
+  createdAt       DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([isActive])
 }

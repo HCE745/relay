@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import {
   BarChart, Bar, LineChart, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip,
+  XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
   ResponsiveContainer, Cell,
 } from "recharts"
 import type { WidgetConfig, MetricResult } from "@/lib/analytics/types"
@@ -189,6 +189,33 @@ function WidgetContent({ config, result }: { config: WidgetConfig; result: Metri
             ))}
           </tbody>
         </table>
+      </div>
+    )
+  }
+
+  if (config.visualType === "BENCHMARK") {
+    if (result.type !== "benchmark") return <NoData />
+    if (result.locations.length === 0) return <NoData />
+    const unit = result.unit ?? ""
+    return (
+      <div className="w-full space-y-1">
+        <div className="flex justify-between text-[10px] text-gray-400 mb-1">
+          <span>Location</span>
+          <span>Org avg: {result.orgAverage}{unit}</span>
+        </div>
+        <ResponsiveContainer width="100%" height={Math.max(80, result.locations.length * 22)}>
+          <BarChart data={result.locations} layout="vertical" margin={{ top: 0, right: 40, left: 0, bottom: 0 }}>
+            <XAxis type="number" tick={{ fontSize: 10 }} allowDecimals={false} />
+            <YAxis type="category" dataKey="label" tick={{ fontSize: 10 }} width={80} />
+            <Tooltip contentStyle={{ fontSize: 11 }} formatter={(v) => [`${v}${unit}`, ""]} />
+            <ReferenceLine x={result.orgAverage} stroke="#f59e0b" strokeDasharray="4 2" label={{ value: "avg", position: "insideTopRight", fontSize: 9, fill: "#f59e0b" }} />
+            <Bar dataKey="value" radius={[0, 3, 3, 0]}>
+              {result.locations.map((entry, i) => (
+                <Cell key={entry.label} fill={entry.value > result.orgAverage ? "#3b82f6" : "#94a3b8"} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     )
   }

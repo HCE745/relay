@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { MetricsRegistry } from "@/lib/analytics/metrics-engine"
 
 export const dynamic = "force-dynamic"
 
@@ -32,7 +33,10 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, calculated })
+  // Check metric alerts
+  const alertsTriggered = await checkMetricAlerts()
+
+  return NextResponse.json({ ok: true, calculated, alertsTriggered })
 }
 
 export async function calculateHealthScore(
@@ -141,4 +145,76 @@ export async function calculateHealthScore(
   })
 
   return { score, explanation }
+}
+
+// ─── Metric alert checking ────────────────────────────────────────────────────
+
+async function checkMetricAlerts(): Promise<number> {
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+
+  const activeAlerts = await prisma.dashboardAlert.findMany({
+    where: {
+      isActive: true,
+      OR: [{ lastTriggeredAt: null }, { lastTriggeredAt: { lt: oneDayAgo } }],
+    },
+  })
+
+  let triggered = 0
+
+  for (const alert of activeAlerts) {
+    try {
+      const metric = MetricsRegistry.get(alert.metricKey)
+      if (!metric) continue
+
+      const rangeDays = parseInt(alert.dateRange.replace("d", "")) || 30
+      const end   = new Date()
+      const start = new Date(end.getTime() - rangeDays * 86400_000)
+
+      const result = await metric.calculate({
+        organizationId: alert.organizationId,
+        userId:         alert.createdById,
+        role:           "ADMIN",
+        dateRange:      { start, end },
+        scopeWhere:     alert.locationId ? { locationId: alert.locationId } : {},
+        visualType:     "KPI_CARD",
+      })
+
+      if (result.type !== "scalar") continue
+
+      const value     = result.value
+      const threshold = Number(alert.threshold)
+      const fire =
+        alert.condition === "GREATER_THAN" ? value > threshold :
+        alert.condition === "LESS_THAN"    ? value < threshold :
+        alert.condition === "EQUALS"       ? value === threshold : false
+
+      if (!fire) continue
+
+      // Send notifications
+      const notifyIds = alert.notifyUserIds as string[]
+      if (notifyIds.length > 0) {
+        await prisma.notification.createMany({
+          data: notifyIds.map(userId => ({
+            userId,
+            organizationId: alert.organizationId,
+            type:           "METRIC_ALERT",
+            title:          `Alert: ${alert.name}`,
+            message:        `Metric ${alert.metricKey} is ${value} (threshold: ${alert.condition.replace(/_/g, " ").toLowerCase()} ${threshold})`,
+          })),
+          skipDuplicates: true,
+        })
+      }
+
+      await prisma.dashboardAlert.update({
+        where: { id: alert.id },
+        data:  { lastTriggeredAt: new Date() },
+      })
+
+      triggered++
+    } catch (err) {
+      console.error(`Alert check failed for alert ${alert.id}:`, err)
+    }
+  }
+
+  return triggered
 }

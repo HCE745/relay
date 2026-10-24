@@ -349,6 +349,223 @@ const qrSubmissions: MetricDefinition = {
   },
 }
 
+const issuesSafety: MetricDefinition = {
+  key: "issues.safety",
+  label: "Safety Issues",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["KPI_CARD", "BAR_CHART", "TREND_LINE"],
+  async calculate(p) {
+    const where = issueBaseWhere(p.organizationId, p.dateRange, p.scopeWhere, { ...p.filters, category: "Safety" })
+
+    if (p.visualType === "BAR_CHART") {
+      const rows = await prisma.issue.groupBy({ by: ["status"], where, _count: true })
+      return { type: "series", data: rows.map(r => ({ label: r.status, value: r._count })) }
+    }
+    if (p.visualType === "TREND_LINE") {
+      const { locFrag, deptFrag } = rawScopeFragments(p.scopeWhere)
+      type Row = { day: Date; count: bigint }
+      const rows = await prisma.$queryRaw<Row[]>`
+        SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
+        FROM "Issue"
+        WHERE "organizationId" = ${p.organizationId}
+          AND category = 'Safety'
+          AND "createdAt" BETWEEN ${p.dateRange.start} AND ${p.dateRange.end}
+          ${locFrag} ${deptFrag}
+        GROUP BY day ORDER BY day ASC
+      `
+      return { type: "series", data: rows.map(r => ({ label: r.day.toISOString().slice(0, 10), value: Number(r.count) })) }
+    }
+    const value = await prisma.issue.count({ where })
+    return { type: "scalar", value }
+  },
+}
+
+const issuesMaintenance: MetricDefinition = {
+  key: "issues.maintenance",
+  label: "Maintenance Issues",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["KPI_CARD", "BAR_CHART"],
+  async calculate(p) {
+    const where = issueBaseWhere(p.organizationId, p.dateRange, p.scopeWhere, { ...p.filters, category: "Maintenance" })
+    if (p.visualType === "BAR_CHART") {
+      const rows = await prisma.issue.groupBy({ by: ["status"], where, _count: true })
+      return { type: "series", data: rows.map(r => ({ label: r.status, value: r._count })) }
+    }
+    const value = await prisma.issue.count({ where })
+    return { type: "scalar", value }
+  },
+}
+
+const teamReporters: MetricDefinition = {
+  key: "team.reporters",
+  label: "Top Reporters",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["LEADERBOARD"],
+  async calculate(p) {
+    type Row = { userId: string | null; name: string | null; count: bigint }
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT i."reportedById" AS "userId", u.name, COUNT(*) AS count
+      FROM "Issue" i
+      LEFT JOIN "User" u ON u.id = i."reportedById"
+      WHERE i."organizationId" = ${p.organizationId}
+        AND i."createdAt" BETWEEN ${p.dateRange.start} AND ${p.dateRange.end}
+      GROUP BY i."reportedById", u.name
+      ORDER BY count DESC
+      LIMIT 10
+    `
+    return {
+      type: "ranked",
+      items: rows.map((r, i) => ({ rank: i + 1, label: r.name ?? "Unknown", value: Number(r.count) })),
+    }
+  },
+}
+
+const teamResolvers: MetricDefinition = {
+  key: "team.resolvers",
+  label: "Top Resolvers",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["LEADERBOARD"],
+  async calculate(p) {
+    type Row = { userId: string | null; name: string | null; count: bigint }
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT i."assigneeId" AS "userId", u.name, COUNT(*) AS count
+      FROM "Issue" i
+      LEFT JOIN "User" u ON u.id = i."assigneeId"
+      WHERE i."organizationId" = ${p.organizationId}
+        AND i.status = 'RESOLVED'
+        AND i."resolvedAt" BETWEEN ${p.dateRange.start} AND ${p.dateRange.end}
+        AND i."assigneeId" IS NOT NULL
+      GROUP BY i."assigneeId", u.name
+      ORDER BY count DESC
+      LIMIT 10
+    `
+    return {
+      type: "ranked",
+      items: rows.map((r, i) => ({ rank: i + 1, label: r.name ?? "Unknown", value: Number(r.count) })),
+    }
+  },
+}
+
+const customerVoiceFeedback: MetricDefinition = {
+  key: "customer_voice.feedback",
+  label: "Customer Feedback",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["KPI_CARD", "TREND_LINE"],
+  async calculate(p) {
+    const where: Prisma.CustomerFeedbackWhereInput = {
+      organizationId: p.organizationId,
+      createdAt: { gte: p.dateRange.start, lte: p.dateRange.end },
+    }
+    if (p.visualType === "TREND_LINE") {
+      type Row = { day: Date; count: bigint }
+      const rows = await prisma.$queryRaw<Row[]>`
+        SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
+        FROM "CustomerFeedback"
+        WHERE "organizationId" = ${p.organizationId}
+          AND "createdAt" BETWEEN ${p.dateRange.start} AND ${p.dateRange.end}
+        GROUP BY day ORDER BY day ASC
+      `
+      return { type: "series", data: rows.map(r => ({ label: r.day.toISOString().slice(0, 10), value: Number(r.count) })) }
+    }
+    const value = await prisma.customerFeedback.count({ where })
+    return { type: "scalar", value }
+  },
+}
+
+const customerVoiceAvgRating: MetricDefinition = {
+  key: "customer_voice.avg_rating",
+  label: "Avg Customer Rating",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["KPI_CARD"],
+  async calculate(p) {
+    type Row = { avg: number | null }
+    const [row] = await prisma.$queryRaw<Row[]>`
+      SELECT AVG(rating)::float AS avg
+      FROM "CustomerFeedback"
+      WHERE "organizationId" = ${p.organizationId}
+        AND rating IS NOT NULL
+        AND "createdAt" BETWEEN ${p.dateRange.start} AND ${p.dateRange.end}
+    `
+    const value = row?.avg != null ? Math.round(row.avg * 10) / 10 : 0
+    return { type: "scalar", value, unit: "/5" }
+  },
+}
+
+const issuesBenchmark: MetricDefinition = {
+  key: "issues.benchmark",
+  label: "Issues by Location",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["BENCHMARK"],
+  async calculate(p) {
+    type Row = { locationId: string; locationName: string | null; count: bigint }
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT i."locationId", l.name AS "locationName", COUNT(*) AS count
+      FROM "Issue" i
+      LEFT JOIN "Location" l ON l.id = i."locationId"
+      WHERE i."organizationId" = ${p.organizationId}
+        AND i."createdAt" BETWEEN ${p.dateRange.start} AND ${p.dateRange.end}
+        AND i."locationId" IS NOT NULL
+      GROUP BY i."locationId", l.name
+      ORDER BY count DESC
+    `
+    const locations = rows.map(r => ({ label: r.locationName ?? r.locationId, value: Number(r.count) }))
+    const orgAverage = locations.length > 0 ? Math.round(locations.reduce((s, r) => s + r.value, 0) / locations.length) : 0
+    return { type: "benchmark", locations, orgAverage }
+  },
+}
+
+const issuesResolutionBenchmark: MetricDefinition = {
+  key: "issues.resolution_benchmark",
+  label: "Resolution Rate by Location",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["BENCHMARK"],
+  async calculate(p) {
+    type Row = { locationId: string; locationName: string | null; total: bigint; resolved: bigint }
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT i."locationId", l.name AS "locationName",
+             COUNT(*) AS total,
+             COUNT(*) FILTER (WHERE i.status = 'RESOLVED') AS resolved
+      FROM "Issue" i
+      LEFT JOIN "Location" l ON l.id = i."locationId"
+      WHERE i."organizationId" = ${p.organizationId}
+        AND i."createdAt" BETWEEN ${p.dateRange.start} AND ${p.dateRange.end}
+        AND i."locationId" IS NOT NULL
+      GROUP BY i."locationId", l.name
+      ORDER BY resolved DESC
+    `
+    const locations = rows.map(r => {
+      const total = Number(r.total)
+      const value = total === 0 ? 0 : Math.round((Number(r.resolved) / total) * 100)
+      return { label: r.locationName ?? r.locationId, value }
+    })
+    const orgAverage = locations.length > 0 ? Math.round(locations.reduce((s, r) => s + r.value, 0) / locations.length) : 0
+    return { type: "benchmark", locations, orgAverage, unit: "%" }
+  },
+}
+
+const issuesOpenBenchmark: MetricDefinition = {
+  key: "issues.open_benchmark",
+  label: "Open Issues by Location",
+  allowedRoles: ALLOWED_ROLES,
+  supportedVisualTypes: ["BENCHMARK"],
+  async calculate(p) {
+    type Row = { locationId: string; locationName: string | null; count: bigint }
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT i."locationId", l.name AS "locationName", COUNT(*) AS count
+      FROM "Issue" i
+      LEFT JOIN "Location" l ON l.id = i."locationId"
+      WHERE i."organizationId" = ${p.organizationId}
+        AND i.status IN ('OPEN', 'IN_PROGRESS')
+        AND i."locationId" IS NOT NULL
+      GROUP BY i."locationId", l.name
+      ORDER BY count DESC
+    `
+    const locations = rows.map(r => ({ label: r.locationName ?? r.locationId, value: Number(r.count) }))
+    const orgAverage = locations.length > 0 ? Math.round(locations.reduce((s, r) => s + r.value, 0) / locations.length) : 0
+    return { type: "benchmark", locations, orgAverage }
+  },
+}
+
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
 const ALL_METRICS: MetricDefinition[] = [
@@ -363,6 +580,15 @@ const ALL_METRICS: MetricDefinition[] = [
   assignmentsCompleted,
   assignmentsOverdue,
   qrSubmissions,
+  issuesSafety,
+  issuesMaintenance,
+  teamReporters,
+  teamResolvers,
+  customerVoiceFeedback,
+  customerVoiceAvgRating,
+  issuesBenchmark,
+  issuesResolutionBenchmark,
+  issuesOpenBenchmark,
 ]
 
 export const MetricsRegistry = new Map<string, MetricDefinition>(

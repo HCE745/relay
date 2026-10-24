@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createSession, getSession } from "@/lib/session"
 import { cleanupExpiredDemos, createDemoOrg, resetDemoOrg } from "@/lib/demo-seed"
 import { getPlatformConfig } from "@/lib/platform-config"
+import { prisma } from "@/lib/prisma"
 
 export async function POST(request: NextRequest) {
   const existing = await getSession()
@@ -14,6 +15,11 @@ export async function POST(request: NextRequest) {
     const isCarWash = requestedIndustry === "Car Wash"
     const pkg = isCarWash ? "wash_essentials" : "professional_plus"
     await resetDemoOrg(existing.organizationId, existing.userId, requestedIndustry, pkg)
+    // Guarantee customer_voice_enabled regardless of seed data
+    await prisma.organization.update({
+      where: { id: existing.organizationId },
+      data:  { customer_voice_enabled: true },
+    })
     await createSession({
       userId:              existing.userId,
       email:               existing.email,
@@ -46,6 +52,12 @@ export async function POST(request: NextRequest) {
   const isCarWash = industry === "Car Wash"
   const pkg = isCarWash ? "wash_essentials" : "professional_plus"
   const { org, user } = await createDemoOrg(industry, pkg)
+
+  // Guarantee customer_voice_enabled regardless of seed data
+  await prisma.organization.update({
+    where: { id: org.id },
+    data:  { customer_voice_enabled: true },
+  })
 
   await createSession({
     userId:              user.id,

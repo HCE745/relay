@@ -132,7 +132,7 @@ const INDUSTRY_CONTENT: Record<string, IndustryContent> = {
     issue:           "tunnel conveyor stalled mid-cycle at Bay 2",
     dept:            "operations",
     title:           "Bay 2 tunnel conveyor stalled",
-    desc:            "Tunnel conveyor stopped mid-cycle in Bay 2. Cars are backing up at the entrance. Attendant suspects a chain tension issue — chemical dosing pump also flagged low pressure this morning.",
+    desc:            "Tunnel conveyor stopped mid-cycle in Bay 2. Cars are backing up at the entrance. Attendant suspects a chain tension issue, and the chemical dosing pump also flagged low pressure this morning.",
     category:        "EQUIPMENT_BREAKDOWN",
     asset:           "Bay 2 Tunnel Conveyor",
     assetRecurring:  "tunnel conveyor or chemical dosing pump",
@@ -498,7 +498,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: null,
     targetSelector: null,
     type: "completion",
-    getTitle: () => "That's Relay — every issue owned, every action tracked.",
+    getTitle: () => "That's Relay. Every issue owned, every action tracked.",
     getExplain: (industry) => {
       const c = ind(industry)
       return `Relay helps organizations replace fragmented workarounds with a shared operational system. Employees have a clear way to report problems. Managers have ownership and accountability. Leadership has visibility. ${c.closingLine} Continue exploring, start a free trial, or schedule a demo.`
@@ -511,7 +511,7 @@ export const ROLE_DEMOS = [
   { label: "Supervisor",         color: "bg-teal-600",   desc: "Team issue queue, department metrics, and first-level escalation management." },
   { label: "Department Manager", color: "bg-blue-600",   desc: "Full department analytics, escalations, team performance, and approval flows." },
   { label: "Plant Manager",      color: "bg-orange-600", desc: "Location-wide visibility, cross-department KPIs, and site-level approvals." },
-  { label: "Administrator",      color: "bg-purple-600", desc: "Complete organizational control — settings, routing rules, users, and all modules." },
+  { label: "Administrator",      color: "bg-purple-600", desc: "Complete organizational control over settings, routing rules, users, and all modules." },
 ]
 
 export const INDUSTRY_DEMOS = [
@@ -606,9 +606,9 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='carwash-equipment-status']",
     audioFile: "/demo-audio/carwash-step-02.mp3",
     cue: "This is what your team sees before the first car arrives.",
-    getTitle: () => "Bay and equipment status — before the first car arrives.",
+    getTitle: () => "Bay and equipment status visible before the first car arrives.",
     getExplain: () =>
-      "Your Wash Overview shows the current state of every bay and piece of equipment — which are operational, which are down, and which have open issues attached. Whether you run self-serve stalls, in-bay automatics, or a tunnel line, every piece of tracked equipment shows its current state. Managers see the morning situation without calling anyone.",
+      "Your Wash Overview shows the current state of every bay and piece of equipment: operational, down, or flagged with open issues. Whether you run self-serve stalls, in-bay automatics, or a tunnel line, every piece of tracked equipment shows its current state. Managers see the morning situation without calling anyone.",
   },
 
   // Step 3: Customer reports panel on dashboard
@@ -617,7 +617,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     path: "/dashboard",
     targetSelector: "[data-tour='carwash-customer-reports']",
     audioFile: "/demo-audio/carwash-step-03.mp3",
-    cue: "Customer reports come in directly — no phone call required.",
+    cue: "Customer reports come in directly with no phone call required.",
     getTitle: () => "Customer reports flow directly to your team.",
     getExplain: () =>
       "When a customer notices a blocked nozzle, a vacuum with no suction, or a pay station that rejected their card, they can report it in seconds from a QR code at the bay or station. The report goes directly to your team with the equipment and location already identified.",
@@ -630,9 +630,9 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='qr-list']",
     audioFile: "/demo-audio/carwash-step-04.mp3",
     cue: "Every bay, vacuum, and pay station can have its own code.",
-    getTitle: () => "The QR code does the routing — they just describe the problem.",
+    getTitle: () => "The QR code handles all the routing so customers just describe the problem.",
     getExplain: () =>
-      "Place a Relay QR code on each bay entrance, vacuum station, pay station, and chemical dispensing area. Customers scan the code, tap what went wrong, and submit — the report enters Relay with the location and equipment already identified. No account, no app, no friction.",
+      "Place a Relay QR code on each bay entrance, vacuum station, pay station, and chemical dispensing area. Customers scan the code, tap what went wrong, and submit, and the report enters Relay with the location and equipment already identified. No account, no app, no friction.",
   },
 
   // Step 5: Issue form-fill
@@ -643,11 +643,11 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     audioFile: "/demo-audio/carwash-step-05.mp3",
     type: "form-fill",
     cue: "Your technician can log a problem from the floor just as quickly.",
-    getTitle: () => "Staff report problems in seconds — from anywhere on site.",
+    getTitle: () => "Staff report problems in seconds from anywhere on site.",
     getExplain: () =>
       "Customers spot problems at the customer experience level. Technicians catch them at the equipment level. Watch as we log a high-pressure rinse issue on Bay 3 directly from the floor.",
     getFormData: () => ({
-      title: "Bay 3 — high-pressure rinse not completing cycle",
+      title: "Bay 3 high-pressure rinse not completing cycle",
       description: "Several customers reported that Bay 3 is not completing the rinse cycle. The arch appears to lose pressure midway through the wash. This may be a nozzle blockage or pump pressure issue affecting Bay 3 specifically.",
       category: "EQUIPMENT_BREAKDOWN",
     }),
@@ -674,7 +674,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     cue: "The report is already categorized and ready to assign.",
     getTitle: () => "Every problem has a clear owner immediately.",
     getExplain: () =>
-      "Once logged, the issue shows who reported it, what equipment it affects, which site it belongs to, and its current status. Assign it to a technician in one tap — from this moment, the issue has an owner and a record that everyone can see.",
+      "Once logged, the issue shows who reported it, what equipment it affects, which site it belongs to, and its current status. Assign it to a technician in one tap. From that moment, the issue has an owner and a record that everyone can see.",
   },
 
   // Step 8: SUBMITTED_ISSUE AI panel
@@ -684,7 +684,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='ai-panel']",
     audioFile: "/demo-audio/carwash-step-08.mp3",
     cue: "Relay's AI can suggest what's likely wrong and how to respond.",
-    getTitle: () => "AI analysis — before your technician arrives at the bay.",
+    getTitle: () => "AI analysis runs before your technician arrives at the bay.",
     getExplain: () =>
       "For equipment issues, Relay's AI can suggest likely causes and recommended actions based on the description, the equipment type, and historical patterns. Your technician arrives at the bay with a starting point instead of starting from scratch.",
   },
@@ -696,7 +696,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='issue-detail-header']",
     audioFile: "/demo-audio/carwash-step-09.mp3",
     cue: "Here's an issue that stayed open longer than it should have.",
-    getTitle: () => "Critical failures get flagged — not buried.",
+    getTitle: () => "Critical failures get flagged immediately, not buried.",
     getExplain: () =>
       "When a bay goes down, a pump fails, or a conveyor stalls, that issue is marked critical. The full record shows who reported it, when it was logged, what equipment is affected, and how long it has been open. Nothing disappears into a text thread.",
   },
@@ -710,7 +710,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     cue: "When no one responds in time, Relay escalates automatically.",
     getTitle: () => "Problems that go unaddressed don't stay silent.",
     getExplain: () =>
-      "If a technician misses the response window or a critical issue goes unresolved, Relay escalates automatically to the next management level — with the full timeline of what happened and how long it has been open. No manual follow-up required.",
+      "If a technician misses the response window or a critical issue goes unresolved, Relay escalates automatically to the next management level, with the full timeline of what happened and how long the issue has been open. No manual follow-up required.",
   },
 
   // Step 11: Asset list
@@ -732,7 +732,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='asset-history']",
     audioFile: "/demo-audio/carwash-step-12.mp3",
     getCue: () => "Every piece of equipment builds its own maintenance record.",
-    getTitle: () => "Equipment history — every issue, every repair, every visit.",
+    getTitle: () => "A complete equipment history covering every issue, repair, and service visit.",
     getExplain: () =>
       "When the same bay or pump keeps generating problems, treating each incident as isolated misses the pattern. Relay tracks every issue, repair, and maintenance visit for each piece of equipment. Technicians and managers see whether something needs another repair or a replacement before it costs more downtime.",
   },
@@ -744,7 +744,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='issue-list']",
     audioFile: "/demo-audio/carwash-step-13.mp3",
     cue: "Routine maintenance stays visible alongside reactive repairs.",
-    getTitle: () => "Stay ahead of maintenance — not behind it.",
+    getTitle: () => "Stay ahead of maintenance instead of falling behind it.",
     getExplain: () =>
       "Chemical line flushes, filter replacements, belt inspections, and pump lubrication stay visible in the same queue as reactive repairs. Nothing slips through because it was not urgent enough to remember.",
   },
@@ -756,7 +756,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='vendor-list']",
     audioFile: "/demo-audio/carwash-step-14.mp3",
     cue: "Parts suppliers and service contractors stay connected to every issue.",
-    getTitle: () => "Vendors connected to the work — not buried in a contact list.",
+    getTitle: () => "Vendors stay connected to the work and never get buried in a contact list.",
     getExplain: () =>
       "When a pump needs a specialist or a bay requires a replacement part, the relevant contractor is linked directly to the issue. The full context travels with every service call: what the problem is, what was tried, and the equipment's service history. No repeated explanations.",
   },
@@ -767,7 +767,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     path: "/locations",
     targetSelector: "[data-tour='location-list']",
     audioFile: "/demo-audio/carwash-step-15.mp3",
-    cue: "Each wash site is its own location — all visible in one system.",
+    cue: "Each wash site is its own location, all visible in one system.",
     getTitle: () => "All your sites in one system.",
     getExplain: () =>
       "Relay brings every wash location into one view, whether you run self-service bays, in-bay automatics, or a tunnel. Open issues, equipment status, and maintenance tasks are organized by site. Managers see which locations need attention without traveling to each one.",
@@ -779,7 +779,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     path: "/assignments",
     targetSelector: "[data-tour='assignment-list']",
     audioFile: "/demo-audio/carwash-step-16.mp3",
-    cue: "Technicians see exactly what needs to get done — nothing missed.",
+    cue: "Technicians see exactly what needs to get done with nothing missed.",
     getTitle: () => "One list. No hunting. Just the work.",
     getExplain: () =>
       "Every technician sees exactly what is assigned to them: which bay, what problem, what priority, what is due. No verbal handoffs, no texts that get missed. A technician starting a shift has a clear answer to the only question that matters: what do I need to do right now?",
@@ -794,7 +794,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     cue: "Get a safety change or chemical update to every site immediately.",
     getTitle: () => "Critical communications reach every site at once.",
     getExplain: () =>
-      "When a chemical procedure changes, a new safety requirement applies, or an equipment issue affects all sites, Relay broadcasts the announcement to every location's staff simultaneously. For critical communications, acknowledgment is tracked in real time — so you know who has seen it and who has not.",
+      "When a chemical procedure changes, a new safety requirement applies, or an equipment issue affects all sites, Relay broadcasts the announcement to every location's staff simultaneously. For critical communications, acknowledgment is tracked in real time so you always know who has seen it and who has not.",
   },
 
   // Step 18: Analytics
@@ -827,7 +827,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     path: "/customer-voice",
     targetSelector: "[data-tour='customer-voice-inbox']",
     audioFile: null,
-    cue: "Customer feedback arrives automatically — no manual collection required.",
+    cue: "Customer feedback arrives automatically with no manual collection required.",
     getTitle: () => "See what customers are saying.",
     getExplain: () =>
       "Customer Voice collects feedback from Google reviews, QR scans, and feedback links and brings it into one inbox. AI classifies each submission and flags operational problems such as a blocked nozzle, a vacuum with no suction, or a pay station issue, so your team can act on customer reports the same way they act on staff-logged problems.",
@@ -853,7 +853,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     type: "completion",
     getTitle: () => "That's Relay for Car Wash.",
     getExplain: () =>
-      "Relay helps car wash operators replace fragmented communication with a shared operational system. Equipment problems are tracked the moment they happen. Technicians have clear tasks. Managers have visibility across every site — self-serve, in-bay automatic, or tunnel. Wash Essentials is available for smaller operations. Full Relay covers multi-site operators that need the complete operational platform. Start a free trial or schedule a demo to see it running at your wash.",
+      "Relay helps car wash operators replace fragmented communication with a shared operational system. Equipment problems are tracked the moment they happen. Technicians have clear tasks. Managers have visibility across every site, whether self-serve, in-bay automatic, or tunnel. Wash Essentials is available for smaller operations. Full Relay covers multi-site operators that need the complete operational platform. Start a free trial or schedule a demo to see it running at your wash.",
   },
 ]
 
@@ -879,9 +879,9 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='pm-kpi-cards']",
     audioFile: "/demo-audio/property-step-02.mp3",
     cue: "This is what your property team sees every morning.",
-    getTitle: () => "Your property portfolio — everything that matters, immediately.",
+    getTitle: () => "Your property portfolio with everything that matters visible immediately.",
     getExplain: () =>
-      "The Property Overview shows open property issues, tenant requests received today, active maintenance work, equipment needing attention, and high-priority items requiring immediate action — no spreadsheets, no inbox digging.",
+      "The Property Overview shows open property issues, tenant requests received today, active maintenance work, equipment needing attention, and and high-priority items requiring immediate action, without spreadsheets or inbox digging.",
   },
 
   // Step 3: Dashboard PM equipment status
@@ -891,9 +891,9 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='pm-equipment-status']",
     audioFile: "/demo-audio/property-step-03.mp3",
     cue: "Building equipment status across all your properties.",
-    getTitle: () => "Equipment health — across every building.",
+    getTitle: () => "Equipment health tracked across every building.",
     getExplain: () =>
-      "HVAC systems, elevators, boilers, and fire suppression equipment across all buildings appear here with their current operational status. Equipment flagged as needing maintenance shows immediately — before a tenant reports a failure. Managers and maintenance supervisors see the same equipment picture.",
+      "HVAC systems, elevators, boilers, and fire suppression equipment across all buildings appear here with their current operational status. Equipment flagged as needing maintenance shows immediately, before a tenant ever reports a failure. Managers and maintenance supervisors see the same equipment picture.",
   },
 
   // Step 4: Dashboard PM tenant requests
@@ -902,10 +902,10 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     path: "/dashboard",
     targetSelector: "[data-tour='pm-tenant-requests']",
     audioFile: "/demo-audio/property-step-04.mp3",
-    cue: "Tenant requests come in directly — no phone tag required.",
+    cue: "Tenant requests come in directly with no phone tag required.",
     getTitle: () => "Tenant requests flow directly to your team.",
     getExplain: () =>
-      "Tenants submit requests by scanning a QR code in their unit, lobby, or common area. The request enters Relay immediately with the property, building, and location already identified — routed to the right maintenance team without a phone call or an email that gets buried.",
+      "Tenants submit requests by scanning a QR code in their unit, lobby, or common area. The request enters Relay immediately with the property, building, and location already identified and routed to the right maintenance team without a phone call or buried email.",
   },
 
   // Step 5: QR codes
@@ -915,9 +915,9 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='qr-list']",
     audioFile: "/demo-audio/property-step-05.mp3",
     cue: "Each code is linked to a building, floor, or common area.",
-    getTitle: () => "Tenants report problems in seconds — no account, no app.",
+    getTitle: () => "Tenants report problems in seconds with no account and no app required.",
     getExplain: () =>
-      "Place Relay QR codes in each unit entry, lobby, hallway, laundry room, and parking structure. Tenants scan, describe the issue, and submit — the request appears in Relay with the building and location already identified. Response begins before anyone has to make a phone call.",
+      "Place Relay QR codes in each unit entry, lobby, hallway, laundry room, and parking structure. Tenants scan, describe the issue, and submit, and the request appears in Relay with the building and location already identified. Response begins before anyone has to make a phone call.",
   },
 
   // Step 6: Issue form-fill
@@ -928,11 +928,11 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     audioFile: "/demo-audio/property-step-06.mp3",
     type: "form-fill",
     cue: "Watch how a maintenance tech logs the ceiling water damage report.",
-    getTitle: () => "Staff and tenants report the same way — in seconds.",
+    getTitle: () => "Staff and tenants both report problems the same way, in seconds.",
     getExplain: () =>
       "Maintenance staff can also log issues directly for the situations they discover themselves. Watch as we document the unit 4B ceiling water damage.",
     getFormData: () => ({
-      title: "Unit 4B — water coming through the bathroom ceiling",
+      title: "Unit 4B ceiling water damage from bathroom above",
       description: "Tenant in unit 4B reported water dripping through the bathroom ceiling. Appears to originate from the unit above or from the roof. Damage started this morning. Ceiling tile is showing water staining and soft spots.",
       category: "FACILITY",
     }),
@@ -956,10 +956,10 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     path: "SUBMITTED_ISSUE",
     targetSelector: "[data-tour='issue-detail-header']",
     audioFile: "/demo-audio/property-step-08.mp3",
-    cue: "Assign the right technician immediately — before the damage gets worse.",
+    cue: "Assign the right technician immediately before the damage gets worse.",
     getTitle: () => "Every request has a clear owner within minutes.",
     getExplain: () =>
-      "Once submitted, the issue shows who reported it, which property and unit it affects, what category it is, and its current status. Assign it to a maintenance technician or flag it for contractor dispatch — the record is visible to everyone on the team.",
+      "Once submitted, the issue shows who reported it, which property and unit it affects, what category it is, and its current status. Assign it to a maintenance technician or flag it for contractor dispatch, and the record is visible to everyone on the team.",
   },
 
   // Step 9: SUBMITTED_ISSUE AI panel
@@ -981,9 +981,9 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='issue-detail-header']",
     audioFile: "/demo-audio/property-step-10.mp3",
     cue: "Here's a critical issue that needed to reach management.",
-    getTitle: () => "High-impact issues surface immediately — not after the fact.",
+    getTitle: () => "High-impact issues surface immediately rather than after the fact.",
     getExplain: () =>
-      "When a water damage issue or major equipment failure stays unresolved, the risk to the property and the tenant grows every hour. Relay gives these issues a visible, critical status so managers can see them immediately — not when someone finally loops them in.",
+      "When a water damage issue or major equipment failure stays unresolved, the risk to the property and the tenant grows every hour. Relay gives these issues a visible, critical status so managers can see them immediately rather than waiting for someone to loop them in.",
   },
 
   // Step 11: ESCALATED_ISSUE escalation timeline
@@ -995,7 +995,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     cue: "When a contractor or tech misses the response window, Relay escalates.",
     getTitle: () => "No response? It escalates automatically.",
     getExplain: () =>
-      "If a tenant issue is not addressed within the defined response window, Relay escalates automatically to the next management level — with the full timeline of what happened and how long the request has been open. Property managers have visibility without needing to manually follow up.",
+      "If a tenant issue is not addressed within the defined response window, Relay escalates automatically to the next management level, with the full timeline of what happened and how long the request has been open. Property managers have visibility without needing to manually follow up.",
   },
 
   // Step 12: Asset list
@@ -1017,7 +1017,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='asset-history']",
     audioFile: "/demo-audio/property-step-13.mp3",
     getCue: () => "Every piece of equipment builds its own service history.",
-    getTitle: () => "Equipment history — every issue, every inspection, every repair.",
+    getTitle: () => "A complete equipment history covering every issue, inspection, and repair.",
     getExplain: () =>
       "When an HVAC unit, elevator, or boiler keeps generating requests, treating each incident as isolated misses the pattern. Relay tracks every issue, maintenance visit, and contractor service call per equipment record. Technicians and managers can see whether equipment needs another repair or is approaching end of life.",
   },
@@ -1029,7 +1029,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='issue-list']",
     audioFile: "/demo-audio/property-step-14.mp3",
     cue: "Scheduled maintenance stays visible alongside reactive tenant requests.",
-    getTitle: () => "Maintenance queue — active work always in view.",
+    getTitle: () => "The maintenance queue with all active work always in view.",
     getExplain: () =>
       "Filter maintenance work orders to see what is currently open, in progress, or waiting on a part or contractor. HVAC filter changes, fire suppression inspections, and elevator service stay in the same queue alongside reactive tenant requests. Nothing is tracked in a separate spreadsheet.",
   },
@@ -1040,8 +1040,8 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     path: "/vendors",
     targetSelector: "[data-tour='vendor-list']",
     audioFile: "/demo-audio/property-step-15.mp3",
-    cue: "Every contractor in your portfolio — connected to the work.",
-    getTitle: () => "Contractors connected to the work — not buried in a contact list.",
+    cue: "Every contractor in your portfolio stays connected to the work.",
+    getTitle: () => "Contractors stay connected to the work and never get buried in a contact list.",
     getExplain: () =>
       "When a leak requires a plumber, a boiler issue requires a specialist, or a roof repair requires a contractor, Relay connects them directly to the work order. The issue description, property record, and equipment history travel with each service call. No repeated explanations over the phone.",
   },
@@ -1052,10 +1052,10 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     path: "/locations",
     targetSelector: "[data-tour='location-list']",
     audioFile: "/demo-audio/property-step-16.mp3",
-    cue: "Every property in your portfolio — all visible in one system.",
+    cue: "Every property in your portfolio is visible in one system.",
     getTitle: () => "All your properties in one system.",
     getExplain: () =>
-      "Relay organizes your portfolio into properties, buildings, and areas so every issue, asset, and QR code is tied to the right location. Managers see which properties have open issues, which buildings have equipment down, and where maintenance teams are focused — across the entire portfolio.",
+      "Relay organizes your portfolio into properties, buildings, and areas so every issue, asset, and QR code is tied to the right location. Managers see which properties have open issues, which buildings have equipment down, and where maintenance teams are focused across the entire portfolio.",
   },
 
   // Step 17: Assignments
@@ -1142,7 +1142,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     audioFile: "/demo-audio/manufacturing-step-01.mp3",
     getTitle: () => "A machine on Line 3 went down. An operator mentioned it at shift change. It never got logged.",
     getExplain: () =>
-      "Keeping equipment running, coordinating maintenance, managing safety procedures, and knowing what is happening across every plant and line — when any of these depend on verbal handoffs or text messages, problems disappear between shifts. Relay gives manufacturing teams a shared operational system so every equipment failure is tracked, every maintenance tech has a clear task, and plant managers have real-time visibility across every location.",
+      "Keeping equipment running, coordinating maintenance, managing safety procedures, and when any of these depend on verbal handoffs or text messages, problems disappear between shifts. Relay gives manufacturing teams a shared operational system so every equipment failure is tracked, every maintenance tech has a clear task, and plant managers have real-time visibility across every location.",
   },
 
   // Step 2: Plant Overview KPIs
@@ -1152,9 +1152,9 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='kpi-cards']",
     audioFile: "/demo-audio/manufacturing-step-02.mp3",
     cue: "This is what your team sees the moment a shift starts.",
-    getTitle: () => "Plant operations at a glance — before the first part ships.",
+    getTitle: () => "Plant operations at a glance before the first part ships.",
     getExplain: () =>
-      "The Plant Overview shows equipment currently down, open safety issues, pending maintenance, high-priority items, and machines available for production — the critical numbers before a shift starts. Supervisors and managers see the same picture without a radio call.",
+      "The Plant Overview shows the critical numbers before a shift starts: equipment currently down, open safety issues, pending maintenance, high-priority items, and machines available for production. Supervisors and managers see the same picture without a radio call.",
   },
 
   // Step 3: Machine Status
@@ -1164,7 +1164,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='mfg-machine-status']",
     audioFile: "/demo-audio/manufacturing-step-03.mp3",
     cue: "Every machine your plant tracks shows its current state here.",
-    getTitle: () => "Machine status — operational, down, or in maintenance.",
+    getTitle: () => "Machine status showing whether each machine is operational, down, or in scheduled maintenance.",
     getExplain: () =>
       "The Machine Status board shows every tracked piece of equipment and its current state: operational, down, or in scheduled maintenance, with open issue counts attached to each machine. Maintenance supervisors see which machines need attention before they walk the floor.",
   },
@@ -1178,7 +1178,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     cue: "Every equipment breakdown lands here the moment it's reported.",
     getTitle: () => "Equipment issues tracked the moment they happen.",
     getExplain: () =>
-      "Machine faults, breakdowns, and safety issues are logged the moment they occur — through the app, through a QR code on the machine, or by a technician directly. Each entry is time-stamped, linked to the specific asset, and visible to maintenance supervisors immediately, not at the next shift meeting.",
+      "Machine faults, breakdowns, and safety issues are logged the moment they occur through the app, a QR code on the machine, or a technician directly. Each entry is time-stamped, linked to the specific asset, and visible to maintenance supervisors immediately, not at the next shift meeting.",
   },
 
   // Step 5: Issue form-fill
@@ -1188,12 +1188,12 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='issue-form']",
     audioFile: "/demo-audio/manufacturing-step-05.mp3",
     type: "form-fill",
-    cue: "This is how any operator logs a problem — from a breakdown to a safety concern.",
+    cue: "This is how any operator logs a problem, from a breakdown to a safety concern.",
     getTitle: () => "Any operator can log a problem in seconds.",
     getExplain: () =>
       "Any team member can log a machine problem from their phone or a QR code in seconds: machine noise, spindle vibration, quality defects, or safety hazards. Watch as we log a CNC spindle vibration issue.",
     getFormData: () => ({
-      title: "CNC Machine #3 — spindle vibration at high RPM",
+      title: "CNC Machine 3 spindle vibrating at high RPM",
       description: "Spindle vibrating noticeably above 8,000 RPM. Operator has slowed the machine to 4,000 RPM as a precaution. Quality check on recent parts recommended.",
       category: "EQUIPMENT_BREAKDOWN",
     }),
@@ -1220,7 +1220,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     cue: "The issue is already categorized and ready to assign.",
     getTitle: () => "Every issue has a clear owner immediately.",
     getExplain: () =>
-      "Once logged, the issue shows who reported it, which machine it affects, the category and priority, and its current status. Assign it to the right maintenance technician in one step — no manager phone call required. The response begins before the end of the current shift.",
+      "Once logged, the issue shows who reported it, which machine it affects, the category and priority, and its current status. Assign it to the right maintenance technician in one step with no manager phone call required. The response begins before the end of the current shift.",
   },
 
   // Step 8: SUBMITTED_ISSUE AI panel
@@ -1230,9 +1230,9 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='ai-panel']",
     audioFile: "/demo-audio/manufacturing-step-08.mp3",
     cue: "Relay's AI can suggest likely causes and a response approach.",
-    getTitle: () => "AI analysis — before the maintenance tech arrives at the machine.",
+    getTitle: () => "AI analysis runs before the maintenance technician arrives at the machine.",
     getExplain: () =>
-      "For equipment issues, Relay's AI can analyze the description, the machine type, and historical patterns to suggest likely causes and recommended actions. A maintenance technician assigned to a spindle vibration issue arrives with a starting point — not a blank page.",
+      "For equipment issues, Relay's AI can analyze the description, the machine type, and historical patterns to suggest likely causes and recommended actions. A maintenance technician assigned to a spindle vibration issue arrives with a concrete starting point instead of a blank page.",
   },
 
   // Step 9: SUBMITTED_ISSUE SOP panel
@@ -1242,7 +1242,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='sop-panel']",
     audioFile: "/demo-audio/manufacturing-step-09.mp3",
     cue: "Safety procedures can be linked directly to the work order.",
-    getTitle: () => "Safety procedures attached to the work — not in a binder.",
+    getTitle: () => "Safety procedures attached directly to the work order rather than stored in a binder.",
     getExplain: () =>
       "When a CNC machine is flagged for a breakdown, the LOTO checklist, lockout steps, and inspection protocol can be linked directly to that issue. Maintenance technicians see the required procedure right alongside the problem description. Nothing gets skipped because the binder was in the wrong building.",
   },
@@ -1254,9 +1254,9 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='issue-detail-header']",
     audioFile: "/demo-audio/manufacturing-step-10.mp3",
     cue: "Here's a production-critical failure that required management escalation.",
-    getTitle: () => "Production-impact failures are flagged — not buried.",
+    getTitle: () => "Production-impact failures get flagged immediately rather than buried.",
     getExplain: () =>
-      "When a hydraulic press, conveyor, or machining center fails completely, that issue is marked critical and treated differently from a routine maintenance request. The full record shows who reported it, which machine it affects, how long it has been open, and what production is impacted — visible to management immediately.",
+      "When a hydraulic press, conveyor, or machining center fails completely, that issue is marked critical and treated differently from a routine maintenance request. The full record shows who reported it, which machine it affects, how long it has been open, and what production is impacted, all visible to management immediately.",
   },
 
   // Step 11: ESCALATED_ISSUE escalation timeline
@@ -1268,7 +1268,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     cue: "When an issue goes unresolved, Relay escalates automatically.",
     getTitle: () => "Production-impact issues don't wait for the next shift meeting.",
     getExplain: () =>
-      "When a critical equipment failure is not addressed within the response window, Relay escalates automatically to the plant manager or the next management level — with the full record of what happened and how long production has been affected. No one has to manually chase the issue up the chain.",
+      "When a critical equipment failure is not addressed within the response window, Relay escalates automatically to the plant manager or the next management level, with the full record of what happened and how long production has been affected. No one has to manually chase the issue up the chain.",
   },
 
   // Step 12: Asset list
@@ -1290,7 +1290,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='asset-history']",
     audioFile: "/demo-audio/manufacturing-step-13.mp3",
     getCue: () => "Every machine builds its own complete maintenance history.",
-    getTitle: () => "Equipment history — every breakdown, every service, every repair.",
+    getTitle: () => "A complete equipment history covering every breakdown, service visit, and repair.",
     getExplain: () =>
       "When the same conveyor, press, or CNC keeps generating issues, treating each incident as isolated misses the pattern. Relay tracks every issue, maintenance visit, repair, and service call per machine. Supervisors and engineers can see whether equipment needs another repair, scheduled maintenance, or a replacement evaluation.",
   },
@@ -1302,9 +1302,9 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='qr-list']",
     audioFile: "/demo-audio/manufacturing-step-14.mp3",
     cue: "Operators report machine problems without leaving the production line.",
-    getTitle: () => "QR codes on every machine — report without leaving the floor.",
+    getTitle: () => "QR codes on every machine let operators report problems without leaving the floor.",
     getExplain: () =>
-      "Place a Relay QR code on each CNC machine, conveyor station, press, and work cell. Operators scan and describe what is wrong. The report enters Relay linked to that specific machine — no app login, no station to walk to. Breakdowns get logged the moment they happen, not at the end of the shift.",
+      "Place a Relay QR code on each CNC machine, conveyor station, press, and work cell. Operators scan and describe what is wrong. The report enters Relay linked to that specific machine with no app login and no station to walk to. Breakdowns get logged the moment they happen, not at the end of the shift.",
   },
 
   // Step 15: SOPs library
@@ -1313,8 +1313,8 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     path: "/sops",
     targetSelector: "[data-tour='sop-list']",
     audioFile: "/demo-audio/manufacturing-step-15.mp3",
-    cue: "Every safety procedure, inspection checklist, and LOTO protocol — centralized.",
-    getTitle: () => "SOPs centralized and searchable — not buried in a binder.",
+    cue: "Every safety procedure, inspection checklist, and LOTO protocol is centralized in one place.",
+    getTitle: () => "SOPs centralized and searchable rather than buried in a binder.",
     getExplain: () =>
       "Safety procedures, LOTO lockout/tagout checklists, machine-specific inspection protocols, and maintenance SOPs are stored in Relay where your team actually works. When an issue is linked to a procedure, the SOP surfaces directly from the issue. Managers can see which SOPs are connected to recurring problems.",
   },
@@ -1337,10 +1337,10 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     path: "/locations",
     targetSelector: "[data-tour='location-list']",
     audioFile: "/demo-audio/manufacturing-step-17.mp3",
-    cue: "Each plant is its own location — all visible in one system.",
+    cue: "Each plant is its own location, all visible in one system.",
     getTitle: () => "All your plants in one system.",
     getExplain: () =>
-      "Relay organizes operations into plants, lines, and areas so every issue, machine, and QR code is tied to the right location. Plant managers and operations directors see which facilities have open equipment failures, which lines are running with active issues, and where maintenance teams are focused — across every location.",
+      "Relay organizes operations into plants, lines, and areas so every issue, machine, and QR code is tied to the right location. Plant managers and operations directors see which facilities have open equipment failures, which lines are running with active issues, and where maintenance teams are focused across every location.",
   },
 
   // Step 18: Assignments
@@ -1362,7 +1362,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     targetSelector: "[data-tour='analytics-header']",
     audioFile: "/demo-audio/manufacturing-step-19.mp3",
     cue: "Every issue your team resolves builds this data over time.",
-    getTitle: () => "Equipment reliability and maintenance data — across every plant.",
+    getTitle: () => "Equipment reliability and maintenance data visible across every plant.",
     getExplain: () =>
       "Relay's history shows which machines fail most often, which categories of issues take longest to resolve, and where recurring breakdowns concentrate across plants and lines. That data informs maintenance schedules, parts stocking decisions, capital equipment planning, and supplier evaluation.",
   },
@@ -1388,7 +1388,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     cue: "External feedback surfaces quality and operational problems early.",
     getTitle: () => "See what customers are saying.",
     getExplain: () =>
-      "Customer Voice collects feedback from QR codes and external channels into one inbox. AI classifies each submission and flags operational or quality-related problems — so your team can act on customer-reported issues the same way they act on floor-reported ones.",
+      "Customer Voice collects feedback from QR codes and external channels into one inbox. AI classifies each submission and flags operational or quality-related problems so your team can act on customer-reported issues the same way they act on floor-reported ones.",
   },
 
   // Step 22: Employee Voice
@@ -1400,7 +1400,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     cue: "Operators surface near-misses and process gaps before they become incidents.",
     getTitle: () => "The people on the floor see problems first.",
     getExplain: () =>
-      "Operators notice machine inefficiencies, near-misses, and quality issues before they appear in the data. Relay gives every team member a direct channel to submit a concern, suggest an improvement, or complete a quick safety survey. Managers see the patterns that emerge across shifts and plants — the kind of operational intelligence that does not show up in maintenance logs.",
+      "Operators notice machine inefficiencies, near-misses, and quality issues before they appear in the data. Relay gives every team member a direct channel to submit a concern, suggest an improvement, or complete a quick safety survey. Managers see the patterns that emerge across shifts and plants, the kind of operational intelligence that does not show up in maintenance logs.",
   },
 
   // Step 23: Completion

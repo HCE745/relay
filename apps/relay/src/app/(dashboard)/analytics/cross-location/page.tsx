@@ -15,7 +15,7 @@ export default async function CrossLocationAnalyticsPage() {
   if (!session) redirect("/login")
   if (!["ADMIN", "MANAGER"].includes(session.role)) redirect("/dashboard")
 
-  if (!isProfessional(session.plan ?? "essentials")) {
+  if (!session.isDemo && !isProfessional(session.plan ?? "essentials")) {
     return (
       <div>
         <Header title="Cross-Location Analytics" />

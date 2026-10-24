@@ -15,7 +15,7 @@ export default async function VendorsPage() {
   const session = await getSession()
   if (!session) redirect("/login")
 
-  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
+  if (!session.isDemo && !hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
       <div>
         <Header title="Vendors" />

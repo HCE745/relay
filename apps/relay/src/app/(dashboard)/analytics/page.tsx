@@ -14,7 +14,7 @@ export default async function AnalyticsPage() {
   if (!session) redirect("/login")
   if (!["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)) redirect("/dashboard")
 
-  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
+  if (!session.isDemo && !hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
       <div>
         <Header title="Analytics" />

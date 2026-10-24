@@ -53,7 +53,7 @@ export default async function AssetsPage({ searchParams }: { searchParams: Promi
   const isManufacturing = org?.industry === "Manufacturing"
   const pageTitle = isManufacturing ? "Machines & Equipment" : (isCarWash || isPropMgmt) ? "Equipment" : "Assets"
 
-  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
+  if (!session.isDemo && !hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
       <div>
         <Header title={pageTitle} />

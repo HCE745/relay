@@ -12,7 +12,7 @@ export default async function SopsPage() {
   const session = await getSession()
   if (!session) redirect("/login")
 
-  if (!isProfessional(session.plan ?? "essentials")) {
+  if (!session.isDemo && !isProfessional(session.plan ?? "essentials")) {
     return (
       <div>
         <Header title="SOPs" />

@@ -13,7 +13,7 @@ export default async function QrCodesPage() {
   if (!session) redirect("/login")
   if (!["ADMIN", "MANAGER"].includes(session.role)) redirect("/dashboard")
 
-  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
+  if (!session.isDemo && !hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
       <div>
         <Header title="QR Codes" />

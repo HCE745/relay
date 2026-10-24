@@ -650,6 +650,7 @@ export async function createDemoOrg(industry?: string, pkg: DemoPackage = "profe
       health_scores_enabled:            isPlusOrAbove,
       trend_detection_enabled:          isPlusOrAbove,
       executive_goals_enabled:          isPlusOrAbove,
+      customer_voice_enabled:           true,
     },
   })
 
@@ -758,6 +759,7 @@ export async function resetDemoOrg(orgId: string, adminUserId: string, industry?
       health_scores_enabled:            isPlusOrAbove,
       trend_detection_enabled:          isPlusOrAbove,
       executive_goals_enabled:          isPlusOrAbove,
+      customer_voice_enabled:           true,
     },
   })
 

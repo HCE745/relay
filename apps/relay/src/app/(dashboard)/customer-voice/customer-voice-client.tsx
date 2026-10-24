@@ -558,7 +558,7 @@ export function CustomerVoiceClient({
   ]
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-3xl" data-tour="customer-voice-inbox">
       {connectedEmail && (
         <div className="flex items-center gap-2 mb-5 text-xs text-gray-500">
           <MessageSquare className="w-3.5 h-3.5" />

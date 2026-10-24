@@ -4,7 +4,7 @@ import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { AnalyticsClient } from "./analytics-client"
 import { PlanGateContent } from "@/components/layout/plan-gate"
-import { isProfessional } from "@/lib/pricing"
+import { hasWashOrProfessional } from "@/lib/pricing"
 import Link from "next/link"
 
 export const dynamic = "force-dynamic"
@@ -14,7 +14,7 @@ export default async function AnalyticsPage() {
   if (!session) redirect("/login")
   if (!["ADMIN", "MANAGER", "SUPERVISOR"].includes(session.role)) redirect("/dashboard")
 
-  if (!isProfessional(session.plan ?? "essentials")) {
+  if (!hasWashOrProfessional(session.plan ?? "essentials", session.productLine)) {
     return (
       <div>
         <Header title="Analytics" />

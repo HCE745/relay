@@ -818,7 +818,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     cue: "Build the exact operations view that matters to your wash.",
     getTitle: () => "Track wash operations across all locations in one view.",
     getExplain: () =>
-      "The analytics dashboard shows your key metrics in one place — issues by category, resolution rates, equipment downtime, top contributors, and more. Add any widget you need, arrange the layout, and save it as your default. Every manager sees the same picture without pulling a report.",
+      "The analytics dashboard shows your key metrics in one place: issues by category, resolution rates, equipment downtime by site, and top contributors. Add any widget you need, arrange the layout, and save it as your default. Every manager sees the same picture without pulling a report.",
   },
 
   // Step 20: Customer Voice
@@ -830,7 +830,7 @@ export const CARWASH_TOUR_STEPS: TourStep[] = [
     cue: "Customer feedback arrives automatically — no manual collection required.",
     getTitle: () => "See what customers are saying.",
     getExplain: () =>
-      "Customer Voice collects feedback from Google reviews, QR scans, and feedback links and brings it into one inbox. AI classifies each submission and flags operational problems — a blocked nozzle, a vacuum with no suction, a pay station issue — so your team can act on customer reports the same way they act on staff-logged problems.",
+      "Customer Voice collects feedback from Google reviews, QR scans, and feedback links and brings it into one inbox. AI classifies each submission and flags operational problems such as a blocked nozzle, a vacuum with no suction, or a pay station issue, so your team can act on customer reports the same way they act on staff-logged problems.",
   },
 
   // Step 21: Employee Voice
@@ -1091,7 +1091,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     cue: "Build the portfolio view that surfaces what actually needs attention.",
     getTitle: () => "Your portfolio metrics in one customizable view.",
     getExplain: () =>
-      "The analytics dashboard shows your key metrics in one place — open work orders by property, resolution rates, contractor response times, equipment failure trends, and more. Add any widget you need, arrange the layout, and save it as your default view across the team.",
+      "The analytics dashboard shows your key metrics in one place: open work orders by property, resolution rates, contractor response times, and equipment failure trends. Add any widget you need, arrange the layout, and save it as your default view across the team.",
   },
 
   // Step 20: Customer Voice
@@ -1115,7 +1115,7 @@ export const PROPERTY_MANAGEMENT_TOUR_STEPS: TourStep[] = [
     cue: "Maintenance staff can surface process gaps and suggestions directly.",
     getTitle: () => "Give your maintenance team a direct channel.",
     getExplain: () =>
-      "Maintenance technicians notice recurring problems before property managers do — equipment that keeps failing, contractor coordination gaps, process improvements. Relay gives every team member a channel to submit ideas, flag concerns, and complete quick surveys. Managers see the patterns that emerge across the portfolio.",
+      "Maintenance technicians notice recurring problems before property managers do: equipment that keeps failing, contractor coordination gaps, and opportunities to improve processes. Relay gives every team member a channel to submit ideas, flag concerns, and complete quick surveys. Managers see the patterns that emerge across the portfolio.",
   },
 
   // Step 22: Completion
@@ -1191,7 +1191,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     cue: "This is how any operator logs a problem — from a breakdown to a safety concern.",
     getTitle: () => "Any operator can log a problem in seconds.",
     getExplain: () =>
-      "Machine noise, spindle vibration, quality defect, safety hazard — any team member can log it from their phone or a QR code in seconds. Watch as we log a CNC spindle vibration issue.",
+      "Any team member can log a machine problem from their phone or a QR code in seconds: machine noise, spindle vibration, quality defects, or safety hazards. Watch as we log a CNC spindle vibration issue.",
     getFormData: () => ({
       title: "CNC Machine #3 — spindle vibration at high RPM",
       description: "Spindle vibrating noticeably above 8,000 RPM. Operator has slowed the machine to 4,000 RPM as a precaution. Quality check on recent parts recommended.",
@@ -1376,7 +1376,7 @@ export const MANUFACTURING_TOUR_STEPS: TourStep[] = [
     cue: "Build the plant operations view your management team actually needs.",
     getTitle: () => "Monitor your plant operations in one view.",
     getExplain: () =>
-      "The analytics dashboard shows your key metrics in one place — equipment downtime by machine, issue resolution rates, breakdown frequency by line, maintenance team performance, and more. Add any widget you need and save your layout as the default view for managers across every plant.",
+      "The analytics dashboard shows your key metrics in one place: equipment downtime by machine, issue resolution rates, breakdown frequency by line, and maintenance team performance. Add any widget you need and save your layout as the default view for managers across every plant.",
   },
 
   // Step 21: Customer Voice

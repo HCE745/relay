@@ -778,6 +778,7 @@ model SuperAdmin {
   broadcastsSent              Broadcast[]
   supportConvsAssigned        SupportConversation[] @relation("SupportAssignment")
   createdOffers               SalesOffer[]          @relation("SACreatedOffers")
+  abTestCampaigns             AbTestCampaign[]      @relation("AbTestCampaignSA")
 }
 
 model ImpersonationLog {
@@ -1956,17 +1957,61 @@ model CrmEmail {
   sentBySalesUserId String?
   bouncedAt         DateTime?
   bounceType        String?
+  abTestGroup       String?   // "A" | "B" | "C" | "D"
+  abTestCampaignId  String?
   createdAt         DateTime  @default(now())
 
-  demoCall        DemoCall?   @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
-  imapConfig      ImapConfig? @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
-  sentBySalesUser SalesUser?  @relation("SentBySalesUser", fields: [sentBySalesUserId], references: [id])
+  demoCall        DemoCall?      @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
+  imapConfig      ImapConfig?    @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
+  sentBySalesUser SalesUser?     @relation("SentBySalesUser", fields: [sentBySalesUserId], references: [id])
   linkClicks      LinkClick[]
+  abTestCampaign  AbTestCampaign? @relation(fields: [abTestCampaignId], references: [id], onDelete: SetNull)
 
   @@index([demoCallId])
   @@index([contactEmail])
   @@index([threadId])
   @@index([sentAt])
+  @@index([abTestCampaignId])
+}
+
+model AbTestCampaign {
+  id                   String    @id @default(cuid())
+  name                 String
+  description          String?
+  variants             Json      // Array<{ label: string; subject: string; body: string }>
+  organizationId       String?
+  createdBySAId        String?
+  createdBySalesUserId String?
+  isActive             Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  emails               CrmEmail[]
+  results              AbTestResult[]
+  createdBySA          SuperAdmin? @relation("AbTestCampaignSA", fields: [createdBySAId], references: [id], onDelete: SetNull)
+  createdBySalesUser   SalesUser?  @relation("AbTestCampaignSalesUser", fields: [createdBySalesUserId], references: [id], onDelete: SetNull)
+
+  @@index([createdBySAId])
+  @@index([createdBySalesUserId])
+}
+
+model AbTestResult {
+  id             String   @id @default(cuid())
+  campaignId     String
+  variant        String   // "A" | "B" | "C" | "D"
+  emailsSent     Int      @default(0)
+  emailsOpened   Int      @default(0)
+  linksClicked   Int      @default(0)
+  repliesReceived Int     @default(0)
+  openRate       Decimal  @default(0) @db.Decimal(5,2)
+  clickRate      Decimal  @default(0) @db.Decimal(5,2)
+  replyRate      Decimal  @default(0) @db.Decimal(5,2)
+  updatedAt      DateTime @updatedAt
+
+  campaign AbTestCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, variant])
+  @@index([campaignId])
 }
 
 model FollowUpStage {
@@ -2692,6 +2737,7 @@ model SalesUser {
   sessions                 SalesSession[]       @relation("SalesUserSessions")
   dailyActivity            SalesDailyActivity[] @relation("SalesUserDailyActivity")
   createdOffers            SalesOffer[]         @relation("SalesUserCreatedOffers")
+  abTestCampaigns          AbTestCampaign[]     @relation("AbTestCampaignSalesUser")
 }
 
 model SalesSession {

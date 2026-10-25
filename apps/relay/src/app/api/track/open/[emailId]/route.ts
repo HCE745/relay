@@ -22,10 +22,30 @@ export async function GET(
     })
 
     // Set first-open timestamp only if not already recorded
-    await prisma.crmEmail.updateMany({
+    const updated = await prisma.crmEmail.updateMany({
       where: { id: emailId, openedAt: null },
       data:  { openedAt: now },
     })
+
+    // If this was the first open, increment A/B test result
+    if (updated.count > 0) {
+      const email = await prisma.crmEmail.findUnique({
+        where: { id: emailId },
+        select: { abTestCampaignId: true, abTestGroup: true },
+      })
+      if (email?.abTestCampaignId && email.abTestGroup) {
+        const row = await prisma.abTestResult.update({
+          where: { campaignId_variant: { campaignId: email.abTestCampaignId, variant: email.abTestGroup } },
+          data:  { emailsOpened: { increment: 1 } },
+        })
+        if (row.emailsSent > 0) {
+          await prisma.abTestResult.update({
+            where: { campaignId_variant: { campaignId: email.abTestCampaignId, variant: email.abTestGroup } },
+            data:  { openRate: parseFloat(((row.emailsOpened / row.emailsSent) * 100).toFixed(2)) },
+          })
+        }
+      }
+    }
   } catch {
     // Never fail — always return the pixel
   }

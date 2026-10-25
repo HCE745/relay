@@ -43,6 +43,26 @@ export async function GET(
         isBotSuspected: lc.isBotSuspected || tooFast,
       },
     }).catch(() => null)
+
+    // A/B test: track link click on first click only (clickCount was 0 before this update)
+    if (!tooFast && lc.clickCount === 0 && lc.crmEmailId) {
+      const email = await prisma.crmEmail.findUnique({
+        where:  { id: lc.crmEmailId },
+        select: { abTestCampaignId: true, abTestGroup: true },
+      }).catch(() => null)
+      if (email?.abTestCampaignId && email.abTestGroup) {
+        const row = await prisma.abTestResult.update({
+          where: { campaignId_variant: { campaignId: email.abTestCampaignId, variant: email.abTestGroup } },
+          data:  { linksClicked: { increment: 1 } },
+        }).catch(() => null)
+        if (row && row.emailsSent > 0) {
+          await prisma.abTestResult.update({
+            where: { campaignId_variant: { campaignId: email.abTestCampaignId, variant: email.abTestGroup } },
+            data:  { clickRate: parseFloat(((row.linksClicked / row.emailsSent) * 100).toFixed(2)) },
+          }).catch(() => null)
+        }
+      }
+    }
   }
 
   const response = NextResponse.redirect(lc.destinationUrl, { status: 302 })

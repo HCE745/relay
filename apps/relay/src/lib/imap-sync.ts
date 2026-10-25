@@ -322,6 +322,30 @@ async function processMessage(
     await prisma.crmEmail.update({ where: { id: created.id }, data: { threadId: created.id } })
   }
 
+  // A/B test reply tracking: if this is a received email replying to an A/B test email, increment repliesReceived
+  if (direction === "received" && threadId) {
+    const originalSent = await prisma.crmEmail.findFirst({
+      where: {
+        threadId,
+        direction:       "sent",
+        abTestCampaignId: { not: null },
+      },
+      select: { abTestCampaignId: true, abTestGroup: true },
+    })
+    if (originalSent?.abTestCampaignId && originalSent.abTestGroup) {
+      const row = await prisma.abTestResult.update({
+        where: { campaignId_variant: { campaignId: originalSent.abTestCampaignId, variant: originalSent.abTestGroup } },
+        data:  { repliesReceived: { increment: 1 } },
+      }).catch(() => null)
+      if (row && row.emailsSent > 0) {
+        await prisma.abTestResult.update({
+          where: { campaignId_variant: { campaignId: originalSent.abTestCampaignId, variant: originalSent.abTestGroup } },
+          data:  { replyRate: parseFloat(((row.repliesReceived / row.emailsSent) * 100).toFixed(2)) },
+        }).catch(() => null)
+      }
+    }
+  }
+
   return "synced"
 }
 

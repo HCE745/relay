@@ -75,18 +75,20 @@ export async function POST(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json() as {
-      demoCallId?:    string
-      to:             string
-      cc?:            string
-      subject:        string
-      bodyHtml:       string
-      inReplyTo?:     string
-      threadId?:      string
-      sequenceId?:    string | null   // null = no follow-up sequence
-      followUpMode?:  string          // "manual" | "review_before_send" | "auto_send"
+      demoCallId?:       string
+      to:                string
+      cc?:               string
+      subject:           string
+      bodyHtml:          string
+      inReplyTo?:        string
+      threadId?:         string
+      sequenceId?:       string | null   // null = no follow-up sequence
+      followUpMode?:     string          // "manual" | "review_before_send" | "auto_send"
+      abTestGroup?:      string          // "A" | "B" | "C" | "D"
+      abTestCampaignId?: string
     }
 
-    const { to, cc, subject, bodyHtml, demoCallId, inReplyTo, threadId, sequenceId, followUpMode } = body
+    const { to, cc, subject, bodyHtml, demoCallId, inReplyTo, threadId, sequenceId, followUpMode, abTestGroup, abTestCampaignId } = body
 
     if (!to || !subject || !bodyHtml) {
       return NextResponse.json({ error: "to, subject, and bodyHtml required" }, { status: 400 })
@@ -98,7 +100,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `This contact has unsubscribed (reason: ${suppressed.reason})` }, { status: 409 })
     }
 
-    const bodyText = htmlToText(bodyHtml)
+    // Append variant footer if this is an A/B test email
+    const variantLabel = abTestGroup ?? null
+    const finalBodyHtml = variantLabel
+      ? `${bodyHtml}<small style="color:#999999;font-size:11px">--- v.${variantLabel}</small>`
+      : bodyHtml
+    const finalBodyText = htmlToText(finalBodyHtml)
+    const bodyText = finalBodyText
 
     // Build a unique Message-ID
     const messageId = `<${Date.now()}.${Math.random().toString(36).slice(2)}@getrelay.software>`
@@ -120,20 +128,22 @@ export async function POST(req: NextRequest) {
     // Create the CrmEmail record first so we have an ID for the tracking pixel
     const email = await prisma.crmEmail.create({
       data: {
-        demoCallId:   demoCallId ?? null,
-        contactEmail: to,
-        direction:    "sent",
+        demoCallId:       demoCallId ?? null,
+        contactEmail:     to,
+        direction:        "sent",
         fromAddress,
-        toAddress:    to,
-        cc:           cc ?? null,
+        toAddress:        to,
+        cc:               cc ?? null,
         subject,
-        bodyHtml,
+        bodyHtml:         finalBodyHtml,
         bodyText,
         messageId,
-        inReplyTo:    inReplyTo ?? null,
-        threadId:     resolvedThreadId,
-        sentAt:       new Date(),
-        source:       "compose",
+        inReplyTo:        inReplyTo ?? null,
+        threadId:         resolvedThreadId,
+        sentAt:           new Date(),
+        source:           "compose",
+        abTestGroup:      variantLabel,
+        abTestCampaignId: abTestCampaignId ?? null,
       },
     })
 
@@ -154,7 +164,7 @@ export async function POST(req: NextRequest) {
         const prospectId = contact?.prospectId ?? null
         const urlPattern = /href="(https?:\/\/[^"]+)"/gi
         const tokenMap = new Map<string, string>()
-        for (const [, url] of bodyHtml.matchAll(urlPattern)) {
+        for (const [, url] of finalBodyHtml.matchAll(urlPattern)) {
           if (!url.includes("app.getrelay.software") && !tokenMap.has(url)) {
             tokenMap.set(url, randomBytes(9).toString("base64url").slice(0, 12))
           }
@@ -165,7 +175,7 @@ export async function POST(req: NextRequest) {
               data: { token, crmEmailId: email.id, prospectId, destinationUrl, emailSentAt: new Date() },
             })
           ))
-          processedHtml = bodyHtml.replace(urlPattern, (_full, url) => {
+          processedHtml = finalBodyHtml.replace(urlPattern, (_full, url) => {
             const token = tokenMap.get(url)
             return token ? `href="https://app.getrelay.software/t/${token}"` : _full
           })
@@ -304,6 +314,27 @@ export async function POST(req: NextRequest) {
           sendingWindowEnd:   crmSettings?.sendingWindowEnd   ?? 16,
         }).catch(err => console.error("[crm-email] enrollment failed:", err))
       }
+    }
+
+    // A/B test: increment emailsSent and recalculate rates
+    if (abTestCampaignId && variantLabel) {
+      prisma.abTestResult.upsert({
+        where: { campaignId_variant: { campaignId: abTestCampaignId, variant: variantLabel } },
+        create: { campaignId: abTestCampaignId, variant: variantLabel, emailsSent: 1 },
+        update: { emailsSent: { increment: 1 } },
+      }).then(async (row) => {
+        const sent = row.emailsSent
+        if (sent > 0) {
+          await prisma.abTestResult.update({
+            where: { campaignId_variant: { campaignId: abTestCampaignId, variant: variantLabel } },
+            data: {
+              openRate:  parseFloat(((row.emailsOpened  / sent) * 100).toFixed(2)),
+              clickRate: parseFloat(((row.linksClicked  / sent) * 100).toFixed(2)),
+              replyRate: parseFloat(((row.repliesReceived / sent) * 100).toFixed(2)),
+            },
+          })
+        }
+      }).catch(err => console.error("[crm-email] ab-test increment failed:", err))
     }
 
     // Audit log — fire-and-forget so a failure never blocks the response

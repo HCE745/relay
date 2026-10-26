@@ -8,7 +8,7 @@ import type { AdminNavItem } from "@/lib/rbac"
 import {
   HomeIcon, CalendarIcon, BriefcaseIcon, BuildingIcon, MapPinIcon, UsersIcon, ClockIcon,
   ClipboardCheckIcon, ClipboardListIcon, AlertTriangleIcon, SparklesIcon, ReceiptIcon, FileTextIcon,
-  CreditCardIcon, DollarIcon, ChartBarIcon, BoxIcon, TagIcon, CogIcon, CircleIcon, InboxIcon,
+  CreditCardIcon, DollarIcon, ChartBarIcon, BoxIcon, TagIcon, CogIcon, CircleIcon, InboxIcon, SearchIcon,
 } from "@/components/ui/icons"
 
 // Icon per nav key — keeps the rail scannable and matches the app's icon system.
@@ -102,6 +102,21 @@ export function AdminSidebar({
     </div>
   )
 
+  // Opens the command palette (also Cmd/Ctrl+K anywhere); dispatches a window
+  // event the palette listens for, so no shared state is needed.
+  const search = (
+    <div className="px-3 pb-2">
+      <button
+        type="button"
+        onClick={() => { setOpen(false); window.dispatchEvent(new CustomEvent("cln:open-palette")) }}
+        className="flex w-full items-center justify-between gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white"
+      >
+        <span className="flex items-center gap-2"><SearchIcon className="h-[18px] w-[18px] text-slate-400" /> Search</span>
+        <kbd className="rounded border border-slate-700 px-1.5 py-0.5 text-[10px] text-slate-400">⌘K</kbd>
+      </button>
+    </div>
+  )
+
   const footer = (
     <div className="border-t border-slate-800 px-4 py-3">
       <div className="mb-2 px-1 text-sm text-slate-300">
@@ -136,6 +151,7 @@ export function AdminSidebar({
       {/* Desktop fixed rail */}
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-slate-900 md:flex">
         {brand}
+        {search}
         {links}
         {footer}
       </aside>
@@ -146,6 +162,7 @@ export function AdminSidebar({
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
           <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-slate-900">
             {brand}
+            {search}
             {links}
             {footer}
           </aside>

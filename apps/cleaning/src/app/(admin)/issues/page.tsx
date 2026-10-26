@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { PeekLink } from "@/components/peek/peek"
 import { redirect } from "next/navigation"
 import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
@@ -89,7 +90,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
           />
         )
       ) : (
-        <Card className="overflow-x-auto">
+        <Card className="cln-table-scroll overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
               <tr>
@@ -105,10 +106,10 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
               {issues.map((i) => (
                 <tr key={i.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
-                    <Link href={`/issues/${i.id}`} className="font-medium text-slate-900 hover:text-brand">
+                    <PeekLink type="issue" id={i.id} href={`/issues/${i.id}`} className="font-medium text-slate-900 hover:text-brand">
                       <span className="mr-2 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">{i.category}</span>
                       {i.title ?? i.description.slice(0, 60)}
-                    </Link>
+                    </PeekLink>
                   </td>
                   <td className="px-4 py-3 text-slate-500">{i.source === "QR" ? "QR (external)" : i.source === "SMS" ? "SMS" : i.source === "CUSTOMER" ? "Customer" : i.inspection ? "Inspection" : "Field report"}</td>
                   <td className="px-4 py-3 text-slate-600">

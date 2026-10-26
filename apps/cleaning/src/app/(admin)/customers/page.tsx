@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { PeekLink } from "@/components/peek/peek"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
@@ -41,7 +41,7 @@ export default async function CustomersPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {customers.map((c) => (
-            <Link key={c.id} href={`/customers/${c.id}`} className="group">
+            <PeekLink key={c.id} type="customer" id={c.id} href={`/customers/${c.id}`} className="group">
               <Card className="h-full p-5 transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-md">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
@@ -60,7 +60,7 @@ export default async function CustomersPage() {
                   <span><span className="font-semibold text-slate-700">{c._count.contacts}</span> {c._count.contacts === 1 ? "contact" : "contacts"}</span>
                 </div>
               </Card>
-            </Link>
+            </PeekLink>
           ))}
         </div>
       )}

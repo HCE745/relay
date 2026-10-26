@@ -63,6 +63,54 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Motion. Utility, not decoration: show what happened and where it came from.
+   120-180ms, ease-out entering / ease-in leaving, no bounce/spring/stagger.
+   Everything here is disabled under prefers-reduced-motion (block at the end).
+   ───────────────────────────────────────────────────────────────────────── */
+@keyframes cln-overlay-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes cln-panel-in { from { transform: translateX(16px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+@keyframes cln-sheet-in { from { transform: translateY(24px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+@keyframes cln-pop-in { from { transform: scale(0.98); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+@keyframes cln-shimmer { from { background-position: -200% 0 } to { background-position: 200% 0 } }
+
+.cln-animate-overlay { animation: cln-overlay-in 140ms ease-out }
+.cln-animate-panel { animation: cln-panel-in 150ms ease-out }
+.cln-animate-sheet { animation: cln-sheet-in 160ms ease-out }
+.cln-animate-pop { animation: cln-pop-in 140ms ease-out }
+
+/* Skeletons that match the shape of content being loaded (replace spinners). */
+.cln-skeleton {
+  background: linear-gradient(90deg, rgb(226 232 240 / 0.55) 25%, rgb(226 232 240 / 0.9) 37%, rgb(226 232 240 / 0.55) 63%);
+  background-size: 200% 100%;
+  animation: cln-shimmer 1.4s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+/* Dense, scannable tables on long operational lists: the list scrolls inside a
+   bounded area and the header stays pinned. Apply .cln-table-scroll to the
+   element that wraps a <table>. Numeric columns should use `tabular-nums`. */
+.cln-table-scroll {
+  max-height: 72vh;
+  overflow: auto;
+}
+.cln-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8fafc; /* slate-50 — matches the existing thead fill */
+}
+
+/* Honor the user's motion preference: kill transitions/animations entirely. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Print-friendly documents (e.g. invoice detail): drop the app chrome so only
    the document card prints. Mark chrome/action elements with [data-no-print]. */
 @media print {

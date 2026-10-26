@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button, Select } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
@@ -23,24 +23,32 @@ const LABEL: Record<string, string> = {
 
 export function IssueStatusBar({ issueId, status }: { issueId: string; status: string }) {
   const router = useRouter()
+  // Optimistic status: reflect the transition immediately (a status change is
+  // near-certain to succeed), then roll back and show the error if it doesn't.
+  const [current, setCurrent] = useState(status)
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  useEffect(() => { setCurrent(status) }, [status]) // sync when the server confirms
+
   async function set(next: string) {
-    setBusy(true)
+    const prev = current
+    setError(null); setBusy(true); setCurrent(next) // optimistic
     // Closing goes through verification (resolver ≠ verifier, enforced server-side).
     const res = next === "CLOSED"
       ? await apiSend(`/api/issues/${issueId}/verify`, "POST")
       : await apiSend(`/api/issues/${issueId}/status`, "PATCH", { status: next })
     setBusy(false)
     if (res.ok) router.refresh()
-    else alert(res.error)
+    else { setCurrent(prev); setError(res.error) } // rollback
   }
   return (
-    <div className="flex flex-wrap gap-2">
-      {(NEXT[status] ?? []).map((s) => (
+    <div className="flex flex-wrap items-center gap-2">
+      {(NEXT[current] ?? []).map((s) => (
         <Button key={s} size="sm" variant={s === "CLOSED" ? "secondary" : "primary"} disabled={busy} onClick={() => set(s)}>
           {LABEL[s] ?? s}
         </Button>
       ))}
+      {error ? <span className="text-xs text-red-600">{error}</span> : null}
     </div>
   )
 }

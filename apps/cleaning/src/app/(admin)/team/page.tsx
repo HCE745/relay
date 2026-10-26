@@ -4,6 +4,7 @@ import { canManageTeam, assignableRoles } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { listUsers } from "@/lib/data/users"
 import { countUserHeldItems } from "@/lib/data/custody"
+import { PeekLink } from "@/components/peek/peek"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, EmptyState } from "@/components/ui/controls"
 import { UsersIcon } from "@/components/ui/icons"
@@ -69,7 +70,7 @@ export default async function TeamPage() {
             <tbody className="divide-y divide-slate-100">
               {users.map((u) => (
                 <tr key={u.id} className={u.isActive ? "" : "opacity-60"}>
-                  <td className="px-4 py-3 font-medium text-slate-900">{u.name}</td>
+                  <td className="px-4 py-3 font-medium text-slate-900"><PeekLink type="employee" id={u.id} href="/team" className="hover:text-brand">{u.name}</PeekLink></td>
                   <td className="px-4 py-3 text-slate-600">{u.email}</td>
                   <td className="px-4 py-3 text-slate-600">{ROLE_LABEL[u.role] ?? u.role}</td>
                   <td className="px-4 py-3 text-slate-500">{u.employeeProfile?.employeeCode ?? "-"}</td>

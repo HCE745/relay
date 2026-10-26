@@ -141,6 +141,10 @@ export function CircleIcon({ className }: IconProps) {
   return base(<circle cx="12" cy="12" r="9" />, className)
 }
 
+export function SearchIcon({ className }: IconProps) {
+  return base(<><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></>, className)
+}
+
 export function ReceiptIcon({ className }: IconProps) {
   return base(
     <>

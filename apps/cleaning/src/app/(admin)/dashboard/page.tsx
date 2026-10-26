@@ -4,7 +4,8 @@ import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getOrgTimezone } from "@/lib/data/org"
-import { getDashboardMetrics } from "@/lib/data/dashboard"
+import { getDashboardMetrics, getOperations } from "@/lib/data/dashboard"
+import { OperationsView } from "@/components/dashboard/operations-view"
 import { countLowStock } from "@/lib/data/supplies"
 import { countOverdue } from "@/lib/data/invoices"
 import { countExpiring } from "@/lib/data/contracts"
@@ -46,7 +47,7 @@ export default async function DashboardPage() {
 
   const orgId = session.organizationId
   const tz = await getOrgTimezone(orgId)
-  const m = await getDashboardMetrics(orgId, tz)
+  const [m, ops] = await Promise.all([getDashboardMetrics(orgId, tz), getOperations(orgId, tz)])
 
   // Setup guide: only for users who can act on it, only until complete/dismissed.
   const canSetup = canManageAccounts(session.role)
@@ -107,28 +108,21 @@ export default async function DashboardPage() {
 
       {showSetup ? <SetupChecklist progress={progress} /> : null}
 
-      <section className="mb-8">
+      {/* Primary: the live operations screen. */}
+      <OperationsView ops={ops} tz={tz} />
+
+      {/* Secondary: the metric tiles, kept but below the operations view. */}
+      <section className="mt-8">
         <div className="mb-3 flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-slate-700">Needs attention</h2>
+          <h2 className="text-sm font-semibold text-slate-700">Metrics</h2>
           {attentionCount > 0 ? (
-            <span className="inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700">
-              {attentionCount}
-            </span>
+            <span className="inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700">{attentionCount} need attention</span>
           ) : (
             <span className="text-xs text-slate-400">All clear</span>
           )}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {needsAttention.map((t) => (
-            <MetricTile key={t.label} t={t} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">Today at a glance</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {overview.map((t) => (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[...needsAttention, ...overview].map((t) => (
             <MetricTile key={t.label} t={t} />
           ))}
         </div>

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { PeekLink } from "@/components/peek/peek"
 import { redirect } from "next/navigation"
 import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
@@ -149,9 +150,9 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                 return (
                   <tr key={job.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3">
-                      <Link href={`/jobs/${job.id}`} className="font-medium text-slate-900 hover:text-brand">
+                      <PeekLink type="job" id={job.id} href={`/jobs/${job.id}`} className="font-medium text-slate-900 hover:text-brand">
                         {dt.toFormat("EEE MMM d")} · {formatTimeInZone(job.scheduledStart, jtz)}
-                      </Link>
+                      </PeekLink>
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-slate-800">{job.serviceLocation.customer.name}</div>

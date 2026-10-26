@@ -15,7 +15,11 @@ export default async function CustomerVoicePage() {
     select: { customer_voice_enabled: true },
   })
 
-  if (!org?.customer_voice_enabled) redirect("/dashboard")
+  // Demo sessions always show Customer Voice regardless of the DB flag, because
+  // the tour navigates here and the flag should be true but may not be in edge
+  // cases (e.g. stale seed data). The demo/start route also sets it to true, but
+  // this guard ensures the page never incorrectly redirects a demo visitor.
+  if (!org?.customer_voice_enabled && !session.isDemo) redirect("/dashboard")
 
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)

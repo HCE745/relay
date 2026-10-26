@@ -11,6 +11,17 @@ import {
 import { computeEngagementScore, scoreLabel, scoreColor } from "@/lib/engagement-score"
 import { SuppressionButtons } from "./SuppressionButtons"
 import { ExportEmailsButton } from "./ExportEmailsButton"
+import { ActivityTimeline } from "@/components/crm/ActivityTimeline"
+import { ObjectionsPanel } from "@/components/crm/ObjectionsPanel"
+import { ProspectCallButton } from "./ProspectCallButton"
+
+function ActivityTimelineSection({ prospectId }: { prospectId: string }) {
+  return <ActivityTimeline prospectId={prospectId} />
+}
+
+function ObjectionsPanelSection({ prospectId }: { prospectId: string }) {
+  return <ObjectionsPanel prospectId={prospectId} />
+}
 
 export const dynamic = "force-dynamic"
 
@@ -218,6 +229,7 @@ export default async function ProspectDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <ProspectCallButton prospectId={prospect.id} />
           {prospect.contacts[0]?.email && (
             <SuppressionButtons email={prospect.contacts[0].email} prospectId={prospect.id} />
           )}
@@ -441,6 +453,16 @@ export default async function ProspectDetailPage({
           </div>
         </div>
       )}
+
+      {/* ── Activity Timeline ── */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <ActivityTimelineSection prospectId={prospect.id} />
+      </div>
+
+      {/* ── Objections ── */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <ObjectionsPanelSection prospectId={prospect.id} />
+      </div>
 
     </div>
   )

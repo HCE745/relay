@@ -7,6 +7,7 @@ import { logSAAction } from "@/lib/sa-audit"
 import { decryptField } from "@/lib/crypto-utils"
 import { sendViaTitanSmtp } from "@/lib/titan-smtp"
 import { enrollInSequence, getDefaultSequence } from "@/lib/crm-sequences"
+import { createSalesActivity } from "@/lib/sales-activities"
 
 async function requireSA() {
   const s = await getSession()
@@ -314,6 +315,17 @@ export async function POST(req: NextRequest) {
           sendingWindowEnd:   crmSettings?.sendingWindowEnd   ?? 16,
         }).catch(err => console.error("[crm-email] enrollment failed:", err))
       }
+    }
+
+    // Create sales activity for timeline
+    if (demoCallId || body.to) {
+      createSalesActivity({
+        demoCallId:  demoCallId ?? null,
+        salesUserId: null,
+        activityType: "EMAIL_SENT",
+        subject:     subject,
+        notes:       `Sent to ${to}`,
+      }).catch(err => console.error("[crm-email] activity creation failed:", err))
     }
 
     // A/B test: increment emailsSent and recalculate rates

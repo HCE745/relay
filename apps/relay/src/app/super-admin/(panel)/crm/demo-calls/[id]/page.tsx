@@ -7,6 +7,8 @@ import { CrmDemoCallForm } from "@/components/super-admin/crm-demo-call-form"
 import { CrmEmailThread } from "@/components/super-admin/crm-email-thread"
 import { CrmEmailCompose } from "@/components/super-admin/crm-email-compose"
 import { Mail, Zap, ShieldOff, AlertTriangle, Download, Loader2, ChevronDown } from "lucide-react"
+import { ActivityTimeline } from "@/components/crm/ActivityTimeline"
+import { ObjectionsPanel } from "@/components/crm/ObjectionsPanel"
 
 interface EngagementData {
   score: number
@@ -351,6 +353,16 @@ export default function DemoCallDetailPage() {
           onSent={() => setComposing(false)}
         />
       )}
+
+      {/* Objections */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+        <ObjectionsPanel demoCallId={call.id} />
+      </div>
+
+      {/* Activity Timeline */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+        <ActivityTimeline demoCallId={call.id} />
+      </div>
     </div>
   )
 }

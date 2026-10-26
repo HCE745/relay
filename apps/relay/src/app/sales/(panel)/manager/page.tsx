@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { TransferActions } from "./TransferActions"
 import { ManagerTabs } from "./ManagerTabs"
-import { Users, TrendingUp, CheckCircle2, AlertCircle, Trophy, AlertTriangle } from "lucide-react"
+import { Users, TrendingUp, CheckCircle2, AlertCircle, Trophy, AlertTriangle, Phone, MessageSquare } from "lucide-react"
 import Link from "next/link"
 
 export const dynamic = "force-dynamic"
@@ -23,7 +23,7 @@ export default async function ManagerPage() {
 
   const duplicateCount = await prisma.prospect.count({ where: { duplicateFlag: true } })
 
-  const [salesUsers, opportunities, tasks, pendingRequests] = await Promise.all([
+  const [salesUsers, opportunities, tasks, pendingRequests, callActivities, objectionRows] = await Promise.all([
     prisma.salesUser.findMany({
       where:   { isActive: true },
       select:  { id: true, name: true, email: true, role: true },
@@ -47,7 +47,41 @@ export default async function ManagerPage() {
       },
       orderBy: { createdAt: "desc" },
     }),
+
+    prisma.salesCrmActivity.findMany({
+      where:  { activityType: { in: ["CALL_ATTEMPTED", "CALL_CONNECTED"] }, occurredAt: { gte: thirtyDaysAgo } },
+      select: { activityType: true, outcome: true, salesUserId: true },
+    }),
+
+    prisma.crmObjection.findMany({
+      where:  { createdAt: { gte: thirtyDaysAgo } },
+      select: { objectionType: true, wasResolved: true },
+    }),
   ])
+
+  // Call outcome stats (last 30d)
+  const totalCalls     = callActivities.length
+  const connectedCalls = callActivities.filter(a => a.activityType === "CALL_CONNECTED").length
+  const connectRate    = totalCalls > 0 ? Math.round((connectedCalls / totalCalls) * 100) : 0
+
+  const callOutcomeCounts: Record<string, number> = {}
+  for (const a of callActivities) {
+    if (a.outcome) callOutcomeCounts[a.outcome] = (callOutcomeCounts[a.outcome] ?? 0) + 1
+  }
+  const topCallOutcomes = Object.entries(callOutcomeCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+
+  // Objection analysis (last 30d)
+  const objectionTypeCounts: Record<string, { total: number; resolved: number }> = {}
+  for (const o of objectionRows) {
+    if (!objectionTypeCounts[o.objectionType]) objectionTypeCounts[o.objectionType] = { total: 0, resolved: 0 }
+    objectionTypeCounts[o.objectionType].total++
+    if (o.wasResolved) objectionTypeCounts[o.objectionType].resolved++
+  }
+  const objectionStats = Object.entries(objectionTypeCounts)
+    .sort(([, a], [, b]) => b.total - a.total)
+    .slice(0, 6)
 
   // Per-rep stats
   type RepStat = {
@@ -225,6 +259,87 @@ export default async function ManagerPage() {
           </div>
         )}
       </div>
+
+      {/* Call Outcome Stats */}
+      {totalCalls > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Phone className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Call Activity (30d)</h2>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">Total Calls</p>
+              <p className="text-2xl font-bold text-white">{totalCalls}</p>
+            </div>
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">Connected</p>
+              <p className="text-2xl font-bold text-emerald-400">{connectedCalls}</p>
+            </div>
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">Connect Rate</p>
+              <p className="text-2xl font-bold text-blue-400">{connectRate}%</p>
+            </div>
+          </div>
+          {topCallOutcomes.length > 0 && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Outcomes Breakdown</p>
+              <div className="space-y-2">
+                {topCallOutcomes.map(([outcome, count]) => (
+                  <div key={outcome} className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400 w-40 truncate">{outcome.replace(/_/g, " ")}</span>
+                    <div className="flex-1 bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                      <div
+                        className="h-full bg-emerald-600 rounded-full"
+                        style={{ width: `${Math.round((count / totalCalls) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-500 tabular-nums w-8 text-right">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Objections Analysis */}
+      {objectionStats.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <MessageSquare className="w-4 h-4 text-amber-400" />
+            <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Objections Analysis (30d)</h2>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-800 text-xs text-gray-500">
+                  <th className="text-left px-4 py-3 font-medium">Objection Type</th>
+                  <th className="text-right px-4 py-3 font-medium">Count</th>
+                  <th className="text-right px-4 py-3 font-medium">Resolved</th>
+                  <th className="text-right px-4 py-3 font-medium">Resolve Rate</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800/60">
+                {objectionStats.map(([type, { total, resolved }]) => (
+                  <tr key={type}>
+                    <td className="px-4 py-3 text-gray-300">{type.replace(/_/g, " ")}</td>
+                    <td className="px-4 py-3 text-right text-white tabular-nums">{total}</td>
+                    <td className="px-4 py-3 text-right text-emerald-400 tabular-nums">{resolved}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={`text-xs font-semibold ${
+                        total > 0 && resolved / total >= 0.5 ? "text-emerald-400" : "text-amber-400"
+                      }`}>
+                        {total > 0 ? `${Math.round((resolved / total) * 100)}%` : "—"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

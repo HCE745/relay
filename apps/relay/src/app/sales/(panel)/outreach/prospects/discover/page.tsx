@@ -21,6 +21,7 @@ interface DuplicateInfo {
   companyName: string | null
   prospectId:  string | null
   demoCallId:  string | null
+  signals?:    string[]
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -413,8 +414,18 @@ function SlideOver({ company, onClose }: {
                         <div className="bg-amber-900/20 border border-amber-700/40 rounded-lg p-3">
                           <div className="flex items-start gap-2">
                             <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                            <div className="text-xs text-amber-300">
-                              <p className="font-medium mb-1">You&apos;ve previously contacted {duplicate.companyName ?? company.companyName}.</p>
+                            <div className="text-xs text-amber-300 w-full">
+                              <p className="font-medium mb-1">Possible duplicate: {duplicate.companyName ?? company.companyName}</p>
+                              {duplicate.signals && duplicate.signals.length > 0 && (
+                                <ul className="mb-2 space-y-0.5">
+                                  {duplicate.signals.map(s => (
+                                    <li key={s} className="flex items-center gap-1 text-amber-400/80">
+                                      <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
+                                      {s}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
                               <div className="flex gap-2 flex-wrap">
                                 {duplicate.prospectId && (
                                   <Link href={`/sales/outreach/prospects/${duplicate.prospectId}`}

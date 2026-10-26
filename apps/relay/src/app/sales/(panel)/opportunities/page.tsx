@@ -143,6 +143,22 @@ export default async function OpportunitiesPage() {
                         Close {new Date(opp.closeDate).toLocaleDateString()}
                       </p>
                     )}
+
+                    {opp.qualificationStatus && (
+                      <div className="flex items-center gap-1.5 mt-2 pt-1.5 border-t border-gray-700/50">
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                          opp.qualificationStatus === "SALES_QUALIFIED"     ? "bg-emerald-900/30 text-emerald-400" :
+                          opp.qualificationStatus === "MARKETING_QUALIFIED" ? "bg-amber-900/30 text-amber-400" :
+                          opp.qualificationStatus === "DISQUALIFIED"        ? "bg-red-900/30 text-red-400" :
+                          "bg-gray-800 text-gray-500"
+                        }`}>
+                          {opp.qualificationStatus.replace(/_/g, " ")}
+                        </span>
+                        {opp.qualificationScore != null && (
+                          <span className="text-[10px] text-gray-600">{Number(opp.qualificationScore)}/100</span>
+                        )}
+                      </div>
+                    )}
                   </Link>
                 ))}
 

@@ -4,8 +4,12 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   ArrowLeft, CheckCircle2, Circle, Clock, DollarSign,
-  User, Calendar, FileText, Loader2, AlertCircle, Plus, RefreshCw, Lock, ShieldAlert, Tag, Copy,
+  User, Calendar, FileText, Loader2, AlertCircle, Plus, RefreshCw, Lock, ShieldAlert, Tag, Copy, Phone,
 } from "lucide-react"
+import { QualifyButton } from "@/components/crm/QualifyButton"
+import { ObjectionsPanel } from "@/components/crm/ObjectionsPanel"
+import { ActivityTimeline } from "@/components/crm/ActivityTimeline"
+import { LogCallModal } from "@/components/crm/LogCallModal"
 
 type Task = {
   id: string
@@ -56,6 +60,8 @@ type Opportunity = {
   tasks: Task[]
   commissionEvents: CommissionEvent[]
   attributions: Attribution[]
+  qualificationScore: number | null
+  qualificationStatus: string | null
 }
 
 type AuthInfo = { superAdmin?: boolean; salesUserId?: string; salesUserRole?: string }
@@ -110,6 +116,13 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
   const [nextStepDateStr, setNextStepDateStr] = useState("")
   const [nextStepSaving, setNextStepSaving] = useState(false)
 
+  // Qualification
+  const [qualScore, setQualScore] = useState<number | null>(null)
+  const [qualStatus, setQualStatus] = useState<string | null>(null)
+
+  // Log call modal
+  const [showCallModal, setShowCallModal] = useState(false)
+
   // Transfer
   const [transferTo, setTransferTo] = useState("")
   const [transferNote, setTransferNote] = useState("")
@@ -140,6 +153,8 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
         setNewStage(oppData.stage ?? "")
         setNextStepText(oppData.nextStep ?? "")
         setNextStepDateStr(oppData.nextStepDate ? oppData.nextStepDate.slice(0, 10) : "")
+        setQualScore(oppData.qualificationScore ?? null)
+        setQualStatus(oppData.qualificationStatus ?? null)
       } catch (e) {
         setError(e instanceof Error ? e.message : "Error loading opportunity")
       } finally {
@@ -312,11 +327,19 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
         <div className="flex items-start gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl font-bold text-white mb-1">{opp.title}</h1>
-            <span className={`inline-flex text-xs font-semibold px-2.5 py-1 rounded-full ${STAGE_COLORS[opp.stage] ?? "bg-gray-800 text-gray-400"}`}>
-              {opp.stage}
-            </span>
+            <div className="flex items-center gap-3 flex-wrap mt-1">
+              <span className={`inline-flex text-xs font-semibold px-2.5 py-1 rounded-full ${STAGE_COLORS[opp.stage] ?? "bg-gray-800 text-gray-400"}`}>
+                {opp.stage}
+              </span>
+              <QualifyButton
+                opportunityId={opp.id}
+                currentScore={qualScore}
+                currentStatus={qualStatus}
+                onQualified={(score, status) => { setQualScore(score); setQualStatus(status) }}
+              />
+            </div>
           </div>
-          <div className="text-right shrink-0">
+          <div className="text-right shrink-0 flex flex-col items-end gap-2">
             {opp.value != null && (
               <div className="flex items-center gap-1 text-2xl font-bold text-emerald-400 justify-end">
                 <DollarSign className="w-5 h-5" />
@@ -324,8 +347,15 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
               </div>
             )}
             {opp.closeDate && (
-              <p className="text-xs text-gray-500 mt-0.5">Close {fmtDate(opp.closeDate)}</p>
+              <p className="text-xs text-gray-500">Close {fmtDate(opp.closeDate)}</p>
             )}
+            <button
+              onClick={() => setShowCallModal(true)}
+              className="flex items-center gap-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              Log Call
+            </button>
           </div>
         </div>
       </div>
@@ -695,6 +725,23 @@ export default function OpportunityDetailPage({ params }: { params: { id: string
           <p className="text-xs text-gray-600">Generate a one-time signup link with a discount for this prospect.</p>
         )}
       </div>
+
+      {/* Objections */}
+      <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
+        <ObjectionsPanel opportunityId={opp.id} />
+      </div>
+
+      {/* Activity Timeline */}
+      <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
+        <ActivityTimeline opportunityId={opp.id} />
+      </div>
+
+      {showCallModal && (
+        <LogCallModal
+          opportunityId={opp.id}
+          onClose={() => setShowCallModal(false)}
+        />
+      )}
 
       {/* Transfer */}
       <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">

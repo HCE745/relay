@@ -1657,13 +1657,15 @@ model DemoCall {
   assignedToId    String?
   productInterest String?
 
-  organization  Organization?                @relation(fields: [organizationId], references: [id])
-  prospect      Prospect?                    @relation("ProspectDemoCalls", fields: [prospectId], references: [id], onDelete: SetNull)
-  crmEmails     CrmEmail[]
-  enrollments   CrmEmailSequenceEnrollment[]
-  assignedTo    SalesUser?                   @relation("DemoCallAssigned", fields: [assignedToId], references: [id])
-  opportunities CrmOpportunity[]             @relation("DemoCallOpportunities")
-  tasks         CrmTask[]                    @relation("DemoCallTasks")
+  organization    Organization?                @relation(fields: [organizationId], references: [id])
+  prospect        Prospect?                    @relation("ProspectDemoCalls", fields: [prospectId], references: [id], onDelete: SetNull)
+  crmEmails       CrmEmail[]
+  enrollments     CrmEmailSequenceEnrollment[]
+  assignedTo      SalesUser?                   @relation("DemoCallAssigned", fields: [assignedToId], references: [id])
+  opportunities   CrmOpportunity[]             @relation("DemoCallOpportunities")
+  tasks           CrmTask[]                    @relation("DemoCallTasks")
+  salesActivities SalesCrmActivity[]           @relation("DemoCallActivities")
+  objections      CrmObjection[]               @relation("DemoCallObjections")
 
   @@index([organizationId])
   @@index([scheduledAt])
@@ -2563,13 +2565,15 @@ model Prospect {
   assignedToId    String?
   productInterest String?
 
-  contacts      ProspectContact[]
-  notes         ProspectNote[]
-  linkClicks    LinkClick[]
-  demoCalls     DemoCall[]        @relation("ProspectDemoCalls")
-  assignedTo    SalesUser?        @relation("ProspectAssigned",      fields: [assignedToId], references: [id])
-  opportunities CrmOpportunity[]  @relation("ProspectOpportunities")
-  tasks         CrmTask[]         @relation("ProspectTasks")
+  contacts        ProspectContact[]
+  notes           ProspectNote[]
+  linkClicks      LinkClick[]
+  demoCalls       DemoCall[]          @relation("ProspectDemoCalls")
+  assignedTo      SalesUser?          @relation("ProspectAssigned",      fields: [assignedToId], references: [id])
+  opportunities   CrmOpportunity[]    @relation("ProspectOpportunities")
+  tasks           CrmTask[]           @relation("ProspectTasks")
+  salesActivities SalesCrmActivity[]  @relation("ProspectActivities")
+  objections      CrmObjection[]      @relation("ProspectObjections")
 
   @@index([aiFitScore])
   @@index([currentCrmStatus])
@@ -2592,6 +2596,16 @@ model ProspectContact {
   role                 String?
   roles                String[]             @default([])
   notes                String?              @db.Text
+  // Enrichment fields (Feature 1)
+  verifiedPhone        String?
+  directEmail          String?
+  emailConfidenceScore Int?                 // 0-100
+  jobLevel             String?              // C_SUITE/VP/DIRECTOR/MANAGER/INDIVIDUAL_CONTRIBUTOR/OTHER
+  department           String?              // OPERATIONS/MAINTENANCE/FACILITIES/IT/FINANCE/HR/OTHER
+  isPrimaryContact     Boolean              @default(false)
+  isDecisionMaker      Boolean              @default(false)
+  isChampion           Boolean              @default(false)
+  lastVerifiedAt       DateTime?
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 
@@ -2738,6 +2752,8 @@ model SalesUser {
   dailyActivity            SalesDailyActivity[] @relation("SalesUserDailyActivity")
   createdOffers            SalesOffer[]         @relation("SalesUserCreatedOffers")
   abTestCampaigns          AbTestCampaign[]     @relation("AbTestCampaignSalesUser")
+  salesActivities          SalesCrmActivity[]   @relation("SalesUserActivities")
+  objections               CrmObjection[]       @relation("SalesUserObjections")
 }
 
 model SalesSession {
@@ -2851,6 +2867,11 @@ model CrmOpportunity {
   commissionEligible     Boolean   @default(true)
   leadSource             String?   // OUTBOUND|INBOUND|REFERRAL|FOUNDER|EVENT|PARTNER|PERSONAL_NETWORK|OTHER
   sourceDetail           String?
+  // Qualification (Feature 6)
+  qualificationScore     Int?
+  qualificationStatus    String?   // UNQUALIFIED/MARKETING_QUALIFIED/SALES_QUALIFIED/OPPORTUNITY/DISQUALIFIED
+  qualifiedAt            DateTime?
+  disqualifiedReason     String?
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
@@ -2864,6 +2885,8 @@ model CrmOpportunity {
   transferLogs  CrmTransferLog[]    @relation("OpportunityTransferLogs")
   transferReqs  CrmTransferRequest[] @relation("OpportunityTransferReqs")
   offers        SalesOffer[]        @relation("OpportunityOffers")
+  objections    CrmObjection[]      @relation("OpportunityObjections")
+  salesActivities SalesCrmActivity[] @relation("OpportunityActivities")
 
   @@index([assignedToId])
   @@index([stage])
@@ -3461,4 +3484,58 @@ model DashboardAlert {
 
   @@index([organizationId])
   @@index([isActive])
+}
+
+// ─── Sales CRM Activity Timeline (Feature 2) ────────────────────────────────
+
+model SalesCrmActivity {
+  id              String    @id @default(cuid())
+  prospectId      String?
+  demoCallId      String?
+  opportunityId   String?
+  salesUserId     String?
+  activityType    String    // EMAIL_SENT/EMAIL_RECEIVED/LINKEDIN_VIEW/LINKEDIN_MESSAGE/CALL_ATTEMPTED/CALL_CONNECTED/MEETING_HELD/NOTE_ADDED/TOUR_VIEWED/PRICING_VIEWED/DEMO_COMPLETED/TASK_COMPLETED/STATUS_CHANGED
+  subject         String?
+  notes           String?   @db.Text
+  outcome         String?
+  durationMinutes Int?
+  metadata        Json?
+  occurredAt      DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+
+  prospect    Prospect?       @relation("ProspectActivities",   fields: [prospectId],    references: [id], onDelete: SetNull)
+  demoCall    DemoCall?       @relation("DemoCallActivities",   fields: [demoCallId],    references: [id], onDelete: SetNull)
+  opportunity CrmOpportunity? @relation("OpportunityActivities", fields: [opportunityId], references: [id], onDelete: SetNull)
+  salesUser   SalesUser?      @relation("SalesUserActivities", fields: [salesUserId],   references: [id], onDelete: SetNull)
+
+  @@index([prospectId])
+  @@index([demoCallId])
+  @@index([opportunityId])
+  @@index([salesUserId])
+  @@index([occurredAt])
+}
+
+// ─── CRM Objection Tracking (Feature 5) ─────────────────────────────────────
+
+model CrmObjection {
+  id             String    @id @default(cuid())
+  prospectId     String?
+  demoCallId     String?
+  opportunityId  String?
+  salesUserId    String
+  objectionType  String    // PRICE/BUDGET/TIMING/COMPETITOR/NO_PAIN/TECHNICAL/COMPLIANCE/INTERNAL_POLITICS/OTHER
+  objectionText  String    @db.Text
+  responseGiven  String?   @db.Text
+  wasResolved    Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+
+  prospect    Prospect?       @relation("ProspectObjections",   fields: [prospectId],    references: [id], onDelete: SetNull)
+  demoCall    DemoCall?       @relation("DemoCallObjections",   fields: [demoCallId],    references: [id], onDelete: SetNull)
+  opportunity CrmOpportunity? @relation("OpportunityObjections", fields: [opportunityId], references: [id], onDelete: SetNull)
+  salesUser   SalesUser       @relation("SalesUserObjections", fields: [salesUserId],   references: [id], onDelete: Cascade)
+
+  @@index([prospectId])
+  @@index([demoCallId])
+  @@index([opportunityId])
+  @@index([salesUserId])
 }

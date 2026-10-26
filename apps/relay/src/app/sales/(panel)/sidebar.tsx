@@ -46,8 +46,9 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
     {
       label: "Analytics",
       items: [
-        { label: "Demo Analytics",  href: "/sales/demo-analytics",   icon: BarChart2 },
-        { label: "Sales Analytics", href: "/sales/sales-analytics",  icon: TrendingUp },
+        { label: "Demo Analytics",    href: "/sales/demo-analytics",   icon: BarChart2 },
+        { label: "Sales Analytics",   href: "/sales/sales-analytics",  icon: TrendingUp },
+        { label: "Campaign Reporting", href: "/sales/campaigns",        icon: TrendingUp },
       ],
     },
     {

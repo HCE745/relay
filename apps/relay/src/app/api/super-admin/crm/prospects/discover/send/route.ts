@@ -62,13 +62,28 @@ export async function POST(req: NextRequest) {
     select: { id: true, companyName: true },
   })
 
+  // 4. Contact email dedup across ProspectContacts
+  const existingPhoneContact = await prisma.prospectContact.findFirst({
+    where: { email: { equals: to, mode: "insensitive" } },
+    select: { id: true, prospect: { select: { id: true, companyName: true } } },
+  })
+
+  const signals: string[] = []
+  if (existingProspect)    signals.push("Company name match")
+  if (existingEmailContact) signals.push("Email already contacted")
+  if (existingDemoCall)    signals.push("DemoCall already exists")
+  if (existingPhoneContact && !existingEmailContact) signals.push("Contact email already in CRM")
+
+  const isDuplicate = existingProspect || existingEmailContact || existingDemoCall || existingPhoneContact
+
   // Return duplicate info but let the client decide whether to proceed (force=true skips this)
-  if (!force && (existingProspect || existingEmailContact || existingDemoCall)) {
+  if (!force && isDuplicate) {
     return NextResponse.json({
       duplicate: true,
-      prospectId:    existingProspect?.id ?? null,
+      prospectId:    existingProspect?.id ?? existingPhoneContact?.prospect?.id ?? null,
       demoCallId:    existingEmailContact?.demoCall?.id ?? existingDemoCall?.id ?? null,
       companyName:   existingProspect?.companyName ?? existingEmailContact?.demoCall?.companyName ?? existingDemoCall?.companyName ?? null,
+      signals,
     }, { status: 409 })
   }
 

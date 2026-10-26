@@ -1,6 +1,7 @@
 import "server-only"
 import { prisma } from "@/lib/prisma"
 import { decryptField } from "@/lib/crypto-utils"
+import { createSalesActivity } from "@/lib/sales-activities"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -320,6 +321,18 @@ async function processMessage(
 
   if (!threadId) {
     await prisma.crmEmail.update({ where: { id: created.id }, data: { threadId: created.id } })
+  }
+
+  // Create sales activity for timeline
+  if (direction === "received" || direction === "sent") {
+    createSalesActivity({
+      demoCallId:   demoCall?.id ?? null,
+      salesUserId:  null,
+      activityType: direction === "received" ? "EMAIL_RECEIVED" : "EMAIL_SENT",
+      subject:      msg.subject,
+      notes:        direction === "received" ? `Received from ${msg.from}` : `Sent to ${msg.to}`,
+      occurredAt:   msg.sentAt,
+    }).catch(err => console.error("[imap-sync] activity creation failed:", err))
   }
 
   // A/B test reply tracking: if this is a received email replying to an A/B test email, increment repliesReceived

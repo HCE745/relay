@@ -21,6 +21,7 @@ import { ChangeOrdersPanel } from "@/components/work-orders/change-orders-panel"
 import { listChangeOrders } from "@/lib/data/change-orders"
 import { listJobCustody } from "@/lib/data/custody"
 import { listJobEarnings } from "@/lib/data/commission"
+import { sopsForSite } from "@/lib/data/sops"
 
 export const dynamic = "force-dynamic"
 
@@ -73,6 +74,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   // Commission/crew-based earnings (Phase 37), managers only, gated by capability.
   const showEarnings = canManage && (await orgHasCapability(orgId, "workforce.commissionPay"))
   const earnings = showEarnings ? await listJobEarnings(orgId, id) : []
+
+  // Site procedures (Phase 39): SOPs posted to this site, alongside access notes.
+  const showSops = await orgHasCapability(orgId, "operations.sopLibrary")
+  const siteSops = showSops ? await sopsForSite(orgId, job.serviceLocationId) : []
 
   return (
     <div className="space-y-6">
@@ -154,6 +159,20 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           jobId={job.id}
           changeOrders={changeOrders.map((co) => ({ id: co.id, description: co.description, amount: co.amount.toFixed(2), status: co.status, requiresCustomerApproval: co.requiresCustomerApproval, approvedByPortal: co.approvedByPortal }))}
         />
+      ) : null}
+
+      {showSops && siteSops.length > 0 ? (
+        <Card className="p-5">
+          <h2 className="mb-3 text-sm font-semibold text-slate-700">Site procedures</h2>
+          <ul className="space-y-1.5">
+            {siteSops.map((s) => (
+              <li key={s.id}>
+                <Link href={`/sops/${s.id}`} className="text-sm font-medium text-brand hover:underline">{s.title}</Link>
+                <span className="ml-2 text-xs text-slate-400">{s.category.toLowerCase().replace(/_/g, " ")}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
       ) : null}
 
       {showCustody && custodyItems.length > 0 ? (

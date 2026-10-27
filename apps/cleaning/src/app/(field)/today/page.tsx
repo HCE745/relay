@@ -8,6 +8,7 @@ import { formatTimeInZone } from "@/lib/scheduling/time"
 import { orgHasCapability } from "@/lib/page-guards"
 import { isSmsConfigured } from "@/lib/sms"
 import { getUserPrefs } from "@/lib/data/notifications"
+import { outstandingAcks } from "@/lib/data/sops"
 import { TimeOffRequest } from "@/components/field/time-off-request"
 import { NotificationPrefs } from "@/components/notifications/notification-prefs"
 
@@ -61,12 +62,14 @@ export default async function TodayPage() {
   const dayStart = now.startOf("day").toJSDate()
   const dayEnd = now.endOf("day").toJSDate()
 
-  const [jobs, canCoverage, hasNotifications, prefs] = await Promise.all([
+  const [jobs, canCoverage, hasNotifications, prefs, hasSops] = await Promise.all([
     listCleanerDayJobs(orgId, session.userId, dayStart, dayEnd),
     orgHasCapability(orgId, "workforce.coverage"),
     orgHasCapability(orgId, "workforce.notifications"),
     getUserPrefs(orgId, session.userId),
+    orgHasCapability(orgId, "operations.sopLibrary"),
   ])
+  const outstandingSops = hasSops ? (await outstandingAcks(orgId, session.userId, session.role)).length : 0
   const cleanerPrefs = prefs.filter((p) => p.roles === "all") // staff-wide events only for cleaners
   const inProgress = jobs.filter((j) => j.status === "IN_PROGRESS")
   const completed = jobs.filter((j) => j.status === "COMPLETED")
@@ -88,6 +91,15 @@ export default async function TodayPage() {
         <h1 className="text-2xl font-semibold text-slate-900">Today&apos;s Work</h1>
         <p className="mt-0.5 text-sm text-slate-500">{now.toFormat("cccc, LLLL d")}</p>
       </div>
+
+      {hasSops ? (
+        <Link href="/my-sops" className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 active:bg-slate-50">
+          <span className="text-sm font-semibold text-slate-800">Procedures &amp; safety</span>
+          {outstandingSops > 0
+            ? <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">{outstandingSops} to acknowledge</span>
+            : <span className="text-xs text-slate-400">Search &amp; read →</span>}
+        </Link>
+      ) : null}
 
       {jobs.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">

@@ -25,6 +25,7 @@ const NAV_ICON: Record<string, (p: { className?: string }) => React.ReactNode> =
   access: TagIcon,
   inspections: ClipboardCheckIcon,
   issues: AlertTriangleIcon,
+  sops: ClipboardListIcon,
   "service-areas": MapPinIcon,
   "service-requests": InboxIcon,
   satisfaction: ChartBarIcon,

@@ -488,6 +488,9 @@ model Organization {
   custodyEvents       CustodyEvent[]
   payRules            PayRule[]
   jobEarnings         JobEarning[]
+  sops                Sop[]
+  sopAcknowledgments  SopAcknowledgment[]
+  sopIssueMappings    SopIssueMapping[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -533,6 +536,7 @@ model User {
   custodyRecorded      CustodyEvent[]     @relation("CustodyRecorder")
   payRules             PayRule[]          @relation("PayRuleEmployee")
   jobEarnings          JobEarning[]       @relation("JobEarningWorker")
+  sopAcknowledgments   SopAcknowledgment[] @relation("SopAckUser")
   performedMaintenance AssetMaintenance[] @relation("MaintenancePerformer")
   recordedSupplyUsages SupplyUsage[]      @relation("SupplyUsageRecorder")
   supplyAdjustments    SupplyAdjustment[] @relation("SupplyAdjuster")
@@ -2437,5 +2441,138 @@ model Contract {
   @@index([organizationId])
   @@index([customerId])
   @@index([status])
+  @@schema("cleaning")
+}
+
+// ─── SOP library (Phase 39): procedures, versioning, acknowledgment, search ──
+// No AI anywhere: search returns the org's own approved text, never generated.
+enum SopCategory {
+  SAFETY
+  CHEMICAL
+  EQUIPMENT
+  SERVICE_PROCEDURE
+  SITE_SPECIFIC
+  HR
+  EMERGENCY
+
+  @@schema("cleaning")
+}
+
+enum SopStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+
+  @@schema("cleaning")
+}
+
+// A logical SOP document (stable across versions). Applicability targets who it
+// is for. Editing a PUBLISHED SOP creates a new immutable SopVersion.
+model Sop {
+  id             String      @id @default(cuid())
+  organizationId String
+  title          String
+  category       SopCategory
+  status         SopStatus   @default(DRAFT)
+  currentVersion Int         @default(1)
+  effectiveDate  DateTime?
+  keywords       String?
+  attachmentUrl  String? // optional link to a PDF/diagram/SDS; content is what's searched
+  requiresAck    Boolean     @default(false)
+  reackIntervalDays Int? // optional re-acknowledgment interval (e.g. 365 for annual)
+  // Applicability: everyone, or any of these role / site / service-plan targets.
+  appliesEveryone      Boolean  @default(true)
+  appliesRoles         String[] @default([])
+  appliesSiteIds       String[] @default([])
+  appliesServicePlanIds String[] @default([])
+  createdById    String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  versions        SopVersion[]
+  acknowledgments SopAcknowledgment[]
+  issueMappings   SopIssueMapping[]
+
+  @@index([organizationId, status])
+  @@schema("cleaning")
+}
+
+// An immutable snapshot of an SOP at one version — readable forever, so an
+// incident shows the procedure exactly as it stood that day.
+model SopVersion {
+  id             String      @id @default(cuid())
+  organizationId String
+  sopId          String
+  version        Int
+  title          String
+  category       SopCategory
+  keywords       String?
+  effectiveDate  DateTime?
+  attachmentUrl  String?
+  publishedAt    DateTime? // set when this version was published (null for a draft)
+  createdById    String?
+  createdAt      DateTime    @default(now())
+
+  sop      Sop          @relation(fields: [sopId], references: [id], onDelete: Cascade)
+  sections SopSection[]
+
+  @@unique([sopId, version])
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// One ordered section of a version. Sections are the unit of search and linking.
+// (A raw tsvector generated column + GIN index is added in the migration and is
+// not represented here; FTS runs via $queryRaw.)
+model SopSection {
+  id             String @id @default(cuid())
+  organizationId String
+  sopVersionId   String
+  orderIndex     Int
+  heading        String
+  body           String
+  // Denormalized from the parent version so a title/keyword hit returns sections.
+  sopTitle       String @default("")
+  keywords       String @default("")
+
+  version SopVersion @relation(fields: [sopVersionId], references: [id], onDelete: Cascade)
+
+  @@index([sopVersionId])
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// Immutable proof a named person read a named version on a date.
+model SopAcknowledgment {
+  id             String   @id @default(cuid())
+  organizationId String
+  sopId          String
+  userId         String
+  version        Int
+  acknowledgedAt DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sop          Sop          @relation(fields: [sopId], references: [id], onDelete: Cascade)
+  user         User         @relation("SopAckUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sopId, userId, version])
+  @@index([organizationId, userId])
+  @@schema("cleaning")
+}
+
+// Admin-configured lookup: an issue category surfaces these SOPs (no inference).
+model SopIssueMapping {
+  id             String        @id @default(cuid())
+  organizationId String
+  issueCategory  IssueCategory
+  sopId          String
+  createdAt      DateTime      @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sop          Sop          @relation(fields: [sopId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, issueCategory, sopId])
+  @@index([organizationId])
   @@schema("cleaning")
 }

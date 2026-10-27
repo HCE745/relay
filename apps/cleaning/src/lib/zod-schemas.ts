@@ -272,6 +272,30 @@ export const payRuleSchema = z.object({
   effectiveFrom: z.coerce.date().optional(),
 })
 
+// SOP library (Phase 39).
+export const SOP_CATEGORIES = ["SAFETY", "CHEMICAL", "EQUIPMENT", "SERVICE_PROCEDURE", "SITE_SPECIFIC", "HR", "EMERGENCY"] as const
+export const sopSectionSchema = z.object({
+  heading: z.string().trim().min(1, "Section heading is required").max(200),
+  body: z.string().trim().min(1, "Section body is required").max(20000),
+})
+export const sopSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200),
+  category: z.enum(SOP_CATEGORIES),
+  keywords: optionalString,
+  attachmentUrl: optionalString,
+  requiresAck: z.boolean().default(false),
+  reackIntervalDays: z.coerce.number().int().min(1).max(3650).nullable().optional(),
+  appliesEveryone: z.boolean().default(true),
+  appliesRoles: z.array(z.enum(["OWNER", "ADMIN", "MANAGER", "SUPERVISOR", "CLEANER"])).default([]),
+  appliesSiteIds: z.array(z.string()).default([]),
+  appliesServicePlanIds: z.array(z.string()).default([]),
+  sections: z.array(sopSectionSchema).min(1, "Add at least one section"),
+})
+export const sopMappingSchema = z.object({
+  issueCategory: z.enum(["QUALITY", "SAFETY", "EQUIPMENT", "SUPPLIES", "ACCESS", "CUSTOMER", "OTHER"]),
+  sopId: z.string().min(1),
+})
+
 export const custodyActionSchema = z.object({
   kind: z.enum(["ACCESS", "ASSET"]),
   itemId: z.string().min(1),

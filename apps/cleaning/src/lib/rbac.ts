@@ -50,6 +50,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "access",      label: "Access & keys", href: "/access",     requiredCap: "operations.accessControl" },
   { key: "inspections", label: "Inspections", href: "/inspections", requiredCap: "quality.inspections" },
   { key: "issues",      label: "Issues",      href: "/issues",      requiredCap: "operations.issues" },
+  { key: "sops",        label: "SOPs",        href: "/sops",        requiredCap: "operations.sopLibrary" },
   { key: "service-requests", label: "Service requests", href: "/service-requests", requiredCap: "core.jobs" },
   { key: "service-areas", label: "Service areas", href: "/service-areas", requiredCap: "operations.serviceAreas" },
   { key: "quotes",      label: "Quotes",      href: "/quotes",      requiredCap: "crm.quoting", section: "Sales" },

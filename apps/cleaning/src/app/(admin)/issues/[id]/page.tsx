@@ -6,6 +6,7 @@ import { canViewSchedule, canManageAccounts } from "@/lib/rbac"
 import { getIssue, listIssueActivity } from "@/lib/data/issues"
 import { listUsers } from "@/lib/data/users"
 import { listAssets } from "@/lib/data/assets"
+import { sopsForIssueCategory } from "@/lib/data/sops"
 import { getOrgTimezone } from "@/lib/data/org"
 import { orgHasCapability } from "@/lib/page-guards"
 import { PageHeader } from "@/components/ui/placeholder"
@@ -43,6 +44,12 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
   // Asset linking only when the org has the asset register.
   const assets = hasAssets
     ? (await listAssets(orgId)).map((a) => ({ id: a.id, name: a.name }))
+    : []
+
+  // Procedures mapped to this issue's category (Phase 39), shown inline to
+  // whoever is resolving it; the mapping persists so a closed issue still shows it.
+  const mappedSops = (await orgHasCapability(orgId, "operations.sopLibrary"))
+    ? await sopsForIssueCategory(orgId, issue.category)
     : []
 
   return (
@@ -122,6 +129,20 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
           </div>
         ) : null}
       </Card>
+
+      {mappedSops.length > 0 ? (
+        <Card className="border-brand-200 bg-brand-50/40 p-5">
+          <h2 className="mb-2 text-sm font-semibold text-brand-900">Procedures for this issue</h2>
+          <ul className="space-y-1.5">
+            {mappedSops.map((s) => (
+              <li key={s.id}>
+                <Link href={`/sops/${s.id}`} className="text-sm font-medium text-brand hover:underline">{s.title}</Link>
+                <span className="ml-2 text-xs text-slate-500">{s.category.toLowerCase().replace(/_/g, " ")}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
 
       <Card className="space-y-4 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">

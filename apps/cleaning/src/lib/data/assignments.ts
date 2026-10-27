@@ -4,6 +4,7 @@ import { notifyUserEventSafe } from "../notifications/dispatch"
 import { getComplianceConfig, checkAssignmentCompliance } from "./compliance"
 import { CREDENTIAL_TYPE_LABELS } from "../credential-status"
 import { recomputeJobEarnings } from "./commission"
+import { sopAssignmentWarnings } from "./sops"
 
 // Cleaner ↔ Job assignment management. Validates that both the Job and the
 // cleaner belong to the authenticated org and that the cleaner is an active
@@ -70,6 +71,9 @@ export async function assignCleaner(orgId: string, jobId: string, userId: string
     }
     credentialWarnings.push(...msgs)
   }
+
+  // Warn (do not block) on unacknowledged required SOPs for this site (Phase 39).
+  credentialWarnings.push(...(await sopAssignmentWarnings(orgId, userId, "CLEANER", job!.serviceLocationId)))
 
   try {
     await db.jobAssignment.create({ data: { organizationId: orgId, jobId, userId, status: "ASSIGNED" } })

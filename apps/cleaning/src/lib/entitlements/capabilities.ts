@@ -25,6 +25,7 @@ export const CAPABILITIES = [
   "quality.inspections",
   "operations.issues",
   "operations.accessControl", // key & access management (encrypted codes)
+  "operations.sopLibrary", // SOP library: procedures, versioning, acknowledgment, section search
   "workforce.payrollExport", // export/integration only — never payroll processing
   "workforce.commissionPay", // commission / crew-based pay rules + earnings (export only)
   "workforce.coverage", // shift coverage: availability, callouts, reassignment

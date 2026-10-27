@@ -434,6 +434,29 @@ async function seedExtras(
     }
   }
 
+  // ── SOP library (Phase 39): two published procedures (one requires ack), an
+  // issue-category mapping, and one cleaner who has acknowledged. ──
+  const sopSeed = async (title: string, category: "CHEMICAL" | "SERVICE_PROCEDURE", keywords: string, requiresAck: boolean, sections: { heading: string; body: string }[], siteIds: string[] = []) => {
+    const sop = await systemDb.sop.create({ data: { organizationId: orgId, title, category, status: "PUBLISHED", currentVersion: 1, keywords, requiresAck, reackIntervalDays: requiresAck ? 365 : null, appliesEveryone: siteIds.length === 0, appliesSiteIds: siteIds, effectiveDate: days(-30), createdById: staff.managerId }, select: { id: true } })
+    const v = await systemDb.sopVersion.create({ data: { organizationId: orgId, sopId: sop.id, version: 1, title, category, keywords, effectiveDate: days(-30), publishedAt: days(-30), createdById: staff.managerId }, select: { id: true } })
+    await systemDb.sopSection.createMany({ data: sections.map((s, i) => ({ organizationId: orgId, sopVersionId: v.id, orderIndex: i, heading: s.heading, body: s.body, sopTitle: title, keywords })) })
+    return sop.id
+  }
+  const spillId = await sopSeed("Chemical Spill Response", "CHEMICAL", "spill, containment, PPE, hazard", true, [
+    { heading: "Step 1: Assess the hazard", body: "Identify the chemical from its label or SDS. Keep people away from the area. Do not touch the spill without the right PPE." },
+    { heading: "Step 2: Put on PPE", body: "Gloves, eye protection, and a mask appropriate to the chemical. Check the SDS for the required protection." },
+    { heading: "Step 3: Contain the spill", body: "Ring the spill with absorbent socks or pads working from the outside in, so it cannot spread to drains." },
+    { heading: "Step 4: Clean up and dispose", body: "Absorb the liquid, bag the waste per the SDS, and label it. Do not pour chemicals down a drain." },
+    { heading: "Step 5: Report it", body: "Report the spill to your supervisor and file an issue in the app with photos." },
+  ])
+  await sopSeed("Restroom Cleaning Procedure", "SERVICE_PROCEDURE", "restroom, toilet, disinfect, restock", false, [
+    { heading: "Stock and set up", body: "Post the wet-floor sign. Gather disinfectant, bowl cleaner, cloths, and restock supplies." },
+    { heading: "Clean top to bottom", body: "Mirrors and dispensers first, then sinks and fixtures, then toilets and urinals, then the floor last." },
+    { heading: "Restock and sign off", body: "Refill soap, towels, and paper. Complete the checklist in the app." },
+  ])
+  await systemDb.sopIssueMapping.create({ data: { organizationId: orgId, issueCategory: "SAFETY", sopId: spillId } })
+  await systemDb.sopAcknowledgment.create({ data: { organizationId: orgId, sopId: spillId, userId: staff.cleanerIds[0], version: 1 } })
+
   // ── Coverage: an upcoming job whose assigned cleaner is unavailable → NEEDS COVERAGE ──
   // Anchor to tomorrow's UTC midnight so the job's date and the availability day
   // always match (adding hours to `now` could roll past midnight).

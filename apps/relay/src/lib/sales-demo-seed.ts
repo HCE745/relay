@@ -20,6 +20,8 @@ export async function clearDemoData(salesUserId: string) {
   await prisma.crmTask.deleteMany({ where: { assignedToId: salesUserId } })
   await prisma.crmOpportunity.deleteMany({ where: { assignedToId: salesUserId } })
   await prisma.crmEmail.deleteMany({ where: { sentBySalesUserId: salesUserId } })
+  // Also purge any orphaned emails from other past demo users (handles stale re-seeds)
+  await prisma.crmEmail.deleteMany({ where: { sentBySalesUser: { isDemo: true } } })
   // Also delete received emails to the demo's contacts (linked by demoCallId)
   const demoCalls = await prisma.demoCall.findMany({
     where: { assignedToId: salesUserId },

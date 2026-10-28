@@ -34,7 +34,11 @@ export async function GET(req: NextRequest) {
   // Unread count shortcut
   if (unread) {
     const count = await prisma.crmEmail.count({
-      where: { direction: "received", isRead: false },
+      where: {
+        direction: "received",
+        isRead: false,
+        OR: [{ sentBySalesUserId: null }, { sentBySalesUser: { isDemo: false } }],
+      },
     })
     return NextResponse.json({ count })
   }
@@ -43,11 +47,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "demoCallId, contactEmail, or all=true required" }, { status: 400 })
   }
 
+  // For global inbox/sent views (all=true), exclude emails seeded by the demo sales user
+  // so they don't pollute Will's real inbox. Per-call and per-contact views still show everything.
+  const demoExclude = (!demoCallId && !contactEmail)
+    ? { NOT: { sentBySalesUser: { isDemo: true } } }
+    : {}
+
   // demoCallId queries: include archived (shown with badge in contact timeline), exclude deleted
   // main/all queries: exclude both deleted and archived
   const baseFilter = demoCallId || contactEmail
-    ? { isDeleted: false }
-    : { isDeleted: false, isArchived: false }
+    ? { isDeleted: false, ...demoExclude }
+    : { isDeleted: false, isArchived: false, ...demoExclude }
 
   const where = demoCallId
     ? { demoCallId, ...baseFilter, ...(direction ? { direction } : {}) }

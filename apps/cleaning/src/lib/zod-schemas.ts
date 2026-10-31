@@ -181,6 +181,18 @@ export const planTaxabilitySchema = z.object({
   taxRateId: z.string().min(1).nullable().optional(),
 })
 
+// ─── Phase 43: shift differentials ───────────────────────────────────────────
+export const DIFFERENTIAL_AMOUNT_TYPES = ["PERCENT", "FLAT_PER_HOUR"] as const
+export const shiftDifferentialSchema = z.object({
+  name: z.string().trim().min(1, "A rule name is required").max(120),
+  startTime: timeString,
+  endTime: timeString,
+  daysOfWeek: z.array(z.coerce.number().int().min(0).max(6)).max(7).optional().default([]),
+  amountType: z.enum(DIFFERENTIAL_AMOUNT_TYPES),
+  value: z.string().trim().regex(/^\d{1,6}(\.\d{1,4})?$/, "Enter a number like 10 or 2.50"),
+})
+export const shiftDifferentialUpdateSchema = shiftDifferentialSchema.partial().extend({ isActive: z.boolean().optional() })
+
 // ─── Phase 41: payroll period locking ────────────────────────────────────────
 export const payPeriodCreateSchema = z
   .object({ start: dateString, end: dateString })
@@ -249,6 +261,8 @@ export const orgSettingsSchema = z.object({
   correctiveOnCriticalOnly: z.boolean().optional(),
   correctiveDueDaysStandard: z.coerce.number().int().min(1).max(60).optional(),
   correctiveDueDaysCritical: z.coerce.number().int().min(1).max(60).optional(),
+  // Labor burden (Phase 43): a percent the user types ("25" or "22.5"); stored as a fraction.
+  laborBurdenPct: z.string().trim().regex(/^\d{1,3}(\.\d{1,2})?$/, "Enter a percent like 25").optional(),
 })
 
 // ─── Compliance & credentials (Phase 13) ───

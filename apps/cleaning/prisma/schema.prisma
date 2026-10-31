@@ -154,6 +154,15 @@ enum PayPeriodStatus {
   @@schema("cleaning")
 }
 
+// Shift differential premium type (Phase 43): a percentage of the base rate, or
+// a flat dollar amount per eligible hour.
+enum DifferentialAmountType {
+  PERCENT
+  FLAT_PER_HOUR
+
+  @@schema("cleaning")
+}
+
 enum ServiceFrequency {
   ONE_TIME
   DAILY
@@ -426,6 +435,10 @@ model Organization {
   otWeeklyThresholdHours Int?    @default(40)
   otDailyThresholdHours  Int?
   otMultiplier           Decimal @default(1.5) @db.Decimal(4, 2)
+  // Labor burden (Phase 43): employer taxes, insurance and workers comp as a
+  // fraction of labor cost (0.25 = 25%), applied for COSTING/profitability only
+  // — never payroll. 0 = off (unburdened).
+  laborBurdenPct         Decimal @default(0) @db.Decimal(5, 4)
   // Exception-alert tuning (Phase 25). Uncovered shifts within this many hours
   // alert managers; a job this many minutes past its start with nobody clocked
   // in alerts the supervisor + managers.
@@ -508,6 +521,7 @@ model Organization {
   sopIssueMappings    SopIssueMapping[]
   taxRates            TaxRate[]
   payPeriods          PayPeriod[]
+  shiftDifferentialRules ShiftDifferentialRule[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -990,6 +1004,11 @@ model TimeEntry {
   // rewrite historical labor cost (same snapshot pattern as invoice lines).
   approvedPayRate Decimal? @db.Decimal(10, 2)
   approvedPayType String?
+  // Shift-differential premium snapshot (Phase 43): the extra $ earned on this
+  // entry from differential rules, plus a human note of which applied. Cost/
+  // export only — never payroll processing.
+  approvedDifferential     Decimal? @db.Decimal(10, 2)
+  approvedDifferentialNote String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -1744,6 +1763,34 @@ model InspectionItemResult {
 }
 
 // ─── Billing: Invoices / AR (Phase 2) ────────────────────────────────────────
+
+// Shift differential rules (Phase 43). A premium on approved hours that fall in
+// a time window (nights) and/or on given weekdays (weekends). The earned premium
+// is SNAPSHOTTED onto the time entry at approval (TimeEntry.approvedDifferential)
+// so later rule edits never rewrite historical labor cost. BOUNDARY: this
+// produces cost/export figures only — it does not calculate or process payroll.
+model ShiftDifferentialRule {
+  id             String                 @id @default(cuid())
+  organizationId String
+  name           String
+  // Daily window in LOCAL minutes-from-midnight [startMinute, endMinute). When
+  // startMinute > endMinute the window wraps past midnight (e.g. 22:00–06:00).
+  startMinute    Int
+  endMinute      Int
+  // Weekdays the rule applies to (0=Sun..6=Sat); empty = every day.
+  daysOfWeek     Int[]                  @default([])
+  amountType     DifferentialAmountType @default(PERCENT)
+  value          Decimal                @db.Decimal(10, 4) // percent (10 = 10%) or $/hour
+  priority       Int                    @default(100)
+  isActive       Boolean                @default(true)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
 
 // Payroll period locking (Phase 41). A locked period freezes the time entries,
 // corrections, approvals and commission earnings whose work date falls inside

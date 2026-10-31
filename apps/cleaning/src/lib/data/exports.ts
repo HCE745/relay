@@ -59,24 +59,34 @@ async function hoursRows(orgId: string, start: Date, end: Date): Promise<ExportH
 
 // Hours + commission/flat earnings as distinct columns (Phase 37).
 async function payrollRows(orgId: string, start: Date, end: Date): Promise<ExportPayrollRow[]> {
-  const [hours, earnings] = await Promise.all([
+  const [hours, earnings, diffs] = await Promise.all([
     hoursRows(orgId, start, end),
     orgDb(orgId).jobEarning.groupBy({
       by: ["userId", "status"],
       where: { job: { scheduledStart: { gte: start, lte: end } } },
       _sum: { amount: true }, _count: true,
     }),
+    // Shift-differential premiums (Phase 43), snapshotted at approval.
+    orgDb(orgId).timeEntry.groupBy({
+      by: ["userId"],
+      where: { status: "APPROVED", clockInAt: { gte: start, lte: end }, approvedDifferential: { not: null } },
+      _sum: { approvedDifferential: true },
+    }),
   ])
-  type Agg = { name: string; email: string | null; regular: string; ot: string; calc: number; pending: number; jobs: number }
+  type Agg = { name: string; email: string | null; regular: string; ot: string; diff: number; calc: number; pending: number; jobs: number }
   const byUser = new Map<string, Agg>()
   for (const h of hours) {
-    byUser.set(h.employeeId, { name: `${h.firstName} ${h.lastName}`.trim(), email: h.email, regular: h.regularHours, ot: h.overtimeHours, calc: 0, pending: 0, jobs: 0 })
+    byUser.set(h.employeeId, { name: `${h.firstName} ${h.lastName}`.trim(), email: h.email, regular: h.regularHours, ot: h.overtimeHours, diff: 0, calc: 0, pending: 0, jobs: 0 })
   }
   // Names for earners who have no approved hours in the window.
-  const extraIds = earnings.map((e) => e.userId).filter((id) => !byUser.has(id))
+  const extraIds = [...earnings.map((e) => e.userId), ...diffs.map((d) => d.userId)].filter((id) => !byUser.has(id))
   if (extraIds.length) {
     const users = await orgDb(orgId).user.findMany({ where: { id: { in: extraIds } }, select: { id: true, name: true, email: true } })
-    for (const u of users) byUser.set(u.id, { name: u.name, email: u.email, regular: "0", ot: "0", calc: 0, pending: 0, jobs: 0 })
+    for (const u of users) byUser.set(u.id, { name: u.name, email: u.email, regular: "0", ot: "0", diff: 0, calc: 0, pending: 0, jobs: 0 })
+  }
+  for (const d of diffs) {
+    const agg = byUser.get(d.userId)
+    if (agg) agg.diff += Number(d._sum.approvedDifferential ?? 0)
   }
   for (const e of earnings) {
     const agg = byUser.get(e.userId)
@@ -87,6 +97,7 @@ async function payrollRows(orgId: string, start: Date, end: Date): Promise<Expor
   }
   return [...byUser.entries()].map(([employeeId, a]) => ({
     employeeId, name: a.name, email: a.email, regularHours: a.regular, overtimeHours: a.ot,
+    differentialEarnings: a.diff.toFixed(2),
     commissionEarnings: a.calc.toFixed(2), jobsWithEarnings: a.jobs, pendingEarnings: a.pending.toFixed(2),
   }))
 }

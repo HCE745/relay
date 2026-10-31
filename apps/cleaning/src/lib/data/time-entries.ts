@@ -2,6 +2,9 @@ import { orgDb } from "../org-db"
 import { assertFound, ConflictError } from "./errors"
 import { recordAudit } from "./audit"
 import { assertDateUnlocked } from "./pay-periods"
+import { activeDifferentialRules } from "./shift-differentials"
+import { getOrgTimezone } from "./org"
+import { computeDifferential } from "../shift-differentials"
 
 // Management Time: review, approve/reapprove, correct (audited), export. NOT
 // payroll — no tax/pay calculation. Durations are derived from timestamps, so a
@@ -31,7 +34,10 @@ export async function approveTimeEntry(orgId: string, entryId: string, approverI
   const db = orgDb(orgId)
   const e = await db.timeEntry.findFirst({
     where: { id: entryId },
-    select: { id: true, status: true, clockInAt: true, clockOutAt: true, userId: true },
+    select: {
+      id: true, status: true, clockInAt: true, clockOutAt: true, breakMinutes: true, userId: true,
+      job: { select: { serviceLocation: { select: { timezone: true } } } },
+    },
   })
   assertFound(e, "Time entry")
   if (e!.status === "OPEN" || e!.clockOutAt == null) throw new ConflictError("Cannot approve an open time entry")
@@ -43,14 +49,28 @@ export async function approveTimeEntry(orgId: string, entryId: string, approverI
     where: { id: e!.userId },
     select: { employeeProfile: { select: { payRate: true, payType: true } } },
   })
+  // Phase 43: snapshot the shift-differential premium earned on this entry. Hourly
+  // only (salaried time has no hourly base to premium); cost/export only.
+  const payType = worker?.employeeProfile?.payType ?? null
+  const payRate = worker?.employeeProfile?.payRate ?? null
+  let differential = null as Awaited<ReturnType<typeof computeDifferential>> | null
+  if (payType !== "SALARY") {
+    const rules = await activeDifferentialRules(orgId)
+    if (rules.length) {
+      const tz = e!.job?.serviceLocation?.timezone ?? (await getOrgTimezone(orgId))
+      differential = computeDifferential({ clockInAt: e!.clockInAt, clockOutAt: e!.clockOutAt, breakMinutes: e!.breakMinutes }, payRate, tz, rules)
+    }
+  }
   await db.timeEntry.updateMany({
     where: { id: entryId },
     data: {
       status: "APPROVED",
       approvedById: approverId,
       approvedAt: new Date(),
-      approvedPayRate: worker?.employeeProfile?.payRate ?? null,
-      approvedPayType: worker?.employeeProfile?.payType ?? null,
+      approvedPayRate: payRate,
+      approvedPayType: payType,
+      approvedDifferential: differential && differential.amount.greaterThan(0) ? differential.amount : null,
+      approvedDifferentialNote: differential && differential.note ? differential.note : null,
     },
   })
   await recordAudit(orgId, approverId, "TimeEntry", entryId, "approve")

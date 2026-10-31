@@ -74,11 +74,12 @@ export type ExportPayrollRow = {
   email: string | null
   regularHours: string
   overtimeHours: string
+  differentialEarnings: string // shift-differential premium (Phase 43), distinct column
   commissionEarnings: string // sum of CALCULATED commission/flat earnings
   jobsWithEarnings: number
   pendingEarnings: string // awaiting a billable amount (not yet payable)
 }
 export function payrollEarningsCsv(rows: ExportPayrollRow[]): string {
-  const headers = ["Employee ID", "Employee Name", "Email", "Regular Hours", "Overtime Hours", "Commission/Flat Earnings", "Jobs With Earnings", "Pending Earnings"]
-  return toCsv(headers, rows.map((r) => [r.employeeId, r.name, r.email, r.regularHours, r.overtimeHours, r.commissionEarnings, r.jobsWithEarnings, r.pendingEarnings]))
+  const headers = ["Employee ID", "Employee Name", "Email", "Regular Hours", "Overtime Hours", "Shift Differential", "Commission/Flat Earnings", "Jobs With Earnings", "Pending Earnings"]
+  return toCsv(headers, rows.map((r) => [r.employeeId, r.name, r.email, r.regularHours, r.overtimeHours, r.differentialEarnings, r.commissionEarnings, r.jobsWithEarnings, r.pendingEarnings]))
 }

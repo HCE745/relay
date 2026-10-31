@@ -1,6 +1,7 @@
-import { orgDb } from "../org-db"
+import { orgDb, systemDb } from "../org-db"
 import { getOrgTimezone } from "./org"
 import { getPeriodOvertime } from "./labor"
+import { applyBurden } from "../shift-differentials"
 import {
   type Money,
   type JobMarginInput,
@@ -33,6 +34,7 @@ type ApprovedEntry = {
   breakMinutes: number
   approvedPayRate: Money | null
   approvedPayType: string | null
+  approvedDifferential: Money | null
   user: { id: string; employeeProfile: { payRate: Money | null; payType: string | null } | null }
 }
 
@@ -62,7 +64,8 @@ function jobLabor(entries: ApprovedEntry[]): { known: boolean; labor: Money; sal
     if (type === "SALARY") salaried = true
     const cost = entryLaborCost(e, rate, type)
     if (cost === null) known = false
-    else labor = labor.plus(cost)
+    // Phase 43: the snapshotted shift-differential premium is part of labor cost.
+    else labor = labor.plus(cost).plus(e.approvedDifferential ?? ZERO)
   }
   return { known, labor, salaried }
 }
@@ -112,6 +115,10 @@ export type Profitability = {
   // Surfaced here rather than per-site: OT is a weekly-per-employee figure that
   // can span multiple sites, so it is not attributed to a single row.
   overtimePremium: Money
+  // Labor burden (Phase 43): the fraction applied to labor in margin, and the
+  // pre-burden labor total for the counted jobs (shown separately).
+  laborBurdenPct: number
+  laborUnburdened: Money
   includeUninvoiced: boolean
 }
 
@@ -138,6 +145,7 @@ export async function getProfitability(
           breakMinutes: true,
           approvedPayRate: true,
           approvedPayType: true,
+          approvedDifferential: true,
           user: { select: { id: true, employeeProfile: { select: { payRate: true, payType: true } } } },
         },
       },
@@ -146,11 +154,13 @@ export async function getProfitability(
       supplyUsages: { select: { quantity: true, costPerUnit: true } },
     },
   })
+  const burdenPct = await getLaborBurdenPct(orgId)
 
   const bySite = new Map<string, Row>()
   const byCustomer = new Map<string, Row>()
   const byPlan = new Map<string, Row>()
   const summaryInputs: JobMarginInput[] = []
+  let laborUnburdened = ZERO // sum of pre-burden labor for jobs counted toward margin
 
   for (const job of jobs) {
     const siteTz = job.serviceLocation.timezone ?? orgTz
@@ -158,13 +168,17 @@ export async function getProfitability(
 
     const billed = job.invoiceLines.reduce((a, l) => a.plus(l.amount), ZERO)
     const invoiced = job.invoiceLines.length > 0
-    const { known, labor } = jobLaborWithCommission(job.timeEntries, job.earnings)
+    const { known, labor: rawLabor } = jobLaborWithCommission(job.timeEntries, job.earnings)
+    // Phase 43: margin uses BURDENED labor (employer taxes/insurance/comp); the
+    // unburdened figure is kept visible separately in the summary.
+    const labor = applyBurden(rawLabor, burdenPct)
     const supplies = jobSupplies(job.supplyUsages)
 
     summaryInputs.push({ invoiced, laborKnown: known, billed, labor, supplies })
 
     // Rows include only jobs that count toward margin, so row sums match totals.
     if (countsTowardMargin({ invoiced, laborKnown: known }, includeUninvoiced)) {
+      if (known) laborUnburdened = laborUnburdened.plus(rawLabor)
       const site = job.serviceLocation
       upsert(bySite, site.id, site.name, site.customer.name, billed, labor, supplies)
       upsert(byCustomer, site.customer.id, site.customer.name, undefined, billed, labor, supplies)
@@ -180,6 +194,8 @@ export async function getProfitability(
     byPlan: finalize(byPlan),
     summary: summarizeMargin(summaryInputs, includeUninvoiced),
     overtimePremium: ot.totalPremium,
+    laborBurdenPct: Number(burdenPct),
+    laborUnburdened,
     includeUninvoiced,
   }
 }
@@ -197,6 +213,7 @@ export async function getJobProfitability(orgId: string, jobId: string) {
           breakMinutes: true,
           approvedPayRate: true,
           approvedPayType: true,
+          approvedDifferential: true,
           user: { select: { id: true, employeeProfile: { select: { payRate: true, payType: true } } } },
         },
       },
@@ -207,9 +224,11 @@ export async function getJobProfitability(orgId: string, jobId: string) {
   })
   if (!job) return null
 
+  const burdenPct = await getLaborBurdenPct(orgId)
   const billedAmount = job.invoiceLines.reduce((a, l) => a.plus(l.amount), ZERO)
   const invoiced = job.invoiceLines.length > 0
-  const { known, labor, salaried } = jobLaborWithCommission(job.timeEntries, job.earnings)
+  const { known, labor: rawLabor, salaried } = jobLaborWithCommission(job.timeEntries, job.earnings)
+  const labor = applyBurden(rawLabor, burdenPct) // margin uses burdened labor
   const supplies = jobSupplies(job.supplyUsages)
   const totalCost = labor.plus(supplies)
 
@@ -219,12 +238,20 @@ export async function getJobProfitability(orgId: string, jobId: string) {
     laborAvailable: known,
     salaried,
     laborCost: known ? labor : null,
+    laborCostUnburdened: known ? rawLabor : null,
+    laborBurdenPct: Number(burdenPct),
     suppliesCost: supplies,
     // Margin only when we have both real revenue and a known labor cost.
     grossMargin: known && invoiced ? billedAmount.minus(totalCost) : null,
     marginPct: known && invoiced ? marginPct(billedAmount, totalCost) : null,
     approvedEntries: job.timeEntries.length,
   }
+}
+
+/** Org labor-burden fraction (Phase 43), 0 when unset/off. */
+async function getLaborBurdenPct(orgId: string): Promise<Money> {
+  const org = await systemDb.organization.findUnique({ where: { id: orgId }, select: { laborBurdenPct: true } })
+  return org?.laborBurdenPct ?? ZERO
 }
 
 /**

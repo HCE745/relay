@@ -340,6 +340,15 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     data: { organizationId: orgId, start: monthStart(now), end: curMonthEnd, status: "OPEN" },
   })
 
+  // ── Shift differentials + labor burden (Phase 43) ──
+  await systemDb.organization.update({ where: { id: orgId }, data: { laborBurdenPct: "0.2200" } })
+  await systemDb.shiftDifferentialRule.create({
+    data: { organizationId: orgId, name: "Night differential", startMinute: 22 * 60, endMinute: 6 * 60, daysOfWeek: [], amountType: "PERCENT", value: "10", priority: 10 },
+  })
+  await systemDb.shiftDifferentialRule.create({
+    data: { organizationId: orgId, name: "Weekend differential", startMinute: 0, endMinute: 24 * 60 - 1, daysOfWeek: [0, 6], amountType: "FLAT_PER_HOUR", value: "2.00", priority: 20 },
+  })
+
   await seedExtras(orgId, stamp, now, week, todayOffset, staff, ctx, () => invoiceNo++)
   return { owner: staff.owner }
 }

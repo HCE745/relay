@@ -46,6 +46,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "team",        label: "Team",        href: "/team",        requiredCap: "workforce.employees" },
   { key: "time",        label: "Time",        href: "/time",        requiredCap: "workforce.timeTracking" },
   { key: "pay-periods", label: "Pay periods", href: "/time/periods", requiredCap: "workforce.payrollExport" },
+  { key: "differentials", label: "Shift differentials", href: "/differentials", requiredCap: "workforce.laborCosting" },
   { key: "coverage",    label: "Coverage",    href: "/coverage",    requiredCap: "workforce.coverage" },
   { key: "compliance",  label: "Compliance",  href: "/compliance",  requiredCap: "workforce.compliance" },
   { key: "access",      label: "Access & keys", href: "/access",     requiredCap: "operations.accessControl" },
@@ -81,7 +82,7 @@ export const ADMIN_ROUTE_KEYS: ReadonlySet<string> = new Set(ADMIN_NAV.map((i) =
 const ROLE_ROUTE_ACCESS: Record<Role, string[] | "*"> = {
   OWNER: "*",
   ADMIN: "*",
-  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "pay-periods", "coverage", "compliance", "access", "inspections", "issues", "service-requests", "satisfaction", "service-areas", "quotes", "leads", "estimates", "contracts", "work-orders", "hiring", "invoices", "payments", "ar-aging", "tax", "profitability", "supply-spend", "exports", "import", "assets", "supplies"],
+  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "pay-periods", "differentials", "coverage", "compliance", "access", "inspections", "issues", "service-requests", "satisfaction", "service-areas", "quotes", "leads", "estimates", "contracts", "work-orders", "hiring", "invoices", "payments", "ar-aging", "tax", "profitability", "supply-spend", "exports", "import", "assets", "supplies"],
   SUPERVISOR: ["dashboard", "schedule", "jobs", "time", "inspections", "issues", "service-requests"],
   CLEANER: [], // cleaners have no admin routes; they use the field app
   CLIENT: [], // portal users have NO admin routes; they live under /portal

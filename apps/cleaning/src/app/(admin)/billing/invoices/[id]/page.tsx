@@ -4,7 +4,9 @@ import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getInvoice } from "@/lib/data/invoices"
+import { listInvoiceCollectionActivity } from "@/lib/data/collections"
 import { getOrgSettings } from "@/lib/data/org"
+import { CollectionsHoldToggle } from "@/components/billing/collections-hold-toggle"
 import { isEmailConfigured } from "@/lib/email"
 import { formatMoney, invoiceNo } from "@/lib/money"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
@@ -34,12 +36,14 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   }
 
   const { id } = await params
-  const [invoice, org, canPayOnline] = await Promise.all([
+  const [invoice, org, canPayOnline, collectionActivity] = await Promise.all([
     getInvoice(session.organizationId, id),
     getOrgSettings(session.organizationId),
     orgHasCapability(session.organizationId, "billing.onlinePayments"),
+    listInvoiceCollectionActivity(session.organizationId, id),
   ])
   if (!invoice) notFound()
+  const outstanding = ["SENT", "PARTIALLY_PAID"].includes(invoice.status)
   const showPayLink = canPayOnline && isStripeConfigured() && ["SENT", "PARTIALLY_PAID"].includes(invoice.status)
 
   const cur = invoice.currency
@@ -210,6 +214,31 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           </div>
         ) : null}
       </Card>
+
+      {/* Collections (Phase 44): hold control + reminder activity */}
+      {outstanding || collectionActivity.length > 0 ? (
+        <Card className="mt-6 p-6" data-no-print>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold text-slate-700">Collections</h3>
+            {outstanding ? <CollectionsHoldToggle invoiceId={invoice.id} held={invoice.collectionsHold} /> : null}
+          </div>
+          {collectionActivity.length > 0 ? (
+            <ul className="mt-4 space-y-1 text-sm">
+              {collectionActivity.map((a) => (
+                <li key={a.id} className="flex justify-between text-slate-600">
+                  <span>
+                    +{a.dayOffset}d · {a.channel}
+                    {a.status !== "SENT" ? ` · ${a.status.toLowerCase()}${a.detail ? ` (${a.detail})` : ""}` : ""}
+                  </span>
+                  <span className="tabular-nums text-slate-400">{fmtDate(a.createdAt)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 text-sm text-slate-400">No reminders sent yet.</p>
+          )}
+        </Card>
+      ) : null}
     </div>
   )
 }

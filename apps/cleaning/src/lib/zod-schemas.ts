@@ -181,6 +181,19 @@ export const planTaxabilitySchema = z.object({
   taxRateId: z.string().min(1).nullable().optional(),
 })
 
+// ─── Phase 44: multi-step collections ────────────────────────────────────────
+export const COLLECTION_CHANNELS = ["EMAIL", "SMS"] as const
+export const collectionStepSchema = z.object({
+  dayOffset: z.coerce.number().int().min(0).max(365),
+  channel: z.enum(COLLECTION_CHANNELS),
+  subject: optionalString,
+  body: z.string().trim().min(1, "A message is required").max(2000),
+  order: z.coerce.number().int().optional(),
+})
+export const collectionStepUpdateSchema = collectionStepSchema.partial().extend({ isActive: z.boolean().optional() })
+export const collectionsHoldSchema = z.object({ hold: z.boolean() })
+export const collectionsOptOutSchema = z.object({ optOut: z.boolean() })
+
 // ─── Phase 43: shift differentials ───────────────────────────────────────────
 export const DIFFERENTIAL_AMOUNT_TYPES = ["PERCENT", "FLAT_PER_HOUR"] as const
 export const shiftDifferentialSchema = z.object({

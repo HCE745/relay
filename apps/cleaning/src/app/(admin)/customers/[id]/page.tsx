@@ -17,6 +17,7 @@ import { ContactsSection } from "@/components/customers/contacts-section"
 import { SitesSection } from "@/components/customers/sites-section"
 import { InvoiceStatusBadge } from "@/components/billing/invoice-status-badge"
 import { GenerateInvoiceButton } from "@/components/billing/generate-invoice-button"
+import { CollectionsOptOutToggle } from "@/components/billing/collections-opt-out-toggle"
 
 export const dynamic = "force-dynamic"
 
@@ -134,6 +135,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               </ul>
             </div>
           ) : null}
+          <div className="mt-6 border-t border-slate-100 pt-4">
+            <CollectionsOptOutToggle customerId={customer.id} optedOut={customer.collectionsOptOut} />
+          </div>
         </Card>
       ) : null}
 

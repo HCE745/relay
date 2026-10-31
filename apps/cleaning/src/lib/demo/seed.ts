@@ -349,6 +349,15 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     data: { organizationId: orgId, name: "Weekend differential", startMinute: 0, endMinute: 24 * 60 - 1, daysOfWeek: [0, 6], amountType: "FLAT_PER_HOUR", value: "2.00", priority: 20 },
   })
 
+  // ── Multi-step collections (Phase 44): a three-step escalating sequence ──
+  await systemDb.collectionStep.createMany({
+    data: [
+      { organizationId: orgId, order: 1, dayOffset: 3, channel: "EMAIL", subject: "Invoice {invoiceNumber} is past due", body: "Hi {customerName}, a friendly reminder that invoice {invoiceNumber} for {balance} was due {dueDate}. Please arrange payment when you can." },
+      { organizationId: orgId, order: 2, dayOffset: 10, channel: "EMAIL", subject: "Second notice: invoice {invoiceNumber}", body: "Hi {customerName}, invoice {invoiceNumber} for {balance} is now {daysOverdue} days past due. Please remit payment to keep your account in good standing." },
+      { organizationId: orgId, order: 3, dayOffset: 21, channel: "SMS", body: "{customerName}: invoice {invoiceNumber} ({balance}) is {daysOverdue} days overdue. Please call us to resolve this before services are affected." },
+    ],
+  })
+
   await seedExtras(orgId, stamp, now, week, todayOffset, staff, ctx, () => invoiceNo++)
   return { owner: staff.owner }
 }

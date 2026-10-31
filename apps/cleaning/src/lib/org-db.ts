@@ -89,6 +89,8 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "TaxRate",
   "PayPeriod",
   "ShiftDifferentialRule",
+  "CollectionStep",
+  "CollectionActivity",
 ])
 
 // Models that are DELIBERATELY not org-scoped, each with a stated reason. A

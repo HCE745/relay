@@ -21,6 +21,7 @@ export type NotificationEventKey =
   | "TIMEOFF_APPROVED" | "TIMEOFF_DECLINED" | "MISSED_CLOCK_IN" | "CREDENTIAL_EXPIRING"
   | "VISIT_REMINDER" | "SERVICE_SUMMARY" | "PAYMENT_REMINDER" | "CUSTOMER_MESSAGE"
   | "ISSUE_ASSIGNED" | "ISSUE_UNACKED" | "ISSUE_OVERDUE" | "ISSUE_ESCALATED"
+  | "COLLECTION_STEP"
 
 export type NotifyMessage = { subject: string; body: string }
 
@@ -81,6 +82,33 @@ export async function notifyCustomer(orgId: string, customerId: string, event: N
   if (!deps.isEmailConfigured()) { await log("SKIPPED", "email_unconfigured"); return }
   const r = await deps.sendEmail({ to, subject: msg.subject, text: msg.body })
   await log(r.delivered ? "SENT" : "FAILED", r.error)
+}
+
+/**
+ * Notify a CUSTOMER over a specific channel (Phase 44 collections). Returns the
+ * delivery status so the caller can record its own activity row. Email goes to
+ * the customer/primary-contact email; SMS to the customer phone. Every attempt
+ * (including skips) is logged to NotificationLog like any other send.
+ */
+export async function notifyCustomerVia(
+  orgId: string, customerId: string, event: NotificationEventKey, channel: "EMAIL" | "SMS", msg: NotifyMessage, deps: NotifyDeps = defaultDeps,
+): Promise<{ status: "SENT" | "FAILED" | "SKIPPED"; detail?: string }> {
+  const db = orgDb(orgId)
+  const c = await db.customer.findFirst({ where: { id: customerId }, select: { email: true, phone: true, contacts: { where: { isPrimary: true }, select: { email: true }, take: 1 } } })
+  const to = channel === "SMS" ? (c?.phone ?? null) : (c?.email || c?.contacts[0]?.email || null)
+  const log = (status: "SENT" | "FAILED" | "SKIPPED", detail?: string, providerId?: string) =>
+    db.notificationLog.create({ data: { organizationId: orgId, userId: null, channel, event, toAddress: to ?? "(none)", subject: msg.subject, body: msg.body, status, detail, providerId } })
+  const done = async (status: "SENT" | "FAILED" | "SKIPPED", detail?: string, providerId?: string) => { await log(status, detail, providerId); return { status, detail } }
+
+  if (!to) return done("SKIPPED", channel === "SMS" ? "no_customer_phone" : "no_customer_email")
+  if (channel === "EMAIL") {
+    if (!deps.isEmailConfigured()) return done("SKIPPED", "email_unconfigured")
+    const r = await deps.sendEmail({ to, subject: msg.subject, text: msg.body })
+    return done(r.delivered ? "SENT" : "FAILED", r.error)
+  }
+  if (!deps.isSmsConfigured()) return done("SKIPPED", "sms_unconfigured")
+  const r = await deps.sendSms({ to, body: msg.body })
+  return done(r.delivered ? "SENT" : "FAILED", r.error, r.providerId)
 }
 
 /** Notify a single user of an event across their chosen channels. */

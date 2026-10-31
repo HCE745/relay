@@ -313,6 +313,18 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     })
   }
 
+  // ── Pay periods (Phase 41): one locked (prior month), one open (current) ──
+  const monthStart = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1))
+  const prevMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1))
+  const prevMonthEnd = new Date(monthStart(now).getTime() - 1)
+  const curMonthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999))
+  await systemDb.payPeriod.create({
+    data: { organizationId: orgId, start: prevMonthStart, end: prevMonthEnd, status: "LOCKED", lockedById: staff.owner.id, lockedAt: new Date(now.getTime() - 5 * DAY) },
+  })
+  await systemDb.payPeriod.create({
+    data: { organizationId: orgId, start: monthStart(now), end: curMonthEnd, status: "OPEN" },
+  })
+
   await seedExtras(orgId, stamp, now, week, todayOffset, staff, ctx, () => invoiceNo++)
   return { owner: staff.owner }
 }

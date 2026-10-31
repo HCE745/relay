@@ -1,6 +1,7 @@
 import { orgDb } from "../org-db"
 import { invoiceNo } from "../money"
 import { startOfUtcDay, endOfUtcDay } from "../billing-math"
+import { findPeriodForRange } from "./pay-periods"
 import { getPeriodOvertime } from "./labor"
 import {
   qboInvoicesCsv, xeroInvoicesCsv, qboCustomersCsv, xeroContactsCsv, gustoHoursCsv, adpHoursCsv, payrollEarningsCsv,
@@ -134,11 +135,20 @@ export async function buildExport(
   }
 }
 
+// Payroll exports (hours / earnings) that cover an exact pay period record it,
+// so the "exported → lock it" workflow (Phase 41) can show what each run covered.
+const PAYROLL_KINDS: ReadonlySet<ExportKind> = new Set(["GUSTO_HOURS", "ADP_HOURS", "PAYROLL_EARNINGS"])
+
 export async function recordExport(
   orgId: string,
   kind: ExportKind,
   opts: { periodStart?: string; periodEnd?: string; rowCount: number; userId?: string; userName?: string },
 ) {
+  let payPeriodId: string | null = null
+  if (PAYROLL_KINDS.has(kind) && opts.periodStart && opts.periodEnd) {
+    const period = await findPeriodForRange(orgId, opts.periodStart, opts.periodEnd)
+    payPeriodId = period?.id ?? null
+  }
   return orgDb(orgId).exportRun.create({
     data: {
       organizationId: orgId,
@@ -148,6 +158,7 @@ export async function recordExport(
       rowCount: opts.rowCount,
       createdById: opts.userId,
       createdByName: opts.userName,
+      payPeriodId,
     },
   })
 }

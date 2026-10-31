@@ -1,6 +1,7 @@
 import { orgDb } from "../org-db"
 import { assertFound, ConflictError } from "./errors"
 import { recordAudit } from "./audit"
+import { assertDateUnlocked } from "./pay-periods"
 
 // Management Time: review, approve/reapprove, correct (audited), export. NOT
 // payroll — no tax/pay calculation. Durations are derived from timestamps, so a
@@ -30,11 +31,12 @@ export async function approveTimeEntry(orgId: string, entryId: string, approverI
   const db = orgDb(orgId)
   const e = await db.timeEntry.findFirst({
     where: { id: entryId },
-    select: { id: true, status: true, clockOutAt: true, userId: true },
+    select: { id: true, status: true, clockInAt: true, clockOutAt: true, userId: true },
   })
   assertFound(e, "Time entry")
   if (e!.status === "OPEN" || e!.clockOutAt == null) throw new ConflictError("Cannot approve an open time entry")
   if (e!.status === "APPROVED") return { alreadyApproved: true }
+  await assertDateUnlocked(orgId, e!.clockInAt) // Phase 41: no approvals in a locked period
   // Snapshot the worker's pay basis at approval so a later raise never rewrites
   // this entry's historical labor cost (same pattern as invoice-line snapshots).
   const worker = await db.user.findFirst({
@@ -68,6 +70,9 @@ export async function correctTimeEntry(
   const newIn = input.clockInAt ?? e!.clockInAt
   const newOut = input.clockOutAt ?? e!.clockOutAt
   if (newOut && newIn >= newOut) throw new ConflictError("Clock-out must be after clock-in")
+  // Phase 41: can't correct into or out of a locked period (check both dates).
+  await assertDateUnlocked(orgId, e!.clockInAt)
+  await assertDateUnlocked(orgId, newIn)
 
   // Editing an APPROVED entry removes approval and requires re-approval.
   const wasApproved = e!.status === "APPROVED"

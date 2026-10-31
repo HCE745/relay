@@ -1,6 +1,7 @@
 import { orgDb, systemDb } from "../org-db"
 import { assertFound, ReferenceError } from "./errors"
 import { dec, ZERO, round2, type Money } from "../billing-math"
+import { isDateLocked } from "./pay-periods"
 import { resolveCapabilities, parseOverrides, type PackageTier } from "../entitlements"
 import { Prisma } from "../../generated/prisma/client"
 
@@ -122,6 +123,11 @@ export async function recomputeJobEarnings(orgId: string, jobId: string): Promis
     },
   })
   if (!job) return { computed: 0 }
+
+  // Phase 41: if the job's work date sits in a LOCKED pay period, freeze its
+  // earnings — leave whatever was computed before the lock untouched.
+  const workDate = job.actualEnd ?? job.scheduledStart
+  if (await isDateLocked(orgId, workDate)) return { computed: 0 }
 
   // Only completed jobs carry earnings. If a job leaves COMPLETED, clear them.
   if (job.status !== "COMPLETED") {

@@ -181,6 +181,14 @@ export const planTaxabilitySchema = z.object({
   taxRateId: z.string().min(1).nullable().optional(),
 })
 
+// ─── Phase 41: payroll period locking ────────────────────────────────────────
+export const payPeriodCreateSchema = z
+  .object({ start: dateString, end: dateString })
+  .refine((v) => v.end >= v.start, { path: ["end"], message: "End must be on or after start" })
+export const payPeriodUnlockSchema = z.object({
+  reason: z.string().trim().min(1, "A reason is required to unlock").max(500),
+})
+
 // ─── Phase 2: scheduling, jobs, assignments ──────────────────────────────────
 
 export const generateJobsSchema = z.object({

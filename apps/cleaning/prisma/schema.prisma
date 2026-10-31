@@ -147,6 +147,13 @@ enum JobEarningStatus {
   @@schema("cleaning")
 }
 
+enum PayPeriodStatus {
+  OPEN
+  LOCKED
+
+  @@schema("cleaning")
+}
+
 enum ServiceFrequency {
   ONE_TIME
   DAILY
@@ -492,6 +499,7 @@ model Organization {
   sopAcknowledgments  SopAcknowledgment[]
   sopIssueMappings    SopIssueMapping[]
   taxRates            TaxRate[]
+  payPeriods          PayPeriod[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -549,6 +557,7 @@ model User {
   portalCustomer       Customer?          @relation("CustomerPortalUsers", fields: [customerId], references: [id])
   notificationPrefs    NotificationPreference[]
   notificationLogs     NotificationLog[]
+  lockedPayPeriods     PayPeriod[]        @relation("PayPeriodLockedBy")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -1712,6 +1721,30 @@ model InspectionItemResult {
 
 // ─── Billing: Invoices / AR (Phase 2) ────────────────────────────────────────
 
+// Payroll period locking (Phase 41). A locked period freezes the time entries,
+// corrections, approvals and commission earnings whose work date falls inside
+// it, so an exported payroll period can't silently change afterward. Only
+// OWNER/ADMIN may unlock, with a reason, which is audited.
+model PayPeriod {
+  id             String          @id @default(cuid())
+  organizationId String
+  start          DateTime // inclusive, UTC day start
+  end            DateTime // inclusive, UTC day end
+  status         PayPeriodStatus @default(OPEN)
+  lockedById     String?
+  lockedAt       DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  lockedBy     User?        @relation("PayPeriodLockedBy", fields: [lockedById], references: [id])
+  exportRuns   ExportRun[]
+
+  @@unique([organizationId, start, end])
+  @@index([organizationId, status])
+  @@schema("cleaning")
+}
+
 // Sales-tax rate catalog (Phase 40). The customer configures jurisdiction rates
 // and decides, per site and per service type, what is taxable — we never ship a
 // default rate or presume janitorial is taxable. Rates are snapshotted onto
@@ -2211,9 +2244,12 @@ model ExportRun {
   rowCount       Int        @default(0)
   createdById    String?
   createdByName  String?
+  // Payroll exports (Phase 41) record which locked pay period they covered.
+  payPeriodId    String?
   createdAt      DateTime   @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  payPeriod    PayPeriod?   @relation(fields: [payPeriodId], references: [id])
 
   @@index([organizationId])
   @@schema("cleaning")

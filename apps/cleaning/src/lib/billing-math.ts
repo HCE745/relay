@@ -39,6 +39,19 @@ export function dueDateFromTerms(from: Date, terms: string): Date {
   return new Date(from.getTime() + (TERM_DAYS[terms] ?? 0) * 86_400_000)
 }
 
+// ─── Sales tax (Phase 40) ────────────────────────────────────────────────────
+//
+// Tax is computed per LINE from a rate SNAPSHOT (a fraction, 0.07 = 7%), so a
+// later rate change never rewrites a historical invoice. A line is taxed only
+// when it is explicitly taxable AND carries a rate; otherwise tax is 0. The
+// invoice taxTotal is the exact sum of rounded per-line tax.
+
+/** Per-line tax: round2(amount × ratePct), or 0 when untaxable / no rate. */
+export function lineTax(amount: Money, ratePct: Money | null, taxable: boolean): Money {
+  if (!taxable || ratePct == null) return ZERO
+  return round2(amount.times(ratePct))
+}
+
 export type AgingBucket = "current" | "d1_30" | "d31_60" | "d61_90" | "d90"
 
 export function agingBucket(daysOverdue: number): AgingBucket {

@@ -32,6 +32,7 @@ export const CAPABILITIES = [
   "billing.invoicing", // invoices, payments, AR
   "billing.periodInvoicing", // flat-period (recurring) invoicing + auto-draft cron
   "billing.arAging", // accounts-receivable aging report
+  "billing.salesTax", // jurisdiction tax rates + per-site/service taxability on invoices
   "integrations.exports", // QBO/Xero/Gusto/ADP CSV exports (no API)
   "portal.customerAccess", // customer portal (CLIENT role, isolated)
   "reporting.profitability", // site/customer/plan margin (pay-rate-derived)

@@ -160,6 +160,27 @@ export const servicePlanUpdateSchema = servicePlanCreateSchema
   .extend({ isActive: z.boolean().optional() })
 export type ServicePlanCreateInput = z.infer<typeof servicePlanCreateSchema>
 
+// ─── Phase 40: sales tax ─────────────────────────────────────────────────────
+// Rate is entered as a PERCENT the user types ("7" or "7.25") and stored as a
+// fraction. We never ship a default; the customer configures every rate.
+export const taxRateCreateSchema = z.object({
+  name: z.string().trim().min(1, "A rate name is required").max(120),
+  jurisdiction: optionalString,
+  ratePct: z.string().trim().regex(/^\d{1,2}(\.\d{1,4})?$/, "Enter a percent like 7 or 7.25"),
+  effectiveDate: z.coerce.date().optional(),
+})
+export const taxRateUpdateSchema = taxRateCreateSchema.partial().extend({ isActive: z.boolean().optional() })
+export type TaxRateCreateInput = z.infer<typeof taxRateCreateSchema>
+
+export const siteTaxabilitySchema = z.object({
+  taxable: z.boolean(),
+  taxRateId: z.string().min(1).nullable().optional(),
+})
+export const planTaxabilitySchema = z.object({
+  taxable: z.boolean().nullable().optional(), // null = inherit the site default
+  taxRateId: z.string().min(1).nullable().optional(),
+})
+
 // ─── Phase 2: scheduling, jobs, assignments ──────────────────────────────────
 
 export const generateJobsSchema = z.object({

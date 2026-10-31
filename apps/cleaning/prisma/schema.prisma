@@ -491,6 +491,7 @@ model Organization {
   sops                Sop[]
   sopAcknowledgments  SopAcknowledgment[]
   sopIssueMappings    SopIssueMapping[]
+  taxRates            TaxRate[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -723,6 +724,11 @@ model ServiceLocation {
   siteContactName  String?
   siteContactPhone String?
   siteContactEmail String?
+  // Sales-tax config (Phase 40). Services at this site are NOT taxable by
+  // default; the customer opts in and picks the jurisdiction rate. A plan may
+  // override taxability (ServicePlan.taxable) for a specific service type.
+  taxable        Boolean  @default(false)
+  taxRateId      String?
   parentId       String?
   // Access instructions / site notes (gate codes, alarm, parking, etc.).
   notes          String?
@@ -733,6 +739,7 @@ model ServiceLocation {
 
   organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   customer     Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  taxRate      TaxRate?          @relation(fields: [taxRateId], references: [id])
   parent       ServiceLocation?  @relation("LocationHierarchy", fields: [parentId], references: [id])
   children     ServiceLocation[] @relation("LocationHierarchy")
   servicePlans ServicePlan[]
@@ -813,6 +820,10 @@ model ServicePlan {
   billingMode        BillingMode      @default(PER_JOB)
   periodAmount       Decimal?         @db.Decimal(12, 2)
   periodFrequency    PeriodFrequency?
+  // Per service-type tax override (Phase 40). null = inherit the site default;
+  // true/false forces taxability for this plan. taxRateId overrides the site rate.
+  taxable            Boolean?
+  taxRateId          String?
   contractId         String? // OPTIONAL link to a commercial contract (Phase 8)
   isActive           Boolean          @default(true)
   createdAt          DateTime         @default(now())
@@ -822,6 +833,7 @@ model ServicePlan {
   serviceLocation   ServiceLocation    @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
   checklistTemplate ChecklistTemplate? @relation(fields: [checklistTemplateId], references: [id])
   contract          Contract?          @relation(fields: [contractId], references: [id])
+  taxRate           TaxRate?           @relation(fields: [taxRateId], references: [id])
   jobs              Job[]
 
   @@index([organizationId])
@@ -1700,6 +1712,30 @@ model InspectionItemResult {
 
 // ─── Billing: Invoices / AR (Phase 2) ────────────────────────────────────────
 
+// Sales-tax rate catalog (Phase 40). The customer configures jurisdiction rates
+// and decides, per site and per service type, what is taxable — we never ship a
+// default rate or presume janitorial is taxable. Rates are snapshotted onto
+// invoice lines at generation, so editing or deactivating a rate here never
+// rewrites a historical invoice.
+model TaxRate {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String // display name, e.g. "Indiana sales tax"
+  jurisdiction   String? // jurisdiction label, e.g. "Indiana / Marion County"
+  rate           Decimal  @db.Decimal(6, 4) // fraction, 0.0700 = 7%
+  effectiveDate  DateTime @default(now())
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocations ServiceLocation[]
+  servicePlans     ServicePlan[]
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
 model Invoice {
   id             String        @id @default(cuid())
   organizationId String
@@ -1714,7 +1750,9 @@ model Invoice {
   periodEnd      DateTime
   currency       String        @default("USD")
   subtotal       Decimal       @db.Decimal(12, 2)
-  taxTotal       Decimal       @default(0) @db.Decimal(12, 2) // always 0 for now
+  // Sum of per-line tax (Phase 40). 0 when no line is taxable. Tax is computed
+  // from the rate snapshotted on each line, never re-derived from TaxRate.
+  taxTotal       Decimal       @default(0) @db.Decimal(12, 2)
   total          Decimal       @db.Decimal(12, 2)
   notes          String?
   emailedAt      DateTime? // last time it was emailed to the customer (Phase 7)
@@ -1765,6 +1803,13 @@ model InvoiceLine {
   quantity    Decimal  @db.Decimal(12, 2)
   unitRate    Decimal  @db.Decimal(12, 2)
   amount      Decimal  @db.Decimal(12, 2)
+  // Sales tax (Phase 40), all SNAPSHOTTED at generation so a later rate change
+  // never rewrites a historical invoice. taxable records the decision; the
+  // rate/name record which rate applied; taxAmount = round2(amount × taxRatePct).
+  taxable     Boolean  @default(false)
+  taxRatePct  Decimal? @db.Decimal(6, 4) // fraction (0.0700 = 7%), null when untaxed
+  taxRateName String? // jurisdiction label snapshot, e.g. "Indiana sales tax"
+  taxAmount   Decimal  @default(0) @db.Decimal(12, 2)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

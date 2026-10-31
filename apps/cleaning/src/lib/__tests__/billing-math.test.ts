@@ -18,6 +18,7 @@ import {
   deriveInvoiceStatus,
   remainingBalance,
   overpays,
+  lineTax,
 } from "../billing-math"
 
 describe("round2", () => {
@@ -242,5 +243,20 @@ describe("isInBillingPeriod — month boundary in a non-UTC site timezone", () =
     const mid = new Date("2026-09-15T14:00:00.000Z")
     expect(isInBillingPeriod(mid, "America/New_York", "2026-09-01", "2026-09-30")).toBe(true)
     expect(isInBillingPeriod(mid, "America/New_York", "2026-10-01", "2026-10-31")).toBe(false)
+  })
+})
+
+describe("lineTax (Phase 40)", () => {
+  it("is 0 when the line is not taxable", () => {
+    expect(lineTax(dec("100.00"), dec("0.0825"), false).toFixed(2)).toBe("0.00")
+  })
+  it("is 0 when there is no rate, even if taxable", () => {
+    expect(lineTax(dec("100.00"), null, true).toFixed(2)).toBe("0.00")
+  })
+  it("rounds half up to 2 dp", () => {
+    // 1200 × 0.0825 = 99.00 exactly
+    expect(lineTax(dec("1200.00"), dec("0.0825"), true).toFixed(2)).toBe("99.00")
+    // 10.10 × 0.0725 = 0.73225 → 0.73
+    expect(lineTax(dec("10.10"), dec("0.0725"), true).toFixed(2)).toBe("0.73")
   })
 })

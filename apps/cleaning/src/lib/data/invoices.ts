@@ -18,6 +18,7 @@ import {
   deriveInvoiceStatus,
   remainingBalance,
   overpays,
+  lineTax,
   OUTSTANDING_STATUSES,
 } from "../billing-math"
 import { periodsInWindow } from "../billing-periods"
@@ -27,7 +28,9 @@ import { recomputeJobEarnings } from "./commission"
 //
 // Money is Prisma.Decimal end-to-end — never a JS float. Amounts are rounded to
 // 2 dp at the LINE level; the invoice subtotal is the exact sum of rounded
-// lines. Tax is always 0 for now. Pure math lives in ../billing-math (tested).
+// lines. Sales tax (Phase 40) is resolved per line from the site/plan
+// taxability config, snapshotted onto the line, and summed into taxTotal. Pure
+// math lives in ../billing-math (tested).
 //
 // Idempotency mirrors job generation: a job may sit on at most one non-VOID
 // invoice, enforced by a DB unique index on InvoiceLine.activeJobId. Generation
@@ -56,7 +59,37 @@ type LineDraft = {
   quantity: Money
   unitRate: Money
   amount: Money
+  // Sales-tax snapshot (Phase 40). Resolved once at generation; never re-derived.
+  taxable: boolean
+  taxRatePct: Money | null
+  taxRateName: string | null
+  taxAmount: Money
 }
+
+// Resolve a line's taxability from the site default and an optional per-plan
+// override. A plan's taxable flag (null = inherit) and rate win over the site's.
+// Returns the rate as a FRACTION to snapshot, plus the jurisdiction label.
+type TaxCfg = { taxable: boolean | null; taxRate: { name: string; rate: Money } | null }
+function resolveTax(
+  site: { taxable: boolean; taxRate: { name: string; rate: Money } | null } | null,
+  plan: TaxCfg | null,
+): { taxable: boolean; taxRatePct: Money | null; taxRateName: string | null } {
+  const taxable = plan?.taxable ?? site?.taxable ?? false
+  const rate = plan?.taxRate ?? site?.taxRate ?? null
+  return { taxable: !!taxable, taxRatePct: rate?.rate ?? null, taxRateName: rate?.name ?? null }
+}
+
+// Build the tax snapshot + amount for one billable line; untaxed lines get zeros.
+function taxFor(amount: Money, cfg: { taxable: boolean; taxRatePct: Money | null; taxRateName: string | null }) {
+  return {
+    taxable: cfg.taxable,
+    taxRatePct: cfg.taxable ? cfg.taxRatePct : null,
+    taxRateName: cfg.taxable ? cfg.taxRateName : null,
+    taxAmount: lineTax(amount, cfg.taxRatePct, cfg.taxable),
+  }
+}
+
+const NO_TAX = { taxable: false, taxRatePct: null, taxRateName: null, taxAmount: ZERO } as const
 
 /**
  * Generate a DRAFT invoice for a customer over a period.
@@ -101,8 +134,8 @@ export async function generateInvoice(
     },
     orderBy: { scheduledStart: "asc" },
     include: {
-      serviceLocation: { select: { name: true, timezone: true } },
-      servicePlan: { select: { id: true, name: true, billingMode: true, billingType: true, rate: true, currency: true } },
+      serviceLocation: { select: { name: true, timezone: true, taxable: true, taxRate: { select: { name: true, rate: true } } } },
+      servicePlan: { select: { id: true, name: true, billingMode: true, billingType: true, rate: true, currency: true, taxable: true, taxRate: { select: { name: true, rate: true } } } },
       timeEntries: { select: { status: true, clockInAt: true, clockOutAt: true, breakMinutes: true } },
       // Non-empty only when this job already sits on a non-VOID invoice.
       invoiceLines: { where: { activeJobId: { not: null } }, select: { id: true } },
@@ -118,7 +151,9 @@ export async function generateInvoice(
       periodAmount: true,
       periodFrequency: true,
       currency: true,
-      serviceLocation: { select: { name: true, timezone: true } },
+      taxable: true,
+      taxRate: { select: { name: true, rate: true } },
+      serviceLocation: { select: { name: true, timezone: true, taxable: true, taxRate: { select: { name: true, rate: true } } } },
     },
   })
 
@@ -169,6 +204,7 @@ export async function generateInvoice(
       continue
     }
 
+    const jobTax = resolveTax(job.serviceLocation, plan)
     if (effective.billingType === "HOURLY") {
       const pending = job.timeEntries.filter((e) => e.status === "OPEN" || e.status === "COMPLETED")
       if (pending.length > 0) {
@@ -181,10 +217,10 @@ export async function generateInvoice(
         continue
       }
       const { quantity, amount } = hourlyLine(minutes, rate)
-      drafts.push({ jobId: job.id, activeJobId: job.id, activePeriodKey: null, billable: true, description: job.title, siteName, serviceDate, quantity, unitRate: rate, amount })
+      drafts.push({ jobId: job.id, activeJobId: job.id, activePeriodKey: null, billable: true, description: job.title, siteName, serviceDate, quantity, unitRate: rate, amount, ...taxFor(amount, jobTax) })
     } else {
       const { quantity, amount } = flatLine(rate)
-      drafts.push({ jobId: job.id, activeJobId: job.id, activePeriodKey: null, billable: true, description: job.title, siteName, serviceDate, quantity, unitRate: rate, amount })
+      drafts.push({ jobId: job.id, activeJobId: job.id, activePeriodKey: null, billable: true, description: job.title, siteName, serviceDate, quantity, unitRate: rate, amount, ...taxFor(amount, jobTax) })
     }
   }
 
@@ -207,7 +243,8 @@ export async function generateInvoice(
     for (const period of periods) {
       if (opts.endedOnly && period.end.getTime() > now.getTime()) continue // period hasn't ended yet
       const periodKey = `${plan.id}:${period.key}`
-      // Flat charge (billable).
+      // Flat charge (billable). Tax: the plan override wins over the site default.
+      const planTax = resolveTax(plan.serviceLocation, plan)
       drafts.push({
         jobId: null,
         activeJobId: null,
@@ -219,6 +256,7 @@ export async function generateInvoice(
         quantity: new Prisma.Decimal(1),
         unitRate: amount,
         amount,
+        ...taxFor(amount, planTax),
       })
       // Covered visits for this period (non-billable detail; claim them).
       for (const cj of covered) {
@@ -235,6 +273,7 @@ export async function generateInvoice(
           quantity: new Prisma.Decimal(1),
           unitRate: ZERO,
           amount: ZERO,
+          ...NO_TAX,
         })
       }
     }
@@ -252,7 +291,7 @@ export async function generateInvoice(
     },
     select: {
       id: true, description: true, amount: true, approvedAt: true,
-      job: { select: { serviceLocation: { select: { name: true } } } },
+      job: { select: { serviceLocation: { select: { name: true, taxable: true, taxRate: { select: { name: true, rate: true } } } } } },
       contract: { select: { title: true } },
     },
   })
@@ -265,6 +304,8 @@ export async function generateInvoice(
       if (taken.has(co.id)) continue
       if (currency === null) currency = "USD" // extras are in the org's currency
       const amount = round2(co.amount as Money)
+      // Extras inherit the job site's taxability; contract-only extras are untaxed.
+      const coTax = resolveTax(co.job?.serviceLocation ?? null, null)
       drafts.push({
         jobId: null, activeJobId: null, activePeriodKey: null,
         changeOrderId: co.id, activeChangeOrderId: co.id,
@@ -273,6 +314,7 @@ export async function generateInvoice(
         siteName: co.job?.serviceLocation.name ?? co.contract?.title ?? "-",
         serviceDate: co.approvedAt ?? now,
         quantity: new Prisma.Decimal(1), unitRate: amount, amount,
+        ...taxFor(amount, coTax),
       })
     }
   }
@@ -293,6 +335,8 @@ export async function generateInvoice(
   let lines = drafts
   for (let attempt = 0; attempt < 5; attempt++) {
     const subtotal = lines.reduce((acc, l) => acc.plus(l.amount), ZERO)
+    const taxTotal = lines.reduce((acc, l) => acc.plus(l.taxAmount), ZERO)
+    const total = subtotal.plus(taxTotal)
     const agg = await db.invoice.aggregate({ _max: { invoiceNumber: true } })
     const invoiceNumber = (agg._max.invoiceNumber ?? 0) + 1
     try {
@@ -308,8 +352,8 @@ export async function generateInvoice(
           periodEnd,
           currency: invoiceCurrency,
           subtotal,
-          taxTotal: ZERO,
-          total: subtotal,
+          taxTotal,
+          total,
           lines: {
             create: lines.map((l) => ({
               jobId: l.jobId,
@@ -324,6 +368,10 @@ export async function generateInvoice(
               quantity: l.quantity,
               unitRate: l.unitRate,
               amount: l.amount,
+              taxable: l.taxable,
+              taxRatePct: l.taxRatePct,
+              taxRateName: l.taxRateName,
+              taxAmount: l.taxAmount,
             })),
           },
         },

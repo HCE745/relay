@@ -291,6 +291,28 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     }
   }
 
+  // ── Sales tax (Phase 40): one jurisdiction rate, one taxable site, a taxed invoice ──
+  const taxRate = await systemDb.taxRate.create({
+    data: { organizationId: orgId, name: "Texas sales tax", jurisdiction: "Texas", rate: "0.0825" },
+    select: { id: true },
+  })
+  const taxSite = ctx.sites.find((s) => s.isComm)
+  if (taxSite) {
+    await systemDb.serviceLocation.updateMany({ where: { id: taxSite.id }, data: { taxable: true, taxRateId: taxRate.id } })
+    const base = "1200.00"
+    const taxAmt = (Math.round(Number(base) * 0.0825 * 100) / 100).toFixed(2)
+    const grand = (Number(base) + Number(taxAmt)).toFixed(2)
+    await systemDb.invoice.create({
+      data: {
+        organizationId: orgId, customerId: taxSite.customerId, invoiceNumber: invoiceNo++, status: "SENT",
+        issueDate: new Date(now.getTime() - 8 * DAY), dueDate: new Date(now.getTime() + 22 * DAY),
+        periodStart: new Date(now.getTime() - 38 * DAY), periodEnd: new Date(now.getTime() - 8 * DAY),
+        subtotal: base, taxTotal: taxAmt, total: grand,
+        lines: { create: [{ description: "Monthly janitorial service", serviceDate: new Date(now.getTime() - 12 * DAY), quantity: "1", unitRate: base, amount: base, billable: true, taxable: true, taxRatePct: "0.0825", taxRateName: "Texas sales tax", taxAmount: taxAmt }] },
+      },
+    })
+  }
+
   await seedExtras(orgId, stamp, now, week, todayOffset, staff, ctx, () => invoiceNo++)
   return { owner: staff.owner }
 }

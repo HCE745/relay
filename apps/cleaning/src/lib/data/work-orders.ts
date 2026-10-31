@@ -1,6 +1,8 @@
-import { orgDb } from "../org-db"
+import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound, ForbiddenActionError, RequirementsError, ConflictError } from "./errors"
 import { getOrgTimezone } from "./org"
+import { recordAudit } from "./audit"
+import { claimOnce } from "./idempotency"
 import { wallTimeToInstant } from "../scheduling/time"
 import type { z } from "zod"
 import type { workOrderCreateSchema, workOrderUpdateSchema, workOrderConvertSchema, issueToWorkOrderSchema } from "../zod-schemas"
@@ -107,4 +109,89 @@ export async function convertIssueToWorkOrder(orgId: string, issueId: string, in
       issueId: issue!.id, createdById,
     },
   })
+}
+
+// ─── Corrective work orders (Phase 42) ───────────────────────────────────────
+//
+// A failed inspection can auto-create a NON-billable corrective work order,
+// linked to the inspection and its issue. One per inspection, enforced via
+// claimOnce. Resolution uses a resolver/verifier split (the verifier must differ
+// from the resolver), mirroring the Phase 30 issue flow. Called from
+// finalizeInspection; kept here so work-order shape stays in one module.
+
+const CORRECTIVE_PRIORITY: Record<string, "URGENT" | "HIGH" | "NORMAL"> = {
+  CRITICAL: "URGENT",
+  HIGH: "HIGH",
+}
+
+export async function maybeCreateCorrectiveWorkOrder(
+  orgId: string,
+  input: {
+    inspectionId: string
+    issueId: string | null
+    customerId: string
+    serviceLocationId: string | null
+    severity: string
+    failedLabels: string[]
+    dueAt: Date
+    createdById: string
+  },
+): Promise<{ created: boolean; workOrderId?: string }> {
+  // One corrective work order per inspection (DB-enforced via the claim ledger).
+  if (!(await claimOnce(orgId, "corrective-wo", input.inspectionId))) return { created: false }
+  const description =
+    "Corrective rework for a failed inspection." +
+    (input.failedLabels.length ? ` Address: ${input.failedLabels.join(", ")}.` : "")
+  try {
+    const wo = await orgDb(orgId).workOrder.create({
+      data: {
+        organizationId: orgId,
+        customerId: input.customerId,
+        serviceLocationId: input.serviceLocationId ?? undefined,
+        type: "ADDITIONAL",
+        description: description.slice(0, 500),
+        priority: CORRECTIVE_PRIORITY[input.severity] ?? "NORMAL",
+        billable: false, // rework is on us by default; overridable per work order
+        isCorrective: true,
+        inspectionId: input.inspectionId,
+        issueId: input.issueId ?? undefined,
+        dueAt: input.dueAt,
+        status: "REQUESTED",
+        createdById: input.createdById,
+      },
+      select: { id: true },
+    })
+    return { created: true, workOrderId: wo.id }
+  } catch (e) {
+    // Lost a race on the unique issue link — the corrective WO already exists.
+    if (isUniqueViolation(e)) return { created: false }
+    throw e
+  }
+}
+
+/** Mark a corrective work order's rework done, awaiting verification. */
+export async function resolveCorrectiveWorkOrder(orgId: string, id: string, actorId: string) {
+  const db = orgDb(orgId)
+  const wo = await db.workOrder.findFirst({ where: { id }, select: { id: true, isCorrective: true, status: true } })
+  assertFound(wo, "Work order")
+  if (!wo!.isCorrective) throw new ConflictError("Only corrective work orders use the resolve/verify flow")
+  if (wo!.status === "VERIFIED") throw new ConflictError("This work order is already verified")
+  await db.workOrder.updateMany({ where: { id }, data: { status: "RESOLVED", resolvedById: actorId, resolvedAt: new Date() } })
+  await recordAudit(orgId, actorId, "WorkOrder", id, "resolve")
+  return db.workOrder.findFirst({ where: { id } })
+}
+
+/** Verify a resolved corrective work order — the verifier must differ. */
+export async function verifyCorrectiveWorkOrder(orgId: string, id: string, actorId: string) {
+  const db = orgDb(orgId)
+  const wo = await db.workOrder.findFirst({ where: { id }, select: { id: true, isCorrective: true, status: true, resolvedById: true } })
+  assertFound(wo, "Work order")
+  if (!wo!.isCorrective) throw new ConflictError("Only corrective work orders use the resolve/verify flow")
+  if (wo!.status !== "RESOLVED") throw new ConflictError("Resolve the work order before verifying it")
+  if (wo!.resolvedById && wo!.resolvedById === actorId) {
+    throw new ForbiddenActionError("Verification must be done by someone other than the person who resolved it")
+  }
+  await db.workOrder.updateMany({ where: { id }, data: { status: "VERIFIED", verifiedById: actorId, verifiedAt: new Date() } })
+  await recordAudit(orgId, actorId, "WorkOrder", id, "verify")
+  return db.workOrder.findFirst({ where: { id } })
 }

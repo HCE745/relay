@@ -16,6 +16,8 @@ export async function getOrgSettings(orgId: string) {
       uncoveredAlertLeadHours: true, missedClockInGraceMin: true,
       visitReminderLeadHours: true, paymentRemindersEnabled: true, issueEscalationEnabled: true,
       defaultIssueAssigneeId: true,
+      autoCorrectiveWorkOrders: true, correctiveOnCriticalOnly: true,
+      correctiveDueDaysStandard: true, correctiveDueDaysCritical: true,
     },
   })
 }
@@ -67,7 +69,7 @@ export async function getContractExpiryLeadDays(orgId: string): Promise<number> 
 /** Update org workspace settings (OWNER/ADMIN only, enforced in the route). */
 export async function updateOrgSettings(
   orgId: string,
-  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string; uncoveredAlertLeadHours?: number; missedClockInGraceMin?: number; issueEscalationEnabled?: boolean; defaultIssueAssigneeId?: string | null },
+  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string; uncoveredAlertLeadHours?: number; missedClockInGraceMin?: number; issueEscalationEnabled?: boolean; defaultIssueAssigneeId?: string | null; autoCorrectiveWorkOrders?: boolean; correctiveOnCriticalOnly?: boolean; correctiveDueDaysStandard?: number; correctiveDueDaysCritical?: number },
 ) {
   const data: Record<string, unknown> = {}
   if (input.timezone !== undefined) data.timezone = input.timezone
@@ -81,5 +83,9 @@ export async function updateOrgSettings(
   if (input.missedClockInGraceMin !== undefined) data.missedClockInGraceMin = input.missedClockInGraceMin
   if (input.issueEscalationEnabled !== undefined) data.issueEscalationEnabled = input.issueEscalationEnabled
   if (input.defaultIssueAssigneeId !== undefined) data.defaultIssueAssigneeId = input.defaultIssueAssigneeId || null
+  if (input.autoCorrectiveWorkOrders !== undefined) data.autoCorrectiveWorkOrders = input.autoCorrectiveWorkOrders
+  if (input.correctiveOnCriticalOnly !== undefined) data.correctiveOnCriticalOnly = input.correctiveOnCriticalOnly
+  if (input.correctiveDueDaysStandard !== undefined) data.correctiveDueDaysStandard = input.correctiveDueDaysStandard
+  if (input.correctiveDueDaysCritical !== undefined) data.correctiveDueDaysCritical = input.correctiveDueDaysCritical
   return systemDb.organization.update({ where: { id: orgId }, data })
 }

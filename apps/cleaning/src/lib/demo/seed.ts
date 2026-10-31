@@ -225,7 +225,7 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
             const critical: boolean = !criticalFailUsed
             if (critical) criticalFailUsed = true
             const score = critical ? 61 : 94
-            await systemDb.inspection.create({
+            const insp = await systemDb.inspection.create({
               data: {
                 organizationId: orgId, serviceLocationId: site.id, jobId: job.id, inspectorId: staff.supervisorIds[d % 2],
                 templateName: "Commercial QC", passThreshold: 80, status: "FINALIZED", score, outcome: critical ? "FAIL" : "PASS",
@@ -238,7 +238,19 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
                   ],
                 },
               },
+              select: { id: true },
             })
+            // Phase 42: the critical failure gets an auto corrective work order.
+            if (critical) {
+              await systemDb.workOrder.create({
+                data: {
+                  organizationId: orgId, customerId: customer.id, serviceLocationId: site.id, type: "ADDITIONAL",
+                  description: "Corrective rework for a failed inspection. Address: Restrooms restocked, High-touch disinfected.",
+                  priority: "URGENT", billable: false, isCorrective: true, inspectionId: insp.id,
+                  dueAt: new Date(now.getTime() + DAY), status: "REQUESTED", createdById: staff.supervisorIds[0],
+                },
+              })
+            }
           }
         }
       }
@@ -312,6 +324,9 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
       },
     })
   }
+
+  // Phase 42: the demo org has the auto-corrective rule on (critical-only).
+  await systemDb.organization.update({ where: { id: orgId }, data: { autoCorrectiveWorkOrders: true, correctiveOnCriticalOnly: true } })
 
   // ── Pay periods (Phase 41): one locked (prior month), one open (current) ──
   const monthStart = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1))

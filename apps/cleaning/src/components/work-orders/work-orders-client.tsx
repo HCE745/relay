@@ -12,11 +12,13 @@ type Customer = { id: string; name: string; sites: { id: string; name: string }[
 type WorkOrder = {
   id: string; type: string; description: string; priority: string; status: string
   quotedAmount: string | null; customerName: string; siteName: string | null; convertedJobId: string | null; requestedBy: string | null
+  isCorrective: boolean; billable: boolean; dueAt: string | null; inspectionId: string | null
 }
 
 const TYPE_LABEL: Record<string, string> = { EMERGENCY: "Emergency", ONE_TIME: "One-time", ADDITIONAL: "Additional", DEEP_CLEAN: "Deep clean" }
-const S_TONE: Record<string, BadgeTone> = { REQUESTED: "info", QUOTED: "purple", APPROVED: "brand", SCHEDULED: "warning", COMPLETED: "success", DECLINED: "neutral" }
+const S_TONE: Record<string, BadgeTone> = { REQUESTED: "info", QUOTED: "purple", APPROVED: "brand", SCHEDULED: "warning", COMPLETED: "success", DECLINED: "neutral", RESOLVED: "warning", VERIFIED: "success" }
 const P_TONE: Record<string, BadgeTone> = { LOW: "neutral", NORMAL: "info", HIGH: "warning", URGENT: "danger" }
+const fmtDate = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" })
 
 export function NewWorkOrderButton({ customers }: { customers: Customer[] }) {
   const router = useRouter()
@@ -66,15 +68,24 @@ function WorkOrderCard({ wo }: { wo: WorkOrder }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cv, setCv] = useState({ date: new Date().toISOString().slice(0, 10), startTime: "09:00", rate: wo.quotedAmount ?? "" })
-  const terminal = !!wo.convertedJobId || wo.status === "DECLINED" || wo.status === "COMPLETED"
+  const terminal = wo.isCorrective
+    ? wo.status === "VERIFIED" || wo.status === "DECLINED"
+    : !!wo.convertedJobId || wo.status === "DECLINED" || wo.status === "COMPLETED"
 
   async function setStatus(status: string) { setBusy(true); await apiSend(`/api/work-orders/${wo.id}`, "PATCH", { status }); setBusy(false); router.refresh() }
+  async function act(path: string) {
+    setBusy(true); setError(null)
+    const res = await apiSend(`/api/work-orders/${wo.id}/${path}`, "POST")
+    setBusy(false); if (!res.ok) return setError(res.error)
+    router.refresh()
+  }
   async function convert() {
     setBusy(true); setError(null)
     const res = await apiSend(`/api/work-orders/${wo.id}/convert`, "POST", { date: cv.date, startTime: cv.startTime, rate: cv.rate || undefined })
     setBusy(false); if (!res.ok) return setError(res.error)
     setMode("none"); router.refresh()
   }
+  const overdue = wo.dueAt && wo.status !== "VERIFIED" && new Date(wo.dueAt) < new Date()
   return (
     <Card className="p-4">
       <div className="flex items-start justify-between gap-2">
@@ -84,9 +95,28 @@ function WorkOrderCard({ wo }: { wo: WorkOrder }) {
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           <StatusBadge tone={S_TONE[wo.status] ?? "neutral"}>{wo.status}</StatusBadge>
-          <StatusBadge tone={P_TONE[wo.priority] ?? "neutral"}>{TYPE_LABEL[wo.type]} · {wo.priority}</StatusBadge>
+          {wo.isCorrective
+            ? <StatusBadge tone="purple">Corrective · non-billable</StatusBadge>
+            : <StatusBadge tone={P_TONE[wo.priority] ?? "neutral"}>{TYPE_LABEL[wo.type]} · {wo.priority}</StatusBadge>}
         </div>
       </div>
+      {wo.isCorrective ? (
+        <>
+          <div className={`mt-2 text-sm ${overdue ? "font-medium text-red-600" : "text-slate-500"}`}>
+            {wo.dueAt ? `Due ${fmtDate(wo.dueAt)}${overdue ? " · OVERDUE" : ""}` : "No due date"}
+            {wo.inspectionId ? <> · <Link href={`/inspections/${wo.inspectionId}`} className="text-brand hover:underline">inspection</Link></> : null}
+          </div>
+          {!terminal ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {wo.status === "REQUESTED" ? <Button size="sm" onClick={() => act("resolve")} disabled={busy}>Mark resolved</Button> : null}
+              {wo.status === "RESOLVED" ? <Button size="sm" onClick={() => act("verify")} disabled={busy}>Verify (different person)</Button> : null}
+              <Button size="sm" variant="secondary" onClick={() => act("reinspect")} disabled={busy}>Re-inspect</Button>
+            </div>
+          ) : null}
+          {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
+        </>
+      ) : (
+      <>
       <div className="mt-2 text-sm text-slate-500">{wo.quotedAmount ? `Quoted $${wo.quotedAmount}` : "Not yet quoted"}{wo.requestedBy ? ` · by ${wo.requestedBy}` : ""}</div>
       {wo.convertedJobId ? (
         <div className="mt-2"><Link href={`/jobs/${wo.convertedJobId}`} className="text-sm font-medium text-brand hover:underline">Scheduled job →</Link></div>
@@ -109,13 +139,19 @@ function WorkOrderCard({ wo }: { wo: WorkOrder }) {
           {error ? <p className="text-xs text-red-600">{error}</p> : null}
         </div>
       ) : null}
+      </>
+      )}
     </Card>
   )
 }
 
 export function WorkOrdersClient({ workOrders }: { workOrders: WorkOrder[] }) {
-  const open = workOrders.filter((w) => !w.convertedJobId && w.status !== "DECLINED" && w.status !== "COMPLETED")
-  const done = workOrders.filter((w) => w.convertedJobId || w.status === "DECLINED" || w.status === "COMPLETED")
+  const isDone = (w: WorkOrder) =>
+    w.isCorrective
+      ? w.status === "VERIFIED" || w.status === "DECLINED"
+      : !!w.convertedJobId || w.status === "DECLINED" || w.status === "COMPLETED"
+  const open = workOrders.filter((w) => !isDone(w))
+  const done = workOrders.filter(isDone)
   return (
     <div className="space-y-6">
       <section>

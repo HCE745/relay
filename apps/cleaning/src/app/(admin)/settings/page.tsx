@@ -12,6 +12,7 @@ import { OrgTimezoneForm } from "@/components/settings/org-timezone-form"
 import { ContractExpiryForm } from "@/components/settings/contract-expiry-form"
 import { OvertimeForm } from "@/components/settings/overtime-form"
 import { AlertsForm } from "@/components/settings/alerts-form"
+import { CorrectiveForm } from "@/components/settings/corrective-form"
 import { CommsForm } from "@/components/settings/comms-form"
 import { ComplianceForm } from "@/components/settings/compliance-form"
 import { ChangePasswordForm } from "@/components/settings/change-password-form"
@@ -27,6 +28,7 @@ export default async function SettingsPage() {
   const showContracts = await orgHasCapability(session.organizationId, "crm.contracts")
   const showCompliance = await orgHasCapability(session.organizationId, "workforce.compliance")
   const showCommission = isOrgAdmin && (await orgHasCapability(session.organizationId, "workforce.commissionPay"))
+  const showCorrective = isOrgAdmin && (await orgHasCapability(session.organizationId, "quality.inspections")) && (await orgHasCapability(session.organizationId, "operations.workOrders"))
 
   const canSetup = canManageAccounts(session.role)
   const [setup, setupDismissed] = canSetup
@@ -134,6 +136,19 @@ export default async function SettingsPage() {
           <div className="mt-3">
             <AlertsForm uncoveredLeadHours={org?.uncoveredAlertLeadHours ?? 24} missedGraceMin={org?.missedClockInGraceMin ?? 30} issueEscalationEnabled={org?.issueEscalationEnabled ?? true} />
           </div>
+        </Card>
+      ) : null}
+
+      {showCorrective ? (
+        <Card className="p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Corrective work orders</h2>
+          <p className="mb-3 text-sm text-slate-500">Turn failed inspections into tracked rework automatically.</p>
+          <CorrectiveForm
+            enabled={org?.autoCorrectiveWorkOrders ?? false}
+            criticalOnly={org?.correctiveOnCriticalOnly ?? false}
+            dueStandard={org?.correctiveDueDaysStandard ?? 3}
+            dueCritical={org?.correctiveDueDaysCritical ?? 1}
+          />
         </Card>
       ) : null}
 

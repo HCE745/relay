@@ -437,6 +437,14 @@ model Organization {
   issueEscalationEnabled  Boolean @default(true)
   // Issue routing (Phase 31): fallback owner when no rule matches (null = leave unassigned).
   defaultIssueAssigneeId  String?
+  // Automatic corrective work orders (Phase 42). When enabled, a failed
+  // inspection auto-creates a NON-billable corrective work order. If
+  // criticalOnly is set, only a failed CRITICAL item triggers it. The due date
+  // is derived from severity using the two configurable day counts.
+  autoCorrectiveWorkOrders  Boolean @default(false)
+  correctiveOnCriticalOnly  Boolean @default(false)
+  correctiveDueDaysStandard Int     @default(3)
+  correctiveDueDaysCritical Int     @default(1)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")
@@ -1237,6 +1245,8 @@ enum WorkOrderStatus {
   SCHEDULED
   COMPLETED
   DECLINED
+  RESOLVED // corrective rework done, awaiting verification (Phase 42)
+  VERIFIED // corrective rework verified by someone other than the resolver
 
   @@schema("cleaning")
 }
@@ -1254,9 +1264,20 @@ model WorkOrder {
   requestedAt       DateTime          @default(now())
   priority          WorkOrderPriority @default(NORMAL)
   quotedAmount      Decimal?          @db.Decimal(12, 2)
+  // Billable by default; corrective rework (Phase 42) defaults to NON-billable.
+  billable          Boolean           @default(true)
+  // Auto-generated corrective rework from a failed inspection (Phase 42).
+  isCorrective      Boolean           @default(false)
+  inspectionId      String? // the inspection that triggered this corrective WO
+  dueAt             DateTime? // corrective due date, derived from severity
   status            WorkOrderStatus   @default(REQUESTED)
   approvedById      String?
   approvedAt        DateTime?
+  // Resolver/verifier split for corrective WOs — the verifier must differ.
+  resolvedById      String?
+  resolvedAt        DateTime?
+  verifiedById      String?
+  verifiedAt        DateTime?
   issueId           String?           @unique // origin complaint (one WO per issue)
   convertedJobId    String?           @unique // the scheduled billable job
   createdById       String?
@@ -1267,10 +1288,12 @@ model WorkOrder {
   customer        Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
   serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
   issue           Issue?           @relation("WorkOrderIssue", fields: [issueId], references: [id], onDelete: SetNull)
+  inspection      Inspection?      @relation("WorkOrderInspection", fields: [inspectionId], references: [id], onDelete: SetNull)
   convertedJob    Job?             @relation("WorkOrderJob", fields: [convertedJobId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
   @@index([status])
+  @@index([inspectionId])
   @@schema("cleaning")
 }
 
@@ -1690,6 +1713,7 @@ model Inspection {
   results         InspectionItemResult[]
   photos          JobPhoto[]
   issue           Issue?
+  correctiveWorkOrders WorkOrder[]       @relation("WorkOrderInspection")
 
   @@index([organizationId])
   @@index([serviceLocationId])

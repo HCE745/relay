@@ -41,6 +41,8 @@ export default async function WorkOrdersPage() {
           quotedAmount: w.quotedAmount ? w.quotedAmount.toFixed(2) : null,
           customerName: w.customer.name, siteName: w.serviceLocation?.name ?? null,
           convertedJobId: w.convertedJobId, requestedBy: w.requestedBy,
+          isCorrective: w.isCorrective, billable: w.billable,
+          dueAt: w.dueAt ? w.dueAt.toISOString() : null, inspectionId: w.inspectionId,
         }))}
       />
     </div>

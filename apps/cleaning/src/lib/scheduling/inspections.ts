@@ -1,10 +1,13 @@
-import { orgDb, isUniqueViolation } from "../org-db"
+import { orgDb, systemDb, isUniqueViolation } from "../org-db"
 import { assertFound, ConflictError, RequirementsError } from "../data/errors"
 import { recordAudit } from "../data/audit"
 import { issueSlaFields } from "../data/issues"
 import { applyRouting } from "../data/issue-routing"
+import { maybeCreateCorrectiveWorkOrder } from "../data/work-orders"
 import { notifyManagers } from "../notify"
 import { scoreInspection, type ResultValue } from "./scoring"
+
+const DAY_MS = 86_400_000
 
 // Inspection lifecycle. An Inspection snapshots its template + items at creation,
 // so later template edits never change historical results. Finalization computes
@@ -86,6 +89,7 @@ export type FinalizeResult = {
   score: number
   outcome: "PASS" | "FAIL"
   issueId: string | null
+  correctiveWorkOrderId: string | null
   alreadyFinalized: boolean
 }
 
@@ -104,7 +108,7 @@ export async function finalizeInspection(
 
   // Idempotent: finalizing again is a no-op that returns the stored outcome.
   if (insp!.status === "FINALIZED") {
-    return { score: insp!.score ?? 0, outcome: insp!.outcome ?? "FAIL", issueId: insp!.issue?.id ?? null, alreadyFinalized: true }
+    return { score: insp!.score ?? 0, outcome: insp!.outcome ?? "FAIL", issueId: insp!.issue?.id ?? null, correctiveWorkOrderId: null, alreadyFinalized: true }
   }
 
   // Every item must be scored, and photo-required items need a photo.
@@ -135,6 +139,7 @@ export async function finalizeInspection(
 
   // FAIL → create exactly one linked Issue (idempotent via unique inspectionId).
   let issueId: string | null = null
+  let correctiveWorkOrderId: string | null = null
   if (outcome === "FAIL") {
     const failed = insp!.results.filter((r) => r.result === "FAIL")
     const description =
@@ -167,6 +172,33 @@ export async function finalizeInspection(
         issueId = existing?.id ?? null
       } else throw e
     }
+    // Phase 42: optionally auto-create a NON-billable corrective work order,
+    // linked to the inspection and the issue. Rule + due days are org-configurable.
+    const cfg = await systemDb.organization.findUnique({
+      where: { id: orgId },
+      select: { autoCorrectiveWorkOrders: true, correctiveOnCriticalOnly: true, correctiveDueDaysStandard: true, correctiveDueDaysCritical: true },
+    })
+    const failedCritical = failed.some((f) => f.isCritical)
+    if (cfg?.autoCorrectiveWorkOrders && (!cfg.correctiveOnCriticalOnly || failedCritical)) {
+      const site = insp!.serviceLocationId
+        ? await db.serviceLocation.findFirst({ where: { id: insp!.serviceLocationId }, select: { customerId: true } })
+        : null
+      if (site?.customerId) {
+        const dueDays = failedCritical ? cfg.correctiveDueDaysCritical : cfg.correctiveDueDaysStandard
+        const res = await maybeCreateCorrectiveWorkOrder(orgId, {
+          inspectionId,
+          issueId,
+          customerId: site.customerId,
+          serviceLocationId: insp!.serviceLocationId,
+          severity: failedCritical ? "CRITICAL" : sla.severity,
+          failedLabels: failed.map((f) => f.label),
+          dueAt: new Date(now.getTime() + dueDays * DAY_MS),
+          createdById: actorId,
+        })
+        correctiveWorkOrderId = res.workOrderId ?? null
+      }
+    }
+
     await notifyManagers(
       orgId,
       `Inspection FAILED (${score}%) at ${insp!.templateName}`,
@@ -174,7 +206,24 @@ export async function finalizeInspection(
     )
   }
 
-  return { score, outcome, issueId, alreadyFinalized: false }
+  return { score, outcome, issueId, correctiveWorkOrderId, alreadyFinalized: false }
+}
+
+/**
+ * Trigger a re-inspection from a corrective work order (Phase 42): create a
+ * fresh DRAFT inspection on the same job using the same template, so the
+ * supervisor can confirm the rework actually fixed the failures.
+ */
+export async function reinspectFromWorkOrder(orgId: string, workOrderId: string, inspectorId: string) {
+  const db = orgDb(orgId)
+  const wo = await db.workOrder.findFirst({ where: { id: workOrderId }, select: { id: true, isCorrective: true, inspectionId: true } })
+  assertFound(wo, "Work order")
+  if (!wo!.isCorrective || !wo!.inspectionId) throw new ConflictError("This is not a corrective work order")
+  const source = await db.inspection.findFirst({ where: { id: wo!.inspectionId }, select: { jobId: true, templateId: true } })
+  if (!source?.jobId || !source.templateId) {
+    throw new RequirementsError("Can't re-inspect automatically", ["The original inspection has no job or template to copy"])
+  }
+  return createInspectionFromJob(orgId, source.jobId, inspectorId, source.templateId)
 }
 
 export function listInspectionsForJob(orgId: string, jobId: string) {

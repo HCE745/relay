@@ -244,6 +244,11 @@ export const orgSettingsSchema = z.object({
   issueEscalationEnabled: z.boolean().optional(),
   // Issue routing fallback (Phase 31): empty string clears it (leave unassigned).
   defaultIssueAssigneeId: z.string().optional().or(z.literal("").transform(() => null)).nullable(),
+  // Automatic corrective work orders (Phase 42).
+  autoCorrectiveWorkOrders: z.boolean().optional(),
+  correctiveOnCriticalOnly: z.boolean().optional(),
+  correctiveDueDaysStandard: z.coerce.number().int().min(1).max(60).optional(),
+  correctiveDueDaysCritical: z.coerce.number().int().min(1).max(60).optional(),
 })
 
 // ─── Compliance & credentials (Phase 13) ───

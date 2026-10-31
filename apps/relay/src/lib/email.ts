@@ -713,3 +713,30 @@ ${btn("View your dashboard", dashboardUrl)}
 `, `A referral reward has been applied to your account`),
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sales CRM — invite email (sent when a super-admin creates a new CRM user)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function salesCrmInviteEmail({ name, inviteUrl }: {
+  name: string
+  inviteUrl: string
+}): string {
+  return layout(`
+<h1 style="margin:0 0 8px;font-size:24px;font-weight:800;color:${TEXT};font-family:${FONT};letter-spacing:-0.5px">You've been invited to Relay Sales CRM</h1>
+<p style="margin:0 0 24px;font-size:15px;color:${MUTED};font-family:${FONT};line-height:1.6">Hi ${name}, you've been added to the Relay sales team. Click the button below to set your password and activate your account.</p>
+
+<div style="margin:0 0 28px">
+  ${btn("Set my password →", inviteUrl, "#10b981")}
+</div>
+
+${alertBox(`This link expires in <strong>24 hours</strong> and can only be used once. If it expires, ask your administrator to resend the invitation.`, "#065f46", "#ecfdf5")}
+
+${card(`
+  ${infoRow("Account email", `<strong style="color:${TEXT}">${inviteUrl.split("=")[0] ? name : name}</strong>`)}
+  ${infoRow("Login page", `<a href="${APP_URL}/sales/login" style="color:${BLUE};text-decoration:none">${APP_URL}/sales/login</a>`)}
+`)}
+
+<p style="margin:16px 0 0;font-size:13px;color:${MUTED};font-family:${FONT}">If you weren't expecting this invitation, you can safely ignore this email. Questions? Contact <a href="mailto:${SUPPORT_EMAIL}" style="color:${BLUE};text-decoration:none">${SUPPORT_EMAIL}</a></p>
+`, `You've been invited to the Relay sales team — set your password to get started`)
+}

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Settings, ExternalLink, Mail, Users, Bell, Layers } from "lucide-react"
 import { DemoResetButton } from "./DemoResetButton"
+import { ChangePasswordForm } from "./ChangePasswordForm"
 
 export const dynamic = "force-dynamic"
 
@@ -87,6 +88,13 @@ export default async function SettingsPage() {
         </Link>
       </div>
 
+      {/* Change password — only for real SalesUser accounts */}
+      {!isDemo && session.salesUserId && !session.superAdmin && (
+        <div className="mt-6">
+          <ChangePasswordForm />
+        </div>
+      )}
+
       {isDemo && (
         <div className="mt-6">
           <DemoResetButton />
@@ -96,7 +104,7 @@ export default async function SettingsPage() {
       {/* Session info */}
       <div className="mt-6 px-1">
         <p className="text-xs text-gray-600">
-          {isDemo ? "Demo account · Sample data only" : "Logged in as super admin · Sales section uses your super admin session"}
+          {isDemo ? "Demo account · Sample data only" : session.superAdmin ? "Logged in as super admin · Sales section uses your super admin session" : `Logged in as ${session.name}`}
         </p>
       </div>
     </div>

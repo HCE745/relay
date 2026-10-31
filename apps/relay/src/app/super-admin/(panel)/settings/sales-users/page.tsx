@@ -3,17 +3,18 @@
 import { useState, useEffect } from "react"
 import {
   Users, Plus, X, Check, Loader2, AlertCircle,
-  ShieldCheck, UserCircle, Power, PowerOff, KeyRound, Trash2,
+  ShieldCheck, UserCircle, Power, PowerOff, KeyRound, Mail,
 } from "lucide-react"
 
 interface SalesUser {
-  id:        string
-  email:     string
-  name:      string
-  role:      "admin_sales" | "sales_rep"
-  isActive:  boolean
-  createdAt: string
-  updatedAt: string
+  id:            string
+  email:         string
+  name:          string
+  role:          "admin_sales" | "sales_rep"
+  isActive:      boolean
+  invitePending: boolean
+  createdAt:     string
+  updatedAt:     string
 }
 
 const ROLE_LABEL: Record<string, string> = {
@@ -46,14 +47,18 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
   const [saving,   setSaving]   = useState(false)
   const [error,    setError]    = useState("")
 
+  const inviteMode = password.length === 0
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true); setError("")
     try {
+      const body: Record<string, string> = { name, email, role }
+      if (password) body.password = password
       const res = await fetch("/api/super-admin/sales-users", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ name, email, password, role }),
+        body:    JSON.stringify(body),
       })
       const j = await res.json() as SalesUser & { error?: string }
       if (!res.ok) throw new Error(j.error ?? "Failed to create user")
@@ -102,17 +107,25 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">Password</label>
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">
+              Password
+              <span className="ml-1.5 text-gray-600 font-normal">(leave blank to send invite)</span>
+            </label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              required
               minLength={8}
-              placeholder="Min 8 characters"
+              placeholder="Leave blank to email an invite"
               autoComplete="new-password"
               className="w-full px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
+            {inviteMode && (
+              <p className="text-xs text-amber-400/80 mt-1.5 flex items-center gap-1">
+                <Mail className="w-3 h-3 shrink-0" />
+                A secure invite link will be emailed to the user (24 h expiry).
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-1.5">Role</label>
@@ -140,8 +153,10 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
             disabled={saving}
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
           >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            {saving ? "Creating…" : "Create User"}
+            {saving
+              ? <Loader2 className="w-4 h-4 animate-spin" />
+              : inviteMode ? <Mail className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {saving ? "Creating…" : inviteMode ? "Create & Send Invite" : "Create User"}
           </button>
           <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors">
             Cancel
@@ -263,6 +278,24 @@ export default function SalesUsersPage() {
     }
   }
 
+  async function resendInvite(user: SalesUser) {
+    setActionId(user.id)
+    try {
+      const res = await fetch(`/api/super-admin/sales-users/${user.id}`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ action: "resend_invite" }),
+      })
+      if (res.ok) showToast(`Invite resent to ${user.email}`)
+      else {
+        const j = await res.json() as { error?: string }
+        showToast(j.error ?? "Failed to resend invite")
+      }
+    } finally {
+      setActionId(null)
+    }
+  }
+
   return (
     <div className="p-4 md:p-8 max-w-4xl">
       {/* Toast */}
@@ -354,7 +387,12 @@ export default function SalesUsersPage() {
                     <Badge role={u.role} />
                   </td>
                   <td className="px-4 py-3">
-                    {u.isActive ? (
+                    {u.invitePending ? (
+                      <span className="flex items-center gap-1.5 text-amber-400 text-xs font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+                        Invite pending
+                      </span>
+                    ) : u.isActive ? (
                       <span className="flex items-center gap-1.5 text-emerald-400 text-xs font-medium">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
                         Active
@@ -371,21 +409,38 @@ export default function SalesUsersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      {/* Reset password */}
-                      <button
-                        onClick={() => setResetTarget(u)}
-                        title="Reset password"
-                        className="p-1.5 rounded-lg text-gray-500 hover:text-yellow-400 hover:bg-yellow-900/20 transition-colors"
-                      >
-                        <KeyRound className="w-4 h-4" />
-                      </button>
+                      {/* Resend invite (only for pending users) */}
+                      {u.invitePending && (
+                        <button
+                          onClick={() => void resendInvite(u)}
+                          disabled={actionId === u.id}
+                          title="Resend invite email"
+                          className="p-1.5 rounded-lg text-gray-500 hover:text-amber-400 hover:bg-amber-900/20 transition-colors"
+                        >
+                          {actionId === u.id
+                            ? <Loader2 className="w-4 h-4 animate-spin" />
+                            : <Mail className="w-4 h-4" />}
+                        </button>
+                      )}
+                      {/* Reset password (only for active, non-pending users) */}
+                      {!u.invitePending && (
+                        <button
+                          onClick={() => setResetTarget(u)}
+                          title="Reset password"
+                          className="p-1.5 rounded-lg text-gray-500 hover:text-yellow-400 hover:bg-yellow-900/20 transition-colors"
+                        >
+                          <KeyRound className="w-4 h-4" />
+                        </button>
+                      )}
                       {/* Toggle active */}
                       <button
                         onClick={() => void toggleActive(u)}
-                        disabled={actionId === u.id}
-                        title={u.isActive ? "Deactivate" : "Reactivate"}
+                        disabled={actionId === u.id || u.invitePending}
+                        title={u.invitePending ? "Cannot activate until invite is accepted" : u.isActive ? "Deactivate" : "Reactivate"}
                         className={`p-1.5 rounded-lg transition-colors ${
-                          u.isActive
+                          u.invitePending
+                            ? "text-gray-700 cursor-not-allowed"
+                            : u.isActive
                             ? "text-gray-500 hover:text-red-400 hover:bg-red-900/20"
                             : "text-gray-500 hover:text-emerald-400 hover:bg-emerald-900/20"
                         }`}
@@ -408,7 +463,7 @@ export default function SalesUsersPage() {
         <ShieldCheck className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
         <div className="space-y-1">
           <p><span className="text-white font-medium">Sales Managers</span> (admin_sales) — full read/write access to all CRM data in the sales panel.</p>
-          <p><span className="text-white font-medium">Sales Reps</span> (sales_rep) — same panel access today; Phase 2 will scope their view to assigned accounts only.</p>
+          <p><span className="text-white font-medium">Sales Reps</span> (sales_rep) — scoped to their own assigned leads, contacts, and opportunities only.</p>
           <p className="text-gray-600">Sales users cannot access <code>/super-admin</code> routes. SuperAdmin credentials continue to work at <code>/sales/login</code> as before.</p>
         </div>
       </div>

@@ -2719,6 +2719,7 @@ model SalesUser {
   role             String    @default("admin_sales") // "admin_sales" | "sales_rep"
   isActive         Boolean   @default(true)
   isDemo           Boolean   @default(false)
+  invitePending    Boolean   @default(false)
   // Commission fields
   employmentStatus String    @default("ACTIVE")     // ACTIVE | INACTIVE
   inactiveAt       DateTime?
@@ -2754,6 +2755,20 @@ model SalesUser {
   abTestCampaigns          AbTestCampaign[]     @relation("AbTestCampaignSalesUser")
   salesActivities          SalesCrmActivity[]   @relation("SalesUserActivities")
   objections               CrmObjection[]       @relation("SalesUserObjections")
+  invites                  SalesUserInvite[]
+}
+
+model SalesUserInvite {
+  id          String    @id @default(cuid())
+  salesUserId String
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  salesUser SalesUser @relation(fields: [salesUserId], references: [id], onDelete: Cascade)
+
+  @@index([salesUserId])
 }
 
 model SalesSession {

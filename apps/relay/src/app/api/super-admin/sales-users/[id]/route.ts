@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
+import { sendInvite } from "../route"
 
 export async function PATCH(
   req: NextRequest,
@@ -20,8 +21,16 @@ export async function PATCH(
   const user = await prisma.salesUser.findUnique({ where: { id } })
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
 
-  // action: "deactivate" | "reactivate" | "reset_password" — or plain field patch
+  // action: "deactivate" | "reactivate" | "reset_password" | "resend_invite" — or plain field patch
   const action = typeof body.action === "string" ? body.action : null
+
+  if (action === "resend_invite") {
+    if (!user.invitePending) {
+      return NextResponse.json({ error: "User has already accepted their invitation" }, { status: 409 })
+    }
+    await sendInvite(id, user.name, user.email)
+    return NextResponse.json({ ok: true, inviteSent: true })
+  }
 
   if (action === "deactivate") {
     const updated = await prisma.salesUser.update({
@@ -67,8 +76,8 @@ export async function PATCH(
     const passwordHash = await bcrypt.hash(password, 12)
     const updated = await prisma.salesUser.update({
       where:  { id },
-      data:   { passwordHash },
-      select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true, updatedAt: true },
+      data:   { passwordHash, invitePending: false, isActive: true },
+      select: { id: true, email: true, name: true, role: true, isActive: true, invitePending: true, createdAt: true, updatedAt: true },
     })
     return NextResponse.json(updated)
   }

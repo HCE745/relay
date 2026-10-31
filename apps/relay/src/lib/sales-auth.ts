@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/session"
+import { prisma } from "@/lib/prisma"
 
 export interface SalesSessionInfo {
   salesUserId: string
@@ -27,15 +28,23 @@ export async function getSalesSession(): Promise<SalesSessionInfo | null> {
   }
 
   if (session.salesUserId) {
-    const role = session.salesUserRole ?? "sales_rep"
+    // Re-validate isActive on every request so deactivated users lose access
+    // immediately even if they have an existing session cookie.
+    const dbUser = await prisma.salesUser.findUnique({
+      where:  { id: session.salesUserId },
+      select: { isActive: true, role: true, name: true, isDemo: true },
+    })
+    if (!dbUser || !dbUser.isActive) return null
+
+    const role = dbUser.role ?? session.salesUserRole ?? "sales_rep"
     return {
       salesUserId: session.salesUserId,
       salesUserRole: role,
-      salesUserName: session.salesUserName ?? "",
+      salesUserName: dbUser.name ?? session.salesUserName ?? "",
       isSuperAdmin: false,
       isManager: role === "admin_sales",
       isRep: role === "sales_rep",
-      isDemo: session.isDemo ?? false,
+      isDemo: dbUser.isDemo ?? session.isDemo ?? false,
     }
   }
 

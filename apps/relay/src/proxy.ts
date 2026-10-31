@@ -25,6 +25,9 @@ const PUBLIC_PATHS = [
   // Sales login page + its dedicated API route
   "/sales/login",
   "/api/sales/login",
+  // Sales invite — new user sets password via emailed link; must be public
+  "/sales/invite",
+  "/api/sales/invite",
   // Open tracking pixel + click event recording — must be reachable without login
   "/api/track",
   // Link click redirects — must be public so email recipients can follow tracked links

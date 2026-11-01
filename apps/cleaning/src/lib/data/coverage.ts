@@ -3,10 +3,17 @@ import { getOrgTimezone } from "./org"
 import { isUnavailableOn } from "./availability"
 import { assertFound, ReferenceError } from "./errors"
 import { notifyUserEventSafe } from "../notifications/dispatch"
+import { satisfiesRequirement } from "../credential-status"
+import { rankCandidates, type CandidateFacts, type RankedCandidate } from "../scheduling/matching"
 
 // Shift coverage (Phase 11). An assignment on an unavailable cleaner's job needs
 // coverage; the finder ranks available cleaners by prior work at the site; a
 // reassign is one write + an AuditEvent.
+//
+// Phase 47 EXTENDS (does not replace) the finder: after the same availability /
+// not-busy / not-already-on-job filtering, candidates are ranked by how well
+// they match the site's required skills and credentials, with site work history
+// as the tiebreaker. With no requirements the ranking is unchanged from Phase 11.
 
 const ACTIVE_JOB_STATUSES = ["SCHEDULED", "ASSIGNED", "IN_PROGRESS"] as const
 const endOf = (start: Date, end: Date | null) => end ?? new Date(start.getTime() + 60 * 60 * 1000)
@@ -65,9 +72,11 @@ export async function countUncoveredShifts(orgId: string, opts: { hoursAhead?: n
   return (await listUncoveredShifts(orgId, opts)).length
 }
 
-export type CoverageCandidate = { userId: string; name: string; priorJobsAtSite: number }
+// A ranked candidate carries the Phase 11 fields (userId/name/priorJobsAtSite)
+// plus the Phase 47 skill/credential match detail.
+export type CoverageCandidate = RankedCandidate
 
-/** Available cleaners who aren't busy at that time, ranked by prior work at the site. */
+/** Available cleaners who aren't busy at that time, ranked by site match (skills, credentials, history). */
 export async function findCoverageCandidates(orgId: string, jobId: string): Promise<CoverageCandidate[]> {
   const db = orgDb(orgId)
   const job = await db.job.findFirst({
@@ -123,12 +132,66 @@ export async function findCoverageCandidates(orgId: string, jobId: string): Prom
   })
   const prior = new Map(priorRows.map((r) => [r.userId, r._count._all]))
 
-  return pool
+  // ── Phase 47: the site's required skills + credentials, and who holds them ──
+  const skillReqs = await db.siteSkillRequirement.findMany({
+    where: { serviceLocationId: job!.serviceLocationId },
+    select: { skill: { select: { id: true, name: true } } },
+  })
+  const requiredSkills = skillReqs.map((r) => r.skill.name)
+  const requiredSkillIds = skillReqs.map((r) => r.skill.id)
+
+  const credReqRows = await db.siteCredentialRequirement.findMany({ where: { serviceLocationId: job!.serviceLocationId }, select: { type: true } })
+  const requiredCredentials = credReqRows.map((r) => r.type)
+
+  // Candidate-held skills (only the required ones matter for matching).
+  const heldSkills =
+    requiredSkillIds.length === 0
+      ? []
+      : await db.employeeSkill.findMany({
+          where: { userId: { in: poolIds }, skillId: { in: requiredSkillIds } },
+          select: { userId: true, skill: { select: { name: true } } },
+        })
+  const skillsByUser = new Map<string, Set<string>>()
+  for (const h of heldSkills) (skillsByUser.get(h.userId) ?? skillsByUser.set(h.userId, new Set()).get(h.userId)!).add(h.skill.name)
+
+  // Candidate-held credentials of the required types, for a valid/expired check.
+  const now = new Date()
+  const heldCreds =
+    requiredCredentials.length === 0
+      ? []
+      : await db.credential.findMany({
+          where: { userId: { in: poolIds }, type: { in: requiredCredentials as never } },
+          select: { userId: true, type: true, status: true, expiryDate: true },
+        })
+  const credsByUser = new Map<string, { type: string; status: string; expiryDate: Date | null }[]>()
+  for (const c of heldCreds) (credsByUser.get(c.userId) ?? credsByUser.set(c.userId, []).get(c.userId)!).push(c)
+
+  function missingCredentialsFor(userId: string): { type: string; reason: "missing" | "expired" }[] {
+    const held = credsByUser.get(userId) ?? []
+    const out: { type: string; reason: "missing" | "expired" }[] = []
+    for (const type of requiredCredentials) {
+      const forType = held.filter((c) => c.type === type)
+      if (forType.length === 0) out.push({ type, reason: "missing" })
+      else if (!forType.some((c) => satisfiesRequirement(c, now))) out.push({ type, reason: "expired" })
+    }
+    return out
+  }
+
+  const facts: CandidateFacts[] = pool
     .filter((u) => !alreadyOnJob.has(u.id))
     .filter((u) => !isUnavailableOn(blocks, u.id, targetStart, siteTz))
     .filter((u) => !busy.has(u.id))
-    .map((u) => ({ userId: u.id, name: u.name, priorJobsAtSite: prior.get(u.id) ?? 0 }))
-    .sort((a, b) => b.priorJobsAtSite - a.priorJobsAtSite || a.name.localeCompare(b.name))
+    .map((u) => ({
+      userId: u.id,
+      name: u.name,
+      priorJobsAtSite: prior.get(u.id) ?? 0,
+      requiredSkills,
+      matchedSkills: requiredSkills.filter((s) => skillsByUser.get(u.id)?.has(s)),
+      requiredCredentials,
+      missingCredentials: missingCredentialsFor(u.id),
+    }))
+
+  return rankCandidates(facts)
 }
 
 /** Reassign a job from one cleaner to another; logged to AuditEvent. */

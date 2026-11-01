@@ -533,6 +533,9 @@ model Organization {
   collectionActivities CollectionActivity[]
   indirectCostPools   IndirectCostPool[]
   laborBudgets        LaborBudget[]
+  skills              Skill[]
+  employeeSkills      EmployeeSkill[]
+  siteSkillRequirements SiteSkillRequirement[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -591,6 +594,7 @@ model User {
   notificationPrefs    NotificationPreference[]
   notificationLogs     NotificationLog[]
   lockedPayPeriods     PayPeriod[]        @relation("PayPeriodLockedBy")
+  skills               EmployeeSkill[]    @relation("UserSkill")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -800,6 +804,7 @@ model ServiceLocation {
   accessItems  AccessItem[]
   workOrders   WorkOrder[]
   laborBudgets LaborBudget[]
+  skillRequirements SiteSkillRequirement[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -2887,6 +2892,62 @@ model LaborBudget {
   serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
   servicePlan     ServicePlan?     @relation(fields: [servicePlanId], references: [id], onDelete: Cascade)
 
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// ─── Skills & intelligent shift matching (Phase 47) ──────────────────────────
+// An org catalog of competencies (floor care, window washing, biohazard, …),
+// assigned to employees and required by sites. The Phase 11 coverage finder is
+// EXTENDED — not replaced — to rank available candidates by how well they match
+// a site's required skills and credentials, on top of site work history.
+// Deterministic matching; no AI.
+model Skill {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization     Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employeeSkills   EmployeeSkill[]
+  siteRequirements SiteSkillRequirement[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+model EmployeeSkill {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  skillId        String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation("UserSkill", fields: [userId], references: [id], onDelete: Cascade)
+  skill        Skill        @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, skillId])
+  @@index([organizationId])
+  @@index([skillId])
+  @@schema("cleaning")
+}
+
+model SiteSkillRequirement {
+  id                String   @id @default(cuid())
+  organizationId    String
+  serviceLocationId String
+  skillId           String
+  createdAt         DateTime @default(now())
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  skill           Skill           @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceLocationId, skillId])
   @@index([organizationId])
   @@schema("cleaning")
 }

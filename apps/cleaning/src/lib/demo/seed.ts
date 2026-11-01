@@ -380,6 +380,35 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
   if (budPlan)
     await systemDb.laborBudget.create({ data: { organizationId: orgId, scope: "PLAN", servicePlanId: budPlan.id, period: "MONTHLY", budgetedHours: "24.00", budgetedCost: "500.00" } })
 
+  // ── Skills & matching (Phase 47): a catalog, assignments, a site requirement ──
+  const skillNames = ["Floor stripping & waxing", "Window washing", "Carpet extraction", "Biohazard handling"]
+  const skillIds: string[] = []
+  for (const name of skillNames) {
+    const s = await systemDb.skill.create({ data: { organizationId: orgId, name }, select: { id: true } })
+    skillIds.push(s.id)
+  }
+  const [floorSkill, windowSkill, carpetSkill] = skillIds
+  // Give the first cleaners a spread of skills (not everyone has floor care).
+  const skillAssign: { organizationId: string; userId: string; skillId: string }[] = []
+  staff.cleanerIds.forEach((uid, i) => {
+    if (i % 2 === 0) skillAssign.push({ organizationId: orgId, userId: uid, skillId: floorSkill })
+    if (i % 3 === 0) skillAssign.push({ organizationId: orgId, userId: uid, skillId: windowSkill })
+    if (i % 4 === 0) skillAssign.push({ organizationId: orgId, userId: uid, skillId: carpetSkill })
+  })
+  for (const sid of [floorSkill, windowSkill]) skillAssign.push({ organizationId: orgId, userId: staff.supervisorIds[0], skillId: sid })
+  if (skillAssign.length > 0) await systemDb.employeeSkill.createMany({ data: skillAssign, skipDuplicates: true })
+  // One site requires floor care + window washing, so coverage matching has teeth.
+  const skillSite = ctx.sites[0]
+  if (skillSite) {
+    await systemDb.siteSkillRequirement.createMany({
+      data: [
+        { organizationId: orgId, serviceLocationId: skillSite.id, skillId: floorSkill },
+        { organizationId: orgId, serviceLocationId: skillSite.id, skillId: windowSkill },
+      ],
+      skipDuplicates: true,
+    })
+  }
+
   return { owner: staff.owner }
 }
 

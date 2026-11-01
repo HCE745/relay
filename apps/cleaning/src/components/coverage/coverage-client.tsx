@@ -10,7 +10,15 @@ type Shift = { jobId: string; title: string; scheduledStart: string; siteName: s
 type Pending = { id: string; userName: string; startDate: string; endDate: string; reason: string | null }
 type Block = { id: string; userName: string; startDate: string; endDate: string; reason: string | null; source: string }
 type Member = { id: string; name: string }
-type Candidate = { userId: string; name: string; priorJobsAtSite: number }
+type Candidate = {
+  userId: string
+  name: string
+  priorJobsAtSite: number
+  qualified: boolean
+  matchScore: number | null
+  missingSkills: string[]
+  missingCredentials: { type: string; reason: "missing" | "expired" }[]
+}
 
 const fmtDT = (s: string) => new Date(s).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
 const fmtD = (s: string) => new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
@@ -60,15 +68,26 @@ function CoverageRow({ shift }: { shift: Shift }) {
           <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500">No available cleaners for this time.</p>
         ) : (
           <ul className="mt-3 divide-y divide-slate-100 rounded-lg border border-slate-200">
-            {candidates.map((c) => (
-              <li key={c.userId} className="flex items-center justify-between px-3 py-2">
-                <span className="text-sm">
-                  <span className="font-medium text-slate-800">{c.name}</span>
-                  <span className="ml-2 text-xs text-slate-500">{c.priorJobsAtSite} prior job{c.priorJobsAtSite === 1 ? "" : "s"} at this site</span>
-                </span>
-                <Button size="sm" onClick={() => reassign(c.userId)} disabled={busyId === c.userId}>{busyId === c.userId ? "Assigning…" : "Reassign"}</Button>
-              </li>
-            ))}
+            {candidates.map((c) => {
+              const gaps = [...c.missingSkills, ...c.missingCredentials.map((m) => `${m.type} (${m.reason})`)]
+              return (
+                <li key={c.userId} className="flex items-center justify-between gap-3 px-3 py-2">
+                  <span className="text-sm">
+                    <span className="font-medium text-slate-800">{c.name}</span>
+                    {c.matchScore !== null ? (
+                      <StatusBadge tone={c.qualified ? "success" : "warning"}>
+                        {c.qualified ? "Full match" : `${c.matchScore}% match`}
+                      </StatusBadge>
+                    ) : null}
+                    <span className="ml-2 text-xs text-slate-500">
+                      {c.priorJobsAtSite} prior job{c.priorJobsAtSite === 1 ? "" : "s"} at this site
+                    </span>
+                    {gaps.length > 0 ? <span className="ml-2 text-xs text-amber-600">missing: {gaps.join(", ")}</span> : null}
+                  </span>
+                  <Button size="sm" onClick={() => reassign(c.userId)} disabled={busyId === c.userId}>{busyId === c.userId ? "Assigning…" : "Reassign"}</Button>
+                </li>
+              )
+            })}
           </ul>
         )
       ) : null}

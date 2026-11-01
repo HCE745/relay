@@ -250,6 +250,19 @@ export const laborBudgetUpdateSchema = z.object({
   isActive: z.boolean().optional(),
 })
 
+// ─── Phase 47: skills & intelligent shift matching ───────────────────────────
+export const skillCreateSchema = z.object({
+  name: z.string().trim().min(1, "A skill name is required").max(80),
+})
+export const employeeSkillsSchema = z.object({
+  userId: z.string().min(1),
+  skillIds: z.array(z.string().min(1)).max(200).default([]),
+})
+export const siteSkillRequirementsSchema = z.object({
+  serviceLocationId: z.string().min(1),
+  skillIds: z.array(z.string().min(1)).max(200).default([]),
+})
+
 // ─── Phase 41: payroll period locking ────────────────────────────────────────
 export const payPeriodCreateSchema = z
   .object({ start: dateString, end: dateString })

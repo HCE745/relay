@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
 import { sendInvite } from "../route"
+import { encryptField } from "@/lib/crypto-utils"
 
 export async function PATCH(
   req: NextRequest,
@@ -16,6 +17,9 @@ export async function PATCH(
     action?: unknown; isActive?: unknown; password?: unknown; role?: unknown; name?: unknown;
     employmentStatus?: unknown; commissionRate?: unknown; commissionEligible?: unknown;
     commissionDuration?: unknown;
+    // update_imap fields
+    imapPassword?: unknown; imapEmail?: unknown;
+    imapHost?: unknown; imapPort?: unknown; smtpHost?: unknown; smtpPort?: unknown;
   }
 
   const user = await prisma.salesUser.findUnique({ where: { id } })
@@ -23,6 +27,24 @@ export async function PATCH(
 
   // action: "deactivate" | "reactivate" | "reset_password" | "resend_invite" — or plain field patch
   const action = typeof body.action === "string" ? body.action : null
+
+  if (action === "update_imap") {
+    const imapPassword = typeof body.imapPassword === "string" ? body.imapPassword.trim() : ""
+    const imapEmail    = typeof body.imapEmail    === "string" ? body.imapEmail.trim().toLowerCase() : user.email
+    const imapHost     = typeof body.imapHost     === "string" ? body.imapHost.trim()  : "imap.titan.email"
+    const imapPort     = typeof body.imapPort     === "number" ? body.imapPort         : 993
+    const smtpHost     = typeof body.smtpHost     === "string" ? body.smtpHost.trim()  : "smtp.titan.email"
+    const smtpPort     = typeof body.smtpPort     === "number" ? body.smtpPort         : 465
+
+    if (!imapPassword) return NextResponse.json({ error: "Email account password is required" }, { status: 400 })
+
+    await prisma.imapConfig.upsert({
+      where:  { salesUserId: id },
+      create: { salesUserId: id, emailAddress: imapEmail, encryptedPassword: encryptField(imapPassword), host: imapHost, port: imapPort, smtpHost, smtpPort },
+      update: { emailAddress: imapEmail, encryptedPassword: encryptField(imapPassword), host: imapHost, port: imapPort, smtpHost, smtpPort },
+    })
+    return NextResponse.json({ ok: true })
+  }
 
   if (action === "resend_invite") {
     if (!user.invitePending) {

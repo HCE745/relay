@@ -329,13 +329,122 @@ function ResetPasswordModal({ user, onDone, onCancel }: ResetPasswordModalProps)
   )
 }
 
+interface EmailSettingsModalProps {
+  user:     SalesUser
+  onDone:   () => void
+  onCancel: () => void
+}
+
+function EmailSettingsModal({ user, onDone, onCancel }: EmailSettingsModalProps) {
+  const [imapPassword, setImapPassword] = useState("")
+  const [imapHost,     setImapHost]     = useState("imap.titan.email")
+  const [imapPort,     setImapPort]     = useState(993)
+  const [smtpHost,     setSmtpHost]     = useState("smtp.titan.email")
+  const [smtpPort,     setSmtpPort]     = useState(465)
+  const [saving,       setSaving]       = useState(false)
+  const [error,        setError]        = useState("")
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true); setError("")
+    try {
+      const res = await fetch(`/api/super-admin/sales-users/${user.id}`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          action:      "update_imap",
+          imapPassword,
+          imapEmail:   user.email,
+          imapHost,
+          imapPort,
+          smtpHost,
+          smtpPort,
+        }),
+      })
+      const j = await res.json() as { error?: string }
+      if (!res.ok) throw new Error(j.error ?? "Failed to update email settings")
+      onDone()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm">
+        <h3 className="text-white font-semibold mb-1">Email Settings</h3>
+        <p className="text-sm text-gray-400 mb-5">
+          Update SMTP/IMAP credentials for <span className="text-white">{user.name}</span>
+          <span className="block text-xs text-gray-600 mt-0.5">{user.email}</span>
+        </p>
+
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">Email account password</label>
+            <input
+              type="password"
+              value={imapPassword}
+              onChange={e => setImapPassword(e.target.value)}
+              required
+              placeholder="Their email account password"
+              autoComplete="off"
+              className="w-full px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">IMAP host</label>
+              <input type="text" value={imapHost} onChange={e => setImapHost(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">IMAP port</label>
+              <input type="number" value={imapPort} onChange={e => setImapPort(Number(e.target.value))}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">SMTP host</label>
+              <input type="text" value={smtpHost} onChange={e => setSmtpHost(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">SMTP port</label>
+              <input type="number" value={smtpPort} onChange={e => setSmtpPort(Number(e.target.value))}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+          </div>
+          {error && (
+            <div className="flex items-center gap-2 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-400 text-sm">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              {error}
+            </div>
+          )}
+          <div className="flex gap-3 pt-1">
+            <button type="submit" disabled={saving}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+              {saving ? "Saving…" : "Save"}
+            </button>
+            <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 export default function SalesUsersPage() {
-  const [users,       setUsers]       = useState<SalesUser[]>([])
-  const [loading,     setLoading]     = useState(true)
-  const [showCreate,  setShowCreate]  = useState(false)
-  const [resetTarget, setResetTarget] = useState<SalesUser | null>(null)
-  const [actionId,    setActionId]    = useState<string | null>(null)
-  const [toast,       setToast]       = useState("")
+  const [users,        setUsers]        = useState<SalesUser[]>([])
+  const [loading,      setLoading]      = useState(true)
+  const [showCreate,   setShowCreate]   = useState(false)
+  const [resetTarget,  setResetTarget]  = useState<SalesUser | null>(null)
+  const [emailTarget,  setEmailTarget]  = useState<SalesUser | null>(null)
+  const [actionId,     setActionId]     = useState<string | null>(null)
+  const [toast,        setToast]        = useState("")
 
   function showToast(msg: string) {
     setToast(msg)
@@ -402,6 +511,15 @@ export default function SalesUsersPage() {
           user={resetTarget}
           onDone={() => { setResetTarget(null); showToast("Password reset") }}
           onCancel={() => setResetTarget(null)}
+        />
+      )}
+
+      {/* Email settings modal */}
+      {emailTarget && (
+        <EmailSettingsModal
+          user={emailTarget}
+          onDone={() => { setEmailTarget(null); showToast(`Email settings updated for ${emailTarget.name}`) }}
+          onCancel={() => setEmailTarget(null)}
         />
       )}
 
@@ -522,6 +640,14 @@ export default function SalesUsersPage() {
                           <KeyRound className="w-4 h-4" />
                         </button>
                       )}
+                      {/* Email settings */}
+                      <button
+                        onClick={() => setEmailTarget(u)}
+                        title="Edit email settings"
+                        className="p-1.5 rounded-lg text-gray-500 hover:text-blue-400 hover:bg-blue-900/20 transition-colors"
+                      >
+                        <Mail className="w-4 h-4" />
+                      </button>
                       {/* Toggle active */}
                       <button
                         onClick={() => void toggleActive(u)}

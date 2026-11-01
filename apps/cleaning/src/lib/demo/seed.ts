@@ -368,6 +368,18 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
   })
 
   await seedExtras(orgId, stamp, now, week, todayOffset, staff, ctx, () => invoiceNo++)
+
+  // ── Labor budgets (Phase 46): a contract, a site and a plan run-rate ──
+  const budContract = await systemDb.contract.findFirst({ where: { organizationId: orgId }, select: { id: true } })
+  const budSite = await systemDb.serviceLocation.findFirst({ where: { organizationId: orgId }, select: { id: true } })
+  const budPlan = await systemDb.servicePlan.findFirst({ where: { organizationId: orgId, isActive: true }, select: { id: true } })
+  if (budContract)
+    await systemDb.laborBudget.create({ data: { organizationId: orgId, scope: "CONTRACT", contractId: budContract.id, period: "MONTHLY", budgetedHours: "160.00", budgetedCost: "3200.00" } })
+  if (budSite)
+    await systemDb.laborBudget.create({ data: { organizationId: orgId, scope: "SITE", serviceLocationId: budSite.id, period: "WEEKLY", budgetedHours: "40.00", budgetedCost: "820.00" } })
+  if (budPlan)
+    await systemDb.laborBudget.create({ data: { organizationId: orgId, scope: "PLAN", servicePlanId: budPlan.id, period: "MONTHLY", budgetedHours: "24.00", budgetedCost: "500.00" } })
+
   return { owner: staff.owner }
 }
 

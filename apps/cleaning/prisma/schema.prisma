@@ -532,6 +532,7 @@ model Organization {
   collectionSteps     CollectionStep[]
   collectionActivities CollectionActivity[]
   indirectCostPools   IndirectCostPool[]
+  laborBudgets        LaborBudget[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -798,6 +799,7 @@ model ServiceLocation {
   credentialRequirements SiteCredentialRequirement[]
   accessItems  AccessItem[]
   workOrders   WorkOrder[]
+  laborBudgets LaborBudget[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -879,6 +881,7 @@ model ServicePlan {
   contract          Contract?          @relation(fields: [contractId], references: [id])
   taxRate           TaxRate?           @relation(fields: [taxRateId], references: [id])
   jobs              Job[]
+  laborBudgets      LaborBudget[]
 
   @@index([organizationId])
   @@index([serviceLocationId])
@@ -2651,6 +2654,7 @@ model Contract {
   customer     Customer      @relation(fields: [customerId], references: [id])
   servicePlans ServicePlan[]
   changeOrders ChangeOrder[]
+  laborBudgets LaborBudget[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -2834,6 +2838,54 @@ model IndirectCostPool {
   updatedAt      DateTime             @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// ─── Labor budgeting & variance (Phase 46) ───────────────────────────────────
+// A budget sets expected labor HOURS and labor COST for a run-rate period
+// (weekly or monthly) on a contract, a site, or a service plan. The variance
+// report prorates the budget to the report range and compares it to SCHEDULED
+// hours (from jobs) and ACTUAL hours / cost (from approved time), and flags a
+// contract whose actual labor cost exceeds its invoiced revenue as unprofitable.
+// Budget/variance figures use direct (unburdened) wage cost — this is planning,
+// not payroll processing.
+enum BudgetScope {
+  CONTRACT
+  SITE
+  PLAN
+
+  @@schema("cleaning")
+}
+
+enum BudgetPeriod {
+  WEEKLY
+  MONTHLY
+
+  @@schema("cleaning")
+}
+
+model LaborBudget {
+  id                String       @id @default(cuid())
+  organizationId    String
+  scope             BudgetScope
+  // Exactly one target is set, matching `scope`.
+  contractId        String?
+  serviceLocationId String?
+  servicePlanId     String?
+  period            BudgetPeriod @default(MONTHLY)
+  budgetedHours     Decimal      @db.Decimal(10, 2)
+  budgetedCost      Decimal      @db.Decimal(12, 2)
+  alertUnprofitable Boolean      @default(true) // flag when actual labor cost exceeds revenue
+  isActive          Boolean      @default(true)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contract        Contract?        @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  servicePlan     ServicePlan?     @relation(fields: [servicePlanId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
   @@schema("cleaning")

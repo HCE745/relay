@@ -220,6 +220,36 @@ export const indirectCostSchema = z.object({
 })
 export const indirectCostUpdateSchema = indirectCostSchema.partial().extend({ isActive: z.boolean().optional() })
 
+// ─── Phase 46: labor budgets ─────────────────────────────────────────────────
+export const BUDGET_SCOPES = ["CONTRACT", "SITE", "PLAN"] as const
+export const BUDGET_PERIODS = ["WEEKLY", "MONTHLY"] as const
+const budgetNumber = z.string().trim().regex(/^\d{1,10}(\.\d{1,2})?$/, "Enter a number like 160 or 160.00")
+export const laborBudgetSchema = z
+  .object({
+    scope: z.enum(BUDGET_SCOPES),
+    contractId: z.string().min(1).nullable().optional(),
+    serviceLocationId: z.string().min(1).nullable().optional(),
+    servicePlanId: z.string().min(1).nullable().optional(),
+    period: z.enum(BUDGET_PERIODS),
+    budgetedHours: budgetNumber,
+    budgetedCost: budgetNumber,
+    alertUnprofitable: z.boolean().optional().default(true),
+  })
+  .refine(
+    (v) =>
+      (v.scope === "CONTRACT" && !!v.contractId) ||
+      (v.scope === "SITE" && !!v.serviceLocationId) ||
+      (v.scope === "PLAN" && !!v.servicePlanId),
+    { path: ["scope"], message: "Choose a target matching the scope" },
+  )
+export const laborBudgetUpdateSchema = z.object({
+  period: z.enum(BUDGET_PERIODS).optional(),
+  budgetedHours: budgetNumber.optional(),
+  budgetedCost: budgetNumber.optional(),
+  alertUnprofitable: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+})
+
 // ─── Phase 41: payroll period locking ────────────────────────────────────────
 export const payPeriodCreateSchema = z
   .object({ start: dateString, end: dateString })

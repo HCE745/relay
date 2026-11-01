@@ -2,6 +2,8 @@ import { orgDb, systemDb } from "../org-db"
 import { getOrgTimezone } from "./org"
 import { getPeriodOvertime } from "./labor"
 import { applyBurden } from "../shift-differentials"
+import { activeIndirectPools } from "./indirect-costs"
+import { allocateIndirect, inclusiveDays, type AllocTarget } from "../indirect-costs"
 import {
   type Money,
   type JobMarginInput,
@@ -53,6 +55,17 @@ function jobLaborWithCommission(entries: ApprovedEntry[], earnings: JobEarningRo
   return { known: hourly.known, labor: hourly.labor.plus(commission), salaried: hourly.salaried }
 }
 
+/** Approved worked hours on a job (clocked time minus breaks) — an allocation driver. */
+function jobHours(entries: ApprovedEntry[]): Money {
+  let hours = ZERO
+  for (const e of entries) {
+    if (!e.clockOutAt) continue
+    const mins = (e.clockOutAt.getTime() - e.clockInAt.getTime()) / 60_000 - e.breakMinutes
+    if (mins > 0) hours = hours.plus(mins / 60)
+  }
+  return hours
+}
+
 /** Job labor: total known (hourly) cost, whether it is fully known, and whether any salaried time is present. */
 function jobLabor(entries: ApprovedEntry[]): { known: boolean; labor: Money; salaried: boolean } {
   let labor = ZERO
@@ -70,7 +83,7 @@ function jobLabor(entries: ApprovedEntry[]): { known: boolean; labor: Money; sal
   return { known, labor, salaried }
 }
 
-type Row = { id: string; name: string; detail?: string; revenue: Money; laborCost: Money; suppliesCost: Money; jobs: number }
+type Row = { id: string; name: string; detail?: string; revenue: Money; laborCost: Money; laborHours: Money; suppliesCost: Money; jobs: number }
 export type ProfitRow = {
   id: string
   name: string
@@ -78,27 +91,58 @@ export type ProfitRow = {
   revenue: Money
   laborCost: Money
   suppliesCost: Money
-  margin: Money
+  // Indirect cost allocated to this row (Phase 45); ZERO when allocation is off.
+  indirectCost: Money
+  margin: Money // gross: revenue − labor − supplies (unchanged)
   marginPct: number | null
+  // Net of allocated indirect cost (Phase 45). Equals gross margin when off.
+  netMargin: Money
+  netMarginPct: number | null
   jobs: number
 }
 
-function upsert(map: Map<string, Row>, id: string, name: string, detail: string | undefined, billed: Money, labor: Money, supplies: Money) {
-  const row = map.get(id) ?? { id, name, detail, revenue: ZERO, laborCost: ZERO, suppliesCost: ZERO, jobs: 0 }
+function upsert(map: Map<string, Row>, id: string, name: string, detail: string | undefined, billed: Money, labor: Money, hours: Money, supplies: Money) {
+  const row = map.get(id) ?? { id, name, detail, revenue: ZERO, laborCost: ZERO, laborHours: ZERO, suppliesCost: ZERO, jobs: 0 }
   row.revenue = row.revenue.plus(billed)
   row.laborCost = row.laborCost.plus(labor)
+  row.laborHours = row.laborHours.plus(hours)
   row.suppliesCost = row.suppliesCost.plus(supplies)
   row.jobs += 1
   map.set(id, row)
 }
 
-function finalize(map: Map<string, Row>): ProfitRow[] {
+/**
+ * Finalize a dimension's rows, folding in any indirect-cost allocation. Gross
+ * margin is unchanged (revenue − direct cost); net margin additionally subtracts
+ * the indirect cost allocated to the row. `indirect` is empty when allocation is off.
+ */
+function finalize(map: Map<string, Row>, indirect: Map<string, Money>): ProfitRow[] {
   return [...map.values()]
     .map((r) => {
-      const cost = r.laborCost.plus(r.suppliesCost)
-      return { ...r, margin: r.revenue.minus(cost), marginPct: marginPct(r.revenue, cost) }
+      const directCost = r.laborCost.plus(r.suppliesCost)
+      const indirectCost = indirect.get(r.id) ?? ZERO
+      const fullCost = directCost.plus(indirectCost)
+      return {
+        id: r.id,
+        name: r.name,
+        detail: r.detail,
+        revenue: r.revenue,
+        laborCost: r.laborCost,
+        suppliesCost: r.suppliesCost,
+        indirectCost,
+        margin: r.revenue.minus(directCost),
+        marginPct: marginPct(r.revenue, directCost),
+        netMargin: r.revenue.minus(fullCost),
+        netMarginPct: marginPct(r.revenue, fullCost),
+        jobs: r.jobs,
+      }
     })
     .sort((a, b) => Number(b.revenue.minus(a.revenue))) // biggest accounts first
+}
+
+/** Build allocation targets from a dimension's rows (burdened labor is the cost driver). */
+function toTargets(map: Map<string, Row>): AllocTarget[] {
+  return [...map.values()].map((r) => ({ id: r.id, revenue: r.revenue, laborCost: r.laborCost, laborHours: r.laborHours, jobs: r.jobs }))
 }
 
 /** Sum a job's allocated supply cost from snapshotted usage (Phase 12). */
@@ -119,14 +163,24 @@ export type Profitability = {
   // pre-burden labor total for the counted jobs (shown separately).
   laborBurdenPct: number
   laborUnburdened: Money
+  // Indirect cost allocation (Phase 45). `indirectAllocated` is the total spread
+  // across the counted sites; `indirectUnallocated` is pool cost with no row to
+  // carry it. Net margin is gross margin minus allocated indirect cost. All ZERO
+  // when allocation is off (no capability / no pools).
+  indirectAllocated: Money
+  indirectUnallocated: Money
+  netMargin: Money
+  netMarginPct: number | null
   includeUninvoiced: boolean
+  includeIndirect: boolean
 }
 
 export async function getProfitability(
   orgId: string,
-  input: { periodStart: string; periodEnd: string; includeUninvoiced?: boolean },
+  input: { periodStart: string; periodEnd: string; includeUninvoiced?: boolean; includeIndirect?: boolean },
 ): Promise<Profitability> {
   const includeUninvoiced = input.includeUninvoiced ?? false
+  const includeIndirect = input.includeIndirect ?? false
   const db = orgDb(orgId)
   const orgTz = await getOrgTimezone(orgId)
   const windowStart = new Date(startOfUtcDay(input.periodStart).getTime() - 86_400_000)
@@ -172,6 +226,7 @@ export async function getProfitability(
     // Phase 43: margin uses BURDENED labor (employer taxes/insurance/comp); the
     // unburdened figure is kept visible separately in the summary.
     const labor = applyBurden(rawLabor, burdenPct)
+    const hours = jobHours(job.timeEntries)
     const supplies = jobSupplies(job.supplyUsages)
 
     summaryInputs.push({ invoiced, laborKnown: known, billed, labor, supplies })
@@ -180,23 +235,56 @@ export async function getProfitability(
     if (countsTowardMargin({ invoiced, laborKnown: known }, includeUninvoiced)) {
       if (known) laborUnburdened = laborUnburdened.plus(rawLabor)
       const site = job.serviceLocation
-      upsert(bySite, site.id, site.name, site.customer.name, billed, labor, supplies)
-      upsert(byCustomer, site.customer.id, site.customer.name, undefined, billed, labor, supplies)
-      upsert(byPlan, job.servicePlan?.id ?? "__none__", job.servicePlan?.name ?? "One-off / no plan", undefined, billed, labor, supplies)
+      upsert(bySite, site.id, site.name, site.customer.name, billed, labor, hours, supplies)
+      upsert(byCustomer, site.customer.id, site.customer.name, undefined, billed, labor, hours, supplies)
+      upsert(byPlan, job.servicePlan?.id ?? "__none__", job.servicePlan?.name ?? "One-off / no plan", undefined, billed, labor, hours, supplies)
+    }
+  }
+
+  // Phase 45: indirect cost allocation. Each dimension independently spreads the
+  // same applicable pools across its own rows by the pool's chosen driver.
+  const noAlloc = new Map<string, Money>()
+  let siteIndirect = noAlloc
+  let customerIndirect = noAlloc
+  let planIndirect = noAlloc
+  let indirectAllocated = ZERO
+  let indirectUnallocated = ZERO
+  if (includeIndirect) {
+    const pools = await activeIndirectPools(orgId)
+    if (pools.length > 0) {
+      const reportDays = inclusiveDays(input.periodStart, input.periodEnd)
+      const pStart = startOfUtcDay(input.periodStart)
+      const pEnd = endOfUtcDay(input.periodEnd)
+      const site = allocateIndirect(pools, toTargets(bySite), reportDays, pStart, pEnd)
+      const cust = allocateIndirect(pools, toTargets(byCustomer), reportDays, pStart, pEnd)
+      const plan = allocateIndirect(pools, toTargets(byPlan), reportDays, pStart, pEnd)
+      siteIndirect = site.byTarget
+      customerIndirect = cust.byTarget
+      planIndirect = plan.byTarget
+      // Totals come from the site dimension (the canonical allocation target).
+      indirectAllocated = site.totalAllocated
+      indirectUnallocated = site.unallocated
     }
   }
 
   const ot = await getPeriodOvertime(orgId, { start: windowStart, end: windowEnd })
+  const summary = summarizeMargin(summaryInputs, includeUninvoiced)
+  const netMargin = summary.margin.minus(indirectAllocated)
 
   return {
-    bySite: finalize(bySite),
-    byCustomer: finalize(byCustomer),
-    byPlan: finalize(byPlan),
-    summary: summarizeMargin(summaryInputs, includeUninvoiced),
+    bySite: finalize(bySite, siteIndirect),
+    byCustomer: finalize(byCustomer, customerIndirect),
+    byPlan: finalize(byPlan, planIndirect),
+    summary,
     overtimePremium: ot.totalPremium,
     laborBurdenPct: Number(burdenPct),
     laborUnburdened,
+    indirectAllocated,
+    indirectUnallocated,
+    netMargin,
+    netMarginPct: marginPct(summary.revenue, summary.laborCost.plus(summary.suppliesCost).plus(indirectAllocated)),
     includeUninvoiced,
+    includeIndirect,
   }
 }
 

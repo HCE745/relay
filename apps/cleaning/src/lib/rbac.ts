@@ -69,6 +69,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "profitability", label: "Profitability", href: "/reports/profitability", requiredCap: "reporting.profitability", section: "Reports" },
   { key: "satisfaction", label: "Satisfaction", href: "/reports/satisfaction", requiredCap: "quality.inspections", section: "Reports" },
   { key: "supply-spend", label: "Supply spend", href: "/reports/supply-spend", requiredCap: "reporting.profitability", section: "Reports" },
+  { key: "indirect-costs", label: "Indirect costs", href: "/reports/indirect-costs", requiredCap: "erp.siteProfitability", section: "Reports" },
   { key: "exports",     label: "Exports",     href: "/exports",     requiredCap: "integrations.exports", section: "Reports" },
   { key: "import",      label: "Import",      href: "/import",      requiredCap: "operations.dataImport", section: "Reports" },
   { key: "assets",      label: "Assets",      href: "/assets",      requiredCap: "assets.management",  section: "Inventory" },
@@ -83,7 +84,7 @@ export const ADMIN_ROUTE_KEYS: ReadonlySet<string> = new Set(ADMIN_NAV.map((i) =
 const ROLE_ROUTE_ACCESS: Record<Role, string[] | "*"> = {
   OWNER: "*",
   ADMIN: "*",
-  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "pay-periods", "differentials", "coverage", "compliance", "access", "inspections", "issues", "service-requests", "satisfaction", "service-areas", "quotes", "leads", "estimates", "contracts", "work-orders", "hiring", "invoices", "payments", "ar-aging", "tax", "collections", "profitability", "supply-spend", "exports", "import", "assets", "supplies"],
+  MANAGER: ["dashboard", "schedule", "jobs", "customers", "locations", "team", "time", "pay-periods", "differentials", "coverage", "compliance", "access", "inspections", "issues", "service-requests", "satisfaction", "service-areas", "quotes", "leads", "estimates", "contracts", "work-orders", "hiring", "invoices", "payments", "ar-aging", "tax", "collections", "profitability", "supply-spend", "indirect-costs", "exports", "import", "assets", "supplies"],
   SUPERVISOR: ["dashboard", "schedule", "jobs", "time", "inspections", "issues", "service-requests"],
   CLEANER: [], // cleaners have no admin routes; they use the field app
   CLIENT: [], // portal users have NO admin routes; they live under /portal

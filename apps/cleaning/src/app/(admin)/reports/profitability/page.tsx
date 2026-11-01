@@ -10,6 +10,7 @@ import { DollarIcon, ChartBarIcon } from "@/components/ui/icons"
 
 export const dynamic = "force-dynamic"
 const CAP = "reporting.profitability"
+const INDIRECT_CAP = "erp.siteProfitability"
 
 const isDate = (s: string | undefined): s is string => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s)
 const pctText = (p: number | null) => (p === null ? "-" : `${p.toFixed(1)}%`)
@@ -40,11 +41,17 @@ export default async function ProfitabilityPage({
   const belowRaw = Number(sp.below)
   const below = Number.isFinite(belowRaw) && belowRaw >= 0 ? belowRaw : 20
   const includeUninvoiced = sp.include === "1"
+  const includeIndirect = await orgHasCapability(session.organizationId, INDIRECT_CAP)
 
-  const data = await getProfitability(session.organizationId, { periodStart: from, periodEnd: to, includeUninvoiced })
+  const data = await getProfitability(session.organizationId, { periodStart: from, periodEnd: to, includeUninvoiced, includeIndirect })
   const { summary } = data
+  // Only show the indirect/net-margin columns when allocation is on AND some
+  // cost was actually spread — otherwise the extra columns are just zeros.
+  const showIndirect = includeIndirect && Number(data.indirectAllocated) > 0
 
-  const flagged = (r: ProfitRow) => r.marginPct === null || r.marginPct < below
+  // When indirect allocation is shown, low-margin flagging uses the net figure.
+  const flagged = (r: ProfitRow) =>
+    showIndirect ? r.netMarginPct === null || r.netMarginPct < below : r.marginPct === null || r.marginPct < below
 
   const Table = ({ title, rows, flag }: { title: string; rows: ProfitRow[]; flag?: boolean }) => (
     <div>
@@ -58,13 +65,16 @@ export default async function ProfitabilityPage({
               <th className="px-4 py-2.5 text-right font-medium">Revenue</th>
               <th className="px-4 py-2.5 text-right font-medium">Labor cost</th>
               <th className="px-4 py-2.5 text-right font-medium">Supplies</th>
-              <th className="px-4 py-2.5 text-right font-medium">Margin</th>
-              <th className="px-4 py-2.5 text-right font-medium">Margin %</th>
+              {showIndirect ? <th className="px-4 py-2.5 text-right font-medium">Indirect</th> : null}
+              <th className="px-4 py-2.5 text-right font-medium">{showIndirect ? "Gross margin" : "Margin"}</th>
+              {showIndirect ? <th className="px-4 py-2.5 text-right font-medium">Net margin</th> : null}
+              <th className="px-4 py-2.5 text-right font-medium">{showIndirect ? "Net %" : "Margin %"}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {rows.map((r) => {
               const low = flag && flagged(r)
+              const pct = showIndirect ? r.netMarginPct : r.marginPct
               return (
                 <tr key={r.id} className={`hover:bg-slate-50 ${low ? "bg-red-50/40" : ""}`}>
                   <td className="px-4 py-3">
@@ -75,14 +85,20 @@ export default async function ProfitabilityPage({
                   <td className="px-4 py-3 text-right tabular-nums text-slate-700">{formatMoney(r.revenue)}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-slate-700">{formatMoney(r.laborCost)}</td>
                   <td className="px-4 py-3 text-right tabular-nums text-slate-700">{formatMoney(r.suppliesCost)}</td>
-                  <td className={`px-4 py-3 text-right tabular-nums font-medium ${Number(r.margin) < 0 ? "text-red-700" : "text-slate-900"}`}>
+                  {showIndirect ? <td className="px-4 py-3 text-right tabular-nums text-slate-700">{formatMoney(r.indirectCost)}</td> : null}
+                  <td className={`px-4 py-3 text-right tabular-nums ${showIndirect ? "text-slate-600" : `font-medium ${Number(r.margin) < 0 ? "text-red-700" : "text-slate-900"}`}`}>
                     {formatMoney(r.margin)}
                   </td>
+                  {showIndirect ? (
+                    <td className={`px-4 py-3 text-right tabular-nums font-medium ${Number(r.netMargin) < 0 ? "text-red-700" : "text-slate-900"}`}>
+                      {formatMoney(r.netMargin)}
+                    </td>
+                  ) : null}
                   <td className="px-4 py-3 text-right">
                     {low ? (
-                      <StatusBadge tone="danger">{pctText(r.marginPct)}</StatusBadge>
+                      <StatusBadge tone="danger">{pctText(pct)}</StatusBadge>
                     ) : (
-                      <span className="tabular-nums text-slate-700">{pctText(r.marginPct)}</span>
+                      <span className="tabular-nums text-slate-700">{pctText(pct)}</span>
                     )}
                   </td>
                 </tr>
@@ -128,9 +144,31 @@ export default async function ProfitabilityPage({
         {data.laborBurdenPct > 0 ? <SummaryTile label={`Labor (pre-burden, +${Math.round(data.laborBurdenPct * 10000) / 100}%)`} value={formatMoney(data.laborUnburdened)} /> : null}
         {Number(data.overtimePremium) > 0 ? <SummaryTile label="Overtime premium" value={formatMoney(data.overtimePremium)} /> : null}
         <SummaryTile label="Supplies" value={formatMoney(summary.suppliesCost)} />
+        {showIndirect ? <SummaryTile label="Indirect allocated" value={formatMoney(data.indirectAllocated)} /> : null}
         <SummaryTile label="Gross margin" value={formatMoney(summary.margin)} accent={Number(summary.margin) < 0} />
-        <SummaryTile label="Margin %" value={pctText(summary.marginPct)} accent={summary.marginPct !== null && summary.marginPct < below} />
+        {showIndirect ? <SummaryTile label="Net margin" value={formatMoney(data.netMargin)} accent={Number(data.netMargin) < 0} /> : null}
+        <SummaryTile
+          label={showIndirect ? "Net margin %" : "Margin %"}
+          value={pctText(showIndirect ? data.netMarginPct : summary.marginPct)}
+          accent={(showIndirect ? data.netMarginPct : summary.marginPct) !== null && (showIndirect ? data.netMarginPct! : summary.marginPct!) < below}
+        />
       </div>
+
+      {/* Indirect cost allocation note + manage link (Phase 45) */}
+      {includeIndirect ? (
+        <Card className="flex flex-wrap items-center justify-between gap-3 border-slate-200 p-4 text-sm text-slate-600">
+          <span>
+            {showIndirect
+              ? `Net margin additionally subtracts indirect cost (equipment, insurance, overhead) allocated across sites${
+                  Number(data.indirectUnallocated) > 0 ? `; ${formatMoney(data.indirectUnallocated)} had no site to carry it` : ""
+                }.`
+              : "Allocate equipment, insurance and overhead across sites to see fully-loaded net margin."}
+          </span>
+          <a href="/reports/indirect-costs" className={buttonClasses("secondary", "sm")}>
+            Manage indirect costs
+          </a>
+        </Card>
+      ) : null}
 
       {/* Excluded work, kept visible */}
       {(summary.uninvoicedJobs > 0 || summary.unavailableJobs > 0) && (

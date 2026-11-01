@@ -206,6 +206,20 @@ export const shiftDifferentialSchema = z.object({
 })
 export const shiftDifferentialUpdateSchema = shiftDifferentialSchema.partial().extend({ isActive: z.boolean().optional() })
 
+// ─── Phase 45: indirect cost pools ───────────────────────────────────────────
+export const INDIRECT_COST_CATEGORIES = ["EQUIPMENT", "INSURANCE", "OVERHEAD", "OTHER"] as const
+export const COST_ALLOCATION_BASES = ["REVENUE", "LABOR_COST", "LABOR_HOURS", "JOB_COUNT", "EVEN"] as const
+export const indirectCostSchema = z.object({
+  name: z.string().trim().min(1, "A pool name is required").max(120),
+  category: z.enum(INDIRECT_COST_CATEGORIES),
+  amount: z.string().trim().regex(/^\d{1,10}(\.\d{1,2})?$/, "Enter an amount like 1200 or 1200.00"),
+  periodDays: z.coerce.number().int().min(1).max(366).default(30),
+  basis: z.enum(COST_ALLOCATION_BASES),
+  effectiveFrom: z.coerce.date().nullable().optional(),
+  effectiveTo: z.coerce.date().nullable().optional(),
+})
+export const indirectCostUpdateSchema = indirectCostSchema.partial().extend({ isActive: z.boolean().optional() })
+
 // ─── Phase 41: payroll period locking ────────────────────────────────────────
 export const payPeriodCreateSchema = z
   .object({ start: dateString, end: dateString })

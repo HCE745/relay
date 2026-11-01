@@ -531,6 +531,7 @@ model Organization {
   shiftDifferentialRules ShiftDifferentialRule[]
   collectionSteps     CollectionStep[]
   collectionActivities CollectionActivity[]
+  indirectCostPools   IndirectCostPool[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -2786,6 +2787,54 @@ model SopIssueMapping {
   sop          Sop          @relation(fields: [sopId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, issueCategory, sopId])
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// ─── Indirect cost allocation (Phase 45) ─────────────────────────────────────
+// Costs not tied to a single job — equipment depreciation, insurance, admin
+// overhead — collected into named pools and spread across sites / customers /
+// service plans on the profitability report by a chosen driver. Allocation is
+// computed LIVE at report time (nothing snapshotted); a pool applies only while
+// its effective window contains the report period. The amount is stated for a
+// span of `periodDays` days (the customer sets the cadence — we never assume a
+// calendar month) and is prorated to the report length. COSTING / management
+// reporting only — never a general ledger or financial statement.
+enum IndirectCostCategory {
+  EQUIPMENT
+  INSURANCE
+  OVERHEAD
+  OTHER
+
+  @@schema("cleaning")
+}
+
+enum CostAllocationBasis {
+  REVENUE // share by each row's invoiced revenue
+  LABOR_COST // share by each row's labor cost
+  LABOR_HOURS // share by each row's approved labor hours
+  JOB_COUNT // share by each row's completed job count
+  EVEN // split equally across rows with activity
+
+  @@schema("cleaning")
+}
+
+model IndirectCostPool {
+  id             String               @id @default(cuid())
+  organizationId String
+  name           String
+  category       IndirectCostCategory @default(OVERHEAD)
+  amount         Decimal              @db.Decimal(12, 2) // cost covering `periodDays` days
+  periodDays     Int                  @default(30) // span the amount covers; report prorates by reportDays/periodDays
+  basis          CostAllocationBasis  @default(REVENUE)
+  effectiveFrom  DateTime? // null = no lower bound
+  effectiveTo    DateTime? // null = open-ended
+  isActive       Boolean              @default(true)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@index([organizationId])
   @@schema("cleaning")
 }

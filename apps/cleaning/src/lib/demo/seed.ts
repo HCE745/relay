@@ -358,6 +358,15 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     ],
   })
 
+  // ── Indirect cost allocation (Phase 45): equipment, insurance, overhead ──
+  await systemDb.indirectCostPool.createMany({
+    data: [
+      { organizationId: orgId, name: "General liability insurance", category: "INSURANCE", amount: "1200.00", periodDays: 30, basis: "REVENUE" },
+      { organizationId: orgId, name: "Equipment & vehicle depreciation", category: "EQUIPMENT", amount: "800.00", periodDays: 30, basis: "LABOR_HOURS" },
+      { organizationId: orgId, name: "Admin & office overhead", category: "OVERHEAD", amount: "2500.00", periodDays: 30, basis: "LABOR_COST" },
+    ],
+  })
+
   await seedExtras(orgId, stamp, now, week, todayOffset, staff, ctx, () => invoiceNo++)
   return { owner: staff.owner }
 }

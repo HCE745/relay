@@ -9,9 +9,33 @@ import { sendViaTitanSmtp } from "@/lib/titan-smtp"
 import { enrollInSequence, getDefaultSequence } from "@/lib/crm-sequences"
 import { createSalesActivity } from "@/lib/sales-activities"
 
+interface CrmSender {
+  superAdminId?: string
+  salesUserId?:  string
+  name:          string
+  isSuperAdmin:  boolean
+}
+
 async function requireSA() {
   const s = await getSession()
   return s?.superAdmin ? s : null
+}
+
+// Accepts both super-admin and active SalesUser sessions for email sending.
+async function requireCrmSender(): Promise<CrmSender | null> {
+  const s = await getSession()
+  if (s?.superAdmin) {
+    return { superAdminId: s.superAdminId, name: s.name ?? "Super Admin", isSuperAdmin: true }
+  }
+  if (s?.salesUserId) {
+    const dbUser = await prisma.salesUser.findUnique({
+      where:  { id: s.salesUserId },
+      select: { isActive: true, name: true },
+    })
+    if (!dbUser?.isActive) return null
+    return { salesUserId: s.salesUserId, name: dbUser.name, isSuperAdmin: false }
+  }
+  return null
 }
 
 // GET /api/super-admin/crm/emails
@@ -82,7 +106,7 @@ export async function GET(req: NextRequest) {
 // POST /api/super-admin/crm/emails — send an email
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireSA()
+    const session = await requireCrmSender()
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json() as {
@@ -122,8 +146,10 @@ export async function POST(req: NextRequest) {
     // Build a unique Message-ID
     const messageId = `<${Date.now()}.${Math.random().toString(36).slice(2)}@getrelay.software>`
 
-    // Prefer Titan SMTP if a config is present, else fall back to Resend
-    const imapCfg = session.superAdminId
+    // Prefer Titan SMTP using the sender's own ImapConfig (SalesUser or SA)
+    const imapCfg = session.salesUserId
+      ? await prisma.imapConfig.findUnique({ where: { salesUserId: session.salesUserId } })
+      : session.superAdminId
       ? await prisma.imapConfig.findUnique({ where: { superAdminId: session.superAdminId } })
       : null
 
@@ -134,27 +160,35 @@ export async function POST(req: NextRequest) {
       resolvedThreadId = parent?.threadId ?? parent?.id ?? null
     }
 
+    if (!imapCfg && !session.isSuperAdmin) {
+      return NextResponse.json(
+        { error: "No email account connected. Go to Settings → Email Configuration to add your SMTP/IMAP credentials." },
+        { status: 400 },
+      )
+    }
+
     const fromAddress = imapCfg ? imapCfg.emailAddress : "will@getrelay.software"
 
     // Create the CrmEmail record first so we have an ID for the tracking pixel
     const email = await prisma.crmEmail.create({
       data: {
-        demoCallId:       demoCallId ?? null,
-        contactEmail:     to,
-        direction:        "sent",
+        demoCallId:          demoCallId ?? null,
+        contactEmail:        to,
+        direction:           "sent",
         fromAddress,
-        toAddress:        to,
-        cc:               cc ?? null,
+        toAddress:           to,
+        cc:                  cc ?? null,
         subject,
-        bodyHtml:         finalBodyHtml,
+        bodyHtml:            finalBodyHtml,
         bodyText,
         messageId,
-        inReplyTo:        inReplyTo ?? null,
-        threadId:         resolvedThreadId,
-        sentAt:           new Date(),
-        source:           "compose",
-        abTestGroup:      variantLabel,
-        abTestCampaignId: abTestCampaignId ?? null,
+        inReplyTo:           inReplyTo ?? null,
+        threadId:            resolvedThreadId,
+        sentAt:              new Date(),
+        source:              "compose",
+        abTestGroup:         variantLabel,
+        abTestCampaignId:    abTestCampaignId ?? null,
+        sentBySalesUserId:   session.salesUserId ?? null,
       },
     })
 
@@ -218,7 +252,7 @@ export async function POST(req: NextRequest) {
             smtpPort:     imapCfg.smtpPort,
             emailAddress: imapCfg.emailAddress,
             password:     smtpPassword,
-            fromName:     "Will @ Relay",
+            fromName:     `${session.name} @ Relay`,
           },
           { to, cc, subject, bodyHtml: trackedHtml, bodyText, messageId, inReplyTo, unsubscribeUrl: unsubUrl },
         )
@@ -236,7 +270,7 @@ export async function POST(req: NextRequest) {
       }
       const unsubUrlFallback = `https://app.getrelay.software/api/unsubscribe?email=${encodeURIComponent(to)}&token=${Buffer.from(to).toString("base64url")}`
       const resendPayload: Record<string, unknown> = {
-        from:    "Will @ Relay <will@getrelay.software>",
+        from:    `${session.name} @ Relay <will@getrelay.software>`,
         to:      [to],
         subject,
         html:    trackedHtml,
@@ -303,7 +337,7 @@ export async function POST(req: NextRequest) {
             organizationId: call.organizationId,
             eventType:      "email_sent",
             description:    `Email sent to ${to}: "${subject}"`,
-            createdBySAName: session.name ?? "Super Admin",
+            createdBySAName: session.name,
             metadata:        { emailId: email.id, subject, to },
           },
         })
@@ -331,7 +365,7 @@ export async function POST(req: NextRequest) {
     if (demoCallId || body.to) {
       createSalesActivity({
         demoCallId:  demoCallId ?? null,
-        salesUserId: null,
+        salesUserId: session.salesUserId ?? null,
         activityType: "EMAIL_SENT",
         subject:     subject,
         notes:       `Sent to ${to}`,

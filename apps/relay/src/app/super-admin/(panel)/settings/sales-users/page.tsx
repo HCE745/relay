@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import {
   Users, Plus, X, Check, Loader2, AlertCircle,
-  ShieldCheck, UserCircle, Power, PowerOff, KeyRound, Mail,
+  ShieldCheck, UserCircle, Power, PowerOff, KeyRound, Mail, ChevronDown, ChevronUp,
 } from "lucide-react"
 
 interface SalesUser {
@@ -40,12 +40,19 @@ interface CreateFormProps {
 }
 
 function CreateForm({ onCreated, onCancel }: CreateFormProps) {
-  const [name,     setName]     = useState("")
-  const [email,    setEmail]    = useState("")
-  const [password, setPassword] = useState("")
-  const [role,     setRole]     = useState<"sales_rep" | "admin_sales">("sales_rep")
-  const [saving,   setSaving]   = useState(false)
-  const [error,    setError]    = useState("")
+  const [name,         setName]         = useState("")
+  const [email,        setEmail]        = useState("")
+  const [password,     setPassword]     = useState("")
+  const [role,         setRole]         = useState<"sales_rep" | "admin_sales">("sales_rep")
+  const [saving,       setSaving]       = useState(false)
+  const [error,        setError]        = useState("")
+  // Email credentials (pre-configured on behalf of user)
+  const [showEmail,    setShowEmail]    = useState(false)
+  const [imapPassword, setImapPassword] = useState("")
+  const [imapHost,     setImapHost]     = useState("imap.titan.email")
+  const [imapPort,     setImapPort]     = useState(993)
+  const [smtpHost,     setSmtpHost]     = useState("smtp.titan.email")
+  const [smtpPort,     setSmtpPort]     = useState(465)
 
   const inviteMode = password.length === 0
 
@@ -53,8 +60,16 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
     e.preventDefault()
     setSaving(true); setError("")
     try {
-      const body: Record<string, string> = { name, email, role }
+      const body: Record<string, unknown> = { name, email, role }
       if (password) body.password = password
+      if (showEmail && imapPassword) {
+        body.imapPassword = imapPassword
+        body.imapEmail    = email
+        body.imapHost     = imapHost
+        body.imapPort     = imapPort
+        body.smtpHost     = smtpHost
+        body.smtpPort     = smtpPort
+      }
       const res = await fetch("/api/super-admin/sales-users", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
@@ -108,7 +123,7 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-1.5">
-              Password
+              CRM password
               <span className="ml-1.5 text-gray-600 font-normal">(leave blank to send invite)</span>
             </label>
             <input
@@ -138,6 +153,81 @@ function CreateForm({ onCreated, onCancel }: CreateFormProps) {
               <option value="admin_sales">Sales Manager</option>
             </select>
           </div>
+        </div>
+
+        {/* Optional email credentials section */}
+        <div className="border border-gray-800 rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setShowEmail(v => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-400 hover:text-gray-300 hover:bg-gray-800/50 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <Mail className="w-3.5 h-3.5" />
+              {showEmail && imapPassword
+                ? <span className="text-emerald-400">Email inbox connected</span>
+                : "Connect email inbox"}
+              <span className="text-xs text-gray-600 font-normal">(so they can send emails immediately)</span>
+            </span>
+            {showEmail ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+
+          {showEmail && (
+            <div className="px-4 pb-4 pt-2 space-y-3 border-t border-gray-800 bg-gray-900/50">
+              <p className="text-xs text-gray-500">
+                Enter the user{"'"}s email account password (their IMAP/SMTP password, not their CRM login). This lets them send emails from their own address right after they set their CRM password.
+              </p>
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Email account password</label>
+                <input
+                  type="password"
+                  value={imapPassword}
+                  onChange={e => setImapPassword(e.target.value)}
+                  placeholder="Their email account password"
+                  autoComplete="off"
+                  className="w-full px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">IMAP host</label>
+                  <input
+                    type="text"
+                    value={imapHost}
+                    onChange={e => setImapHost(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">IMAP port</label>
+                  <input
+                    type="number"
+                    value={imapPort}
+                    onChange={e => setImapPort(Number(e.target.value))}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">SMTP host</label>
+                  <input
+                    type="text"
+                    value={smtpHost}
+                    onChange={e => setSmtpHost(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">SMTP port</label>
+                  <input
+                    type="number"
+                    value={smtpPort}
+                    onChange={e => setSmtpPort(Number(e.target.value))}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {error && (

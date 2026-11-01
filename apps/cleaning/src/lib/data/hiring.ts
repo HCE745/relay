@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs"
 import { orgDb, systemDb } from "../org-db"
 import { assertFound, ForbiddenActionError, ReferenceError, ConflictError, RequirementsError } from "./errors"
 import { enforceIntakeLimits, INTAKE_LIMITS } from "../public-intake"
+import { assignOnHirePackets } from "./onboarding"
 import type { z } from "zod"
 import type { jobPostingCreateSchema, applicantCreateSchema, publicApplicationSchema, interviewCreateSchema, convertApplicantSchema } from "../zod-schemas"
 
@@ -135,5 +136,8 @@ export async function convertApplicantToEmployee(orgId: string, id: string, inpu
     await tx.applicant.update({ where: { id }, data: { convertedUserId: user.id, convertedAt: new Date(), status: "HIRED" } })
     return user.id
   })
+  // Phase 48: auto-assign any assign-on-hire onboarding packets. Best-effort —
+  // a packet problem must never undo a completed hire.
+  await assignOnHirePackets(orgId, userId, null).catch(() => {})
   return { userId }
 }

@@ -263,6 +263,34 @@ export const siteSkillRequirementsSchema = z.object({
   skillIds: z.array(z.string().min(1)).max(200).default([]),
 })
 
+// ─── Phase 48: employee onboarding packets ───────────────────────────────────
+const packetItemSchema = z.object({
+  label: z.string().trim().min(1, "An item label is required").max(200),
+  description: z.string().trim().max(1000).nullable().optional(),
+  requiresDocument: z.boolean().optional().default(false),
+})
+export const onboardingPacketSchema = z.object({
+  name: z.string().trim().min(1, "A packet name is required").max(120),
+  description: z.string().trim().max(1000).nullable().optional(),
+  assignOnHire: z.boolean().optional().default(false),
+  items: z.array(packetItemSchema).min(1, "Add at least one item").max(50),
+})
+export const onboardingPacketUpdateSchema = z.object({
+  name: z.string().trim().min(1).max(120).optional(),
+  description: z.string().trim().max(1000).nullable().optional(),
+  assignOnHire: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  items: z.array(packetItemSchema).max(50).optional(),
+})
+export const onboardingAssignSchema = z.object({
+  packetId: z.string().min(1),
+  userId: z.string().min(1),
+})
+export const onboardingTaskCompleteSchema = z.object({
+  documentRef: z.string().trim().max(500).nullable().optional(),
+  note: z.string().trim().max(1000).nullable().optional(),
+})
+
 // ─── Phase 41: payroll period locking ────────────────────────────────────────
 export const payPeriodCreateSchema = z
   .object({ start: dateString, end: dateString })

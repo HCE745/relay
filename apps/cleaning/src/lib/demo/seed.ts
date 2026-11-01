@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs"
 import { systemDb } from "../org-db"
 import { estimatePdfData } from "../data/documents"
+import { createPacket, assignPacket, completeTask } from "../data/onboarding"
 import type { Prisma } from "../../generated/prisma/client"
 
 // Purpose-built demo seed (NOT prisma/seed.ts / Summit). Builds a realistic,
@@ -408,6 +409,27 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
       skipDuplicates: true,
     })
   }
+
+  // ── Onboarding packets (Phase 48): a packet + assignments at various stages ──
+  const packet = await createPacket(orgId, {
+    name: "New cleaner onboarding",
+    description: "Everything a new hire completes in week one.",
+    assignOnHire: true,
+    items: [
+      { label: "Sign employee handbook", requiresDocument: true },
+      { label: "Submit I-9 and tax forms", requiresDocument: true },
+      { label: "Complete safety & chemical orientation" },
+      { label: "Set up direct deposit", requiresDocument: true },
+      { label: "Review site access procedures" },
+    ],
+  })
+  // One finished, one partially complete, so the tracker isn't empty.
+  const a1 = await assignPacket(orgId, packet.id, staff.cleanerIds[0], staff.managerId)
+  const a1Tasks = await systemDb.onboardingTask.findMany({ where: { assignmentId: a1.id }, orderBy: { orderIndex: "asc" }, select: { id: true, requiresDocument: true } })
+  for (const t of a1Tasks) await completeTask(orgId, t.id, staff.managerId, t.requiresDocument ? { documentRef: "https://docs.demo/signed.pdf" } : {})
+  const a2 = await assignPacket(orgId, packet.id, staff.cleanerIds[1], staff.managerId)
+  const a2Tasks = await systemDb.onboardingTask.findMany({ where: { assignmentId: a2.id }, orderBy: { orderIndex: "asc" }, select: { id: true, requiresDocument: true } })
+  for (const t of a2Tasks.slice(0, 2)) await completeTask(orgId, t.id, staff.managerId, t.requiresDocument ? { documentRef: "https://docs.demo/handbook.pdf" } : {})
 
   return { owner: staff.owner }
 }

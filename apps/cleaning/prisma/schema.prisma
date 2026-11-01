@@ -536,6 +536,10 @@ model Organization {
   skills              Skill[]
   employeeSkills      EmployeeSkill[]
   siteSkillRequirements SiteSkillRequirement[]
+  onboardingPackets     OnboardingPacket[]
+  onboardingPacketItems OnboardingPacketItem[]
+  onboardingAssignments OnboardingAssignment[]
+  onboardingTasks       OnboardingTask[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -595,6 +599,7 @@ model User {
   notificationLogs     NotificationLog[]
   lockedPayPeriods     PayPeriod[]        @relation("PayPeriodLockedBy")
   skills               EmployeeSkill[]    @relation("UserSkill")
+  onboardingAssignments OnboardingAssignment[] @relation("OnboardingUser")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -2949,5 +2954,88 @@ model SiteSkillRequirement {
 
   @@unique([serviceLocationId, skillId])
   @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// ─── Employee onboarding packets (Phase 48) ──────────────────────────────────
+// A reusable checklist of onboarding documents/tasks, assignable to an employee
+// (automatically on hire when flagged). Completion is tracked per task with an
+// immutable record of who completed it and when — the SOP-acknowledgment
+// pattern (Phase 39) applied to onboarding. Item labels are SNAPSHOTTED onto the
+// assignment's tasks, so editing a packet never rewrites someone's history.
+model OnboardingPacket {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  assignOnHire   Boolean  @default(false) // auto-assign to a converted applicant
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items        OnboardingPacketItem[]
+  assignments  OnboardingAssignment[]
+
+  @@index([organizationId])
+  @@schema("cleaning")
+}
+
+model OnboardingPacketItem {
+  id               String   @id @default(cuid())
+  organizationId   String
+  packetId         String
+  orderIndex       Int
+  label            String
+  description      String?
+  requiresDocument Boolean  @default(false) // the task expects a document reference
+  createdAt        DateTime @default(now())
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  packet       OnboardingPacket @relation(fields: [packetId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([packetId])
+  @@schema("cleaning")
+}
+
+model OnboardingAssignment {
+  id             String    @id @default(cuid())
+  organizationId String
+  packetId       String
+  userId         String
+  packetName     String // snapshot of the packet name at assignment
+  assignedById   String? // audit stamp (no relation)
+  assignedAt     DateTime  @default(now())
+  completedAt    DateTime? // set when every task is complete
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  packet       OnboardingPacket @relation(fields: [packetId], references: [id])
+  user         User             @relation("OnboardingUser", fields: [userId], references: [id], onDelete: Cascade)
+  tasks        OnboardingTask[]
+
+  @@index([organizationId])
+  @@index([userId])
+  @@schema("cleaning")
+}
+
+model OnboardingTask {
+  id               String    @id @default(cuid())
+  organizationId   String
+  assignmentId     String
+  orderIndex       Int
+  label            String // snapshot of the packet item label
+  requiresDocument Boolean   @default(false)
+  status           String    @default("PENDING") // PENDING | COMPLETE
+  documentRef      String?
+  note             String?
+  completedById    String? // audit stamp (no relation)
+  completedAt      DateTime?
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignment   OnboardingAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([assignmentId])
   @@schema("cleaning")
 }

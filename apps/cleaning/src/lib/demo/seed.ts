@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs"
 import { systemDb } from "../org-db"
 import { estimatePdfData } from "../data/documents"
 import { createPacket, assignPacket, completeTask } from "../data/onboarding"
+import { createKiosk, setClockPin } from "../data/kiosks"
 import type { Prisma } from "../../generated/prisma/client"
 
 // Purpose-built demo seed (NOT prisma/seed.ts / Summit). Builds a realistic,
@@ -430,6 +431,14 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
   const a2 = await assignPacket(orgId, packet.id, staff.cleanerIds[1], staff.managerId)
   const a2Tasks = await systemDb.onboardingTask.findMany({ where: { assignmentId: a2.id }, orderBy: { orderIndex: "asc" }, select: { id: true, requiresDocument: true } })
   for (const t of a2Tasks.slice(0, 2)) await completeTask(orgId, t.id, staff.managerId, t.requiresDocument ? { documentRef: "https://docs.demo/handbook.pdf" } : {})
+
+  // ── Shared time-clock kiosk (Phase 49): a site kiosk + a few employee PINs ──
+  const kioskSite = ctx.sites[0]
+  await createKiosk(orgId, { name: "Front desk tablet", serviceLocationId: kioskSite?.id ?? null, pinRequired: true, photoRequired: false })
+  // Give the first few cleaners clock PINs so the kiosk roster is usable.
+  for (let i = 0; i < Math.min(4, staff.cleanerIds.length); i++) {
+    await setClockPin(orgId, staff.cleanerIds[i], String(1000 + i * 1111).padStart(4, "0"))
+  }
 
   return { owner: staff.owner }
 }

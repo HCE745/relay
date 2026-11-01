@@ -540,6 +540,7 @@ model Organization {
   onboardingPacketItems OnboardingPacketItem[]
   onboardingAssignments OnboardingAssignment[]
   onboardingTasks       OnboardingTask[]
+  timeClockKiosks       TimeClockKiosk[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -617,6 +618,9 @@ model EmployeeProfile {
   payRate          Decimal?         @db.Decimal(10, 2)
   employmentStatus EmploymentStatus @default(ACTIVE)
   hireDate         DateTime?
+  // Shared time-clock kiosk PIN (Phase 49), bcrypt-hashed. Identifies the
+  // employee at a shared device; never the login password. Null = no PIN set.
+  clockPinHash     String?
   availability     String? // carried over from an Applicant on hire (Phase 18)
   emergencyContactName  String?
   emergencyContactPhone String?
@@ -810,6 +814,7 @@ model ServiceLocation {
   workOrders   WorkOrder[]
   laborBudgets LaborBudget[]
   skillRequirements SiteSkillRequirement[]
+  timeClockKiosks TimeClockKiosk[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -3037,5 +3042,32 @@ model OnboardingTask {
 
   @@index([organizationId])
   @@index([assignmentId])
+  @@schema("cleaning")
+}
+
+// ─── Shared time-clock kiosk (Phase 49) ──────────────────────────────────────
+// A device at a site/office where a crew clocks in and out. Each punch still
+// creates a per-USER TimeEntry through the normal clock path (source "kiosk"),
+// and is written to the audit trail with the kiosk id — so a shared device never
+// weakens per-user time integrity or auditability. The employee is identified by
+// a per-user PIN (EmployeeProfile.clockPinHash) and, when the kiosk requires it,
+// a captured photo reference stored on the punch's audit record.
+model TimeClockKiosk {
+  id                String    @id @default(cuid())
+  organizationId    String
+  name              String
+  serviceLocationId String? // null = office / general kiosk (not tied to one site)
+  deviceTokenHash   String // bcrypt hash of the device's activation token
+  pinRequired       Boolean   @default(true)
+  photoRequired     Boolean   @default(false)
+  isActive          Boolean   @default(true)
+  lastSeenAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
   @@schema("cleaning")
 }

@@ -30,6 +30,8 @@ const PUBLIC_PATHS = [
   "/apply", // public per-org job application (Phase 18)
   "/careers", // public per-org careers page + Google for Jobs markup (Phase 38)
   "/r", // public QR issue-report page occupants scan, no login (Phase 32)
+  "/kiosk", // shared time-clock kiosk device page — device-token auth, no staff session (Phase 49)
+  "/api/kiosk", // kiosk device endpoints — self-guard via device token (NOT /api/kiosks, which is admin)
   "/pay", // public login-free invoice pay link (Phase 22)
   "/proposal", // public proposal accept link (Phase 27)
   "/api/public", // public intake endpoints — self rate-limit + honeypot

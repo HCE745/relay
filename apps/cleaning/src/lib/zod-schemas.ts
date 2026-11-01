@@ -291,6 +291,38 @@ export const onboardingTaskCompleteSchema = z.object({
   note: z.string().trim().max(1000).nullable().optional(),
 })
 
+// ─── Phase 49: shared time-clock kiosk ───────────────────────────────────────
+export const kioskCreateSchema = z.object({
+  name: z.string().trim().min(1, "A kiosk name is required").max(120),
+  serviceLocationId: z.string().min(1).nullable().optional(),
+  pinRequired: z.boolean().optional().default(true),
+  photoRequired: z.boolean().optional().default(false),
+})
+export const kioskUpdateSchema = z.object({
+  name: z.string().trim().min(1).max(120).optional(),
+  serviceLocationId: z.string().min(1).nullable().optional(),
+  pinRequired: z.boolean().optional(),
+  photoRequired: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+})
+const clockPin = z.string().trim().regex(/^\d{4,8}$/, "PIN must be 4–8 digits")
+export const clockPinSchema = z.object({
+  userId: z.string().min(1),
+  pin: clockPin.nullable(), // null clears the PIN
+})
+// Device-side (token-authenticated, no staff session).
+export const kioskSessionSchema = z.object({
+  kioskId: z.string().min(1),
+  token: z.string().min(1).max(200),
+})
+export const kioskPunchSchema = z.object({
+  kioskId: z.string().min(1),
+  token: z.string().min(1).max(200),
+  userId: z.string().min(1),
+  pin: z.string().trim().max(20).optional(),
+  photoRef: z.string().trim().max(500).optional(),
+})
+
 // ─── Phase 41: payroll period locking ────────────────────────────────────────
 export const payPeriodCreateSchema = z
   .object({ start: dateString, end: dateString })
@@ -469,7 +501,7 @@ export const clockSchema = z.object({
   lat: z.coerce.number().min(-90).max(90).optional(),
   lng: z.coerce.number().min(-180).max(180).optional(),
   accuracyM: z.coerce.number().min(0).optional(),
-  source: z.enum(["web", "native", "manual"]).optional(),
+  source: z.enum(["web", "native", "manual", "kiosk"]).optional(),
   // Unpaid break/meal minutes, entered at clock-out (Phase 29). Subtracted from
   // billable/worked time via billableMinutes.
   breakMinutes: z.coerce.number().int().min(0).max(1440).optional(),

@@ -45,7 +45,10 @@ import type { ClockInput } from "../zod-schemas"
 type Loc = ClockInput
 
 function sourceFor(loc: Loc): string {
-  return loc.lat != null && loc.lng != null ? (loc.source ?? "web") : "web_no_location"
+  // An explicit source (native app, kiosk, manual) is recorded as-is. Only the
+  // implicit web case is tagged "_no_location" when no GPS fix was captured.
+  if (loc.source) return loc.source
+  return loc.lat != null && loc.lng != null ? "web" : "web_no_location"
 }
 
 async function assertAssigned(db: ReturnType<typeof orgDb>, jobId: string, userId: string) {

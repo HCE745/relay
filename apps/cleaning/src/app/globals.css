@@ -35,10 +35,11 @@
   --brand-800: #115e59;
   --brand-900: #134e4a;
 
-  /* Type: body is the app sans; display == body in the default theme (no
-     ornamental face), so default titles are visually identical to today. */
+  /* Type: body is the app sans; display == ornate == body in the default theme
+     (no ornamental faces), so default titles are visually identical to today. */
   --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-body);
+  --font-ornate: var(--font-body);
 
   /* Radii (softer corners in default). */
   --rad-lg: 0.625rem;
@@ -116,10 +117,14 @@
   --brand-800: #4e3917;
   --brand-900: #38290f;
 
-  /* Ornamental serif (Google Fonts via next/font, loaded only for this theme)
-     for titles/headings. Body stays the app's system sans — highly legible and
-     zero added bytes — with tabular figures for comparing numbers. */
-  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  /* Ornamental faces (Google Fonts via next/font, loaded only for this theme):
+       --font-display  high-contrast Victorian Didone (Playfair) for headings.
+       --font-ornate   engraved inscriptional caps (Cinzel Decorative) for the
+                       wordmark + page titles — the "titlepage" lettering.
+     Body/tables/forms stay the app's system sans — highly legible, zero added
+     bytes — with tabular figures for comparing numbers. */
+  --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-ornate: var(--font-cinzel), var(--font-playfair), Georgia, serif;
   --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-feature-settings: "tnum" 1; /* tabular figures everywhere numbers appear */
 
@@ -227,10 +232,19 @@ body {
    pages, or PDFs. Ornament sits around titles/headings/dividers — never over a
    number: tables, inputs and numeric cells keep the body face.
    ───────────────────────────────────────────────────────────────────────── */
-:root[data-theme="victorian"] .cln-ornament :is(h1, h2) {
+:root[data-theme="victorian"] .cln-ornament :is(h1, h2, h3) {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.01em;
+}
+/* The major page title is the engraved "titlepage" line: inscriptional caps,
+   generously letterspaced. Short strings only (page names), so the decorative
+   face never sits over a sentence or a number. */
+:root[data-theme="victorian"] .cln-ornament .cln-page-title {
+  font-family: var(--font-ornate);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 /* The ornamental engraving motifs (dividers, header rule) are hidden entirely
    unless the Victorian theme is active AND inside the admin shell (.cln-ornament),
@@ -243,11 +257,13 @@ body {
   display: block;
   color: var(--rule);
 }
-/* Give the sidebar brand wordmark + section labels the engraved serif too. */
+/* Give the sidebar brand wordmark the engraved inscriptional caps (it sits in
+   the rail, outside .cln-ornament, so this is scoped to the theme alone). */
 :root[data-theme="victorian"] .cln-display {
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-family: var(--font-ornate);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* Capacitor / iOS safe-area helpers for the field app. */

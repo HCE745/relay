@@ -30,7 +30,7 @@ export function PageHeader({
             </div>
           ) : null}
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.7rem]">{title}</h1>
+            <h1 className="cln-page-title text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.7rem]">{title}</h1>
             {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
           </div>
         </div>

@@ -12,8 +12,8 @@ export const THEMES = [
   {
     id: "victorian",
     label: "Victorian Industrial",
-    description: "A commercial-engraving identity: parchment, charcoal ink, muted brass.",
-    swatches: ["#ece4d1", "#7e5e2a", "#1d1810"],
+    description: "Engraved typography, squared boxes and hairline ornament over the standard palette.",
+    swatches: ["#f6f8fb", "#0d9488", "#0f172a"],
   },
 ] as const
 

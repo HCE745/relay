@@ -1,9 +1,14 @@
 // Lightweight server-safe building blocks for Phase 0 shell pages. These are
 // intentionally minimal — real screens arrive in their respective phases.
 
+import { HeaderCartouche } from "@/components/theme/ornament"
+
 // Consistent page header: title + optional subtitle on the left, an optional
 // primary action right-aligned. `action` keeps every screen's header identical
-// instead of each page hand-rolling its own flex row.
+// instead of each page hand-rolling its own flex row. Under the Victorian theme
+// the title renders in the ornamental serif (via .cln-ornament on the admin
+// <main>) and an engraved cartouche appears beneath it; the default look is
+// unchanged because the cartouche is hidden unless that theme is active.
 export function PageHeader({
   title,
   subtitle,
@@ -16,20 +21,23 @@ export function PageHeader({
   icon?: React.ReactNode
 }) {
   return (
-    <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
-      <div className="flex items-start gap-3">
-        {icon ? (
-          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 [&>svg]:h-5 [&>svg]:w-5">
-            {icon}
+    <div className="mb-6">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          {icon ? (
+            <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 [&>svg]:h-5 [&>svg]:w-5">
+              {icon}
+            </div>
+          ) : null}
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.7rem]">{title}</h1>
+            {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
           </div>
-        ) : null}
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.7rem]">{title}</h1>
-          {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
         </div>
-      </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
-    </header>
+        {action ? <div className="shrink-0">{action}</div> : null}
+      </header>
+      <HeaderCartouche />
+    </div>
   )
 }
 

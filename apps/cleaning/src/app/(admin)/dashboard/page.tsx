@@ -18,6 +18,7 @@ import { getComplianceConfig } from "@/lib/data/compliance"
 import { getSetupProgress } from "@/lib/data/setup"
 import { isSetupGuideDismissed } from "@/lib/setup-actions"
 import { PageHeader } from "@/components/ui/placeholder"
+import { EngravedDivider } from "@/components/theme/ornament"
 import { Card } from "@/components/ui/controls"
 import { SetupChecklist } from "@/components/dashboard/setup-checklist"
 
@@ -110,6 +111,9 @@ export default async function DashboardPage() {
 
       {/* Primary: the live operations screen. */}
       <OperationsView ops={ops} tz={tz} />
+
+      {/* Engraved section divider (Victorian theme only; hidden otherwise). */}
+      <EngravedDivider />
 
       {/* Secondary: the metric tiles, kept but below the operations view. */}
       <section className="mt-8">

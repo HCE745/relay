@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { logout } from "@/lib/auth-actions"
 import type { AdminNavItem } from "@/lib/rbac"
+import type { ThemeId } from "@/lib/theme"
+import { ThemeSwitcher } from "@/components/theme/theme-switcher"
 import {
   HomeIcon, CalendarIcon, BriefcaseIcon, BuildingIcon, MapPinIcon, UsersIcon, ClockIcon,
   ClipboardCheckIcon, ClipboardListIcon, AlertTriangleIcon, SparklesIcon, ReceiptIcon, FileTextIcon,
@@ -51,10 +53,12 @@ export function AdminSidebar({
   nav,
   user,
   packageTier,
+  theme,
 }: {
   nav: AdminNavItem[]
   user: { name: string; role: string }
   packageTier: string
+  theme: ThemeId
 }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
@@ -97,7 +101,7 @@ export function AdminSidebar({
         C
       </div>
       <div>
-        <div className="text-sm font-semibold text-white">HCE Cleaning</div>
+        <div className="cln-display text-sm font-semibold text-white">HCE Cleaning</div>
         <div className="text-[11px] uppercase tracking-wide text-slate-400">{packageTier}</div>
       </div>
     </div>
@@ -124,6 +128,7 @@ export function AdminSidebar({
         <div className="font-medium text-white">{user.name}</div>
         <div className="text-xs text-slate-400">{user.role}</div>
       </div>
+      <ThemeSwitcher current={theme} variant="menu" />
       <form action={logout}>
         <button
           type="submit"

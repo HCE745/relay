@@ -1,6 +1,9 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 import { getSession } from "@/lib/session"
+import { THEME_COOKIE, normalizeTheme } from "@/lib/theme"
+import { ThemeSwitcher } from "@/components/theme/theme-switcher"
 import { canManageOrg, canManageAccounts } from "@/lib/rbac"
 import { getOrgSettings } from "@/lib/data/org"
 import { getSetupProgress } from "@/lib/data/setup"
@@ -32,6 +35,7 @@ export default async function SettingsPage() {
   const showCorrective = isOrgAdmin && (await orgHasCapability(session.organizationId, "quality.inspections")) && (await orgHasCapability(session.organizationId, "operations.workOrders"))
   const showBurden = isOrgAdmin && (await orgHasCapability(session.organizationId, "workforce.laborCosting"))
 
+  const theme = normalizeTheme((await cookies()).get(THEME_COOKIE)?.value)
   const canSetup = canManageAccounts(session.role)
   const [setup, setupDismissed] = canSetup
     ? await Promise.all([getSetupProgress(session.organizationId), isSetupGuideDismissed()])
@@ -57,6 +61,12 @@ export default async function SettingsPage() {
             <dd className="text-sm font-medium text-slate-900">{session.role}</dd>
           </div>
         </dl>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="mb-1 text-sm font-semibold text-slate-700">Appearance</h2>
+        <p className="mb-3 text-sm text-slate-500">Choose a theme for your workspace. Saved to your browser and applied everywhere.</p>
+        <ThemeSwitcher current={theme} variant="settings" />
       </Card>
 
       <Card className="p-6">

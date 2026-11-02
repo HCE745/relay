@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 import { Suspense } from "react"
 import { getSession } from "@/lib/session"
+import { THEME_COOKIE, normalizeTheme } from "@/lib/theme"
 import { experienceForRole, navForRole } from "@/lib/rbac"
 import { getOrgCapabilities } from "@/lib/entitlements-server"
 import { CapabilityProvider } from "@/lib/entitlements"
@@ -21,6 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const capabilities = await getOrgCapabilities(session.organizationId)
   const capSet = new Set(capabilities)
   const nav = navForRole(session.role, (cap) => capSet.has(cap))
+  const theme = normalizeTheme((await cookies()).get(THEME_COOKIE)?.value)
 
   return (
     <CapabilityProvider capabilities={capabilities}>
@@ -29,10 +32,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           nav={nav}
           user={{ name: session.name, role: session.role }}
           packageTier={session.packageTier}
+          theme={theme}
         />
         <div className="md:pl-64">
           {session.isDemo ? <DemoBanner /> : null}
-          <main className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+          {/* cln-ornament scopes the Victorian title/heading serif to the admin
+              shell only — the field app and portal never get ornament. */}
+          <main className="cln-ornament mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
         </div>
         {session.isDemo ? <ProductTour isDemo /> : null}
         <CommandPalette nav={nav.map((n) => ({ label: n.label, href: n.href }))} />

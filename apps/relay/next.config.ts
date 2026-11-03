@@ -1,6 +1,9 @@
 import type { NextConfig } from "next"
 import { withSentryConfig } from "@sentry/nextjs"
+import createNextIntlPlugin from "next-intl/plugin"
 import path from "path"
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts")
 
 const nextConfig: NextConfig = {
   // In the monorepo, Next would otherwise infer the workspace root from a
@@ -26,7 +29,7 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withNextIntl(nextConfig), {
   // Sentry org/project from dashboard — needed for source map uploads
   org:     process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,

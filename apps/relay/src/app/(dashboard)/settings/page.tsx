@@ -11,6 +11,7 @@ import { SafetySettingsForm } from "@/components/settings/safety-settings-form"
 import { SopSettingsForm } from "@/components/settings/sop-settings-form"
 import { ApprovalIntelligenceSettingsForm } from "@/components/settings/approval-intelligence-settings-form"
 import { DarkModeToggle } from "@/components/settings/dark-mode-toggle"
+import { LanguagePicker } from "@/components/settings/language-picker"
 import { IssueTemplatesManager } from "@/components/settings/issue-templates-manager"
 import { NotificationPrefsForm } from "@/components/settings/notification-prefs-form"
 import { DEFAULT_ACCESS, type PageAccessConfig, type PageKey } from "@/lib/page-access"
@@ -27,7 +28,7 @@ export default async function SettingsPage() {
   const [org, currentUser, userSettings, issueTemplates] = await Promise.all([
     isAdmin ? prisma.organization.findUnique({ where: { id: session.organizationId } }) : Promise.resolve(null),
     prisma.user.findUnique({ where: { id: session.userId }, select: { canChangeEmail: true } }),
-    prisma.userSettings.findUnique({ where: { userId: session.userId }, select: { aiSuggestionsOn: true, aiSuggestionsCollapsed: true, sopPanelsCollapsed: true, darkMode: true, notificationPrefs: true } }),
+    prisma.userSettings.findUnique({ where: { userId: session.userId }, select: { aiSuggestionsOn: true, aiSuggestionsCollapsed: true, sopPanelsCollapsed: true, darkMode: true, language: true, notificationPrefs: true } }),
     isAdmin ? prisma.issueTemplate.findMany({ where: { organizationId: session.organizationId }, orderBy: { name: "asc" } }) : Promise.resolve([]),
   ])
 
@@ -215,6 +216,8 @@ export default async function SettingsPage() {
             />
             <div className="border-t border-gray-100 pt-5 mt-5" />
             <DarkModeToggle initialDarkMode={userSettings?.darkMode ?? false} />
+            <div className="border-t border-gray-100 pt-5 mt-5" />
+            <LanguagePicker initialLanguage={userSettings?.language ?? "en"} />
           </div>
         </div>
 

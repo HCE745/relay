@@ -40,6 +40,7 @@ import {
   MessageSquare,
   Settings2,
 } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { logout } from "@/lib/auth-actions"
 import type { PageKey } from "@/lib/page-access"
@@ -132,9 +133,19 @@ export function Sidebar({
   customViewItems = [],
   customPageItems = [],
 }: SidebarProps) {
+  const t = useTranslations("Nav")
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const allowedSet = new Set(allowedPageKeys)
+
+  const SECTION_LABELS: Record<string, string> = {
+    "MAIN":             t("sections.main"),
+    "EMPLOYEE VOICE":   t("sections.employeeVoice"),
+    "CUSTOMER VOICE":   t("sections.customerVoice"),
+    "OPERATIONS":       t("sections.operations"),
+    "INTELLIGENCE":     t("sections.intelligence"),
+    "ADMINISTRATION":   t("sections.administration"),
+  }
   const industryNavItems = industry ? buildNav(industry, allowedSet, { corporateDashboardEnabled }) : null
   const [recentItems, setRecentItems] = useState<RecentlyViewedItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -221,26 +232,26 @@ export function Sidebar({
   )
 
   const voiceExtras = [
-    voiceInsightsVisible && { href: "/voice/insights", label: "Voice Insights", icon: PieChart },
+    voiceInsightsVisible && { href: "/voice/insights", label: t("voice-insights"), icon: PieChart },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 
   const intelligenceExtras = [
-    executiveBriefingsEnabled && { href: "/executive-briefings", label: "AI Briefings",  icon: FileText  },
-    trendDetectionEnabled     && { href: "/trend-alerts",        label: "Trend Alerts",  icon: TrendingUp },
-    executiveGoalsEnabled     && { href: "/executive-goals",     label: "Goals & KPIs",  icon: Target     },
+    executiveBriefingsEnabled && { href: "/executive-briefings", label: t("ai-briefings"),  icon: FileText  },
+    trendDetectionEnabled     && { href: "/trend-alerts",        label: t("trend-alerts"),  icon: TrendingUp },
+    executiveGoalsEnabled     && { href: "/executive-goals",     label: t("goals-kpis"),    icon: Target     },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 
   const customerVoiceExtras = [
-    customerVoiceEnabled && { href: "/customer-voice",          label: "Customer Voice", icon: MessageSquare },
-    customerVoiceEnabled && { href: "/customer-voice/surveys",  label: "Surveys",        icon: ClipboardList },
-    customerVoiceEnabled && { href: "/customer-voice/settings", label: "CV Settings",    icon: Settings2     },
+    customerVoiceEnabled && { href: "/customer-voice",          label: t("customer-voice"),   icon: MessageSquare },
+    customerVoiceEnabled && { href: "/customer-voice/surveys",  label: t("customer-surveys"), icon: ClipboardList },
+    customerVoiceEnabled && { href: "/customer-voice/settings", label: t("cv-settings"),      icon: Settings2     },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 
   const adminExtras = [
-    regionsEnabled                    && { href: "/regions",                  label: "Regions",          icon: MapPin    },
-    showRouting                        && { href: "/settings/routing",         label: "Routing Rules",    icon: GitBranch },
-    showIntegrations                    && { href: "/settings/integrations",   label: "Integrations",     icon: Key       },
-    sharedFacilityEnabled             && { href: "/settings/shared-facility", label: "Shared Facility",  icon: Building2 },
+    regionsEnabled        && { href: "/regions",                  label: t("regions"),          icon: MapPin    },
+    showRouting           && { href: "/settings/routing",         label: t("routing-rules"),    icon: GitBranch },
+    showIntegrations      && { href: "/settings/integrations",    label: t("integrations"),     icon: Key       },
+    sharedFacilityEnabled && { href: "/settings/shared-facility", label: t("shared-facility"), icon: Building2 },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: React.ElementType }>
 
   const customViewExtras = allowedSet.has("issues")
@@ -280,10 +291,10 @@ export function Sidebar({
             return (
               <div key={section} className="mb-4">
                 <p className="text-[10px] font-bold tracking-widest text-gray-600 uppercase px-4 mb-1 mt-1">
-                  {section}
+                  {SECTION_LABELS[section] ?? section}
                 </p>
                 <div className="space-y-0.5">
-                  {items.map(({ href, label, icon: Icon }) => navLink(href, navLabelOverrides?.[href] ?? label, Icon))}
+                  {items.map(({ key, href, icon: Icon }) => navLink(href, navLabelOverrides?.[href] ?? t(key), Icon))}
                   {extras.map(({ href, label, icon: Icon }) => navLink(href, label, Icon))}
                 </div>
               </div>
@@ -292,9 +303,9 @@ export function Sidebar({
 
         {/* Settings + Notifications in Admin section at bottom */}
         <div className="mb-4">
-          <p className="text-[10px] font-bold tracking-widest text-gray-600 uppercase px-4 mb-1">ACCOUNT</p>
+          <p className="text-[10px] font-bold tracking-widest text-gray-600 uppercase px-4 mb-1">{t("sections.account")}</p>
           <div className="space-y-0.5">
-            {navLink("/settings", "Settings", Settings)}
+            {navLink("/settings", t("settings"), Settings)}
             <div className="relative">
               <div className={cn(
                 "absolute inset-y-0 left-0 w-0.5 rounded-r-full transition-colors",
@@ -310,7 +321,7 @@ export function Sidebar({
                 )}
               >
                 <Bell className="w-4 h-4 flex-shrink-0" />
-                <span className="flex-1">Notifications</span>
+                <span className="flex-1">{t("notifications")}</span>
                 {unreadCount > 0 && (
                   <span className="bg-blue-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                     {unreadCount > 9 ? "9+" : unreadCount}
@@ -326,7 +337,7 @@ export function Sidebar({
           <div className="mb-4 border-t border-gray-800/60 pt-3">
             <p className="flex items-center gap-1.5 text-[10px] font-bold text-gray-600 uppercase tracking-widest px-4 mb-1">
               <Clock className="w-3 h-3" />
-              Recent
+              {t("sections.recent")}
             </p>
             <div className="space-y-0.5">
               {recentItems.map(item => (
@@ -362,7 +373,7 @@ export function Sidebar({
             className="w-full flex items-center gap-3 pl-4 pr-3 py-2 rounded-r-lg text-sm font-medium text-gray-500 hover:text-gray-200 hover:bg-white/5 transition-colors"
           >
             <LogOut className="w-4 h-4 flex-shrink-0" />
-            Logout
+            {t("logout")}
           </button>
         </form>
       </div>

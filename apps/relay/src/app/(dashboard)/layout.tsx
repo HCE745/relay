@@ -1,4 +1,6 @@
 import Link from "next/link"
+import { NextIntlClientProvider } from "next-intl"
+import { getLocale, getMessages } from "next-intl/server"
 import { Sidebar } from "@/components/layout/sidebar"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { InstallPrompt } from "@/components/pwa/install-prompt"
@@ -31,6 +33,8 @@ export const dynamic = "force-dynamic"
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
   if (!session) redirect("/login")
+
+  const [locale, messages] = await Promise.all([getLocale(), getMessages()])
 
   const [org, userSettings, latestAcceptance, sidebarViews, sidebarPages] = await Promise.all([
     prisma.organization.findUnique({
@@ -139,6 +143,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                              : "red"
 
   return (
+    <NextIntlClientProvider locale={locale} messages={messages}>
     <div className="flex h-screen overflow-hidden flex-col">
       {/* Impersonation banner — shown when a super admin is viewing as an org admin */}
       {session.impersonatedBy && (
@@ -288,5 +293,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <OfflineBanner />
       </div>
     </div>
+    </NextIntlClientProvider>
   )
 }

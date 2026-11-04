@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { createPortal } from "react-dom"
 import {
   CircleHelp, X, Loader2, CheckCircle, Bug, MessageSquare,
   BookOpen, Send, ChevronLeft, AlertCircle, Video, Monitor, Headphones,
@@ -1067,8 +1068,17 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
   const chunksRef        = useRef<Blob[]>([])
   const recordedBlobRef  = useRef<Blob | null>(null)
   const timerRef         = useRef<ReturnType<typeof setInterval> | null>(null)
+  const triggerRef       = useRef<HTMLButtonElement>(null)
+  const [popoverPos, setPopoverPos] = useState<{ top: number; right: number }>({ top: 60, right: 16 })
 
-  function openModal() { setView("menu"); setOpen(true) }
+  function openModal() {
+    if (triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect()
+      setPopoverPos({ top: r.bottom + 8, right: Math.max(8, window.innerWidth - r.right) })
+    }
+    setView("menu")
+    setOpen(true)
+  }
   function closeModal() { setOpen(false) }
 
   useEffect(() => {
@@ -1116,6 +1126,7 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
     <>
       {/* Nav trigger */}
       <button
+        ref={triggerRef}
         onClick={openModal}
         aria-label="Help & support"
         className={triggerClassName ?? "p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"}
@@ -1124,8 +1135,8 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
       </button>
 
       {/* Screen recording indicator (shown during active recording) */}
-      {isRecording && (
-        <div className="fixed top-20 right-4 z-50 flex items-center gap-2 bg-black/85 text-white px-3.5 py-2 rounded-full shadow-xl">
+      {isRecording && createPortal(
+        <div className="fixed top-20 right-4 z-[9999] flex items-center gap-2 bg-black/85 text-white px-3.5 py-2 rounded-full shadow-xl">
           <div className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shrink-0" />
           <span className="text-xs font-mono">{formatRecordingTime(recordingSeconds)}</span>
           <button
@@ -1134,18 +1145,22 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
           >
             Stop &amp; Send
           </button>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* Modal */}
-      {open && (
-        <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/30"
-          onClick={closeModal}
-        >
-          <div className="flex min-h-full items-end sm:items-center justify-center px-4 py-4 sm:py-8 modal-safe-bottom">
+      {/* Popover — rendered via portal so it escapes any overflow/transform on the navbar */}
+      {open && createPortal(
+        <>
+          {/* transparent click-outside backdrop */}
           <div
-            className="bg-white rounded-2xl shadow-xl border border-gray-200 w-full max-w-md max-h-[90dvh] overflow-y-auto"
+            style={{ position: "fixed", inset: 0, zIndex: 9998 }}
+            onClick={closeModal}
+          />
+          {/* panel */}
+          <div
+            style={{ position: "fixed", top: popoverPos.top, right: popoverPos.right, zIndex: 9999, maxHeight: "min(90dvh, 640px)", overflowY: "auto" }}
+            className="bg-white rounded-2xl shadow-xl border border-gray-200 w-96 relative"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
@@ -1307,8 +1322,8 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
               </div>
             )}
           </div>
-          </div>
-        </div>
+        </>,
+        document.body
       )}
     </>
   )

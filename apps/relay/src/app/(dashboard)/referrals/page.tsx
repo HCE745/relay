@@ -164,7 +164,7 @@ export default async function ReferralsPage() {
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
             <h2 className="font-semibold text-gray-900 dark:text-white">Referral History</h2>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {rows.length === 0 ? "No referrals yet — share your link to get started." : `${rows.length} referral${rows.length === 1 ? "" : "s"}`}
+              {rows.length === 0 ? "No referrals yet. Share your link to get started." : `${rows.length} referral${rows.length === 1 ? "" : "s"}`}
             </p>
           </div>
 

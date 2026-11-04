@@ -292,7 +292,7 @@ function CinematicIntro({
       <div className="max-w-lg w-full text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-full mb-8">
           <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
-          <span className="text-xs text-blue-300 font-medium">Interactive Demo — Step 1 of {getNumTourSteps(industry)}</span>
+          <span className="text-xs text-blue-300 font-medium">Interactive Demo · Step 1 of {getNumTourSteps(industry)}</span>
         </div>
 
         <h1 className="text-3xl font-bold text-white mb-5 leading-tight">
@@ -351,8 +351,8 @@ function CompletionOverlay({ industry, onClose }: { industry: string; onClose: (
       ? "Start Wash Essentials Free Trial"
       : "Start Full Relay Free Trial"
     : isManufacturing
-      ? "Start Free Trial — No Credit Card Required"
-      : "Start Free Trial — No Credit Card Required"
+      ? "Start Free Trial · No Credit Card Required"
+      : "Start Free Trial · No Credit Card Required"
 
   useEffect(() => {
     fireTrackingEvent("tour_completed", { industry })
@@ -885,7 +885,7 @@ export function TourOverlay() {
             )}
             {isFormStep && formFillDone && !isSubmitting && (
               <div className="mt-3 text-xs text-green-400 bg-green-900/20 px-3 py-2 rounded-lg">
-                Form pre-filled — click "Submit Issue" to watch it go live.
+                Form pre-filled. Click "Submit Issue" to watch it go live.
               </div>
             )}
           </>

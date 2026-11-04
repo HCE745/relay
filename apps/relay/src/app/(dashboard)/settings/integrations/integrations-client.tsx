@@ -107,7 +107,7 @@ function ApiKeysSection({ initialKeys }: { initialKeys: ApiKey[] }) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6">
-      <SectionHeader icon={Key} title="API Keys" description="Generate keys to authenticate programmatic access to the Relay API. Keys are shown only once — store them securely." />
+      <SectionHeader icon={Key} title="API Keys" description="Generate keys to authenticate programmatic access to the Relay API. Keys are shown only once, so store them securely." />
 
       {newKey && (
         <div className="mb-5 p-4 bg-green-50 border border-green-200 rounded-xl">
@@ -333,7 +333,7 @@ function ConnectedAccountsSection({ initialAccount }: { initialAccount: Connecte
     setSyncing(true); setSyncResult(null); setSyncError("")
     try {
       const res = await fetch("/api/integrations/google/sync", { method: "POST" })
-      if (!res.ok) { setSyncError("Sync failed — check your connection"); return }
+      if (!res.ok) { setSyncError("Sync failed. Check your connection."); return }
       const j = await res.json() as SyncResult
       setSyncResult(j)
       setAccount(a => a ? { ...a, lastSyncAt: new Date().toISOString() } : a)

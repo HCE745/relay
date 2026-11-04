@@ -96,7 +96,7 @@ export function WorkspaceSettingsClient({
       setSaved(true)
       router.refresh()
     } catch {
-      setError("Network error — please try again.")
+      setError("Network error. Please try again.")
     } finally {
       setSaving(false)
     }
@@ -117,7 +117,7 @@ export function WorkspaceSettingsClient({
       setSaved(true)
       router.refresh()
     } catch {
-      setError("Reset failed — please try again.")
+      setError("Reset failed. Please try again.")
     } finally {
       setSaving(false)
     }

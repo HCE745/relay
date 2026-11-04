@@ -160,7 +160,7 @@ export function SuggestionForm({ users, aiSuggestionsEnabled = true, isProfessio
       const d = await res.json().catch(() => ({}))
       setError((d as { error?: string }).error ?? "Failed to submit")
     } catch {
-      setError("Network error — please check your connection and try again.")
+      setError("Network error. Please check your connection and try again.")
     } finally {
       setLoading(false)
     }

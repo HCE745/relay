@@ -101,7 +101,7 @@ function SubmitForm({
         setError(d.error ?? "Failed to submit")
       }
     } catch {
-      setError("Network error — please try again.")
+      setError("Network error. Please try again.")
     } finally {
       setSubmitting(false)
     }

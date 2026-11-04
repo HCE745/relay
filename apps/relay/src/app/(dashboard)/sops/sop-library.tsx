@@ -336,7 +336,7 @@ export function SopLibrary({ initialSops, departments, isAdminLevel }: Props) {
       if (!res.ok) { setError(data.error ?? "Upload failed"); setUploading(false); return }
       setUploadResult(data)
     } catch {
-      setError("Upload failed — please try again")
+      setError("Upload failed. Please try again.")
     }
     setUploading(false)
   }

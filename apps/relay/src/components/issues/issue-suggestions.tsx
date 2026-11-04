@@ -141,7 +141,7 @@ function SopViolationCallout({
           )}
           <p className={`text-[11px] ${isViolation ? "text-orange-400" : "text-teal-400"}`}>
             {isViolation
-              ? "Review the linked SOP before resolving — use the SOP Compliance Outcome field when closing this issue."
+              ? "Review the linked SOP before resolving. Use the SOP Compliance Outcome field when closing this issue."
               : "This SOP may be relevant to diagnosing or resolving this issue."}
           </p>
         </div>

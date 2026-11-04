@@ -248,7 +248,7 @@ export function CustomViewsClient({ initialViews, locations }: Props) {
                     )}
                   </div>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    {filterCount > 0 ? `${filterCount} filter${filterCount > 1 ? "s" : ""}` : "No filters — shows all issues"}
+                    {filterCount > 0 ? `${filterCount} filter${filterCount > 1 ? "s" : ""}` : "No filters: shows all issues"}
                     {view.showInSidebar && ` · order ${view.sidebarOrder}`}
                   </p>
                 </div>

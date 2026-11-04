@@ -12,8 +12,6 @@ import {
   BookOpen,
   QrCode,
   ClipboardList,
-  MessageSquare,
-  HardHat,
   Droplets,
   Lightbulb,
   Megaphone,
@@ -92,10 +90,8 @@ export const MASTER_NAV_ITEMS: MasterNavItem[] = [
 
 const CARWASH_CONFIG: IndustryConfig = {
   mainItems: [
-    { key: "dashboard", href: "/dashboard",                       label: "Wash Overview",    icon: Droplets,      section: "MAIN" },
-    { key: "issues",    href: "/issues?category=CUSTOMER_REPORT", label: "Customer Reports", icon: ClipboardList, section: "MAIN" },
-    { key: "issues",    href: "/issues",                          label: "Issues",            icon: AlertCircle,   section: "MAIN" },
-    { key: "issues",    href: "/issues?category=MAINTENANCE",     label: "Maintenance",       icon: Wrench,        section: "MAIN" },
+    { key: "dashboard", href: "/dashboard", label: "Wash Overview", icon: Droplets,    section: "MAIN" },
+    { key: "issues",    href: "/issues",    label: "Issues",        icon: AlertCircle, section: "MAIN" },
   ],
   labelOverrides: {
     "/assets": "Equipment",
@@ -104,10 +100,8 @@ const CARWASH_CONFIG: IndustryConfig = {
 
 const PROPERTY_CONFIG: IndustryConfig = {
   mainItems: [
-    { key: "dashboard", href: "/dashboard",                         label: "Property Overview", icon: LayoutDashboard, section: "MAIN" },
-    { key: "issues",    href: "/issues?category=TENANT_REQUEST",    label: "Tenant Requests",   icon: MessageSquare,   section: "MAIN" },
-    { key: "issues",    href: "/issues",                            label: "Property Issues",   icon: AlertCircle,     section: "MAIN" },
-    { key: "issues",    href: "/issues?category=MAINTENANCE",       label: "Maintenance",       icon: Wrench,          section: "MAIN" },
+    { key: "dashboard", href: "/dashboard", label: "Property Overview", icon: LayoutDashboard, section: "MAIN" },
+    { key: "issues",    href: "/issues",    label: "Issues",            icon: AlertCircle,     section: "MAIN" },
   ],
   labelOverrides: {
     "/assets":    "Equipment",
@@ -118,10 +112,8 @@ const PROPERTY_CONFIG: IndustryConfig = {
 
 const MANUFACTURING_CONFIG: IndustryConfig = {
   mainItems: [
-    { key: "dashboard", href: "/dashboard",                               label: "Plant Overview",  icon: LayoutDashboard, section: "MAIN" },
-    { key: "issues",    href: "/issues?category=EQUIPMENT_BREAKDOWN",     label: "Equipment Issues", icon: Wrench,         section: "MAIN" },
-    { key: "issues",    href: "/issues",                                  label: "Issues",           icon: AlertCircle,    section: "MAIN" },
-    { key: "issues",    href: "/issues?category=SAFETY",                  label: "Safety Issues",    icon: HardHat,        section: "MAIN" },
+    { key: "dashboard", href: "/dashboard", label: "Plant Overview", icon: LayoutDashboard, section: "MAIN" },
+    { key: "issues",    href: "/issues",    label: "Issues",         icon: AlertCircle,     section: "MAIN" },
   ],
   labelOverrides: {
     "/assets":    "Machines & Equipment",

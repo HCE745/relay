@@ -37,7 +37,7 @@ export function ReadOnlyGuard({
   return (
     <span
       className={`relative group inline-block ${className ?? ""}`}
-      title="Subscription required — upgrade to restore full access"
+      title="Subscription required: upgrade to restore full access"
     >
       <span className="pointer-events-none opacity-50 select-none">{children}</span>
       {/* Tooltip */}

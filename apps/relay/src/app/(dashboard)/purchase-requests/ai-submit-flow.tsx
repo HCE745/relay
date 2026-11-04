@@ -216,7 +216,7 @@ function SubmitForm({ assets, onSubmitted, onCancel }: {
               value={description}
               onChange={e => setDesc(e.target.value)}
               rows={4}
-              placeholder="Describe the item you need and why. Be specific — the AI uses this to identify the correct item from the catalog."
+              placeholder="Describe the item you need and why. Be specific: the AI uses this to identify the correct item from the catalog."
               className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             />
           </div>

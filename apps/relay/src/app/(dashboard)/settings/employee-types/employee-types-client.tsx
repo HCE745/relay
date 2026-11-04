@@ -403,7 +403,7 @@ export function EmployeeTypesClient({ initialTypes, presets }: Props) {
                       <button
                         onClick={() => handleDelete(t.id)}
                         disabled={t._count.users > 0 || saving}
-                        title={t._count.users > 0 ? "Cannot delete — employees are assigned" : "Delete"}
+                        title={t._count.users > 0 ? "Cannot delete: employees are assigned" : "Delete"}
                         className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

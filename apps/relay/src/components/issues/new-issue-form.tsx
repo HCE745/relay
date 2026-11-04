@@ -244,7 +244,7 @@ export function NewIssueForm({ locations, departments, assets, vendors, users, s
       const data = await res.json().catch(() => ({}))
       setError((data as { error?: string }).error ?? "Failed to create issue")
     } catch {
-      setError("Network error — please check your connection and try again.")
+      setError("Network error. Please check your connection and try again.")
     } finally {
       setLoading(false)
     }

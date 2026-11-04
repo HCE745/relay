@@ -97,7 +97,7 @@ export function IssueActions({ issue, users, vendors, sessionRole }: Props) {
       toast.error("Failed to save changes. Please try again.")
     }
     } catch {
-      toast.error("Connection error — please check your internet and try again.")
+      toast.error("Connection error. Please check your internet and try again.")
     } finally {
       setLoading(false)
     }
@@ -119,7 +119,7 @@ export function IssueActions({ issue, users, vendors, sessionRole }: Props) {
       toast.error("Failed to escalate issue. Please try again.")
     }
     } catch {
-      toast.error("Connection error — please check your internet and try again.")
+      toast.error("Connection error. Please check your internet and try again.")
     } finally {
       setLoading(false)
     }

@@ -354,17 +354,17 @@ function generateAiInsights(d: {
   }
 
   if (d.criticalIssues >= 2) {
-    out.push(`${d.criticalIssues} critical issues unresolved — prioritize before next shift to prevent escalation`)
+    out.push(`${d.criticalIssues} critical issues unresolved. Prioritize before next shift to prevent escalation.`)
   } else if (d.criticalIssues === 1 && d.escalatedIssues > 0) {
     out.push(`1 critical + ${d.escalatedIssues} escalated issue${d.escalatedIssues > 1 ? "s" : ""} need immediate attention`)
   } else if (d.escalatedIssues > 0) {
-    out.push(`${d.escalatedIssues} escalated issue${d.escalatedIssues > 1 ? "s" : ""} pending — update stakeholders on resolution targets`)
+    out.push(`${d.escalatedIssues} escalated issue${d.escalatedIssues > 1 ? "s" : ""} pending. Update stakeholders on resolution targets.`)
   } else if (d.criticalIssues === 1) {
-    out.push("1 critical issue active — resolve before shift end to protect the health score")
+    out.push("1 critical issue active. Resolve before shift end to protect the health score.")
   } else if (d.openIssues === 0) {
-    out.push("All issues resolved — excellent operational standing")
+    out.push("All issues resolved. Excellent operational standing.")
   } else if (d.newToday === 0 && d.openIssues > 0) {
-    out.push(`No new issues today — focus on clearing the ${d.openIssues} in the backlog`)
+    out.push(`No new issues today. Focus on clearing the ${d.openIssues} in the backlog.`)
   }
 
   return out.filter(Boolean).slice(0, 3)

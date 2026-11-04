@@ -168,7 +168,7 @@ export function CrmEmailCompose({
       setSuccess(true)
       setTimeout(() => { onSent(); onClose() }, 1500)
     } catch {
-      setError("Network error — please try again.")
+      setError("Network error. Please try again.")
     } finally {
       setSending(false)
     }

@@ -208,7 +208,7 @@ function RecordBugReview({
         <h3 className="font-semibold text-gray-900">Recording Captured</h3>
       </div>
       <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs text-green-700">
-        {sizeMB} MB recorded — ready to send.
+        {sizeMB} MB recorded. Ready to send.
       </div>
       {error && (
         <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2">
@@ -431,7 +431,7 @@ function FeedbackForm({ userName, onDone, onBack }: { userName: string; onDone: 
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
         >
           {FEEDBACK_TYPES.map(t => (
-            <option key={t.value} value={t.value}>{t.label} — {t.desc}</option>
+            <option key={t.value} value={t.value}>{t.label}: {t.desc}</option>
           ))}
         </select>
       </div>
@@ -511,7 +511,7 @@ function FeedbackDone({ onClose }: { onClose: () => void }) {
     <div className="px-5 py-10 flex flex-col items-center text-center">
       <CheckCircle className="w-10 h-10 text-green-500 mb-3" />
       <p className="font-semibold text-gray-900 mb-1">Feedback sent!</p>
-      <p className="text-sm text-gray-500 mb-5">Thanks — we read every submission.</p>
+      <p className="text-sm text-gray-500 mb-5">Thanks! We read every submission.</p>
       <button onClick={onClose} className="text-sm text-blue-600 hover:underline">Close</button>
     </div>
   )
@@ -581,7 +581,7 @@ function AIChatPanel({ onBack }: { onBack: () => void }) {
         <BookOpen className="w-4 h-4 text-blue-500" />
         <div className="flex-1">
           <p className="text-sm font-semibold text-gray-900">How to Use Relay</p>
-          <p className="text-xs text-gray-400">AI-powered help — may not be perfectly accurate</p>
+          <p className="text-xs text-gray-400">AI-powered help · may not be perfectly accurate</p>
         </div>
       </div>
 
@@ -1071,6 +1071,13 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
   function openModal() { setView("menu"); setOpen(true) }
   function closeModal() { setOpen(false) }
 
+  useEffect(() => {
+    if (!open) return
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") closeModal() }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [open])
+
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
@@ -1132,8 +1139,14 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
 
       {/* Modal */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 px-4 pt-4 modal-safe-bottom">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 w-full max-w-md overflow-hidden">
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 px-4 pt-4 modal-safe-bottom"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl border border-gray-200 w-full max-w-md max-h-[90dvh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
             {/* Header */}
             {view !== "chat" && (
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -1200,7 +1213,7 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
                     icon:   <Headphones className="w-5 h-5 text-green-500" />,
                     bg:     "bg-green-50 hover:bg-green-100 border-green-200",
                     title:  "Contact Support",
-                    desc:   "Message our team directly — we'll get back to you ASAP",
+                    desc:   "Message our team. We'll reply as soon as possible.",
                     action: () => setView("support"),
                   },
                 ].map(item => (

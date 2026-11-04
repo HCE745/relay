@@ -92,7 +92,7 @@ export function TeamActions({
       if (res.ok) { setMessage({ type: "ok", text: "Password reset." }); setPassword("") }
       else setMessage({ type: "err", text: data.error ?? "Failed" })
     } catch {
-      toast.error("Connection error — please check your internet and try again.")
+      toast.error("Connection error. Please check your internet and try again.")
     } finally {
       setSaving(false)
     }
@@ -114,7 +114,7 @@ export function TeamActions({
         setMessage({ type: "err", text: data.error ?? "Failed" })
       }
     } catch {
-      toast.error("Connection error — please check your internet and try again.")
+      toast.error("Connection error. Please check your internet and try again.")
     } finally {
       setSaving(false)
     }
@@ -137,7 +137,7 @@ export function TeamActions({
         setMessage({ type: "err", text: data.error ?? "Failed" })
       }
     } catch {
-      toast.error("Connection error — please check your internet and try again.")
+      toast.error("Connection error. Please check your internet and try again.")
     } finally {
       setSaving(false)
     }
@@ -324,7 +324,7 @@ export function TeamActions({
                       setMessage({ type: "err", text: data.error ?? "Failed" })
                     }
                   } catch {
-                    toast.error("Connection error — please check your internet and try again.")
+                    toast.error("Connection error. Please check your internet and try again.")
                   } finally {
                     setSaving(false)
                   }
@@ -391,7 +391,7 @@ export function TeamActions({
                       setMessage({ type: "err", text: data.error ?? "Failed" })
                     }
                   } catch {
-                    toast.error("Connection error — please check your internet and try again.")
+                    toast.error("Connection error. Please check your internet and try again.")
                   } finally {
                     setSaving(false)
                   }

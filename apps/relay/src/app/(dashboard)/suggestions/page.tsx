@@ -5,6 +5,7 @@ import { cookies } from "next/headers"
 import { Header } from "@/components/layout/header"
 import { SuggestionForm } from "@/components/suggestions/suggestion-form"
 import { SuggestionInbox } from "@/components/suggestions/suggestion-inbox"
+import { MySubmittedSuggestions } from "@/components/suggestions/my-submitted-suggestions"
 import { isProfessional, isRecognitionEnabled } from "@/lib/pricing"
 import type { SuggestionType } from "@/lib/suggestion-constants"
 
@@ -30,6 +31,18 @@ export default async function SuggestionsPage({
     include: {
       submittedBy: { select: { id: true, name: true } },
       routedToUser: { select: { id: true, name: true } },
+      convertedToIssue: { select: { id: true, title: true } },
+    },
+  })
+
+  // For non-admins: also load suggestions they personally submitted so they can track status
+  const mySubmissions = isAdmin ? [] : await prisma.suggestion.findMany({
+    where: { organizationId: orgId, submittedById: session.userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true, type: true, content: true, status: true, adminNote: true,
+      detectedCategory: true, createdAt: true,
+      routedToUser: { select: { name: true } },
       convertedToIssue: { select: { id: true, title: true } },
     },
   })
@@ -173,6 +186,15 @@ export default async function SuggestionsPage({
             defaultType={defaultType}
           />
         </div>
+
+        {/* My submitted suggestions — non-admin only, so they can track status of what they submitted */}
+        {!isAdmin && mySubmissions.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="font-semibold text-gray-900 mb-1">My Submitted Suggestions</h2>
+            <p className="text-sm text-gray-500 mb-4">Track the status of suggestions you&apos;ve submitted.</p>
+            <MySubmittedSuggestions suggestions={JSON.parse(JSON.stringify(mySubmissions))} />
+          </div>
+        )}
       </div>
     </div>
   )

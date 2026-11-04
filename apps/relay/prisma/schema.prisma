@@ -65,8 +65,10 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  pageAccessConfig   Json?
-  navigationConfig   Json?
+  pageAccessConfig         Json?
+  navigationConfig         Json?
+  notificationRulesConfig  Json?
+  priorityRulesConfig      Json?
   terminologyConfig  Json?
 
   // ── Professional Plus feature flags (controlled by Super Admin, default false) ─
@@ -519,6 +521,8 @@ model Issue {
   sopComplianceOutcome  String?  // "SOP_NON_COMPLIANCE" | "SOP_DEFICIENCY" | "UNRELATED" — set during resolution
   injurySeverity        String?  // "MINOR" | "MODERATE" | "SEVERE" — set when category = "INJURY"
   injuryDescription     String?  // specific injury details (what happened, body part, etc.)
+  acknowledgedAt        DateTime? // when a supervisor/manager acknowledged receipt of a critical issue
+  acknowledgedById      String?   // user who acknowledged
   areaDetail            String?  // free-text sub-location (e.g. "Loading dock bay 3")
   // Shared facility cross-org routing
   isSharedFacilityIssue Boolean  @default(false)

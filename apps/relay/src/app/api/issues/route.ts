@@ -7,6 +7,8 @@ import { generateIssueSuggestions } from "@/lib/ai-suggestions"
 import { matchSOPToIssue } from "@/lib/sop-matching"
 import { checkLimit, limiters } from "@/lib/ratelimit"
 import { dispatchInjuryNotifications } from "@/lib/injury-notifications"
+import { dispatchNotificationRules, parseNotificationRules } from "@/lib/notification-rules"
+import { applyPriorityRules, parsePriorityRules } from "@/lib/priority-rules"
 import { sendPushNotification } from "@/lib/push-notifications"
 import { checkDuplicateIssue, suggestIssueTitle } from "@/lib/ai-haiku"
 import { logActivationEvent } from "@/lib/analytics"
@@ -203,6 +205,19 @@ export async function POST(request: NextRequest) {
   const resolvedLocationId: string | null   = locationId   || reporter?.locationId   || null
   const resolvedDepartmentId: string | null = departmentId || reporter?.departmentId || null
 
+  // ── 2b. Fetch org config (needed for priority rules + notification rules + AI suggestions) ──
+  const org = await prisma.organization.findUnique({
+    where: { id: session.organizationId },
+    select: {
+      industry: true,
+      aiSuggestionsAvailable: true,
+      aiSuggestionsPolicy: true,
+      aiSuggestionsAudience: true,
+      notificationRulesConfig: true,
+      priorityRulesConfig: true,
+    },
+  })
+
   // ── 3. AI category + priority inference (synchronous, graceful fallback) ────
   // Only runs for fields the user left on Automatic (null/empty).
   // If the Anthropic call fails or times out, falls back to GENERAL/MEDIUM.
@@ -218,6 +233,17 @@ export async function POST(request: NextRequest) {
 
   if (!resolvedCategory) resolvedCategory = "GENERAL"
   if (!resolvedPriority) resolvedPriority = "MEDIUM"
+
+  // ── 3b. Priority rules — may elevate priority based on admin-configured rules ─
+  const priorityRules = parsePriorityRules(org?.priorityRulesConfig)
+  if (priorityRules.length > 0) {
+    resolvedPriority = applyPriorityRules(resolvedPriority, {
+      category:     resolvedCategory,
+      locationId:   locationId || null,
+      departmentId: departmentId || null,
+      title,
+    }, priorityRules)
+  }
 
   // ── 4. Auto-routing (runs after all inference + fallbacks are applied) ───────
   let resolvedAssigneeId: string | null = manualAssignee || null
@@ -250,12 +276,8 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // ── Fetch org + asset type + location/department for patterns and suggestions
-  const [org, asset, location, department] = await Promise.all([
-    prisma.organization.findUnique({
-      where: { id: session.organizationId },
-      select: { industry: true, aiSuggestionsAvailable: true, aiSuggestionsPolicy: true, aiSuggestionsAudience: true },
-    }),
+  // ── Fetch asset type + location/department for patterns and suggestions
+  const [asset, location, department] = await Promise.all([
     assetId           ? prisma.asset.findUnique({ where: { id: assetId }, select: { type: true } }) : null,
     resolvedLocationId   ? prisma.location.findUnique({ where: { id: resolvedLocationId }, select: { name: true } }) : null,
     resolvedDepartmentId ? prisma.department.findUnique({ where: { id: resolvedDepartmentId }, select: { name: true } }) : null,
@@ -316,6 +338,20 @@ export async function POST(request: NextRequest) {
       supervisorId:  reporter?.managerId ?? resolvedAssigneeId,
       excludeUserId: session.userId,
     })
+  }
+
+  // ── Custom notification rules (fire-and-forget) ───────────────────────────
+  const notifRules = parseNotificationRules(org?.notificationRulesConfig)
+  if (notifRules.length > 0) {
+    void dispatchNotificationRules({
+      id:             issue.id,
+      title,
+      priority:       resolvedPriority,
+      category:       resolvedCategory,
+      locationId:     resolvedLocationId,
+      departmentId:   resolvedDepartmentId,
+      organizationId: session.organizationId,
+    }, notifRules)
   }
 
   // ── AI suggestions (fire-and-forget) ──────────────────────────────────────

@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic"
 import { Badge } from "@/components/ui/badge"
 import { PRIORITY_COLOR, STATUS_COLOR, ISSUE_STATUS, ISSUE_PRIORITY, ISSUE_CATEGORY } from "@/lib/constants"
 import { IssueActions } from "@/components/issues/issue-actions"
+import { AcknowledgeButton } from "@/components/issues/acknowledge-button"
 import { IssueComments } from "@/components/issues/issue-comments"
 import { IssueChat } from "@/components/issues/issue-chat"
 import { format, formatDistanceToNow } from "date-fns"
@@ -45,6 +46,14 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
       sop: { select: { id: true, title: true } },
     },
   })
+
+  // Fetch acknowledgedBy name separately (denormalized field, not a relation)
+  const acknowledgedByUser = issue?.acknowledgedById
+    ? await prisma.user.findUnique({
+        where: { id: issue.acknowledgedById },
+        select: { name: true },
+      })
+    : null
 
   if (!issue) notFound()
 
@@ -173,7 +182,16 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
                 <p className="mt-2 text-gray-600 text-sm whitespace-pre-wrap">{issue.description}</p>
               )}
             </div>
-            <IssueActions issue={issue} users={orgUsers.map(u => ({ id: u.id, name: u.name, role: u.role, email: u.email, department: u.department?.name ?? undefined, location: u.location?.name ?? undefined }))} vendors={orgVendors} sessionRole={session.role} />
+            <div className="flex flex-col gap-2 items-end">
+              <IssueActions issue={issue} users={orgUsers.map(u => ({ id: u.id, name: u.name, role: u.role, email: u.email, department: u.department?.name ?? undefined, location: u.location?.name ?? undefined }))} vendors={orgVendors} sessionRole={session.role} />
+              <AcknowledgeButton
+                issueId={issue.id}
+                priority={issue.priority}
+                acknowledgedAt={issue.acknowledgedAt?.toISOString() ?? null}
+                acknowledgedByName={acknowledgedByUser?.name ?? null}
+                sessionRole={session.role}
+              />
+            </div>
           </div>
 
           {/* Attachments */}

@@ -8,14 +8,23 @@ import { formatDistanceToNow } from "date-fns"
 export const dynamic = "force-dynamic"
 
 const STATUS_STYLE: Record<string, string> = {
-  OPEN:       "bg-blue-100 text-blue-700",
-  IN_PROGRESS:"bg-yellow-100 text-yellow-700",
-  RESOLVED:   "bg-green-100 text-green-700",
-  CLOSED:     "bg-gray-100 text-gray-500",
-  PENDING:    "bg-yellow-100 text-yellow-700",
-  REVIEWED:   "bg-green-100 text-green-700",
-  DISMISSED:  "bg-gray-100 text-gray-500",
-  CONVERTED:  "bg-blue-100 text-blue-700",
+  OPEN:        "bg-blue-100 text-blue-700",
+  IN_PROGRESS: "bg-yellow-100 text-yellow-700",
+  RESOLVED:    "bg-green-100 text-green-700",
+  CLOSED:      "bg-gray-100 text-gray-500",
+  PENDING:     "bg-yellow-100 text-yellow-700",
+  REVIEWED:    "bg-green-100 text-green-700",
+  DISMISSED:   "bg-gray-100 text-gray-500",
+  CONVERTED:   "bg-blue-100 text-blue-700",
+  IMPLEMENTED: "bg-emerald-100 text-emerald-700",
+}
+
+const SUGGESTION_STATUS_LABEL: Record<string, string> = {
+  PENDING:     "Pending Review",
+  REVIEWED:    "Reviewed",
+  DISMISSED:   "Dismissed",
+  CONVERTED:   "Converted to Issue",
+  IMPLEMENTED: "Implemented",
 }
 
 const PRIORITY_STYLE: Record<string, string> = {
@@ -133,7 +142,7 @@ export default async function MySubmissionsPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLE[suggestion.status] ?? "bg-gray-100 text-gray-600"}`}>
-                          {suggestion.status}
+                          {SUGGESTION_STATUS_LABEL[suggestion.status] ?? suggestion.status}
                         </span>
                         {suggestion.detectedCategory && (
                           <span className="text-xs text-gray-400">{suggestion.detectedCategory}</span>

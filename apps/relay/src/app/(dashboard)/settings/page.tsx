@@ -179,6 +179,44 @@ export default async function SettingsPage() {
           </Link>
         )}
 
+        {/* Priority Rules — ADMIN only */}
+        {isAdmin && (
+          <Link
+            href="/settings/priority-rules"
+            className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-300 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+                <Sliders className="w-4.5 h-4.5 text-orange-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900 text-sm">Priority Rules</p>
+                <p className="text-xs text-gray-500">Set minimum priority levels for specific issue categories or locations</p>
+              </div>
+            </div>
+            <span className="text-gray-400 text-sm">→</span>
+          </Link>
+        )}
+
+        {/* Notification Rules — ADMIN only */}
+        {isAdmin && (
+          <Link
+            href="/settings/notifications"
+            className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-300 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                <Sliders className="w-4.5 h-4.5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900 text-sm">Notification Rules</p>
+                <p className="text-xs text-gray-500">Configure who gets alerted for critical or high-priority issues</p>
+              </div>
+            </div>
+            <span className="text-gray-400 text-sm">→</span>
+          </Link>
+        )}
+
         {/* AI Suggestions org policy — ADMIN only, and only when feature is available */}
         {isAdmin && aiAvailable && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">

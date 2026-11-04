@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ISSUE_STATUS, ISSUE_PRIORITY } from "@/lib/constants"
-import { ChevronUp, Edit3, Check, X } from "lucide-react"
+import { ChevronUp, Edit3, Check, X, CheckCircle } from "lucide-react"
 import { toast } from "@/lib/toast"
 import { PeoplePicker } from "@/components/ui/people-picker"
 import type { Person } from "@/components/ui/people-picker"
@@ -157,7 +157,16 @@ export function IssueActions({ issue, users, vendors, sessionRole }: Props) {
 
   if (!editing) {
     return (
-      <div className="flex gap-2 flex-shrink-0">
+      <div className="flex gap-2 flex-shrink-0 flex-wrap">
+        {issue.status !== "RESOLVED" && issue.status !== "CLOSED" && (
+          <button
+            onClick={() => { setStatus("RESOLVED"); setEditing(true) }}
+            className="flex items-center gap-1.5 px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors font-medium"
+          >
+            <CheckCircle className="w-4 h-4" />
+            Resolve
+          </button>
+        )}
         <button
           onClick={() => setEscalating(true)}
           className="flex items-center gap-1.5 px-3 py-2 border border-orange-300 text-orange-700 rounded-lg text-sm hover:bg-orange-50 transition-colors"

@@ -128,6 +128,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const showRouting = ["ADMIN", "MANAGER"].includes(session.role)
   const voiceInsightsVisible = ["ADMIN", "HR", "MANAGER"].includes(session.role)
 
+  // Employee-role users get a scoped view: no customer voice, intelligence extras, or region/facility admin links
+  const isEmployeeRole = session.role === "EMPLOYEE"
+
   // Trial banner — read from JWT (no extra DB query)
   const trialEndsAt = session.trialEndsAt ? new Date(session.trialEndsAt) : null
   const isTrialing  = currentStatus === "trialing" && trialEndsAt && trialEndsAt > new Date()
@@ -159,15 +162,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
         showRouting={showRouting}
         industry={org?.industry ?? undefined}
         corporateDashboardEnabled={org?.corporate_dashboard_enabled ?? false}
-        regionsEnabled={org?.regions_enabled ?? false}
+        regionsEnabled={!isEmployeeRole && (org?.regions_enabled ?? false)}
         apiWebhooksEnabled={org?.api_webhooks_enabled ?? false}
         ssoEnabled={org?.sso_foundation_enabled ?? false}
-        sharedFacilityEnabled={org?.shared_facility_enabled ?? false}
-        executiveBriefingsEnabled={org?.executive_briefings_enabled ?? false}
-        executiveGoalsEnabled={org?.executive_goals_enabled ?? false}
-        trendDetectionEnabled={org?.trend_detection_enabled ?? false}
+        sharedFacilityEnabled={!isEmployeeRole && (org?.shared_facility_enabled ?? false)}
+        executiveBriefingsEnabled={!isEmployeeRole && (org?.executive_briefings_enabled ?? false)}
+        executiveGoalsEnabled={!isEmployeeRole && (org?.executive_goals_enabled ?? false)}
+        trendDetectionEnabled={!isEmployeeRole && (org?.trend_detection_enabled ?? false)}
         voiceInsightsVisible={voiceInsightsVisible}
-        customerVoiceEnabled={org?.customer_voice_enabled ?? false}
+        customerVoiceEnabled={!isEmployeeRole && (org?.customer_voice_enabled ?? false)}
         showIntegrations={session.role === "ADMIN"}
         navLabelOverrides={navLabelOverrides}
         customViewItems={sidebarViews}
@@ -180,13 +183,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
         showRouting={showRouting}
         industry={org?.industry ?? undefined}
         corporateDashboardEnabled={org?.corporate_dashboard_enabled ?? false}
-        regionsEnabled={org?.regions_enabled ?? false}
-        executiveBriefingsEnabled={org?.executive_briefings_enabled ?? false}
-        executiveGoalsEnabled={org?.executive_goals_enabled ?? false}
-        trendDetectionEnabled={org?.trend_detection_enabled ?? false}
+        regionsEnabled={!isEmployeeRole && (org?.regions_enabled ?? false)}
+        executiveBriefingsEnabled={!isEmployeeRole && (org?.executive_briefings_enabled ?? false)}
+        executiveGoalsEnabled={!isEmployeeRole && (org?.executive_goals_enabled ?? false)}
+        trendDetectionEnabled={!isEmployeeRole && (org?.trend_detection_enabled ?? false)}
         userName={session.name ?? ""}
         orgName={org?.name ?? ""}
-        customerVoiceEnabled={org?.customer_voice_enabled ?? false}
+        customerVoiceEnabled={!isEmployeeRole && (org?.customer_voice_enabled ?? false)}
         navLabelOverrides={navLabelOverrides}
         customViewItems={sidebarViews}
         customPageItems={sidebarPages}

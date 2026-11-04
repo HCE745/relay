@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic"
 export default async function CustomerVoicePage() {
   const session = await getSession()
   if (!session) redirect("/login")
+  if (!["ADMIN", "MANAGER", "SUPERVISOR", "HR"].includes(session.role)) redirect("/dashboard")
 
   const org = await prisma.organization.findUnique({
     where: { id: session.organizationId },

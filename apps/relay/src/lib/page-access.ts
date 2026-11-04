@@ -54,7 +54,7 @@ export const DEFAULT_ACCESS: Record<string, PageKey[]> = {
   HR:         ["dashboard", "assignments", "communications", "team", "injury-reports", "voice", "suggestions", "surveys", "my-submissions", "analytics", "analytics-dashboard", "archive"],
   MANAGER:    ["dashboard", "issues", "assignments", "communications", "archive", "calendar", "sops", "assets", "qr-codes", "departments", "vendors", "team", "voice", "suggestions", "surveys", "my-submissions", "purchase-requests", "approval-intelligence", "injury-reports", "analytics", "analytics-dashboard", "corporate-dashboard", "regional-dashboard"],
   SUPERVISOR: ["dashboard", "issues", "assignments", "communications", "archive", "calendar", "sops", "team", "voice", "suggestions", "surveys", "my-submissions", "purchase-requests", "injury-reports", "analytics-dashboard"],
-  EMPLOYEE:   ["dashboard", "assignments", "communications", "voice", "suggestions", "surveys", "my-submissions", "purchase-requests"],
+  EMPLOYEE:   ["dashboard", "issues", "assignments", "communications", "voice", "suggestions", "surveys", "my-submissions", "purchase-requests"],
   VENDOR:     ["my-submissions"],
 }
 

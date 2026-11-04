@@ -1140,9 +1140,10 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
       {/* Modal */}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 px-4 pt-4 modal-safe-bottom"
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/30"
           onClick={closeModal}
         >
+          <div className="flex min-h-full items-end sm:items-center justify-center px-4 py-4 sm:py-8 modal-safe-bottom">
           <div
             className="bg-white rounded-2xl shadow-xl border border-gray-200 w-full max-w-md max-h-[90dvh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
@@ -1305,6 +1306,7 @@ export function SupportButton({ userName = "", orgName = "", triggerClassName }:
                 <button onClick={closeModal} className="text-sm text-blue-600 hover:underline">Close</button>
               </div>
             )}
+          </div>
           </div>
         </div>
       )}

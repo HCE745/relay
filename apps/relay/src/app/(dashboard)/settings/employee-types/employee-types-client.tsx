@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2, Pencil, Users, X, Check, ChevronDown, ChevronUp } from "lucide-react"
-import { CONFIGURABLE_PAGES, CONFIGURABLE_ACTIONS } from "@/lib/page-access"
+import { CONFIGURABLE_PAGES, CONFIGURABLE_ACTIONS, CONFIGURABLE_ROLES } from "@/lib/page-access"
 import type { PageKey, ActionKey } from "@/lib/page-access"
 import type { EmployeeTypePreset } from "@/lib/employee-type-presets"
 
@@ -54,7 +54,7 @@ function TypeForm({
 }) {
   const [name, setName] = useState(initial.name ?? "")
   const [description, setDescription] = useState(initial.description ?? "")
-  const [baseRole] = useState(initial.baseRole ?? "EMPLOYEE")
+  const [baseRole, setBaseRole] = useState(initial.baseRole ?? "EMPLOYEE")
   const [pageAccess, setPageAccess] = useState<Set<PageKey>>(new Set(initial.pageAccess ?? ["my-submissions"]))
   const [actions, setActions] = useState<Set<ActionKey>>(new Set(initial.actions ?? []))
   const [canInvite, setCanInvite] = useState(initial.canInvite ?? false)
@@ -97,6 +97,20 @@ function TypeForm({
             placeholder="Optional description"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-xs font-medium text-gray-600 mb-1">Base Role</label>
+        <select
+          value={baseRole}
+          onChange={e => setBaseRole(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          {CONFIGURABLE_ROLES.map(r => (
+            <option key={r} value={r}>{r.charAt(0) + r.slice(1).toLowerCase()}</option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-400 mt-1">Controls system-level permissions (what the user can be assigned to do).</p>
       </div>
 
       <div>

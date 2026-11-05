@@ -1319,6 +1319,139 @@ async function seedPlusDemoContent(orgId: string, adminUserId: string) {
       isActive:       true,
     },
   })
+
+  // ── Executive Goals (Manufacturing only) ─────────────────────────────────
+  const orgRecord = await prisma.organization.findUnique({
+    where: { id: orgId },
+    select: { industry: true },
+  })
+  const isMfg = getTemplate(orgRecord?.industry ?? "").key === "manufacturing"
+
+  if (isMfg) {
+    const depts = await prisma.department.findMany({
+      where: { organizationId: orgId },
+      orderBy: { createdAt: "asc" },
+      select: { id: true },
+    })
+    // Dept order matches template: 0=Production, 1=Maintenance
+    const productionDeptId  = depts[0]?.id ?? null
+    const maintenanceDeptId = depts[1]?.id ?? null
+
+    const now      = Date.now()
+    const daysAgo  = (d: number) => new Date(now - d * 86400000)
+    const future   = (d: number) => new Date(now + d * 86400000)
+
+    // Goal 1 — Zero open safety issues (AT_RISK: 4 currently open)
+    // Open: hydraulic spill, harness inspection overdue, exit sign failure, roof leak
+    const g1 = await prisma.executiveGoal.create({
+      data: {
+        organizationId: orgId,
+        createdById:    adminUserId,
+        title:          "Zero Open Safety Issues",
+        description:    "Close all open safety incidents by end of quarter. Currently tracking: hydraulic spill on aisle floor, safety harness inspection overdue, emergency exit sign failure (Mezzanine B), and roof leak over receiving dock.",
+        metricType:     "open_issue_volume",
+        targetValue:    0,
+        currentValue:   4,
+        unit:           "count",
+        targetDate:     future(57),
+        scope:          "org",
+        status:         "AT_RISK",
+        isAtRisk:       true,
+      },
+    })
+    await prisma.goalProgress.createMany({
+      data: [
+        { goalId: g1.id, value: 8, calculatedAt: daysAgo(90) },
+        { goalId: g1.id, value: 6, calculatedAt: daysAgo(60) },
+        { goalId: g1.id, value: 5, calculatedAt: daysAgo(30) },
+        { goalId: g1.id, value: 4, calculatedAt: daysAgo(0)  },
+      ],
+    })
+
+    // Goal 2 — Equipment MTTR < 48 hours (ACTIVE: currently 29h avg, well under target)
+    // Most equipment breakdowns in seed resolve in 1–2 days; 29h is realistic given recent data
+    const g2 = await prisma.executiveGoal.create({
+      data: {
+        organizationId:  orgId,
+        createdById:     adminUserId,
+        title:           "Equipment MTTR Under 48 Hours",
+        description:     "Mean time to resolve equipment breakdown issues below 48 hours. Improving steadily — down from 68h in Q3. Conveyor belt, packaging sealer, and CNC repairs all closed in under 24h this period.",
+        metricType:      "resolution_time",
+        targetValue:     48,
+        currentValue:    29,
+        unit:            "hours",
+        targetDate:      future(57),
+        scope:           "department",
+        scopeId:         productionDeptId,
+        status:          "ACTIVE",
+        isAtRisk:        false,
+      },
+    })
+    await prisma.goalProgress.createMany({
+      data: [
+        { goalId: g2.id, value: 68, calculatedAt: daysAgo(90) },
+        { goalId: g2.id, value: 55, calculatedAt: daysAgo(60) },
+        { goalId: g2.id, value: 42, calculatedAt: daysAgo(30) },
+        { goalId: g2.id, value: 29, calculatedAt: daysAgo(0)  },
+      ],
+    })
+
+    // Goal 3 — Active equipment breakdown backlog ≤ 2 (AT_RISK: 6 currently open)
+    // Open: Conveyor E-stop, Hydraulic press, CNC #4 spindle, Air compressor, Overhead crane, CMM drift
+    const g3 = await prisma.executiveGoal.create({
+      data: {
+        organizationId:  orgId,
+        createdById:     adminUserId,
+        title:           "Active Equipment Breakdowns ≤ 2",
+        description:     "Keep concurrent open equipment breakdown issues at or below 2 at all times. Currently 6 open: Conveyor Belt E-stop, Hydraulic Press Line 2, CNC #4 spindle, Air Compressor, Overhead Crane, and CMM calibration drift.",
+        metricType:      "open_issue_volume",
+        targetValue:     2,
+        currentValue:    6,
+        unit:            "count",
+        targetDate:      future(42),
+        scope:           "department",
+        scopeId:         productionDeptId,
+        status:          "AT_RISK",
+        isAtRisk:        true,
+      },
+    })
+    await prisma.goalProgress.createMany({
+      data: [
+        { goalId: g3.id, value: 11, calculatedAt: daysAgo(90) },
+        { goalId: g3.id, value: 9,  calculatedAt: daysAgo(60) },
+        { goalId: g3.id, value: 7,  calculatedAt: daysAgo(30) },
+        { goalId: g3.id, value: 6,  calculatedAt: daysAgo(0)  },
+      ],
+    })
+
+    // Goal 4 — Preventive maintenance completion ≥ 90% (ACHIEVED: now at 95%)
+    // Seed shows cooling tower, boiler, compressed air dryer, forklift PMs all resolved
+    const g4 = await prisma.executiveGoal.create({
+      data: {
+        organizationId:  orgId,
+        createdById:     adminUserId,
+        title:           "PM Completion Rate ≥ 90%",
+        description:     "Complete all scheduled preventive maintenance tasks on time. Target reached this quarter — maintenance team resolved cooling tower descale, compressed air dryer desiccant, boiler float assembly, and forklift 500-hour service.",
+        metricType:      "custom",
+        targetValue:     90,
+        currentValue:    95,
+        unit:            "%",
+        targetDate:      future(57),
+        scope:           "department",
+        scopeId:         maintenanceDeptId,
+        status:          "ACHIEVED",
+        isAtRisk:        false,
+      },
+    })
+    await prisma.goalProgress.createMany({
+      data: [
+        { goalId: g4.id, value: 71, calculatedAt: daysAgo(90) },
+        { goalId: g4.id, value: 80, calculatedAt: daysAgo(60) },
+        { goalId: g4.id, value: 88, calculatedAt: daysAgo(30) },
+        { goalId: g4.id, value: 95, calculatedAt: daysAgo(0)  },
+      ],
+    })
+  }
 }
 
 // ─── Workforce Communications demo content ────────────────────────────────────

@@ -33,8 +33,21 @@ interface IssueInput {
   title: string
 }
 
-export function applyPriorityRules(currentPriority: string, issue: IssueInput, rules: PriorityRule[]): string {
+export interface PriorityRuleResult {
+  priority: string
+  source: "AI" | "RULE" | "MANUAL"
+  ruleName: string | null
+}
+
+export function applyPriorityRules(
+  currentPriority: string,
+  currentSource: "AI" | "MANUAL",
+  issue: IssueInput,
+  rules: PriorityRule[],
+): PriorityRuleResult {
   let result = currentPriority
+  let matchedRuleName: string | null = null
+
   for (const rule of rules) {
     if (!rule.enabled) continue
     const c = rule.conditions
@@ -45,10 +58,16 @@ export function applyPriorityRules(currentPriority: string, issue: IssueInput, r
       const lc = issue.title.toLowerCase()
       if (!c.titleKeywords.some(k => lc.includes(k.toLowerCase()))) continue
     }
-    // Rule matched — apply minimum priority (never lower the current)
+    // Rule matched — apply minimum priority (never lower)
     if (priorityRank(rule.setMinimumPriority) > priorityRank(result)) {
       result = rule.setMinimumPriority
+      matchedRuleName = rule.name
     }
   }
-  return result
+
+  return {
+    priority: result,
+    source: matchedRuleName ? "RULE" : currentSource,
+    ruleName: matchedRuleName,
+  }
 }

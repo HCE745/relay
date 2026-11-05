@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/header"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { NotificationRulesClient } from "./notification-rules-client"
+import { AckEscalationClient } from "./ack-escalation-client"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
@@ -16,7 +17,7 @@ export default async function NotificationRulesPage() {
   const [org, locations, departments] = await Promise.all([
     prisma.organization.findUnique({
       where: { id: session.organizationId },
-      select: { notificationRulesConfig: true },
+      select: { notificationRulesConfig: true, ackEscalationConfig: true },
     }),
     prisma.location.findMany({
       where: { organizationId: session.organizationId },
@@ -53,6 +54,16 @@ export default async function NotificationRulesPage() {
           locations={locations}
           departments={departments}
         />
+
+        <div className="mt-10">
+          <h2 className="text-base font-semibold text-gray-900 mb-1">Escalation</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Automatically alert additional people when a critical or high-priority issue remains unacknowledged.
+          </p>
+          <AckEscalationClient
+            initialConfig={org?.ackEscalationConfig as Parameters<typeof AckEscalationClient>[0]["initialConfig"]}
+          />
+        </div>
       </div>
     </div>
   )

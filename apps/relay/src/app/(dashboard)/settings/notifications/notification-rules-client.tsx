@@ -108,6 +108,12 @@ export function NotificationRulesClient({ initialRules, locations, departments }
     updateRule(rule.id, { conditions: { ...rule.conditions, locationIds: next } })
   }
 
+  function toggleRecipientDept(rule: NotificationRule, deptId: string) {
+    const cur = rule.recipients.recipientDepartmentIds ?? []
+    const next = cur.includes(deptId) ? cur.filter(x => x !== deptId) : [...cur, deptId]
+    updateRule(rule.id, { recipients: { ...rule.recipients, recipientDepartmentIds: next } })
+  }
+
   return (
     <div className="space-y-4">
       {rules.length === 0 && (
@@ -258,7 +264,7 @@ export function NotificationRulesClient({ initialRules, locations, departments }
                 </div>
               )}
 
-              {/* Recipients */}
+              {/* Recipients — roles */}
               <div>
                 <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Then notify these roles</h4>
                 <div className="flex flex-wrap gap-2">
@@ -276,6 +282,41 @@ export function NotificationRulesClient({ initialRules, locations, departments }
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Recipients — departments */}
+              {departments.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">And/or notify all members of these departments</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {departments.map(d => (
+                      <button
+                        key={d.id}
+                        onClick={() => toggleRecipientDept(rule, d.id)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                          rule.recipients.recipientDepartmentIds?.includes(d.id)
+                            ? "bg-teal-100 text-teal-800 border-teal-200"
+                            : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
+                        {d.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recipients — assignee */}
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rule.recipients.includeAssignee ?? false}
+                    onChange={e => updateRule(rule.id, { recipients: { ...rule.recipients, includeAssignee: e.target.checked } })}
+                    className="rounded border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700">Also notify the issue's assigned owner</span>
+                </label>
               </div>
 
               {/* Channels */}

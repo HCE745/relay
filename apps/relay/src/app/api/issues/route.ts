@@ -223,6 +223,9 @@ export async function POST(request: NextRequest) {
   // If the Anthropic call fails or times out, falls back to GENERAL/MEDIUM.
   let resolvedCategory: string = category || ""
   let resolvedPriority: string = priority || ""
+  // Track how the final priority was determined
+  let prioritySource: "MANUAL" | "AI" | "RULE" = priority ? "MANUAL" : "AI"
+  let priorityRuleName: string | null = null
 
   const needsInference = !resolvedCategory || !resolvedPriority
   if (needsInference) {
@@ -237,12 +240,15 @@ export async function POST(request: NextRequest) {
   // ── 3b. Priority rules — may elevate priority based on admin-configured rules ─
   const priorityRules = parsePriorityRules(org?.priorityRulesConfig)
   if (priorityRules.length > 0) {
-    resolvedPriority = applyPriorityRules(resolvedPriority, {
+    const ruleResult = applyPriorityRules(resolvedPriority, prioritySource, {
       category:     resolvedCategory,
       locationId:   locationId || null,
       departmentId: departmentId || null,
       title,
     }, priorityRules)
+    resolvedPriority = ruleResult.priority
+    prioritySource   = ruleResult.source
+    priorityRuleName = ruleResult.ruleName
   }
 
   // ── 4. Auto-routing (runs after all inference + fallbacks are applied) ───────
@@ -303,6 +309,8 @@ export async function POST(request: NextRequest) {
       injurySeverity:    resolvedCategory === "INJURY" ? (injurySeverity    || null) : null,
       injuryDescription: resolvedCategory === "INJURY" ? (injuryDescription || null) : null,
       areaDetail:        areaDetail || null,
+      prioritySource,
+      priorityRuleName,
     },
     include: {
       reportedBy: { select: { id: true, name: true } },

@@ -69,6 +69,7 @@ model Organization {
   navigationConfig         Json?
   notificationRulesConfig  Json?
   priorityRulesConfig      Json?
+  ackEscalationConfig      Json?  // { enabled, delayMinutes, recipients: { roles, userIds } }
   terminologyConfig  Json?
 
   // ── Professional Plus feature flags (controlled by Super Admin, default false) ─
@@ -523,6 +524,9 @@ model Issue {
   injuryDescription     String?  // specific injury details (what happened, body part, etc.)
   acknowledgedAt        DateTime? // when a supervisor/manager acknowledged receipt of a critical issue
   acknowledgedById      String?   // user who acknowledged
+  escalationSentAt      DateTime? // when unacknowledged escalation was dispatched; null = not yet sent
+  prioritySource        String?   // "MANUAL" | "AI" | "RULE" | null (legacy, pre-tracking)
+  priorityRuleName      String?   // name of the priority rule that set the final priority (if source=RULE)
   areaDetail            String?  // free-text sub-location (e.g. "Loading dock bay 3")
   // Shared facility cross-org routing
   isSharedFacilityIssue Boolean  @default(false)

@@ -161,6 +161,16 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
                 <Badge className={PRIORITY_COLOR[issue.priority]}>
                   {ISSUE_PRIORITY[issue.priority as keyof typeof ISSUE_PRIORITY] ?? issue.priority}
                 </Badge>
+                {issue.prioritySource && (
+                  <span
+                    className="text-xs text-gray-400"
+                    title={issue.prioritySource === "RULE" && issue.priorityRuleName ? `Rule: ${issue.priorityRuleName}` : undefined}
+                  >
+                    {issue.prioritySource === "AI" && "AI-inferred"}
+                    {issue.prioritySource === "MANUAL" && "Manually set"}
+                    {issue.prioritySource === "RULE" && `Rule: ${issue.priorityRuleName ?? "priority rule"}`}
+                  </span>
+                )}
                 <Badge className={STATUS_COLOR[issue.status]}>
                   {ISSUE_STATUS[issue.status as keyof typeof ISSUE_STATUS] ?? issue.status}
                 </Badge>

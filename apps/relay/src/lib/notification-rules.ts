@@ -15,6 +15,8 @@ export interface NotificationRule {
   recipients: {
     roles?: string[]
     userIds?: string[]
+    recipientDepartmentIds?: string[]  // all active members of these departments
+    includeAssignee?: boolean           // always include the issue's assigned user
   }
   channels: {
     inApp: boolean
@@ -40,6 +42,7 @@ interface IssueContext {
   locationId: string | null
   departmentId: string | null
   organizationId: string
+  assignedToId?: string | null
 }
 
 function issueMatchesRule(issue: IssueContext, rule: NotificationRule): boolean {
@@ -55,13 +58,21 @@ export async function dispatchNotificationRules(issue: IssueContext, rules: Noti
   const enabledRules = rules.filter(r => r.enabled && issueMatchesRule(issue, r))
   if (!enabledRules.length) return
 
-  // Collect recipient roles and user IDs across all matching rules
+  // Collect recipient selectors across all matching rules
   const recipientRoles = new Set<string>()
   const recipientUserIds = new Set<string>()
+  const recipientDeptIds = new Set<string>()
+  let includeAssignee = false
 
   for (const rule of enabledRules) {
     rule.recipients.roles?.forEach(r => recipientRoles.add(r))
     rule.recipients.userIds?.forEach(id => recipientUserIds.add(id))
+    rule.recipients.recipientDepartmentIds?.forEach(id => recipientDeptIds.add(id))
+    if (rule.recipients.includeAssignee) includeAssignee = true
+  }
+
+  if (includeAssignee && issue.assignedToId) {
+    recipientUserIds.add(issue.assignedToId)
   }
 
   // Load users by role
@@ -76,7 +87,19 @@ export async function dispatchNotificationRules(issue: IssueContext, rules: Noti
       })
     : []
 
-  // Load specific users
+  // Load users in recipient departments
+  const deptUsers = recipientDeptIds.size > 0
+    ? await prisma.user.findMany({
+        where: {
+          organizationId: issue.organizationId,
+          isActive: true,
+          departmentId: { in: Array.from(recipientDeptIds) },
+        },
+        select: { id: true, name: true, email: true },
+      })
+    : []
+
+  // Load specific users (includes assignee if applicable)
   const specificUsers = recipientUserIds.size > 0
     ? await prisma.user.findMany({
         where: {
@@ -90,7 +113,7 @@ export async function dispatchNotificationRules(issue: IssueContext, rules: Noti
 
   // Merge and deduplicate
   const allUsersMap = new Map<string, { id: string; name: string; email: string }>()
-  for (const u of [...roleUsers, ...specificUsers]) allUsersMap.set(u.id, u)
+  for (const u of [...roleUsers, ...deptUsers, ...specificUsers]) allUsersMap.set(u.id, u)
   const recipients = Array.from(allUsersMap.values())
   if (!recipients.length) return
 

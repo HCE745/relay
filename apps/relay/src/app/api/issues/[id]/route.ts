@@ -112,10 +112,23 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
   if (body.resolutionCost !== undefined) {
     updateData.resolutionCost = body.resolutionCost != null ? Number(body.resolutionCost) : null
+    if (body.resolutionCost != null && body.resolutionCost !== existing.resolutionCost) {
+      historyEntries.push({ field: "resolutionCost", oldValue: String(existing.resolutionCost ?? ""), newValue: String(body.resolutionCost) })
+    }
   }
-  if (body.rootCause !== undefined) updateData.rootCause = body.rootCause || null
+  if (body.rootCause !== undefined) {
+    updateData.rootCause = body.rootCause || null
+    if (body.rootCause && body.rootCause !== existing.rootCause) {
+      historyEntries.push({ field: "rootCause", oldValue: existing.rootCause ?? null, newValue: body.rootCause })
+    }
+  }
   if (body.timeToResolve !== undefined) updateData.timeToResolve = body.timeToResolve || null
-  if (body.resolutionCategory !== undefined) updateData.resolutionCategory = body.resolutionCategory || null
+  if (body.resolutionCategory !== undefined) {
+    updateData.resolutionCategory = body.resolutionCategory || null
+    if (body.resolutionCategory && body.resolutionCategory !== existing.resolutionCategory) {
+      historyEntries.push({ field: "resolutionCategory", oldValue: existing.resolutionCategory ?? null, newValue: body.resolutionCategory })
+    }
+  }
 
   // SOP compliance outcome — recorded during resolution
   if (body.sopComplianceOutcome !== undefined) {

@@ -128,15 +128,18 @@ export async function POST(request: NextRequest) {
         }),
       ])
 
-      // Push and email fire-and-forget after the transaction
+      // Push and email are best-effort. In-app notification is guaranteed by the
+      // transaction above. Failures here are logged to Vercel function logs but do
+      // NOT un-stamp escalationSentAt — the issue won't re-escalate, which is correct.
       for (const u of recipients) {
-        void sendPushNotification(u.id, title, message, { url: issueUrl, issueId: issue.id })
+        sendPushNotification(u.id, title, message, { url: issueUrl, issueId: issue.id })
+          .catch(err => console.error(`[ack-escalation] push failed for user ${u.id} issue ${issue.id}:`, err))
         if (u.email) {
-          void sendEmail({
+          sendEmail({
             to:      u.email,
             subject: title,
             html:    `<p>${message}</p><p><a href="${appUrl}${issueUrl}">View Issue →</a></p>`,
-          })
+          }).catch(err => console.error(`[ack-escalation] email failed for ${u.email} issue ${issue.id}:`, err))
         }
       }
 

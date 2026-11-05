@@ -24,6 +24,7 @@ interface Props {
   initialRules: unknown
   locations: { id: string; name: string }[]
   departments: { id: string; name: string }[]
+  users: { id: string; name: string; role: string }[]
 }
 
 function parseRules(raw: unknown): NotificationRule[] {
@@ -31,7 +32,7 @@ function parseRules(raw: unknown): NotificationRule[] {
   return raw as NotificationRule[]
 }
 
-export function NotificationRulesClient({ initialRules, locations, departments }: Props) {
+export function NotificationRulesClient({ initialRules, locations, departments, users }: Props) {
   const [rules, setRules]     = useState<NotificationRule[]>(() => parseRules(initialRules))
   const [saving, setSaving]   = useState(false)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
@@ -112,6 +113,12 @@ export function NotificationRulesClient({ initialRules, locations, departments }
     const cur = rule.recipients.recipientDepartmentIds ?? []
     const next = cur.includes(deptId) ? cur.filter(x => x !== deptId) : [...cur, deptId]
     updateRule(rule.id, { recipients: { ...rule.recipients, recipientDepartmentIds: next } })
+  }
+
+  function toggleUserId(rule: NotificationRule, userId: string) {
+    const cur = rule.recipients.userIds ?? []
+    const next = cur.includes(userId) ? cur.filter(x => x !== userId) : [...cur, userId]
+    updateRule(rule.id, { recipients: { ...rule.recipients, userIds: next } })
   }
 
   return (
@@ -300,6 +307,29 @@ export function NotificationRulesClient({ initialRules, locations, departments }
                         }`}
                       >
                         {d.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recipients — specific employees */}
+              {users.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">And/or notify specific employees</h4>
+                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                    {users.map(u => (
+                      <button
+                        key={u.id}
+                        onClick={() => toggleUserId(rule, u.id)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                          rule.recipients.userIds?.includes(u.id)
+                            ? "bg-indigo-100 text-indigo-800 border-indigo-200"
+                            : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
+                        {u.name}
+                        <span className="ml-1 text-gray-400">{u.role.toLowerCase()}</span>
                       </button>
                     ))}
                   </div>

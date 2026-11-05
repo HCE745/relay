@@ -5,7 +5,7 @@ import { ISSUE_STATUS, ISSUE_PRIORITY, ISSUE_CATEGORY } from "@/lib/constants"
 import { Search } from "lucide-react"
 import { useState, useTransition } from "react"
 
-interface Location {
+interface FilterOption {
   id:   string
   name: string
 }
@@ -17,12 +17,14 @@ interface IssueFiltersProps {
     category?:    string
     search?:      string
     locationId?:  string
+    assetId?:     string
     isEscalated?: string
   }
-  locations?: Location[]
+  locations?: FilterOption[]
+  assets?:    FilterOption[]
 }
 
-export function IssueFilters({ initialFilters, locations = [] }: IssueFiltersProps) {
+export function IssueFilters({ initialFilters, locations = [], assets = [] }: IssueFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
@@ -35,6 +37,7 @@ export function IssueFilters({ initialFilters, locations = [] }: IssueFiltersPro
       category:    initialFilters.category,
       search:      search || undefined,
       locationId:  initialFilters.locationId,
+      assetId:     initialFilters.assetId,
       isEscalated: initialFilters.isEscalated,
     }
     const merged = { ...base, ...overrides }
@@ -110,6 +113,19 @@ export function IssueFilters({ initialFilters, locations = [] }: IssueFiltersPro
           <option value="">All Locations</option>
           {locations.map(l => (
             <option key={l.id} value={l.id}>{l.name}</option>
+          ))}
+        </select>
+      )}
+
+      {assets.length > 0 && (
+        <select
+          value={initialFilters.assetId ?? ""}
+          onChange={(e) => updateFilter("assetId", e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">All Assets</option>
+          {assets.map(a => (
+            <option key={a.id} value={a.id}>{a.name}</option>
           ))}
         </select>
       )}

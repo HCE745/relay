@@ -68,6 +68,7 @@ export interface ViewFilters {
   category?:    string
   search?:      string
   locationId?:  string
+  assetId?:     string
   isEscalated?: boolean
 }
 

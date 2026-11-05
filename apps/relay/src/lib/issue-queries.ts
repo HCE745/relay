@@ -25,6 +25,7 @@ export async function fetchIssues(
   if (filters.category)   where.category   = filters.category
   if (filters.search)     where.title      = { contains: filters.search, mode: "insensitive" }
   if (filters.locationId) where.locationId = filters.locationId
+  if (filters.assetId)    where.assetId    = filters.assetId
   if (filters.isEscalated === true || (filters.isEscalated as unknown) === "true") where.isEscalated = true
 
   const orderBy = resolveSortPairs(sortField, sortDir).map(([f, d]) => ({ [f]: d }))

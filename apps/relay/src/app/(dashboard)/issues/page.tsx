@@ -22,6 +22,7 @@ interface SearchParams {
   category?:    string
   search?:      string
   locationId?:  string
+  assetId?:     string
   isEscalated?: string
   sort?:        string
   page?:        string
@@ -68,6 +69,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
         category:    params.category,
         search:      params.search,
         locationId:  params.locationId,
+        assetId:     params.assetId,
         isEscalated: params.isEscalated === "true" ? true : undefined,
       }
 
@@ -77,7 +79,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
   const page = Math.max(1, parseInt(params.page ?? "1", 10))
   const skip = (page - 1) * PAGE_SIZE
 
-  const [{ issues, total }, users, org, locations] = await Promise.all([
+  const [{ issues, total }, users, org, locations, assets] = await Promise.all([
     fetchIssues(session.organizationId, effectiveFilters, effectiveSortField, effectiveSortDir, PAGE_SIZE, skip),
     prisma.user.findMany({
       where: { organizationId: session.organizationId, isActive: true },
@@ -86,6 +88,11 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
     }),
     prisma.organization.findUnique({ where: { id: session.organizationId }, select: { industry: true } }),
     prisma.location.findMany({
+      where: { organizationId: session.organizationId },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.asset.findMany({
       where: { organizationId: session.organizationId },
       orderBy: { name: "asc" },
       select: { id: true, name: true },
@@ -111,6 +118,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
     if (params.category)    currentFilters.category    = params.category
     if (params.search)      currentFilters.search      = params.search
     if (params.locationId)  currentFilters.locationId  = params.locationId
+    if (params.assetId)     currentFilters.assetId     = params.assetId
     if (params.isEscalated) currentFilters.isEscalated = params.isEscalated
   }
 
@@ -144,7 +152,7 @@ export default async function IssuesPage({ searchParams }: { searchParams: Promi
           </div>
         ) : (
           /* ── Normal filter mode ─────────────────────────────────────────── */
-          <IssueFilters initialFilters={params} locations={locations} />
+          <IssueFilters initialFilters={params} locations={locations} assets={assets} />
         )}
 
         <div className="mt-3" data-tour="issue-list">

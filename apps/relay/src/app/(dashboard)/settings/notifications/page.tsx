@@ -14,7 +14,7 @@ export default async function NotificationRulesPage() {
   if (!session) redirect("/login")
   if (session.role !== "ADMIN") redirect("/settings")
 
-  const [org, locations, departments] = await Promise.all([
+  const [org, locations, departments, users] = await Promise.all([
     prisma.organization.findUnique({
       where: { id: session.organizationId },
       select: { notificationRulesConfig: true, ackEscalationConfig: true },
@@ -28,6 +28,11 @@ export default async function NotificationRulesPage() {
       where: { organizationId: session.organizationId },
       orderBy: { name: "asc" },
       select: { id: true, name: true },
+    }),
+    prisma.user.findMany({
+      where: { organizationId: session.organizationId, isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, role: true },
     }),
   ])
 
@@ -53,6 +58,7 @@ export default async function NotificationRulesPage() {
           initialRules={org?.notificationRulesConfig ?? []}
           locations={locations}
           departments={departments}
+          users={users}
         />
 
         <div className="mt-10">

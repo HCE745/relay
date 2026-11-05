@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
   Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
-  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2, Compass, DollarSign, FlaskConical,
+  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2, Compass, DollarSign, FlaskConical, Target, MonitorDot,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -23,7 +23,9 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
     {
       items: [
         { label: "Dashboard",       href: "/sales",                  icon: LayoutDashboard },
-        { label: "My Accounts",      href: "/sales/accounts",         icon: Building2 },
+        { label: "My Workspace",    href: "/sales/workspace",        icon: MonitorDot },
+        { label: "Companies",       href: "/sales/companies",        icon: Building2 },
+        { label: "My Accounts",     href: "/sales/accounts",         icon: Building2 },
         { label: "Opportunities",   href: "/sales/opportunities",    icon: Briefcase },
         { label: "Pipeline",        href: "/sales/pipeline",         icon: GitBranch },
         { label: "All Demo Calls",  href: "/sales/leads",            icon: Users },
@@ -68,8 +70,9 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
       label: "Manager",
       items: [
         { label: "Team Dashboard",  href: "/sales/manager",          icon: UsersRound },
+        { label: "Sales Goals",     href: "/sales/goals",            icon: Target },
       ],
-    }] : []),
+    }] : [{ label: "Goals", items: [{ label: "My Goals", href: "/sales/goals", icon: Target }] }]),
     {
       label: "Config",
       items: [

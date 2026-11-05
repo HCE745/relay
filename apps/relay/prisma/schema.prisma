@@ -1971,19 +1971,25 @@ model CrmEmail {
   sentiment         String?   // "positive" | "neutral" | "negative" — manually classified on received emails
   abTestGroup       String?   // "A" | "B" | "C" | "D"
   abTestCampaignId  String?
+  prospectId        String?   // direct link to Prospect (Company) record
+  contactId         String?   // direct link to ProspectContact record
   createdAt         DateTime  @default(now())
 
-  demoCall        DemoCall?      @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
-  imapConfig      ImapConfig?    @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
-  sentBySalesUser SalesUser?     @relation("SentBySalesUser", fields: [sentBySalesUserId], references: [id])
+  demoCall        DemoCall?        @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
+  imapConfig      ImapConfig?      @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
+  sentBySalesUser SalesUser?       @relation("SentBySalesUser", fields: [sentBySalesUserId], references: [id])
   linkClicks      LinkClick[]
-  abTestCampaign  AbTestCampaign? @relation(fields: [abTestCampaignId], references: [id], onDelete: SetNull)
+  abTestCampaign  AbTestCampaign?  @relation(fields: [abTestCampaignId], references: [id], onDelete: SetNull)
+  prospect        Prospect?        @relation("ProspectEmails", fields: [prospectId], references: [id], onDelete: SetNull)
+  contact         ProspectContact? @relation("ContactEmails", fields: [contactId], references: [id], onDelete: SetNull)
 
   @@index([demoCallId])
   @@index([contactEmail])
   @@index([threadId])
   @@index([sentAt])
   @@index([abTestCampaignId])
+  @@index([prospectId])
+  @@index([contactId])
 }
 
 model AbTestCampaign {
@@ -2552,6 +2558,9 @@ model Prospect {
   headquartersState      String?
   headquartersCountry    String?           @default("US")
   linkedinUrl            String?
+  phone                  String?
+  description            String?           @db.Text
+  tags                   String[]          @default([])
   source                 ProspectSource    @default(ai_research)
   aiFitScore             Int?
   researchSummary        String?           @db.Text
@@ -2584,6 +2593,8 @@ model Prospect {
   tasks           CrmTask[]           @relation("ProspectTasks")
   salesActivities SalesCrmActivity[]  @relation("ProspectActivities")
   objections      CrmObjection[]      @relation("ProspectObjections")
+  emails          CrmEmail[]          @relation("ProspectEmails")
+  goals           SalesGoal[]         @relation("ProspectGoals")
 
   @@index([aiFitScore])
   @@index([currentCrmStatus])
@@ -2619,9 +2630,14 @@ model ProspectContact {
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 
-  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospect    Prospect         @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  emails      CrmEmail[]       @relation("ContactEmails")
+  activities  SalesCrmActivity[] @relation("ContactActivities")
+  tasks       CrmTask[]        @relation("ContactTasks")
+  opportunities CrmOpportunity[] @relation("ContactOpportunities")
 
   @@index([prospectId])
+  @@index([email])
 }
 
 model ProspectNote {
@@ -2766,6 +2782,8 @@ model SalesUser {
   salesActivities          SalesCrmActivity[]   @relation("SalesUserActivities")
   objections               CrmObjection[]       @relation("SalesUserObjections")
   invites                  SalesUserInvite[]
+  goals                    SalesGoal[]
+  createdGoals             SalesGoal[]          @relation("GoalCreator")
 }
 
 model SalesUserInvite {
@@ -2872,6 +2890,7 @@ model CrmOpportunity {
   id                     String    @id @default(cuid())
   prospectId             String?
   demoCallId             String?
+  contactId              String?  // primary contact for this opportunity
   organizationId         String?  // plain String reference to a relay Organization
   customerOrganizationId String?  // FK to relay Organization for commission/Stripe lookup
   assignedToId           String
@@ -2900,9 +2919,10 @@ model CrmOpportunity {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
-  prospect      Prospect?  @relation("ProspectOpportunities", fields: [prospectId],  references: [id], onDelete: SetNull)
-  demoCall      DemoCall?  @relation("DemoCallOpportunities",  fields: [demoCallId],  references: [id], onDelete: SetNull)
-  assignedTo    SalesUser  @relation(fields: [assignedToId], references: [id])
+  prospect      Prospect?        @relation("ProspectOpportunities", fields: [prospectId],  references: [id], onDelete: SetNull)
+  demoCall      DemoCall?        @relation("DemoCallOpportunities",  fields: [demoCallId],  references: [id], onDelete: SetNull)
+  contact       ProspectContact? @relation("ContactOpportunities",   fields: [contactId],   references: [id], onDelete: SetNull)
+  assignedTo    SalesUser        @relation(fields: [assignedToId], references: [id])
   closedBy      SalesUser? @relation("OpportunityClosedBy",  fields: [closedById],  references: [id])
   tasks         CrmTask[]
   commissions   CrmCommissionEvent[]
@@ -2917,6 +2937,7 @@ model CrmOpportunity {
   @@index([stage])
   @@index([prospectId])
   @@index([demoCallId])
+  @@index([contactId])
   @@index([customerOrganizationId])
 }
 
@@ -2925,6 +2946,7 @@ model CrmTask {
   opportunityId String?
   prospectId    String?
   demoCallId    String?
+  contactId     String?   // specific contact this task is about
   assignedToId  String
   title         String
   taskType      String    @default("other") // call|email|linkedin|proposal|contract|other
@@ -2935,15 +2957,17 @@ model CrmTask {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  opportunity CrmOpportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
-  prospect    Prospect?       @relation("ProspectTasks",   fields: [prospectId],  references: [id], onDelete: SetNull)
-  demoCall    DemoCall?       @relation("DemoCallTasks",   fields: [demoCallId],  references: [id], onDelete: SetNull)
-  assignedTo  SalesUser       @relation(fields: [assignedToId], references: [id])
+  opportunity CrmOpportunity?  @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  prospect    Prospect?        @relation("ProspectTasks",   fields: [prospectId],  references: [id], onDelete: SetNull)
+  demoCall    DemoCall?        @relation("DemoCallTasks",   fields: [demoCallId],  references: [id], onDelete: SetNull)
+  contact     ProspectContact? @relation("ContactTasks",   fields: [contactId],   references: [id], onDelete: SetNull)
+  assignedTo  SalesUser        @relation(fields: [assignedToId], references: [id])
 
   @@index([assignedToId])
   @@index([dueAt])
   @@index([opportunityId])
   @@index([completedAt])
+  @@index([contactId])
 }
 
 model CrmCommissionEvent {
@@ -3518,6 +3542,7 @@ model SalesCrmActivity {
   prospectId      String?
   demoCallId      String?
   opportunityId   String?
+  contactId       String?   // which ProspectContact this activity involved
   salesUserId     String?
   activityType    String    // EMAIL_SENT/EMAIL_RECEIVED/LINKEDIN_VIEW/LINKEDIN_MESSAGE/CALL_ATTEMPTED/CALL_CONNECTED/MEETING_HELD/NOTE_ADDED/TOUR_VIEWED/PRICING_VIEWED/DEMO_COMPLETED/TASK_COMPLETED/STATUS_CHANGED
   subject         String?
@@ -3528,14 +3553,16 @@ model SalesCrmActivity {
   occurredAt      DateTime  @default(now())
   createdAt       DateTime  @default(now())
 
-  prospect    Prospect?       @relation("ProspectActivities",   fields: [prospectId],    references: [id], onDelete: SetNull)
-  demoCall    DemoCall?       @relation("DemoCallActivities",   fields: [demoCallId],    references: [id], onDelete: SetNull)
-  opportunity CrmOpportunity? @relation("OpportunityActivities", fields: [opportunityId], references: [id], onDelete: SetNull)
-  salesUser   SalesUser?      @relation("SalesUserActivities", fields: [salesUserId],   references: [id], onDelete: SetNull)
+  prospect    Prospect?        @relation("ProspectActivities",    fields: [prospectId],    references: [id], onDelete: SetNull)
+  demoCall    DemoCall?        @relation("DemoCallActivities",    fields: [demoCallId],    references: [id], onDelete: SetNull)
+  opportunity CrmOpportunity?  @relation("OpportunityActivities", fields: [opportunityId], references: [id], onDelete: SetNull)
+  contact     ProspectContact? @relation("ContactActivities",     fields: [contactId],     references: [id], onDelete: SetNull)
+  salesUser   SalesUser?       @relation("SalesUserActivities",   fields: [salesUserId],   references: [id], onDelete: SetNull)
 
   @@index([prospectId])
   @@index([demoCallId])
   @@index([opportunityId])
+  @@index([contactId])
   @@index([salesUserId])
   @@index([occurredAt])
 }
@@ -3563,4 +3590,29 @@ model CrmObjection {
   @@index([demoCallId])
   @@index([opportunityId])
   @@index([salesUserId])
+}
+
+// ─── Sales Goals ─────────────────────────────────────────────────────────────
+
+model SalesGoal {
+  id                   String    @id @default(cuid())
+  salesUserId          String?   // null = team-wide goal
+  prospectId           String?   // optional: goal scoped to a company
+  metric               String    // "emailsSent" | "prospectsAdded" | "demosLogged" | "opportunitiesCreated" | "revenueWon" | "dealsWon" | "callsMade" | "prospectsContacted"
+  period               String    // "daily" | "weekly" | "monthly" | "quarterly"
+  targetValue          Decimal   @db.Decimal(12,2)
+  startDate            DateTime  @db.Date
+  endDate              DateTime  @db.Date
+  notes                String?
+  createdBySalesUserId String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  salesUser     SalesUser?  @relation(fields: [salesUserId], references: [id], onDelete: SetNull)
+  createdBy     SalesUser?  @relation("GoalCreator", fields: [createdBySalesUserId], references: [id], onDelete: SetNull)
+  prospect      Prospect?   @relation("ProspectGoals", fields: [prospectId], references: [id], onDelete: SetNull)
+
+  @@index([salesUserId])
+  @@index([period])
+  @@index([startDate, endDate])
 }

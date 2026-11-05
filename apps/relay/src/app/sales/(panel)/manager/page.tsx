@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { TransferActions } from "./TransferActions"
 import { ManagerTabs } from "./ManagerTabs"
-import { Users, TrendingUp, CheckCircle2, AlertCircle, Trophy, AlertTriangle, Phone, MessageSquare } from "lucide-react"
+import { Users, TrendingUp, CheckCircle2, AlertCircle, Trophy, AlertTriangle, Phone, MessageSquare, Briefcase, Mail } from "lucide-react"
 import Link from "next/link"
 
 export const dynamic = "force-dynamic"
@@ -23,7 +23,7 @@ export default async function ManagerPage() {
 
   const duplicateCount = await prisma.prospect.count({ where: { duplicateFlag: true } })
 
-  const [salesUsers, opportunities, tasks, pendingRequests, callActivities, objectionRows] = await Promise.all([
+  const [salesUsers, opportunities, tasks, pendingRequests, callActivities, objectionRows, sentimentCounts] = await Promise.all([
     prisma.salesUser.findMany({
       where:   { isActive: true },
       select:  { id: true, name: true, email: true, role: true },
@@ -56,6 +56,13 @@ export default async function ManagerPage() {
     prisma.crmObjection.findMany({
       where:  { createdAt: { gte: thirtyDaysAgo } },
       select: { objectionType: true, wasResolved: true },
+    }),
+
+    // Classified reply counts — for positive reply rate
+    prisma.crmEmail.groupBy({
+      by: ["sentiment"],
+      where: { direction: "received", sentiment: { not: null } },
+      _count: { id: true },
     }),
   ])
 
@@ -117,6 +124,26 @@ export default async function ManagerPage() {
   const totalPipeline      = opportunities.filter(o => o.stage !== "Closed Lost").reduce((s, o) => s + Number(o.value ?? 0), 0)
   const totalOverdueTasks  = tasks.filter(t => !t.completedAt && t.dueAt && t.dueAt < now).length
 
+  // Pipeline stage breakdown
+  const STAGES = ["Qualified", "Demo", "Proposal", "Negotiating", "Closed Won", "Closed Lost"]
+  const stageBreakdown = STAGES.map(stage => {
+    const inStage = opportunities.filter(o => o.stage === stage)
+    return {
+      stage,
+      count: inStage.length,
+      value: inStage.reduce((s, o) => s + Number(o.value ?? 0), 0),
+    }
+  }).filter(s => s.count > 0)
+
+  // Positive reply rate from classified emails
+  const sentimentMap: Record<string, number> = {}
+  for (const row of sentimentCounts) {
+    if (row.sentiment) sentimentMap[row.sentiment] = row._count.id
+  }
+  const totalClassified  = Object.values(sentimentMap).reduce((s, n) => s + n, 0)
+  const positiveReplies  = sentimentMap["positive"] ?? 0
+  const positiveReplyRate = totalClassified > 0 ? Math.round((positiveReplies / totalClassified) * 100) : null
+
   return (
     <div className="p-6 max-w-6xl space-y-8">
       <ManagerTabs />
@@ -174,6 +201,78 @@ export default async function ManagerPage() {
           <p className="text-2xl font-bold text-red-400">{totalOverdueTasks}</p>
         </div>
       </div>
+
+      {/* Pipeline stage breakdown */}
+      {stageBreakdown.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Briefcase className="w-4 h-4 text-indigo-400" />
+            <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Pipeline by Stage</h2>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-800 text-xs text-gray-500">
+                  <th className="text-left px-4 py-3 font-medium">Stage</th>
+                  <th className="text-right px-4 py-3 font-medium">Opportunities</th>
+                  <th className="text-right px-4 py-3 font-medium">Pipeline Value</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800/60">
+                {stageBreakdown.map(({ stage, count, value }) => (
+                  <tr key={stage} className="hover:bg-gray-800/40 transition-colors">
+                    <td className="px-4 py-3">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        stage === "Closed Won"  ? "bg-emerald-900/40 text-emerald-400" :
+                        stage === "Closed Lost" ? "bg-gray-800 text-gray-500" :
+                        "bg-indigo-900/30 text-indigo-300"
+                      }`}>{stage}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right text-white tabular-nums">{count}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {value > 0 ? (
+                        <span className={stage === "Closed Won" ? "text-emerald-400 font-semibold" : "text-yellow-400"}>
+                          {fmtValue(value)}
+                        </span>
+                      ) : (
+                        <span className="text-gray-600">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Positive reply rate */}
+      {totalClassified > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="w-4 h-4 text-blue-400" />
+            <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Reply Classification</h2>
+            <span className="text-xs text-gray-600 font-normal ml-1">(manually classified received emails)</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">Positive Rate</p>
+              <p className={`text-2xl font-bold ${positiveReplyRate !== null && positiveReplyRate >= 20 ? "text-emerald-400" : "text-amber-400"}`}>
+                {positiveReplyRate !== null ? `${positiveReplyRate}%` : "—"}
+              </p>
+              <p className="text-[10px] text-gray-600 mt-1">of {totalClassified} classified</p>
+            </div>
+            {(["positive", "neutral", "negative"] as const).map(s => (
+              <div key={s} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1 capitalize">{s}</p>
+                <p className={`text-2xl font-bold ${s === "positive" ? "text-emerald-400" : s === "negative" ? "text-red-400" : "text-gray-300"}`}>
+                  {sentimentMap[s] ?? 0}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Rep table */}
       <div data-tour="mgr-overdue-section">

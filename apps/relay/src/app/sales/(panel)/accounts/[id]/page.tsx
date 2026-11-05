@@ -274,10 +274,22 @@ export default async function AccountDetailPage({
           <section className="bg-gray-900 border border-gray-800 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Opportunities</h2>
-              <Link href={`/sales/opportunities`} className="text-xs text-gray-500 hover:text-gray-300">View all</Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/sales/opportunities/new?demoCallId=${call.id}&company=${encodeURIComponent(call.companyName)}&contact=${encodeURIComponent(call.contactName)}&email=${encodeURIComponent(call.contactEmail)}`}
+                  className="flex items-center gap-1 px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium rounded-lg transition-colors"
+                >
+                  <Briefcase className="w-3 h-3" />
+                  New Opp
+                </Link>
+                <Link href="/sales/opportunities" className="text-xs text-gray-500 hover:text-gray-300">View all</Link>
+              </div>
             </div>
             {call.opportunities.length === 0 ? (
-              <p className="text-gray-600 text-sm">No opportunities yet.</p>
+              <div className="text-center py-4 text-gray-600 text-sm">
+                <p>No opportunities yet.</p>
+                <p className="text-xs mt-1 text-gray-700">Create one when this account enters active evaluation.</p>
+              </div>
             ) : (
               <div className="space-y-2">
                 {call.opportunities.map(opp => (

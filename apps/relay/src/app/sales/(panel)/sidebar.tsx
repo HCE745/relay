@@ -23,10 +23,10 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
     {
       items: [
         { label: "Dashboard",       href: "/sales",                  icon: LayoutDashboard },
-        { label: "Accounts",        href: "/sales/accounts",         icon: Building2 },
+        { label: "My Accounts",      href: "/sales/accounts",         icon: Building2 },
         { label: "Opportunities",   href: "/sales/opportunities",    icon: Briefcase },
         { label: "Pipeline",        href: "/sales/pipeline",         icon: GitBranch },
-        { label: "Leads",           href: "/sales/leads",            icon: Users },
+        { label: "All Demo Calls",  href: "/sales/leads",            icon: Users },
         {
           label: "Outreach",
           href:  "/sales/outreach",

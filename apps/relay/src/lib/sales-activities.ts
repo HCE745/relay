@@ -1,4 +1,12 @@
 import { prisma } from "@/lib/prisma"
+import { trackActivity, type ActivityCounter } from "@/lib/sales-activity"
+
+// Map SalesCrmActivity event types → SalesDailyActivity counters
+const ACTIVITY_COUNTER_MAP: Record<string, ActivityCounter> = {
+  EMAIL_SENT:          "emailsSent",
+  MEETING_HELD:        "demosLogged",
+  PROSPECT_CONTACTED:  "prospectsContacted",
+}
 
 interface CreateActivityInput {
   prospectId?:      string | null
@@ -30,6 +38,12 @@ export async function createSalesActivity(input: CreateActivityInput) {
       occurredAt:      input.occurredAt      ?? new Date(),
     },
   })
+
+  // Keep SalesDailyActivity rollup in sync for countable event types
+  if (input.salesUserId) {
+    const counter = ACTIVITY_COUNTER_MAP[input.activityType]
+    trackActivity(input.salesUserId, counter)
+  }
 
   // Auto-generate tasks (Feature 3)
   await maybeCreateAutoTask(activity, input)

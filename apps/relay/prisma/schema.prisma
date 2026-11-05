@@ -1968,6 +1968,7 @@ model CrmEmail {
   sentBySalesUserId String?
   bouncedAt         DateTime?
   bounceType        String?
+  sentiment         String?   // "positive" | "neutral" | "negative" — manually classified on received emails
   abTestGroup       String?   // "A" | "B" | "C" | "D"
   abTestCampaignId  String?
   createdAt         DateTime  @default(now())

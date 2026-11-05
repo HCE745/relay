@@ -9,12 +9,14 @@ import { DuplicateDismissButton } from "./DuplicateDismissButton"
 export const dynamic = "force-dynamic"
 
 const STATUS_STYLES: Record<string, string> = {
-  researched:       "text-blue-400 bg-blue-900/30",
-  outreach_sent:    "text-indigo-400 bg-indigo-900/30",
-  replied:          "text-emerald-400 bg-emerald-900/30",
-  meeting_booked:   "text-green-400 bg-green-900/30",
-  not_interested:   "text-gray-500 bg-gray-800/60",
-  converted_to_crm: "text-purple-400 bg-purple-900/30",
+  researched:     "text-blue-400 bg-blue-900/30",
+  contacted:      "text-indigo-400 bg-indigo-900/30",
+  replied:        "text-emerald-400 bg-emerald-900/30",
+  demo_scheduled: "text-green-400 bg-green-900/30",
+  trial:          "text-purple-400 bg-purple-900/30",
+  customer:       "text-teal-400 bg-teal-900/30",
+  not_interested: "text-gray-500 bg-gray-800/60",
+  do_not_contact: "text-red-400 bg-red-900/30",
 }
 
 export default async function DuplicateAccountsPage() {

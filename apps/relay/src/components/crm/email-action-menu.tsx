@@ -1,16 +1,17 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { MoreHorizontal, Archive, ArchiveRestore, Trash2, AlertTriangle, Download, FileText, Forward, Loader2 } from "lucide-react"
+import { MoreHorizontal, Archive, ArchiveRestore, Trash2, AlertTriangle, Download, FileText, Forward, Loader2, ShieldOff } from "lucide-react"
 
 interface Props {
-  emailId:    string
-  threadKey?: string   // thread to export (defaults to emailId)
-  subject:    string
-  isArchived: boolean
-  byName?:    string
-  onSuccess:  () => void
-  onForward?: (prefilledBody: string, subject: string) => void
+  emailId:      string
+  threadKey?:   string   // thread to export (defaults to emailId)
+  subject:      string
+  isArchived:   boolean
+  byName?:      string
+  contactEmail?: string  // used for suppression
+  onSuccess:    () => void
+  onForward?:   (prefilledBody: string, subject: string) => void
   threadEmails?: Array<{
     direction: "sent" | "received"
     fromAddress: string
@@ -21,12 +22,13 @@ interface Props {
   }>
 }
 
-export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byName, onSuccess, onForward, threadEmails }: Props) {
-  const [open,        setOpen]        = useState(false)
-  const [confirming,  setConfirming]  = useState(false)
-  const [busy,        setBusy]        = useState(false)
-  const [exporting,   setExporting]   = useState(false)
-  const [error,       setError]       = useState("")
+export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byName, contactEmail, onSuccess, onForward, threadEmails }: Props) {
+  const [open,          setOpen]          = useState(false)
+  const [confirming,    setConfirming]    = useState(false)
+  const [suppressing,   setSuppressing]   = useState(false)
+  const [busy,          setBusy]          = useState(false)
+  const [exporting,     setExporting]     = useState(false)
+  const [error,         setError]         = useState("")
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -110,6 +112,30 @@ export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byNam
       alert(`Export error: ${msg}`)
     } finally {
       setExporting(false)
+    }
+  }
+
+  async function suppressContact(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!contactEmail) return
+    setBusy(true); setError("")
+    try {
+      const r = await fetch("/api/sales/unsubscribe", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email: contactEmail, reason: "DO_NOT_CONTACT", source: "MANUAL" }),
+      })
+      if (r.ok) {
+        setOpen(false); setSuppressing(false)
+        onSuccess()
+      } else {
+        const d = await r.json() as { error?: string }
+        setError(d.error ?? "Suppress failed")
+      }
+    } catch {
+      setError("Network error")
+    } finally {
+      setBusy(false)
     }
   }
 
@@ -197,6 +223,18 @@ export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byNam
 
           <div className="border-t border-gray-700" />
 
+          {/* Suppress contact */}
+          {contactEmail && (
+            <button
+              onClick={e => { e.stopPropagation(); setSuppressing(true) }}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-amber-400 hover:bg-gray-700 hover:text-amber-300 text-left transition-colors"
+            >
+              <ShieldOff className="w-4 h-4 shrink-0" />
+              <span className="flex-1">Suppress Contact</span>
+              <span className="text-[10px] text-gray-500">stops future sends</span>
+            </button>
+          )}
+
           {/* Delete */}
           <button
             onClick={e => { e.stopPropagation(); setConfirming(true) }}
@@ -205,6 +243,37 @@ export function EmailActionMenu({ emailId, threadKey, subject, isArchived, byNam
             <Trash2 className="w-4 h-4 shrink-0" />
             Delete CRM Record
           </button>
+        </div>
+      )}
+
+      {open && suppressing && (
+        <div className="absolute right-0 top-full mt-1 z-50 bg-gray-800 border border-amber-700/50 rounded-xl shadow-2xl w-72 p-4">
+          <div className="flex items-start gap-2.5 mb-3">
+            <ShieldOff className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-white mb-1.5">Suppress this contact?</p>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                <span className="text-amber-300 font-medium">{contactEmail}</span> will be added to the suppression list.
+                No further outreach emails or sequences will be sent to this address.
+              </p>
+            </div>
+          </div>
+          {error && <p className="text-xs text-red-400 mb-2">{error}</p>}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={suppressContact}
+              disabled={busy}
+              className="flex-1 bg-amber-700 hover:bg-amber-600 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-lg transition-colors"
+            >
+              {busy ? "Suppressing…" : "Suppress Contact"}
+            </button>
+            <button
+              onClick={e => { e.stopPropagation(); setSuppressing(false) }}
+              className="px-3 py-2 text-xs text-gray-400 hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
 

@@ -33,7 +33,14 @@ export type DuplicateWarning = {
 }
 
 /** Check for existing prospects that match by company name or domain.
- *  Returns the first match found, or null if none. */
+ *  Returns the first match found, or null if none.
+ *
+ *  Strategy:
+ *  1. Domain match — targeted DB query using ILIKE; avoids a full table scan
+ *     for the common case where a website is provided.
+ *  2. Name match — loads only (id, companyName, assignedToName, currentCrmStatus)
+ *     with no row limit and applies normalization in JS. Much smaller payload
+ *     than loading full records; reliable at any prospect count. */
 export async function findDuplicateProspect(params: {
   companyName: string
   website?: string | null
@@ -43,41 +50,30 @@ export async function findDuplicateProspect(params: {
   const normalized = normalizeCompanyName(companyName)
   const domain = normalizeDomain(website)
 
-  const prospects = await prisma.prospect.findMany({
-    where: excludeId ? { id: { not: excludeId } } : undefined,
-    select: {
-      id: true,
-      companyName: true,
-      website: true,
-      assignedToName: true,
-      currentCrmStatus: true,
-    },
-    take: 500,
+  const excludeFilter = excludeId ? { id: { not: excludeId } } : {}
+
+  // ── 1. Domain match via DB query ─────────────────────────────────────────
+  if (domain) {
+    const domainMatch = await prisma.prospect.findFirst({
+      where: {
+        ...excludeFilter,
+        website: { contains: domain, mode: "insensitive" },
+      },
+      select: { id: true, companyName: true, assignedToName: true, currentCrmStatus: true },
+    })
+    if (domainMatch) return domainMatch
+  }
+
+  // ── 2. Name match — load minimal columns, no row limit ───────────────────
+  const rows = await prisma.prospect.findMany({
+    where:  excludeFilter,
+    select: { id: true, companyName: true, assignedToName: true, currentCrmStatus: true },
   })
 
-  for (const p of prospects) {
-    // Domain match (exact, normalized)
-    if (domain && p.website) {
-      const pDomain = normalizeDomain(p.website)
-      if (pDomain && pDomain === domain) {
-        return {
-          id: p.id,
-          companyName: p.companyName,
-          assignedToName: p.assignedToName,
-          currentCrmStatus: p.currentCrmStatus,
-        }
-      }
-    }
-    // Name match (normalized)
-    if (normalizeCompanyName(p.companyName) === normalized) {
-      return {
-        id: p.id,
-        companyName: p.companyName,
-        assignedToName: p.assignedToName,
-        currentCrmStatus: p.currentCrmStatus,
-      }
-    }
+  for (const p of rows) {
+    if (normalizeCompanyName(p.companyName) === normalized) return p
   }
+
   return null
 }
 

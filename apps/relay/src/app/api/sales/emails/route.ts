@@ -26,6 +26,7 @@ const EMAIL_SELECT = {
   openedAt:       true,
   openCount:      true,
   lastOpenedAt:   true,
+  sentiment:      true,
   demoCall: {
     select: { id: true, contactName: true, companyName: true },
   },

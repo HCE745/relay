@@ -35,6 +35,7 @@ interface CrmEmail {
   openedAt:       string | null
   openCount:      number
   lastOpenedAt:   string | null
+  sentiment:      string | null
   demoCall:       { id: string; contactName: string; companyName: string } | null
 }
 
@@ -823,6 +824,7 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction, onForward
   const [savingReminder,  setSavingReminder]  = useState(false)
   const [customDays,      setCustomDays]      = useState("")
   const [showCustom,      setShowCustom]      = useState(false)
+  const [sentimentMap,    setSentimentMap]    = useState<Record<string, string | null>>({})
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -830,6 +832,20 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction, onForward
     if (last) setExpanded({ [last.id]: true })
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [thread.key])
+
+  async function classifySentiment(emailId: string, value: string | null) {
+    const prev = sentimentMap[emailId] ?? thread.emails.find(e => e.id === emailId)?.sentiment ?? null
+    setSentimentMap(m => ({ ...m, [emailId]: value }))
+    try {
+      await fetch(`/api/sales/emails/${emailId}`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ action: "set_sentiment", sentiment: value }),
+      })
+    } catch {
+      setSentimentMap(m => ({ ...m, [emailId]: prev }))
+    }
+  }
 
   async function sendReply() {
     if (!replyText.trim()) return
@@ -1021,6 +1037,37 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction, onForward
                   ) : (
                     <pre className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">{email.bodyText}</pre>
                   )}
+
+                  {/* Sentiment classification — only on received emails */}
+                  {!isSent && (() => {
+                    const current = sentimentMap[email.id] !== undefined ? sentimentMap[email.id] : email.sentiment
+                    return (
+                      <div className="flex items-center gap-2 mt-4 flex-wrap">
+                        <span className="text-[10px] text-gray-600 uppercase tracking-wider font-medium">Reply tone:</span>
+                        {(["positive", "neutral", "negative"] as const).map(v => {
+                          const isActive = current === v
+                          const styles: Record<string, string> = {
+                            positive: isActive ? "bg-emerald-700 text-white border-emerald-600" : "bg-gray-800 text-gray-400 border-gray-700 hover:border-emerald-700 hover:text-emerald-300",
+                            neutral:  isActive ? "bg-gray-600 text-white border-gray-500"   : "bg-gray-800 text-gray-400 border-gray-700 hover:border-gray-500 hover:text-gray-200",
+                            negative: isActive ? "bg-red-800 text-white border-red-700"      : "bg-gray-800 text-gray-400 border-gray-700 hover:border-red-700 hover:text-red-300",
+                          }
+                          const labels: Record<string, string> = { positive: "👍 Positive", neutral: "😐 Neutral", negative: "👎 Negative" }
+                          return (
+                            <button
+                              key={v}
+                              onClick={() => void classifySentiment(email.id, isActive ? null : v)}
+                              className={`text-xs px-2.5 py-1 rounded-lg border transition-colors ${styles[v]}`}
+                            >
+                              {labels[v]}
+                            </button>
+                          )
+                        })}
+                        {current && (
+                          <span className="text-[10px] text-gray-600 ml-1">click again to clear</span>
+                        )}
+                      </div>
+                    )
+                  })()}
 
                   {/* Reminder controls — only on sent emails */}
                   {isSent && (

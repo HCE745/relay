@@ -2,23 +2,13 @@ import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { Building2, Users, Briefcase, Search, Filter, Plus } from "lucide-react"
+import { Building2, Search, Filter, Plus } from "lucide-react"
 import type { SearchParams } from "next/dist/server/request/search-params"
+import { ProspectsTable } from "./ProspectsTable"
 
 export const dynamic = "force-dynamic"
 
 const PAGE_SIZE = 50
-
-const STATUS_STYLES: Record<string, { text: string; bg: string }> = {
-  researched:     { text: "text-blue-400",    bg: "bg-blue-900/30"    },
-  contacted:      { text: "text-indigo-400",  bg: "bg-indigo-900/30"  },
-  replied:        { text: "text-emerald-400", bg: "bg-emerald-900/30" },
-  demo_scheduled: { text: "text-green-400",   bg: "bg-green-900/30"   },
-  trial:          { text: "text-purple-400",  bg: "bg-purple-900/30"  },
-  customer:       { text: "text-teal-400",    bg: "bg-teal-900/30"    },
-  not_interested: { text: "text-gray-500",    bg: "bg-gray-800/60"    },
-  do_not_contact: { text: "text-red-400",     bg: "bg-red-900/30"     },
-}
 
 const STATUS_LABELS: Record<string, string> = {
   researched:     "Researched",
@@ -183,90 +173,7 @@ export default async function ProspectsPage({ searchParams }: { searchParams: Pr
       {/* Table */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wide">
-                <th className="text-left px-4 py-3 font-medium">Prospect</th>
-                <th className="text-left px-4 py-3 font-medium">Primary Contact</th>
-                <th className="text-left px-4 py-3 font-medium">Status</th>
-                <th className="text-left px-4 py-3 font-medium">Pipeline</th>
-                <th className="text-left px-4 py-3 font-medium">Contacts</th>
-                {isManager && <th className="text-left px-4 py-3 font-medium">Rep</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800/60">
-              {prospects.map(p => {
-                const primary  = p.contacts.find(c => c.isPrimaryContact) ?? p.contacts[0]
-                const opp      = p.opportunities[0]
-                const style    = STATUS_STYLES[p.currentCrmStatus] ?? { text: "text-gray-400", bg: "bg-gray-800/60" }
-                const href     = `/sales/prospects/${p.id}`
-                return (
-                  <tr key={p.id} className="relative hover:bg-gray-800/30 transition-colors cursor-pointer group">
-                    <td className="px-4 py-3">
-                      {/* Full-row overlay link — covers the entire row */}
-                      <Link
-                        href={href}
-                        className="absolute inset-0"
-                        aria-label={`Open prospect: ${p.companyName}`}
-                      />
-                      <div className="flex items-center gap-2.5 relative">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-900/40 flex items-center justify-center shrink-0">
-                          <Building2 className="w-4 h-4 text-indigo-400" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-white group-hover:text-indigo-300 transition-colors">
-                            {p.companyName}
-                            {p.duplicateFlag && <span className="ml-1.5 text-[10px] text-amber-400 bg-amber-900/30 px-1 py-0.5 rounded">dup</span>}
-                          </p>
-                          {(p.industry || p.headquartersCity) && (
-                            <p className="text-xs text-gray-600">
-                              {[p.industry, p.headquartersCity && p.headquartersState
-                                ? `${p.headquartersCity}, ${p.headquartersState}`
-                                : p.headquartersCity].filter(Boolean).join(" · ")}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 relative">
-                      {primary ? (
-                        <div>
-                          <p className="text-gray-200 text-sm">{primary.name}</p>
-                          <p className="text-xs text-gray-600">{primary.title ?? primary.email}</p>
-                        </div>
-                      ) : (
-                        <span className="text-gray-600 text-xs">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 relative">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${style.bg} ${style.text}`}>
-                        {STATUS_LABELS[p.currentCrmStatus] ?? p.currentCrmStatus}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 relative">
-                      {opp ? (
-                        <div>
-                          <p className="text-gray-300 text-xs font-medium">{opp.stage}</p>
-                          {opp.value && <p className="text-xs text-gray-600">${Number(opp.value).toLocaleString()}</p>}
-                        </div>
-                      ) : (
-                        <span className="text-gray-600 text-xs">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 relative">
-                      <span className="flex items-center gap-1 text-xs text-gray-500">
-                        <Users className="w-3 h-3" />
-                        {p._count.contacts}
-                      </span>
-                    </td>
-                    {isManager && (
-                      <td className="px-4 py-3 relative text-xs text-gray-500">{p.assignedTo?.name ?? "—"}</td>
-                    )}
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <ProspectsTable prospects={prospects} isManager={isManager} />
         </div>
         {prospects.length === 0 && (
           <div className="text-center py-16">

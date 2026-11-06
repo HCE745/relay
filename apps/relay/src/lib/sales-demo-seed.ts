@@ -842,4 +842,146 @@ export async function seedDemoData(salesUserId: string) {
       taskType: "call", dueAt: daysFromNow(5), priority: "normal",
     }}),
   ])
+
+  // ── SalesCrmActivity records (powers the Company Hub Timeline tab) ────────────
+
+  await Promise.all([
+    // Midwest Precision — called twice, no answer, then connected
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_midwest.id, demoCallId: dc_midwest.id, salesUserId,
+      activityType: "CALL_ATTEMPTED",
+      subject: "Call attempt — Tom Hadley", notes: "Voicemail left. Asked for 15 min to discuss maintenance tracking.",
+      occurredAt: daysAgo(14),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_midwest.id, demoCallId: dc_midwest.id, salesUserId,
+      activityType: "CALL_CONNECTED",
+      subject: "Connected with Tom Hadley", notes: "Brief intro call — 8 minutes. Tom manages 120 employees across 2 sites. Pain point: ISO audit trails for tooling maintenance. Sending follow-up email with case study.",
+      outcome: "Interested, follow up with case study", durationMinutes: 8,
+      occurredAt: daysAgo(7),
+    }}),
+
+    // Buckeye Metal — email opened, called
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_buckeye.id, demoCallId: dc_buckeye.id, salesUserId,
+      activityType: "CALL_ATTEMPTED",
+      subject: "Call attempt — Karen Metzger", notes: "No answer. Sent follow-up email instead.",
+      occurredAt: daysAgo(9),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_buckeye.id, demoCallId: dc_buckeye.id, salesUserId,
+      activityType: "NOTE_ADDED",
+      subject: "Email opened twice", notes: "Karen opened the first email twice in 2 days. Good sign — no reply yet. Will call tomorrow.",
+      occurredAt: daysAgo(8),
+    }}),
+
+    // Cornerstone PM — full thread, meeting held
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_cornerstone.id, salesUserId,
+      activityType: "EMAIL_RECEIVED",
+      subject: "Reply from Susan Rizzo", notes: "Susan asked to hop on a call — Thursday 2pm works.",
+      occurredAt: daysAgo(12),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_cornerstone.id, salesUserId,
+      activityType: "MEETING_HELD",
+      subject: "Discovery call — Susan Rizzo, Cornerstone PM",
+      notes: "45-minute call. Susan manages 12 properties across greater Cleveland. Main pain: work orders via email chains, vendors don't confirm receipt. Relay is a strong fit — she mentioned budget is approved for Q4.",
+      outcome: "Strong fit. Sending proposal.", durationMinutes: 45,
+      occurredAt: daysAgo(11),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_cornerstone.id, opportunityId: opp3.id, salesUserId,
+      activityType: "STATUS_CHANGED",
+      subject: "Status updated: Contacted → Replied",
+      notes: "Proposal sent after discovery call.",
+      occurredAt: daysAgo(10),
+    }}),
+
+    // Prairie Management — demo completed, follow-up
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_prairie.id, demoCallId: dc_prairie.id, salesUserId,
+      activityType: "CALL_CONNECTED",
+      subject: "Discovery call — Brian Callahan",
+      notes: "Quick 20-min intro. Brian is evaluating 2-3 options. Relay is strongest on mobile UX. Scheduled full demo.",
+      outcome: "Demo scheduled for next week", durationMinutes: 20,
+      occurredAt: daysAgo(22),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_prairie.id, demoCallId: dc_prairie.id, salesUserId,
+      activityType: "DEMO_COMPLETED",
+      subject: "Full demo — Prairie Management Group",
+      notes: "60-min demo. Brian brought in his assistant. Live QR code demo landed well — paper work order problem is real for them. Asked about Competitor A pricing. Sending comparison doc.",
+      outcome: "Positive. Needs proposal + competitor comparison.", durationMinutes: 60,
+      occurredAt: daysAgo(14),
+    }}),
+
+    // Lakefront — full cycle
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_lakefront.id, demoCallId: dc_lakefront.id, salesUserId,
+      activityType: "CALL_CONNECTED",
+      subject: "Intro call — James Kopacki, Lakefront",
+      notes: "15-min intro. James manages 18 NE Ohio properties. Vendor coordination is the main pain — techs confirming jobs via text, no paper trail.",
+      outcome: "Very interested, full demo booked", durationMinutes: 15,
+      occurredAt: daysAgo(35),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_lakefront.id, demoCallId: dc_lakefront.id, salesUserId,
+      activityType: "DEMO_COMPLETED",
+      subject: "Full demo — Lakefront Property Services",
+      notes: "James spent 22 min on vendor portal. Very engaged. Asked about implementation timeline and import from their current Excel setup. Contract sent.",
+      outcome: "Proposal sent. Contract in legal review.", durationMinutes: 90,
+      occurredAt: daysAgo(22),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_lakefront.id, demoCallId: dc_lakefront.id, opportunityId: opp4.id, salesUserId,
+      activityType: "NOTE_ADDED",
+      subject: "Legal redlines received",
+      notes: "James's attorney sent redlines on the MSA. Main ask: 30-day implementation guarantee and SLA for uptime. Review and respond.",
+      occurredAt: daysAgo(5),
+    }}),
+
+    // Meridian — trial activity
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_meridian.id, demoCallId: dc_meridian.id, salesUserId,
+      activityType: "CALL_CONNECTED",
+      subject: "Trial kickoff call — Phil Nguyen",
+      notes: "30-min onboarding call. Walked through mobile app setup for 6 technicians. Phil is very engaged. Set check-in call for 2 weeks.",
+      outcome: "Trial started. 6 techs being onboarded.", durationMinutes: 30,
+      occurredAt: daysAgo(25),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_meridian.id, demoCallId: dc_meridian.id, salesUserId,
+      activityType: "CALL_CONNECTED",
+      subject: "Trial check-in — Meridian Industrial (week 2)",
+      notes: "4 of 6 techs active. Phil happy with mobile experience. Hasn't yet set up PM schedules — walked him through that on the call.",
+      outcome: "Adoption strong. PM schedule setup next.", durationMinutes: 20,
+      occurredAt: daysAgo(11),
+    }}),
+
+    // Great Lakes Stamping — called, left note
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_greatlakes.id, salesUserId,
+      activityType: "CALL_ATTEMPTED",
+      subject: "Call attempt — Michelle Braun",
+      notes: "Left voicemail. Sent follow-up email about ISO audit trail use case.",
+      occurredAt: daysAgo(14),
+    }}),
+
+    // Ohio Valley — email reply, discovery scheduled
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_ohiovalley.id, salesUserId,
+      activityType: "EMAIL_RECEIVED",
+      subject: "Reply from Amanda Torres",
+      notes: "Amanda responded — interested. Requested discovery call agenda before committing.",
+      occurredAt: daysAgo(20),
+    }}),
+    prisma.salesCrmActivity.create({ data: {
+      prospectId: p_ohiovalley.id, salesUserId,
+      activityType: "NOTE_ADDED",
+      subject: "Discovery call agenda sent",
+      notes: "Sent 3-point agenda: (1) current maintenance process, (2) Relay mobile walkthrough, (3) pricing and next steps.",
+      occurredAt: daysAgo(19),
+    }}),
+  ])
 }

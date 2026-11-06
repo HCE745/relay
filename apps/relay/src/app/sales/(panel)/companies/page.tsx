@@ -122,7 +122,7 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Pr
   return (
     <div className="p-6 min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div data-tour="company-list-header" className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white">Companies</h1>
           <p className="text-gray-400 text-sm mt-0.5">{total} total</p>

@@ -98,7 +98,7 @@ export default function WorkspacePage() {
     try {
       await fetch(`/api/sales/tasks/${id}`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "complete" }),
+        body: JSON.stringify({ complete: true }),
       })
       setData(d => !d ? d : {
         ...d,
@@ -119,7 +119,7 @@ export default function WorkspacePage() {
   return (
     <div className="p-6 max-w-4xl">
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between">
+      <div data-tour="workspace-header" className="mb-6 flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <MonitorDot className="w-5 h-5 text-indigo-400" />
@@ -168,7 +168,7 @@ export default function WorkspacePage() {
 
           {/* Overdue tasks */}
           {data.overdueTasks.length > 0 && (
-            <Section title="Overdue Tasks" icon={<AlertCircle className="w-4 h-4 text-red-400" />} count={data.overdueTasks.length} accent="border-red-800/30">
+            <Section title="Overdue Tasks" icon={<AlertCircle className="w-4 h-4 text-red-400" />} count={data.overdueTasks.length} accent="border-red-800/30" tourId="workspace-task-list">
               {data.overdueTasks.map(t => (
                 <TaskRow key={t.id} task={t} completing={completing} onComplete={completeTask} />
               ))}
@@ -177,7 +177,7 @@ export default function WorkspacePage() {
 
           {/* Due today */}
           {data.tasksDueToday.length > 0 && (
-            <Section title="Due Today" icon={<Clock className="w-4 h-4 text-yellow-400" />} count={data.tasksDueToday.length}>
+            <Section title="Due Today" icon={<Clock className="w-4 h-4 text-yellow-400" />} count={data.tasksDueToday.length} tourId="workspace-task-list">
               {data.tasksDueToday.map(t => (
                 <TaskRow key={t.id} task={t} completing={completing} onComplete={completeTask} />
               ))}
@@ -282,11 +282,11 @@ export default function WorkspacePage() {
   )
 }
 
-function Section({ title, icon, count, accent, children }: {
-  title: string; icon: React.ReactNode; count: number; accent?: string; children: React.ReactNode
+function Section({ title, icon, count, accent, tourId, children }: {
+  title: string; icon: React.ReactNode; count: number; accent?: string; tourId?: string; children: React.ReactNode
 }) {
   return (
-    <div className={cn("bg-gray-900 border rounded-xl overflow-hidden", accent ?? "border-gray-800")}>
+    <div data-tour={tourId} className={cn("bg-gray-900 border rounded-xl overflow-hidden", accent ?? "border-gray-800")}>
       <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-800">
         {icon}
         <h2 className="font-semibold text-white text-sm">{title}</h2>

@@ -178,7 +178,7 @@ export function CompanyHub({
     if (!noteText.trim()) return
     setSavingNote(true)
     try {
-      const res = await fetch(`/api/super-admin/crm/prospects/${company.id}/notes`, {
+      const res = await fetch(`/api/sales/companies/${company.id}/notes`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ noteText: noteText.trim() }),
       })
@@ -238,7 +238,7 @@ export function CompanyHub({
     try {
       await fetch(`/api/sales/tasks/${taskId}`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "complete" }),
+        body: JSON.stringify({ complete: true }),
       })
       setCompany(c => ({ ...c, tasks: c.tasks.map(t => t.id === taskId ? { ...t, completedAt: new Date().toISOString() } : t) }))
     } finally { setCompletingTask(null) }
@@ -406,7 +406,13 @@ export function CompanyHub({
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Add Task
             </button>
             <Link
-              href={`/sales/outreach/email?demoCallId=${company.demoCalls[0]?.id ?? ""}&to=${company.contacts[0]?.email ?? ""}`}
+              href={(() => {
+                const params = new URLSearchParams()
+                if (company.demoCalls[0]?.id) params.set("demoCallId", company.demoCalls[0].id)
+                else params.set("prospectId", company.id)
+                if (company.contacts[0]?.email) params.set("to", company.contacts[0].email)
+                return `/sales/outreach/email?${params.toString()}`
+              })()}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 rounded-lg transition-colors"
             >
               <Mail className="w-3.5 h-3.5 text-indigo-400" /> Send Email

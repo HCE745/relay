@@ -144,7 +144,7 @@ export default function GoalsPage() {
   return (
     <div className="p-6 max-w-4xl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div data-tour="goals-header" className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <Target className="w-6 h-6 text-indigo-400" />
           <div>

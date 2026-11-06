@@ -944,10 +944,10 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction, onForward
             <span className="text-xs text-gray-500 truncate">{thread.contactName}</span>
             {thread.prospect ? (
               <Link
-                href={`/sales/companies/${thread.prospect.id}`}
+                href={`/sales/prospects/${thread.prospect.id}`}
                 className="text-[10px] text-emerald-400 hover:text-emerald-300 transition-colors shrink-0"
               >
-                View Company →
+                View Prospect →
               </Link>
             ) : thread.demoCall ? (
               <Link

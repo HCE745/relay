@@ -63,7 +63,7 @@ function taskCompanyName(t: Task) {
   return t.prospect?.companyName ?? t.demoCall?.companyName ?? null
 }
 function taskCompanyHref(t: Task) {
-  if (t.prospect) return `/sales/companies/${t.prospect.id}`
+  if (t.prospect) return `/sales/prospects/${t.prospect.id}`
   if (t.demoCall) return `/sales/leads/${t.demoCall.id}`
   return null
 }
@@ -71,7 +71,7 @@ function emailCompanyName(e: Email) {
   return e.prospect?.companyName ?? e.demoCall?.companyName ?? null
 }
 function emailCompanyHref(e: Email) {
-  if (e.prospect) return `/sales/companies/${e.prospect.id}`
+  if (e.prospect) return `/sales/prospects/${e.prospect.id}`
   if (e.demoCall) return `/sales/leads/${e.demoCall.id}`
   return null
 }
@@ -254,7 +254,7 @@ export default function WorkspacePage() {
             <Section title="Needs Attention" icon={<Briefcase className="w-4 h-4 text-gray-400" />} count={data.stuckOpportunities.length}>
               {data.stuckOpportunities.map(o => {
                 const company = o.prospect?.companyName ?? o.demoCall?.companyName ?? null
-                const href    = o.prospect ? `/sales/companies/${o.prospect.id}` : o.demoCall ? `/sales/leads/${o.demoCall.id}` : null
+                const href    = o.prospect ? `/sales/prospects/${o.prospect.id}` : o.demoCall ? `/sales/leads/${o.demoCall.id}` : null
                 const days    = Math.floor((now.getTime() - new Date(o.updatedAt).getTime()) / 86400_000)
                 return (
                   <div key={o.id} className="flex items-center gap-3 py-2.5 border-b border-gray-800/60 last:border-0">

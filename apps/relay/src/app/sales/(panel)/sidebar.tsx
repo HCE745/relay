@@ -24,7 +24,7 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
       // 6 primary CRM actions — always visible at the top
       items: [
         { label: "My Workspace",    href: "/sales/workspace",                    icon: MonitorDot },
-        { label: "Companies",       href: "/sales/companies",                    icon: Building2 },
+        { label: "Prospects",        href: "/sales/prospects",                    icon: Building2 },
         { label: "Find Prospects",  href: "/sales/outreach/prospects/discover",  icon: Compass },
         { label: "Email",           href: "/sales/outreach/email",               icon: Mail, badge: followUpsDue },
         { label: "Opportunities",   href: "/sales/opportunities",                icon: Briefcase },

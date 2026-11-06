@@ -8,6 +8,7 @@ import { decryptField } from "@/lib/crypto-utils"
 import { sendViaTitanSmtp } from "@/lib/titan-smtp"
 import { enrollInSequence, getDefaultSequence } from "@/lib/crm-sequences"
 import { createSalesActivity } from "@/lib/sales-activities"
+import { linkEmailToProspect } from "@/lib/prospect-email-link"
 
 interface CrmSender {
   superAdminId?: string
@@ -196,6 +197,15 @@ export async function POST(req: NextRequest) {
     if (!resolvedThreadId) {
       await prisma.crmEmail.update({ where: { id: email.id }, data: { threadId: email.id } })
     }
+
+    // Auto-link to Prospect (Company) record — fire-and-forget, never blocks send
+    linkEmailToProspect({
+      crmEmailId:   email.id,
+      contactEmail: to,
+      demoCallId:   demoCallId ?? null,
+      salesUserId:  session.salesUserId ?? null,
+      createIfMissing: true,
+    }).catch(err => console.error("[prospect-link] send:", err))
 
     // Auto link-tracking: replace href URLs with tracked redirect URLs before sending
     let processedHtml = bodyHtml

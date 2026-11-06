@@ -36,7 +36,9 @@ interface CrmEmail {
   openCount:      number
   lastOpenedAt:   string | null
   sentiment:      string | null
+  prospectId:     string | null
   demoCall:       { id: string; contactName: string; companyName: string } | null
+  prospect:       { id: string; companyName: string } | null
 }
 
 interface Thread {
@@ -44,8 +46,10 @@ interface Thread {
   subject:          string
   contactName:      string
   contactEmail:     string
+  companyName:      string | null
   demoCallId:       string | null
   demoCall:         CrmEmail["demoCall"]
+  prospect:         CrmEmail["prospect"]
   emails:           CrmEmail[]
   lastEmail:        CrmEmail
   hasUnread:        boolean
@@ -106,20 +110,24 @@ function groupIntoThreads(emails: CrmEmail[]): Thread[] {
   const threads: Thread[] = []
   for (const [key, group] of map.entries()) {
     group.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
-    const last   = group[group.length - 1]!
-    const dc     = group.find(e => e.demoCall)?.demoCall ?? null
-    const isSent = last.direction === "sent"
-    const raw    = isSent ? last.toAddress : last.fromAddress
-    const name   = dc?.contactName ?? parseDisplayName(raw)
-    const email  = isSent ? last.toAddress : (last.contactEmail || last.fromAddress)
-    const lastSent = [...group].reverse().find(e => e.direction === "sent")
+    const last      = group[group.length - 1]!
+    const dc        = group.find(e => e.demoCall)?.demoCall ?? null
+    const prospect  = group.find(e => e.prospect)?.prospect ?? null
+    const isSent    = last.direction === "sent"
+    const raw       = isSent ? last.toAddress : last.fromAddress
+    const name      = dc?.contactName ?? parseDisplayName(raw)
+    const email     = isSent ? last.toAddress : (last.contactEmail || last.fromAddress)
+    const compName  = prospect?.companyName ?? dc?.companyName ?? null
+    const lastSent  = [...group].reverse().find(e => e.direction === "sent")
     threads.push({
       key,
       subject:          stripRe(group[0]!.subject),
       contactName:      name,
       contactEmail:     email,
+      companyName:      compName,
       demoCallId:       dc?.id ?? null,
       demoCall:         dc,
+      prospect,
       emails:           group,
       lastEmail:        last,
       hasUnread:        group.some(e => e.direction === "received" && !e.isRead),
@@ -614,6 +622,9 @@ function ThreadRow({ thread, isSelected, isChecked, onClick, onToggle }: {
               thread.hasUnread ? "text-white font-semibold" : "text-gray-300 font-medium",
             )}>
               {thread.contactName}
+              {thread.companyName && (
+                <span className="font-normal text-gray-500"> · {thread.companyName}</span>
+              )}
             </span>
             <span className="text-[10px] text-gray-600 shrink-0">{formatDate(thread.lastEmail.sentAt)}</span>
           </div>
@@ -931,14 +942,21 @@ function ThreadDetail({ thread, onBack, onReplySuccess, onEmailAction, onForward
           <h2 className="text-sm font-semibold text-white truncate">{thread.subject || "(no subject)"}</h2>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-gray-500 truncate">{thread.contactName}</span>
-            {thread.demoCall && (
+            {thread.prospect ? (
+              <Link
+                href={`/sales/companies/${thread.prospect.id}`}
+                className="text-[10px] text-emerald-400 hover:text-emerald-300 transition-colors shrink-0"
+              >
+                View Company →
+              </Link>
+            ) : thread.demoCall ? (
               <Link
                 href={`/super-admin/crm/demo-calls/${thread.demoCall.id}`}
                 className="text-[10px] text-emerald-400 hover:text-emerald-300 transition-colors shrink-0"
               >
                 View full contact →
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
         <span className="text-xs text-gray-600 shrink-0">

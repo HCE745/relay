@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { htmlToText } from "@/lib/html-to-text"
+import { linkEmailToProspect } from "@/lib/prospect-email-link"
 
 export const dynamic = "force-dynamic"
 
@@ -110,6 +111,15 @@ export async function POST(req: NextRequest) {
   if (!threadId) {
     await prisma.crmEmail.update({ where: { id: email.id }, data: { threadId: email.id } })
   }
+
+  // Auto-link to Prospect (Company) record — fire-and-forget, never blocks webhook response
+  linkEmailToProspect({
+    crmEmailId:      email.id,
+    contactEmail,
+    demoCallId:      demoCall?.id ?? null,
+    salesUserId:     null,
+    createIfMissing: false, // don't create stubs for inbound — no rep to assign to
+  }).catch(err => console.error("[prospect-link] inbound:", err))
 
   // Log CRM activity if demo call has an org
   if (demoCall?.organizationId) {

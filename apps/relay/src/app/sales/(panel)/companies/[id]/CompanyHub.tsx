@@ -65,7 +65,13 @@ interface Company {
   assignedTo: { id: string; name: string; email: string } | null
   contacts:   Contact[]; notes: Note[]; opportunities: Opportunity[]
   salesActivities: Activity[]; tasks: Task[]; emails: Email[]
-  demoCalls: { id: string; companyName: string; callStatus: string; scheduledAt: string | null }[]
+  demoCalls: {
+    id: string; companyName: string; callStatus: string; scheduledAt: string | null
+    organization: {
+      id: string; name: string; subscriptionStatus: string | null
+      plan: string | null; productLine: string | null; createdAt: string
+    } | null
+  }[]
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -246,13 +252,16 @@ export function CompanyHub({
 
   // ── Activity log state ──────────────────────────────────────────────────────
   const [addingActivity, setAddingActivity] = useState(false)
-  const [actForm, setActForm] = useState({ activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "" })
+  const [actForm, setActForm] = useState({
+    activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "",
+    scheduleFollowUp: false, followUpType: "call", followUpDue: "",
+  })
   const [savingActivity, setSavingActivity] = useState(false)
 
   async function logActivity() {
     setSavingActivity(true)
     try {
-      const res = await fetch("/api/sales/activities", {
+      const actRes = await fetch("/api/sales/activities", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prospectId: company.id,
@@ -263,10 +272,26 @@ export function CompanyHub({
           durationMinutes: actForm.durationMinutes ? parseInt(actForm.durationMinutes) : null,
         }),
       })
-      if (res.ok) {
-        router.refresh()
-        setAddingActivity(false); setActForm({ activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "" })
+      if (!actRes.ok) return
+
+      if (actForm.scheduleFollowUp && actForm.followUpDue) {
+        const followUpTitle = `Follow up with ${company.companyName}`
+        await fetch("/api/sales/tasks", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prospectId: company.id,
+            assignedToId: currentUserId,
+            title: followUpTitle,
+            taskType: actForm.followUpType,
+            priority: "normal",
+            dueAt: actForm.followUpDue,
+          }),
+        })
       }
+
+      router.refresh()
+      setAddingActivity(false)
+      setActForm({ activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "", scheduleFollowUp: false, followUpType: "call", followUpDue: "" })
     } finally { setSavingActivity(false) }
   }
 
@@ -388,22 +413,16 @@ export function CompanyHub({
           {/* Quick action bar */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => { setAddingActivity(true); setAddingNote(false); setAddingTask(false) }}
+              onClick={() => { setAddingActivity(true); setAddingNote(false) }}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 rounded-lg transition-colors"
             >
-              <Zap className="w-3.5 h-3.5 text-yellow-400" /> Log Activity
+              <Zap className="w-3.5 h-3.5 text-yellow-400" /> Log Interaction
             </button>
             <button
-              onClick={() => { setAddingNote(true); setAddingActivity(false); setAddingTask(false) }}
+              onClick={() => { setAddingNote(true); setAddingActivity(false) }}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 rounded-lg transition-colors"
             >
               <FileText className="w-3.5 h-3.5 text-blue-400" /> Add Note
-            </button>
-            <button
-              onClick={() => { setAddingTask(true); setAddingNote(false); setAddingActivity(false) }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 rounded-lg transition-colors"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Add Task
             </button>
             <Link
               href={(() => {
@@ -419,18 +438,16 @@ export function CompanyHub({
             </Link>
           </div>
 
-          {/* Log Activity form */}
+          {/* Log Interaction form */}
           {addingActivity && (
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 space-y-3">
-              <p className="text-sm font-medium text-white">Log Activity</p>
+              <p className="text-sm font-medium text-white">Log Interaction</p>
               <div className="grid grid-cols-2 gap-3">
                 <select value={actForm.activityType} onChange={e => setActForm(f => ({ ...f, activityType: e.target.value }))}
                   className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
-                  {["CALL_ATTEMPTED","CALL_CONNECTED","MEETING_HELD","LINKEDIN_MESSAGE","LINKEDIN_VIEW","NOTE_ADDED","DEMO_COMPLETED"].map(t =>
+                  {["CALL_ATTEMPTED","CALL_CONNECTED","MEETING_HELD","LINKEDIN_MESSAGE","LINKEDIN_VIEW","DEMO_COMPLETED"].map(t =>
                     <option key={t} value={t}>{t.replace(/_/g, " ")}</option>)}
                 </select>
-                <input placeholder="Subject / topic (optional)" value={actForm.subject} onChange={e => setActForm(f => ({ ...f, subject: e.target.value }))}
-                  className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
                 <input placeholder="Outcome (e.g. Left voicemail)" value={actForm.outcome} onChange={e => setActForm(f => ({ ...f, outcome: e.target.value }))}
                   className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
                 <input type="number" placeholder="Duration (mins)" value={actForm.durationMinutes} onChange={e => setActForm(f => ({ ...f, durationMinutes: e.target.value }))}
@@ -438,10 +455,34 @@ export function CompanyHub({
                 <textarea placeholder="Notes…" value={actForm.notes} onChange={e => setActForm(f => ({ ...f, notes: e.target.value }))} rows={2}
                   className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500" />
               </div>
+
+              {/* Optional follow-up scheduling */}
+              <div className="border-t border-gray-800 pt-3 space-y-2">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={actForm.scheduleFollowUp}
+                    onChange={e => setActForm(f => ({ ...f, scheduleFollowUp: e.target.checked }))}
+                    className="rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-indigo-500"
+                  />
+                  <span className="text-sm text-gray-400">Schedule a follow-up</span>
+                </label>
+                {actForm.scheduleFollowUp && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <select value={actForm.followUpType} onChange={e => setActForm(f => ({ ...f, followUpType: e.target.value }))}
+                      className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
+                      {["call","email","linkedin","proposal","other"].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                    <input type="date" value={actForm.followUpDue} onChange={e => setActForm(f => ({ ...f, followUpDue: e.target.value }))}
+                      className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500" />
+                  </div>
+                )}
+              </div>
+
               <div className="flex gap-2">
                 <button onClick={logActivity} disabled={savingActivity}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors">
-                  Save
+                  {savingActivity ? "Saving…" : "Save"}
                 </button>
                 <button onClick={() => setAddingActivity(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
               </div>
@@ -460,34 +501,6 @@ export function CompanyHub({
                   Save Note
                 </button>
                 <button onClick={() => { setAddingNote(false); setNoteText("") }} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
-              </div>
-            </div>
-          )}
-
-          {/* Add Task form */}
-          {addingTask && (
-            <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 space-y-3">
-              <p className="text-sm font-medium text-white">Add Task</p>
-              <div className="grid grid-cols-2 gap-3">
-                <input placeholder="Task title *" value={taskForm.title} onChange={e => setTaskForm(f => ({ ...f, title: e.target.value }))}
-                  className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
-                <select value={taskForm.taskType} onChange={e => setTaskForm(f => ({ ...f, taskType: e.target.value }))}
-                  className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
-                  {["call","email","linkedin","proposal","contract","other"].map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-                <select value={taskForm.priority} onChange={e => setTaskForm(f => ({ ...f, priority: e.target.value }))}
-                  className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
-                  {["high","normal","low"].map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-                <input type="date" value={taskForm.dueAt} onChange={e => setTaskForm(f => ({ ...f, dueAt: e.target.value }))}
-                  className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500" />
-              </div>
-              <div className="flex gap-2">
-                <button onClick={createTask} disabled={savingTask || !taskForm.title.trim()}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors">
-                  Add Task
-                </button>
-                <button onClick={() => setAddingTask(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
               </div>
             </div>
           )}
@@ -920,6 +933,36 @@ export function CompanyHub({
               )}
             </div>
           )}
+
+          {/* Customer subscription info */}
+          {company.demoCalls.some(d => d.organization) && (() => {
+            const org = company.demoCalls.find(d => d.organization)?.organization!
+            return (
+              <div className="bg-teal-950/40 border border-teal-800/50 rounded-xl p-4 space-y-2">
+                <p className="text-xs font-semibold text-teal-400 uppercase tracking-wider">Customer Account</p>
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
+                  <div>
+                    <dt className="text-xs text-gray-600 mb-0.5">Organization</dt>
+                    <dd className="text-sm text-gray-200">{org.name}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-gray-600 mb-0.5">Subscription</dt>
+                    <dd className="text-sm text-gray-200 capitalize">{org.subscriptionStatus ?? "—"}</dd>
+                  </div>
+                  {org.productLine && (
+                    <div>
+                      <dt className="text-xs text-gray-600 mb-0.5">Product</dt>
+                      <dd className="text-sm text-gray-200">{org.productLine.replace(/_/g, " ")}</dd>
+                    </div>
+                  )}
+                  <div>
+                    <dt className="text-xs text-gray-600 mb-0.5">Customer Since</dt>
+                    <dd className="text-sm text-gray-200">{new Date(org.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</dd>
+                  </div>
+                </dl>
+              </div>
+            )
+          })()}
         </div>
       )}
     </div>

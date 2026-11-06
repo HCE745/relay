@@ -120,6 +120,23 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     await setLifecycle(orgId, "Converted", "Stripe", org.lifecycleStatus)
     await setWorkforceCommsPlanFlags(orgId, org.plan)
   }
+
+  // Auto-mark linked Prospect as "customer" so the CRM Companies page reflects conversion
+  try {
+    const demoCall = await prisma.demoCall.findFirst({
+      where:  { organizationId: orgId, prospectId: { not: null } },
+      select: { prospectId: true },
+      orderBy: { createdAt: "desc" },
+    })
+    if (demoCall?.prospectId) {
+      await prisma.prospect.update({
+        where: { id: demoCall.prospectId },
+        data:  { currentCrmStatus: "customer" },
+      })
+    }
+  } catch (err) {
+    console.error("[Stripe webhook] Failed to update Prospect status:", err)
+  }
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {

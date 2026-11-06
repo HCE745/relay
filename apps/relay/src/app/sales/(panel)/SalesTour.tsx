@@ -116,10 +116,16 @@ const REP_STEPS: Step[] = [
     selector: "[data-tour='company-list-header']",
   },
   {
-    title: "Log a call in seconds",
-    body: "In any company record click Log Activity, pick the call type, write your outcome and notes, and it posts to the timeline immediately. All history for that account stays in one place.",
+    title: "Log an interaction in seconds",
+    body: "In any company record click Log Interaction, pick what happened (call, meeting, LinkedIn), write your outcome, and optionally schedule a follow-up — all in one form. Everything posts to the timeline immediately.",
     path: "/sales/companies",
     selector: "[data-tour='company-list-header']",
+  },
+  {
+    title: "Emails automatically link to companies",
+    body: "When you send or receive an email through Relay CRM, it is automatically matched to the right company record. Open the Email tab and click 'View Company →' in any thread to jump straight to the account hub.",
+    path: "/sales/outreach/email",
+    selector: null,
   },
   {
     title: "Start every day on the workspace",
@@ -135,7 +141,7 @@ const REP_STEPS: Step[] = [
   },
   {
     title: "That covers your daily workflow",
-    body: "Find prospects → open the company hub → log activities → schedule follow-up tasks → work your workspace every morning. Your manager can answer questions about your specific targets and territory.",
+    body: "Find prospects → open the company hub → send emails (they auto-link to the company) → log interactions + schedule follow-ups → work your workspace every morning. Your manager can answer questions about your specific targets and territory.",
     path: "/sales",
     selector: null,
   },

@@ -27,8 +27,12 @@ const EMAIL_SELECT = {
   openCount:      true,
   lastOpenedAt:   true,
   sentiment:      true,
+  prospectId:     true,
   demoCall: {
     select: { id: true, contactName: true, companyName: true },
+  },
+  prospect: {
+    select: { id: true, companyName: true },
   },
 } as const
 

@@ -30,7 +30,20 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         orderBy: { createdAt: "desc" },
       },
       demoCalls: {
-        include: { assignedTo: { select: { id: true, name: true } } },
+        include: {
+          assignedTo: { select: { id: true, name: true } },
+          organization: {
+            select: {
+              id: true,
+              name: true,
+              subscriptionStatus: true,
+              stripeSubscriptionId: true,
+              plan: true,
+              productLine: true,
+              createdAt: true,
+            },
+          },
+        },
         orderBy: { createdAt: "desc" },
       },
       salesActivities: {

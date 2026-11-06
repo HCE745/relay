@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
   Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
-  Bell, FileText, Calendar, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2, Compass, DollarSign, FlaskConical, Target, MonitorDot,
+  Bell, FileText, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2, Compass, DollarSign, FlaskConical, Target, MonitorDot,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -21,48 +21,43 @@ interface NavItem {
 function buildSections(followUpsDue: number, isManager: boolean): { label?: string; items: NavItem[] }[] {
   return [
     {
+      // 6 primary CRM actions — always visible at the top
       items: [
-        { label: "Dashboard",       href: "/sales",                  icon: LayoutDashboard },
-        { label: "My Workspace",    href: "/sales/workspace",        icon: MonitorDot },
-        { label: "Companies",       href: "/sales/companies",        icon: Building2 },
-        { label: "My Accounts",     href: "/sales/accounts",         icon: Building2 },
-        { label: "Opportunities",   href: "/sales/opportunities",    icon: Briefcase },
-        { label: "Pipeline",        href: "/sales/pipeline",         icon: GitBranch },
-        { label: "All Demo Calls",  href: "/sales/leads",            icon: Users },
-        {
-          label: "Outreach",
-          href:  "/sales/outreach",
-          icon:  Mail,
-          children: [
-            { label: "Email",           href: "/sales/outreach/email",              icon: Mail },
-            { label: "Prospects",       href: "/sales/outreach/prospects",          icon: Search },
-            { label: "Find Prospects",  href: "/sales/outreach/prospects/discover", icon: Compass },
-            { label: "Follow-Ups",  href: "/sales/outreach/follow-ups",  icon: Bell, badge: followUpsDue },
-            { label: "A/B Tests",   href: "/sales/outreach/ab-tests",    icon: FlaskConical },
-            { label: "Sequences",   href: "/sales/outreach/sequences",   icon: GitBranch },
-            { label: "Templates",   href: "/sales/outreach/templates",   icon: FileText },
-          ],
-        },
+        { label: "My Workspace",    href: "/sales/workspace",                    icon: MonitorDot },
+        { label: "Companies",       href: "/sales/companies",                    icon: Building2 },
+        { label: "Find Prospects",  href: "/sales/outreach/prospects/discover",  icon: Compass },
+        { label: "Email",           href: "/sales/outreach/email",               icon: Mail, badge: followUpsDue },
+        { label: "Opportunities",   href: "/sales/opportunities",                icon: Briefcase },
+        { label: "Sales Goals",     href: "/sales/goals",                        icon: Target },
+      ],
+    },
+    {
+      label: "More",
+      items: [
+        { label: "Dashboard",       href: "/sales",              icon: LayoutDashboard },
+        { label: "My Accounts",     href: "/sales/accounts",     icon: Building2 },
+        { label: "Pipeline",        href: "/sales/pipeline",     icon: GitBranch },
+        { label: "All Demo Calls",  href: "/sales/leads",        icon: Users },
+        { label: "Prospects",       href: "/sales/outreach/prospects",          icon: Search },
+        { label: "Follow-Ups",      href: "/sales/outreach/follow-ups",         icon: Bell },
+        { label: "A/B Tests",       href: "/sales/outreach/ab-tests",           icon: FlaskConical },
+        { label: "Sequences",       href: "/sales/outreach/sequences",          icon: GitBranch },
+        { label: "Templates",       href: "/sales/outreach/templates",          icon: FileText },
       ],
     },
     {
       label: "Analytics",
       items: [
-        { label: "Demo Analytics",    href: "/sales/demo-analytics",   icon: BarChart2 },
-        { label: "Sales Analytics",   href: "/sales/sales-analytics",  icon: TrendingUp },
-        { label: "Campaign Reporting", href: "/sales/campaigns",        icon: TrendingUp },
-      ],
-    },
-    {
-      label: "Intelligence",
-      items: [
-        { label: "Marketing Intelligence", href: "/sales/marketing-intelligence", icon: Eye },
+        { label: "Demo Analytics",        href: "/sales/demo-analytics",          icon: BarChart2 },
+        { label: "Sales Analytics",       href: "/sales/sales-analytics",         icon: TrendingUp },
+        { label: "Campaign Reporting",    href: "/sales/campaigns",               icon: TrendingUp },
+        { label: "Marketing Intelligence",href: "/sales/marketing-intelligence",  icon: Eye },
       ],
     },
     {
       label: "Finance",
       items: [
-        { label: "My Commission",   href: "/sales/commission",           icon: DollarSign },
+        { label: "My Commission",   href: "/sales/commission",                   icon: DollarSign },
         ...(isManager ? [{ label: "Commission Ledger", href: "/sales/manager/commissions", icon: DollarSign }] : []),
       ],
     },
@@ -70,17 +65,16 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
       label: "Manager",
       items: [
         { label: "Team Dashboard",  href: "/sales/manager",          icon: UsersRound },
-        { label: "Sales Goals",     href: "/sales/goals",            icon: Target },
       ],
-    }] : [{ label: "Goals", items: [{ label: "My Goals", href: "/sales/goals", icon: Target }] }]),
+    }] : []),
     {
       label: "Config",
       items: [
-        { label: "Settings",        href: "/sales/settings",         icon: Settings },
-        { label: "Email Config",    href: "/sales/settings/email",         icon: Mail },
-        { label: "Suppressions",    href: "/sales/settings/suppressions",  icon: ShieldOff },
-        { label: "Follow-Up Stages", href: "/sales/settings/stages",       icon: Layers },
-        { label: "Team Settings",   href: "/sales/settings/team",          icon: UsersRound },
+        { label: "Settings",         href: "/sales/settings",                icon: Settings },
+        { label: "Email Config",     href: "/sales/settings/email",          icon: Mail },
+        { label: "Suppressions",     href: "/sales/settings/suppressions",   icon: ShieldOff },
+        { label: "Follow-Up Stages", href: "/sales/settings/stages",         icon: Layers },
+        { label: "Team Settings",    href: "/sales/settings/team",           icon: UsersRound },
       ],
     },
   ]

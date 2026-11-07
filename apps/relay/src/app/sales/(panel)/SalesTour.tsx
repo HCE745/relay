@@ -128,8 +128,8 @@ const REP_STEPS: Step[] = [
     selector: null,
   },
   {
-    title: "Start every day on the workspace",
-    body: "My Workspace shows your overdue tasks, tasks due today, unread emails, and follow-ups due — all in one place. Work through it top to bottom before anything else.",
+    title: "Start every day on To-Do",
+    body: "To-Do shows your overdue tasks, tasks due today, unread emails, and follow-ups due — all in one place. Work through it top to bottom before anything else.",
     path: "/sales/workspace",
     selector: "[data-tour='workspace-header']",
   },
@@ -141,7 +141,7 @@ const REP_STEPS: Step[] = [
   },
   {
     title: "That covers your daily workflow",
-    body: "Find prospects → open their profile → send emails (they auto-link to the prospect) → log interactions + schedule follow-ups → work your workspace every morning. Your manager can answer questions about your specific targets and territory.",
+    body: "Find prospects → open their profile → send emails (they auto-link to the prospect) → log interactions + schedule follow-ups → check To-Do every morning. Your manager can answer questions about your specific targets and territory.",
     path: "/sales",
     selector: null,
   },

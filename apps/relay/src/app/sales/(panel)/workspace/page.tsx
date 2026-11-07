@@ -138,7 +138,7 @@ export default function WorkspacePage() {
       </div>
 
       {loading && !data && (
-        <div className="text-center py-16 text-gray-600">Loading your workspace…</div>
+        <div className="text-center py-16 text-gray-600">Loading…</div>
       )}
 
       {data && (

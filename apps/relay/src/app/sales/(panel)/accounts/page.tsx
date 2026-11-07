@@ -1,24 +1,12 @@
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
-import Link from "next/link"
-import { Building2, Mail, Calendar, ChevronRight, Search } from "lucide-react"
+import { Building2 } from "lucide-react"
 import { computeEngagementScore, scoreLabel, scoreColor } from "@/lib/engagement-score"
+import { AccountsTable } from "./AccountsTable"
 
 export const dynamic = "force-dynamic"
 
-function fmtDate(d: Date | string | null | undefined) {
-  if (!d) return "—"
-  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-}
-
-const STATUS_COLORS: Record<string, string> = {
-  Scheduled:    "bg-blue-900/40 text-blue-300",
-  Completed:    "bg-emerald-900/40 text-emerald-300",
-  "No-Show":    "bg-red-900/40 text-red-300",
-  Cancelled:    "bg-gray-800 text-gray-400",
-  "Follow-Up":  "bg-amber-900/40 text-amber-300",
-}
 
 export default async function AccountsPage() {
   const session = await getSession()
@@ -93,72 +81,12 @@ export default async function AccountsPage() {
       ) : (
         <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-800 text-left text-gray-500 text-xs uppercase tracking-wider">
-                  <th className="px-4 py-3 font-medium">Company</th>
-                  <th className="px-4 py-3 font-medium">Contact</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Open Deal</th>
-                  <th className="px-4 py-3 font-medium">Engagement</th>
-                  <th className="px-4 py-3 font-medium">Last Activity</th>
-                  <th className="px-4 py-3 font-medium">Rep</th>
-                  <th className="px-4 py-3 font-medium"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800/60">
-                {calls.map(call => {
-                  const eng  = scoreByEmail[call.contactEmail.toLowerCase()] ?? { score: 0, label: "Low", color: "text-gray-400" }
-                  const opp  = call.opportunities[0]
-                  const last = call.crmEmails[0]?.createdAt ?? call.updatedAt
-                  const org  = call.organization
-
-                  return (
-                    <tr key={call.id} className="hover:bg-gray-800/30 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center shrink-0">
-                            <Building2 className="w-4 h-4 text-gray-500" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-white">{call.companyName}</p>
-                            {org && (
-                              <p className="text-xs text-emerald-400">{org.plan} · {org.subscriptionStatus}</p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-white">{call.contactName}</p>
-                        <p className="text-gray-500 text-xs">{call.contactEmail}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[call.callStatus] ?? "bg-gray-800 text-gray-400"}`}>
-                          {call.callStatus}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {opp ? (
-                          <span className="text-gray-300 text-xs">{opp.stage}</span>
-                        ) : (
-                          <span className="text-gray-600 text-xs">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`text-xs font-medium ${eng.color}`}>{eng.label}</span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{fmtDate(last)}</td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{call.assignedTo?.name ?? "—"}</td>
-                      <td className="px-4 py-3">
-                        <Link href={`/sales/accounts/${call.id}`} className="text-gray-500 hover:text-white transition-colors">
-                          <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+            <AccountsTable
+              accounts={calls.map(call => ({
+                ...call,
+                engagement: scoreByEmail[call.contactEmail.toLowerCase()] ?? { score: 0, label: "Low", color: "text-gray-400" },
+              }))}
+            />
           </div>
         </div>
       )}

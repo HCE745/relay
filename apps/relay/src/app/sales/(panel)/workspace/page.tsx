@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils"
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Task {
-  id: string; title: string; taskType: string; priority: string; dueAt: string | null
+  id: string; title: string; taskType: string; priority: string; dueAt: string | null; completedAt?: string | null
   prospect:    { id: string; companyName: string } | null
   demoCall:    { id: string; companyName: string } | null
   opportunity: { id: string; title: string } | null
@@ -41,6 +41,7 @@ interface WorkspaceData {
   tasksDueToday:      Task[]
   upcomingTasks:      Task[]
   undatedTasks:       Task[]
+  recentlyCompleted:  Task[]
   unreadEmails:       Email[]
   stuckOpportunities: Opportunity[]
   upcomingDemos:      DemoCall[]
@@ -84,6 +85,7 @@ export default function WorkspacePage() {
   const [data, setData]       = useState<WorkspaceData | null>(null)
   const [loading, setLoading] = useState(true)
   const [completing, setCompleting] = useState<string | null>(null)
+  const [reopening, setReopening]   = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
@@ -98,18 +100,41 @@ export default function WorkspacePage() {
   async function completeTask(id: string) {
     setCompleting(id)
     try {
-      await fetch(`/api/sales/tasks/${id}`, {
+      const res = await fetch(`/api/sales/tasks/${id}`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ complete: true }),
       })
-      setData(d => !d ? d : {
-        ...d,
-        overdueTasks:  d.overdueTasks.filter(t => t.id !== id),
-        tasksDueToday: d.tasksDueToday.filter(t => t.id !== id),
-        upcomingTasks: d.upcomingTasks.filter(t => t.id !== id),
-        undatedTasks:  d.undatedTasks.filter(t => t.id !== id),
-      })
+      if (res.ok) {
+        const updated = await res.json() as Task
+        setData(d => !d ? d : {
+          ...d,
+          overdueTasks:      d.overdueTasks.filter(t => t.id !== id),
+          tasksDueToday:     d.tasksDueToday.filter(t => t.id !== id),
+          upcomingTasks:     d.upcomingTasks.filter(t => t.id !== id),
+          undatedTasks:      d.undatedTasks.filter(t => t.id !== id),
+          recentlyCompleted: [updated, ...d.recentlyCompleted],
+        })
+      }
     } finally { setCompleting(null) }
+  }
+
+  async function reopenTask(id: string) {
+    setReopening(id)
+    try {
+      const res = await fetch(`/api/sales/tasks/${id}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ complete: false }),
+      })
+      if (res.ok) {
+        const updated = await res.json() as Task
+        setData(d => !d ? d : {
+          ...d,
+          recentlyCompleted: d.recentlyCompleted.filter(t => t.id !== id),
+          undatedTasks: updated.dueAt ? d.undatedTasks : [updated, ...d.undatedTasks],
+          upcomingTasks: updated.dueAt && new Date(updated.dueAt) > new Date() ? [updated, ...d.upcomingTasks] : d.upcomingTasks,
+        })
+      }
+    } finally { setReopening(null) }
   }
 
   const now = new Date()
@@ -205,6 +230,34 @@ export default function WorkspacePage() {
               {data.undatedTasks.map(t => (
                 <TaskRow key={t.id} task={t} completing={completing} onComplete={completeTask} />
               ))}
+            </Section>
+          )}
+
+          {/* Recently completed */}
+          {data.recentlyCompleted.length > 0 && (
+            <Section title="Recently Completed" icon={<CheckCircle2 className="w-4 h-4 text-emerald-400" />} count={data.recentlyCompleted.length}>
+              {data.recentlyCompleted.map(t => {
+                const company = taskCompanyName(t)
+                const href    = taskCompanyHref(t)
+                return (
+                  <div key={t.id} className="flex items-start gap-3 py-2.5 border-b border-gray-800/60 last:border-0">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-500 line-through truncate">{t.title}</p>
+                      <p className="text-xs text-gray-600">
+                        {t.taskType}
+                        {company && href && <> · <Link href={href} className="text-indigo-400 hover:underline">{company}</Link></>}
+                        {t.contact && <> · {t.contact.name}</>}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => reopenTask(t.id)}
+                      disabled={reopening === t.id}
+                      className="shrink-0 text-xs text-gray-500 hover:text-indigo-400 disabled:opacity-50 transition-colors"
+                    >Reopen</button>
+                  </div>
+                )
+              })}
             </Section>
           )}
 

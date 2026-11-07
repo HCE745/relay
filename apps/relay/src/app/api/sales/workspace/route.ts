@@ -25,11 +25,14 @@ export async function GET() {
     contact:     { select: { id: true, name: true } },
   }
 
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400_000)
+
   const [
     overdueTasks,
     tasksDueToday,
     upcomingTasks,
     undatedTasks,
+    recentlyCompleted,
     unreadEmails,
     stuckOpportunities,
     upcomingDemos,
@@ -64,6 +67,14 @@ export async function GET() {
       where: { ...repFilter, completedAt: null, dueAt: null },
       include: taskIncludes,
       orderBy: { createdAt: "desc" },
+      take: 20,
+    }),
+
+    // Recently completed tasks (last 7 days)
+    prisma.crmTask.findMany({
+      where: { ...repFilter, completedAt: { gte: sevenDaysAgo } },
+      include: taskIncludes,
+      orderBy: { completedAt: "desc" },
       take: 20,
     }),
 
@@ -135,6 +146,7 @@ export async function GET() {
     tasksDueToday,
     upcomingTasks,
     undatedTasks,
+    recentlyCompleted,
     unreadEmails,
     stuckOpportunities,
     upcomingDemos,

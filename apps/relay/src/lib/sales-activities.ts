@@ -12,6 +12,7 @@ interface CreateActivityInput {
   prospectId?:      string | null
   demoCallId?:      string | null
   opportunityId?:   string | null
+  contactId?:       string | null
   salesUserId?:     string | null
   activityType:     string
   subject?:         string | null
@@ -28,6 +29,7 @@ export async function createSalesActivity(input: CreateActivityInput) {
       prospectId:      input.prospectId      ?? null,
       demoCallId:      input.demoCallId      ?? null,
       opportunityId:   input.opportunityId   ?? null,
+      contactId:       input.contactId       ?? null,
       salesUserId:     input.salesUserId     ?? null,
       activityType:    input.activityType,
       subject:         input.subject         ?? null,
@@ -36,6 +38,10 @@ export async function createSalesActivity(input: CreateActivityInput) {
       durationMinutes: input.durationMinutes ?? null,
       metadata:        input.metadata ? (input.metadata as never) : undefined,
       occurredAt:      input.occurredAt      ?? new Date(),
+    },
+    include: {
+      salesUser: { select: { id: true, name: true } },
+      contact:   { select: { id: true, name: true } },
     },
   })
 

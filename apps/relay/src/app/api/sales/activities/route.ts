@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
     prospectId?:      string
     demoCallId?:      string
     opportunityId?:   string
+    contactId?:       string
     activityType:     string
     subject?:         string
     notes?:           string

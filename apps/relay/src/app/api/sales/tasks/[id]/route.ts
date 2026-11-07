@@ -10,6 +10,7 @@ const taskIncludes = {
   opportunity: { select: { id: true, title: true } },
   prospect: { select: { id: true, companyName: true } },
   demoCall: { select: { id: true, contactName: true, companyName: true } },
+  contact: { select: { id: true, name: true } },
 };
 
 export async function PATCH(

@@ -201,6 +201,10 @@ export function ProspectHub({
   const [contactForm, setContactForm]     = useState({ name: "", title: "", email: "", phone: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
   const [savingContact, setSavingContact] = useState(false)
   const [expandedContactId, setExpandedContactId] = useState<string | null>(null)
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null)
+  const [editingContactId, setEditingContactId]   = useState<string | null>(null)
+  const [contactEditDraft, setContactEditDraft]   = useState<Partial<Contact>>({})
+  const [savingContactEdit, setSavingContactEdit] = useState(false)
 
   async function createContact() {
     if (!contactForm.name.trim()) return
@@ -218,29 +222,56 @@ export function ProspectHub({
     } finally { setSavingContact(false) }
   }
 
+  async function saveContactEdit(contactId: string) {
+    setSavingContactEdit(true)
+    try {
+      const res = await fetch(`/api/sales/companies/${company.id}/contacts/${contactId}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contactEditDraft),
+      })
+      if (res.ok) {
+        const data = await res.json() as { contact: Contact }
+        setCompany(c => ({ ...c, contacts: c.contacts.map(ct => ct.id === contactId ? { ...ct, ...data.contact } : ct) }))
+        setEditingContactId(null)
+        setContactEditDraft({})
+      }
+    } finally { setSavingContactEdit(false) }
+  }
+
   // ── Task state ──────────────────────────────────────────────────────────────
   const [addingTask, setAddingTask]       = useState(false)
   const [taskForm, setTaskForm]           = useState({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "" })
   const [savingTask, setSavingTask]       = useState(false)
   const [completingTask, setCompletingTask] = useState<string | null>(null)
 
+  const [taskError, setTaskError] = useState<string | null>(null)
+
   async function createTask() {
     if (!taskForm.title.trim()) return
     setSavingTask(true)
+    setTaskError(null)
     try {
       const res = await fetch("/api/sales/tasks", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...taskForm,
+          title: taskForm.title,
+          taskType: taskForm.taskType,
+          priority: taskForm.priority,
+          dueAt: taskForm.dueAt || null,
+          notes: taskForm.notes || null,
           prospectId: company.id,
           assignedToId: currentUserId,
           contactId: taskForm.contactId || null,
         }),
       })
-      if (res.ok) {
-        router.refresh()
-        setAddingTask(false); setTaskForm({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "" })
+      if (!res.ok) {
+        setTaskError("Failed to save task. Please try again.")
+        return
       }
+      const data = await res.json() as Task
+      setCompany(c => ({ ...c, tasks: [...c.tasks, data] }))
+      setAddingTask(false)
+      setTaskForm({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "" })
     } finally { setSavingTask(false) }
   }
 
@@ -255,37 +286,64 @@ export function ProspectHub({
     } finally { setCompletingTask(null) }
   }
 
+  async function reopenTask(taskId: string) {
+    setCompletingTask(taskId)
+    try {
+      await fetch(`/api/sales/tasks/${taskId}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ complete: false }),
+      })
+      setCompany(c => ({ ...c, tasks: c.tasks.map(t => t.id === taskId ? { ...t, completedAt: null } : t) }))
+    } finally { setCompletingTask(null) }
+  }
+
   // ── Activity log state ──────────────────────────────────────────────────────
   const [addingActivity, setAddingActivity] = useState(false)
   const [actForm, setActForm] = useState({
-    activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "",
+    activityType: "CALL_ATTEMPTED", subject: "", otherDescription: "", notes: "", outcome: "", durationMinutes: "",
     scheduleFollowUp: false, followUpType: "call", followUpDue: "",
     contactId: "",
   })
   const [savingActivity, setSavingActivity] = useState(false)
 
+  const [activityError, setActivityError] = useState<string | null>(null)
+
   async function logActivity() {
     setSavingActivity(true)
+    setActivityError(null)
     try {
+      // For OTHER type, require a description; store it as the subject
+      if (actForm.activityType === "OTHER" && !actForm.otherDescription.trim()) {
+        setActivityError("Please describe the interaction type.")
+        setSavingActivity(false)
+        return
+      }
       const actRes = await fetch("/api/sales/activities", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prospectId: company.id,
           activityType: actForm.activityType,
-          subject: actForm.subject || null,
+          subject: actForm.activityType === "OTHER" ? actForm.otherDescription.trim() : (actForm.subject || null),
           notes: actForm.notes || null,
           outcome: actForm.outcome || null,
           durationMinutes: actForm.durationMinutes ? parseInt(actForm.durationMinutes) : null,
           contactId: actForm.contactId || null,
         }),
       })
-      if (!actRes.ok) return
+      if (!actRes.ok) {
+        setActivityError("Failed to save interaction. Please try again.")
+        return
+      }
+      const newActivity = await actRes.json() as Activity & { occurredAt: string }
+
+      // Optimistic update — prepend to salesActivities immediately
+      setCompany(c => ({ ...c, salesActivities: [newActivity, ...c.salesActivities] }))
 
       if (actForm.scheduleFollowUp && actForm.followUpDue) {
         const contactName = actForm.contactId
           ? (company.contacts.find(c => c.id === actForm.contactId)?.name ?? company.companyName)
           : company.companyName
-        await fetch("/api/sales/tasks", {
+        const taskRes = await fetch("/api/sales/tasks", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prospectId: company.id,
@@ -297,11 +355,14 @@ export function ProspectHub({
             contactId: actForm.contactId || null,
           }),
         })
+        if (taskRes.ok) {
+          const newTask = await taskRes.json() as Task
+          setCompany(c => ({ ...c, tasks: [...c.tasks, newTask] }))
+        }
       }
 
-      router.refresh()
       setAddingActivity(false)
-      setActForm({ activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "", scheduleFollowUp: false, followUpType: "call", followUpDue: "", contactId: "" })
+      setActForm({ activityType: "CALL_ATTEMPTED", subject: "", otherDescription: "", notes: "", outcome: "", durationMinutes: "", scheduleFollowUp: false, followUpType: "call", followUpDue: "", contactId: "" })
     } finally { setSavingActivity(false) }
   }
 
@@ -412,6 +473,165 @@ export function ProspectHub({
         ))}
       </div>
 
+      {/* ── Contact detail panel ───────────────────────────────────────────── */}
+      {selectedContactId && (() => {
+        const sc = company.contacts.find(c => c.id === selectedContactId)
+        if (!sc) return null
+        const contactActivities = allTimelineItems.filter(item =>
+          item.type !== "note" && (
+            item.type === "activity"
+              ? (item.data as Activity).contact?.id === selectedContactId
+              : (item.data as Email).contact?.id === selectedContactId
+          )
+        )
+        const contactTasks = company.tasks.filter(t => t.contact?.id === selectedContactId)
+        const isEditing    = editingContactId === selectedContactId
+        return (
+          <div className="mb-6 bg-gray-900 border border-indigo-800/40 rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+              <button onClick={() => { setSelectedContactId(null); setEditingContactId(null) }}
+                className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Back to contacts
+              </button>
+              {!isEditing
+                ? <button onClick={() => { setEditingContactId(selectedContactId); setContactEditDraft({ name: sc.name, title: sc.title ?? "", email: sc.email ?? "", phone: sc.phone ?? "", linkedinUrl: sc.linkedinUrl ?? "", isDecisionMaker: sc.isDecisionMaker, isPrimaryContact: sc.isPrimaryContact }) }}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Edit</button>
+                : <div className="flex gap-2">
+                    <button onClick={() => saveContactEdit(selectedContactId)} disabled={savingContactEdit}
+                      className="text-xs px-3 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg transition-colors">Save</button>
+                    <button onClick={() => { setEditingContactId(null); setContactEditDraft({}) }} className="text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
+                  </div>
+              }
+            </div>
+
+            {/* Contact header */}
+            <div className="px-5 py-4 border-b border-gray-800">
+              <div className="flex items-start gap-4">
+                <div className="w-11 h-11 rounded-full bg-indigo-900/40 flex items-center justify-center text-lg font-bold text-indigo-300 shrink-0">
+                  {sc.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  {isEditing ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {([
+                        { key: "name",        label: "Name *",    span: 2 },
+                        { key: "title",       label: "Title"           },
+                        { key: "email",       label: "Email"           },
+                        { key: "phone",       label: "Phone"           },
+                        { key: "linkedinUrl", label: "LinkedIn URL", span: 2 },
+                      ] as { key: keyof typeof contactEditDraft; label: string; span?: number }[]).map(f => (
+                        <input key={f.key} placeholder={f.label}
+                          value={(contactEditDraft[f.key] as string) ?? ""}
+                          onChange={e => setContactEditDraft(d => ({ ...d, [f.key]: e.target.value }))}
+                          className={cn("px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500", f.span === 2 ? "col-span-2" : "")} />
+                      ))}
+                      <div className="col-span-2 flex items-center gap-4">
+                        {([
+                          { key: "isDecisionMaker", label: "Decision maker" },
+                          { key: "isPrimaryContact", label: "Primary contact" },
+                        ] as { key: "isDecisionMaker" | "isPrimaryContact"; label: string }[]).map(f => (
+                          <label key={f.key} className="flex items-center gap-1.5 text-xs text-gray-400 cursor-pointer">
+                            <input type="checkbox" checked={!!(contactEditDraft[f.key])}
+                              onChange={e => setContactEditDraft(d => ({ ...d, [f.key]: e.target.checked }))}
+                              className="accent-indigo-500" />
+                            {f.label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-white">{sc.name}</span>
+                        {sc.isPrimaryContact && <span className="text-[10px] bg-indigo-900/40 text-indigo-300 px-1.5 py-0.5 rounded-full">Primary</span>}
+                        {sc.isDecisionMaker  && <span className="text-[10px] bg-yellow-900/40 text-yellow-400 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><Star className="w-2.5 h-2.5" />DM</span>}
+                      </div>
+                      {sc.title && <p className="text-sm text-gray-400 mt-0.5">{sc.title}</p>}
+                      <div className="flex flex-wrap gap-4 mt-2 text-sm">
+                        {sc.email && <a href={`mailto:${sc.email}`} className="text-indigo-400 hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{sc.email}</a>}
+                        {sc.phone && <span className="text-gray-400 flex items-center gap-1"><Phone className="w-3.5 h-3.5" />{sc.phone}</span>}
+                        {sc.linkedinUrl && <a href={sc.linkedinUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline flex items-center gap-1"><Link2 className="w-3.5 h-3.5" />LinkedIn</a>}
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">{company.companyName}</p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Contact tasks */}
+            {contactTasks.length > 0 && (
+              <div className="px-5 py-3 border-b border-gray-800">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Tasks</p>
+                <div className="space-y-1.5">
+                  {contactTasks.map(t => {
+                    const overdue = !t.completedAt && t.dueAt && new Date(t.dueAt) < now
+                    return (
+                      <div key={t.id} className={cn("flex items-center gap-2 text-sm", t.completedAt && "opacity-50")}>
+                        {t.completedAt
+                          ? <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          : <Circle className={cn("w-4 h-4 shrink-0", overdue ? "text-red-400" : "text-gray-600")} />}
+                        <span className={cn(t.completedAt ? "line-through text-gray-600" : "text-gray-300")}>{t.title}</span>
+                        {t.dueAt && <span className={cn("text-xs ml-auto shrink-0", overdue ? "text-red-400" : "text-gray-600")}>{fmtDate(t.dueAt)}</span>}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Contact activity timeline */}
+            <div className="px-5 py-3">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                Communication history ({contactActivities.length})
+              </p>
+              {contactActivities.length === 0
+                ? <p className="text-xs text-gray-600 py-4 text-center">No interactions recorded for {sc.name} yet.</p>
+                : <div className="space-y-2">
+                    {contactActivities.map((item, i) => {
+                      if (item.type === "activity") {
+                        const act = item.data as Activity
+                        const { icon, color } = ACTIVITY_ICONS[act.activityType] ?? { icon: "📋", color: "text-gray-400" }
+                        return (
+                          <div key={`cact-${act.id}-${i}`} className="flex gap-2.5">
+                            <div className="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center text-xs shrink-0 mt-0.5">{icon}</div>
+                            <div className="flex-1 bg-gray-800/60 border border-gray-800 rounded-lg px-3 py-2">
+                              <div className="flex items-center justify-between gap-2 flex-wrap">
+                                <span className={cn("text-xs font-medium", color)}>
+                                  {act.activityType === "OTHER" ? (act.subject ?? "Other") : act.activityType.replace(/_/g, " ")}
+                                </span>
+                                <span className="text-[10px] text-gray-600">{fmtTime(act.occurredAt)}</span>
+                              </div>
+                              {act.activityType !== "OTHER" && act.subject && <p className="text-xs text-white mt-0.5">{act.subject}</p>}
+                              {act.outcome && <p className="text-xs text-gray-500 mt-0.5">Outcome: {act.outcome}</p>}
+                              {act.notes   && <p className="text-xs text-gray-400 mt-0.5 whitespace-pre-wrap">{act.notes}</p>}
+                            </div>
+                          </div>
+                        )
+                      }
+                      const em = item.data as Email
+                      return (
+                        <div key={`ceml-${em.id}`} className="flex gap-2.5">
+                          <div className={cn("w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5", em.direction === "sent" ? "bg-indigo-900/40" : "bg-blue-900/40")}>
+                            {em.direction === "sent" ? <ArrowUpRight className="w-3.5 h-3.5 text-indigo-400" /> : <ArrowDownLeft className="w-3.5 h-3.5 text-blue-400" />}
+                          </div>
+                          <div className="flex-1 bg-gray-800/60 border border-gray-800 rounded-lg px-3 py-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-medium text-gray-400">{em.direction === "sent" ? "Email sent" : "Email received"}</span>
+                              <span className="text-[10px] text-gray-600">{fmtTime(em.sentAt)}</span>
+                            </div>
+                            <p className="text-xs text-white mt-0.5">{em.subject}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+              }
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-6 border-b border-gray-800">
         {TABS.map(t => (
@@ -466,9 +686,17 @@ export function ProspectHub({
               <div className="grid grid-cols-2 gap-3">
                 <select value={actForm.activityType} onChange={e => setActForm(f => ({ ...f, activityType: e.target.value }))}
                   className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
-                  {["CALL_ATTEMPTED","CALL_CONNECTED","MEETING_HELD","LINKEDIN_MESSAGE","LINKEDIN_VIEW","DEMO_COMPLETED"].map(t =>
-                    <option key={t} value={t}>{t.replace(/_/g, " ")}</option>)}
+                  {["CALL_ATTEMPTED","CALL_CONNECTED","MEETING_HELD","LINKEDIN_MESSAGE","LINKEDIN_VIEW","DEMO_COMPLETED","OTHER"].map(t =>
+                    <option key={t} value={t}>{t === "OTHER" ? "Other…" : t.replace(/_/g, " ")}</option>)}
                 </select>
+                {actForm.activityType === "OTHER" && (
+                  <input
+                    placeholder="Describe interaction type (e.g. LinkedIn message, Text, In-person) *"
+                    value={actForm.otherDescription}
+                    onChange={e => setActForm(f => ({ ...f, otherDescription: e.target.value }))}
+                    className="col-span-2 px-3 py-2 bg-gray-800 border border-indigo-600 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-400"
+                  />
+                )}
                 {company.contacts.length > 0 && (
                   <select value={actForm.contactId} onChange={e => setActForm(f => ({ ...f, contactId: e.target.value }))}
                     className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
@@ -507,12 +735,13 @@ export function ProspectHub({
                 )}
               </div>
 
+              {activityError && <p className="text-xs text-red-400">{activityError}</p>}
               <div className="flex gap-2">
                 <button onClick={logActivity} disabled={savingActivity}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors">
                   {savingActivity ? "Saving…" : "Save"}
                 </button>
-                <button onClick={() => setAddingActivity(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+                <button onClick={() => { setAddingActivity(false); setActivityError(null) }} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
               </div>
             </div>
           )}
@@ -582,10 +811,14 @@ export function ProspectHub({
                       <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-sm shrink-0 mt-0.5">{icon}</div>
                       <div className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3">
                         <div className="flex items-center justify-between mb-0.5 flex-wrap gap-2">
-                          <span className={cn("text-xs font-medium", color)}>{act.activityType.replace(/_/g, " ")}</span>
+                          <span className={cn("text-xs font-medium", color)}>
+                            {act.activityType === "OTHER"
+                              ? (act.subject ?? "Other")
+                              : act.activityType.replace(/_/g, " ")}
+                          </span>
                           <span className="text-xs text-gray-600">{fmtTime(act.occurredAt)} · {act.salesUser?.name ?? "unknown"}</span>
                         </div>
-                        {act.subject && <p className="text-sm font-medium text-white">{act.subject}</p>}
+                        {act.activityType !== "OTHER" && act.subject && <p className="text-sm font-medium text-white">{act.subject}</p>}
                         {act.outcome && <p className="text-xs text-gray-400 mt-0.5">Outcome: {act.outcome}</p>}
                         {act.notes   && <p className="text-sm text-gray-400 mt-1 whitespace-pre-wrap">{act.notes}</p>}
                         {act.durationMinutes && <p className="text-xs text-gray-600 mt-0.5">{act.durationMinutes} min</p>}
@@ -700,6 +933,10 @@ export function ProspectHub({
                     </div>
                     <p className="text-xs text-gray-500 truncate">{[c.title, c.email].filter(Boolean).join(" · ")}</p>
                   </div>
+                  <button
+                    onClick={e => { e.stopPropagation(); setSelectedContactId(c.id) }}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 px-2 py-0.5 rounded transition-colors shrink-0"
+                  >History</button>
                   {expandedContactId === c.id ? <ChevronUp className="w-4 h-4 text-gray-600" /> : <ChevronDown className="w-4 h-4 text-gray-600" />}
                 </div>
                 {expandedContactId === c.id && (
@@ -822,10 +1059,11 @@ export function ProspectHub({
                   </select>
                 )}
               </div>
+              {taskError && <p className="text-xs text-red-400">{taskError}</p>}
               <div className="flex gap-2">
                 <button onClick={createTask} disabled={savingTask || !taskForm.title.trim()}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors">Add Task</button>
-                <button onClick={() => setAddingTask(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+                <button onClick={() => { setAddingTask(false); setTaskError(null) }} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
               </div>
             </div>
           )}
@@ -856,6 +1094,12 @@ export function ProspectHub({
                       {t.contact && ` · re: ${t.contact.name}`}
                     </p>
                   </div>
+                  {t.completedAt && (
+                    <button onClick={() => reopenTask(t.id)} disabled={completingTask === t.id}
+                      className="shrink-0 text-xs text-gray-600 hover:text-indigo-400 disabled:opacity-50 transition-colors">
+                      Reopen
+                    </button>
+                  )}
                 </div>
               )
             })}

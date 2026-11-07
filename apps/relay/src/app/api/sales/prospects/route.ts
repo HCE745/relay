@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const skip = (page - 1) * limit
 
   const repFilter = info.isManager || info.isSuperAdmin
-    ? {}
+    ? { NOT: { assignedTo: { isDemo: true } } }
     : { assignedToId: info.salesUserId }
 
   const where = {

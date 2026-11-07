@@ -4,9 +4,11 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 
+const excludeDemo = { NOT: { assignedTo: { isDemo: true } } }
+
 function salesFilter(session: Awaited<ReturnType<typeof getSession>>) {
   if (!session) return null
-  if (session.superAdmin || session.salesUserRole === "admin_sales") return {}
+  if (session.superAdmin || session.salesUserRole === "admin_sales") return excludeDemo
   return { assignedToId: session.salesUserId ?? "" }
 }
 

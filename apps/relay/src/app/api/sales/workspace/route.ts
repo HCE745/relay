@@ -12,7 +12,7 @@ export async function GET() {
 
   const userId = session.salesUserId ?? ""
   const isManager = session.superAdmin || session.salesUserRole === "admin_sales"
-  const repFilter = isManager ? {} : { assignedToId: userId }
+  const repFilter = isManager ? { NOT: { assignedTo: { isDemo: true } } } : { assignedToId: userId }
 
   const now      = new Date()
   const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999)

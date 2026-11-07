@@ -220,7 +220,7 @@ export function ProspectHub({
 
   // ── Task state ──────────────────────────────────────────────────────────────
   const [addingTask, setAddingTask]       = useState(false)
-  const [taskForm, setTaskForm]           = useState({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "" })
+  const [taskForm, setTaskForm]           = useState({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "" })
   const [savingTask, setSavingTask]       = useState(false)
   const [completingTask, setCompletingTask] = useState<string | null>(null)
 
@@ -230,11 +230,16 @@ export function ProspectHub({
     try {
       const res = await fetch("/api/sales/tasks", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...taskForm, prospectId: company.id, assignedToId: currentUserId }),
+        body: JSON.stringify({
+          ...taskForm,
+          prospectId: company.id,
+          assignedToId: currentUserId,
+          contactId: taskForm.contactId || null,
+        }),
       })
       if (res.ok) {
         router.refresh()
-        setAddingTask(false); setTaskForm({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "" })
+        setAddingTask(false); setTaskForm({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "" })
       }
     } finally { setSavingTask(false) }
   }
@@ -255,6 +260,7 @@ export function ProspectHub({
   const [actForm, setActForm] = useState({
     activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "",
     scheduleFollowUp: false, followUpType: "call", followUpDue: "",
+    contactId: "",
   })
   const [savingActivity, setSavingActivity] = useState(false)
 
@@ -270,42 +276,57 @@ export function ProspectHub({
           notes: actForm.notes || null,
           outcome: actForm.outcome || null,
           durationMinutes: actForm.durationMinutes ? parseInt(actForm.durationMinutes) : null,
+          contactId: actForm.contactId || null,
         }),
       })
       if (!actRes.ok) return
 
       if (actForm.scheduleFollowUp && actForm.followUpDue) {
-        const followUpTitle = `Follow up with ${company.companyName}`
+        const contactName = actForm.contactId
+          ? (company.contacts.find(c => c.id === actForm.contactId)?.name ?? company.companyName)
+          : company.companyName
         await fetch("/api/sales/tasks", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prospectId: company.id,
             assignedToId: currentUserId,
-            title: followUpTitle,
+            title: `Follow up with ${contactName}`,
             taskType: actForm.followUpType,
             priority: "normal",
             dueAt: actForm.followUpDue,
+            contactId: actForm.contactId || null,
           }),
         })
       }
 
       router.refresh()
       setAddingActivity(false)
-      setActForm({ activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "", scheduleFollowUp: false, followUpType: "call", followUpDue: "" })
+      setActForm({ activityType: "CALL_ATTEMPTED", subject: "", notes: "", outcome: "", durationMinutes: "", scheduleFollowUp: false, followUpType: "call", followUpDue: "", contactId: "" })
     } finally { setSavingActivity(false) }
   }
 
   // ── Build merged timeline ───────────────────────────────────────────────────
-  type TimelineItem =
-    | { type: "activity"; data: Activity }
-    | { type: "email";    data: Email }
-    | { type: "note";     data: Note }
+  const [timelineContactFilter, setTimelineContactFilter] = useState("")
 
-  const timeline: TimelineItem[] = [
+  type TimelineItem =
+    | { type: "activity"; data: Activity; ts: number }
+    | { type: "email";    data: Email;    ts: number }
+    | { type: "note";     data: Note;     ts: number }
+
+  const allTimelineItems: TimelineItem[] = [
     ...company.salesActivities.map(a => ({ type: "activity" as const, data: a, ts: new Date(a.occurredAt).getTime() })),
     ...company.emails.map(e => ({ type: "email" as const, data: e, ts: new Date(e.sentAt).getTime() })),
     ...company.notes.map(n => ({ type: "note" as const, data: n, ts: new Date(n.createdAt).getTime() })),
   ].sort((a, b) => b.ts - a.ts)
+
+  const timeline = timelineContactFilter
+    ? allTimelineItems.filter(item => {
+        if (item.type === "note") return false // notes are company-level only
+        if (item.type === "activity") return (item.data as Activity).contact?.id === timelineContactFilter
+        if (item.type === "email")    return (item.data as Email).contact?.id === timelineContactFilter
+        return false
+      })
+    : allTimelineItems
 
   const openOpps  = company.opportunities.filter(o => o.stage !== "Closed Won" && o.stage !== "Closed Lost")
   const openTasks = company.tasks.filter(t => !t.completedAt)
@@ -448,6 +469,13 @@ export function ProspectHub({
                   {["CALL_ATTEMPTED","CALL_CONNECTED","MEETING_HELD","LINKEDIN_MESSAGE","LINKEDIN_VIEW","DEMO_COMPLETED"].map(t =>
                     <option key={t} value={t}>{t.replace(/_/g, " ")}</option>)}
                 </select>
+                {company.contacts.length > 0 && (
+                  <select value={actForm.contactId} onChange={e => setActForm(f => ({ ...f, contactId: e.target.value }))}
+                    className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
+                    <option value="">No specific contact</option>
+                    {company.contacts.map(c => <option key={c.id} value={c.id}>{c.name}{c.title ? ` · ${c.title}` : ""}</option>)}
+                  </select>
+                )}
                 <input placeholder="Outcome (e.g. Left voicemail)" value={actForm.outcome} onChange={e => setActForm(f => ({ ...f, outcome: e.target.value }))}
                   className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
                 <input type="number" placeholder="Duration (mins)" value={actForm.durationMinutes} onChange={e => setActForm(f => ({ ...f, durationMinutes: e.target.value }))}
@@ -505,9 +533,31 @@ export function ProspectHub({
             </div>
           )}
 
+          {/* Contact filter */}
+          {company.contacts.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Filter:</span>
+              <select
+                value={timelineContactFilter}
+                onChange={e => setTimelineContactFilter(e.target.value)}
+                className="px-2 py-1 bg-gray-800 border border-gray-700 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500"
+              >
+                <option value="">All company activity</option>
+                {company.contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+              {timelineContactFilter && (
+                <span className="text-[10px] text-gray-600">Notes hidden — they are company-level only</span>
+              )}
+            </div>
+          )}
+
           {/* Timeline feed */}
           {timeline.length === 0 ? (
-            <p className="text-gray-600 text-sm py-8 text-center">No activity yet. Log a call, send an email, or add a note above.</p>
+            <p className="text-gray-600 text-sm py-8 text-center">
+              {timelineContactFilter
+                ? "No activity recorded for this contact yet."
+                : "No activity yet. Log a call, send an email, or add a note above."}
+            </p>
           ) : (
             <div className="space-y-2">
               {timeline.map((item, i) => {
@@ -565,6 +615,7 @@ export function ProspectHub({
                         <span className="text-xs text-gray-600">{fmtTime(em.sentAt)}</span>
                       </div>
                       <p className="text-sm font-medium text-white">{em.subject}</p>
+                      {em.contact && <p className="text-xs text-indigo-400 mt-0.5">With {em.contact.name}</p>}
                       <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{em.bodyText.slice(0, 150)}</p>
                     </div>
                   </div>
@@ -761,7 +812,15 @@ export function ProspectHub({
                   {["call","email","linkedin","proposal","contract","other"].map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
                 <input type="date" value={taskForm.dueAt} onChange={e => setTaskForm(f => ({ ...f, dueAt: e.target.value }))}
-                  className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500" />
+                  className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="Due date" />
+                {company.contacts.length > 0 && (
+                  <select value={taskForm.contactId} onChange={e => setTaskForm(f => ({ ...f, contactId: e.target.value }))}
+                    className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
+                    <option value="">No specific contact</option>
+                    {company.contacts.map(c => <option key={c.id} value={c.id}>{c.name}{c.title ? ` · ${c.title}` : ""}</option>)}
+                  </select>
+                )}
               </div>
               <div className="flex gap-2">
                 <button onClick={createTask} disabled={savingTask || !taskForm.title.trim()}

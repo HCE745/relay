@@ -39,6 +39,8 @@ interface DemoCall {
 interface WorkspaceData {
   overdueTasks:       Task[]
   tasksDueToday:      Task[]
+  upcomingTasks:      Task[]
+  undatedTasks:       Task[]
   unreadEmails:       Email[]
   stuckOpportunities: Opportunity[]
   upcomingDemos:      DemoCall[]
@@ -104,6 +106,8 @@ export default function WorkspacePage() {
         ...d,
         overdueTasks:  d.overdueTasks.filter(t => t.id !== id),
         tasksDueToday: d.tasksDueToday.filter(t => t.id !== id),
+        upcomingTasks: d.upcomingTasks.filter(t => t.id !== id),
+        undatedTasks:  d.undatedTasks.filter(t => t.id !== id),
       })
     } finally { setCompleting(null) }
   }
@@ -113,7 +117,7 @@ export default function WorkspacePage() {
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
 
   const totalActions = data
-    ? data.overdueTasks.length + data.tasksDueToday.length + data.unreadEmails.length + data.followUpsDue.length
+    ? data.overdueTasks.length + data.tasksDueToday.length + data.unreadEmails.length + data.followUpsDue.length + data.upcomingTasks.length + data.undatedTasks.length
     : 0
 
   return (
@@ -144,10 +148,12 @@ export default function WorkspacePage() {
       {data && (
         <div className="space-y-6">
           {/* Summary row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {[
               { label: "Overdue Tasks",    value: data.overdueTasks.length,       color: data.overdueTasks.length  > 0 ? "text-red-400"    : "text-gray-500", bg: data.overdueTasks.length  > 0 ? "border-red-800/40"    : "border-gray-800" },
               { label: "Due Today",        value: data.tasksDueToday.length,      color: data.tasksDueToday.length > 0 ? "text-yellow-400"  : "text-gray-500", bg: "border-gray-800" },
+              { label: "Upcoming",         value: data.upcomingTasks.length,      color: data.upcomingTasks.length > 0 ? "text-indigo-400"  : "text-gray-500", bg: "border-gray-800" },
+              { label: "Unscheduled",      value: data.undatedTasks.length,       color: data.undatedTasks.length  > 0 ? "text-purple-400"  : "text-gray-500", bg: "border-gray-800" },
               { label: "Unread Emails",    value: data.unreadEmails.length,       color: data.unreadEmails.length  > 0 ? "text-blue-400"    : "text-gray-500", bg: "border-gray-800" },
               { label: "Follow-ups Due",   value: data.followUpsDue.length,       color: data.followUpsDue.length  > 0 ? "text-orange-400"  : "text-gray-500", bg: "border-gray-800" },
             ].map(s => (
@@ -179,6 +185,24 @@ export default function WorkspacePage() {
           {data.tasksDueToday.length > 0 && (
             <Section title="Due Today" icon={<Clock className="w-4 h-4 text-yellow-400" />} count={data.tasksDueToday.length} tourId="workspace-task-list">
               {data.tasksDueToday.map(t => (
+                <TaskRow key={t.id} task={t} completing={completing} onComplete={completeTask} />
+              ))}
+            </Section>
+          )}
+
+          {/* Upcoming tasks */}
+          {data.upcomingTasks.length > 0 && (
+            <Section title="Upcoming" icon={<ArrowRight className="w-4 h-4 text-indigo-400" />} count={data.upcomingTasks.length}>
+              {data.upcomingTasks.map(t => (
+                <TaskRow key={t.id} task={t} completing={completing} onComplete={completeTask} />
+              ))}
+            </Section>
+          )}
+
+          {/* Unscheduled tasks */}
+          {data.undatedTasks.length > 0 && (
+            <Section title="Unscheduled" icon={<Circle className="w-4 h-4 text-purple-400" />} count={data.undatedTasks.length}>
+              {data.undatedTasks.map(t => (
                 <TaskRow key={t.id} task={t} completing={completing} onComplete={completeTask} />
               ))}
             </Section>

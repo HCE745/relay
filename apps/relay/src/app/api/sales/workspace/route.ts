@@ -18,9 +18,18 @@ export async function GET() {
   const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999)
   const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0)
 
+  const taskIncludes = {
+    prospect:    { select: { id: true, companyName: true } },
+    demoCall:    { select: { id: true, companyName: true } },
+    opportunity: { select: { id: true, title: true } },
+    contact:     { select: { id: true, name: true } },
+  }
+
   const [
     overdueTasks,
     tasksDueToday,
+    upcomingTasks,
+    undatedTasks,
     unreadEmails,
     stuckOpportunities,
     upcomingDemos,
@@ -29,12 +38,7 @@ export async function GET() {
     // Overdue tasks
     prisma.crmTask.findMany({
       where: { ...repFilter, completedAt: null, dueAt: { lt: todayStart } },
-      include: {
-        prospect:    { select: { id: true, companyName: true } },
-        demoCall:    { select: { id: true, companyName: true } },
-        opportunity: { select: { id: true, title: true } },
-        contact:     { select: { id: true, name: true } },
-      },
+      include: taskIncludes,
       orderBy: { dueAt: "asc" },
       take: 20,
     }),
@@ -42,13 +46,24 @@ export async function GET() {
     // Tasks due today
     prisma.crmTask.findMany({
       where: { ...repFilter, completedAt: null, dueAt: { gte: todayStart, lte: todayEnd } },
-      include: {
-        prospect:    { select: { id: true, companyName: true } },
-        demoCall:    { select: { id: true, companyName: true } },
-        opportunity: { select: { id: true, title: true } },
-        contact:     { select: { id: true, name: true } },
-      },
+      include: taskIncludes,
       orderBy: [{ priority: "desc" }, { dueAt: "asc" }],
+      take: 20,
+    }),
+
+    // Upcoming tasks (after today)
+    prisma.crmTask.findMany({
+      where: { ...repFilter, completedAt: null, dueAt: { gt: todayEnd } },
+      include: taskIncludes,
+      orderBy: { dueAt: "asc" },
+      take: 30,
+    }),
+
+    // Tasks with no due date
+    prisma.crmTask.findMany({
+      where: { ...repFilter, completedAt: null, dueAt: null },
+      include: taskIncludes,
+      orderBy: { createdAt: "desc" },
       take: 20,
     }),
 
@@ -118,6 +133,8 @@ export async function GET() {
   return NextResponse.json({
     overdueTasks,
     tasksDueToday,
+    upcomingTasks,
+    undatedTasks,
     unreadEmails,
     stuckOpportunities,
     upcomingDemos,

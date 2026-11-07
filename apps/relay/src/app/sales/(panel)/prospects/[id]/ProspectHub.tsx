@@ -8,7 +8,7 @@ import {
   Plus, CheckCircle2, Circle, Mail, ChevronDown, ChevronUp,
   Edit3, Save, ExternalLink, Link2, Star, Shield, Zap,
   FileText, AlertCircle, ArrowUpRight, ArrowDownLeft,
-  Eye,
+  Eye, Send, X, Trash2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -205,6 +205,13 @@ export function ProspectHub({
   const [editingContactId, setEditingContactId]   = useState<string | null>(null)
   const [contactEditDraft, setContactEditDraft]   = useState<Partial<Contact>>({})
   const [savingContactEdit, setSavingContactEdit] = useState(false)
+  const [deletingContact, setDeletingContact]     = useState<{ id: string; name: string } | null>(null)
+  const [deleteContactError, setDeleteContactError] = useState<string | null>(null)
+  const [composeEmail, setComposeEmail]           = useState<{ toEmail: string; contactId?: string; contactName?: string } | null>(null)
+  const [sendingEmail, setSendingEmail]           = useState(false)
+  const [composeError, setComposeError]           = useState<string | null>(null)
+  const [composeSubject, setComposeSubject]       = useState("")
+  const [composeBody, setComposeBody]             = useState("")
 
   async function createContact() {
     if (!contactForm.name.trim()) return
@@ -236,6 +243,56 @@ export function ProspectHub({
         setContactEditDraft({})
       }
     } finally { setSavingContactEdit(false) }
+  }
+
+  async function deleteContact(contactId: string) {
+    setDeleteContactError(null)
+    try {
+      const res = await fetch(`/api/sales/companies/${company.id}/contacts/${contactId}`, { method: "DELETE" })
+      if (!res.ok) {
+        setDeleteContactError("Failed to delete contact. Please try again.")
+        return
+      }
+      setCompany(c => ({ ...c, contacts: c.contacts.filter(ct => ct.id !== contactId) }))
+      setDeletingContact(null)
+      if (selectedContactId === contactId) setSelectedContactId(null)
+    } catch {
+      setDeleteContactError("Network error. Please try again.")
+    }
+  }
+
+  async function sendComposedEmail() {
+    if (!composeEmail || !composeSubject.trim() || !composeBody.trim()) {
+      setComposeError("Subject and message are required.")
+      return
+    }
+    setSendingEmail(true)
+    setComposeError(null)
+    try {
+      const bodyHtml = `<p>${composeBody.trim().replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>`
+      const payload: Record<string, unknown> = {
+        to:         composeEmail.toEmail,
+        subject:    composeSubject.trim(),
+        bodyHtml,
+        prospectId: company.id,
+      }
+      if (composeEmail.contactId) payload.contactId = composeEmail.contactId
+      if (company.demoCalls[0]?.id) payload.demoCallId = company.demoCalls[0].id
+      const res = await fetch("/api/super-admin/crm/emails", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({})) as { error?: string }
+        setComposeError(d.error ?? "Failed to send email.")
+        return
+      }
+      const sentEmail = await res.json() as Email & { sentAt: string }
+      setCompany(c => ({ ...c, emails: [sentEmail, ...c.emails] }))
+      setComposeEmail(null)
+      setComposeSubject("")
+      setComposeBody("")
+    } finally { setSendingEmail(false) }
   }
 
   // ── Task state ──────────────────────────────────────────────────────────────
@@ -394,6 +451,7 @@ export function ProspectHub({
   const now       = new Date()
 
   return (
+    <>
     <div className="p-6 max-w-6xl">
       {/* Back + header */}
       <div className="mb-5">
@@ -493,15 +551,27 @@ export function ProspectHub({
                 className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors">
                 <ArrowLeft className="w-4 h-4" /> Back to contacts
               </button>
-              {!isEditing
-                ? <button onClick={() => { setEditingContactId(selectedContactId); setContactEditDraft({ name: sc.name, title: sc.title ?? "", email: sc.email ?? "", phone: sc.phone ?? "", linkedinUrl: sc.linkedinUrl ?? "", isDecisionMaker: sc.isDecisionMaker, isPrimaryContact: sc.isPrimaryContact }) }}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Edit</button>
-                : <div className="flex gap-2">
-                    <button onClick={() => saveContactEdit(selectedContactId)} disabled={savingContactEdit}
-                      className="text-xs px-3 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg transition-colors">Save</button>
-                    <button onClick={() => { setEditingContactId(null); setContactEditDraft({}) }} className="text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
-                  </div>
-              }
+              <div className="flex items-center gap-2">
+                {sc.email && !isEditing && (
+                  <button onClick={() => { setComposeEmail({ toEmail: sc.email!, contactId: sc.id, contactName: sc.name }); setComposeSubject(""); setComposeBody("") }}
+                    className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+                    <Mail className="w-3 h-3" /> Email
+                  </button>
+                )}
+                {!isEditing
+                  ? <>
+                      <button onClick={() => { setEditingContactId(selectedContactId); setContactEditDraft({ name: sc.name, title: sc.title ?? "", email: sc.email ?? "", phone: sc.phone ?? "", linkedinUrl: sc.linkedinUrl ?? "", isDecisionMaker: sc.isDecisionMaker, isPrimaryContact: sc.isPrimaryContact }) }}
+                        className="text-xs text-gray-400 hover:text-white transition-colors">Edit</button>
+                      <button onClick={() => { setDeletingContact({ id: sc.id, name: sc.name }); setDeleteContactError(null) }}
+                        className="text-xs text-red-500/70 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </>
+                  : <div className="flex gap-2">
+                      <button onClick={() => saveContactEdit(selectedContactId)} disabled={savingContactEdit}
+                        className="text-xs px-3 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg transition-colors">Save</button>
+                      <button onClick={() => { setEditingContactId(null); setContactEditDraft({}) }} className="text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
+                    </div>
+                }
+              </div>
             </div>
 
             {/* Contact header */}
@@ -548,7 +618,7 @@ export function ProspectHub({
                       </div>
                       {sc.title && <p className="text-sm text-gray-400 mt-0.5">{sc.title}</p>}
                       <div className="flex flex-wrap gap-4 mt-2 text-sm">
-                        {sc.email && <a href={`mailto:${sc.email}`} className="text-indigo-400 hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{sc.email}</a>}
+                        {sc.email && <button onClick={() => { setComposeEmail({ toEmail: sc.email!, contactId: sc.id, contactName: sc.name }); setComposeSubject(""); setComposeBody("") }} className="text-indigo-400 hover:underline flex items-center gap-1 text-sm"><Mail className="w-3.5 h-3.5" />{sc.email}</button>}
                         {sc.phone && <span className="text-gray-400 flex items-center gap-1"><Phone className="w-3.5 h-3.5" />{sc.phone}</span>}
                         {sc.linkedinUrl && <a href={sc.linkedinUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline flex items-center gap-1"><Link2 className="w-3.5 h-3.5" />LinkedIn</a>}
                       </div>
@@ -665,18 +735,16 @@ export function ProspectHub({
             >
               <FileText className="w-3.5 h-3.5 text-blue-400" /> Add Note
             </button>
-            <Link
-              href={(() => {
-                const params = new URLSearchParams()
-                if (company.demoCalls[0]?.id) params.set("demoCallId", company.demoCalls[0].id)
-                else params.set("prospectId", company.id)
-                if (company.contacts[0]?.email) params.set("to", company.contacts[0].email)
-                return `/sales/outreach/email?${params.toString()}`
-              })()}
+            <button
+              onClick={() => {
+                const c = company.contacts.find(ct => ct.email) ?? company.contacts[0]
+                setComposeEmail({ toEmail: c?.email ?? "", contactId: c?.id, contactName: c?.name })
+                setComposeSubject(""); setComposeBody("")
+              }}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 rounded-lg transition-colors"
             >
               <Mail className="w-3.5 h-3.5 text-indigo-400" /> Send Email
-            </Link>
+            </button>
           </div>
 
           {/* Log Interaction form */}
@@ -944,7 +1012,7 @@ export function ProspectHub({
                     {c.email && (
                       <div>
                         <p className="text-xs text-gray-600 mb-0.5">Email</p>
-                        <a href={`mailto:${c.email}`} className="text-indigo-400 hover:underline">{c.email}</a>
+                        <button onClick={() => { setComposeEmail({ toEmail: c.email!, contactId: c.id, contactName: c.name }); setComposeSubject(""); setComposeBody("") }} className="text-indigo-400 hover:underline text-sm">{c.email}</button>
                       </div>
                     )}
                     {c.phone && (
@@ -1269,6 +1337,86 @@ export function ProspectHub({
         </div>
       )}
     </div>
+
+      {/* ── Compose email modal ────────────────────────────────────────────────── */}
+      {composeEmail && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-lg bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+              <h2 className="text-sm font-semibold text-white">Compose Email</h2>
+              <button onClick={() => setComposeEmail(null)} className="text-gray-500 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="px-5 py-3 space-y-2 border-b border-gray-800">
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-500 w-10 shrink-0">To</span>
+                <input value={composeEmail.toEmail} readOnly className="flex-1 bg-transparent text-sm text-indigo-300 outline-none" />
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-500 w-10 shrink-0">Subject</span>
+                <input
+                  value={composeSubject}
+                  onChange={e => setComposeSubject(e.target.value)}
+                  placeholder="Subject"
+                  className="flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 py-3">
+              <textarea
+                value={composeBody}
+                onChange={e => setComposeBody(e.target.value)}
+                placeholder="Write your message here…"
+                rows={8}
+                className="w-full bg-transparent text-sm text-gray-200 outline-none resize-none leading-relaxed placeholder-gray-600"
+              />
+            </div>
+            <div className="px-5 py-3 border-t border-gray-800 flex items-center gap-3">
+              {composeError && <p className="text-xs text-red-400 flex-1">{composeError}</p>}
+              {!composeError && <span className="flex-1 text-xs text-gray-600">To: {composeEmail.toEmail}</span>}
+              <button onClick={() => setComposeEmail(null)} className="text-xs text-gray-500 hover:text-gray-300 px-3 py-1.5">Cancel</button>
+              <button
+                onClick={sendComposedEmail}
+                disabled={sendingEmail || !composeSubject.trim() || !composeBody.trim()}
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <Send className="w-3.5 h-3.5" />
+                {sendingEmail ? "Sending…" : "Send"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete contact confirmation ────────────────────────────────────────── */}
+      {deletingContact && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-gray-900 border border-red-800/50 rounded-2xl shadow-2xl p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <Trash2 className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-white">Delete {deletingContact.name}?</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  This permanently removes the contact record. Historical emails, logged interactions, and tasks
+                  linked to this contact <span className="text-white">will be retained</span> but will
+                  no longer be associated with this person by name.
+                </p>
+                <p className="text-xs text-yellow-500/80 mt-2">This action cannot be undone.</p>
+              </div>
+            </div>
+            {deleteContactError && <p className="text-xs text-red-400">{deleteContactError}</p>}
+            <div className="flex justify-end gap-3 pt-1">
+              <button onClick={() => { setDeletingContact(null); setDeleteContactError(null) }}
+                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+              <button onClick={() => deleteContact(deletingContact.id)}
+                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-medium rounded-lg transition-colors">
+                Delete Contact
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

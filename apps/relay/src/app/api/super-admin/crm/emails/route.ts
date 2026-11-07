@@ -112,6 +112,8 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json() as {
       demoCallId?:       string
+      prospectId?:       string
+      contactId?:        string
       to:                string
       cc?:               string
       subject:           string
@@ -124,7 +126,7 @@ export async function POST(req: NextRequest) {
       abTestCampaignId?: string
     }
 
-    const { to, cc, subject, bodyHtml, demoCallId, inReplyTo, threadId, sequenceId, followUpMode, abTestGroup, abTestCampaignId } = body
+    const { to, cc, subject, bodyHtml, demoCallId, prospectId, contactId, inReplyTo, threadId, sequenceId, followUpMode, abTestGroup, abTestCampaignId } = body
 
     if (!to || !subject || !bodyHtml) {
       return NextResponse.json({ error: "to, subject, and bodyHtml required" }, { status: 400 })
@@ -174,6 +176,8 @@ export async function POST(req: NextRequest) {
     const email = await prisma.crmEmail.create({
       data: {
         demoCallId:          demoCallId ?? null,
+        prospectId:          prospectId ?? null,
+        contactId:           contactId  ?? null,
         contactEmail:        to,
         direction:           "sent",
         fromAddress,

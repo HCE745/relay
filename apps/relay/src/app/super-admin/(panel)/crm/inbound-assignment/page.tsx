@@ -41,24 +41,36 @@ export default function InboundAssignmentPage() {
     setLoading(true)
     setError(null)
     try {
-      const [repsRes, statsRes] = await Promise.all([
-        fetch("/api/super-admin/crm/inbound-assignment"),
-        fetch("/api/super-admin/crm/prospects?isUnassigned=true&isRegistered=true&limit=1"),
-      ])
-      const repsJson  = await repsRes.json() as { reps?: SalesRep[]; error?: string }
-      const statsJson = await statsRes.json() as { total?: number }
-
+      // Primary fetch — reps list; must succeed
+      const repsRes = await fetch("/api/super-admin/crm/inbound-assignment")
+      let repsJson: { reps?: SalesRep[]; error?: string }
+      try {
+        repsJson = await repsRes.json() as typeof repsJson
+      } catch {
+        const text = await repsRes.text().catch(() => "(unreadable)")
+        setError(`API error ${repsRes.status}: ${text.slice(0, 200)}`)
+        return
+      }
       if (!repsRes.ok || !repsJson.reps) {
-        setError(repsJson.error ?? "Failed to load reps")
+        setError(`${repsJson.error ?? "Failed to load reps"} (HTTP ${repsRes.status})`)
         return
       }
       setReps(repsJson.reps)
       setStats({
-        unassignedCount: statsJson.total ?? 0,
+        unassignedCount: 0,
         eligibleCount:   repsJson.reps.filter(r => r.inboundEligible).length,
       })
-    } catch {
-      setError("Network error")
+
+      // Secondary fetch — unassigned queue count; failure shows 0, doesn't block reps
+      try {
+        const statsRes  = await fetch("/api/super-admin/crm/prospects?isUnassigned=true&isRegistered=true&limit=1")
+        const statsJson = await statsRes.json() as { total?: number }
+        setStats(prev => prev ? { ...prev, unassignedCount: statsJson.total ?? 0 } : prev)
+      } catch {
+        // non-fatal — reps are shown; queue count stays 0
+      }
+    } catch (err) {
+      setError(`Network error: ${err instanceof Error ? err.message : String(err)}`)
     } finally {
       setLoading(false)
     }
@@ -74,7 +86,11 @@ export default function InboundAssignmentPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ updates: [{ id: repId, inboundEligible: !currentValue }] }),
       })
-      if (!res.ok) return
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({})) as { error?: string }
+        setError(j.error ?? `Save failed (HTTP ${res.status})`)
+        return
+      }
       setReps(prev => prev.map(r =>
         r.id === repId ? { ...r, inboundEligible: !currentValue } : r
       ))
@@ -82,6 +98,8 @@ export default function InboundAssignmentPage() {
         ...prev,
         eligibleCount: prev.eligibleCount + (currentValue ? -1 : 1),
       } : prev)
+    } catch (err) {
+      setError(`Save failed: ${err instanceof Error ? err.message : String(err)}`)
     } finally {
       setSaving(null)
     }

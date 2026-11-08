@@ -11,22 +11,27 @@ async function requireSA() {
 export async function GET() {
   if (!await requireSA()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const reps = await prisma.salesUser.findMany({
-    where: { isDemo: false },
-    orderBy: { name: "asc" },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      isActive: true,
-      employmentStatus: true,
-      inboundEligible: true,
-      inboundLastAssignedAt: true,
-    },
-  })
-
-  return NextResponse.json({ reps })
+  try {
+    const reps = await prisma.salesUser.findMany({
+      where: { isDemo: false },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        employmentStatus: true,
+        inboundEligible: true,
+        inboundLastAssignedAt: true,
+      },
+    })
+    return NextResponse.json({ reps })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error("[inbound-assignment GET]", msg)
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
 }
 
 // PATCH — update inboundEligible for one or more sales reps
@@ -44,14 +49,20 @@ export async function PATCH(request: NextRequest) {
 
   const results: Array<{ id: string; inboundEligible: boolean }> = []
 
-  for (const update of body.updates) {
-    if (typeof update.id !== "string" || typeof update.inboundEligible !== "boolean") continue
-    const rep = await prisma.salesUser.update({
-      where: { id: update.id },
-      data: { inboundEligible: update.inboundEligible },
-      select: { id: true, inboundEligible: true },
-    })
-    results.push(rep)
+  try {
+    for (const update of body.updates) {
+      if (typeof update.id !== "string" || typeof update.inboundEligible !== "boolean") continue
+      const rep = await prisma.salesUser.update({
+        where: { id: update.id },
+        data: { inboundEligible: update.inboundEligible },
+        select: { id: true, inboundEligible: true },
+      })
+      results.push(rep)
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error("[inbound-assignment PATCH]", msg)
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 
   return NextResponse.json({ updated: results })

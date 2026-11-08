@@ -100,14 +100,19 @@ export async function POST(request: NextRequest) {
 
     logActivationEvent(org.id, "org_created").catch(() => {})
 
-    // Async CRM sync — non-blocking; registration succeeds regardless
-    syncRegistrationToCrm({
-      orgId:      org.id,
-      orgName:    orgName!,
-      adminEmail: user.email,
-      adminName:  user.name,
-      source:     referrerOrg ? "referral" : (source ?? "website_self_service"),
-    }).catch(console.error)
+    // CRM sync — awaited so it completes before the serverless function exits;
+    // caught so a CRM failure never blocks a successful registration
+    try {
+      await syncRegistrationToCrm({
+        orgId:      org.id,
+        orgName:    orgName!,
+        adminEmail: user.email,
+        adminName:  user.name,
+        source:     referrerOrg ? "referral" : (source ?? "website_self_service"),
+      })
+    } catch (err) {
+      console.error("[CRM sync] Failed for org", org.id, err)
+    }
 
     return NextResponse.json({ success: true })
   } catch {

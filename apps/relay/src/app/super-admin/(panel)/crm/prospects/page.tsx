@@ -63,14 +63,30 @@ function relativeDate(date: Date | null | undefined): string {
 
 type SearchParams = { [key: string]: string | string[] | undefined }
 
+const ONBOARDING_LABELS: Record<string, string> = {
+  not_started: "Not Started",
+  in_progress: "In Progress",
+  completed:   "Completed",
+  stalled:     "Stalled",
+}
+
+const ONBOARDING_COLORS: Record<string, string> = {
+  not_started: "bg-gray-700/60 text-gray-300 border-gray-600",
+  in_progress: "bg-blue-900/50 text-blue-300 border-blue-700",
+  completed:   "bg-green-900/50 text-green-300 border-green-700",
+  stalled:     "bg-orange-900/50 text-orange-300 border-orange-700",
+}
+
 export default async function ProspectsPage({ searchParams }: { searchParams: SearchParams }) {
   const session = await getSession()
   if (!session?.superAdmin) redirect("/super-admin/login")
 
-  const search   = typeof searchParams.search   === "string" ? searchParams.search.trim()   : ""
-  const industry = typeof searchParams.industry === "string" ? searchParams.industry.trim() : ""
-  const status   = typeof searchParams.status   === "string" ? searchParams.status.trim()   : ""
-  const score    = typeof searchParams.score    === "string" ? searchParams.score.trim()    : ""
+  const search          = typeof searchParams.search          === "string" ? searchParams.search.trim()          : ""
+  const industry        = typeof searchParams.industry        === "string" ? searchParams.industry.trim()        : ""
+  const status          = typeof searchParams.status          === "string" ? searchParams.status.trim()          : ""
+  const score           = typeof searchParams.score           === "string" ? searchParams.score.trim()           : ""
+  const isRegistered    = typeof searchParams.isRegistered    === "string" ? searchParams.isRegistered            : ""
+  const onboardingStatus = typeof searchParams.onboarding    === "string" ? searchParams.onboarding              : ""
 
   // Build where clause from filters
   const scoreFilter =
@@ -81,10 +97,14 @@ export default async function ProspectsPage({ searchParams }: { searchParams: Se
 
   const prospects = await prisma.prospect.findMany({
     where: {
+      isTestRecord: false,
       ...(search   ? { companyName:      { contains: search, mode: "insensitive" as const } } : {}),
       ...(industry ? { industry }                                                              : {}),
       ...(status   ? { currentCrmStatus: status as ProspectCrmStatus }                        : {}),
       ...(scoreFilter ? { aiFitScore: scoreFilter }                                           : {}),
+      ...(isRegistered === "true"  ? { relayOrganizationId: { not: null } }  : {}),
+      ...(isRegistered === "false" ? { relayOrganizationId: null }           : {}),
+      ...(onboardingStatus ? { onboardingStatus }                            : {}),
     },
     include: { contacts: { take: 1 } },
     orderBy: { aiFitScore: "desc" },
@@ -104,7 +124,7 @@ export default async function ProspectsPage({ searchParams }: { searchParams: Se
     ? Math.round(avgFitRaw._avg.aiFitScore)
     : null
 
-  const hasFilters = !!(search || industry || status || score)
+  const hasFilters = !!(search || industry || status || score || isRegistered || onboardingStatus)
 
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-[1600px]">
@@ -222,6 +242,36 @@ export default async function ProspectsPage({ searchParams }: { searchParams: Se
           </select>
         </div>
 
+        {/* Registration */}
+        <div className="min-w-[160px]">
+          <label className="block text-xs text-gray-500 mb-1.5 font-medium">Registration</label>
+          <select
+            name="isRegistered"
+            defaultValue={isRegistered}
+            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40"
+          >
+            <option value="">All prospects</option>
+            <option value="true">Registered customers</option>
+            <option value="false">Prospects only</option>
+          </select>
+        </div>
+
+        {/* Onboarding */}
+        <div className="min-w-[160px]">
+          <label className="block text-xs text-gray-500 mb-1.5 font-medium">Onboarding</label>
+          <select
+            name="onboarding"
+            defaultValue={onboardingStatus}
+            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40"
+          >
+            <option value="">All statuses</option>
+            <option value="not_started">Not Started</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="stalled">Stalled</option>
+          </select>
+        </div>
+
         <div className="flex gap-2 pb-0.5">
           <button
             type="submit"
@@ -281,12 +331,24 @@ export default async function ProspectsPage({ searchParams }: { searchParams: Se
                       {/* Company */}
                       <td className="px-4 py-3">
                         <div className="flex flex-col gap-0.5">
-                          <Link
-                            href={`/super-admin/crm/prospects/${p.id}`}
-                            className="font-medium text-white group-hover:text-indigo-300 transition-colors leading-snug"
-                          >
-                            {p.companyName}
-                          </Link>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Link
+                              href={`/super-admin/crm/prospects/${p.id}`}
+                              className="font-medium text-white group-hover:text-indigo-300 transition-colors leading-snug"
+                            >
+                              {p.companyName}
+                            </Link>
+                            {p.relayOrganizationId && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-900/50 text-green-300 border border-green-800 font-medium whitespace-nowrap">
+                                Customer
+                              </span>
+                            )}
+                            {p.duplicateFlag && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/50 text-yellow-400 border border-yellow-800 font-medium whitespace-nowrap">
+                                Review
+                              </span>
+                            )}
+                          </div>
                           {p.website && (
                             <a
                               href={p.website.startsWith("http") ? p.website : `https://${p.website}`}
@@ -297,6 +359,11 @@ export default async function ProspectsPage({ searchParams }: { searchParams: Se
                               <Globe className="w-3 h-3" />
                               {p.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
                             </a>
+                          )}
+                          {p.onboardingStatus && (
+                            <span className={`inline-flex self-start text-[10px] px-1.5 py-0.5 rounded border font-medium ${ONBOARDING_COLORS[p.onboardingStatus] ?? "bg-gray-800 text-gray-400 border-gray-700"}`}>
+                              {ONBOARDING_LABELS[p.onboardingStatus] ?? p.onboardingStatus}
+                            </span>
                           )}
                         </div>
                       </td>

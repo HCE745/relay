@@ -15,10 +15,11 @@ import type { OnboardingStatus } from "./registration-crm-sync-pure"
 
 // ── Match result types ────────────────────────────────────────────────────────
 type MatchResult =
-  | { kind: "exact"; prospectId: string }
-  | { kind: "domain"; prospectId: string }
-  | { kind: "contact"; prospectId: string }
-  | { kind: "name"; prospectId: string }
+  | { kind: "exact";     prospectId: string }
+  | { kind: "domain";    prospectId: string }
+  | { kind: "contact";   prospectId: string }
+  | { kind: "name";      prospectId: string }
+  | { kind: "ambiguous" }  // multiple candidates — flag for manual review
   | { kind: "none" }
 
 // ── Core matching logic ───────────────────────────────────────────────────────
@@ -34,10 +35,10 @@ async function matchProspect(params: {
 
   // 1. Business email domain match (skip public providers)
   if (domain && !isPublicEmailDomain(domain)) {
-    const hit = await prisma.prospect.findFirst({
+    const hits = await prisma.prospect.findMany({
       where: {
         ...baseWhere,
-        relayOrganizationId: null, // not yet linked to any org
+        relayOrganizationId: null,
         OR: [
           { website: { contains: domain, mode: "insensitive" } },
           {
@@ -49,7 +50,8 @@ async function matchProspect(params: {
       },
       select: { id: true },
     })
-    if (hit) return { kind: "domain", prospectId: hit.id }
+    if (hits.length === 1) return { kind: "domain", prospectId: hits[0].id }
+    if (hits.length > 1)  return { kind: "ambiguous" }
   }
 
   // 2. Contact email exact match
@@ -70,11 +72,9 @@ async function matchProspect(params: {
       where: { ...baseWhere, relayOrganizationId: null },
       select: { id: true, companyName: true },
     })
-    for (const c of candidates) {
-      if (normalizeCompanyName(c.companyName) === normalizedInput) {
-        return { kind: "name", prospectId: c.id }
-      }
-    }
+    const nameMatches = candidates.filter(c => normalizeCompanyName(c.companyName) === normalizedInput)
+    if (nameMatches.length === 1) return { kind: "name", prospectId: nameMatches[0].id }
+    if (nameMatches.length > 1)  return { kind: "ambiguous" }
   }
 
   return { kind: "none" }
@@ -115,6 +115,25 @@ export async function assignInboundRep(): Promise<{ id: string; name: string; em
     },
     { isolationLevel: "Serializable" },
   )
+}
+
+// ── Notify admins about ambiguous company match ───────────────────────────────
+async function notifyAmbiguousMatch(orgName: string, prospectId: string): Promise<void> {
+  const admins = await prisma.salesUser.findMany({
+    where: { role: "admin_sales", isActive: true },
+    select: { id: true },
+  })
+  if (admins.length === 0) return
+  await prisma.salesAlert.createMany({
+    data: admins.map((a) => ({
+      recipientId: a.id,
+      type: "ambiguous_company_match",
+      title: "Ambiguous Company Match on Registration",
+      message: `"${orgName}" registered but matched multiple existing CRM prospects. A new record was created with duplicateFlag=true. Manual review and merge required.`,
+      relatedId: prospectId,
+    })),
+    skipDuplicates: true,
+  })
 }
 
 // ── Notify admins about unassigned inbound ────────────────────────────────────
@@ -161,6 +180,15 @@ export async function syncRegistrationToCrm(params: {
   const crmSource = source === "referral" ? ("referral" as const) : ("inbound" as const)
 
   const matchResult = await matchProspect({ adminEmail, orgName, domain })
+
+  if (matchResult.kind === "ambiguous") {
+    // ── Multiple prospects match — flag new record for manual review ──────────
+    await createNewProspect({
+      orgId, orgName, adminEmail, adminName, domain, crmSource, now,
+      duplicateFlag: true,
+    })
+    return
+  }
 
   if (matchResult.kind !== "none") {
     // ── Matched an existing prospect ──────────────────────────────────────────
@@ -222,7 +250,8 @@ export async function syncRegistrationToCrm(params: {
   }
 }
 
-// ── Create a new prospect for an unmatched registration ───────────────────────
+
+// ── Create a new prospect for an unmatched or ambiguous registration ──────────
 async function createNewProspect(params: {
   orgId: string
   orgName: string
@@ -231,11 +260,12 @@ async function createNewProspect(params: {
   domain: string | null
   crmSource: "inbound" | "referral"
   now: Date
+  duplicateFlag?: boolean
 }): Promise<void> {
-  const { orgId, orgName, adminEmail, adminName, domain, crmSource, now } = params
+  const { orgId, orgName, adminEmail, adminName, domain, crmSource, now, duplicateFlag = false } = params
 
-  // Assign round-robin rep
-  const rep = await assignInboundRep()
+  // Assign round-robin rep (skipped when flagged for review)
+  const rep = duplicateFlag ? null : await assignInboundRep()
 
   const prospect = await prisma.prospect.create({
     data: {
@@ -249,6 +279,7 @@ async function createNewProspect(params: {
       onboardingLastActivityAt: now,
       assignedToId: rep?.id ?? null,
       assignedToName: rep?.name ?? null,
+      duplicateFlag,
     },
   })
 
@@ -269,15 +300,19 @@ async function createNewProspect(params: {
     },
   })
 
+  const activityNotes = duplicateFlag
+    ? `${adminName} (${adminEmail}) registered "${orgName}". Multiple CRM prospects matched — flagged for manual review.`
+    : rep
+    ? `${adminName} (${adminEmail}) registered "${orgName}" via self-service. Assigned to ${rep.name}.`
+    : `${adminName} (${adminEmail}) registered "${orgName}" via self-service. No eligible rep — placed in unassigned queue.`
+
   // Activity timeline entry
   await prisma.salesCrmActivity.create({
     data: {
       prospectId: prospect.id,
       activityType: "STATUS_CHANGED",
-      subject: "Customer Registered",
-      notes: rep
-        ? `${adminName} (${adminEmail}) registered "${orgName}" via self-service. Assigned to ${rep.name}.`
-        : `${adminName} (${adminEmail}) registered "${orgName}" via self-service. No eligible rep — placed in unassigned queue.`,
+      subject: duplicateFlag ? "Customer Registered — Duplicate Flag" : "Customer Registered",
+      notes: activityNotes,
       occurredAt: now,
     },
   })
@@ -287,15 +322,19 @@ async function createNewProspect(params: {
     data: {
       organizationId: orgId,
       eventType: "customer_registered",
-      description: rep
+      description: duplicateFlag
+        ? `Customer registered. Ambiguous company match — new record created and flagged for review.`
+        : rep
         ? `Customer registered via ${crmSource}. New CRM prospect created and assigned to ${rep.name}.`
         : `Customer registered via ${crmSource}. New CRM prospect created. No eligible rep — unassigned.`,
       createdBySAName: "System",
     },
   })
 
-  // Alert admins if no rep
-  if (!rep) {
+  // Alert admins if ambiguous match or no rep
+  if (duplicateFlag) {
+    await notifyAmbiguousMatch(orgName, prospect.id).catch(console.error)
+  } else if (!rep) {
     await notifyUnassignedInbound(orgName, prospect.id).catch(console.error)
   }
 }

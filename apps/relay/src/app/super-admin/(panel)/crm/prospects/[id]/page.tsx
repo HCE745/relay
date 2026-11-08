@@ -69,6 +69,12 @@ interface Prospect {
   lastReplyDate: string | null
   pipelineStage: string | null
   duplicateFlag: boolean
+  // Registration & onboarding fields
+  relayOrganizationId: string | null
+  registeredAt: string | null
+  onboardingStatus: string | null
+  onboardingLastActivityAt: string | null
+  isTestRecord: boolean
   createdAt: string
   updatedAt: string
   contacts: ProspectContact[]
@@ -923,6 +929,68 @@ export default function ProspectDetailPage() {
           {prospect.assignedToName && (
             <SectionCard title="Assigned To">
               <p className="text-sm text-gray-300">{prospect.assignedToName}</p>
+            </SectionCard>
+          )}
+
+          {/* Registration & Onboarding */}
+          {prospect.relayOrganizationId && (
+            <SectionCard title="Registration & Onboarding">
+              <div className="space-y-3">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs text-gray-600">Registered</span>
+                  <span className="text-sm text-gray-300">{fmtDate(prospect.registeredAt)}</span>
+                </div>
+
+                {prospect.onboardingStatus && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-gray-600">Onboarding Status</span>
+                    <span className={`inline-flex self-start items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                      prospect.onboardingStatus === "completed"   ? "bg-green-900/50 text-green-300 border-green-800" :
+                      prospect.onboardingStatus === "in_progress" ? "bg-blue-900/50 text-blue-300 border-blue-800" :
+                      prospect.onboardingStatus === "stalled"     ? "bg-orange-900/50 text-orange-300 border-orange-800" :
+                      "bg-gray-800 text-gray-400 border-gray-700"
+                    }`}>
+                      {{
+                        not_started: "Not Started",
+                        in_progress: "In Progress",
+                        completed:   "Completed",
+                        stalled:     "Stalled",
+                      }[prospect.onboardingStatus] ?? prospect.onboardingStatus}
+                    </span>
+                  </div>
+                )}
+
+                {prospect.onboardingLastActivityAt && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-gray-600">Last Onboarding Activity</span>
+                    <span className="text-sm text-gray-300">{fmtDate(prospect.onboardingLastActivityAt)}</span>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs text-gray-600">Org ID</span>
+                  <Link
+                    href={`/super-admin/organizations/${prospect.relayOrganizationId}`}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 font-mono break-all leading-snug"
+                  >
+                    {prospect.relayOrganizationId}
+                  </Link>
+                </div>
+
+                {prospect.isTestRecord && (
+                  <div className="mt-1 px-2 py-1 rounded bg-yellow-900/30 border border-yellow-800 text-xs text-yellow-400">
+                    Test record
+                  </div>
+                )}
+              </div>
+            </SectionCard>
+          )}
+
+          {prospect.duplicateFlag && (
+            <SectionCard title="Review Required">
+              <p className="text-xs text-yellow-400 leading-relaxed">
+                Multiple existing CRM records matched this registration. Manual review and merge required before treating this as the canonical record.
+              </p>
             </SectionCard>
           )}
         </div>

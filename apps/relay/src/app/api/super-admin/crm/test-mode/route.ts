@@ -96,22 +96,42 @@ export async function POST(request: NextRequest) {
     data: { organizationId: org.id },
   })
 
-  // Impersonate the test user so the super admin can test the flow immediately
+  // Create an impersonation log so the SA can exit back via /api/super-admin/exit-impersonation
+  const log = await prisma.impersonationLog.create({
+    data: {
+      superAdminId:   sa.superAdminId!,
+      superAdminName: sa.name,
+      organizationId: org.id,
+      orgName:        org.name,
+      targetUserId:   user.id,
+      targetUserName: user.name,
+    },
+  })
+
+  // Enter as the test admin; impersonatedBy lets exit-impersonation restore the SA session
   await createSession({
-    userId:         user.id,
-    email:          user.email,
-    name:           user.name,
-    role:           user.role,
-    organizationId: org.id,
+    userId:              user.id,
+    email:               user.email,
+    name:                user.name,
+    role:                user.role,
+    organizationId:      org.id,
+    onboardingCompleted: false,
+    superAdmin:          false,
+    superAdminId:        sa.superAdminId,
+    impersonatedBy:      sa.superAdminId,
+    impersonatedByName:  sa.name,
+    impersonatedOrgName: org.name,
+    impersonationLogId:  log.id,
   })
 
   return NextResponse.json({
-    message: "Test organization created. You are now logged in as the test admin.",
+    message: "Test organization created. You are now in a test session. Visit /api/super-admin/exit-impersonation to return to your SA session.",
     testOrgId: org.id,
     testProspectId: prospect.id,
     testUserEmail: adminEmail,
     testPassword: adminPassword,
     onboardingUrl: `/onboarding`,
+    exitUrl: `/api/super-admin/exit-impersonation`,
     cleanupUrl: `/api/super-admin/crm/test-mode?orgId=${org.id}`,
   })
 }

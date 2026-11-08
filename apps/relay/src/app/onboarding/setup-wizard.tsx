@@ -13,6 +13,8 @@ import { EMPLOYEE_TYPE_PRESETS, type EmployeeTypePreset } from "@/lib/employee-t
 import { CONFIGURABLE_PAGES, CONFIGURABLE_ACTIONS, type PageKey, type ActionKey } from "@/lib/page-access"
 import { INDUSTRY_LABELS, getTemplate } from "@/lib/industry-templates"
 import { PLANS } from "@/lib/pricing"
+import { AiPanel } from "@/components/onboarding/AiPanel"
+import { useOnboardingSession } from "@/hooks/useOnboardingSession"
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -343,9 +345,13 @@ function Step2({
 function Step3({
   data,
   set,
+  sessionId,
+  onConfigApplied,
 }: {
   data: WizardData
   set: <K extends keyof WizardData>(k: K, v: WizardData[K]) => void
+  sessionId?: string
+  onConfigApplied?: () => void
 }) {
   function updateLoc(id: string, field: keyof Omit<LocationEntry, "id">, value: string) {
     set(
@@ -436,6 +442,8 @@ function Step3({
         <Plus className="w-4 h-4" />
         Add another location
       </button>
+
+      <AiPanel stage={3} sessionId={sessionId} onConfigApplied={onConfigApplied} />
     </div>
   )
 }
@@ -1206,6 +1214,9 @@ export function SetupWizard({
   }))
   const [hydrated, setHydrated] = useState(false)
 
+  // Server-side session — provides cross-device resume and AI session ID
+  const { session: serverSession, updateSession: updateServerSession } = useOnboardingSession()
+
   // Load persisted progress from localStorage (initialIndustry wins if localStorage has none)
   useEffect(() => {
     try {
@@ -1228,13 +1239,15 @@ export function SetupWizard({
     setHydrated(true)
   }, [userId, initialIndustry, initialPlan])
 
-  // Persist progress on every change
+  // Persist progress on every change — both localStorage and server
   const persist = useCallback(() => {
     if (!hydrated) return
     try {
       localStorage.setItem(storageKey(userId), JSON.stringify({ ...data, __step: step }))
     } catch { /* ignore */ }
-  }, [hydrated, userId, data, step])
+    // Async server sync — non-blocking, non-critical
+    updateServerSession({ currentStage: step }).catch(() => {/* ignore */})
+  }, [hydrated, userId, data, step, updateServerSession])
 
   useEffect(() => { persist() }, [persist])
 
@@ -1284,6 +1297,8 @@ export function SetupWizard({
         return
       }
       localStorage.removeItem(storageKey(userId))
+      // Mark server session as completed
+      updateServerSession({ draftOps: [] }).catch(() => {/* ignore */})
       setStep(6)
     } catch {
       setError("Network error. Please try again.")
@@ -1360,7 +1375,14 @@ export function SetupWizard({
 
         {step === 1 && <Step1 data={data} set={set} />}
         {step === 2 && <Step2 data={data} set={set} />}
-        {step === 3 && <Step3 data={data} set={set} />}
+        {step === 3 && (
+          <Step3
+            data={data}
+            set={set}
+            sessionId={serverSession?.id}
+            onConfigApplied={() => {/* AI applied config — wizard state reflects form; server session updated by apply route */}}
+          />
+        )}
         {step === 4 && <Step4 data={data} set={set} onGoNext={goNext} onGoBack={goBack} />}
         {step === 5 && (
           <Step5

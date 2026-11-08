@@ -112,7 +112,13 @@ export async function POST(request: NextRequest) {
       if (mapped?.dept) deptNames.add(mapped.dept)
     }
     for (const name of deptNames) {
-      const existing = await tx.department.findFirst({ where: { organizationId: orgId, name } })
+      // Check for name+locationId combination — AI-created departments carry a locationId;
+      // onboarding-wizard departments are org-wide (null locationId).
+      // Matching on (organizationId, name, locationId: null) prevents false-positive
+      // duplicate detection when the same dept name exists scoped to different locations.
+      const existing = await tx.department.findFirst({
+        where: { organizationId: orgId, name, locationId: null },
+      })
       if (!existing) {
         await tx.department.create({ data: { organizationId: orgId, name } })
       }

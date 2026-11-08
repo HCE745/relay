@@ -223,6 +223,8 @@ model Organization {
   dashboardLayouts        DashboardLayout[]
   dashboardReports        DashboardReport[]
   dashboardAlerts         DashboardAlert[]
+  onboardingSession       OnboardingSession?
+  configurationAuditLogs  ConfigurationAuditLog[]
 }
 
 model CustomView {
@@ -3615,4 +3617,41 @@ model SalesGoal {
   @@index([salesUserId])
   @@index([period])
   @@index([startDate, endDate])
+}
+
+// ── AI-Assisted Onboarding ─────────────────────────────────────────────────────
+
+model OnboardingSession {
+  id             String    @id @default(cuid())
+  organizationId String    @unique
+  currentStage   Int       @default(1)
+  stageData      Json      @default("{}")
+  skippedStages  Int[]     @default([])
+  draftOps       Json      @default("[]")
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model ConfigurationAuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  actorId        String
+  source         String
+  operationType  String
+  idempotencyKey String?
+  targetModel    String?
+  targetId       String?
+  before         Json?
+  after          Json?
+  batchId        String?
+  sessionId      String?
+  appliedAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, appliedAt(sort: Desc)])
+  @@index([batchId])
 }

@@ -7,6 +7,7 @@ import { checkLimit, getIP, limiters } from "@/lib/ratelimit"
 import { generateUniqueReferralCode, buildReferralLink, getActiveReferralProgram } from "@/lib/billing-credits-engine"
 import { logActivationEvent } from "@/lib/analytics"
 import { syncRegistrationToCrm } from "@/lib/registration-crm-sync"
+import { verifyTestRegToken, TEST_REG_COOKIE } from "@/lib/test-registration-token"
 
 export async function POST(request: NextRequest) {
   const blocked = await checkLimit(
@@ -26,6 +27,12 @@ export async function POST(request: NextRequest) {
     if (!name || !email || !password || !orgName) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 })
     }
+
+    // Server-side detection of authorized test registrations via HMAC-signed HttpOnly cookie.
+    // The SA generates this token from /api/super-admin/crm/test-mode/registration-token.
+    // A plain query param or client-side flag would be trivially forged; this is not.
+    const testToken = request.cookies.get(TEST_REG_COOKIE)?.value
+    const isTestRegistration = verifyTestRegToken(testToken)
 
     const existing = await prisma.user.findUnique({ where: { email } })
     if (existing) {
@@ -60,7 +67,15 @@ export async function POST(request: NextRequest) {
 
     const [org, user] = await prisma.$transaction(async (tx) => {
       const newOrg = await tx.organization.create({
-        data: { name: orgName, slug, referralCode, referralLink },
+        data: {
+          name: orgName,
+          slug,
+          referralCode,
+          referralLink,
+          // Test registrations are isolated: they never enter live round-robin,
+          // customer reporting, or real sales follow-ups.
+          ...(isTestRegistration ? { isDemo: true } : {}),
+        },
       })
       const newUser = await tx.user.create({
         data: { name, email, password: hashedPassword, role: "ADMIN", organizationId: newOrg.id },
@@ -92,29 +107,44 @@ export async function POST(request: NextRequest) {
     })
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.getrelay.software"
-    sendEmail({
-      to:      user.email,
-      subject: "Welcome to Relay — Let's get you set up",
-      html:    welcomeEmail({ name: user.name, orgName, setupUrl: `${appUrl}/onboarding` }),
-    }).catch(console.error)
 
-    logActivationEvent(org.id, "org_created").catch(() => {})
+    // Test registrations skip welcome emails, CRM sync, and analytics to stay isolated
+    if (!isTestRegistration) {
+      sendEmail({
+        to:      user.email,
+        subject: "Welcome to Relay — Let's get you set up",
+        html:    welcomeEmail({ name: user.name, orgName, setupUrl: `${appUrl}/onboarding` }),
+      }).catch(console.error)
 
-    // CRM sync — awaited so it completes before the serverless function exits;
-    // caught so a CRM failure never blocks a successful registration
-    try {
-      await syncRegistrationToCrm({
-        orgId:      org.id,
-        orgName:    orgName!,
-        adminEmail: user.email,
-        adminName:  user.name,
-        source:     referrerOrg ? "referral" : (source ?? "website_self_service"),
-      })
-    } catch (err) {
-      console.error("[CRM sync] Failed for org", org.id, err)
+      logActivationEvent(org.id, "org_created").catch(() => {})
+
+      try {
+        await syncRegistrationToCrm({
+          orgId:      org.id,
+          orgName:    orgName!,
+          adminEmail: user.email,
+          adminName:  user.name,
+          source:     referrerOrg ? "referral" : (source ?? "website_self_service"),
+        })
+      } catch (err) {
+        console.error("[CRM sync] Failed for org", org.id, err)
+      }
     }
 
-    return NextResponse.json({ success: true })
+    const response = NextResponse.json({ success: true })
+
+    // Consume the test token so it cannot be reused
+    if (isTestRegistration) {
+      response.cookies.set(TEST_REG_COOKIE, "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0,
+      })
+    }
+
+    return response
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }

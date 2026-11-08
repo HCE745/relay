@@ -21,6 +21,60 @@ export async function POST(request: NextRequest) {
     adminName?: string
     adminEmail?: string
     adminPassword?: string
+    resumeOrgId?: string
+  }
+
+  const resumeOrgId   = typeof body.resumeOrgId === "string" ? body.resumeOrgId.trim() : ""
+
+  // Resume mode: re-enter an existing test org without creating a new one
+  if (resumeOrgId) {
+    const org = await prisma.organization.findUnique({
+      where: { id: resumeOrgId },
+      select: { id: true, name: true, isDemo: true, users: { select: { id: true, name: true, email: true, role: true }, take: 1 } },
+    })
+    if (!org) return NextResponse.json({ error: "Organization not found" }, { status: 404 })
+    if (!org.isDemo) return NextResponse.json({ error: "Only test organizations can be resumed here" }, { status: 403 })
+
+    const user = org.users[0]
+    if (!user) return NextResponse.json({ error: "No users found in test org" }, { status: 404 })
+
+    const log = await prisma.impersonationLog.create({
+      data: {
+        superAdminId:   sa.superAdminId!,
+        superAdminName: sa.name,
+        organizationId: org.id,
+        orgName:        org.name,
+        targetUserId:   user.id,
+        targetUserName: user.name,
+      },
+    })
+
+    const onboardingSession = await prisma.onboardingSession.findUnique({
+      where: { organizationId: org.id },
+      select: { completedAt: true },
+    })
+
+    await createSession({
+      userId:              user.id,
+      email:               user.email,
+      name:                user.name,
+      role:                user.role,
+      organizationId:      org.id,
+      onboardingCompleted: !!onboardingSession?.completedAt,
+      superAdmin:          false,
+      superAdminId:        sa.superAdminId,
+      impersonatedBy:      sa.superAdminId,
+      impersonatedByName:  sa.name,
+      impersonatedOrgName: org.name,
+      impersonationLogId:  log.id,
+    })
+
+    return NextResponse.json({
+      message: "Re-entered test org session. Visit /onboarding or /dashboard to continue.",
+      testOrgId: org.id,
+      onboardingUrl: onboardingSession?.completedAt ? "/dashboard" : "/onboarding",
+      exitUrl: `/api/super-admin/exit-impersonation`,
+    })
   }
 
   const companyName   = typeof body.companyName  === "string" ? body.companyName.trim()  : ""

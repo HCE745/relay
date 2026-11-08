@@ -3,6 +3,7 @@ import { randomUUID } from "crypto"
 import { getSession, createSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { sendEmail } from "@/lib/email"
+import { updateOnboardingStatusInCrm, resolveOnboardingFollowUps } from "@/lib/registration-crm-sync"
 
 function inviteHtml(orgName: string, inviteUrl: string, inviteeName?: string): string {
   return `
@@ -231,6 +232,10 @@ export async function POST(request: NextRequest) {
   for (const mail of pendingEmails) {
     await sendEmail(mail).catch(() => {})
   }
+
+  // Async CRM updates — non-blocking
+  updateOnboardingStatusInCrm(orgId, "completed").catch(console.error)
+  resolveOnboardingFollowUps(orgId).catch(console.error)
 
   // ── Refresh session ───────────────────────────────────────────────────────
   await createSession({

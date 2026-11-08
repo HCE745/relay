@@ -225,6 +225,7 @@ model Organization {
   dashboardAlerts         DashboardAlert[]
   onboardingSession       OnboardingSession?
   configurationAuditLogs  ConfigurationAuditLog[]
+  crmProspectId           String?                  @unique // CRM Prospect linked at registration
 }
 
 model CustomView {
@@ -2586,6 +2587,13 @@ model Prospect {
   assignedToId    String?
   productInterest String?
 
+  // Registration + onboarding tracking
+  relayOrganizationId      String?   @unique // linked Relay org after registration
+  registeredAt             DateTime?           // when the customer registered
+  onboardingStatus         String?             // "not_started"|"in_progress"|"completed"|"stalled"
+  onboardingLastActivityAt DateTime?           // last onboarding activity timestamp
+  isTestRecord             Boolean   @default(false) // internal test; excluded from reporting
+
   contacts        ProspectContact[]
   notes           ProspectNote[]
   linkClicks      LinkClick[]
@@ -2603,6 +2611,10 @@ model Prospect {
   @@index([industry])
   @@index([companyName])
   @@index([assignedToId])
+  @@index([relayOrganizationId])
+  @@index([onboardingStatus])
+  @@index([registeredAt])
+  @@index([isTestRecord])
 }
 
 model ProspectContact {
@@ -2747,6 +2759,9 @@ model SalesUser {
   role             String    @default("admin_sales") // "admin_sales" | "sales_rep"
   isActive         Boolean   @default(true)
   isDemo           Boolean   @default(false)
+  // Inbound round-robin eligibility
+  inboundEligible       Boolean   @default(false)  // must be true to receive inbound signups
+  inboundLastAssignedAt DateTime?                  // tracks round-robin position
   invitePending    Boolean   @default(false)
   // Commission fields
   employmentStatus String    @default("ACTIVE")     // ACTIVE | INACTIVE

@@ -24,7 +24,19 @@ export async function GET(req: NextRequest) {
   const page = parseInt(searchParams.get("page") ?? "1", 10)
   const limit = parseInt(searchParams.get("limit") ?? "50", 10)
 
+  // New filters for registered / onboarding tracking
+  const onboardingStatus = searchParams.get("onboardingStatus")  // "not_started"|"in_progress"|"completed"|"stalled"
+  const isRegistered     = searchParams.get("isRegistered")       // "true" = has relayOrganizationId
+  const isUnassigned     = searchParams.get("isUnassigned")       // "true" = no assignedToId + is registered
+  const sourceFilter     = searchParams.get("source") as ProspectSource | null
+  const hideTest         = searchParams.get("includeTest") !== "true" // exclude test records by default
+
   const where: Prisma.ProspectWhereInput = {}
+
+  // Always exclude test records from normal views unless explicitly included
+  if (hideTest) {
+    where.isTestRecord = false
+  }
 
   if (status) {
     where.currentCrmStatus = status
@@ -44,6 +56,23 @@ export async function GET(req: NextRequest) {
     where.contacts = { some: {} }
   }
 
+  if (onboardingStatus) {
+    where.onboardingStatus = onboardingStatus
+  }
+
+  if (isRegistered === "true") {
+    where.relayOrganizationId = { not: null }
+  }
+
+  if (isUnassigned === "true") {
+    where.relayOrganizationId = { not: null }
+    where.assignedToId = null
+  }
+
+  if (sourceFilter) {
+    where.source = sourceFilter
+  }
+
   if (search) {
     where.OR = [
       { companyName: { contains: search, mode: "insensitive" } },
@@ -55,6 +84,8 @@ export async function GET(req: NextRequest) {
   const orderByField =
     sortBy === "lastOutreachDate"
       ? "lastOutreachDate"
+      : sortBy === "registeredAt"
+      ? "registeredAt"
       : sortBy === "createdAt"
       ? "createdAt"
       : "aiFitScore"

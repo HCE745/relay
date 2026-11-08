@@ -6,6 +6,7 @@ import { sendEmail, welcomeEmail } from "@/lib/email"
 import { checkLimit, getIP, limiters } from "@/lib/ratelimit"
 import { generateUniqueReferralCode, buildReferralLink, getActiveReferralProgram } from "@/lib/billing-credits-engine"
 import { logActivationEvent } from "@/lib/analytics"
+import { syncRegistrationToCrm } from "@/lib/registration-crm-sync"
 
 export async function POST(request: NextRequest) {
   const blocked = await checkLimit(
@@ -98,6 +99,15 @@ export async function POST(request: NextRequest) {
     }).catch(console.error)
 
     logActivationEvent(org.id, "org_created").catch(() => {})
+
+    // Async CRM sync — non-blocking; registration succeeds regardless
+    syncRegistrationToCrm({
+      orgId:      org.id,
+      orgName:    orgName!,
+      adminEmail: user.email,
+      adminName:  user.name,
+      source:     referrerOrg ? "referral" : (source ?? "website_self_service"),
+    }).catch(console.error)
 
     return NextResponse.json({ success: true })
   } catch {

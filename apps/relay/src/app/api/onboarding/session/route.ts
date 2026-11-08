@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import type { InputJsonValue } from "@prisma/client/runtime/client"
+import { updateOnboardingStatusInCrm } from "@/lib/registration-crm-sync"
 
 const toJson = (v: unknown): InputJsonValue => JSON.parse(JSON.stringify(v ?? null)) as InputJsonValue
 
@@ -57,6 +58,11 @@ export async function PATCH(request: NextRequest) {
       ...(body.draftOps      !== undefined ? { draftOps:      toJson(body.draftOps) }          : {}),
     },
   })
+
+  // Sync CRM onboarding status when stage advances beyond 1
+  if (body.currentStage !== undefined && body.currentStage > 1) {
+    updateOnboardingStatusInCrm(orgId, "in_progress").catch(console.error)
+  }
 
   return NextResponse.json(updated)
 }

@@ -9,6 +9,7 @@ import { createSession, deleteSession } from "./session"
 import { checkLimitAction, limiters } from "./ratelimit"
 import { CURRENT_TERMS_VERSION, CURRENT_PRIVACY_VERSION } from "./legal-versions"
 import { syncRegistrationToCrm } from "./registration-crm-sync"
+import { TRIAL_DAYS } from "./billing-config"
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string
@@ -105,7 +106,7 @@ export async function register(formData: FormData) {
     + "-" + Date.now().toString(36)
 
   const hashedPassword = await bcrypt.hash(password, 12)
-  const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+  const trialEndsAt = new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000)
 
   let org: { id: string; name: string }
   let user: { id: string; email: string; name: string; role: string; organizationId: string }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { logSAAction } from "@/lib/sa-audit"
+import { TRIAL_DAYS } from "@/lib/billing-config"
 
 export async function PATCH(
   req: NextRequest,
@@ -27,10 +28,10 @@ export async function PATCH(
 
   if (action === "extend") {
     const base = org.trialEndsAt && org.trialEndsAt > now ? org.trialEndsAt : now
-    update.trialEndsAt        = new Date(base.getTime() + (days ?? 14) * 86400000)
+    update.trialEndsAt        = new Date(base.getTime() + (days ?? TRIAL_DAYS) * 86400000)
     update.subscriptionStatus = "trialing"
   } else if (action === "reset") {
-    update.trialEndsAt        = new Date(now.getTime() + 14 * 86400000)
+    update.trialEndsAt        = new Date(now.getTime() + TRIAL_DAYS * 86400000)
     update.subscriptionStatus = "trialing"
   } else if (action === "end") {
     update.trialEndsAt        = new Date(now.getTime() - 1)

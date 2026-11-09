@@ -57,7 +57,7 @@ const PUBLIC_PATHS = [
 ]
 
 // Authenticated but bypass onboarding/billing guards
-const ONBOARDING_PATHS = ["/onboarding",  "/api/onboarding"]
+const ONBOARDING_PATHS = ["/onboarding",  "/api/onboarding", "/api/ai"]
 const BILLING_PATHS    = ["/billing",     "/api/billing"]
 
 // Paths not included in the Wash Essentials product line.

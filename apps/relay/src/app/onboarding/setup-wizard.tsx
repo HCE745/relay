@@ -1565,7 +1565,7 @@ export function SetupWizard({
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        Your 14-day free trial has started · No credit card required yet
+        Your 30-day free trial has started · No credit card required yet
       </p>
     </div>
   )

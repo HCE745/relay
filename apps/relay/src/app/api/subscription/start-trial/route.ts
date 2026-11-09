@@ -2,13 +2,14 @@ import { NextResponse } from "next/server"
 import { getSession, createSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { setLifecycle } from "@/lib/crm-lifecycle"
+import { TRIAL_DAYS } from "@/lib/billing-config"
 
 export async function POST() {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const now          = new Date()
-  const trialEndsAt  = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
+  const trialEndsAt  = new Date(now.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000)
 
   const org = await prisma.organization.findUnique({
     where:  { id: session.organizationId },

@@ -163,8 +163,8 @@ export async function extractOperations(
       return { type: "clarification", question: "AI is temporarily unavailable. Please try again or configure manually." }
     }
 
-    const data = await res.json() as { content?: Array<{ text: string }> }
-    const text = data?.content?.[0]?.text?.trim()
+    const data = await res.json() as { content?: Array<{ type: string; text?: string }> }
+    const text = data?.content?.find(b => b.type === "text")?.text?.trim()
     if (!text) return { type: "clarification", question: "AI returned an empty response. Please try rephrasing your request." }
 
     const jsonRaw = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim()
@@ -750,8 +750,8 @@ export async function extractWizardSuggestions(
       return { type: "error", error: "AI is temporarily unavailable. Please try again or configure manually." }
     }
 
-    const data = await res.json() as { content?: Array<{ text: string }> }
-    const text = data?.content?.[0]?.text?.trim()
+    const data = await res.json() as { content?: Array<{ type: string; text?: string }> }
+    const text = data?.content?.find(b => b.type === "text")?.text?.trim()
     if (!text) return { type: "error", error: "AI returned an empty response. Please rephrase your request." }
 
     const jsonRaw = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim()

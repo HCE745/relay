@@ -5,13 +5,18 @@ import {
   extractOperations,
   validateOperations,
   generatePreview,
+  extractWizardSuggestions,
 } from "@/lib/config-engine"
+import type { WizardSuggestionsContext } from "@/lib/config-engine"
 import { resolveOperationRefs, loadOrgContext } from "@/lib/config-engine/resolver"
 
 interface ConversationMessage {
   role: "user" | "assistant"
   content: string
 }
+
+// Wizard stages that update local state rather than creating DB entities.
+const WIZARD_STAGES = new Set([1, 2, 4, 5, 6])
 
 // POST /api/ai/configure
 // Accepts a natural-language message + conversation history.
@@ -33,6 +38,8 @@ export async function POST(request: NextRequest) {
     message: string
     history?: ConversationMessage[]
     sessionId?: string
+    stage?: number
+    wizardContext?: Omit<WizardSuggestionsContext, "stage">
   }
 
   if (!body.message?.trim()) {
@@ -60,6 +67,36 @@ export async function POST(request: NextRequest) {
     { role: "user", content: body.message },
   ]
 
+  // ── Wizard stages: update local wizard state rather than DB entities ─────────
+  if (body.stage && WIZARD_STAGES.has(body.stage)) {
+    const ctx: WizardSuggestionsContext = {
+      stage: body.stage,
+      ...(body.wizardContext ?? {}),
+    }
+    const result = await extractWizardSuggestions(ctx, history)
+
+    if (result.type === "clarification") {
+      return NextResponse.json({
+        type: "clarification",
+        question: result.question,
+        history: [...history, { role: "assistant", content: result.question }],
+      })
+    }
+
+    if (result.type === "wizard_update") {
+      const assistantMsg = `I'll ${result.summary}. Review the suggestions below and click Apply to add them.`
+      return NextResponse.json({
+        type: "wizard_update",
+        update: result.update,
+        summary: result.summary,
+        history: [...history, { role: "assistant", content: assistantMsg }],
+      })
+    }
+
+    return NextResponse.json({ type: "error", errors: [result.error] }, { status: 422 })
+  }
+
+  // ── DB-operation stages (stage 3): locations, departments, routing rules ─────
   // Build org snapshot for context
   const snapshot = await buildOrgSnapshot(orgId)
 

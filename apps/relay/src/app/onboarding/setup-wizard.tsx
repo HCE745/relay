@@ -155,9 +155,11 @@ const selectCls =
 function Step1({
   data,
   set,
+  sessionId,
 }: {
   data: WizardData
   set: <K extends keyof WizardData>(k: K, v: WizardData[K]) => void
+  sessionId?: string
 }) {
   const industryIsOther = data.industry === "Other"
 
@@ -238,6 +240,19 @@ function Step1({
           />
         </Field>
       </div>
+
+      <AiPanel
+        stage={1}
+        sessionId={sessionId}
+        onWizardUpdate={update => {
+          if (!update.orgProfile) return
+          if (update.orgProfile.companyName) set("companyName", update.orgProfile.companyName)
+          if (update.orgProfile.industry)    set("industry",    update.orgProfile.industry)
+          if (update.orgProfile.companySize) set("companySize", update.orgProfile.companySize)
+          if (update.orgProfile.numberOfLocations) set("numberOfLocations", update.orgProfile.numberOfLocations)
+        }}
+        wizardContext={{ industry: data.industry, companySize: data.companySize }}
+      />
     </div>
   )
 }
@@ -247,9 +262,11 @@ function Step1({
 function Step2({
   data,
   set,
+  sessionId,
 }: {
   data: WizardData
   set: <K extends keyof WizardData>(k: K, v: WizardData[K]) => void
+  sessionId?: string
 }) {
   const otherSelected = data.issueTypes.includes("Other")
   const industryLabel = data.industry && data.industry !== "Other" ? data.industry : null
@@ -336,6 +353,15 @@ function Step2({
           {data.issueTypes.length} type{data.issueTypes.length !== 1 ? "s" : ""} selected — we&apos;ll create the matching departments and categories.
         </p>
       )}
+
+      <AiPanel
+        stage={2}
+        sessionId={sessionId}
+        onWizardUpdate={update => {
+          if (update.issueTypes) set("issueTypes", update.issueTypes)
+        }}
+        wizardContext={{ industry: data.industry, issueTypes: data.issueTypes }}
+      />
     </div>
   )
 }
@@ -453,9 +479,11 @@ function Step3({
 function Step4a({
   data,
   set,
+  sessionId,
 }: {
   data: WizardData
   set: <K extends keyof WizardData>(k: K, v: WizardData[K]) => void
+  sessionId?: string
 }) {
   const [addingCustom, setAddingCustom] = useState(false)
   const [customName, setCustomName] = useState("")
@@ -763,6 +791,32 @@ function Step4a({
           This step is optional — you can configure employee types later in Settings → Employee Types.
         </p>
       )}
+
+      <AiPanel
+        stage={4}
+        sessionId={sessionId}
+        onWizardUpdate={update => {
+          if (!update.employeeTypeDefs?.length) return
+          // Merge in suggestions, skipping presets already added
+          const existing = new Set(data.employeeTypeDefs.map(d => d.presetKey).filter(Boolean))
+          const toAdd = update.employeeTypeDefs.filter(d => !d.presetKey || !existing.has(d.presetKey))
+          if (toAdd.length > 0) {
+            set("employeeTypeDefs", [
+              ...data.employeeTypeDefs,
+              ...toAdd.map(d => ({
+                ...d,
+                pageAccess: d.pageAccess as PageKey[],
+                actions:    d.actions    as ActionKey[],
+              })),
+            ])
+          }
+        }}
+        wizardContext={{
+          industry: data.industry,
+          companySize: data.companySize,
+          employeeTypeDefs: data.employeeTypeDefs.map(d => ({ name: d.name, baseRole: d.baseRole, presetKey: d.presetKey })),
+        }}
+      />
     </div>
   )
 }
@@ -772,9 +826,11 @@ function Step4a({
 function Step4b({
   data,
   set,
+  sessionId,
 }: {
   data: WizardData
   set: <K extends keyof WizardData>(k: K, v: WizardData[K]) => void
+  sessionId?: string
 }) {
   function updateMember(id: string, field: keyof Omit<TeamEntry, "id" | "title" | "role">, value: string) {
     set(
@@ -879,6 +935,35 @@ function Step4b({
           {filledCount} invitation{filledCount !== 1 ? "s" : ""} will be sent when you finish setup.
         </p>
       )}
+
+      <AiPanel
+        stage={5}
+        sessionId={sessionId}
+        onWizardUpdate={update => {
+          if (!update.teamMembers?.length) return
+          // Append members that don't already have the same email
+          const existingEmails = new Set(data.team.map(m => m.email.toLowerCase()).filter(Boolean))
+          const toAdd = update.teamMembers.filter(m => !m.email || !existingEmails.has(m.email.toLowerCase()))
+          if (toAdd.length > 0) {
+            set("team", [
+              ...data.team,
+              ...toAdd.map(m => ({
+                id:             m.id,
+                name:           m.name,
+                email:          m.email,
+                title:          m.title,
+                role:           m.role,
+                employeeTypeId: m.employeeTypeId ?? "",
+              })),
+            ])
+          }
+        }}
+        wizardContext={{
+          industry:         data.industry,
+          employeeTypeDefs: data.employeeTypeDefs.map(d => ({ name: d.name, baseRole: d.baseRole, presetKey: d.presetKey })),
+          teamMembers:      data.team.map(m => ({ name: m.name, email: m.email, title: m.title })),
+        }}
+      />
     </div>
   )
 }
@@ -890,11 +975,13 @@ function Step4({
   set,
   onGoNext,
   onGoBack,
+  sessionId,
 }: {
   data: WizardData
   set: <K extends keyof WizardData>(k: K, v: WizardData[K]) => void
   onGoNext: () => void
   onGoBack: () => void
+  sessionId?: string
 }) {
   const [subStep, setSubStep] = useState<"types" | "invites">("types")
 
@@ -935,9 +1022,9 @@ function Step4({
       </div>
 
       {subStep === "types" ? (
-        <Step4a data={data} set={set} />
+        <Step4a data={data} set={set} sessionId={sessionId} />
       ) : (
-        <Step4b data={data} set={set} />
+        <Step4b data={data} set={set} sessionId={sessionId} />
       )}
 
       {/* Navigation — handled internally since step 4 has sub-steps */}
@@ -1001,11 +1088,13 @@ function Step5({
   set,
   categories,
   teamMembers,
+  sessionId,
 }: {
   data: WizardData
   set: <K extends keyof WizardData>(k: K, v: WizardData[K]) => void
   categories: IssueTypeOption[]
   teamMembers: TeamEntry[]
+  sessionId?: string
 }) {
   function setRoute(category: string, value: string) {
     set("routing", { ...data.routing, [category]: value })
@@ -1064,6 +1153,22 @@ function Step5({
       <p className="text-xs text-gray-400 mt-4">
         Routing rules can be edited any time from Settings → Routing Rules.
       </p>
+
+      <AiPanel
+        stage={6}
+        sessionId={sessionId}
+        onWizardUpdate={update => {
+          if (update.routing) {
+            set("routing", { ...data.routing, ...update.routing })
+          }
+        }}
+        wizardContext={{
+          industry:    data.industry,
+          issueTypes:  data.issueTypes,
+          teamMembers: data.team.map(m => ({ name: m.name, email: m.email, title: m.title })),
+          routing:     data.routing,
+        }}
+      />
     </div>
   )
 }
@@ -1373,8 +1478,8 @@ export function SetupWizard({
           </div>
         )}
 
-        {step === 1 && <Step1 data={data} set={set} />}
-        {step === 2 && <Step2 data={data} set={set} />}
+        {step === 1 && <Step1 data={data} set={set} sessionId={serverSession?.id} />}
+        {step === 2 && <Step2 data={data} set={set} sessionId={serverSession?.id} />}
         {step === 3 && (
           <Step3
             data={data}
@@ -1383,13 +1488,14 @@ export function SetupWizard({
             onConfigApplied={() => {/* AI applied config — wizard state reflects form; server session updated by apply route */}}
           />
         )}
-        {step === 4 && <Step4 data={data} set={set} onGoNext={goNext} onGoBack={goBack} />}
+        {step === 4 && <Step4 data={data} set={set} onGoNext={goNext} onGoBack={goBack} sessionId={serverSession?.id} />}
         {step === 5 && (
           <Step5
             data={data}
             set={set}
             categories={categories}
             teamMembers={teamMembers}
+            sessionId={serverSession?.id}
           />
         )}
 

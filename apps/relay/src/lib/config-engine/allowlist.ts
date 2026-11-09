@@ -90,6 +90,37 @@ export type ConfigOperation =
   | CreateRoutingRuleOp
   | ExplainOp
 
+// Wizard-state update payload — returned for stages that modify local wizard state
+// rather than creating DB entities. Shared between client and server.
+export interface WizardUpdatePayload {
+  orgProfile?: {
+    companyName?: string
+    industry?: string
+    companySize?: string
+    numberOfLocations?: string
+  }
+  issueTypes?: string[]
+  employeeTypeDefs?: Array<{
+    id: string
+    name: string
+    baseRole: string
+    pageAccess: string[]
+    actions: string[]
+    presetKey: string | null
+    canInvite: boolean
+    canChangeEmail: boolean
+  }>
+  teamMembers?: Array<{
+    id: string
+    name: string
+    email: string
+    title: string
+    role: string
+    employeeTypeId: string
+  }>
+  routing?: Record<string, string>
+}
+
 // Human-readable label per operation type for the preview UI
 export function opLabel(type: OperationType): string {
   switch (type) {

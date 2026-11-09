@@ -7,6 +7,7 @@ import { loadOrgContext, resolveOperationRefs } from "./resolver"
 import type { ConfigOperation, CreateDepartmentOp, UpdateDepartmentOp, CreateLocationOp, CreateRoutingRuleOp } from "./allowlist"
 import { isAllowedOp, opLabel } from "./allowlist"
 import type { InputJsonValue } from "@prisma/client/runtime/client"
+import { EMPLOYEE_TYPE_PRESETS } from "@/lib/employee-type-presets"
 
 const toJson = (v: unknown): InputJsonValue => JSON.parse(JSON.stringify(v ?? null)) as InputJsonValue
 
@@ -557,4 +558,236 @@ export async function checkRateLimit(orgId: string): Promise<{ allowed: boolean;
     return { allowed: false, retryAfterMs: windowMs }
   }
   return { allowed: true }
+}
+
+// ── Wizard State Suggestions (Stages 1, 2, 4, 5) ─────────────────────────────
+// These stages update wizard-local state rather than creating DB entities.
+
+export interface WizardSuggestionsContext {
+  stage: number
+  industry?: string
+  companySize?: string
+  issueTypes?: string[]
+  employeeTypeDefs?: Array<{ name: string; baseRole: string; presetKey: string | null }>
+  teamMembers?: Array<{ name: string; email: string; title: string }>
+  routing?: Record<string, string>
+}
+
+export type { WizardUpdatePayload } from "./allowlist"
+import type { WizardUpdatePayload } from "./allowlist"
+
+export type WizardSuggestionsResult =
+  | { type: "clarification"; question: string }
+  | { type: "wizard_update"; summary: string; update: WizardUpdatePayload }
+  | { type: "error"; error: string }
+
+function buildWizardSystemPrompt(ctx: WizardSuggestionsContext): string {
+  const lines: string[] = ["ORGANIZATION CONTEXT:"]
+  if (ctx.industry)      lines.push(`  Industry: ${ctx.industry}`)
+  if (ctx.companySize)   lines.push(`  Company size: ${ctx.companySize} employees`)
+  if (ctx.issueTypes?.length) lines.push(`  Issue types: ${ctx.issueTypes.join(", ")}`)
+  if (ctx.employeeTypeDefs?.length) {
+    lines.push(`  Employee types: ${ctx.employeeTypeDefs.map(d => `${d.name} (${d.baseRole})`).join(", ")}`)
+  }
+  const contextBlock = lines.join("\n")
+
+  if (ctx.stage === 1) {
+    return `You help fill in an organization profile for Relay, a facility operations SaaS.
+${contextBlock}
+
+The user will describe their company. Extract the following fields if mentioned:
+- companyName: official company name
+- industry: one of (Manufacturing, Logistics & Warehousing, Car Wash, Healthcare, Education, Food & Beverage, Retail, Commercial Real Estate, Construction, Transportation, Other)
+- companySize: approximate number of employees (number as string)
+- numberOfLocations: number of physical sites (number as string)
+
+RESPONSE FORMAT — respond with ONLY valid JSON:
+Clarification: { "type": "clarification", "question": "..." }
+Suggestions:   { "type": "wizard_update", "summary": "...", "update": { "orgProfile": { "companyName": "...", "industry": "...", "companySize": "50", "numberOfLocations": "3" } } }
+
+Only include fields you can confidently extract. Omit fields you are unsure about.`
+  }
+
+  if (ctx.stage === 2) {
+    const current = ctx.issueTypes?.length ? ctx.issueTypes.join(", ") : "(none selected)"
+    return `You help configure issue tracking categories during Relay onboarding.
+${contextBlock}
+
+AVAILABLE ISSUE TYPES (use exact labels):
+Maintenance, Operations, Safety, Customer Complaints, Purchasing, IT, Facilities, HR, Quality Control, Other
+
+CURRENT SELECTION: ${current}
+
+Based on the user's description, suggest which issue types to track.
+RESPONSE FORMAT — respond with ONLY valid JSON:
+Clarification: { "type": "clarification", "question": "..." }
+Suggestions:   { "type": "wizard_update", "summary": "...", "update": { "issueTypes": ["Maintenance", "Safety", ...] } }
+
+issueTypes must only contain labels from the list above.`
+  }
+
+  if (ctx.stage === 4) {
+    const presets = EMPLOYEE_TYPE_PRESETS.map(p =>
+      `  - "${p.key}": ${p.name} (${p.baseRole}) — ${p.description}`
+    ).join("\n")
+    const existing = ctx.employeeTypeDefs?.length
+      ? ctx.employeeTypeDefs.map(d => `  - ${d.name} (preset: ${d.presetKey ?? "custom"})`).join("\n")
+      : "  (none yet)"
+
+    return `You help configure employee role types during Relay onboarding.
+${contextBlock}
+
+AVAILABLE PRESETS:
+${presets}
+
+CURRENTLY CONFIGURED:
+${existing}
+
+The user will describe job titles or workforce structure. Map each to the closest preset.
+Do NOT suggest a preset that is already configured.
+RESPONSE FORMAT — respond with ONLY valid JSON:
+Clarification: { "type": "clarification", "question": "..." }
+Suggestions:   { "type": "wizard_update", "summary": "...", "update": { "employeeTypeDefs": [{ "presetKey": "supervisor", "name": "Supervisor", "baseRole": "SUPERVISOR", "pageAccess": ["dashboard","issues","calendar","sops","team","suggestions","my-submissions","injury-reports","archive"], "actions": ["can_edit_issues","can_manage_users"], "canInvite": true, "canChangeEmail": true }, ...] } }
+
+Each item must include: presetKey (from the available list, or null for custom), name, baseRole (EMPLOYEE/SUPERVISOR/MANAGER/HR/ADMIN), pageAccess (array of page key strings), actions (array of action key strings), canInvite (boolean), canChangeEmail (boolean).`
+  }
+
+  if (ctx.stage === 5) {
+    const types = ctx.employeeTypeDefs?.length
+      ? ctx.employeeTypeDefs.map(d => `  - "${d.presetKey ?? "custom-" + d.name}": ${d.name} (${d.baseRole})`).join("\n")
+      : "  (no types configured)"
+
+    return `You help add initial team members for Relay onboarding.
+${contextBlock}
+
+CONFIGURED EMPLOYEE TYPES:
+${types}
+
+The user will describe their team, paste names/emails, or provide a roster.
+Extract individual people. For each person:
+- name: full name (string)
+- email: work email, or "" if not provided
+- title: job title or role description
+- role: EMPLOYEE | SUPERVISOR | MANAGER | HR | ADMIN (pick the best fit)
+
+Do NOT fabricate emails. Leave email as "" when not given.
+RESPONSE FORMAT — respond with ONLY valid JSON:
+Clarification: { "type": "clarification", "question": "..." }
+Suggestions:   { "type": "wizard_update", "summary": "...", "update": { "teamMembers": [{ "name": "Jane Smith", "email": "jane@acme.com", "title": "Plant Manager", "role": "MANAGER" }, ...] } }`
+  }
+
+  if (ctx.stage === 6) {
+    const issueTypes = ctx.issueTypes?.length
+      ? ctx.issueTypes.map(t => `  - ${t}`).join("\n")
+      : "  (none selected)"
+    const team = ctx.teamMembers?.length
+      ? ctx.teamMembers.map(m => `  - ${m.name || m.email} (${m.title})`).join("\n")
+      : "  (no team members yet)"
+    const currentRouting = ctx.routing && Object.keys(ctx.routing).length > 0
+      ? Object.entries(ctx.routing).map(([k, v]) => `  - ${k}: ${v}`).join("\n")
+      : "  (none set)"
+
+    return `You help configure issue routing rules during Relay onboarding.
+${contextBlock}
+
+SELECTED ISSUE TYPES:
+${issueTypes}
+
+INVITED TEAM MEMBERS:
+${team}
+
+CURRENT ROUTING:
+${currentRouting}
+
+The user will describe how they want issues assigned. For each issue type, suggest who should receive it.
+Routing values must be one of:
+- "role:ADMIN" — the organization admin
+- "role:MANAGER" — any manager
+- "role:SUPERVISOR" — any supervisor
+- "role:HR" — any HR user
+- "user:<email>" — a specific person by email
+
+RESPONSE FORMAT — respond with ONLY valid JSON:
+Clarification: { "type": "clarification", "question": "..." }
+Suggestions:   { "type": "wizard_update", "summary": "...", "update": { "routing": { "MAINTENANCE": "role:MANAGER", "SAFETY": "role:SUPERVISOR", ... } } }
+
+Routing keys are platform issue categories: MAINTENANCE, GENERAL, SAFETY, CUSTOMER_COMPLAINT, SUPPLY_SHORTAGE, FACILITY, EMPLOYEE, EQUIPMENT_BREAKDOWN.`
+  }
+
+  return `You are helping configure Relay during onboarding. Stage: ${ctx.stage}. Answer the user's question.\nRespond with ONLY valid JSON: { "type": "clarification", "question": "..." } or { "type": "wizard_update", "summary": "...", "update": {} }`
+}
+
+export async function extractWizardSuggestions(
+  ctx: WizardSuggestionsContext,
+  history: ConversationMessage[],
+): Promise<WizardSuggestionsResult> {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) return { type: "error", error: "AI assistance is not configured for this environment." }
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 30_000)
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type":      "application/json",
+        "x-api-key":         apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model:    "claude-sonnet-4-5",
+        max_tokens: 2048,
+        system:   buildWizardSystemPrompt(ctx),
+        messages: history,
+      }),
+      signal: controller.signal,
+    })
+
+    if (!res.ok) {
+      console.error("AI wizard suggest error:", res.status, await res.text().catch(() => ""))
+      return { type: "error", error: "AI is temporarily unavailable. Please try again or configure manually." }
+    }
+
+    const data = await res.json() as { content?: Array<{ text: string }> }
+    const text = data?.content?.[0]?.text?.trim()
+    if (!text) return { type: "error", error: "AI returned an empty response. Please rephrase your request." }
+
+    const parsed = JSON.parse(text) as { type: string; question?: string; summary?: string; update?: WizardUpdatePayload }
+
+    if (parsed.type === "clarification") {
+      return { type: "clarification", question: parsed.question! }
+    }
+
+    if (parsed.type === "wizard_update") {
+      const update = parsed.update ?? {}
+      if (update.employeeTypeDefs) {
+        update.employeeTypeDefs = update.employeeTypeDefs.map(d => ({
+          ...d,
+          id: randomUUID(),
+          actions: d.actions ?? [],
+          pageAccess: d.pageAccess ?? [],
+        }))
+      }
+      if (update.teamMembers) {
+        update.teamMembers = update.teamMembers.map(m => ({
+          ...m,
+          id: randomUUID(),
+          employeeTypeId: (m as unknown as Record<string, unknown>).employeeTypeId as string ?? "",
+          role: m.role ?? "EMPLOYEE",
+        }))
+      }
+      return { type: "wizard_update", summary: parsed.summary ?? "", update }
+    }
+
+    return { type: "error", error: "Could not understand the AI response. Please try rephrasing." }
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      return { type: "error", error: "Request timed out. Please try again." }
+    }
+    console.error("extractWizardSuggestions error:", err)
+    return { type: "error", error: "An unexpected error occurred. Please try again or configure manually." }
+  } finally {
+    clearTimeout(timer)
+  }
 }

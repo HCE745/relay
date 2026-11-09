@@ -149,7 +149,7 @@ export async function extractOperations(
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model:      "claude-sonnet-4-5",
+        model:      "claude-haiku-5-5",
         max_tokens: 2048,
         system:     buildSystemPrompt(snapshot),
         messages:   history,
@@ -167,7 +167,8 @@ export async function extractOperations(
     const text = data?.content?.[0]?.text?.trim()
     if (!text) return { type: "clarification", question: "AI returned an empty response. Please try rephrasing your request." }
 
-    const parsed = JSON.parse(text)
+    const jsonRaw = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim()
+    const parsed = JSON.parse(jsonRaw)
     if (parsed.type === "clarification") return parsed as ExtractorResult
     if (parsed.type === "operations") {
       // Validate each operation type is in the allowlist
@@ -736,7 +737,7 @@ export async function extractWizardSuggestions(
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model:    "claude-sonnet-4-5",
+        model:    "claude-haiku-5-5",
         max_tokens: 2048,
         system:   buildWizardSystemPrompt(ctx),
         messages: history,
@@ -753,7 +754,8 @@ export async function extractWizardSuggestions(
     const text = data?.content?.[0]?.text?.trim()
     if (!text) return { type: "error", error: "AI returned an empty response. Please rephrase your request." }
 
-    const parsed = JSON.parse(text) as { type: string; question?: string; summary?: string; update?: WizardUpdatePayload }
+    const jsonRaw = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim()
+    const parsed = JSON.parse(jsonRaw) as { type: string; question?: string; summary?: string; update?: WizardUpdatePayload }
 
     if (parsed.type === "clarification") {
       return { type: "clarification", question: parsed.question! }

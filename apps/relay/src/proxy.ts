@@ -91,9 +91,15 @@ export async function proxy(request: NextRequest) {
 
   // ── MCP Dynamic Client Registration fallback ──────────────────────────────
   // Claude.ai POSTs to /register (root path) for OAuth DCR. Rewrite it to the
-  // actual MCP registration endpoint before any route matching fires. GET is
-  // left alone so the user registration page continues to work normally.
-  if (pathname === "/register" && (request.method === "POST" || request.method === "OPTIONS")) {
+  // actual MCP registration endpoint before any route matching fires.
+  // IMPORTANT: Next.js server actions also POST to the page URL (/register)
+  // but always include the `Next-Action` header. MCP DCR clients never send it.
+  // Check for that header to avoid intercepting the user registration form.
+  if (
+    pathname === "/register" &&
+    (request.method === "POST" || request.method === "OPTIONS") &&
+    !request.headers.has("Next-Action")
+  ) {
     console.error("[proxy] MCP DCR rewrite:", request.method, "/register → /api/mcp/oauth/register")
     return NextResponse.rewrite(new URL("/api/mcp/oauth/register", request.url))
   }

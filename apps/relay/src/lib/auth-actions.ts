@@ -3,10 +3,12 @@
 import bcrypt from "bcryptjs"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { after } from "next/server"
 import { prisma } from "./prisma"
 import { createSession, deleteSession } from "./session"
 import { checkLimitAction, limiters } from "./ratelimit"
 import { CURRENT_TERMS_VERSION, CURRENT_PRIVACY_VERSION } from "./legal-versions"
+import { syncRegistrationToCrm } from "./registration-crm-sync"
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string
@@ -65,24 +67,34 @@ export async function register(formData: FormData) {
     return { error: "All fields are required" }
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } })
+  // Check for existing user before attempting any writes
+  let existing: { id: string } | null = null
+  try {
+    existing = await prisma.user.findUnique({ where: { email }, select: { id: true } })
+  } catch {
+    return { error: "Unable to reach the database. Please try again." }
+  }
   if (existing) return { error: "Email already registered" }
 
   // Validate offer token if provided
   let validOffer: { id: string; maxRedemptions: number; redemptionCount: number; expiresAt: Date | null; redeemedAt: Date | null } | null = null
   if (offerToken) {
-    validOffer = await prisma.salesOffer.findUnique({
-      where: { token: offerToken },
-      select: { id: true, maxRedemptions: true, redemptionCount: true, expiresAt: true, redeemedAt: true },
-    })
-    // Silently ignore invalid/exhausted offers — don't block registration
-    if (
-      !validOffer ||
-      validOffer.redeemedAt ||
-      validOffer.redemptionCount >= validOffer.maxRedemptions ||
-      (validOffer.expiresAt && validOffer.expiresAt < new Date())
-    ) {
-      validOffer = null
+    try {
+      validOffer = await prisma.salesOffer.findUnique({
+        where: { token: offerToken },
+        select: { id: true, maxRedemptions: true, redemptionCount: true, expiresAt: true, redeemedAt: true },
+      })
+      // Silently ignore invalid/exhausted offers — don't block registration
+      if (
+        !validOffer ||
+        validOffer.redeemedAt ||
+        validOffer.redemptionCount >= validOffer.maxRedemptions ||
+        (validOffer.expiresAt && validOffer.expiresAt < new Date())
+      ) {
+        validOffer = null
+      }
+    } catch {
+      validOffer = null // offer lookup failure is non-fatal
     }
   }
 
@@ -95,48 +107,77 @@ export async function register(formData: FormData) {
   const hashedPassword = await bcrypt.hash(password, 12)
   const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
 
-  const org = await prisma.organization.create({
-    data: {
-      name: orgName,
-      slug,
-      trialEndsAt,
+  let org: { id: string; name: string }
+  let user: { id: string; email: string; name: string; role: string; organizationId: string }
+
+  try {
+    org = await prisma.organization.create({
+      data: {
+        name: orgName,
+        slug,
+        trialEndsAt,
+        subscriptionStatus: "trialing",
+        plan: "essentials",
+        ...(validOffer ? { pendingOfferToken: offerToken } : {}),
+      },
+    })
+
+    const headersList = await headers()
+    const ip =
+      headersList.get("x-forwarded-for")?.split(",")[0].trim() ||
+      headersList.get("x-real-ip") ||
+      null
+
+    user = await prisma.user.create({
+      data: { name, email, password: hashedPassword, role: "ADMIN", organizationId: org.id },
+    })
+
+    await prisma.legalAcceptance.create({
+      data: {
+        userId:                  user.id,
+        organizationId:          org.id,
+        termsVersion:            CURRENT_TERMS_VERSION,
+        privacyVersion:          CURRENT_PRIVACY_VERSION,
+        ipAddress:               ip,
+        aiDisclaimerAcknowledged: true,
+      },
+    })
+  } catch (err) {
+    console.error("[register] DB error", err)
+    return { error: "Registration failed. Please try again." }
+  }
+
+  try {
+    await createSession({
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      organizationId: user.organizationId,
+      onboardingCompleted: false,
+      trialEndsAt: trialEndsAt.toISOString(),
       subscriptionStatus: "trialing",
       plan: "essentials",
-      ...(validOffer ? { pendingOfferToken: offerToken } : {}),
-    },
-  })
+    })
+  } catch (err) {
+    console.error("[register] Session error", err)
+    return { error: "Account created but session failed. Please sign in." }
+  }
 
-  const headersList = await headers()
-  const ip =
-    headersList.get("x-forwarded-for")?.split(",")[0].trim() ||
-    headersList.get("x-real-ip") ||
-    null
-
-  const user = await prisma.user.create({
-    data: { name, email, password: hashedPassword, role: "ADMIN", organizationId: org.id },
-  })
-
-  await prisma.legalAcceptance.create({
-    data: {
-      userId:                  user.id,
-      organizationId:          org.id,
-      termsVersion:            CURRENT_TERMS_VERSION,
-      privacyVersion:          CURRENT_PRIVACY_VERSION,
-      ipAddress:               ip,
-      aiDisclaimerAcknowledged: true,
-    },
-  })
-
-  await createSession({
-    userId: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    organizationId: user.organizationId,
-    onboardingCompleted: false,
-    trialEndsAt: trialEndsAt.toISOString(),
-    subscriptionStatus: "trialing",
-    plan: "essentials",
+  // CRM sync runs AFTER the redirect response is sent — it must not block registration.
+  // `after()` schedules work past the response in both server actions and route handlers.
+  after(async () => {
+    try {
+      await syncRegistrationToCrm({
+        orgId:      org.id,
+        orgName:    org.name,
+        adminEmail: user.email,
+        adminName:  user.name,
+        source:     "website_self_service",
+      })
+    } catch (err) {
+      console.error("[CRM sync] Failed for org", org.id, err)
+    }
   })
 
   redirect("/onboarding")

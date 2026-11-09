@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse, after } from "next/server"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { createSession } from "@/lib/session"
@@ -118,17 +118,21 @@ export async function POST(request: NextRequest) {
 
       logActivationEvent(org.id, "org_created").catch(() => {})
 
-      try {
-        await syncRegistrationToCrm({
-          orgId:      org.id,
-          orgName:    orgName!,
-          adminEmail: user.email,
-          adminName:  user.name,
-          source:     referrerOrg ? "referral" : (source ?? "website_self_service"),
-        })
-      } catch (err) {
-        console.error("[CRM sync] Failed for org", org.id, err)
-      }
+      // CRM sync runs after the response is sent so it never blocks registration.
+      // `after()` is safe here — Vercel keeps the function alive until after() callbacks complete.
+      after(async () => {
+        try {
+          await syncRegistrationToCrm({
+            orgId:      org.id,
+            orgName:    orgName!,
+            adminEmail: user.email,
+            adminName:  user.name,
+            source:     referrerOrg ? "referral" : (source ?? "website_self_service"),
+          })
+        } catch (err) {
+          console.error("[CRM sync] Failed for org", org.id, err)
+        }
+      })
     }
 
     const response = NextResponse.json({ success: true })

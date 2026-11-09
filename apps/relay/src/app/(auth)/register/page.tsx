@@ -85,13 +85,23 @@ function RegisterForm() {
     e.preventDefault()
     setLoading(true)
     setError("")
-    const formData = new FormData(e.currentTarget)
-    if (offerToken && offer) {
-      formData.set("offerToken", offerToken)
-    }
-    const result = await register(formData)
-    if (result?.error) {
-      setError(result.error)
+    try {
+      const formData = new FormData(e.currentTarget)
+      if (offerToken && offer) {
+        formData.set("offerToken", offerToken)
+      }
+      const result = await register(formData)
+      if (result?.error) {
+        setError(result.error)
+      }
+      // On success the server action calls redirect() — the browser navigates
+      // away and this component unmounts, so setLoading(false) in finally is harmless.
+    } catch {
+      // Network failure or unhandled server-action error. Next.js redirect() throws
+      // internally but Next.js handles it before it reaches here — so any catch here
+      // is a genuine error, not a navigation.
+      setError("Something went wrong. Please try again.")
+    } finally {
       setLoading(false)
     }
   }

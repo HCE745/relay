@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, X, AlertTriangle, Building2, Globe, Loader2 } from "lucide-react"
+import { Plus, X, AlertTriangle, Building2, Globe, Loader2, User, ChevronDown, ChevronUp } from "lucide-react"
 
 type DuplicateInfo = {
   id: string
@@ -17,10 +17,17 @@ export function AddProspectModal() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Form fields
+  // Company fields
   const [companyName, setCompanyName] = useState("")
   const [website, setWebsite] = useState("")
   const [industry, setIndustry] = useState("")
+
+  // Contact fields
+  const [showContact, setShowContact] = useState(false)
+  const [contactName, setContactName] = useState("")
+  const [contactTitle, setContactTitle] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
+  const [contactPhone, setContactPhone] = useState("")
 
   // Duplicate confirmation state
   const [dupWarning, setDupWarning] = useState<{ message: string; existing: DuplicateInfo } | null>(null)
@@ -29,6 +36,11 @@ export function AddProspectModal() {
     setCompanyName("")
     setWebsite("")
     setIndustry("")
+    setShowContact(false)
+    setContactName("")
+    setContactTitle("")
+    setContactEmail("")
+    setContactPhone("")
     setDupWarning(null)
     setError(null)
   }
@@ -46,6 +58,13 @@ export function AddProspectModal() {
     setSaving(true)
     setError(null)
     try {
+      const initialContact = showContact && contactName.trim() ? {
+        name: contactName.trim(),
+        title: contactTitle.trim() || null,
+        email: contactEmail.trim() || null,
+        phone: contactPhone.trim() || null,
+      } : null
+
       const res = await fetch("/api/sales/prospects", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -54,6 +73,7 @@ export function AddProspectModal() {
           website: website.trim() || null,
           industry: industry.trim() || null,
           confirmDuplicate,
+          initialContact,
         }),
       })
 
@@ -160,7 +180,7 @@ export function AddProspectModal() {
                       onChange={e => setCompanyName(e.target.value)}
                       placeholder="Acme Manufacturing"
                       className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
-                      onKeyDown={e => e.key === "Enter" && submit(false)}
+                      onKeyDown={e => e.key === "Enter" && !showContact && submit(false)}
                     />
                   </div>
 
@@ -188,6 +208,65 @@ export function AddProspectModal() {
                       className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
                     />
                   </div>
+
+                  {/* Initial contact toggle */}
+                  <button
+                    type="button"
+                    onClick={() => setShowContact(v => !v)}
+                    className="flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    {showContact ? "Hide" : "Add"} initial contact
+                    {showContact ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  </button>
+
+                  {showContact && (
+                    <div className="space-y-3 pt-1 border-t border-gray-800">
+                      <p className="text-xs text-gray-500 pt-1">Initial contact (optional)</p>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1.5">Name</label>
+                        <input
+                          type="text"
+                          value={contactName}
+                          onChange={e => setContactName(e.target.value)}
+                          placeholder="Jane Smith"
+                          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1.5">Title</label>
+                          <input
+                            type="text"
+                            value={contactTitle}
+                            onChange={e => setContactTitle(e.target.value)}
+                            placeholder="Operations Manager"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1.5">Phone</label>
+                          <input
+                            type="text"
+                            value={contactPhone}
+                            onChange={e => setContactPhone(e.target.value)}
+                            placeholder="(555) 000-0000"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1.5">Email</label>
+                        <input
+                          type="email"
+                          value={contactEmail}
+                          onChange={e => setContactEmail(e.target.value)}
+                          placeholder="jane@acme.com"
+                          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {error && (
                     <p className="text-xs text-red-400 flex items-center gap-1.5">

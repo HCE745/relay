@@ -13,6 +13,10 @@ export async function GET() {
   const userId = session.salesUserId ?? ""
   const isManager = session.superAdmin || session.salesUserRole === "admin_sales"
   const repFilter = isManager ? { NOT: { assignedTo: { isDemo: true } } } : { assignedToId: userId }
+  // For task queries: also include tasks linked to prospects assigned to this rep
+  const taskRepFilter = isManager
+    ? repFilter
+    : { OR: [{ assignedToId: userId }, { prospect: { assignedToId: userId } }] }
 
   const now      = new Date()
   const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999)
@@ -40,7 +44,7 @@ export async function GET() {
   ] = await Promise.all([
     // Overdue tasks
     prisma.crmTask.findMany({
-      where: { ...repFilter, completedAt: null, dueAt: { lt: todayStart } },
+      where: { ...taskRepFilter, completedAt: null, dueAt: { lt: todayStart } },
       include: taskIncludes,
       orderBy: { dueAt: "asc" },
       take: 20,
@@ -48,7 +52,7 @@ export async function GET() {
 
     // Tasks due today
     prisma.crmTask.findMany({
-      where: { ...repFilter, completedAt: null, dueAt: { gte: todayStart, lte: todayEnd } },
+      where: { ...taskRepFilter, completedAt: null, dueAt: { gte: todayStart, lte: todayEnd } },
       include: taskIncludes,
       orderBy: [{ priority: "desc" }, { dueAt: "asc" }],
       take: 20,
@@ -56,7 +60,7 @@ export async function GET() {
 
     // Upcoming tasks (after today)
     prisma.crmTask.findMany({
-      where: { ...repFilter, completedAt: null, dueAt: { gt: todayEnd } },
+      where: { ...taskRepFilter, completedAt: null, dueAt: { gt: todayEnd } },
       include: taskIncludes,
       orderBy: { dueAt: "asc" },
       take: 30,
@@ -64,7 +68,7 @@ export async function GET() {
 
     // Tasks with no due date
     prisma.crmTask.findMany({
-      where: { ...repFilter, completedAt: null, dueAt: null },
+      where: { ...taskRepFilter, completedAt: null, dueAt: null },
       include: taskIncludes,
       orderBy: { createdAt: "desc" },
       take: 20,
@@ -72,7 +76,7 @@ export async function GET() {
 
     // Recently completed tasks (last 7 days)
     prisma.crmTask.findMany({
-      where: { ...repFilter, completedAt: { gte: sevenDaysAgo } },
+      where: { ...taskRepFilter, completedAt: { gte: sevenDaysAgo } },
       include: taskIncludes,
       orderBy: { completedAt: "desc" },
       take: 20,

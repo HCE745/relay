@@ -72,8 +72,13 @@ export async function POST(req: NextRequest) {
     researchSummary?: string | null
     currentCrmStatus?: string
     assignedToId?: string | null
-    // duplicate confirmation: pass true to proceed despite a warning
     confirmDuplicate?: boolean
+    initialContact?: {
+      name: string
+      title?: string | null
+      email?: string | null
+      phone?: string | null
+    } | null
   }
 
   if (!body.companyName?.trim()) {
@@ -158,6 +163,21 @@ export async function POST(req: NextRequest) {
         })),
       })
     }
+  }
+
+  // Create initial contact if provided
+  if (body.initialContact?.name?.trim()) {
+    await prisma.prospectContact.create({
+      data: {
+        prospectId: prospect.id,
+        name: body.initialContact.name.trim(),
+        title: body.initialContact.title ?? null,
+        email: body.initialContact.email ?? null,
+        phone: body.initialContact.phone ?? null,
+        isPrimaryContact: true,
+        discoveryDate: new Date(),
+      },
+    })
   }
 
   if (info.salesUserId) trackActivity(info.salesUserId, "prospectsAdded")

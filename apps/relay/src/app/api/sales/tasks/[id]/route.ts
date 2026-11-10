@@ -31,7 +31,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { title, taskType, dueAt, notes, priority, completedAt, complete } = body;
+    const { title, taskType, dueAt, notes, priority, completedAt, complete, outcome, completionNotes } = body;
 
     const updateData: Record<string, unknown> = {};
 
@@ -42,7 +42,8 @@ export async function PATCH(
     if (priority !== undefined) updateData.priority = priority;
     if (completedAt !== undefined) updateData.completedAt = completedAt ? new Date(completedAt) : null;
 
-    if (complete === true && !task.completedAt) {
+    const isNewCompletion = complete === true && !task.completedAt;
+    if (isNewCompletion) {
       updateData.completedAt = new Date();
     } else if (complete === false) {
       updateData.completedAt = null;
@@ -54,8 +55,22 @@ export async function PATCH(
       include: taskIncludes,
     });
 
-    if (info.salesUserId && complete === true && !task.completedAt) {
+    if (info.salesUserId && isNewCompletion) {
       trackActivity(info.salesUserId, "tasksCompleted");
+      // Optionally log a sales activity when completing a task with an outcome
+      if ((outcome || completionNotes) && task.prospectId) {
+        await prisma.salesCrmActivity.create({
+          data: {
+            prospectId:  task.prospectId,
+            contactId:   task.contactId ?? null,
+            salesUserId: info.salesUserId,
+            activityType: "TASK_COMPLETED",
+            subject:     task.title,
+            outcome:     outcome ?? null,
+            notes:       completionNotes ?? null,
+          },
+        }).catch(() => { /* non-fatal */ });
+      }
     }
 
     return NextResponse.json(updated);

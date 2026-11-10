@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Building2, Search, Filter, Plus } from "lucide-react"
 import type { SearchParams } from "next/dist/server/request/search-params"
 import { ProspectsTable } from "./ProspectsTable"
+import { AddProspectModal } from "@/app/sales/(panel)/outreach/prospects/AddProspectModal"
 
 export const dynamic = "force-dynamic"
 
@@ -119,9 +120,10 @@ export default async function ProspectsPage({ searchParams }: { searchParams: Pr
           <p className="text-gray-400 text-sm mt-0.5">{total} total</p>
         </div>
         <div className="flex items-center gap-2">
+          <AddProspectModal />
           <Link
             href="/sales/outreach/prospects/discover"
-            className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
           >
             <Plus className="w-4 h-4" />
             Find Prospects

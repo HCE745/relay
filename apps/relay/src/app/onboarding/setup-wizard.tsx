@@ -1240,7 +1240,7 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
         >
           <div className="flex items-start justify-between">
             <div>
-              <p className="font-bold text-lg">Start 14-Day Free Trial</p>
+              <p className="font-bold text-lg">Start 30-Day Free Trial</p>
               <p className="text-blue-100 text-sm mt-1">
                 Full access to all features. No credit card required.
                 Your data is preserved for 30 days after expiry.
@@ -1302,11 +1302,13 @@ export function SetupWizard({
   userId,
   initialIndustry,
   initialPlan,
+  onSwitchToConversational,
 }: {
   orgName: string
   userId: string
   initialIndustry?: string
   initialPlan?: string
+  onSwitchToConversational?: () => void
 }) {
   const router = useRouter()
   const [step, setStep] = useState(1)
@@ -1431,8 +1433,17 @@ export function SetupWizard({
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
       {/* Logo */}
-      <div className="mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <RelayWordmark height={36} />
+        {onSwitchToConversational && (
+          <button
+            type="button"
+            onClick={onSwitchToConversational}
+            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Try AI Setup →
+          </button>
+        )}
       </div>
 
       {/* Step indicator */}

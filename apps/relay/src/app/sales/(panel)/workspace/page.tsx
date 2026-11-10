@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 
 interface Task {
   id: string; title: string; taskType: string; priority: string; dueAt: string | null; completedAt?: string | null
+  notes:       string | null
   prospect:    { id: string; companyName: string } | null
   demoCall:    { id: string; companyName: string } | null
   opportunity: { id: string; title: string } | null
@@ -360,7 +361,7 @@ export default function WorkspacePage() {
                         {company && href && <> · <Link href={href} className="text-indigo-400 hover:underline">{company}</Link></>}
                       </p>
                     </div>
-                    <Link href="/sales/outreach/follow-ups" className="shrink-0 text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5">
+                    <Link href={href ?? "/sales/outreach/follow-ups"} className="shrink-0 text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5">
                       View <ArrowRight className="w-3 h-3" />
                     </Link>
                   </div>
@@ -568,6 +569,7 @@ function TaskRow({ task, completing, onComplete }: { task: Task; completing: str
           {company && href && <> · <Link href={href} className="text-indigo-400 hover:underline">{company}</Link></>}
           {task.contact && <> · {task.contact.name}</>}
         </p>
+        {task.notes && <p className="text-xs text-gray-600 mt-0.5 italic truncate">{task.notes}</p>}
       </div>
     </div>
   )

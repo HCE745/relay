@@ -297,7 +297,7 @@ export function ProspectHub({
 
   // ── Task state ──────────────────────────────────────────────────────────────
   const [addingTask, setAddingTask]       = useState(false)
-  const [taskForm, setTaskForm]           = useState({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "" })
+  const [taskForm, setTaskForm]           = useState({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "", assignedToId: currentUserId ?? "" })
   const [savingTask, setSavingTask]       = useState(false)
   const [completingTask, setCompletingTask] = useState<string | null>(null)
 
@@ -317,7 +317,7 @@ export function ProspectHub({
           dueAt: taskForm.dueAt || null,
           notes: taskForm.notes || null,
           prospectId: company.id,
-          assignedToId: currentUserId,
+          assignedToId: taskForm.assignedToId || currentUserId || null,
           contactId: taskForm.contactId || null,
         }),
       })
@@ -328,7 +328,7 @@ export function ProspectHub({
       const data = await res.json() as Task
       setCompany(c => ({ ...c, tasks: [...c.tasks, data] }))
       setAddingTask(false)
-      setTaskForm({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "" })
+      setTaskForm({ title: "", taskType: "other", priority: "normal", dueAt: "", notes: "", contactId: "", assignedToId: currentUserId ?? "" })
     } finally { setSavingTask(false) }
   }
 
@@ -1126,10 +1126,19 @@ export function ProspectHub({
                     {company.contacts.map(c => <option key={c.id} value={c.id}>{c.name}{c.title ? ` · ${c.title}` : ""}</option>)}
                   </select>
                 )}
+                {isManager && salesUsers.length > 0 && (
+                  <select value={taskForm.assignedToId} onChange={e => setTaskForm(f => ({ ...f, assignedToId: e.target.value }))}
+                    className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
+                    <option value="">Assign to rep…</option>
+                    {salesUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  </select>
+                )}
+                <textarea placeholder="Notes (optional)" value={taskForm.notes} onChange={e => setTaskForm(f => ({ ...f, notes: e.target.value }))} rows={2}
+                  className="col-span-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500" />
               </div>
               {taskError && <p className="text-xs text-red-400">{taskError}</p>}
               <div className="flex gap-2">
-                <button onClick={createTask} disabled={savingTask || !taskForm.title.trim()}
+                <button onClick={createTask} disabled={savingTask || !taskForm.title.trim() || (isManager && !taskForm.assignedToId)}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors">Add Task</button>
                 <button onClick={() => { setAddingTask(false); setTaskError(null) }} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
               </div>
@@ -1161,6 +1170,7 @@ export function ProspectHub({
                       {t.assignedTo && ` · ${t.assignedTo.name}`}
                       {t.contact && ` · re: ${t.contact.name}`}
                     </p>
+                    {t.notes && <p className="text-xs text-gray-600 italic mt-0.5">{t.notes}</p>}
                   </div>
                   {t.completedAt && (
                     <button onClick={() => reopenTask(t.id)} disabled={completingTask === t.id}

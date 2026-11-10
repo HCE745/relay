@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react"
 import Link from "next/link"
 import {
-  Search, Loader2, X, ChevronLeft, ExternalLink,
+  Search, Loader2, X, ChevronLeft, ChevronDown, ChevronUp, ExternalLink,
   MapPin, Users, Zap, CheckCircle2, AlertTriangle,
   Building2, Star, Mail, Globe, User, Plus, Send,
   Phone, Link2, FileText, Calendar, Clock,
@@ -31,6 +31,13 @@ interface ProspectCreated {
   prospectId: string
   contactId:  string | null
   contactEmail: string
+}
+
+interface SavedContact {
+  id:         string
+  name:       string
+  email:      string
+  prospectId: string
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -144,37 +151,48 @@ function SlideOver({ company, onClose }: {
   const [details,      setDetails]      = useState<DiscoveredCompanyDetails | null>(null)
   const [detailsErr,   setDetailsErr]   = useState<string | null>(null)
 
-  // Panel step
-  const [step, setStep] = useState<PanelStep>("contact")
+  // Accordion sections — all independent, contact open by default
+  const [sectionOpen, setSectionOpen] = useState({ contact: true, outreach: false, contacts: false })
+  function toggleSection(s: "contact" | "outreach" | "contacts") {
+    setSectionOpen(prev => ({ ...prev, [s]: !prev[s] }))
+  }
 
-  // Created prospect
-  const [created, setCreated] = useState<ProspectCreated | null>(null)
+  // Saved contacts for this session
+  const [savedContacts, setSavedContacts] = useState<SavedContact[]>([])
+  const [created, setCreated]             = useState<ProspectCreated | null>(null)
 
-  // Contact draft
+  // Contact form
   const blankContact = (): ContactDraft => ({ name: "", title: "", email: "", phone: "", linkedin: "", notes: "" })
-  const [contact, setContact] = useState<ContactDraft>(blankContact())
+  const [contact, setContact]           = useState<ContactDraft>(blankContact())
   const [savingContact, setSavingContact] = useState(false)
   const [contactError, setContactError] = useState<string | null>(null)
+  const [lastSaved, setLastSaved]       = useState<string | null>(null)
+
+  // Outreach
+  type OutreachTab = "email" | "log"
+  const [outreachTab, setOutreachTab]           = useState<OutreachTab>("email")
+  const [outreachContactId, setOutreachContactId] = useState<string>("")
 
   // Templates
-  const [templates, setTemplates] = useState<Template[]>([])
+  const [templates, setTemplates]           = useState<Template[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<string>("")
-  const [emailTo, setEmailTo] = useState("")
-  const [emailSubject, setEmailSubject] = useState("")
-  const [emailBody, setEmailBody] = useState("")
-  const [sendingEmail, setSendingEmail] = useState(false)
-  const [emailError, setEmailError] = useState<string | null>(null)
-  const [emailSent, setEmailSent] = useState(false)
 
-  // Interaction log
-  const [logType, setLogType] = useState("CALL_CONNECTED")
+  // Email
+  const [emailTo, setEmailTo]           = useState("")
+  const [emailSubject, setEmailSubject] = useState("")
+  const [emailBody, setEmailBody]       = useState("")
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailError, setEmailError]     = useState<string | null>(null)
+  const [emailSent, setEmailSent]       = useState(false)
+
+  // Log
+  const [logType, setLogType]       = useState("CALL_CONNECTED")
   const [logOutcome, setLogOutcome] = useState("")
-  const [logOccurredAt] = useState(() => { const d = new Date(); d.setSeconds(0, 0); return d.toISOString().slice(0, 16) })
   const [logDuration, setLogDuration] = useState("")
-  const [logNotes, setLogNotes] = useState("")
-  const [savingLog, setSavingLog] = useState(false)
-  const [logError, setLogError] = useState<string | null>(null)
-  const [logSaved, setLogSaved] = useState(false)
+  const [logNotes, setLogNotes]     = useState("")
+  const [savingLog, setSavingLog]   = useState(false)
+  const [logError, setLogError]     = useState<string | null>(null)
+  const [logSaved, setLogSaved]     = useState(false)
 
   // Load company research
   useEffect(() => {
@@ -199,114 +217,113 @@ function SlideOver({ company, onClose }: {
     void fetchDetails()
   }, [company])
 
-  // Load templates when email step opens
+  // Load templates when outreach section first opens
   useEffect(() => {
-    if (step !== "email") return
+    if (!sectionOpen.outreach || templates.length > 0) return
     fetch("/api/sales/templates")
       .then(r => r.ok ? r.json() : { templates: [] })
       .then((d: { templates: Template[] }) => setTemplates(d.templates ?? []))
       .catch(() => {})
-  }, [step])
+  }, [sectionOpen.outreach, templates.length])
 
-  // Apply merge fields when template changes
   const applyTemplate = useCallback((templateId: string) => {
     const tmpl = templates.find(t => t.id === templateId)
     if (!tmpl) return
+    const sc = savedContacts.find(c => c.id === outreachContactId) ?? savedContacts[0]
     const ctx = {
       companyName: company.companyName,
       city: company.city ?? "",
-      firstName: contact.name.split(" ")[0] ?? "",
+      firstName: sc?.name.split(" ")[0] ?? "",
     }
     setEmailSubject(applyMergeFields(tmpl.subject, ctx))
     setEmailBody(applyMergeFields(tmpl.body, ctx))
     setSelectedTemplate(templateId)
-  }, [templates, company, contact.name])
+  }, [templates, company, savedContacts, outreachContactId])
 
   async function handleSaveContact() {
     if (!contact.name.trim()) { setContactError("Contact name is required"); return }
     setSavingContact(true)
     setContactError(null)
     try {
-      const res = await fetch("/api/sales/prospects", {
+      const prospectPayload = {
+        companyName: company.companyName,
+        website: company.website ?? null,
+        industry: company.industry ?? null,
+        headquartersCity: company.city ?? null,
+        headquartersState: company.state ?? null,
+        aiFitScore: company.fitScore ?? null,
+        source: "ai_research",
+        initialContact: {
+          name: contact.name.trim(),
+          title: contact.title.trim() || null,
+          email: contact.email.trim() || null,
+          phone: contact.phone.trim() || null,
+          linkedinUrl: contact.linkedin.trim() || null,
+          notes: contact.notes.trim() || null,
+        },
+        initialInteraction: null,
+      }
+
+      let res = await fetch("/api/sales/prospects", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          companyName: company.companyName,
-          website: company.website ?? null,
-          industry: company.industry ?? null,
-          headquartersCity: company.city ?? null,
-          headquartersState: company.state ?? null,
-          aiFitScore: company.fitScore ?? null,
-          source: "ai_research",
-          confirmDuplicate: false,
-          initialContact: {
-            name: contact.name.trim(),
-            title: contact.title.trim() || null,
-            email: contact.email.trim() || null,
-            phone: contact.phone.trim() || null,
-          },
-          initialInteraction: null,
-        }),
+        body: JSON.stringify({ ...prospectPayload, confirmDuplicate: false }),
       })
+
       if (res.status === 409) {
-        const data = await res.json()
-        // Handle duplicate — just proceed with force
-        const res2 = await fetch("/api/sales/prospects", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            companyName: company.companyName,
-            website: company.website ?? null,
-            industry: company.industry ?? null,
-            headquartersCity: company.city ?? null,
-            headquartersState: company.state ?? null,
-            aiFitScore: company.fitScore ?? null,
-            confirmDuplicate: true,
-            initialContact: {
-              name: contact.name.trim(),
-              title: contact.title.trim() || null,
-              email: contact.email.trim() || null,
-              phone: contact.phone.trim() || null,
-            },
-            initialInteraction: null,
-          }),
-        })
-        if (!res2.ok) {
-          const d2 = await res2.json().catch(() => ({}))
-          // If it's a duplicate, extract the existing prospect
-          if (data.existing?.id) {
-            setCreated({ prospectId: data.existing.id, contactId: null, contactEmail: contact.email.trim() })
-            setEmailTo(contact.email.trim())
-            setStep("action")
+        const dup = await res.json() as { existing?: { id: string } }
+        const existingId = dup.existing?.id
+        if (existingId) {
+          // Add contact to the existing prospect via companies API
+          const r2 = await fetch(`/api/sales/companies/${existingId}/contacts`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(prospectPayload.initialContact),
+          })
+          if (r2.ok) {
+            const d2 = await r2.json() as { contact: { id: string } }
+            pushContact({ id: d2.contact.id, name: contact.name.trim(), email: contact.email.trim(), prospectId: existingId })
             return
           }
-          setContactError(d2.error ?? "Failed to save")
+          // If contact add failed, still use the existing prospect
+          pushContact({ id: "", name: contact.name.trim(), email: contact.email.trim(), prospectId: existingId })
           return
         }
-        const d2 = await res2.json()
-        setCreated({ prospectId: d2.prospect.id, contactId: d2.prospect.contacts?.[0]?.id ?? null, contactEmail: contact.email.trim() })
-        setEmailTo(contact.email.trim())
-        setStep("action")
-        return
+        // No existing.id — force-create
+        res = await fetch("/api/sales/prospects", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ ...prospectPayload, confirmDuplicate: true }),
+        })
       }
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
+        const data = await res.json().catch(() => ({})) as { error?: string }
         setContactError(data.error ?? "Failed to save contact")
         return
       }
-      const data = await res.json()
-      setCreated({
+      const data = await res.json() as { prospect: { id: string; contacts?: { id: string }[] } }
+      pushContact({
+        id: data.prospect.contacts?.[0]?.id ?? "",
+        name: contact.name.trim(),
+        email: contact.email.trim(),
         prospectId: data.prospect.id,
-        contactId: data.prospect.contacts?.[0]?.id ?? null,
-        contactEmail: contact.email.trim(),
       })
-      setEmailTo(contact.email.trim())
-      setStep("action")
     } catch {
       setContactError("Network error — please try again")
     } finally {
       setSavingContact(false)
     }
+  }
+
+  function pushContact(newContact: SavedContact) {
+    setSavedContacts(prev => [...prev, newContact])
+    setCreated({ prospectId: newContact.prospectId, contactId: newContact.id || null, contactEmail: newContact.email })
+    setOutreachContactId(newContact.id)
+    setEmailTo(newContact.email)
+    setLastSaved(newContact.name)
+    setContact(blankContact())
+    setSectionOpen(prev => ({ ...prev, outreach: true, contacts: true }))
   }
 
   async function handleSendEmail() {
@@ -317,6 +334,7 @@ function SlideOver({ company, onClose }: {
     setSendingEmail(true)
     setEmailError(null)
     try {
+      const sc = savedContacts.find(c => c.id === outreachContactId) ?? savedContacts[0]
       const res = await fetch(`/api/sales/prospects/${created.prospectId}/email`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -324,16 +342,18 @@ function SlideOver({ company, onClose }: {
           to: emailTo.trim(),
           subject: emailSubject,
           emailBody,
-          contactId: created.contactId,
+          contactId: sc?.id || null,
         }),
       })
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
+        const data = await res.json().catch(() => ({})) as { error?: string }
         setEmailError(data.error ?? "Send failed")
         return
       }
       setEmailSent(true)
-      setStep("action")
+      setEmailSubject("")
+      setEmailBody("")
+      setSelectedTemplate("")
     } finally {
       setSendingEmail(false)
     }
@@ -344,12 +364,13 @@ function SlideOver({ company, onClose }: {
     setSavingLog(true)
     setLogError(null)
     try {
+      const sc = savedContacts.find(c => c.id === outreachContactId)
       const res = await fetch("/api/sales/activities", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           prospectId: created.prospectId,
-          contactId: created.contactId,
+          contactId: sc?.id || null,
           activityType: logType,
           outcome: logOutcome.trim() || null,
           notes: logNotes.trim() || null,
@@ -357,24 +378,21 @@ function SlideOver({ company, onClose }: {
         }),
       })
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
+        const data = await res.json().catch(() => ({})) as { error?: string }
         setLogError(data.error ?? "Failed to log interaction")
         return
       }
       setLogSaved(true)
-      setStep("action")
+      setLogOutcome("")
+      setLogDuration("")
+      setLogNotes("")
     } finally {
       setSavingLog(false)
     }
   }
 
-  function handleAddAnother() {
-    setContact(blankContact())
-    setContactError(null)
-    setStep("contact")
-  }
-
   const inputCls = "w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors"
+  const sectionHdrCls = "w-full flex items-center gap-2.5 px-4 py-3 text-left hover:bg-gray-800/40 transition-colors"
 
   return (
     <>
@@ -437,7 +455,6 @@ function SlideOver({ company, onClose }: {
             {company.summary && (
               <p className="text-sm text-gray-300 leading-relaxed">{company.summary}</p>
             )}
-
             {detailsState === "loading" && (
               <div className="space-y-2 animate-pulse">
                 <div className="h-3 bg-gray-800 rounded w-32" />
@@ -445,14 +462,12 @@ function SlideOver({ company, onClose }: {
                 <div className="h-3 bg-gray-800 rounded w-4/5" />
               </div>
             )}
-
             {detailsState === "error" && (
               <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-3 text-xs text-red-400 flex items-start gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                 <span>Research failed: {detailsErr}</span>
               </div>
             )}
-
             {detailsState === "ready" && details && (
               <>
                 {details.painPoints?.length > 0 && (
@@ -490,13 +505,26 @@ function SlideOver({ company, onClose }: {
               </>
             )}
 
-            {/* ── Step A: Add Contact ───────────────────────────────────── */}
-            {step === "contact" && (
-              <div className="border-t border-gray-800 pt-4">
-                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5" /> Add Contact
-                </p>
-                <div className="space-y-3">
+            {/* ── Section 1: Contact Information ──────────────────────── */}
+            <div className="border border-gray-700/60 rounded-xl overflow-hidden">
+              <button onClick={() => toggleSection("contact")} className={sectionHdrCls}>
+                <User className="w-4 h-4 text-indigo-400 shrink-0" />
+                <span className="font-medium text-white text-sm flex-1">Contact Information</span>
+                {savedContacts.length > 0 && (
+                  <span className="text-[10px] text-gray-500 mr-1">{savedContacts.length} saved</span>
+                )}
+                {sectionOpen.contact
+                  ? <ChevronUp className="w-4 h-4 text-gray-500 shrink-0" />
+                  : <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" />}
+              </button>
+              {sectionOpen.contact && (
+                <div className="px-4 pb-4 pt-2 border-t border-gray-800 space-y-3">
+                  {lastSaved && (
+                    <div className="flex items-center gap-2 text-xs text-green-400 py-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      <span><span className="font-medium">{lastSaved}</span> saved. Add another contact below.</span>
+                    </div>
+                  )}
                   <div>
                     <label className="block text-[11px] text-gray-500 mb-1">Name <span className="text-red-400">*</span></label>
                     <input type="text" value={contact.name} onChange={e => setContact(c => ({ ...c, name: e.target.value }))}
@@ -513,8 +541,7 @@ function SlideOver({ company, onClose }: {
                       <div className="relative">
                         <Phone className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
                         <input type="text" value={contact.phone} onChange={e => setContact(c => ({ ...c, phone: e.target.value }))}
-                          placeholder="(555) 000-0000"
-                          className={`${inputCls} pl-8`} />
+                          placeholder="(555) 000-0000" className={`${inputCls} pl-8`} />
                       </div>
                     </div>
                   </div>
@@ -523,8 +550,7 @@ function SlideOver({ company, onClose }: {
                     <div className="relative">
                       <Mail className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
                       <input type="email" value={contact.email} onChange={e => setContact(c => ({ ...c, email: e.target.value }))}
-                        placeholder="jane@company.com"
-                        className={`${inputCls} pl-8`} />
+                        placeholder="jane@company.com" className={`${inputCls} pl-8`} />
                     </div>
                   </div>
                   <div>
@@ -532,23 +558,19 @@ function SlideOver({ company, onClose }: {
                     <div className="relative">
                       <Link2 className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
                       <input type="text" value={contact.linkedin} onChange={e => setContact(c => ({ ...c, linkedin: e.target.value }))}
-                        placeholder="linkedin.com/in/janesmith"
-                        className={`${inputCls} pl-8`} />
+                        placeholder="linkedin.com/in/janesmith" className={`${inputCls} pl-8`} />
                     </div>
                   </div>
                   <div>
                     <label className="block text-[11px] text-gray-500 mb-1">Notes</label>
                     <textarea value={contact.notes} onChange={e => setContact(c => ({ ...c, notes: e.target.value }))}
-                      rows={2} placeholder="Anything worth noting..."
-                      className={`${inputCls} resize-none`} />
+                      rows={2} placeholder="Anything worth noting..." className={`${inputCls} resize-none`} />
                   </div>
-
                   {contactError && (
                     <p className="text-xs text-red-400 flex items-center gap-1.5">
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{contactError}
                     </p>
                   )}
-
                   <button
                     onClick={handleSaveContact}
                     disabled={savingContact || !contact.name.trim()}
@@ -560,192 +582,230 @@ function SlideOver({ company, onClose }: {
                     }
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* ── Step B: Action choice ─────────────────────────────────── */}
-            {step === "action" && created && (
-              <div className="border-t border-gray-800 pt-4 space-y-3">
-                <div className="flex items-center gap-2 text-sm text-green-400">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">{contact.name || "Contact"} saved to CRM</span>
-                </div>
+            {/* ── Section 2: Outreach Activity ──────────────────────────── */}
+            <div className={`border rounded-xl overflow-hidden ${created ? "border-gray-700/60" : "border-gray-800/40 opacity-50"}`}>
+              <button
+                onClick={() => created && toggleSection("outreach")}
+                className={sectionHdrCls}
+              >
+                <Mail className="w-4 h-4 text-orange-400 shrink-0" />
+                <span className="font-medium text-white text-sm flex-1">Outreach Activity</span>
+                {!created && <span className="text-[10px] text-gray-600 mr-1">save a contact first</span>}
+                {created && (sectionOpen.outreach
+                  ? <ChevronUp className="w-4 h-4 text-gray-500 shrink-0" />
+                  : <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" />)}
+              </button>
 
-                {emailSent && (
-                  <div className="bg-green-900/20 border border-green-700/30 rounded-lg px-3 py-2 text-xs text-green-400">
-                    Email sent successfully.
-                  </div>
-                )}
-                {logSaved && (
-                  <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg px-3 py-2 text-xs text-indigo-400">
-                    Interaction logged.
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => { setEmailSent(false); setEmailError(null); setStep("email") }}
-                    className="flex flex-col items-center gap-1.5 p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl transition-colors"
-                  >
-                    <Mail className="w-5 h-5 text-indigo-400" />
-                    <span className="text-xs font-medium text-gray-200">Send Email</span>
-                  </button>
-                  <button
-                    onClick={() => { setLogSaved(false); setLogError(null); setStep("log") }}
-                    className="flex flex-col items-center gap-1.5 p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl transition-colors"
-                  >
-                    <Calendar className="w-5 h-5 text-amber-400" />
-                    <span className="text-xs font-medium text-gray-200">Log Interaction</span>
-                  </button>
-                </div>
-
-                <button
-                  onClick={handleAddAnother}
-                  className="w-full flex items-center justify-center gap-2 py-2 text-sm text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Another Contact
-                </button>
-
-                <Link
-                  href={`/sales/prospects/${created.prospectId}`}
-                  className="block text-center text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-                >
-                  Open in CRM →
-                </Link>
-              </div>
-            )}
-
-            {/* ── Email composer ────────────────────────────────────────── */}
-            {step === "email" && created && (
-              <div className="border-t border-gray-800 pt-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5" /> Compose Email
-                  </p>
-                  <button onClick={() => setStep("action")} className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors">
-                    ← Back
-                  </button>
-                </div>
-
-                {/* Template picker */}
-                {templates.length > 0 && (
-                  <div>
-                    <label className="block text-[11px] text-gray-500 mb-1">Template</label>
-                    <div className="relative">
-                      <FileText className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
+              {sectionOpen.outreach && created && (
+                <div className="px-4 pb-4 pt-2 border-t border-gray-800 space-y-3">
+                  {/* Contact selector (only when multiple saved) */}
+                  {savedContacts.length > 1 && (
+                    <div>
+                      <label className="block text-[11px] text-gray-500 mb-1">Contact</label>
                       <select
-                        value={selectedTemplate}
-                        onChange={e => applyTemplate(e.target.value)}
-                        className={`${inputCls} pl-8`}
+                        value={outreachContactId}
+                        onChange={e => {
+                          setOutreachContactId(e.target.value)
+                          const sc = savedContacts.find(c => c.id === e.target.value)
+                          if (sc?.email) setEmailTo(sc.email)
+                        }}
+                        className={inputCls}
                       >
-                        <option value="">— select a template —</option>
-                        {templates.map(t => (
-                          <option key={t.id} value={t.id}>{t.name}</option>
+                        {savedContacts.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}{c.email ? ` — ${c.email}` : ""}</option>
                         ))}
                       </select>
                     </div>
+                  )}
+
+                  {/* Tab switcher */}
+                  <div className="flex gap-1 p-1 bg-gray-800/60 rounded-lg">
+                    <button
+                      onClick={() => setOutreachTab("email")}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-colors ${outreachTab === "email" ? "bg-gray-700 text-white" : "text-gray-400 hover:text-gray-200"}`}
+                    >
+                      <Send className="w-3 h-3" /> Send Email
+                    </button>
+                    <button
+                      onClick={() => setOutreachTab("log")}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-colors ${outreachTab === "log" ? "bg-gray-700 text-white" : "text-gray-400 hover:text-gray-200"}`}
+                    >
+                      <Calendar className="w-3 h-3" /> Log Interaction
+                    </button>
+                  </div>
+
+                  {/* Email tab */}
+                  {outreachTab === "email" && (
+                    <div className="space-y-3">
+                      {emailSent && (
+                        <div className="flex items-center gap-2 text-xs text-green-400 py-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> Email sent.
+                        </div>
+                      )}
+                      {templates.length > 0 && (
+                        <div>
+                          <label className="block text-[11px] text-gray-500 mb-1">Template</label>
+                          <div className="relative">
+                            <FileText className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
+                            <select value={selectedTemplate} onChange={e => applyTemplate(e.target.value)}
+                              className={`${inputCls} pl-8`}>
+                              <option value="">— select a template —</option>
+                              {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                      )}
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">To</label>
+                        <input type="email" value={emailTo} onChange={e => setEmailTo(e.target.value)}
+                          placeholder="recipient@company.com" className={inputCls} />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Subject</label>
+                        <input type="text" value={emailSubject} onChange={e => setEmailSubject(e.target.value)}
+                          className={inputCls} />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Body</label>
+                        <textarea rows={9} value={emailBody} onChange={e => setEmailBody(e.target.value)}
+                          className={`${inputCls} resize-none font-mono`} />
+                      </div>
+                      {emailError && (
+                        <p className="text-xs text-red-400 flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{emailError}
+                        </p>
+                      )}
+                      <button
+                        onClick={handleSendEmail}
+                        disabled={sendingEmail || !emailTo.trim() || !emailSubject.trim() || !emailBody.trim()}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        {sendingEmail
+                          ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
+                          : <><Send className="w-4 h-4" /> Send Email</>}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Log tab */}
+                  {outreachTab === "log" && (
+                    <div className="space-y-3">
+                      {logSaved && (
+                        <div className="flex items-center gap-2 text-xs text-indigo-400 py-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> Interaction logged.
+                        </div>
+                      )}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[11px] text-gray-500 mb-1">Type</label>
+                          <select value={logType} onChange={e => setLogType(e.target.value)} className={inputCls}>
+                            <option value="CALL_CONNECTED">Phone Call</option>
+                            <option value="CALL_ATTEMPTED">Call Attempted</option>
+                            <option value="EMAIL_SENT">Email</option>
+                            <option value="LINKEDIN_MESSAGE">LinkedIn Message</option>
+                            <option value="MEETING_HELD">In-Person Meeting</option>
+                            <option value="NOTE_ADDED">Note</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] text-gray-500 mb-1">
+                            <Clock className="inline w-3 h-3 mr-1" />Duration (min)
+                          </label>
+                          <input type="number" min="1" value={logDuration} onChange={e => setLogDuration(e.target.value)}
+                            placeholder="15" className={inputCls} />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Outcome</label>
+                        <input type="text" value={logOutcome} onChange={e => setLogOutcome(e.target.value)}
+                          placeholder="Left voicemail, interested, requested follow-up…" className={inputCls} />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Notes</label>
+                        <textarea rows={3} value={logNotes} onChange={e => setLogNotes(e.target.value)}
+                          className={`${inputCls} resize-none`} />
+                      </div>
+                      {logError && (
+                        <p className="text-xs text-red-400 flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{logError}
+                        </p>
+                      )}
+                      <button
+                        onClick={handleLogInteraction}
+                        disabled={savingLog}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        {savingLog
+                          ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
+                          : "Log Interaction"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* ── Section 3: Saved Contacts ─────────────────────────────── */}
+            {savedContacts.length > 0 && (
+              <div className="border border-gray-700/60 rounded-xl overflow-hidden">
+                <button onClick={() => toggleSection("contacts")} className={sectionHdrCls}>
+                  <Users className="w-4 h-4 text-indigo-400 shrink-0" />
+                  <span className="font-medium text-white text-sm flex-1">
+                    Saved Contacts <span className="text-gray-500 font-normal">({savedContacts.length})</span>
+                  </span>
+                  {sectionOpen.contacts
+                    ? <ChevronUp className="w-4 h-4 text-gray-500 shrink-0" />
+                    : <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" />}
+                </button>
+                {sectionOpen.contacts && (
+                  <div className="px-4 pb-3 pt-2 border-t border-gray-800">
+                    {savedContacts.map(c => (
+                      <div key={`${c.id}-${c.name}`} className="flex items-center gap-3 py-2.5 border-b border-gray-800/60 last:border-0">
+                        <div className="w-7 h-7 rounded-full bg-indigo-900/40 flex items-center justify-center text-xs font-bold text-indigo-300 shrink-0">
+                          {c.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white">{c.name}</p>
+                          {c.email && <p className="text-xs text-gray-500">{c.email}</p>}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            onClick={() => {
+                              setOutreachContactId(c.id)
+                              if (c.email) setEmailTo(c.email)
+                              setSectionOpen(prev => ({ ...prev, outreach: true }))
+                            }}
+                            className="text-[11px] text-orange-400 hover:text-orange-300 transition-colors"
+                          >
+                            Outreach
+                          </button>
+                          <Link
+                            href={`/sales/prospects/${c.prospectId}`}
+                            className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5"
+                          >
+                            CRM <ExternalLink className="w-2.5 h-2.5" />
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => {
+                        setLastSaved(null)
+                        setContact(blankContact())
+                        setSectionOpen(prev => ({ ...prev, contact: true }))
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2 mt-2 text-sm text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors"
+                    >
+                      <Plus className="w-4 h-4" /> Add Another Contact
+                    </button>
                   </div>
                 )}
-
-                <div>
-                  <label className="block text-[11px] text-gray-500 mb-1">To</label>
-                  <input type="email" value={emailTo} onChange={e => setEmailTo(e.target.value)}
-                    placeholder="recipient@company.com" className={inputCls} />
-                </div>
-                <div>
-                  <label className="block text-[11px] text-gray-500 mb-1">Subject</label>
-                  <input type="text" value={emailSubject} onChange={e => setEmailSubject(e.target.value)}
-                    className={inputCls} />
-                </div>
-                <div>
-                  <label className="block text-[11px] text-gray-500 mb-1">Body</label>
-                  <textarea rows={10} value={emailBody} onChange={e => setEmailBody(e.target.value)}
-                    className={`${inputCls} resize-none font-mono`} />
-                </div>
-
-                {emailError && (
-                  <p className="text-xs text-red-400 flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{emailError}
-                  </p>
-                )}
-
-                <button
-                  onClick={handleSendEmail}
-                  disabled={sendingEmail || !emailTo.trim() || !emailSubject.trim() || !emailBody.trim()}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-                >
-                  {sendingEmail
-                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                    : <><Send className="w-4 h-4" /> Send Email</>
-                  }
-                </button>
               </div>
             )}
 
-            {/* ── Log interaction ───────────────────────────────────────── */}
-            {step === "log" && created && (
-              <div className="border-t border-gray-800 pt-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" /> Log Interaction
-                  </p>
-                  <button onClick={() => setStep("action")} className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors">
-                    ← Back
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[11px] text-gray-500 mb-1">Type</label>
-                    <select value={logType} onChange={e => setLogType(e.target.value)} className={inputCls}>
-                      <option value="CALL_CONNECTED">Phone Call</option>
-                      <option value="CALL_ATTEMPTED">Call Attempted</option>
-                      <option value="EMAIL_SENT">Email</option>
-                      <option value="LINKEDIN_MESSAGE">LinkedIn Message</option>
-                      <option value="MEETING_HELD">In-Person Meeting</option>
-                      <option value="NOTE_ADDED">Note</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-gray-500 mb-1">
-                      <Clock className="inline w-3 h-3 mr-1" />Duration (min)
-                    </label>
-                    <input type="number" min="1" value={logDuration} onChange={e => setLogDuration(e.target.value)}
-                      placeholder="15" className={inputCls} />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-gray-500 mb-1">Outcome</label>
-                  <input type="text" value={logOutcome} onChange={e => setLogOutcome(e.target.value)}
-                    placeholder="Left voicemail, interested, requested follow-up…" className={inputCls} />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-gray-500 mb-1">Notes</label>
-                  <textarea rows={3} value={logNotes} onChange={e => setLogNotes(e.target.value)}
-                    className={`${inputCls} resize-none`} />
-                </div>
-
-                {logError && (
-                  <p className="text-xs text-red-400 flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{logError}
-                  </p>
-                )}
-
-                <button
-                  onClick={handleLogInteraction}
-                  disabled={savingLog}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-                >
-                  {savingLog
-                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
-                    : "Log Interaction"
-                  }
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>

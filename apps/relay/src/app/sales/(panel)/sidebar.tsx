@@ -4,8 +4,8 @@ import { usePathname, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
-  LayoutDashboard, Users, Mail, Search, GitBranch, BarChart2,
-  Settings, ChevronDown, ChevronRight, Menu, X, LogOut,
+  LayoutDashboard, Users, Mail, GitBranch, BarChart2,
+  Settings, Menu, X, LogOut,
   Bell, FileText, TrendingUp, Layers, Eye, Briefcase, UsersRound, ShieldOff, Building2, Compass, DollarSign, FlaskConical, Target, MonitorDot,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -15,7 +15,6 @@ interface NavItem {
   href:  string
   icon:  React.ElementType
   badge?: number
-  children?: NavItem[]
 }
 
 function buildSections(followUpsDue: number, isManager: boolean): { label?: string; items: NavItem[] }[] {
@@ -26,9 +25,8 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
         { label: "To-Do",            href: "/sales/workspace",                    icon: MonitorDot },
         { label: "Prospects",        href: "/sales/prospects",                    icon: Building2 },
         { label: "Find Prospects",  href: "/sales/outreach/prospects/discover",  icon: Compass },
-        { label: "Email",           href: "/sales/outreach/email",               icon: Mail, badge: followUpsDue, children: [
-          { label: "Email Follow-Ups", href: "/sales/outreach/follow-ups", icon: Bell },
-        ] },
+        { label: "Email",            href: "/sales/outreach/email",         icon: Mail, badge: followUpsDue },
+        { label: "Email Follow-Ups", href: "/sales/outreach/follow-ups",   icon: Bell },
         { label: "Opportunities",   href: "/sales/opportunities",                icon: Briefcase },
         { label: "Sales Goals",     href: "/sales/goals",                        icon: Target },
       ],
@@ -40,7 +38,6 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
         { label: "My Accounts",     href: "/sales/accounts",     icon: Building2 },
         { label: "Pipeline",        href: "/sales/pipeline",     icon: GitBranch },
         { label: "All Demo Calls",  href: "/sales/leads",        icon: Users },
-        { label: "Prospects",       href: "/sales/outreach/prospects",          icon: Search },
         { label: "A/B Tests",       href: "/sales/outreach/ab-tests",           icon: FlaskConical },
         { label: "Sequences",       href: "/sales/outreach/sequences",          icon: GitBranch },
         { label: "Templates",       href: "/sales/outreach/templates",          icon: FileText },
@@ -85,17 +82,7 @@ export function SalesSidebar({ name, email, isManager, isDemo }: { name: string;
   const pathname       = usePathname()
   const router         = useRouter()
   const [open, setOpen]               = useState(false)
-  const [outreachOpen, setOutreachOpen] = useState(false)
-  const [emailOpen, setEmailOpen]       = useState(false)
   const [followUpsDue, setFollowUpsDue] = useState(0)
-
-  // Auto-open outreach if we're on an outreach sub-page
-  useEffect(() => {
-    if (pathname.startsWith("/sales/outreach")) setOutreachOpen(true)
-    if (pathname.startsWith("/sales/outreach/email") || pathname.startsWith("/sales/outreach/follow-ups")) {
-      setEmailOpen(true)
-    }
-  }, [pathname])
 
   // Poll follow-ups due count
   useEffect(() => {
@@ -117,49 +104,10 @@ export function SalesSidebar({ name, email, isManager, isDemo }: { name: string;
 
   const sections = buildSections(followUpsDue, isManager)
 
-  function NavLink({ item, depth = 0 }: { item: NavItem; depth?: number }) {
-    const active = item.href === "/sales" || item.href === "/sales/outreach"
+  function NavLink({ item }: { item: NavItem }) {
+    const active = item.href === "/sales"
       ? pathname === item.href
-      : pathname.startsWith(item.href) && (depth > 0 || !item.children)
-
-    if (item.children) {
-      const isEmail = item.href === "/sales/outreach/email"
-      const isOpen = isEmail ? emailOpen : outreachOpen
-      const toggle = isEmail ? () => setEmailOpen(v => !v) : () => setOutreachOpen(v => !v)
-      const isAnyChildActive = item.children.some(c => pathname.startsWith(c.href))
-
-      return (
-        <div>
-          <button
-            onClick={toggle}
-            className={cn(
-              "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-              isOpen || pathname === item.href
-                ? "text-white bg-gray-800"
-                : isAnyChildActive
-                  ? "text-emerald-400 bg-emerald-600/20"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/60",
-            )}
-          >
-            <item.icon className="w-4 h-4 shrink-0" />
-            <span className="flex-1 text-left">{item.label}</span>
-            {item.badge != null && item.badge > 0 && (
-              <span className="bg-emerald-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full mr-1">
-                {item.badge > 99 ? "99+" : item.badge}
-              </span>
-            )}
-            {isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-          </button>
-          {isOpen && (
-            <div className="ml-4 mt-0.5 space-y-0.5 border-l border-gray-800 pl-2">
-              {item.children.map(child => (
-                <NavLink key={child.href} item={child} depth={1} />
-              ))}
-            </div>
-          )}
-        </div>
-      )
-    }
+      : pathname.startsWith(item.href)
 
     return (
       <Link

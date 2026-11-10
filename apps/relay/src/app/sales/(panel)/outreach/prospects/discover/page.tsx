@@ -1,27 +1,36 @@
 "use client"
 
-import { useState, useCallback, useEffect, useMemo } from "react"
+import { useState, useCallback, useEffect } from "react"
 import Link from "next/link"
 import {
   Search, Loader2, X, ChevronLeft, ExternalLink,
   MapPin, Users, Zap, CheckCircle2, AlertTriangle,
-  RefreshCw, Send, Building2, Star, Mail, Globe,
+  Building2, Star, Mail, Globe, User, Plus, Send,
+  Phone, Link2, FileText, Calendar, Clock,
 } from "lucide-react"
 import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api/super-admin/crm/prospects/discover/route"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface EmailDraft { subject: string; body: string }
-
 type SearchState  = "idle" | "loading" | "done" | "error"
 type DetailsState = "loading" | "ready" | "error"
-type EmailState   = "idle" | "loading" | "ready" | "sending" | "sent" | "error"
+type PanelStep    = "contact" | "action" | "email" | "log"
 
-interface DuplicateInfo {
-  companyName: string | null
-  prospectId:  string | null
-  demoCallId:  string | null
-  signals?:    string[]
+interface ContactDraft {
+  name:     string
+  title:    string
+  email:    string
+  phone:    string
+  linkedin: string
+  notes:    string
+}
+
+interface Template { id: string; name: string; subject: string; body: string }
+
+interface ProspectCreated {
+  prospectId: string
+  contactId:  string | null
+  contactEmail: string
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -37,21 +46,15 @@ function cleanUrl(url: string): string {
 }
 
 function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-  } catch { return "" }
+  try { return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) }
+  catch { return "" }
 }
 
-function domainFromWebsite(website: string): string | null {
-  try {
-    return new URL(website.startsWith("http") ? website : `https://${website}`).hostname.replace(/^www\./, "")
-  } catch { return null }
-}
-
-function suggestEmailsFromDomain(website: string): string[] {
-  const domain = domainFromWebsite(website)
-  if (!domain) return []
-  return [`info@${domain}`, `operations@${domain}`, `contact@${domain}`, `facilities@${domain}`]
+function applyMergeFields(text: string, ctx: { companyName: string; city?: string; firstName?: string }): string {
+  return text
+    .replace(/\{\{companyName\}\}/g, ctx.companyName)
+    .replace(/\{\{city\}\}/g, ctx.city ?? "")
+    .replace(/\{\{firstName\}\}/g, ctx.firstName ?? "")
 }
 
 // ─── Company Card ─────────────────────────────────────────────────────────────
@@ -132,104 +135,246 @@ function SlideOver({ company, onClose }: {
   onClose: () => void
 }) {
   const badge = fitBadge(company.fitScore)
+  const websiteHref = company.website
+    ? (company.website.startsWith("http") ? company.website : `https://${company.website}`)
+    : null
 
-  const suggestedEmails = useMemo(() => company.website ? suggestEmailsFromDomain(company.website) : [], [company.website])
-
+  // Company research
   const [detailsState, setDetailsState] = useState<DetailsState>("loading")
   const [details,      setDetails]      = useState<DiscoveredCompanyDetails | null>(null)
   const [detailsErr,   setDetailsErr]   = useState<string | null>(null)
 
-  const [emailState,  setEmailState]  = useState<EmailState>("idle")
-  const [draft,       setDraft]       = useState<EmailDraft | null>(null)
-  const [toEmail,     setToEmail]     = useState(suggestedEmails[0] ?? "")
-  const [subject,     setSubject]     = useState("")
-  const [emailBody,   setEmailBody]   = useState("")
-  const [emailError,  setEmailError]  = useState<string | null>(null)
-  const [sentIds,     setSentIds]     = useState<{ prospectId: string; demoCallId: string } | null>(null)
-  const [duplicate,   setDuplicate]   = useState<DuplicateInfo | null>(null)
+  // Panel step
+  const [step, setStep] = useState<PanelStep>("contact")
 
-  const generateEmail = useCallback(async (detailsData: DiscoveredCompanyDetails) => {
-    setEmailState("loading")
-    setEmailError(null)
-    setDuplicate(null)
-    try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover/email", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ company: detailsData }),
-      })
-      if (!res.ok) throw new Error(`Generation failed (${res.status})`)
-      const data = await res.json() as EmailDraft
-      setDraft(data)
-      setSubject(data.subject)
-      setEmailBody(data.body)
-      setEmailState("ready")
-    } catch (err) {
-      setEmailError(err instanceof Error ? err.message : "Failed to generate email")
-      setEmailState("error")
-    }
-  }, [])
+  // Created prospect
+  const [created, setCreated] = useState<ProspectCreated | null>(null)
 
+  // Contact draft
+  const blankContact = (): ContactDraft => ({ name: "", title: "", email: "", phone: "", linkedin: "", notes: "" })
+  const [contact, setContact] = useState<ContactDraft>(blankContact())
+  const [savingContact, setSavingContact] = useState(false)
+  const [contactError, setContactError] = useState<string | null>(null)
+
+  // Templates
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("")
+  const [emailTo, setEmailTo] = useState("")
+  const [emailSubject, setEmailSubject] = useState("")
+  const [emailBody, setEmailBody] = useState("")
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [emailSent, setEmailSent] = useState(false)
+
+  // Interaction log
+  const [logType, setLogType] = useState("CALL_CONNECTED")
+  const [logOutcome, setLogOutcome] = useState("")
+  const [logOccurredAt] = useState(() => { const d = new Date(); d.setSeconds(0, 0); return d.toISOString().slice(0, 16) })
+  const [logDuration, setLogDuration] = useState("")
+  const [logNotes, setLogNotes] = useState("")
+  const [savingLog, setSavingLog] = useState(false)
+  const [logError, setLogError] = useState<string | null>(null)
+  const [logSaved, setLogSaved] = useState(false)
+
+  // Load company research
   useEffect(() => {
     async function fetchDetails() {
       setDetailsState("loading")
       setDetailsErr(null)
       try {
         const res = await fetch("/api/super-admin/crm/prospects/discover/details", {
-          method:  "POST",
+          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ company }),
+          body: JSON.stringify({ company }),
         })
         if (!res.ok) throw new Error(`Details failed (${res.status})`)
         const data = await res.json() as DiscoveredCompanyDetails
         setDetails(data)
         setDetailsState("ready")
-        void generateEmail(data)
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Failed to load research"
-        setDetailsErr(msg)
+        setDetailsErr(err instanceof Error ? err.message : "Failed to load research")
         setDetailsState("error")
       }
     }
     void fetchDetails()
-  }, [company, generateEmail])
+  }, [company])
 
-  async function handleSend(force = false) {
-    if (!toEmail.trim()) { setEmailError("Enter a recipient email address"); return }
-    if (emailState === "sending") return
-    const payload = details ?? { ...company, painPoints: [], relayFitReasons: [], suggestedOutreachAngle: "" }
-    setEmailState("sending")
-    setEmailError(null)
-    setDuplicate(null)
+  // Load templates when email step opens
+  useEffect(() => {
+    if (step !== "email") return
+    fetch("/api/sales/templates")
+      .then(r => r.ok ? r.json() : { templates: [] })
+      .then((d: { templates: Template[] }) => setTemplates(d.templates ?? []))
+      .catch(() => {})
+  }, [step])
+
+  // Apply merge fields when template changes
+  const applyTemplate = useCallback((templateId: string) => {
+    const tmpl = templates.find(t => t.id === templateId)
+    if (!tmpl) return
+    const ctx = {
+      companyName: company.companyName,
+      city: company.city ?? "",
+      firstName: contact.name.split(" ")[0] ?? "",
+    }
+    setEmailSubject(applyMergeFields(tmpl.subject, ctx))
+    setEmailBody(applyMergeFields(tmpl.body, ctx))
+    setSelectedTemplate(templateId)
+  }, [templates, company, contact.name])
+
+  async function handleSaveContact() {
+    if (!contact.name.trim()) { setContactError("Contact name is required"); return }
+    setSavingContact(true)
+    setContactError(null)
     try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover/send", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ company: payload, to: toEmail.trim(), subject, emailBody, force }),
+      const res = await fetch("/api/sales/prospects", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          companyName: company.companyName,
+          website: company.website ?? null,
+          industry: company.industry ?? null,
+          headquartersCity: company.city ?? null,
+          headquartersState: company.state ?? null,
+          aiFitScore: company.fitScore ?? null,
+          source: "ai_research",
+          confirmDuplicate: false,
+          initialContact: {
+            name: contact.name.trim(),
+            title: contact.title.trim() || null,
+            email: contact.email.trim() || null,
+            phone: contact.phone.trim() || null,
+          },
+          initialInteraction: null,
+        }),
       })
       if (res.status === 409) {
-        const data = await res.json() as DuplicateInfo & { duplicate: boolean }
-        setDuplicate({ companyName: data.companyName, prospectId: data.prospectId, demoCallId: data.demoCallId })
-        setEmailState("ready")
+        const data = await res.json()
+        // Handle duplicate — just proceed with force
+        const res2 = await fetch("/api/sales/prospects", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            companyName: company.companyName,
+            website: company.website ?? null,
+            industry: company.industry ?? null,
+            headquartersCity: company.city ?? null,
+            headquartersState: company.state ?? null,
+            aiFitScore: company.fitScore ?? null,
+            confirmDuplicate: true,
+            initialContact: {
+              name: contact.name.trim(),
+              title: contact.title.trim() || null,
+              email: contact.email.trim() || null,
+              phone: contact.phone.trim() || null,
+            },
+            initialInteraction: null,
+          }),
+        })
+        if (!res2.ok) {
+          const d2 = await res2.json().catch(() => ({}))
+          // If it's a duplicate, extract the existing prospect
+          if (data.existing?.id) {
+            setCreated({ prospectId: data.existing.id, contactId: null, contactEmail: contact.email.trim() })
+            setEmailTo(contact.email.trim())
+            setStep("action")
+            return
+          }
+          setContactError(d2.error ?? "Failed to save")
+          return
+        }
+        const d2 = await res2.json()
+        setCreated({ prospectId: d2.prospect.id, contactId: d2.prospect.contacts?.[0]?.id ?? null, contactEmail: contact.email.trim() })
+        setEmailTo(contact.email.trim())
+        setStep("action")
         return
       }
       if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(data.error ?? `Send failed (${res.status})`)
+        const data = await res.json().catch(() => ({}))
+        setContactError(data.error ?? "Failed to save contact")
+        return
       }
-      const data = await res.json() as { prospectId: string; demoCallId: string }
-      setSentIds(data)
-      setEmailState("sent")
-    } catch (err) {
-      setEmailError(err instanceof Error ? err.message : "Send failed")
-      setEmailState("ready")
+      const data = await res.json()
+      setCreated({
+        prospectId: data.prospect.id,
+        contactId: data.prospect.contacts?.[0]?.id ?? null,
+        contactEmail: contact.email.trim(),
+      })
+      setEmailTo(contact.email.trim())
+      setStep("action")
+    } catch {
+      setContactError("Network error — please try again")
+    } finally {
+      setSavingContact(false)
     }
   }
 
-  const canSend = emailState === "ready" || emailState === "sending"
-  const websiteHref = company.website
-    ? (company.website.startsWith("http") ? company.website : `https://${company.website}`)
-    : null
+  async function handleSendEmail() {
+    if (!created) return
+    if (!emailTo.trim()) { setEmailError("Recipient email required"); return }
+    if (!emailSubject.trim()) { setEmailError("Subject required"); return }
+    if (!emailBody.trim()) { setEmailError("Body required"); return }
+    setSendingEmail(true)
+    setEmailError(null)
+    try {
+      const res = await fetch(`/api/sales/prospects/${created.prospectId}/email`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          to: emailTo.trim(),
+          subject: emailSubject,
+          emailBody,
+          contactId: created.contactId,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setEmailError(data.error ?? "Send failed")
+        return
+      }
+      setEmailSent(true)
+      setStep("action")
+    } finally {
+      setSendingEmail(false)
+    }
+  }
+
+  async function handleLogInteraction() {
+    if (!created) return
+    setSavingLog(true)
+    setLogError(null)
+    try {
+      const res = await fetch("/api/sales/activities", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          prospectId: created.prospectId,
+          contactId: created.contactId,
+          activityType: logType,
+          outcome: logOutcome.trim() || null,
+          notes: logNotes.trim() || null,
+          durationMinutes: logDuration ? parseInt(logDuration, 10) : null,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setLogError(data.error ?? "Failed to log interaction")
+        return
+      }
+      setLogSaved(true)
+      setStep("action")
+    } finally {
+      setSavingLog(false)
+    }
+  }
+
+  function handleAddAnother() {
+    setContact(blankContact())
+    setContactError(null)
+    setStep("contact")
+  }
+
+  const inputCls = "w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors"
 
   return (
     <>
@@ -260,11 +405,6 @@ function SlideOver({ company, onClose }: {
                   <MapPin className="w-3 h-3" />{[company.city, company.state].filter(Boolean).join(", ")}
                 </span>
               )}
-              {company.industry && (
-                <span className="text-[11px] text-gray-400 flex items-center gap-1">
-                  <Building2 className="w-3 h-3" />{company.industry}
-                </span>
-              )}
               {company.estimatedEmployees && (
                 <span className="text-[11px] text-gray-400 flex items-center gap-1">
                   <Users className="w-3 h-3" />{company.estimatedEmployees} employees
@@ -272,8 +412,7 @@ function SlideOver({ company, onClose }: {
               )}
               {websiteHref && (
                 <a href={websiteHref} target="_blank" rel="noopener noreferrer"
-                  className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
-                  onClick={e => e.stopPropagation()}>
+                  className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
                   <Globe className="w-3 h-3" />{cleanUrl(company.website)}
                 </a>
               )}
@@ -294,18 +433,16 @@ function SlideOver({ company, onClose }: {
         <div className="flex-1 overflow-y-auto">
           <div className="px-5 py-4 space-y-5">
 
+            {/* Company research */}
             {company.summary && (
               <p className="text-sm text-gray-300 leading-relaxed">{company.summary}</p>
             )}
 
             {detailsState === "loading" && (
-              <div className="space-y-3 animate-pulse">
+              <div className="space-y-2 animate-pulse">
                 <div className="h-3 bg-gray-800 rounded w-32" />
-                <div className="space-y-2">
-                  <div className="h-3 bg-gray-800 rounded w-full" />
-                  <div className="h-3 bg-gray-800 rounded w-4/5" />
-                  <div className="h-3 bg-gray-800 rounded w-full" />
-                </div>
+                <div className="h-3 bg-gray-800 rounded w-full" />
+                <div className="h-3 bg-gray-800 rounded w-4/5" />
               </div>
             )}
 
@@ -331,7 +468,6 @@ function SlideOver({ company, onClose }: {
                     </ul>
                   </div>
                 )}
-
                 {details.relayFitReasons?.length > 0 && (
                   <div>
                     <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Why Relay Fits</p>
@@ -345,7 +481,6 @@ function SlideOver({ company, onClose }: {
                     </ul>
                   </div>
                 )}
-
                 {details.suggestedOutreachAngle && (
                   <div className="bg-indigo-950/30 border border-indigo-800/40 rounded-lg px-3.5 py-2.5">
                     <p className="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider mb-1">Outreach Angle</p>
@@ -355,170 +490,262 @@ function SlideOver({ company, onClose }: {
               </>
             )}
 
-            {/* ── Email Draft ──────────────────────────────────────────────── */}
-            <div className="border-t border-gray-800 pt-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5" /> Outreach Email
+            {/* ── Step A: Add Contact ───────────────────────────────────── */}
+            {step === "contact" && (
+              <div className="border-t border-gray-800 pt-4">
+                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5" /> Add Contact
                 </p>
-                {details && emailState !== "loading" && emailState !== "sending" && emailState !== "sent" && (
-                  <button onClick={() => void generateEmail(details)}
-                    className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-gray-300 transition-colors px-2 py-1 rounded hover:bg-gray-800">
-                    <RefreshCw className="w-3 h-3" /> Regenerate
-                  </button>
-                )}
-              </div>
-
-              {emailState === "sent" && sentIds && (
-                <div className="bg-green-900/30 border border-green-700/40 rounded-lg p-3.5">
-                  <div className="flex items-center gap-2 text-green-400 font-medium text-sm mb-2">
-                    <CheckCircle2 className="w-4 h-4" /> Email sent
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-[11px] text-gray-500 mb-1">Name <span className="text-red-400">*</span></label>
+                    <input type="text" value={contact.name} onChange={e => setContact(c => ({ ...c, name: e.target.value }))}
+                      placeholder="Jane Smith" className={inputCls} />
                   </div>
-                  <p className="text-xs text-green-300/70 mb-2">
-                    {company.companyName} saved to CRM and enrolled in Cold Outreach follow-up sequence.
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[11px] text-gray-500 mb-1">Title</label>
+                      <input type="text" value={contact.title} onChange={e => setContact(c => ({ ...c, title: e.target.value }))}
+                        placeholder="Operations Manager" className={inputCls} />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-gray-500 mb-1">Phone</label>
+                      <div className="relative">
+                        <Phone className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
+                        <input type="text" value={contact.phone} onChange={e => setContact(c => ({ ...c, phone: e.target.value }))}
+                          placeholder="(555) 000-0000"
+                          className={`${inputCls} pl-8`} />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-gray-500 mb-1">Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
+                      <input type="email" value={contact.email} onChange={e => setContact(c => ({ ...c, email: e.target.value }))}
+                        placeholder="jane@company.com"
+                        className={`${inputCls} pl-8`} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-gray-500 mb-1">LinkedIn</label>
+                    <div className="relative">
+                      <Link2 className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
+                      <input type="text" value={contact.linkedin} onChange={e => setContact(c => ({ ...c, linkedin: e.target.value }))}
+                        placeholder="linkedin.com/in/janesmith"
+                        className={`${inputCls} pl-8`} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-gray-500 mb-1">Notes</label>
+                    <textarea value={contact.notes} onChange={e => setContact(c => ({ ...c, notes: e.target.value }))}
+                      rows={2} placeholder="Anything worth noting..."
+                      className={`${inputCls} resize-none`} />
+                  </div>
+
+                  {contactError && (
+                    <p className="text-xs text-red-400 flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{contactError}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={handleSaveContact}
+                    disabled={savingContact || !contact.name.trim()}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    {savingContact
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
+                      : <><User className="w-4 h-4" /> Save Contact &amp; Add to CRM</>
+                    }
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── Step B: Action choice ─────────────────────────────────── */}
+            {step === "action" && created && (
+              <div className="border-t border-gray-800 pt-4 space-y-3">
+                <div className="flex items-center gap-2 text-sm text-green-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">{contact.name || "Contact"} saved to CRM</span>
+                </div>
+
+                {emailSent && (
+                  <div className="bg-green-900/20 border border-green-700/30 rounded-lg px-3 py-2 text-xs text-green-400">
+                    Email sent successfully.
+                  </div>
+                )}
+                {logSaved && (
+                  <div className="bg-indigo-900/20 border border-indigo-700/30 rounded-lg px-3 py-2 text-xs text-indigo-400">
+                    Interaction logged.
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => { setEmailSent(false); setEmailError(null); setStep("email") }}
+                    className="flex flex-col items-center gap-1.5 p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl transition-colors"
+                  >
+                    <Mail className="w-5 h-5 text-indigo-400" />
+                    <span className="text-xs font-medium text-gray-200">Send Email</span>
+                  </button>
+                  <button
+                    onClick={() => { setLogSaved(false); setLogError(null); setStep("log") }}
+                    className="flex flex-col items-center gap-1.5 p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl transition-colors"
+                  >
+                    <Calendar className="w-5 h-5 text-amber-400" />
+                    <span className="text-xs font-medium text-gray-200">Log Interaction</span>
+                  </button>
+                </div>
+
+                <button
+                  onClick={handleAddAnother}
+                  className="w-full flex items-center justify-center gap-2 py-2 text-sm text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Another Contact
+                </button>
+
+                <Link
+                  href={`/sales/prospects/${created.prospectId}`}
+                  className="block text-center text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  Open in CRM →
+                </Link>
+              </div>
+            )}
+
+            {/* ── Email composer ────────────────────────────────────────── */}
+            {step === "email" && created && (
+              <div className="border-t border-gray-800 pt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5" /> Compose Email
                   </p>
-                  <div className="flex gap-2">
-                    <Link href={`/sales/outreach/prospects/${sentIds.prospectId}`}
-                      className="text-xs text-indigo-400 hover:text-indigo-300 underline">
-                      View prospect →
-                    </Link>
-                    <span className="text-gray-600">·</span>
-                    <Link href="/sales/outreach/email"
-                      className="text-xs text-indigo-400 hover:text-indigo-300 underline">
-                      View in inbox →
-                    </Link>
+                  <button onClick={() => setStep("action")} className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors">
+                    ← Back
+                  </button>
+                </div>
+
+                {/* Template picker */}
+                {templates.length > 0 && (
+                  <div>
+                    <label className="block text-[11px] text-gray-500 mb-1">Template</label>
+                    <div className="relative">
+                      <FileText className="absolute left-2.5 top-2.5 w-3 h-3 text-gray-600" />
+                      <select
+                        value={selectedTemplate}
+                        onChange={e => applyTemplate(e.target.value)}
+                        className={`${inputCls} pl-8`}
+                      >
+                        <option value="">— select a template —</option>
+                        {templates.map(t => (
+                          <option key={t.id} value={t.id}>{t.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-[11px] text-gray-500 mb-1">To</label>
+                  <input type="email" value={emailTo} onChange={e => setEmailTo(e.target.value)}
+                    placeholder="recipient@company.com" className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-gray-500 mb-1">Subject</label>
+                  <input type="text" value={emailSubject} onChange={e => setEmailSubject(e.target.value)}
+                    className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-gray-500 mb-1">Body</label>
+                  <textarea rows={10} value={emailBody} onChange={e => setEmailBody(e.target.value)}
+                    className={`${inputCls} resize-none font-mono`} />
+                </div>
+
+                {emailError && (
+                  <p className="text-xs text-red-400 flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{emailError}
+                  </p>
+                )}
+
+                <button
+                  onClick={handleSendEmail}
+                  disabled={sendingEmail || !emailTo.trim() || !emailSubject.trim() || !emailBody.trim()}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  {sendingEmail
+                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
+                    : <><Send className="w-4 h-4" /> Send Email</>
+                  }
+                </button>
+              </div>
+            )}
+
+            {/* ── Log interaction ───────────────────────────────────────── */}
+            {step === "log" && created && (
+              <div className="border-t border-gray-800 pt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" /> Log Interaction
+                  </p>
+                  <button onClick={() => setStep("action")} className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors">
+                    ← Back
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] text-gray-500 mb-1">Type</label>
+                    <select value={logType} onChange={e => setLogType(e.target.value)} className={inputCls}>
+                      <option value="CALL_CONNECTED">Phone Call</option>
+                      <option value="CALL_ATTEMPTED">Call Attempted</option>
+                      <option value="EMAIL_SENT">Email</option>
+                      <option value="LINKEDIN_MESSAGE">LinkedIn Message</option>
+                      <option value="MEETING_HELD">In-Person Meeting</option>
+                      <option value="NOTE_ADDED">Note</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-gray-500 mb-1">
+                      <Clock className="inline w-3 h-3 mr-1" />Duration (min)
+                    </label>
+                    <input type="number" min="1" value={logDuration} onChange={e => setLogDuration(e.target.value)}
+                      placeholder="15" className={inputCls} />
                   </div>
                 </div>
-              )}
 
-              {emailState !== "sent" && (
-                <>
-                  {emailState === "loading" && (
-                    <div className="space-y-2 animate-pulse">
-                      <div className="h-8 bg-gray-800 rounded-lg" />
-                      <div className="h-32 bg-gray-800 rounded-lg" />
-                    </div>
-                  )}
+                <div>
+                  <label className="block text-[11px] text-gray-500 mb-1">Outcome</label>
+                  <input type="text" value={logOutcome} onChange={e => setLogOutcome(e.target.value)}
+                    placeholder="Left voicemail, interested, requested follow-up…" className={inputCls} />
+                </div>
 
-                  {emailState === "error" && (
-                    <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-3 text-sm text-red-400 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                      {emailError ?? "Failed to generate email"}
-                    </div>
-                  )}
+                <div>
+                  <label className="block text-[11px] text-gray-500 mb-1">Notes</label>
+                  <textarea rows={3} value={logNotes} onChange={e => setLogNotes(e.target.value)}
+                    className={`${inputCls} resize-none`} />
+                </div>
 
-                  {(emailState === "ready" || emailState === "sending" || emailState === "idle") && (
-                    <div className="space-y-3">
-                      {/* Duplicate warning */}
-                      {duplicate && (
-                        <div className="bg-amber-900/20 border border-amber-700/40 rounded-lg p-3">
-                          <div className="flex items-start gap-2">
-                            <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                            <div className="text-xs text-amber-300 w-full">
-                              <p className="font-medium mb-1">Possible duplicate: {duplicate.companyName ?? company.companyName}</p>
-                              {duplicate.signals && duplicate.signals.length > 0 && (
-                                <ul className="mb-2 space-y-0.5">
-                                  {duplicate.signals.map(s => (
-                                    <li key={s} className="flex items-center gap-1 text-amber-400/80">
-                                      <span className="w-1 h-1 rounded-full bg-amber-400 shrink-0" />
-                                      {s}
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                              <div className="flex gap-2 flex-wrap">
-                                {duplicate.prospectId && (
-                                  <Link href={`/sales/outreach/prospects/${duplicate.prospectId}`}
-                                    className="underline hover:text-amber-200">View existing prospect</Link>
-                                )}
-                                <button onClick={() => { setDuplicate(null); void handleSend(true) }}
-                                  className="underline hover:text-amber-200">Send anyway</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                {logError && (
+                  <p className="text-xs text-red-400 flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{logError}
+                  </p>
+                )}
 
-                      {/* Suggested emails */}
-                      {suggestedEmails.length > 0 && (
-                        <div>
-                          <p className="text-[10px] text-gray-500 mb-1.5 flex items-center gap-1">
-                            <AlertTriangle className="w-2.5 h-2.5 text-amber-600" />
-                            Suggested contact emails — not verified
-                          </p>
-                          <div className="flex flex-wrap gap-1">
-                            {suggestedEmails.map(e => (
-                              <button key={e} onClick={() => setToEmail(e)}
-                                className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
-                                  toEmail === e
-                                    ? "bg-indigo-600/20 border-indigo-500/50 text-indigo-300"
-                                    : "bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600"
-                                }`}>
-                                {e}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* To field */}
-                      <div>
-                        <label className="block text-[11px] text-gray-500 mb-1">To</label>
-                        <input
-                          type="email"
-                          placeholder="recipient@company.com"
-                          value={toEmail}
-                          onChange={e => setToEmail(e.target.value)}
-                          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors"
-                        />
-                      </div>
-
-                      {draft && (
-                        <>
-                          <div>
-                            <label className="block text-[11px] text-gray-500 mb-1">Subject</label>
-                            <input
-                              type="text"
-                              value={subject}
-                              onChange={e => setSubject(e.target.value)}
-                              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[11px] text-gray-500 mb-1">Body</label>
-                            <textarea
-                              rows={10}
-                              value={emailBody}
-                              onChange={e => setEmailBody(e.target.value)}
-                              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white leading-relaxed focus:outline-none focus:border-indigo-500 transition-colors resize-none font-mono"
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      {emailError && !duplicate && (
-                        <p className="text-xs text-red-400 flex items-center gap-1.5">
-                          <AlertTriangle className="w-3.5 h-3.5" />{emailError}
-                        </p>
-                      )}
-
-                      <div className="flex gap-2 pt-1">
-                        <button
-                          onClick={() => void handleSend()}
-                          disabled={!canSend || !draft}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-                        >
-                          {emailState === "sending"
-                            ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                            : <><Send className="w-4 h-4" /> Send Now</>
-                          }
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                <button
+                  onClick={handleLogInteraction}
+                  disabled={savingLog}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  {savingLog
+                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
+                    : "Log Interaction"
+                  }
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -601,13 +828,13 @@ export default function SalesDiscoverPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Top bar */}
       <div className="sticky top-0 z-30 bg-gray-950/95 backdrop-blur border-b border-gray-800 px-4 py-3 flex items-center gap-3">
-        <Link href="/sales/outreach/prospects"
+        <Link href="/sales/prospects"
           className="text-gray-400 hover:text-gray-200 transition-colors p-1 rounded">
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <div>
           <h1 className="text-sm font-semibold text-white">Find New Prospects</h1>
-          <p className="text-[11px] text-gray-500">AI-powered search for new sales prospects</p>
+          <p className="text-[11px] text-gray-500">Search for companies, then add contacts to reach out</p>
         </div>
       </div>
 
@@ -708,7 +935,7 @@ export default function SalesDiscoverPage() {
               <Search className="w-12 h-12 text-gray-700 mb-3" />
               <p className="text-gray-400 font-medium mb-1">Find sales prospects</p>
               <p className="text-sm text-gray-600">
-                Choose a country and fill in your criteria. Claude will return 8-10 real companies — click any card to load full research and generate a personalized outreach email.
+                Choose a country and fill in your criteria. Claude returns real companies — click any card to add a contact and start outreach.
               </p>
             </div>
           )}
@@ -717,7 +944,7 @@ export default function SalesDiscoverPage() {
             <div className="h-full flex flex-col items-center justify-center">
               <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
               <p className="text-gray-400 font-medium">Finding prospects…</p>
-              <p className="text-sm text-gray-600 mt-1">Using Claude&apos;s training knowledge to find real companies</p>
+              <p className="text-sm text-gray-600 mt-1">Using Claude&apos;s knowledge to find real companies</p>
             </div>
           )}
 
@@ -743,7 +970,7 @@ export default function SalesDiscoverPage() {
                   )}
                 </p>
                 {companies.length > 0 && (
-                  <p className="text-[11px] text-gray-500">Click a card to research + draft email</p>
+                  <p className="text-[11px] text-gray-500">Click a card to add a contact</p>
                 )}
               </div>
 

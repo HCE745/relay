@@ -79,6 +79,18 @@ export async function POST(req: NextRequest) {
       email?: string | null
       phone?: string | null
     } | null
+    initialInteraction?: {
+      activityType: string
+      outcome?: string | null
+      occurredAt?: string | null
+      durationMinutes?: number | null
+      notes?: string | null
+    } | null
+    followUpTask?: {
+      title: string
+      taskType?: string | null
+      dueAt?: string | null
+    } | null
   }
 
   if (!body.companyName?.trim()) {
@@ -166,8 +178,9 @@ export async function POST(req: NextRequest) {
   }
 
   // Create initial contact if provided
+  let initialContactId: string | null = null
   if (body.initialContact?.name?.trim()) {
-    await prisma.prospectContact.create({
+    const contact = await prisma.prospectContact.create({
       data: {
         prospectId: prospect.id,
         name: body.initialContact.name.trim(),
@@ -178,6 +191,37 @@ export async function POST(req: NextRequest) {
         discoveryDate: new Date(),
       },
     })
+    initialContactId = contact.id
+  }
+
+  // Log initial interaction if provided
+  if (body.initialInteraction) {
+    const ix = body.initialInteraction
+    await prisma.salesCrmActivity.create({
+      data: {
+        prospectId: prospect.id,
+        contactId: initialContactId,
+        salesUserId: info.salesUserId !== "sa" ? info.salesUserId : null,
+        activityType: ix.activityType,
+        outcome: ix.outcome ?? null,
+        occurredAt: ix.occurredAt ? new Date(ix.occurredAt) : new Date(),
+        durationMinutes: ix.durationMinutes ?? null,
+        notes: ix.notes ?? null,
+      },
+    }).catch(() => { /* non-fatal */ })
+  }
+
+  // Create follow-up task if requested (skip for superAdmin who has no real SalesUser row)
+  if (body.followUpTask?.title?.trim() && info.salesUserId && info.salesUserId !== "sa") {
+    await prisma.crmTask.create({
+      data: {
+        title: body.followUpTask.title.trim(),
+        taskType: body.followUpTask.taskType ?? "other",
+        dueAt: body.followUpTask.dueAt ? new Date(body.followUpTask.dueAt) : null,
+        prospectId: prospect.id,
+        assignedToId: info.salesUserId,
+      },
+    }).catch(() => { /* non-fatal */ })
   }
 
   if (info.salesUserId) trackActivity(info.salesUserId, "prospectsAdded")

@@ -46,12 +46,23 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  await cleanupExpiredDemos()
+  try {
+    await cleanupExpiredDemos()
+  } catch (cleanupErr) {
+    console.error("[demo/start] cleanupExpiredDemos failed:", cleanupErr)
+    // Non-fatal: stale demo orgs remain but we can still create a new one
+  }
 
   const industry = body.industry?.trim() || undefined
   const isCarWash = industry === "Car Wash"
   const pkg = isCarWash ? "wash_essentials" : "professional_plus"
-  const { org, user } = await createDemoOrg(industry, pkg)
+
+  const created = await createDemoOrg(industry, pkg).catch((seedErr: unknown) => {
+    console.error("[demo/start] createDemoOrg failed:", seedErr)
+    return null
+  })
+  if (!created) return NextResponse.json({ error: "Demo creation failed" }, { status: 500 })
+  const { org, user } = created
 
   // Guarantee customer_voice_enabled regardless of seed data
   await prisma.organization.update({

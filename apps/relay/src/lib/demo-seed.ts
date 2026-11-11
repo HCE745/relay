@@ -20,7 +20,11 @@ export async function cleanupExpiredDemos() {
     select: { id: true },
   })
   for (const org of expired) {
-    await deleteOrganization(org.id)
+    try {
+      await deleteOrganization(org.id)
+    } catch (err) {
+      console.error(`[demo/cleanup] deleteOrganization failed for org ${org.id}:`, err)
+    }
   }
 }
 

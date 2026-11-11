@@ -36,6 +36,7 @@ interface ProspectCreated {
 interface SavedContact {
   id:         string
   name:       string
+  title:      string
   email:      string
   prospectId: string
 }
@@ -175,6 +176,7 @@ function SlideOver({ company, onClose }: {
 
   // Follow-up task
   const [followupTitle, setFollowupTitle]     = useState("")
+  const [followupType, setFollowupType]       = useState("other")
   const [followupDueAt, setFollowupDueAt]     = useState("")
   const [followupNotes, setFollowupNotes]     = useState("")
   const [followupPriority, setFollowupPriority] = useState("normal")
@@ -195,13 +197,14 @@ function SlideOver({ company, onClose }: {
   const [emailSent, setEmailSent]       = useState(false)
 
   // Log
-  const [logType, setLogType]       = useState("CALL_CONNECTED")
-  const [logOutcome, setLogOutcome] = useState("")
-  const [logDuration, setLogDuration] = useState("")
-  const [logNotes, setLogNotes]     = useState("")
-  const [savingLog, setSavingLog]   = useState(false)
-  const [logError, setLogError]     = useState<string | null>(null)
-  const [logSaved, setLogSaved]     = useState(false)
+  const [logType, setLogType]           = useState("CALL_CONNECTED")
+  const [logCustomType, setLogCustomType] = useState("")
+  const [logOutcome, setLogOutcome]     = useState("")
+  const [logDuration, setLogDuration]   = useState("")
+  const [logNotes, setLogNotes]         = useState("")
+  const [savingLog, setSavingLog]       = useState(false)
+  const [logError, setLogError]         = useState<string | null>(null)
+  const [logSaved, setLogSaved]         = useState(false)
 
   // Load company research
   useEffect(() => {
@@ -291,11 +294,11 @@ function SlideOver({ company, onClose }: {
           })
           if (r2.ok) {
             const d2 = await r2.json() as { contact: { id: string } }
-            pushContact({ id: d2.contact.id, name: contact.name.trim(), email: contact.email.trim(), prospectId: existingId })
+            pushContact({ id: d2.contact.id, name: contact.name.trim(), title: contact.title.trim(), email: contact.email.trim(), prospectId: existingId })
             return
           }
           // If contact add failed, still use the existing prospect
-          pushContact({ id: "", name: contact.name.trim(), email: contact.email.trim(), prospectId: existingId })
+          pushContact({ id: "", name: contact.name.trim(), title: contact.title.trim(), email: contact.email.trim(), prospectId: existingId })
           return
         }
         // No existing.id — force-create
@@ -315,6 +318,7 @@ function SlideOver({ company, onClose }: {
       pushContact({
         id: data.prospect.contacts?.[0]?.id ?? "",
         name: contact.name.trim(),
+        title: contact.title.trim(),
         email: contact.email.trim(),
         prospectId: data.prospect.id,
       })
@@ -329,7 +333,7 @@ function SlideOver({ company, onClose }: {
     setSavedContacts(prev => [...prev, newContact])
     setCreated({ prospectId: newContact.prospectId, contactId: newContact.id || null, contactEmail: newContact.email })
     setOutreachContactId(newContact.id)
-    setEmailTo(newContact.email)
+    if (newContact.email) setEmailTo(newContact.email)
     setLastSaved(newContact.name)
     setContact(blankContact())
     setSectionOpen(prev => ({ ...prev, outreach: true, contacts: true }))
@@ -381,6 +385,7 @@ function SlideOver({ company, onClose }: {
           prospectId: created.prospectId,
           contactId: sc?.id || null,
           activityType: logType,
+          subject: logType === "OTHER" && logCustomType.trim() ? logCustomType.trim() : null,
           outcome: logOutcome.trim() || null,
           notes: logNotes.trim() || null,
           durationMinutes: logDuration ? parseInt(logDuration, 10) : null,
@@ -395,6 +400,7 @@ function SlideOver({ company, onClose }: {
       setLogOutcome("")
       setLogDuration("")
       setLogNotes("")
+      setLogCustomType("")
     } finally {
       setSavingLog(false)
     }
@@ -411,7 +417,7 @@ function SlideOver({ company, onClose }: {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           title: followupTitle.trim(),
-          taskType: "other",
+          taskType: followupType,
           priority: followupPriority,
           dueAt: followupDueAt || null,
           notes: followupNotes.trim() || null,
@@ -427,6 +433,7 @@ function SlideOver({ company, onClose }: {
       }
       setFollowupSaved(true)
       setFollowupTitle("")
+      setFollowupType("other")
       setFollowupDueAt("")
       setFollowupNotes("")
       setFollowupPriority("normal")
@@ -638,6 +645,12 @@ function SlideOver({ company, onClose }: {
                 <Mail className="w-4 h-4 text-orange-400 shrink-0" />
                 <span className="font-medium text-white text-sm flex-1">Outreach Activity</span>
                 {!created && <span className="text-[10px] text-gray-600 mr-1">save a contact first</span>}
+                {created && (() => {
+                  const ac = savedContacts.find(c => c.id === outreachContactId)
+                  return ac ? (
+                    <span className="text-[10px] text-orange-400/80 mr-1 truncate max-w-[100px]">{ac.name}</span>
+                  ) : null
+                })()}
                 {created && (sectionOpen.outreach
                   ? <ChevronUp className="w-4 h-4 text-gray-500 shrink-0" />
                   : <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" />)}
@@ -645,26 +658,6 @@ function SlideOver({ company, onClose }: {
 
               {sectionOpen.outreach && created && (
                 <div className="px-4 pb-4 pt-2 border-t border-gray-800 space-y-3">
-                  {/* Contact selector (only when multiple saved) */}
-                  {savedContacts.length > 1 && (
-                    <div>
-                      <label className="block text-[11px] text-gray-500 mb-1">Contact</label>
-                      <select
-                        value={outreachContactId}
-                        onChange={e => {
-                          setOutreachContactId(e.target.value)
-                          const sc = savedContacts.find(c => c.id === e.target.value)
-                          if (sc?.email) setEmailTo(sc.email)
-                        }}
-                        className={inputCls}
-                      >
-                        {savedContacts.map(c => (
-                          <option key={c.id} value={c.id}>{c.name}{c.email ? ` — ${c.email}` : ""}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
                   {/* Tab switcher */}
                   <div className="flex gap-1 p-1 bg-gray-800/60 rounded-lg">
                     <button
@@ -751,13 +744,14 @@ function SlideOver({ company, onClose }: {
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <label className="block text-[11px] text-gray-500 mb-1">Type</label>
-                          <select value={logType} onChange={e => setLogType(e.target.value)} className={inputCls}>
+                          <select value={logType} onChange={e => { setLogType(e.target.value); setLogCustomType("") }} className={inputCls}>
                             <option value="CALL_CONNECTED">Phone Call</option>
                             <option value="CALL_ATTEMPTED">Call Attempted</option>
                             <option value="EMAIL_SENT">Email</option>
                             <option value="LINKEDIN_MESSAGE">LinkedIn Message</option>
                             <option value="MEETING_HELD">In-Person Meeting</option>
                             <option value="NOTE_ADDED">Note</option>
+                            <option value="OTHER">Other</option>
                           </select>
                         </div>
                         <div>
@@ -768,6 +762,13 @@ function SlideOver({ company, onClose }: {
                             placeholder="15" className={inputCls} />
                         </div>
                       </div>
+                      {logType === "OTHER" && (
+                        <div>
+                          <label className="block text-[11px] text-gray-500 mb-1">Specify Interaction Type</label>
+                          <input type="text" value={logCustomType} onChange={e => setLogCustomType(e.target.value)}
+                            placeholder="e.g. Text message, Trade show…" className={inputCls} />
+                        </div>
+                      )}
                       <div>
                         <label className="block text-[11px] text-gray-500 mb-1">Outcome</label>
                         <input type="text" value={logOutcome} onChange={e => setLogOutcome(e.target.value)}
@@ -810,9 +811,14 @@ function SlideOver({ company, onClose }: {
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-[11px] text-gray-500 mb-1">Due Date</label>
-                          <input type="datetime-local" value={followupDueAt} onChange={e => setFollowupDueAt(e.target.value)}
-                            className={inputCls} />
+                          <label className="block text-[11px] text-gray-500 mb-1">Follow-Up Type</label>
+                          <select value={followupType} onChange={e => setFollowupType(e.target.value)} className={inputCls}>
+                            <option value="call">Phone Call</option>
+                            <option value="email">Email</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="other">General Task</option>
+                          </select>
                         </div>
                         <div>
                           <label className="block text-[11px] text-gray-500 mb-1">Priority</label>
@@ -822,6 +828,11 @@ function SlideOver({ company, onClose }: {
                             <option value="high">High</option>
                           </select>
                         </div>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Due Date</label>
+                        <input type="datetime-local" value={followupDueAt} onChange={e => setFollowupDueAt(e.target.value)}
+                          className={inputCls} />
                       </div>
                       <div>
                         <label className="block text-[11px] text-gray-500 mb-1">Notes</label>
@@ -863,41 +874,54 @@ function SlideOver({ company, onClose }: {
                   <span className="font-medium text-white text-sm flex-1">
                     Saved Contacts <span className="text-gray-500 font-normal">({savedContacts.length})</span>
                   </span>
+                  <span className="text-[10px] text-gray-500 mr-1">tap to set active</span>
                   {sectionOpen.contacts
                     ? <ChevronUp className="w-4 h-4 text-gray-500 shrink-0" />
                     : <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" />}
                 </button>
                 {sectionOpen.contacts && (
                   <div className="px-4 pb-3 pt-2 border-t border-gray-800">
-                    {savedContacts.map(c => (
-                      <div key={`${c.id}-${c.name}`} className="flex items-center gap-3 py-2.5 border-b border-gray-800/60 last:border-0">
-                        <div className="w-7 h-7 rounded-full bg-indigo-900/40 flex items-center justify-center text-xs font-bold text-indigo-300 shrink-0">
-                          {c.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white">{c.name}</p>
-                          {c.email && <p className="text-xs text-gray-500">{c.email}</p>}
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            onClick={() => {
-                              setOutreachContactId(c.id)
-                              if (c.email) setEmailTo(c.email)
-                              setSectionOpen(prev => ({ ...prev, outreach: true }))
-                            }}
-                            className="text-[11px] text-orange-400 hover:text-orange-300 transition-colors"
-                          >
-                            Outreach
-                          </button>
-                          <Link
-                            href={`/sales/prospects/${c.prospectId}`}
-                            className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5"
-                          >
-                            CRM <ExternalLink className="w-2.5 h-2.5" />
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
+                    {savedContacts.map(c => {
+                      const isActive = c.id === outreachContactId
+                      return (
+                        <button
+                          key={`${c.id}-${c.name}`}
+                          onClick={() => {
+                            setOutreachContactId(c.id)
+                            if (c.email) setEmailTo(c.email)
+                            setSectionOpen(prev => ({ ...prev, outreach: true }))
+                          }}
+                          className={`w-full flex items-center gap-3 py-2.5 border-b border-gray-800/60 last:border-0 text-left transition-colors rounded-lg px-1 -mx-1 ${
+                            isActive ? "bg-orange-950/30" : "hover:bg-gray-800/40"
+                          }`}
+                        >
+                          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                            isActive ? "bg-orange-800/50 text-orange-200" : "bg-indigo-900/40 text-indigo-300"
+                          }`}>
+                            {c.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium ${isActive ? "text-orange-300" : "text-white"}`}>{c.name}</p>
+                            {c.title && <p className="text-[11px] text-gray-500">{c.title}</p>}
+                            {c.email && <p className="text-[11px] text-gray-500">{c.email}</p>}
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {isActive && (
+                              <span className="text-[10px] text-orange-400 font-medium px-1.5 py-0.5 rounded-full bg-orange-900/30 border border-orange-800/40">
+                                Active
+                              </span>
+                            )}
+                            <Link
+                              href={`/sales/prospects/${c.prospectId}`}
+                              onClick={e => e.stopPropagation()}
+                              className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5"
+                            >
+                              CRM <ExternalLink className="w-2.5 h-2.5" />
+                            </Link>
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
               </div>

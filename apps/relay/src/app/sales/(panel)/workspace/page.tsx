@@ -5,7 +5,7 @@ import Link from "next/link"
 import {
   MonitorDot, CheckCircle2, Circle, Mail, Briefcase,
   Calendar, Bell, AlertCircle, Clock, ArrowRight,
-  RefreshCcw, ChevronDown, ChevronUp, X, Loader2,
+  RefreshCcw, ChevronDown, ChevronUp, X, Loader2, Search, SlidersHorizontal,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -54,6 +54,8 @@ interface CompleteDialogState {
   taskTitle: string
   prospectId: string | null
 }
+
+type CardFilter = "overdue" | "dueToday" | "upcoming" | "unscheduled" | "emailFollowUps" | "unreadEmails" | null
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -188,6 +190,11 @@ export default function WorkspacePage() {
   const [showCompleted, setShowCompleted] = useState(false)
   const [showOther, setShowOther]         = useState(true)
 
+  // Filters (D + E)
+  const [cardFilter, setCardFilter] = useState<CardFilter>(null)
+  const [typeFilter, setTypeFilter] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
+
   async function load() {
     setLoading(true)
     try {
@@ -250,6 +257,37 @@ export default function WorkspacePage() {
   const greeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening"
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
 
+  function taskMatchesFilters(t: Task): boolean {
+    if (typeFilter && t.taskType !== typeFilter) return false
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      if (
+        !t.title.toLowerCase().includes(q) &&
+        !(taskCompanyName(t) ?? "").toLowerCase().includes(q) &&
+        !(t.contact?.name ?? "").toLowerCase().includes(q) &&
+        !(t.notes ?? "").toLowerCase().includes(q)
+      ) return false
+    }
+    return true
+  }
+
+  function emailMatchesSearch(e: Email): boolean {
+    if (!searchQuery) return true
+    const q = searchQuery.toLowerCase()
+    return (
+      e.subject.toLowerCase().includes(q) ||
+      (emailCompanyName(e) ?? "").toLowerCase().includes(q) ||
+      (e.contactEmail ?? "").toLowerCase().includes(q)
+    )
+  }
+
+  const fOverdue   = data?.overdueTasks.filter(taskMatchesFilters)   ?? []
+  const fToday     = data?.tasksDueToday.filter(taskMatchesFilters)   ?? []
+  const fUpcoming  = data?.upcomingTasks.filter(taskMatchesFilters)   ?? []
+  const fUndated   = data?.undatedTasks.filter(taskMatchesFilters)    ?? []
+  const fFollowUps = data?.followUpsDue.filter(emailMatchesSearch)    ?? []
+  const fUnread    = data?.unreadEmails.filter(emailMatchesSearch)    ?? []
+
   const scheduledTasks = data
     ? [...data.overdueTasks, ...data.tasksDueToday, ...data.upcomingTasks]
     : []
@@ -257,6 +295,9 @@ export default function WorkspacePage() {
   const totalActions = data
     ? scheduledTasks.length + data.undatedTasks.length + data.unreadEmails.length + data.followUpsDue.length
     : 0
+
+  const hasFilters = !!(cardFilter || typeFilter || searchQuery)
+  const anyFilterResult = fOverdue.length + fToday.length + fUpcoming.length + fUndated.length + fFollowUps.length + fUnread.length
 
   return (
     <div className="p-6 max-w-4xl">
@@ -285,30 +326,153 @@ export default function WorkspacePage() {
 
       {data && (
         <div className="space-y-6">
-          {/* Summary row */}
+          {/* Summary row — clickable cards (Work Package D) */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {[
-              { label: "Overdue",        value: data.overdueTasks.length,       color: data.overdueTasks.length  > 0 ? "text-red-400"    : "text-gray-500", bg: data.overdueTasks.length  > 0 ? "border-red-800/40"    : "border-gray-800" },
-              { label: "Due Today",      value: data.tasksDueToday.length,      color: data.tasksDueToday.length > 0 ? "text-yellow-400"  : "text-gray-500", bg: "border-gray-800" },
-              { label: "Upcoming",       value: data.upcomingTasks.length,      color: data.upcomingTasks.length > 0 ? "text-indigo-400"  : "text-gray-500", bg: "border-gray-800" },
-              { label: "Unscheduled",    value: data.undatedTasks.length,       color: data.undatedTasks.length  > 0 ? "text-purple-400"  : "text-gray-500", bg: "border-gray-800" },
-              { label: "Email Follow-Ups", value: data.followUpsDue.length,     color: data.followUpsDue.length  > 0 ? "text-orange-400"  : "text-gray-500", bg: "border-gray-800" },
-              { label: "Unread Emails",  value: data.unreadEmails.length,       color: data.unreadEmails.length  > 0 ? "text-blue-400"    : "text-gray-500", bg: "border-gray-800" },
-            ].map(s => (
-              <div key={s.label} className={cn("bg-gray-900 border rounded-xl p-3", s.bg)}>
-                <p className={cn("text-2xl font-bold", s.color)}>{s.value}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
-              </div>
-            ))}
+            {([
+              { key: "overdue"       as CardFilter, label: "Overdue",          value: data.overdueTasks.length,   color: data.overdueTasks.length  > 0 ? "text-red-400"    : "text-gray-500", border: data.overdueTasks.length  > 0 ? "border-red-800/40"    : "border-gray-800" },
+              { key: "dueToday"      as CardFilter, label: "Due Today",        value: data.tasksDueToday.length,  color: data.tasksDueToday.length > 0 ? "text-yellow-400"  : "text-gray-500", border: "border-gray-800" },
+              { key: "upcoming"      as CardFilter, label: "Upcoming",         value: data.upcomingTasks.length,  color: data.upcomingTasks.length > 0 ? "text-indigo-400"  : "text-gray-500", border: "border-gray-800" },
+              { key: "unscheduled"   as CardFilter, label: "Unscheduled",      value: data.undatedTasks.length,   color: data.undatedTasks.length  > 0 ? "text-purple-400"  : "text-gray-500", border: "border-gray-800" },
+              { key: "emailFollowUps"as CardFilter, label: "Email Follow-Ups", value: data.followUpsDue.length,   color: data.followUpsDue.length  > 0 ? "text-orange-400"  : "text-gray-500", border: "border-gray-800" },
+              { key: "unreadEmails"  as CardFilter, label: "Unread Emails",    value: data.unreadEmails.length,   color: data.unreadEmails.length  > 0 ? "text-blue-400"    : "text-gray-500", border: "border-gray-800" },
+            ] as const).map(s => {
+              const isActive = cardFilter === s.key
+              return (
+                <button
+                  key={s.label}
+                  onClick={() => setCardFilter(prev => prev === s.key ? null : s.key)}
+                  className={cn(
+                    "bg-gray-900 border rounded-xl p-3 text-left transition-colors",
+                    isActive ? "border-indigo-500 ring-1 ring-indigo-500/30" : cn(s.border, "hover:border-gray-600"),
+                  )}
+                >
+                  <p className={cn("text-2xl font-bold", s.color)}>{s.value}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
+                </button>
+              )
+            })}
           </div>
 
-          {totalActions === 0 && data.upcomingDemos.length === 0 && (
+          {/* Filter bar (Work Package E) */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {cardFilter && (
+              <button
+                onClick={() => setCardFilter(null)}
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-indigo-900/30 text-indigo-300 border border-indigo-700/40 hover:bg-indigo-900/50 transition-colors"
+              >
+                <X className="w-3 h-3" /> All
+              </button>
+            )}
+            <div className="relative flex-shrink-0">
+              <SlidersHorizontal className="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+              <select
+                value={typeFilter}
+                onChange={e => setTypeFilter(e.target.value)}
+                className="bg-gray-900 border border-gray-700 rounded-lg pl-7 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors appearance-none"
+              >
+                <option value="">All Types</option>
+                <option value="call">Phone Call</option>
+                <option value="email">Email</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="meeting">Meeting</option>
+                <option value="other">General Task</option>
+              </select>
+            </div>
+            <div className="relative flex-1 min-w-[160px]">
+              <Search className="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search tasks…"
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-7 pr-3 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors"
+              />
+            </div>
+            {(typeFilter || searchQuery) && (
+              <button
+                onClick={() => { setTypeFilter(""); setSearchQuery("") }}
+                className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          {totalActions === 0 && data.upcomingDemos.length === 0 && !hasFilters && (
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
               <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
               <p className="text-white font-medium">All clear!</p>
               <p className="text-gray-500 text-sm mt-1">No overdue tasks, unread emails, or follow-ups. Good work.</p>
             </div>
           )}
+
+          {/* ── Filtered view (card or search/type filter active) ─────────────── */}
+          {hasFilters && (
+            <>
+              {anyFilterResult === 0 && (
+                <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
+                  <p className="text-gray-500 text-sm">No items match the current filters.</p>
+                </div>
+              )}
+              {(!cardFilter || cardFilter === "overdue") && fOverdue.length > 0 && (
+                <Section title="Overdue" icon={<AlertCircle className="w-4 h-4 text-red-400" />} count={fOverdue.length} accent="border-red-800/40" tourId="workspace-task-list">
+                  {fOverdue.map(t => <TaskRow key={t.id} task={t} completing={completing} onComplete={() => openCompleteDialog(t)} />)}
+                </Section>
+              )}
+              {(!cardFilter || cardFilter === "dueToday") && fToday.length > 0 && (
+                <Section title="Due Today" icon={<Clock className="w-4 h-4 text-yellow-400" />} count={fToday.length}>
+                  {fToday.map(t => <TaskRow key={t.id} task={t} completing={completing} onComplete={() => openCompleteDialog(t)} />)}
+                </Section>
+              )}
+              {(!cardFilter || cardFilter === "upcoming") && fUpcoming.length > 0 && (
+                <Section title="Upcoming" icon={<Clock className="w-4 h-4 text-indigo-400" />} count={fUpcoming.length}>
+                  {fUpcoming.map(t => <TaskRow key={t.id} task={t} completing={completing} onComplete={() => openCompleteDialog(t)} />)}
+                </Section>
+              )}
+              {(!cardFilter || cardFilter === "unscheduled") && fUndated.length > 0 && (
+                <Section title="Unscheduled" icon={<Clock className="w-4 h-4 text-purple-400" />} count={fUndated.length}>
+                  {fUndated.map(t => <TaskRow key={t.id} task={t} completing={completing} onComplete={() => openCompleteDialog(t)} />)}
+                </Section>
+              )}
+              {(!cardFilter || cardFilter === "emailFollowUps") && fFollowUps.length > 0 && (
+                <Section title="Email Follow-Ups" icon={<Bell className="w-4 h-4 text-orange-400" />} count={fFollowUps.length}>
+                  {fFollowUps.map(e => {
+                    const company = emailCompanyName(e); const href = emailCompanyHref(e)
+                    return (
+                      <div key={e.id} className="flex items-start gap-3 py-2.5 border-b border-gray-800/60 last:border-0">
+                        <Bell className="w-4 h-4 text-orange-400 mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white truncate">{e.subject}</p>
+                          <p className="text-xs text-gray-500">Due {fmtDate(e.followUpDate ?? null)}{company && href && <> · <Link href={href} className="text-indigo-400 hover:underline">{company}</Link></>}</p>
+                        </div>
+                        <Link href={href ?? "/sales/outreach/follow-ups"} className="shrink-0 text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5">View <ArrowRight className="w-3 h-3" /></Link>
+                      </div>
+                    )
+                  })}
+                </Section>
+              )}
+              {(!cardFilter || cardFilter === "unreadEmails") && fUnread.length > 0 && (
+                <Section title="Unread Emails" icon={<Mail className="w-4 h-4 text-blue-400" />} count={fUnread.length}>
+                  {fUnread.map(e => {
+                    const company = emailCompanyName(e); const href = emailCompanyHref(e)
+                    return (
+                      <div key={e.id} className="flex items-start gap-3 py-2.5 border-b border-gray-800/60 last:border-0">
+                        <Mail className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white truncate">{e.subject}</p>
+                          <p className="text-xs text-gray-500 truncate">{e.fromAddress}{company && href && <> · <Link href={href} className="text-indigo-400 hover:underline">{company}</Link></>}</p>
+                        </div>
+                        <Link href="/sales/outreach/email" className="shrink-0 text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5">View <ArrowRight className="w-3 h-3" /></Link>
+                      </div>
+                    )
+                  })}
+                </Section>
+              )}
+            </>
+          )}
+
+          {/* ── Unfiltered sections ───────────────────────────────────────────── */}
+          {!hasFilters && (<>
 
           {/* ── Scheduled Tasks ─────────────────────────────────────────────── */}
           {scheduledTasks.length > 0 && (
@@ -474,6 +638,8 @@ export default function WorkspacePage() {
                 </div>
               )}
             </div>
+          )}
+          </>
           )}
 
           {/* ── Recently Completed ───────────────────────────────────────────── */}

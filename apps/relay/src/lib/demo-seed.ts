@@ -66,6 +66,8 @@ export async function deleteOrganization(orgId: string): Promise<void> {
   await prisma.issue.deleteMany({ where: { organizationId: orgId } })
 
   // ── 5. Delete remaining org-level records (all User/Issue/Asset refs safe now)
+  // BugReport and FeatureRequest have required org FKs without onDelete: Cascade,
+  // so they must be deleted explicitly before the organization row is removed.
   await Promise.all([
     prisma.injuryReport.deleteMany({ where: { organizationId: orgId } }),
     prisma.purchaseRequest.deleteMany({ where: { organizationId: orgId } }),
@@ -80,6 +82,8 @@ export async function deleteOrganization(orgId: string): Promise<void> {
     prisma.assignment.deleteMany({ where: { orgId } }),
     prisma.announcement.deleteMany({ where: { orgId } }),
     prisma.emergencyBroadcast.deleteMany({ where: { orgId } }),
+    prisma.bugReport.deleteMany({ where: { organizationId: orgId } }),
+    prisma.featureRequest.deleteMany({ where: { organizationId: orgId } }),
   ])
 
   // ── 6. Escalation steps before policies ──────────────────────────────────

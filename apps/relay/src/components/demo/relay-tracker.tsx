@@ -27,18 +27,37 @@ function isNewSession(token: string): boolean {
   return true
 }
 
+// Module-level active-time accumulator — written by RelayTracker, read by fireTrackingEvent
+// so tour_step_completed and similar events automatically carry elapsed active time.
+let _moduleActiveSeconds = 0
+let _moduleLastActive: number | null = null
+
+function _flushModuleTime() {
+  if (_moduleLastActive !== null) {
+    _moduleActiveSeconds += (Date.now() - _moduleLastActive) / 1000
+    _moduleLastActive = null
+  }
+}
+
+export function getActiveSeconds(): number {
+  _flushModuleTime()
+  return Math.round(_moduleActiveSeconds)
+}
+
 export function fireTrackingEvent(
   eventType: string,
   eventData: Record<string, unknown> = {},
-  activeTimeSeconds = 0,
+  activeTimeSeconds?: number,
 ) {
   const token = getCookie("relay_track")
   if (!token) return
   const sessionId = getOrCreateSessionId()
+  // If caller doesn't specify, use the module-level accumulator
+  const seconds = activeTimeSeconds ?? getActiveSeconds()
   fetch("/api/track/event", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, eventType, eventData, sessionId, activeTimeSeconds }),
+    body: JSON.stringify({ token, eventType, eventData, sessionId, activeTimeSeconds: seconds }),
   }).catch(() => {})
 }
 
@@ -47,34 +66,29 @@ export { getCookie as getTrackingToken }
 
 export function RelayTracker() {
   const pathname  = usePathname()
-  const activeRef = useRef(0)       // accumulated active seconds this session
-  const lastRef   = useRef<number | null>(null)  // timestamp when tab became visible+active
   const firedRef  = useRef(new Set<string>())    // dedup page_viewed events
 
   const accumulate = useCallback(() => {
-    if (lastRef.current !== null) {
-      activeRef.current += (Date.now() - lastRef.current) / 1000
-      lastRef.current = null
-    }
+    _flushModuleTime()
   }, [])
 
   // Visibility + activity tracking
   useEffect(() => {
     function onVisible() {
-      if (!document.hidden) lastRef.current = Date.now()
-      else accumulate()
+      if (!document.hidden) _moduleLastActive = Date.now()
+      else _flushModuleTime()
     }
     document.addEventListener("visibilitychange", onVisible)
     // Start counting if tab is already visible
-    if (!document.hidden) lastRef.current = Date.now()
+    if (!document.hidden) _moduleLastActive = Date.now()
 
     // Activity: reset inactivity timeout — stop counting if idle >60s
     let idleTimer: ReturnType<typeof setTimeout>
     function resetIdle() {
       clearTimeout(idleTimer)
-      if (!lastRef.current) lastRef.current = Date.now()
+      if (!_moduleLastActive) _moduleLastActive = Date.now()
       idleTimer = setTimeout(() => {
-        accumulate()  // stop counting — user is idle
+        _flushModuleTime()  // stop counting — user is idle
       }, 60_000)
     }
     window.addEventListener("mousemove", resetIdle, { passive: true })

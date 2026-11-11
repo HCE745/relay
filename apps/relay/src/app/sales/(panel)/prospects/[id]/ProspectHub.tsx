@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -8,9 +8,11 @@ import {
   Plus, CheckCircle2, Circle, Mail, ChevronDown, ChevronUp,
   Edit3, Save, ExternalLink, Link2, Star, Shield, Zap,
   FileText, AlertCircle, ArrowUpRight, ArrowDownLeft,
-  Eye, Send, X, Trash2,
+  Eye, Send, X, Trash2, MousePointerClick, Loader2,
+  Clock, Award, ChevronRight,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { DemoSession, DemoEngagementResponse } from "@/app/api/sales/prospects/[id]/demo-engagement/route"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -76,7 +78,7 @@ interface Company {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const TABS = ["Timeline", "Contacts", "Opportunities", "Tasks", "Profile"] as const
+const TABS = ["Timeline", "Contacts", "Opportunities", "Tasks", "Demo", "Profile"] as const
 type Tab = typeof TABS[number]
 
 const STATUS_LABELS: Record<string, string> = {
@@ -134,6 +136,22 @@ export function ProspectHub({
   const [company, setCompany]     = useState(initialCompany)
   const [tab, setTab]             = useState<Tab>("Timeline")
   const [saving, setSaving]       = useState(false)
+
+  // ── Demo Engagement state ───────────────────────────────────────────────────
+  const [demoData, setDemoData]       = useState<DemoEngagementResponse | null>(null)
+  const [demoLoading, setDemoLoading] = useState(false)
+  const [expandedSession, setExpandedSession] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (tab !== "Demo") return
+    if (demoData) return
+    setDemoLoading(true)
+    fetch(`/api/sales/prospects/${company.id}/demo-engagement`)
+      .then(r => r.json())
+      .then(d => setDemoData(d as DemoEngagementResponse))
+      .catch(() => null)
+      .finally(() => setDemoLoading(false))
+  }, [tab, company.id, demoData])
 
   // ── Profile edit state ──────────────────────────────────────────────────────
   const [editingProfile, setEditingProfile] = useState(false)
@@ -1186,6 +1204,61 @@ export function ProspectHub({
       )}
 
       {/* ── Tab: Profile ───────────────────────────────────────────────────── */}
+      {/* ── Tab: Demo Engagement ──────────────────────────────────────────── */}
+      {tab === "Demo" && (
+        <div className="space-y-4">
+          {demoLoading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+            </div>
+          )}
+          {!demoLoading && demoData && demoData.sessions.length === 0 && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
+              <MousePointerClick className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+              <p className="text-sm text-gray-400 font-medium">No demo sessions yet</p>
+              <p className="text-xs text-gray-600 mt-1">
+                Send a tracked demo link from the email composer to start measuring engagement.
+              </p>
+            </div>
+          )}
+          {!demoLoading && demoData && demoData.sessions.length > 0 && (
+            <>
+              {/* Summary row */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-white">{demoData.linkCount}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Links sent</p>
+                </div>
+                <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-white">{demoData.totalVisits}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Sessions</p>
+                </div>
+                <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-white">
+                    {demoData.sessions.filter(s => s.enteredTour).length}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">Toured</p>
+                </div>
+              </div>
+
+              {/* Session list */}
+              <div className="space-y-2">
+                {demoData.sessions.map(session => (
+                  <DemoSessionCard
+                    key={session.sessionId}
+                    session={session}
+                    expanded={expandedSession === session.sessionId}
+                    onToggle={() => setExpandedSession(
+                      expandedSession === session.sessionId ? null : session.sessionId
+                    )}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
       {tab === "Profile" && (
         <div className="space-y-6 max-w-2xl">
           <div className="flex items-center justify-between">
@@ -1427,6 +1500,133 @@ export function ProspectHub({
         </div>
       )}
     </>
+  )
+}
+
+// ─── Demo Session Card ────────────────────────────────────────────────────────
+
+function fmtDuration(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return s > 0 ? `${m}m ${s}s` : `${m}m`
+}
+
+const EVENT_LABELS: Record<string, string> = {
+  page_viewed:          "Page viewed",
+  returned_visit:       "Return visit",
+  pricing_viewed:       "Viewed pricing",
+  tour_started:         "Started tour",
+  tour_step_completed:  "Tour step",
+  tour_completed:       "Completed tour",
+  demo_requested:       "Requested demo",
+  trial_started:        "Started trial",
+  link_clicked:         "Link clicked",
+}
+
+function DemoSessionCard({
+  session,
+  expanded,
+  onToggle,
+}: {
+  session:  DemoSession
+  expanded: boolean
+  onToggle: () => void
+}) {
+  const date = new Date(session.firstEventAt)
+  const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  const timeStr = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <button
+        onClick={onToggle}
+        className="w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-800/50 transition-colors"
+      >
+        {/* Left: date + badge */}
+        <div className="shrink-0 w-8 h-8 rounded-lg bg-blue-900/40 flex items-center justify-center mt-0.5">
+          <MousePointerClick className="w-4 h-4 text-blue-400" />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm font-medium text-white">{dateStr} · {timeStr}</span>
+            {session.contactName && (
+              <span className="text-[11px] text-gray-500">for {session.contactName}</span>
+            )}
+            {session.salesUserName && (
+              <span className="text-[11px] text-gray-600">· via {session.salesUserName}</span>
+            )}
+          </div>
+
+          {/* Signal row */}
+          <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+            {session.industrySelected && (
+              <span className="inline-flex items-center gap-1 text-[11px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded-full">
+                {session.industrySelected}
+              </span>
+            )}
+            {session.enteredTour && (
+              <span className="inline-flex items-center gap-1 text-[11px] bg-indigo-900/40 text-indigo-300 px-2 py-0.5 rounded-full">
+                Tour entered
+              </span>
+            )}
+            {session.tourStepsReached > 0 && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
+                <Award className="w-3 h-3" />
+                {session.tourStepsReached} step{session.tourStepsReached !== 1 ? "s" : ""}
+              </span>
+            )}
+            {session.totalActiveSeconds > 0 && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
+                <Clock className="w-3 h-3" />
+                {fmtDuration(session.totalActiveSeconds)} active
+              </span>
+            )}
+            {session.requestedDemo && (
+              <span className="inline-flex items-center gap-1 text-[11px] bg-emerald-900/40 text-emerald-300 px-2 py-0.5 rounded-full">
+                Demo requested
+              </span>
+            )}
+            {session.startedTrial && (
+              <span className="inline-flex items-center gap-1 text-[11px] bg-purple-900/40 text-purple-300 px-2 py-0.5 rounded-full">
+                Trial started
+              </span>
+            )}
+          </div>
+        </div>
+
+        <ChevronRight className={cn(
+          "w-4 h-4 text-gray-600 shrink-0 mt-1 transition-transform",
+          expanded && "rotate-90",
+        )} />
+      </button>
+
+      {expanded && (
+        <div className="border-t border-gray-800 px-4 py-3">
+          <p className="text-[11px] text-gray-500 uppercase tracking-wide mb-2">Event timeline</p>
+          <div className="space-y-1.5">
+            {session.events.map(evt => {
+              const evtDate = new Date(evt.createdAt)
+              const evtTime = evtDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" })
+              const data = evt.eventData
+              const stepNum = typeof data.step === "number" ? data.step : null
+              const label = EVENT_LABELS[evt.eventType] ?? evt.eventType
+              return (
+                <div key={evt.id} className="flex items-baseline gap-2 text-xs">
+                  <span className="text-gray-600 shrink-0 w-20 text-right">{evtTime}</span>
+                  <span className="text-gray-400">
+                    {label}
+                    {stepNum !== null ? ` #${stepNum}` : ""}
+                    {evt.activeTimeSeconds > 0 ? ` · ${fmtDuration(evt.activeTimeSeconds)} active` : ""}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 

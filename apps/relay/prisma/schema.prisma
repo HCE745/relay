@@ -2649,6 +2649,7 @@ model ProspectContact {
   activities  SalesCrmActivity[] @relation("ContactActivities")
   tasks       CrmTask[]        @relation("ContactTasks")
   opportunities CrmOpportunity[] @relation("ContactOpportunities")
+  demoLinks   LinkClick[]      @relation("ContactDemoLinks")
 
   @@index([prospectId])
   @@index([email])
@@ -2697,6 +2698,8 @@ model LinkClick {
   token          String    @unique @db.VarChar(16)
   crmEmailId     String?
   prospectId     String?
+  contactId      String?   // ProspectContact this demo link was sent to
+  salesUserId    String?   // SalesUser who created this demo link
   destinationUrl String    @db.Text
   emailSentAt    DateTime?
   createdAt      DateTime  @default(now())
@@ -2705,12 +2708,16 @@ model LinkClick {
   lastClickedAt  DateTime?
   isBotSuspected Boolean   @default(false)
 
-  crmEmail CrmEmail?         @relation(fields: [crmEmailId], references: [id], onDelete: SetNull)
-  prospect Prospect?         @relation(fields: [prospectId], references: [id], onDelete: SetNull)
-  events   LinkTrackingEvent[]
+  crmEmail  CrmEmail?        @relation(fields: [crmEmailId],  references: [id], onDelete: SetNull)
+  prospect  Prospect?        @relation(fields: [prospectId],  references: [id], onDelete: SetNull)
+  contact   ProspectContact? @relation("ContactDemoLinks",   fields: [contactId],   references: [id], onDelete: SetNull)
+  salesUser SalesUser?       @relation("SalesUserDemoLinks", fields: [salesUserId], references: [id], onDelete: SetNull)
+  events    LinkTrackingEvent[]
 
   @@index([crmEmailId])
   @@index([prospectId])
+  @@index([contactId])
+  @@index([salesUserId])
 }
 
 model LinkTrackingEvent {
@@ -2801,6 +2808,7 @@ model SalesUser {
   invites                  SalesUserInvite[]
   goals                    SalesGoal[]
   createdGoals             SalesGoal[]          @relation("GoalCreator")
+  demoLinks                LinkClick[]          @relation("SalesUserDemoLinks")
 }
 
 model SalesUserInvite {

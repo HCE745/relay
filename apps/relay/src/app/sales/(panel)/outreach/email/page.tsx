@@ -1223,6 +1223,8 @@ function ComposeModal({ templates, contacts, initialBody, initialSubject, onClos
   const [abVariant,      setAbVariant]      = useState<string | null>(null)
   const [abCampaigns,    setAbCampaigns]    = useState<Array<{ id: string; name: string; variants: Array<{ label: string; subject: string; body: string }> }>>([])
   const [abLoading,      setAbLoading]      = useState(false)
+  const [insertingLink,  setInsertingLink]  = useState(false)
+  const bodyRef = useRef<HTMLTextAreaElement>(null)
 
   function enableAbTesting() {
     setAbEnabled(true)
@@ -1259,6 +1261,36 @@ function ComposeModal({ templates, contacts, initialBody, initialSubject, onClos
     setSubject(t.subject)
     setBody(t.body)
     setShowTpl(false)
+  }
+
+  async function insertDemoLink() {
+    setInsertingLink(true)
+    try {
+      const res  = await fetch("/api/sales/demo-link/create", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email: to.trim() || null }),
+      })
+      if (!res.ok) return
+      const { url } = await res.json() as { url: string }
+      const ta = bodyRef.current
+      if (ta) {
+        const start = ta.selectionStart ?? body.length
+        const end   = ta.selectionEnd   ?? body.length
+        const next  = body.slice(0, start) + url + body.slice(end)
+        setBody(next)
+        // Restore cursor after the inserted URL
+        setTimeout(() => {
+          ta.selectionStart = start + url.length
+          ta.selectionEnd   = start + url.length
+          ta.focus()
+        }, 0)
+      } else {
+        setBody(b => b ? `${b}\n\n${url}` : url)
+      }
+    } finally {
+      setInsertingLink(false)
+    }
   }
 
   async function handleSend() {
@@ -1398,6 +1430,14 @@ function ComposeModal({ templates, contacts, initialBody, initialSubject, onClos
                   A/B Test
                 </button>
               )}
+              <button
+                onClick={() => void insertDemoLink()}
+                disabled={insertingLink}
+                className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-blue-400 disabled:opacity-50 transition-colors"
+              >
+                {insertingLink ? <Loader2 className="w-3 h-3 animate-spin" /> : <MousePointerClick className="w-3 h-3" />}
+                Insert Demo Link
+              </button>
             </div>
 
             {/* A/B panel */}
@@ -1471,6 +1511,7 @@ function ComposeModal({ templates, contacts, initialBody, initialSubject, onClos
 
         {/* Body */}
         <textarea
+          ref={bodyRef}
           value={body}
           onChange={e => setBody(e.target.value)}
           placeholder={initialBody ? "" : "Write your email…"}

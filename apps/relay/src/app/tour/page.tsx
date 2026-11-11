@@ -14,6 +14,35 @@ function track(payload: Record<string, unknown>) {
   }).catch(() => null)
 }
 
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null
+  const m = document.cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`))
+  return m ? decodeURIComponent(m[1]) : null
+}
+
+function getOrCreateSessionId(): string {
+  if (typeof sessionStorage === "undefined") return Math.random().toString(36).slice(2)
+  let id = sessionStorage.getItem("relay_session_id")
+  if (!id) {
+    id = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+    sessionStorage.setItem("relay_session_id", id)
+  }
+  return id
+}
+
+// Fire a CRM tracking event when a rep's tracked link brought this visitor here
+function trackCrm(eventType: string, eventData: Record<string, unknown> = {}) {
+  const token = getCookie("relay_track")
+  if (!token) return
+  const sessionId = getOrCreateSessionId()
+  fetch("/api/track/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, eventType, eventData, sessionId, activeTimeSeconds: 0 }),
+    keepalive: true,
+  }).catch(() => null)
+}
+
 const INDUSTRIES = [
   { label: "Manufacturing",       emoji: "🏭" },
   { label: "Warehousing",         emoji: "📦" },
@@ -61,6 +90,7 @@ function TourPageInner() {
     if (tracked.current) return
     tracked.current = true
     void track({})
+    trackCrm("page_viewed", { path: "/tour" })
   }, [])
 
   useEffect(() => {
@@ -129,6 +159,7 @@ function TourPageInner() {
       if (!res.ok) throw new Error()
       // Track industry before navigating away
       await track({ industrySelected: industry })
+      trackCrm("page_viewed", { path: "/tour", industrySelected: industry })
       window.location.href = "/dashboard?autoStartTour=1"
     } catch {
       setStartError("Could not start the demo. Please try again.")

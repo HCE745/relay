@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import Link from "next/link"
 import {
   Search, Loader2, X, ChevronLeft, ChevronDown, ChevronUp, ExternalLink,
   MapPin, Users, Zap, CheckCircle2, AlertTriangle,
   Building2, Star, Mail, Globe, User, Plus, Send,
-  Phone, Link2, FileText, Calendar, Clock,
+  Phone, Link2, FileText, Calendar, Clock, MousePointerClick,
 } from "lucide-react"
 import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api/super-admin/crm/prospects/discover/route"
 
@@ -195,6 +195,8 @@ function SlideOver({ company, onClose }: {
   const [sendingEmail, setSendingEmail] = useState(false)
   const [emailError, setEmailError]     = useState<string | null>(null)
   const [emailSent, setEmailSent]       = useState(false)
+  const [insertingLink, setInsertingLink] = useState(false)
+  const emailBodyRef = useRef<HTMLTextAreaElement>(null)
 
   // Log
   const [logType, setLogType]           = useState("CALL_CONNECTED")
@@ -369,6 +371,40 @@ function SlideOver({ company, onClose }: {
       setSelectedTemplate("")
     } finally {
       setSendingEmail(false)
+    }
+  }
+
+  async function insertDemoLink() {
+    if (!created) return
+    setInsertingLink(true)
+    try {
+      const sc = savedContacts.find(c => c.id === outreachContactId) ?? savedContacts[0]
+      const res = await fetch("/api/sales/demo-link/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prospectId: created.prospectId,
+          contactId:  sc?.id ?? null,
+        }),
+      })
+      if (!res.ok) return
+      const { url } = await res.json() as { url: string }
+      const ta = emailBodyRef.current
+      if (ta) {
+        const start = ta.selectionStart ?? emailBody.length
+        const end   = ta.selectionEnd   ?? emailBody.length
+        const next  = emailBody.slice(0, start) + url + emailBody.slice(end)
+        setEmailBody(next)
+        setTimeout(() => {
+          ta.selectionStart = start + url.length
+          ta.selectionEnd   = start + url.length
+          ta.focus()
+        }, 0)
+      } else {
+        setEmailBody(b => b ? `${b}\n\n${url}` : url)
+      }
+    } finally {
+      setInsertingLink(false)
     }
   }
 
@@ -713,8 +749,20 @@ function SlideOver({ company, onClose }: {
                       </div>
                       <div>
                         <label className="block text-[11px] text-gray-500 mb-1">Body</label>
-                        <textarea rows={9} value={emailBody} onChange={e => setEmailBody(e.target.value)}
+                        <textarea ref={emailBodyRef} rows={9} value={emailBody} onChange={e => setEmailBody(e.target.value)}
                           className={`${inputCls} resize-none font-mono`} />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => void insertDemoLink()}
+                          disabled={insertingLink || !created}
+                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-blue-400 disabled:opacity-40 transition-colors"
+                        >
+                          {insertingLink
+                            ? <Loader2 className="w-3 h-3 animate-spin" />
+                            : <MousePointerClick className="w-3 h-3" />}
+                          Insert Demo Link
+                        </button>
                       </div>
                       {emailError && (
                         <p className="text-xs text-red-400 flex items-center gap-1.5">

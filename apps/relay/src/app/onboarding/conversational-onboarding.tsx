@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import {
   Check, ChevronRight, Building2, Zap,
   MapPin, Users, Network, Loader2, Plus, Trash2,
-  Rocket, ArrowRight, PartyPopper, Settings,
+  Rocket, ArrowRight, PartyPopper, Settings, Upload, AlertCircle,
 } from "lucide-react"
 import { RelayWordmark } from "@/components/logo"
 import { EMPLOYEE_TYPE_PRESETS } from "@/lib/employee-type-presets"
@@ -627,6 +627,17 @@ function EmployeeTypesCard({ data, onComplete, onSkip }: {
   )
 }
 
+type ImportPreviewRow = {
+  rowNum: number
+  name: string
+  email: string
+  role: string
+  locationName: string | null
+  departmentName: string | null
+  warnings: string[]
+  status: "invite" | "skip"
+}
+
 function TeamInvitesCard({ data, onComplete, onSkip }: {
   data: WizardData
   onComplete: (updates: Partial<WizardData>) => void
@@ -635,10 +646,61 @@ function TeamInvitesCard({ data, onComplete, onSkip }: {
   const [members, setMembers] = useState<TeamEntry[]>(
     data.team.length > 0 ? data.team : [{ id: uid(), name: "", email: "", title: "", role: "MANAGER", employeeTypeId: "" }]
   )
+  const [showImport, setShowImport]       = useState(false)
+  const [importRows, setImportRows]       = useState<ImportPreviewRow[]>([])
+  const [importErrors, setImportErrors]   = useState<string[]>([])
+  const [importLoading, setImportLoading] = useState(false)
+  const [importDone, setImportDone]       = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const ROLES = ["ADMIN", "MANAGER", "SUPERVISOR", "HR", "EMPLOYEE"]
 
   function update(idx: number, field: keyof TeamEntry, val: string) {
     setMembers(prev => prev.map((m, i) => i === idx ? { ...m, [field]: val } : m))
+  }
+
+  async function handleFileSelect(file: File) {
+    setImportLoading(true)
+    setImportRows([])
+    setImportErrors([])
+    try {
+      const text = await file.text()
+      const res = await fetch("/api/onboarding/import/employees", {
+        method: "POST",
+        headers: { "Content-Type": "text/csv" },
+        body: text,
+      })
+      const json = await res.json() as { rows?: ImportPreviewRow[]; errors?: string[] }
+      setImportRows(json.rows ?? [])
+      setImportErrors(json.errors ?? [])
+    } catch {
+      setImportErrors(["Failed to process file. Please check the format and try again."])
+    } finally {
+      setImportLoading(false)
+    }
+  }
+
+  async function confirmImport() {
+    setImportLoading(true)
+    try {
+      const res = await fetch("/api/onboarding/import/employees?confirm=true", {
+        method: "POST",
+        headers: { "Content-Type": "text/csv" },
+        // Re-use the last preview result to get the file; re-send is simpler than caching
+        // We re-trigger from the preview rows since they already contain validated data
+        body: importRows
+          .filter(r => r.status === "invite")
+          .map(r => `${r.name},${r.email},${r.role},,${r.locationName ?? ""},${r.departmentName ?? ""}`)
+          .join("\n"),
+      })
+      const json = await res.json() as { invited?: number; errors?: string[] }
+      setImportErrors(json.errors ?? [])
+      setImportDone(true)
+    } catch {
+      setImportErrors(["Import failed. Please try again."])
+    } finally {
+      setImportLoading(false)
+    }
   }
 
   return (
@@ -650,23 +712,107 @@ function TeamInvitesCard({ data, onComplete, onSkip }: {
         <h3 className="text-base font-semibold text-gray-900">Team invites</h3>
       </div>
       <p className="text-sm text-gray-500 mb-4">Add team members to invite after setup is complete.</p>
-      <div className="space-y-2 mb-3">
-        {members.map((m, idx) => (
-          <div key={m.id} className="grid grid-cols-[1fr,1fr,auto,auto] gap-2 items-center">
-            <input type="text" value={m.name} onChange={e => update(idx, "name", e.target.value)} placeholder="Name" className={inputCls} />
-            <input type="email" value={m.email} onChange={e => update(idx, "email", e.target.value)} placeholder="Email" className={inputCls} />
-            <select value={m.role} onChange={e => update(idx, "role", e.target.value)} className="px-2.5 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-              {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-            </select>
-            <button type="button" onClick={() => setMembers(prev => prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev)} disabled={members.length <= 1} className="p-2.5 text-gray-400 hover:text-red-500 disabled:opacity-30">
-              <Trash2 className="w-4 h-4" />
+
+      {!showImport ? (
+        <>
+          <div className="space-y-2 mb-3">
+            {members.map((m, idx) => (
+              <div key={m.id} className="grid grid-cols-[1fr,1fr,auto,auto] gap-2 items-center">
+                <input type="text" value={m.name} onChange={e => update(idx, "name", e.target.value)} placeholder="Name" className={inputCls} />
+                <input type="email" value={m.email} onChange={e => update(idx, "email", e.target.value)} placeholder="Email" className={inputCls} />
+                <select value={m.role} onChange={e => update(idx, "role", e.target.value)} className="px-2.5 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+                <button type="button" onClick={() => setMembers(prev => prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev)} disabled={members.length <= 1} className="p-2.5 text-gray-400 hover:text-red-500 disabled:opacity-30">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-4 mb-5">
+            <button type="button" onClick={() => setMembers(prev => [...prev, { id: uid(), name: "", email: "", title: "", role: "MANAGER", employeeTypeId: "" }])} className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700">
+              <Plus className="w-4 h-4" /> Add person
+            </button>
+            <button type="button" onClick={() => setShowImport(true)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
+              <Upload className="w-3.5 h-3.5" /> Import CSV
             </button>
           </div>
-        ))}
-      </div>
-      <button type="button" onClick={() => setMembers(prev => [...prev, { id: uid(), name: "", email: "", title: "", role: "MANAGER", employeeTypeId: "" }])} className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 mb-5">
-        <Plus className="w-4 h-4" /> Add person
-      </button>
+        </>
+      ) : (
+        <div className="mb-5">
+          {importDone ? (
+            <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-xl px-4 py-3 mb-3">
+              <Check className="w-4 h-4 shrink-0" /> Invitations sent — team members will receive an email to accept.
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-gray-700">Import from CSV</span>
+                <a href="/api/onboarding/import/employees" className="text-xs text-blue-600 hover:text-blue-700 underline">Download template</a>
+              </div>
+              {importRows.length === 0 && (
+                <>
+                  <input ref={fileInputRef} type="file" accept=".csv,text/csv" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFileSelect(f) }} />
+                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={importLoading} className="w-full border-2 border-dashed border-gray-300 rounded-xl py-6 flex flex-col items-center gap-2 hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-60">
+                    {importLoading ? <Loader2 className="w-5 h-5 text-blue-500 animate-spin" /> : <Upload className="w-5 h-5 text-gray-400" />}
+                    <span className="text-sm text-gray-500">{importLoading ? "Processing…" : "Click to upload CSV"}</span>
+                  </button>
+                </>
+              )}
+              {importRows.length > 0 && (
+                <div className="border border-gray-200 rounded-xl overflow-hidden mb-3">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-gray-500 font-medium">Name</th>
+                        <th className="px-3 py-2 text-left text-gray-500 font-medium">Email</th>
+                        <th className="px-3 py-2 text-left text-gray-500 font-medium">Role</th>
+                        <th className="px-3 py-2 text-left text-gray-500 font-medium">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {importRows.map(row => (
+                        <tr key={row.rowNum} className={row.status === "skip" ? "opacity-50" : ""}>
+                          <td className="px-3 py-2 text-gray-800">{row.name}</td>
+                          <td className="px-3 py-2 text-gray-600">{row.email}</td>
+                          <td className="px-3 py-2 text-gray-600">{row.role}</td>
+                          <td className="px-3 py-2">
+                            {row.status === "invite"
+                              ? <span className="text-green-700 font-medium">Will invite</span>
+                              : <span className="text-gray-400">Already exists</span>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {importErrors.length > 0 && (
+                <div className="mb-3 space-y-1">
+                  {importErrors.slice(0, 5).map((e, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {e}
+                    </div>
+                  ))}
+                  {importErrors.length > 5 && <p className="text-xs text-gray-500 pl-3">+{importErrors.length - 5} more warnings</p>}
+                </div>
+              )}
+            </>
+          )}
+          <div className="flex gap-2">
+            <button type="button" onClick={() => { setShowImport(false); setImportRows([]); setImportErrors([]); setImportDone(false) }} className="text-sm text-gray-500 hover:text-gray-700">
+              Back to manual
+            </button>
+            {importRows.length > 0 && !importDone && (
+              <button type="button" onClick={confirmImport} disabled={importLoading || importRows.filter(r => r.status === "invite").length === 0} className="ml-auto flex items-center gap-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-60">
+                {importLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                Send {importRows.filter(r => r.status === "invite").length} invitation{importRows.filter(r => r.status === "invite").length !== 1 ? "s" : ""}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex gap-3">
         <button type="button" onClick={onSkip} className="flex-1 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl text-sm font-medium">Skip for now</button>
         <button type="button" onClick={() => onComplete({ team: members.filter(m => m.email.trim()) })} className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">

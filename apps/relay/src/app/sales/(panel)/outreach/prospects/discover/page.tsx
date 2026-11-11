@@ -169,9 +169,18 @@ function SlideOver({ company, onClose }: {
   const [lastSaved, setLastSaved]       = useState<string | null>(null)
 
   // Outreach
-  type OutreachTab = "email" | "log"
+  type OutreachTab = "email" | "log" | "followup"
   const [outreachTab, setOutreachTab]           = useState<OutreachTab>("email")
   const [outreachContactId, setOutreachContactId] = useState<string>("")
+
+  // Follow-up task
+  const [followupTitle, setFollowupTitle]     = useState("")
+  const [followupDueAt, setFollowupDueAt]     = useState("")
+  const [followupNotes, setFollowupNotes]     = useState("")
+  const [followupPriority, setFollowupPriority] = useState("normal")
+  const [savingFollowup, setSavingFollowup]   = useState(false)
+  const [followupError, setFollowupError]     = useState<string | null>(null)
+  const [followupSaved, setFollowupSaved]     = useState(false)
 
   // Templates
   const [templates, setTemplates]           = useState<Template[]>([])
@@ -388,6 +397,41 @@ function SlideOver({ company, onClose }: {
       setLogNotes("")
     } finally {
       setSavingLog(false)
+    }
+  }
+
+  async function handleCreateFollowup() {
+    if (!created || !followupTitle.trim()) return
+    setSavingFollowup(true)
+    setFollowupError(null)
+    try {
+      const sc = savedContacts.find(c => c.id === outreachContactId)
+      const res = await fetch("/api/sales/tasks", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          title: followupTitle.trim(),
+          taskType: "other",
+          priority: followupPriority,
+          dueAt: followupDueAt || null,
+          notes: followupNotes.trim() || null,
+          prospectId: created.prospectId,
+          contactId: sc?.id || null,
+          // No assignedToId — API assigns to the current session user by default
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setFollowupError(data.error ?? "Failed to create follow-up")
+        return
+      }
+      setFollowupSaved(true)
+      setFollowupTitle("")
+      setFollowupDueAt("")
+      setFollowupNotes("")
+      setFollowupPriority("normal")
+    } finally {
+      setSavingFollowup(false)
     }
   }
 
@@ -635,6 +679,12 @@ function SlideOver({ company, onClose }: {
                     >
                       <Calendar className="w-3 h-3" /> Log Interaction
                     </button>
+                    <button
+                      onClick={() => setOutreachTab("followup")}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-colors ${outreachTab === "followup" ? "bg-gray-700 text-white" : "text-gray-400 hover:text-gray-200"}`}
+                    >
+                      <Plus className="w-3 h-3" /> Create Follow-Up
+                    </button>
                   </div>
 
                   {/* Email tab */}
@@ -744,6 +794,63 @@ function SlideOver({ company, onClose }: {
                       </button>
                     </div>
                   )}
+
+                  {/* Follow-up tab */}
+                  {outreachTab === "followup" && (
+                    <div className="space-y-3">
+                      {followupSaved && (
+                        <div className="flex items-center gap-2 text-xs text-green-400 py-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> Follow-up task created and added to To-Do.
+                        </div>
+                      )}
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Task Title <span className="text-red-400">*</span></label>
+                        <input type="text" value={followupTitle} onChange={e => setFollowupTitle(e.target.value)}
+                          placeholder="Call Bob next Tuesday…" className={inputCls} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[11px] text-gray-500 mb-1">Due Date</label>
+                          <input type="datetime-local" value={followupDueAt} onChange={e => setFollowupDueAt(e.target.value)}
+                            className={inputCls} />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] text-gray-500 mb-1">Priority</label>
+                          <select value={followupPriority} onChange={e => setFollowupPriority(e.target.value)} className={inputCls}>
+                            <option value="low">Low</option>
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-gray-500 mb-1">Notes</label>
+                        <textarea rows={3} value={followupNotes} onChange={e => setFollowupNotes(e.target.value)}
+                          placeholder="What to cover, context, reminders…"
+                          className={`${inputCls} resize-none`} />
+                      </div>
+                      <p className="text-[10px] text-gray-600">
+                        Company: {company.companyName}
+                        {savedContacts.find(c => c.id === outreachContactId)?.name
+                          ? ` · Contact: ${savedContacts.find(c => c.id === outreachContactId)!.name}`
+                          : ""}
+                      </p>
+                      {followupError && (
+                        <p className="text-xs text-red-400 flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />{followupError}
+                        </p>
+                      )}
+                      <button
+                        onClick={handleCreateFollowup}
+                        disabled={savingFollowup || !followupTitle.trim()}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        {savingFollowup
+                          ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
+                          : <><Plus className="w-4 h-4" /> Save Follow-Up</>}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -791,16 +898,6 @@ function SlideOver({ company, onClose }: {
                         </div>
                       </div>
                     ))}
-                    <button
-                      onClick={() => {
-                        setLastSaved(null)
-                        setContact(blankContact())
-                        setSectionOpen(prev => ({ ...prev, contact: true }))
-                      }}
-                      className="w-full flex items-center justify-center gap-2 py-2 mt-2 text-sm text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors"
-                    >
-                      <Plus className="w-4 h-4" /> Add Another Contact
-                    </button>
                   </div>
                 )}
               </div>

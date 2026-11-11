@@ -13,9 +13,13 @@ export async function GET() {
   const userId = session.salesUserId ?? ""
   const isManager = session.superAdmin || session.salesUserRole === "admin_sales"
   const repFilter = isManager ? { NOT: { assignedTo: { isDemo: true } } } : { assignedToId: userId }
-  // For task queries: also include tasks linked to prospects assigned to this rep
+  // For managers: show all non-demo tasks, but always include the manager's OWN tasks even
+  // if their own account has isDemo=true (the demo manager filter would otherwise hide them).
+  // For reps: show tasks assigned to them or tasks on their assigned prospects.
   const taskRepFilter = isManager
-    ? repFilter
+    ? (userId
+        ? { OR: [{ assignedToId: userId }, { NOT: { assignedTo: { isDemo: true } } }] }
+        : { NOT: { assignedTo: { isDemo: true } } })
     : { OR: [{ assignedToId: userId }, { prospect: { assignedToId: userId } }] }
 
   const now      = new Date()

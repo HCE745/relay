@@ -62,8 +62,11 @@ export async function GET(
     },
   })
 
-  // Group events by sessionId across all links for this prospect
+  // Group events by token+sessionId — keying on sessionId alone would merge sessions
+  // from different links if the same browser tab visited multiple tracked links
+  // (sessionStorage reuses the same relay_session_id across hard navigations within a tab).
   const sessionMap = new Map<string, {
+    sessionId: string
     linkToken: string
     linkCreatedAt: string
     contactId: string | null
@@ -76,8 +79,10 @@ export async function GET(
   for (const link of links) {
     for (const event of link.events) {
       if (!event.sessionId) continue
-      if (!sessionMap.has(event.sessionId)) {
-        sessionMap.set(event.sessionId, {
+      const key = `${link.token}_${event.sessionId}`
+      if (!sessionMap.has(key)) {
+        sessionMap.set(key, {
+          sessionId:    event.sessionId,
           linkToken:    link.token,
           linkCreatedAt: link.createdAt.toISOString(),
           contactId:    link.contact?.id    ?? null,
@@ -87,13 +92,14 @@ export async function GET(
           events: [],
         })
       }
-      sessionMap.get(event.sessionId)!.events.push(event)
+      sessionMap.get(key)!.events.push(event)
     }
   }
 
   // Build session summaries
   const sessions: DemoSession[] = []
-  for (const [sessionId, data] of sessionMap) {
+  for (const [, data] of sessionMap) {
+    const sessionId = data.sessionId
     const evts = data.events
     if (evts.length === 0) continue
 

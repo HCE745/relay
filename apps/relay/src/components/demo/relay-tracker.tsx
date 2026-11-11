@@ -31,6 +31,9 @@ function isNewSession(token: string): boolean {
 // so tour_step_completed and similar events automatically carry elapsed active time.
 let _moduleActiveSeconds = 0
 let _moduleLastActive: number | null = null
+// Tracks how many seconds have already been reported, so each event carries
+// only the DELTA since the last event (avoids summing cumulative values server-side).
+let _lastReportedSeconds = 0
 
 function _flushModuleTime() {
   if (_moduleLastActive !== null) {
@@ -52,8 +55,16 @@ export function fireTrackingEvent(
   const token = getCookie("relay_track")
   if (!token) return
   const sessionId = getOrCreateSessionId()
-  // If caller doesn't specify, use the module-level accumulator
-  const seconds = activeTimeSeconds ?? getActiveSeconds()
+  let seconds: number
+  if (activeTimeSeconds !== undefined) {
+    // Explicit override (e.g. 0 for immediate page-load events)
+    seconds = activeTimeSeconds
+  } else {
+    // Delta since last reported — prevents summing cumulative totals server-side
+    const current = getActiveSeconds()
+    seconds = Math.max(0, current - _lastReportedSeconds)
+    _lastReportedSeconds = current
+  }
   fetch("/api/track/event", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -4,20 +4,19 @@ import { useState, useCallback, useEffect, useRef } from "react"
 import Link from "next/link"
 import {
   Search, Loader2, X, ChevronLeft, ChevronDown, ChevronUp, ExternalLink,
-  MapPin, Users, Zap, CheckCircle2, AlertTriangle,
+  MapPin, Users, CheckCircle2, AlertTriangle,
   Building2, Star, Mail, Globe, User, Plus, Send,
-  Phone, Link2, FileText, Calendar, Clock, MousePointerClick,
-  Bookmark, BookmarkCheck, Trash2, FolderOpen, PenLine, ArrowRight,
-  RefreshCw, ChevronRight, List as ListIcon,
+  Link2, FileText, Calendar, Clock,
+  Bookmark, Trash2, PenLine,
+  RefreshCw, ChevronRight, Save,
 } from "lucide-react"
 import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api/super-admin/crm/prospects/discover/route"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type NavSection  = "search" | "lists" | "prospects"
+type NavSection  = "search" | "lists"
 type SearchState = "idle" | "loading" | "done" | "error"
 type DetailsState = "loading" | "ready" | "error"
-type PanelStep   = "contact" | "action" | "email" | "log"
 
 interface ContactDraft {
   name:     string
@@ -137,7 +136,57 @@ function buildAutoName(params: {
   return `${parts.join(" · ")} — ${date}`
 }
 
-// ─── Company Card (search results) ───────────────────────────────────────────
+// ─── Save List Dialog ─────────────────────────────────────────────────────────
+
+function SaveListDialog({ suggestedName, onSave, onCancel, saving }: {
+  suggestedName: string
+  onSave:        (name: string) => void
+  onCancel:      () => void
+  saving:        boolean
+}) {
+  const [name, setName] = useState(suggestedName)
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/60 z-50" onClick={onCancel} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+          <h3 className="text-white font-semibold text-sm mb-1">Save this list</h3>
+          <p className="text-[12px] text-gray-500 mb-4">
+            Give this set of research results a name so you can return to it later.
+          </p>
+          <input
+            autoFocus
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter" && name.trim()) onSave(name.trim()) }}
+            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 mb-4"
+            placeholder="List name…"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => { if (name.trim()) onSave(name.trim()) }}
+              disabled={saving || !name.trim()}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving…</> : <><Save className="w-3.5 h-3.5" /> Save List</>}
+            </button>
+            <button
+              onClick={onCancel}
+              disabled={saving}
+              className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 border border-gray-700 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ─── Company Card ─────────────────────────────────────────────────────────────
 
 function CompanyCard({ company, selected, onClick }: {
   company:  DiscoveredCompanyBasic
@@ -182,10 +231,12 @@ function CompanyCard({ company, selected, onClick }: {
               </span>
             )}
             {company.website && (
-              <a href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
+              <a
+                href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
                 target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-0.5 text-indigo-400/80 hover:text-indigo-300 transition-colors"
-                onClick={e => e.stopPropagation()}>
+                onClick={e => e.stopPropagation()}
+              >
                 <ExternalLink className="w-2.5 h-2.5" />{cleanUrl(company.website)}
               </a>
             )}
@@ -208,450 +259,39 @@ function CompanyCard({ company, selected, onClick }: {
   )
 }
 
-// ─── List Result Card (saved lists view) ──────────────────────────────────────
+// ─── Slide-over ───────────────────────────────────────────────────────────────
+// key={company.companyName} from parent forces remount on navigation,
+// resetting all contact/email/log state cleanly.
 
-function ListResultCard({
-  result,
-  onAddToCRM,
-  addingId,
-}: {
-  result:    ResearchResult
-  onAddToCRM: (resultId: string) => void
-  addingId:  string | null
-}) {
-  const badge = fitBadge(result.fitScore ?? 70)
-  const isAdding = addingId === result.id
-  return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-white font-semibold text-[14px] leading-snug">{result.companyName}</h3>
-            {result.prospectId && (
-              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-900/30 text-indigo-400 border border-indigo-800/50 flex-shrink-0">
-                <Building2 className="w-2 h-2" />
-                In CRM
-              </span>
-            )}
-          </div>
-          <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5 text-[11px] text-gray-400">
-            {(result.verifiedCity || result.verifiedState) && (
-              <span className="flex items-center gap-0.5">
-                <MapPin className="w-2.5 h-2.5" />
-                {[result.verifiedCity, result.verifiedState].filter(Boolean).join(", ")}
-              </span>
-            )}
-            {result.estimatedEmployees && (
-              <span className="flex items-center gap-0.5">
-                <Users className="w-2.5 h-2.5" />{result.estimatedEmployees} emp.
-              </span>
-            )}
-            {result.website && (
-              <a href={result.website.startsWith("http") ? result.website : `https://${result.website}`}
-                target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-0.5 text-indigo-400/80 hover:text-indigo-300 transition-colors">
-                <ExternalLink className="w-2.5 h-2.5" />{cleanUrl(result.website)}
-              </a>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <div className={`flex flex-col items-center justify-center w-11 h-11 rounded-lg border ${badge.bg} ${badge.border}`}>
-            <span className={`text-lg font-bold leading-none tabular-nums ${badge.text}`}>{result.fitScore ?? "—"}</span>
-            <span className="text-[8px] uppercase tracking-widest text-gray-500 mt-0.5">fit</span>
-          </div>
-          {result.prospectId ? (
-            <Link
-              href={`/sales/prospects/${result.prospectId}`}
-              className="text-[10px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5"
-            >
-              View <ExternalLink className="w-2.5 h-2.5" />
-            </Link>
-          ) : (
-            <button
-              onClick={() => onAddToCRM(result.id)}
-              disabled={isAdding}
-              className="text-[10px] px-2 py-1 rounded-md bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-700/40 transition-colors disabled:opacity-50 flex items-center gap-1"
-            >
-              {isAdding ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Plus className="w-2.5 h-2.5" />}
-              Add to CRM
-            </button>
-          )}
-        </div>
-      </div>
-      {result.industry && (
-        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700/60 mb-2">
-          <Building2 className="w-2.5 h-2.5" />{result.industry}
-        </span>
-      )}
-      {result.summary && (
-        <p className="text-[12px] text-gray-400 leading-relaxed line-clamp-2">{result.summary}</p>
-      )}
-    </div>
-  )
-}
-
-// ─── Saved Lists Section ──────────────────────────────────────────────────────
-
-function SavedListsSection({ onRunSearch }: {
-  onRunSearch: (params: {
-    country: string; stateProvince: string; industry: string
-    empMin: string; empMax: string; keywords: string; context: string
-    appendToListId?: string
-  }) => void
-}) {
-  const [lists,       setLists]       = useState<ResearchList[] | null>(null)
-  const [loading,     setLoading]     = useState(true)
-  const [error,       setError]       = useState<string | null>(null)
-  const [openList,    setOpenList]    = useState<ResearchListWithResults | null>(null)
-  const [loadingList, setLoadingList] = useState<string | null>(null)
-  const [renamingId,  setRenamingId]  = useState<string | null>(null)
-  const [renameVal,   setRenameVal]   = useState("")
-  const [savingRename, setSavingRename] = useState(false)
-  const [deletingId,  setDeletingId]  = useState<string | null>(null)
-  const [addingId,    setAddingId]    = useState<string | null>(null)
-  const [findingMore, setFindingMore] = useState(false)
-  const [findMoreErr, setFindMoreErr] = useState<string | null>(null)
-  const [findMoreCount, setFindMoreCount] = useState<number | null>(null)
-
-  useEffect(() => {
-    setLoading(true)
-    fetch("/api/super-admin/crm/prospects/discover/lists")
-      .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-      .then(d => { setLists(d as ResearchList[]); setLoading(false) })
-      .catch(() => { setError("Failed to load lists"); setLoading(false) })
-  }, [])
-
-  async function openListDetail(list: ResearchList) {
-    setLoadingList(list.id)
-    setFindMoreErr(null)
-    setFindMoreCount(null)
-    try {
-      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${list.id}`)
-      if (!res.ok) throw new Error("Failed to load list")
-      const data = await res.json() as ResearchListWithResults
-      setOpenList(data)
-    } catch {
-      setError("Failed to load list details")
-    } finally {
-      setLoadingList(null)
-    }
-  }
-
-  async function handleRename(id: string) {
-    if (!renameVal.trim()) return
-    setSavingRename(true)
-    try {
-      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${id}`, {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name: renameVal.trim() }),
-      })
-      if (!res.ok) throw new Error("Rename failed")
-      const updated = await res.json() as ResearchList & { _count: { results: number } }
-      setLists(prev => prev?.map(l => l.id === id ? { ...l, name: updated.name } : l) ?? null)
-      if (openList?.id === id) setOpenList(prev => prev ? { ...prev, name: updated.name } : null)
-    } finally {
-      setSavingRename(false)
-      setRenamingId(null)
-      setRenameVal("")
-    }
-  }
-
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this list? Results that have been added to CRM will not be affected.")) return
-    setDeletingId(id)
-    try {
-      await fetch(`/api/super-admin/crm/prospects/discover/lists/${id}`, { method: "DELETE" })
-      setLists(prev => prev?.filter(l => l.id !== id) ?? null)
-      if (openList?.id === id) setOpenList(null)
-    } finally {
-      setDeletingId(null)
-    }
-  }
-
-  async function handleAddToCRM(resultId: string) {
-    if (!openList) return
-    setAddingId(resultId)
-    try {
-      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${openList.id}/promote`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ resultIds: [resultId] }),
-      })
-      if (!res.ok) return
-      const { promoted } = await res.json() as { promoted: { resultId: string; prospectId: string }[] }
-      const p = promoted.find(x => x.resultId === resultId)
-      if (p) {
-        setOpenList(prev => prev ? {
-          ...prev,
-          results: prev.results.map(r => r.id === resultId ? { ...r, prospectId: p.prospectId } : r),
-        } : null)
-      }
-    } finally {
-      setAddingId(null)
-    }
-  }
-
-  async function handleFindMore() {
-    if (!openList) return
-    setFindingMore(true)
-    setFindMoreErr(null)
-    setFindMoreCount(null)
-    try {
-      // Run a fresh search with the same criteria
-      const body: Record<string, unknown> = {
-        country: openList.searchCountry ?? "United States",
-      }
-      if (openList.searchState)    body.stateProvince    = openList.searchState
-      if (openList.searchIndustry) body.industry         = openList.searchIndustry
-      if (openList.searchEmpMin)   body.employeeCountMin = openList.searchEmpMin
-      if (openList.searchEmpMax)   body.employeeCountMax = openList.searchEmpMax
-      if (openList.searchKeywords) body.keywords         = openList.searchKeywords
-      if (openList.searchContext)  body.additionalContext = openList.searchContext
-
-      const res = await fetch("/api/super-admin/crm/prospects/discover", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(body),
-      })
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(d.error ?? "Search failed")
-      }
-      const { companies } = await res.json() as { companies: DiscoveredCompanyBasic[] }
-      if (!companies.length) { setFindMoreErr("No additional companies found"); return }
-
-      // Append to list
-      const appendRes = await fetch(`/api/super-admin/crm/prospects/discover/lists/${openList.id}`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ results: companies }),
-      })
-      if (!appendRes.ok) throw new Error("Failed to append results")
-      const { appended } = await appendRes.json() as { appended: number; skipped: number }
-
-      // Reload the list
-      const refreshed = await fetch(`/api/super-admin/crm/prospects/discover/lists/${openList.id}`)
-      if (refreshed.ok) {
-        const data = await refreshed.json() as ResearchListWithResults
-        setOpenList(data)
-        setLists(prev => prev?.map(l => l.id === openList.id
-          ? { ...l, _count: { results: data.results.length } } : l) ?? null)
-      }
-      setFindMoreCount(appended)
-    } catch (err) {
-      setFindMoreErr(err instanceof Error ? err.message : "Find More failed")
-    } finally {
-      setFindingMore(false)
-    }
-  }
-
-  if (loading) return (
-    <div className="flex items-center justify-center h-48">
-      <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
-    </div>
-  )
-  if (error) return (
-    <div className="p-6 text-center text-red-400 text-sm">{error}</div>
-  )
-
-  // ── Detail view: open list ──────────────────────────────────────────────────
-  if (openList) {
-    const promoted = openList.results.filter(r => r.prospectId).length
-    return (
-      <div className="flex flex-col h-full">
-        {/* List header */}
-        <div className="border-b border-gray-800 px-4 py-3 flex-shrink-0">
-          <div className="flex items-center gap-2 mb-1">
-            <button
-              onClick={() => { setOpenList(null); setFindMoreErr(null); setFindMoreCount(null) }}
-              className="text-gray-400 hover:text-gray-200 transition-colors p-0.5"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            {renamingId === openList.id ? (
-              <div className="flex items-center gap-2 flex-1">
-                <input
-                  autoFocus
-                  value={renameVal}
-                  onChange={e => setRenameVal(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") void handleRename(openList.id); if (e.key === "Escape") { setRenamingId(null); setRenameVal("") } }}
-                  className="flex-1 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none"
-                />
-                <button
-                  onClick={() => void handleRename(openList.id)}
-                  disabled={savingRename}
-                  className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md"
-                >
-                  {savingRename ? "…" : "Save"}
-                </button>
-                <button onClick={() => { setRenamingId(null); setRenameVal("") }} className="text-gray-400 hover:text-gray-200">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <h2 className="text-sm font-semibold text-white truncate">{openList.name}</h2>
-                <button
-                  onClick={() => { setRenamingId(openList.id); setRenameVal(openList.name) }}
-                  className="text-gray-500 hover:text-gray-300 flex-shrink-0"
-                  title="Rename list"
-                >
-                  <PenLine className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-3 text-[11px] text-gray-500 ml-6">
-            <span>{openList.results.length} companies</span>
-            {promoted > 0 && <span className="text-indigo-400">{promoted} in CRM</span>}
-            {openList.searchState && <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{openList.searchState}</span>}
-            {openList.searchIndustry && <span>{openList.searchIndustry}</span>}
-            <span>{formatDate(openList.createdAt)}</span>
-          </div>
-
-          {/* Find More / status */}
-          <div className="mt-2.5 ml-6 flex items-center gap-3">
-            <button
-              onClick={() => void handleFindMore()}
-              disabled={findingMore}
-              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-lg transition-colors disabled:opacity-50"
-            >
-              {findingMore
-                ? <><Loader2 className="w-3 h-3 animate-spin" /> Finding more…</>
-                : <><RefreshCw className="w-3 h-3" /> Find More Companies</>
-              }
-            </button>
-            {findMoreCount !== null && (
-              <span className="text-[11px] text-green-400">+{findMoreCount} new companies added</span>
-            )}
-            {findMoreErr && (
-              <span className="text-[11px] text-red-400">{findMoreErr}</span>
-            )}
-          </div>
-        </div>
-
-        {/* Results */}
-        <div className="flex-1 overflow-y-auto p-4">
-          {openList.results.length === 0 ? (
-            <div className="text-center py-16 text-gray-500">
-              <Building2 className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p>No companies in this list yet.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {openList.results.map(r => (
-                <ListResultCard
-                  key={r.id}
-                  result={r}
-                  onAddToCRM={handleAddToCRM}
-                  addingId={addingId}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  // ── List index ──────────────────────────────────────────────────────────────
-  return (
-    <div className="flex-1 overflow-y-auto p-4">
-      {(!lists || lists.length === 0) ? (
-        <div className="h-full flex flex-col items-center justify-center text-center px-8 py-16">
-          <Bookmark className="w-12 h-12 text-gray-700 mb-3" />
-          <p className="text-gray-400 font-medium mb-1">No saved lists yet</p>
-          <p className="text-sm text-gray-600">
-            Research results are saved automatically after each search. Run a search to get started.
-          </p>
-        </div>
-      ) : (
-        <>
-          <p className="text-[11px] text-gray-500 mb-3">{lists.length} saved {lists.length === 1 ? "list" : "lists"}</p>
-          <div className="space-y-2">
-            {lists.map(list => (
-              <div key={list.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    {renamingId === list.id ? (
-                      <div className="flex items-center gap-2 mb-1">
-                        <input
-                          autoFocus
-                          value={renameVal}
-                          onChange={e => setRenameVal(e.target.value)}
-                          onKeyDown={e => { if (e.key === "Enter") void handleRename(list.id); if (e.key === "Escape") { setRenamingId(null); setRenameVal("") } }}
-                          className="flex-1 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none"
-                        />
-                        <button onClick={() => void handleRename(list.id)} disabled={savingRename}
-                          className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md">
-                          {savingRename ? "…" : "Save"}
-                        </button>
-                        <button onClick={() => { setRenamingId(null); setRenameVal("") }} className="text-gray-400 hover:text-gray-200">
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm font-semibold text-white truncate">{list.name}</h3>
-                        <button
-                          onClick={() => { setRenamingId(list.id); setRenameVal(list.name) }}
-                          className="text-gray-600 hover:text-gray-400 flex-shrink-0"
-                        >
-                          <PenLine className="w-3 h-3" />
-                        </button>
-                      </div>
-                    )}
-                    <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
-                      <span className="text-gray-400 font-medium">{list._count.results} companies</span>
-                      {list.searchState && <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{list.searchState}</span>}
-                      {list.searchIndustry && <span>{list.searchIndustry}</span>}
-                      {list.searchEmpMin && list.searchEmpMax && (
-                        <span className="flex items-center gap-0.5"><Users className="w-2.5 h-2.5" />{list.searchEmpMin}–{list.searchEmpMax}</span>
-                      )}
-                      <span>{formatDate(list.createdAt)}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => void handleDelete(list.id)}
-                      disabled={deletingId === list.id}
-                      className="text-gray-600 hover:text-red-400 transition-colors p-1"
-                    >
-                      {deletingId === list.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                    </button>
-                    <button
-                      onClick={() => void openListDetail(list)}
-                      disabled={loadingList === list.id}
-                      className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-700/40 rounded-lg transition-colors"
-                    >
-                      {loadingList === list.id
-                        ? <><Loader2 className="w-3 h-3 animate-spin" /> Loading…</>
-                        : <><FolderOpen className="w-3 h-3" /> Open</>
-                      }
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
-
-// ─── Slide-over (contact/email/log workflow) ──────────────────────────────────
-
-function SlideOver({ company, onClose }: {
-  company: DiscoveredCompanyBasic
-  onClose: () => void
+function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, onProspectCreated }: {
+  company:            DiscoveredCompanyBasic
+  onClose:            () => void
+  allCompanies?:      DiscoveredCompanyBasic[]
+  selectedIndex?:     number
+  onNavigate?:        (newIndex: number) => void
+  onProspectCreated?: (prospectId: string) => void
 }) {
   const badge = fitBadge(company.fitScore)
   const websiteHref = company.website
     ? (company.website.startsWith("http") ? company.website : `https://${company.website}`)
     : null
+
+  const hasPrev = allCompanies && selectedIndex !== undefined && selectedIndex > 0
+  const hasNext = allCompanies && selectedIndex !== undefined && selectedIndex < allCompanies.length - 1
+  const navLabel = allCompanies && selectedIndex !== undefined
+    ? `${selectedIndex + 1} of ${allCompanies.length}`
+    : null
+
+  // Computed after all draft state is declared — referenced by nav guard
+  // (declared here as a closure; actual values come from state declared below)
+  function checkUnsaved(
+    contactDraft: ContactDraft,
+    subject: string,
+    body: string,
+    ftitle: string,
+  ): boolean {
+    return !!(contactDraft.name || contactDraft.email || contactDraft.title || subject || body || ftitle)
+  }
 
   const [detailsState, setDetailsState] = useState<DetailsState>("loading")
   const [details,      setDetails]      = useState<DiscoveredCompanyDetails | null>(null)
@@ -831,6 +471,7 @@ function SlideOver({ company, onClose }: {
     setLastSaved(newContact.name)
     setContact(blankContact())
     setSectionOpen(prev => ({ ...prev, outreach: true, contacts: true }))
+    onProspectCreated?.(newContact.prospectId)
   }
 
   async function handleSendEmail() {
@@ -874,10 +515,7 @@ function SlideOver({ company, onClose }: {
       const res = await fetch("/api/sales/demo-link/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prospectId: created.prospectId,
-          contactId:  sc?.id ?? null,
-        }),
+        body: JSON.stringify({ prospectId: created.prospectId, contactId: sc?.id ?? null }),
       })
       if (!res.ok) return
       const { url } = await res.json() as { url: string }
@@ -977,8 +615,39 @@ function SlideOver({ company, onClose }: {
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
       <div className="fixed right-0 top-0 h-screen w-full sm:w-[520px] bg-gray-950 border-l border-gray-800 z-50 flex flex-col overflow-hidden">
 
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4 border-b border-gray-800 flex-shrink-0">
+        {/* ── Navigation bar (prev/next) ─────────────────────────────────── */}
+        {navLabel && (
+          <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-gray-800/60 flex-shrink-0 bg-gray-900/50">
+            <button
+              onClick={() => {
+                if (!hasPrev) return
+                if (checkUnsaved(contact, emailSubject, emailBody, followupTitle) &&
+                    !window.confirm("You have unsaved form data. Navigate to the previous company?")) return
+                onNavigate!(selectedIndex! - 1)
+              }}
+              disabled={!hasPrev}
+              className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors px-2 py-1 rounded-md hover:bg-gray-800"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" /> Prev
+            </button>
+            <span className="text-[11px] text-gray-500">{navLabel}</span>
+            <button
+              onClick={() => {
+                if (!hasNext) return
+                if (checkUnsaved(contact, emailSubject, emailBody, followupTitle) &&
+                    !window.confirm("You have unsaved form data. Navigate to the next company?")) return
+                onNavigate!(selectedIndex! + 1)
+              }}
+              disabled={!hasNext}
+              className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors px-2 py-1 rounded-md hover:bg-gray-800"
+            >
+              Next <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        {/* ── Header ────────────────────────────────────────────────────── */}
+        <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-4 border-b border-gray-800 flex-shrink-0">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-white font-semibold text-base leading-snug">{company.companyName}</h2>
@@ -1032,7 +701,7 @@ function SlideOver({ company, onClose }: {
           </div>
         </div>
 
-        {/* Body */}
+        {/* ── Body ──────────────────────────────────────────────────────── */}
         <div className="flex-1 overflow-y-auto">
 
           {/* Research summary */}
@@ -1135,7 +804,6 @@ function SlideOver({ company, onClose }: {
                   <p className="text-[12px] text-gray-500 py-2">Save a contact above to unlock outreach.</p>
                 ) : (
                   <>
-                    {/* Contact selector */}
                     {savedContacts.length > 1 && (
                       <div className="mb-3">
                         <label className="block text-[11px] text-gray-500 mb-1">Sending to</label>
@@ -1155,21 +823,19 @@ function SlideOver({ company, onClose }: {
                       </div>
                     )}
 
-                    {/* Sub-tabs */}
                     <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-lg p-0.5 mb-3">
                       {(["email", "log", "followup"] as OutreachTab[]).map(tab => (
                         <button key={tab}
                           onClick={() => setOutreachTab(tab)}
                           className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-colors ${outreachTab === tab ? "bg-gray-700 text-white" : "text-gray-400 hover:text-gray-200"}`}
                         >
-                          {tab === "email" && <><Mail className="w-3 h-3" /> Email</>}
-                          {tab === "log"   && <><FileText className="w-3 h-3" /> Log</>}
+                          {tab === "email"    && <><Mail className="w-3 h-3" /> Email</>}
+                          {tab === "log"      && <><FileText className="w-3 h-3" /> Log</>}
                           {tab === "followup" && <><Clock className="w-3 h-3" /> Follow-up</>}
                         </button>
                       ))}
                     </div>
 
-                    {/* Email tab */}
                     {outreachTab === "email" && (
                       <div className="space-y-2">
                         {emailSent && (
@@ -1187,10 +853,8 @@ function SlideOver({ company, onClose }: {
                           onChange={e => setEmailTo(e.target.value)} className={inputCls} />
                         <input type="text" placeholder="Subject" value={emailSubject}
                           onChange={e => setEmailSubject(e.target.value)} className={inputCls} />
-                        <div className="relative">
-                          <textarea ref={emailBodyRef} rows={6} placeholder="Message…" value={emailBody}
-                            onChange={e => setEmailBody(e.target.value)} className={`${inputCls} resize-none`} />
-                        </div>
+                        <textarea ref={emailBodyRef} rows={6} placeholder="Message…" value={emailBody}
+                          onChange={e => setEmailBody(e.target.value)} className={`${inputCls} resize-none`} />
                         <button
                           onClick={() => void insertDemoLink()}
                           disabled={insertingLink}
@@ -1210,7 +874,6 @@ function SlideOver({ company, onClose }: {
                       </div>
                     )}
 
-                    {/* Log tab */}
                     {outreachTab === "log" && (
                       <div className="space-y-2">
                         {logSaved && (
@@ -1249,7 +912,6 @@ function SlideOver({ company, onClose }: {
                       </div>
                     )}
 
-                    {/* Follow-up tab */}
                     {outreachTab === "followup" && (
                       <div className="space-y-2">
                         {followupSaved && (
@@ -1354,6 +1016,291 @@ function SlideOver({ company, onClose }: {
   )
 }
 
+// ─── Saved Lists Section ──────────────────────────────────────────────────────
+
+function SavedListsSection({ onSelectCompany }: {
+  onSelectCompany: (
+    company:    DiscoveredCompanyBasic,
+    all:        DiscoveredCompanyBasic[],
+    index:      number,
+    resultIds:  (string | null)[],
+  ) => void
+}) {
+  const [lists,       setLists]       = useState<ResearchList[] | null>(null)
+  const [loading,     setLoading]     = useState(true)
+  const [error,       setError]       = useState<string | null>(null)
+  const [openList,    setOpenList]    = useState<ResearchListWithResults | null>(null)
+  const [loadingList, setLoadingList] = useState<string | null>(null)
+  const [renamingId,  setRenamingId]  = useState<string | null>(null)
+  const [renameVal,   setRenameVal]   = useState("")
+  const [savingRename, setSavingRename] = useState(false)
+  const [deletingId,  setDeletingId]  = useState<string | null>(null)
+
+  // Track in-session CRM status updates (prospectId set by SlideOver during this session)
+  const [localProspectIds, setLocalProspectIds] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    setLoading(true)
+    fetch("/api/super-admin/crm/prospects/discover/lists")
+      .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+      .then(d => { setLists(d as ResearchList[]); setLoading(false) })
+      .catch(() => { setError("Failed to load lists"); setLoading(false) })
+  }, [])
+
+  async function openListDetail(list: ResearchList) {
+    setLoadingList(list.id)
+    try {
+      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${list.id}`)
+      if (!res.ok) throw new Error("Failed to load list")
+      const data = await res.json() as ResearchListWithResults
+      setOpenList(data)
+    } catch {
+      setError("Failed to load list details")
+    } finally {
+      setLoadingList(null)
+    }
+  }
+
+  async function handleRename(id: string) {
+    if (!renameVal.trim()) return
+    setSavingRename(true)
+    try {
+      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: renameVal.trim() }),
+      })
+      if (!res.ok) return
+      const updated = await res.json() as ResearchList
+      setLists(prev => prev?.map(l => l.id === id ? { ...l, name: updated.name } : l) ?? null)
+      if (openList?.id === id) setOpenList(prev => prev ? { ...prev, name: updated.name } : null)
+    } finally {
+      setSavingRename(false)
+      setRenamingId(null)
+      setRenameVal("")
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this list? Results that have been added to CRM will not be affected.")) return
+    setDeletingId(id)
+    try {
+      await fetch(`/api/super-admin/crm/prospects/discover/lists/${id}`, { method: "DELETE" })
+      setLists(prev => prev?.filter(l => l.id !== id) ?? null)
+      if (openList?.id === id) setOpenList(null)
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  // Called by parent when a prospect is created from a saved-list company
+  function markInCRM(companyName: string, prospectId: string) {
+    setLocalProspectIds(prev => ({ ...prev, [companyName]: prospectId }))
+  }
+
+  // Expose markInCRM via a ref-compatible callback pattern
+  // Parent calls onProspectCreated → needs to know which company & list is open
+  // We store the callback so parent can call it after SlideOver fires
+  // (see usage in SalesDiscoverPage)
+
+  function getCompanies(): DiscoveredCompanyBasic[] {
+    if (!openList) return []
+    return openList.results.map(r => {
+      const localPid = localProspectIds[r.companyName]
+      return resultToBasic({
+        ...r,
+        prospectId: localPid ?? r.prospectId,
+      })
+    })
+  }
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-48">
+      <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
+    </div>
+  )
+  if (error) return (
+    <div className="p-6 text-center text-red-400 text-sm">{error}</div>
+  )
+
+  // ── Detail view ─────────────────────────────────────────────────────────────
+  if (openList) {
+    const companies = getCompanies()
+    const inCRMCount = companies.filter(c => c.crmStatus === "in_crm").length
+
+    return (
+      <div className="flex flex-col h-full">
+        {/* List header */}
+        <div className="border-b border-gray-800 px-4 py-3 flex-shrink-0">
+          <div className="flex items-center gap-2 mb-1">
+            <button
+              onClick={() => setOpenList(null)}
+              className="text-gray-400 hover:text-gray-200 transition-colors p-0.5 flex-shrink-0"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            {renamingId === openList.id ? (
+              <div className="flex items-center gap-2 flex-1">
+                <input
+                  autoFocus
+                  value={renameVal}
+                  onChange={e => setRenameVal(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") void handleRename(openList.id); if (e.key === "Escape") { setRenamingId(null); setRenameVal("") } }}
+                  className="flex-1 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none"
+                />
+                <button onClick={() => void handleRename(openList.id)} disabled={savingRename}
+                  className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md">
+                  {savingRename ? "…" : "Save"}
+                </button>
+                <button onClick={() => { setRenamingId(null); setRenameVal("") }} className="text-gray-400 hover:text-gray-200">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <h2 className="text-sm font-semibold text-white truncate">{openList.name}</h2>
+                <button
+                  onClick={() => { setRenamingId(openList.id); setRenameVal(openList.name) }}
+                  className="text-gray-500 hover:text-gray-300 flex-shrink-0"
+                  title="Rename list"
+                >
+                  <PenLine className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-3 text-[11px] text-gray-500 ml-6">
+            <span>{openList.results.length} companies</span>
+            {inCRMCount > 0 && (
+              <span className="text-indigo-400">{inCRMCount} in CRM</span>
+            )}
+            {openList.results.length - inCRMCount > 0 && (
+              <span className="text-gray-400">{openList.results.length - inCRMCount} remaining</span>
+            )}
+            {openList.searchState && (
+              <span className="flex items-center gap-0.5">
+                <MapPin className="w-2.5 h-2.5" />{openList.searchState}
+              </span>
+            )}
+            {openList.searchIndustry && <span>{openList.searchIndustry}</span>}
+            <span>{formatDate(openList.createdAt)}</span>
+          </div>
+          <p className="text-[11px] text-gray-600 ml-6 mt-1">Click any company to open the full prospecting workflow</p>
+        </div>
+
+        {/* Company cards — same component as fresh search */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {companies.length === 0 ? (
+            <div className="text-center py-16 text-gray-500">
+              <Building2 className="w-10 h-10 mx-auto mb-2 opacity-30" />
+              <p>No companies in this list yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {companies.map((c, i) => (
+                <CompanyCard
+                  key={c.companyName}
+                  company={c}
+                  selected={false}
+                  onClick={() => onSelectCompany(c, companies, i, openList.results.map(r => r.id))}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // ── List index ──────────────────────────────────────────────────────────────
+  return (
+    <div className="flex-1 overflow-y-auto p-4">
+      {(!lists || lists.length === 0) ? (
+        <div className="h-full flex flex-col items-center justify-center text-center px-8 py-16">
+          <Bookmark className="w-12 h-12 text-gray-700 mb-3" />
+          <p className="text-gray-400 font-medium mb-1">No saved lists yet</p>
+          <p className="text-sm text-gray-600">
+            Run a search and click <strong className="text-gray-400">Save List</strong> to save your results for later.
+          </p>
+        </div>
+      ) : (
+        <>
+          <p className="text-[11px] text-gray-500 mb-3">{lists.length} saved {lists.length === 1 ? "list" : "lists"}</p>
+          <div className="space-y-2">
+            {lists.map(list => (
+              <div key={list.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    {renamingId === list.id ? (
+                      <div className="flex items-center gap-2 mb-1">
+                        <input
+                          autoFocus
+                          value={renameVal}
+                          onChange={e => setRenameVal(e.target.value)}
+                          onKeyDown={e => { if (e.key === "Enter") void handleRename(list.id); if (e.key === "Escape") { setRenamingId(null); setRenameVal("") } }}
+                          className="flex-1 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none"
+                        />
+                        <button onClick={() => void handleRename(list.id)} disabled={savingRename}
+                          className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md">
+                          {savingRename ? "…" : "Save"}
+                        </button>
+                        <button onClick={() => { setRenamingId(null); setRenameVal("") }} className="text-gray-400 hover:text-gray-200">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        className="flex items-center gap-2 mb-1 group w-full text-left"
+                        onClick={() => void openListDetail(list)}
+                      >
+                        <h3 className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors truncate">
+                          {list.name}
+                        </h3>
+                        {loadingList === list.id && <Loader2 className="w-3 h-3 animate-spin text-indigo-400 flex-shrink-0" />}
+                      </button>
+                    )}
+                    <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                      <span className="text-gray-400 font-medium">{list._count.results} companies</span>
+                      {list.searchState && (
+                        <span className="flex items-center gap-0.5">
+                          <MapPin className="w-2.5 h-2.5" />{list.searchState}
+                        </span>
+                      )}
+                      {list.searchIndustry && <span>{list.searchIndustry}</span>}
+                      {list.searchEmpMin && list.searchEmpMax && (
+                        <span className="flex items-center gap-0.5">
+                          <Users className="w-2.5 h-2.5" />{list.searchEmpMin}–{list.searchEmpMax}
+                        </span>
+                      )}
+                      <span>{formatDate(list.createdAt)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => { setRenamingId(list.id); setRenameVal(list.name) }}
+                      className="text-gray-600 hover:text-gray-400 transition-colors p-1"
+                      title="Rename"
+                    >
+                      <PenLine className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => void handleDelete(list.id)}
+                      disabled={deletingId === list.id}
+                      className="text-gray-600 hover:text-red-400 transition-colors p-1"
+                    >
+                      {deletingId === list.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const INDUSTRY_OPTIONS = [
@@ -1389,16 +1336,19 @@ export default function SalesDiscoverPage() {
   const [searchState, setSearchState] = useState<SearchState>("idle")
   const [companies,   setCompanies]   = useState<DiscoveredCompanyBasic[]>([])
   const [searchError, setSearchError] = useState<string | null>(null)
-  const [selected,    setSelected]    = useState<DiscoveredCompanyBasic | null>(null)
 
-  // ── Auto-save state ─────────────────────────────────────────────────────────
-  const [currentListId,   setCurrentListId]   = useState<string | null>(null)
-  const [currentListName, setCurrentListName] = useState<string>("")
-  const [savingList,      setSavingList]      = useState(false)
-  const [saveListError,   setSaveListError]   = useState<string | null>(null)
-  const [renaming,        setRenaming]        = useState(false)
-  const [renameInput,     setRenameInput]     = useState("")
-  const [savingRename,    setSavingRename]    = useState(false)
+  // ── Save dialog ─────────────────────────────────────────────────────────────
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [savingList,     setSavingList]     = useState(false)
+  const [savedListId,    setSavedListId]    = useState<string | null>(null)
+  const [savedListName,  setSavedListName]  = useState<string | null>(null)
+  const saveDialogSuggestion = buildAutoName({ industry, stateProvince, country, keywords })
+
+  // ── Active company selection (shared by both search and saved-list contexts) ─
+  const [activeCompanies,   setActiveCompanies]   = useState<DiscoveredCompanyBasic[]>([])
+  const [activeResultIds,   setActiveResultIds]   = useState<(string | null)[]>([])
+  const [selectedIndex,     setSelectedIndex]     = useState<number | null>(null)
+  const selected = selectedIndex !== null ? (activeCompanies[selectedIndex] ?? null) : null
 
   const stateLabel = country === "Canada" ? "Province" : country === "United States" ? "State" : "Region"
 
@@ -1407,10 +1357,9 @@ export default function SalesDiscoverPage() {
     setSearchState("loading")
     setSearchError(null)
     setCompanies([])
-    setSelected(null)
-    setCurrentListId(null)
-    setCurrentListName("")
-    setSaveListError(null)
+    setSelectedIndex(null)
+    setSavedListId(null)
+    setSavedListName(null)
 
     const body: Record<string, unknown> = { country }
     if (stateProvince) body.stateProvince     = stateProvince
@@ -1432,74 +1381,70 @@ export default function SalesDiscoverPage() {
       const data = await res.json() as { companies: DiscoveredCompanyBasic[] }
       const found = data.companies ?? []
       setCompanies(found)
+      setActiveCompanies(found)
+      setActiveResultIds(found.map(() => null))
       setSearchState("done")
-
-      // Auto-save results to a new list
-      if (found.length > 0) {
-        const autoName = buildAutoName({ industry, stateProvince, country, keywords })
-        setSavingList(true)
-        try {
-          const saveRes = await fetch("/api/super-admin/crm/prospects/discover/lists", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              name:           autoName,
-              searchCountry:  country || null,
-              searchState:    stateProvince || null,
-              searchIndustry: industry || null,
-              searchEmpMin:   empMin ? parseInt(empMin, 10) : null,
-              searchEmpMax:   empMax ? parseInt(empMax, 10) : null,
-              searchKeywords: keywords || null,
-              searchContext:  context || null,
-              results:        found,
-            }),
-          })
-          if (saveRes.ok) {
-            const saved = await saveRes.json() as ResearchList
-            setCurrentListId(saved.id)
-            setCurrentListName(saved.name)
-          } else {
-            const errData = await saveRes.json().catch(() => ({})) as { error?: string }
-            setSaveListError(errData.error ?? `Could not save list (${saveRes.status}) — results are still shown above`)
-          }
-        } catch {
-          setSaveListError("Could not save list — check your connection and try again")
-        }
-        finally { setSavingList(false) }
-      }
     } catch (err) {
       setSearchError(err instanceof Error ? err.message : "Search failed")
       setSearchState("error")
     }
   }
 
-  async function handleRenameList() {
-    if (!currentListId || !renameInput.trim()) return
-    setSavingRename(true)
+  async function handleSaveList(name: string) {
+    setSavingList(true)
     try {
-      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${currentListId}`, {
+      const res = await fetch("/api/super-admin/crm/prospects/discover/lists", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name,
+          searchCountry:  country || null,
+          searchState:    stateProvince || null,
+          searchIndustry: industry || null,
+          searchEmpMin:   empMin ? parseInt(empMin, 10) : null,
+          searchEmpMax:   empMax ? parseInt(empMax, 10) : null,
+          searchKeywords: keywords || null,
+          searchContext:  context || null,
+          results:        companies,
+        }),
+      })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(d.error ?? "Save failed")
+      }
+      const saved = await res.json() as ResearchList
+      setSavedListId(saved.id)
+      setSavedListName(saved.name)
+      setShowSaveDialog(false)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Could not save list — please try again")
+    } finally {
+      setSavingList(false)
+    }
+  }
+
+  // Called by SlideOver when a prospect is created
+  function handleProspectCreated(prospectId: string) {
+    if (selectedIndex === null) return
+    const updated = activeCompanies.map((c, i) =>
+      i === selectedIndex ? { ...c, crmStatus: "in_crm" as const, crmProspectId: prospectId } : c
+    )
+    setActiveCompanies(updated)
+    if (section === "search") setCompanies(updated)
+
+    // Persist the link to the DB so the status survives page refresh
+    const resultId = activeResultIds[selectedIndex]
+    if (resultId) {
+      void fetch(`/api/super-admin/crm/prospects/discover/results/${resultId}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name: renameInput.trim() }),
+        body: JSON.stringify({ prospectId }),
       })
-      if (res.ok) {
-        setCurrentListName(renameInput.trim())
-        setRenaming(false)
-        setRenameInput("")
-      }
-    } finally {
-      setSavingRename(false)
     }
   }
 
   const inputCls = "w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
   const labelCls = "block text-[11px] font-medium text-gray-400 mb-1.5"
-
-  const navTabs: { id: NavSection; label: string; icon: React.ReactNode }[] = [
-    { id: "search",   label: "Find Prospects",   icon: <Search className="w-3.5 h-3.5" /> },
-    { id: "lists",    label: "Saved Lists",       icon: <Bookmark className="w-3.5 h-3.5" /> },
-    { id: "prospects", label: "Active Prospects", icon: <Building2 className="w-3.5 h-3.5" /> },
-  ]
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -1509,23 +1454,23 @@ export default function SalesDiscoverPage() {
           className="text-gray-400 hover:text-gray-200 transition-colors p-3 mr-1 border-r border-gray-800">
           <ChevronLeft className="w-5 h-5" />
         </Link>
-        {navTabs.map(tab => (
+        {(["search", "lists"] as NavSection[]).map(tab => (
           <button
-            key={tab.id}
-            onClick={() => setSection(tab.id)}
-            className={`flex items-center gap-1.5 px-4 py-4 text-[12px] font-medium border-b-2 transition-colors ${
-              section === tab.id
+            key={tab}
+            onClick={() => { setSection(tab); setSelectedIndex(null) }}
+            className={`flex items-center gap-1.5 px-5 py-4 text-[12px] font-medium border-b-2 transition-colors ${
+              section === tab
                 ? "border-indigo-500 text-white"
                 : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600"
             }`}
           >
-            {tab.icon}
-            {tab.label}
+            {tab === "search" && <><Search className="w-3.5 h-3.5" /> Find Prospects</>}
+            {tab === "lists"  && <><Bookmark className="w-3.5 h-3.5" /> Saved Lists</>}
           </button>
         ))}
       </div>
 
-      {/* ── Find Prospects section ───────────────────────────────────────── */}
+      {/* ── Find Prospects ───────────────────────────────────────────────── */}
       {section === "search" && (
         <div className="flex h-[calc(100vh-57px)]">
           {/* Left: Search form */}
@@ -1534,32 +1479,19 @@ export default function SalesDiscoverPage() {
 
               <div>
                 <label className={labelCls}>Country</label>
-                <select value={country} onChange={e => { setCountry(e.target.value); setStateProvince("") }}
-                  className={inputCls}>
+                <select value={country} onChange={e => { setCountry(e.target.value); setStateProvince("") }} className={inputCls}>
                   {COUNTRY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
 
-              {country !== "Other" && (
-                <div>
-                  <label className={labelCls}>{stateLabel}</label>
-                  <input type="text"
-                    placeholder={country === "Canada" ? "e.g. Ontario, BC" : "e.g. Texas, Midwest"}
-                    value={stateProvince} onChange={e => setStateProvince(e.target.value)}
-                    className={inputCls}
-                  />
-                </div>
-              )}
-
-              {country === "Other" && (
-                <div>
-                  <label className={labelCls}>Region / Location</label>
-                  <input type="text" placeholder="e.g. Southeast Asia, Germany"
-                    value={stateProvince} onChange={e => setStateProvince(e.target.value)}
-                    className={inputCls}
-                  />
-                </div>
-              )}
+              <div>
+                <label className={labelCls}>{country === "Other" ? "Region / Location" : stateLabel}</label>
+                <input type="text"
+                  placeholder={country === "Canada" ? "e.g. Ontario, BC" : country === "United States" ? "e.g. Texas, Midwest" : "e.g. Southeast Asia"}
+                  value={stateProvince} onChange={e => setStateProvince(e.target.value)}
+                  className={inputCls}
+                />
+              </div>
 
               <div>
                 <label className={labelCls}>Industry</label>
@@ -1572,17 +1504,14 @@ export default function SalesDiscoverPage() {
               <div>
                 <label className={labelCls}>Employee Count</label>
                 <div className="flex gap-2">
-                  <input type="number" placeholder="Min" value={empMin} onChange={e => setEmpMin(e.target.value)}
-                    className={inputCls} />
-                  <input type="number" placeholder="Max" value={empMax} onChange={e => setEmpMax(e.target.value)}
-                    className={inputCls} />
+                  <input type="number" placeholder="Min" value={empMin} onChange={e => setEmpMin(e.target.value)} className={inputCls} />
+                  <input type="number" placeholder="Max" value={empMax} onChange={e => setEmpMax(e.target.value)} className={inputCls} />
                 </div>
               </div>
 
               <div>
                 <label className={labelCls}>Min. Locations</label>
-                <input type="number" placeholder="e.g. 3" value={locMin} onChange={e => setLocMin(e.target.value)}
-                  className={inputCls} />
+                <input type="number" placeholder="e.g. 3" value={locMin} onChange={e => setLocMin(e.target.value)} className={inputCls} />
               </div>
 
               <div>
@@ -1594,8 +1523,7 @@ export default function SalesDiscoverPage() {
               <div>
                 <label className={labelCls}>Additional Context</label>
                 <textarea rows={3} placeholder="Any other targeting details…" value={context}
-                  onChange={e => setContext(e.target.value)}
-                  className={`${inputCls} resize-none`} />
+                  onChange={e => setContext(e.target.value)} className={`${inputCls} resize-none`} />
               </div>
 
               <button
@@ -1608,11 +1536,8 @@ export default function SalesDiscoverPage() {
                   : <><Search className="w-4 h-4" /> Find Prospects</>
                 }
               </button>
-
               {searchState === "loading" && (
-                <p className="text-[11px] text-gray-500 text-center">
-                  Claude is finding real companies — this takes ~20 seconds
-                </p>
+                <p className="text-[11px] text-gray-500 text-center">Claude is finding real companies — this takes ~20 seconds</p>
               )}
             </form>
           </div>
@@ -1624,13 +1549,11 @@ export default function SalesDiscoverPage() {
                 <Search className="w-12 h-12 text-gray-700 mb-3" />
                 <p className="text-gray-400 font-medium mb-1">Find sales prospects</p>
                 <p className="text-sm text-gray-600">
-                  Choose a country and fill in your criteria. Click any card to add a contact and start outreach.
+                  Fill in your criteria and click <strong className="text-gray-400">Find Prospects</strong>. Click any card to open the full outreach workflow.
                 </p>
-                <button
-                  onClick={() => setSection("lists")}
-                  className="mt-4 flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-                >
-                  <Bookmark className="w-4 h-4" /> View your saved lists
+                <button onClick={() => setSection("lists")}
+                  className="mt-4 flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
+                  <Bookmark className="w-4 h-4" /> View saved lists
                 </button>
               </div>
             )}
@@ -1655,92 +1578,47 @@ export default function SalesDiscoverPage() {
 
             {searchState === "done" && (
               <>
-                {/* Auto-save banner */}
-                {(savingList || currentListId || saveListError) && (
-                  <div className={`mb-4 rounded-xl px-4 py-3 border ${saveListError && !currentListId ? "bg-amber-950/30 border-amber-800/40" : "bg-gray-900 border-gray-700"}`}>
-                    {savingList ? (
-                      <div className="flex items-center gap-2 text-[12px] text-gray-400">
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
-                        Saving results to your lists…
-                      </div>
-                    ) : saveListError && !currentListId ? (
-                      <div className="flex items-center gap-2 text-[12px] text-amber-400">
-                        <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span>{saveListError}</span>
-                      </div>
-                    ) : currentListId && (
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <BookmarkCheck className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
-                        {renaming ? (
-                          <div className="flex items-center gap-2 flex-1">
-                            <input
-                              autoFocus
-                              value={renameInput}
-                              onChange={e => setRenameInput(e.target.value)}
-                              onKeyDown={e => { if (e.key === "Enter") void handleRenameList(); if (e.key === "Escape") { setRenaming(false); setRenameInput("") } }}
-                              className="flex-1 min-w-0 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none"
-                            />
-                            <button onClick={() => void handleRenameList()} disabled={savingRename}
-                              className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md flex-shrink-0">
-                              {savingRename ? "…" : "Save"}
-                            </button>
-                            <button onClick={() => { setRenaming(false); setRenameInput("") }} className="text-gray-400 hover:text-gray-200 flex-shrink-0">
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        ) : (
-                          <>
-                            <span className="text-[12px] text-gray-300 flex-1">
-                              Saved as <span className="font-medium text-white">{currentListName}</span>
-                            </span>
-                            <button
-                              onClick={() => { setRenaming(true); setRenameInput(currentListName) }}
-                              className="text-[11px] flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors"
-                            >
-                              <PenLine className="w-3 h-3" /> Rename
-                            </button>
-                            <button
-                              onClick={() => setSection("lists")}
-                              className="text-[11px] flex items-center gap-1 text-indigo-400 hover:text-indigo-300 transition-colors"
-                            >
-                              View lists <ChevronRight className="w-3 h-3" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm text-gray-300 font-medium">
                     Found {companies.length} {companies.length === 1 ? "company" : "companies"}
-                    {companies.some(c => c.crmStatus !== "none") && (
+                    {activeCompanies.some(c => c.crmStatus !== "none") && (
                       <span className="text-[11px] text-gray-500 ml-2 font-normal">
-                        · {companies.filter(c => c.crmStatus !== "none").length} already in CRM
+                        · {activeCompanies.filter(c => c.crmStatus !== "none").length} in CRM
                       </span>
                     )}
                   </p>
-                  {companies.length > 0 && (
-                    <p className="text-[11px] text-gray-500">Click a card to add a contact</p>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {savedListId ? (
+                      <span className="flex items-center gap-1.5 text-[11px] text-green-400">
+                        <Bookmark className="w-3 h-3" />
+                        Saved as <button onClick={() => setSection("lists")} className="font-medium underline underline-offset-2 hover:text-green-300">{savedListName}</button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setShowSaveDialog(true)}
+                        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-lg transition-colors"
+                      >
+                        <Save className="w-3 h-3" /> Save List
+                      </button>
+                    )}
+                    <p className="text-[11px] text-gray-500">Click a company to start</p>
+                  </div>
                 </div>
 
                 {companies.length === 0 && (
                   <div className="text-center py-16 text-gray-500">
                     <Building2 className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                    <p>No companies found for this search.</p>
-                    <p className="text-sm mt-1">Try broader criteria.</p>
+                    <p>No companies found. Try broader criteria.</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {companies.map(c => (
+                  {activeCompanies.map((c, i) => (
                     <CompanyCard
                       key={c.companyName}
                       company={c}
-                      selected={selected?.companyName === c.companyName}
-                      onClick={() => setSelected(prev => prev?.companyName === c.companyName ? null : c)}
+                      selected={selectedIndex === i}
+                      onClick={() => { setActiveCompanies(activeCompanies); setSelectedIndex(i) }}
                     />
                   ))}
                 </div>
@@ -1750,48 +1628,39 @@ export default function SalesDiscoverPage() {
         </div>
       )}
 
-      {/* ── Saved Lists section ──────────────────────────────────────────── */}
+      {/* ── Saved Lists ──────────────────────────────────────────────────── */}
       {section === "lists" && (
         <div className="flex flex-col h-[calc(100vh-57px)]">
-          <SavedListsSection onRunSearch={params => {
-            setCountry(params.country || "United States")
-            setStateProvince(params.stateProvince || "")
-            setIndustry(params.industry || "")
-            setEmpMin(params.empMin || "")
-            setEmpMax(params.empMax || "")
-            setKeywords(params.keywords || "")
-            setContext(params.context || "")
-            setSection("search")
-          }} />
+          <SavedListsSection
+            onSelectCompany={(company, all, index, resultIds) => {
+              setActiveCompanies(all)
+              setActiveResultIds(resultIds)
+              setSelectedIndex(index)
+            }}
+          />
         </div>
       )}
 
-      {/* ── Active Prospects section ─────────────────────────────────────── */}
-      {section === "prospects" && (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-57px)] text-center px-8">
-          <Building2 className="w-12 h-12 text-gray-700 mb-3" />
-          <h2 className="text-white font-semibold mb-1">Your Active Prospects</h2>
-          <p className="text-sm text-gray-500 mb-4 max-w-sm">
-            Companies promoted from research lists live here. Manage outreach, track stages, and log activity.
-          </p>
-          <Link
-            href="/sales/prospects"
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            <Building2 className="w-4 h-4" />
-            Open Prospects
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <p className="text-[11px] text-gray-600 mt-4">
-            To add a company to your prospects, open a Saved List and click &quot;Add to CRM&quot; on any card.
-          </p>
-        </div>
+      {/* ── Save dialog ──────────────────────────────────────────────────── */}
+      {showSaveDialog && (
+        <SaveListDialog
+          suggestedName={saveDialogSuggestion}
+          onSave={name => void handleSaveList(name)}
+          onCancel={() => setShowSaveDialog(false)}
+          saving={savingList}
+        />
       )}
 
-      {selected && (
+      {/* ── SlideOver — shared by both search and saved-list contexts ────── */}
+      {selected !== null && (
         <SlideOver
+          key={selected.companyName}
           company={selected}
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedIndex(null)}
+          allCompanies={activeCompanies}
+          selectedIndex={selectedIndex!}
+          onNavigate={newIdx => setSelectedIndex(newIdx)}
+          onProspectCreated={handleProspectCreated}
         />
       )}
     </div>

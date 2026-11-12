@@ -63,14 +63,35 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
   if (!isOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
-  const body = await req.json() as { name?: string; description?: string }
-  const data: { name?: string; description?: string | null } = {}
+  const body = await req.json() as {
+    name?:        string
+    description?: string
+    status?:      "active" | "completed"
+  }
+  const data: {
+    name?:             string
+    description?:      string | null
+    status?:           string
+    completedAt?:      Date | null
+    manuallyCompleted?: boolean
+  } = {}
+
   if (typeof body.name === "string") {
     const trimmed = body.name.trim()
     if (!trimmed) return NextResponse.json({ error: "name cannot be empty" }, { status: 400 })
     data.name = trimmed
   }
   if ("description" in body) data.description = body.description ?? null
+
+  if (body.status === "completed") {
+    data.status            = "completed"
+    data.manuallyCompleted = true
+    data.completedAt       = new Date()
+  } else if (body.status === "active") {
+    data.status            = "active"
+    data.manuallyCompleted = false
+    data.completedAt       = null
+  }
 
   const updated = await prisma.prospectResearchList.update({
     where: { id },

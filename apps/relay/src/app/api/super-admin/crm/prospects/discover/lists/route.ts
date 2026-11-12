@@ -19,14 +19,27 @@ export async function GET() {
       ? { OR: [{ superAdminId: session.superAdminId }, { isShared: true }] }
       : { OR: [{ salesUserId: session.salesUserId },   { isShared: true }] },
     include: { _count: { select: { results: true } } },
-    orderBy: { createdAt: "desc" },
+    // Active lists first (by createdAt desc), then completed
+    orderBy: [{ status: "asc" }, { createdAt: "desc" }],
   })
+
+  // Add per-list done count without loading all result rows
+  const listIds = lists.map(l => l.id)
+  const doneCounts = listIds.length > 0
+    ? await prisma.prospectResearchResult.groupBy({
+        by: ["listId"],
+        where: { listId: { in: listIds }, isDone: true },
+        _count: { id: true },
+      })
+    : []
+  const doneByListId = Object.fromEntries(doneCounts.map(d => [d.listId, d._count.id]))
 
   const withOwnership = lists.map(list => ({
     ...list,
     ownedByMe:
       (!!session.superAdminId && list.superAdminId === session.superAdminId) ||
       (!!session.salesUserId  && list.salesUserId  === session.salesUserId),
+    doneCount: doneByListId[list.id] ?? 0,
   }))
 
   return NextResponse.json(withOwnership)

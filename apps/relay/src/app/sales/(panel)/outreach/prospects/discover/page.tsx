@@ -8,7 +8,8 @@ import {
   Building2, Star, Mail, Globe, User, Plus, Send,
   Link2, FileText, Calendar, Clock,
   Bookmark, Trash2, PenLine,
-  RefreshCw, ChevronRight, Save,
+  RefreshCw, ChevronRight, Save, CheckCheck, Circle,
+  BarChart3,
 } from "lucide-react"
 import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api/super-admin/crm/prospects/discover/route"
 
@@ -17,6 +18,13 @@ import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api
 type NavSection  = "search" | "lists"
 type SearchState = "idle" | "loading" | "done" | "error"
 type DetailsState = "loading" | "ready" | "error"
+
+// Extended type used by saved-list context — fresh-search results use resultId=""
+type CompanyWithProgress = DiscoveredCompanyBasic & {
+  resultId: string   // "" for fresh search, UUID for saved-list results
+  isDone:   boolean
+  doneAt:   string | null
+}
 
 interface ContactDraft {
   name:     string
@@ -44,20 +52,24 @@ interface SavedContact {
 }
 
 interface ResearchList {
-  id:              string
-  name:            string
-  description:     string | null
-  isShared:        boolean
-  ownedByMe:       boolean
-  searchCountry:   string | null
-  searchState:     string | null
-  searchIndustry:  string | null
-  searchEmpMin:    number | null
-  searchEmpMax:    number | null
-  searchKeywords:  string | null
-  searchContext:   string | null
-  createdAt:       string
-  _count:          { results: number }
+  id:               string
+  name:             string
+  description:      string | null
+  isShared:         boolean
+  ownedByMe:        boolean
+  searchCountry:    string | null
+  searchState:      string | null
+  searchIndustry:   string | null
+  searchEmpMin:     number | null
+  searchEmpMax:     number | null
+  searchKeywords:   string | null
+  searchContext:    string | null
+  status:           string   // "active" | "completed"
+  completedAt:      string | null
+  manuallyCompleted: boolean
+  createdAt:        string
+  _count:           { results: number }
+  doneCount:        number
 }
 
 interface ResearchResult {
@@ -76,6 +88,8 @@ interface ResearchResult {
   relayFitReasons:   string[]
   outreachAngle:     string | null
   prospectId:        string | null
+  isDone:            boolean
+  doneAt:            string | null
   researchDate:      string
 }
 
@@ -107,7 +121,7 @@ function applyMergeFields(text: string, ctx: { companyName: string; city?: strin
     .replace(/\{\{firstName\}\}/g, ctx.firstName ?? "")
 }
 
-function resultToBasic(r: ResearchResult): DiscoveredCompanyBasic {
+function resultToProgress(r: ResearchResult): CompanyWithProgress {
   return {
     companyName:        r.companyName,
     website:            r.website ?? "",
@@ -120,7 +134,14 @@ function resultToBasic(r: ResearchResult): DiscoveredCompanyBasic {
     fitScore:           r.fitScore ?? 70,
     crmStatus:          r.prospectId ? "in_crm" : "none",
     crmProspectId:      r.prospectId ?? undefined,
+    resultId:           r.id,
+    isDone:             r.isDone,
+    doneAt:             r.doneAt ?? null,
   }
+}
+
+function basicToProgress(c: DiscoveredCompanyBasic): CompanyWithProgress {
+  return { ...c, resultId: "", isDone: false, doneAt: null }
 }
 
 function buildAutoName(params: {
@@ -134,6 +155,18 @@ function buildAutoName(params: {
   if (parts.length === 0)   parts.push("Prospect Search")
   const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
   return `${parts.join(" · ")} — ${date}`
+}
+
+function listStatusLabel(list: ResearchList): string {
+  if (list.status === "completed") return "Complete"
+  if (list.doneCount === 0)        return "Not Started"
+  return "In Progress"
+}
+
+function listStatusColor(list: ResearchList): string {
+  if (list.status === "completed") return "text-green-400 bg-green-900/20 border-green-800/40"
+  if (list.doneCount === 0)        return "text-gray-500 bg-gray-800/60 border-gray-700/60"
+  return "text-indigo-400 bg-indigo-900/20 border-indigo-800/40"
 }
 
 // ─── Save List Dialog ─────────────────────────────────────────────────────────
@@ -172,11 +205,8 @@ function SaveListDialog({ suggestedName, onSave, onCancel, saving }: {
             >
               {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving…</> : <><Save className="w-3.5 h-3.5" /> Save List</>}
             </button>
-            <button
-              onClick={onCancel}
-              disabled={saving}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 border border-gray-700 rounded-lg transition-colors"
-            >
+            <button onClick={onCancel} disabled={saving}
+              className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 border border-gray-700 rounded-lg transition-colors">
               Cancel
             </button>
           </div>
@@ -188,30 +218,45 @@ function SaveListDialog({ suggestedName, onSave, onCancel, saving }: {
 
 // ─── Company Card ─────────────────────────────────────────────────────────────
 
-function CompanyCard({ company, selected, onClick }: {
-  company:  DiscoveredCompanyBasic
-  selected: boolean
-  onClick:  () => void
+function CompanyCard({ company, selected, onClick, onToggleDone, showDoneToggle }: {
+  company:        CompanyWithProgress
+  selected:       boolean
+  onClick:        () => void
+  onToggleDone?:  (e: React.MouseEvent) => void
+  showDoneToggle?: boolean
 }) {
   const badge = fitBadge(company.fitScore)
+  const isDone = company.isDone
+
   return (
     <button
       onClick={onClick}
       className={`w-full text-left bg-gray-900 border rounded-xl p-4 transition-all cursor-pointer ${
-        selected ? "border-indigo-500 ring-1 ring-indigo-500/30" : "border-gray-800 hover:border-gray-700"
+        selected
+          ? "border-indigo-500 ring-1 ring-indigo-500/30"
+          : isDone
+            ? "border-gray-800/50 opacity-60 hover:opacity-80 hover:border-gray-700"
+            : "border-gray-800 hover:border-gray-700"
       }`}
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-white font-semibold text-[14px] leading-snug">{company.companyName}</h3>
-            {company.crmStatus === "contacted" && (
+            <h3 className={`font-semibold text-[14px] leading-snug ${isDone ? "text-gray-400" : "text-white"}`}>
+              {company.companyName}
+            </h3>
+            {isDone && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-green-900/30 text-green-400 border border-green-800/50 flex-shrink-0">
+                <CheckCheck className="w-2 h-2" /> Done
+              </span>
+            )}
+            {!isDone && company.crmStatus === "contacted" && (
               <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-orange-900/30 text-orange-400 border border-orange-800/50 flex-shrink-0">
                 <CheckCircle2 className="w-2 h-2" />
                 Contacted {company.lastContactAt ? formatDate(company.lastContactAt) : ""}
               </span>
             )}
-            {company.crmStatus === "in_crm" && (
+            {!isDone && company.crmStatus === "in_crm" && (
               <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-900/30 text-indigo-400 border border-indigo-800/50 flex-shrink-0">
                 <Building2 className="w-2 h-2" />
                 In CRM
@@ -242,9 +287,27 @@ function CompanyCard({ company, selected, onClick }: {
             )}
           </div>
         </div>
-        <div className={`flex-shrink-0 flex flex-col items-center justify-center w-11 h-11 rounded-lg border ${badge.bg} ${badge.border}`}>
-          <span className={`text-lg font-bold leading-none tabular-nums ${badge.text}`}>{company.fitScore}</span>
-          <span className="text-[8px] uppercase tracking-widest text-gray-500 mt-0.5">fit</span>
+        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <div className={`flex flex-col items-center justify-center w-11 h-11 rounded-lg border ${badge.bg} ${badge.border}`}>
+            <span className={`text-lg font-bold leading-none tabular-nums ${badge.text}`}>{company.fitScore}</span>
+            <span className="text-[8px] uppercase tracking-widest text-gray-500 mt-0.5">fit</span>
+          </div>
+          {showDoneToggle && onToggleDone && (
+            <button
+              onClick={onToggleDone}
+              title={isDone ? "Mark as To Do" : "Mark as Done"}
+              className={`flex items-center gap-0.5 text-[10px] rounded-md px-1.5 py-0.5 transition-colors ${
+                isDone
+                  ? "text-green-400/80 hover:text-gray-400 bg-green-900/20 border border-green-800/30"
+                  : "text-gray-600 hover:text-gray-300 bg-gray-800 border border-gray-700"
+              }`}
+            >
+              {isDone
+                ? <><CheckCheck className="w-2.5 h-2.5" /> Done</>
+                : <><Circle className="w-2.5 h-2.5" /> Mark Done</>
+              }
+            </button>
+          )}
         </div>
       </div>
       {company.industry && (
@@ -253,23 +316,24 @@ function CompanyCard({ company, selected, onClick }: {
         </span>
       )}
       {company.summary && (
-        <p className="text-[12px] text-gray-400 leading-relaxed line-clamp-2">{company.summary}</p>
+        <p className={`text-[12px] leading-relaxed line-clamp-2 ${isDone ? "text-gray-500" : "text-gray-400"}`}>
+          {company.summary}
+        </p>
       )}
     </button>
   )
 }
 
 // ─── Slide-over ───────────────────────────────────────────────────────────────
-// key={company.companyName} from parent forces remount on navigation,
-// resetting all contact/email/log state cleanly.
 
-function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, onProspectCreated }: {
-  company:            DiscoveredCompanyBasic
+function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, onProspectCreated, onOutreachLogged }: {
+  company:            CompanyWithProgress
   onClose:            () => void
-  allCompanies?:      DiscoveredCompanyBasic[]
+  allCompanies?:      CompanyWithProgress[]
   selectedIndex?:     number
   onNavigate?:        (newIndex: number) => void
   onProspectCreated?: (prospectId: string) => void
+  onOutreachLogged?:  (resultId: string) => void
 }) {
   const badge = fitBadge(company.fitScore)
   const websiteHref = company.website
@@ -282,15 +346,8 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
     ? `${selectedIndex + 1} of ${allCompanies.length}`
     : null
 
-  // Computed after all draft state is declared — referenced by nav guard
-  // (declared here as a closure; actual values come from state declared below)
-  function checkUnsaved(
-    contactDraft: ContactDraft,
-    subject: string,
-    body: string,
-    ftitle: string,
-  ): boolean {
-    return !!(contactDraft.name || contactDraft.email || contactDraft.title || subject || body || ftitle)
+  function checkUnsaved(c: ContactDraft, subject: string, body: string, ftitle: string): boolean {
+    return !!(c.name || c.email || c.title || subject || body || ftitle)
   }
 
   const [detailsState, setDetailsState] = useState<DetailsState>("loading")
@@ -306,25 +363,25 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
   const [created, setCreated]             = useState<ProspectCreated | null>(null)
 
   const blankContact = (): ContactDraft => ({ name: "", title: "", email: "", phone: "", linkedin: "", notes: "" })
-  const [contact, setContact]           = useState<ContactDraft>(blankContact())
+  const [contact, setContact]             = useState<ContactDraft>(blankContact())
   const [savingContact, setSavingContact] = useState(false)
-  const [contactError, setContactError] = useState<string | null>(null)
-  const [lastSaved, setLastSaved]       = useState<string | null>(null)
+  const [contactError, setContactError]   = useState<string | null>(null)
+  const [lastSaved, setLastSaved]         = useState<string | null>(null)
 
   type OutreachTab = "email" | "log" | "followup"
   const [outreachTab, setOutreachTab]           = useState<OutreachTab>("email")
   const [outreachContactId, setOutreachContactId] = useState<string>("")
 
-  const [followupTitle, setFollowupTitle]     = useState("")
-  const [followupType, setFollowupType]       = useState("other")
-  const [followupDueAt, setFollowupDueAt]     = useState("")
-  const [followupNotes, setFollowupNotes]     = useState("")
+  const [followupTitle, setFollowupTitle]       = useState("")
+  const [followupType, setFollowupType]         = useState("other")
+  const [followupDueAt, setFollowupDueAt]       = useState("")
+  const [followupNotes, setFollowupNotes]       = useState("")
   const [followupPriority, setFollowupPriority] = useState("normal")
-  const [savingFollowup, setSavingFollowup]   = useState(false)
-  const [followupError, setFollowupError]     = useState<string | null>(null)
-  const [followupSaved, setFollowupSaved]     = useState(false)
+  const [savingFollowup, setSavingFollowup]     = useState(false)
+  const [followupError, setFollowupError]       = useState<string | null>(null)
+  const [followupSaved, setFollowupSaved]       = useState(false)
 
-  const [templates, setTemplates]             = useState<Template[]>([])
+  const [templates, setTemplates]               = useState<Template[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<string>("")
 
   const [emailTo, setEmailTo]           = useState("")
@@ -336,14 +393,17 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
   const [insertingLink, setInsertingLink] = useState(false)
   const emailBodyRef = useRef<HTMLTextAreaElement>(null)
 
-  const [logType, setLogType]           = useState("CALL_CONNECTED")
+  const [logType, setLogType]             = useState("CALL_CONNECTED")
   const [logCustomType, setLogCustomType] = useState("")
-  const [logOutcome, setLogOutcome]     = useState("")
-  const [logDuration, setLogDuration]   = useState("")
-  const [logNotes, setLogNotes]         = useState("")
-  const [savingLog, setSavingLog]       = useState(false)
-  const [logError, setLogError]         = useState<string | null>(null)
-  const [logSaved, setLogSaved]         = useState(false)
+  const [logOutcome, setLogOutcome]       = useState("")
+  const [logDuration, setLogDuration]     = useState("")
+  const [logNotes, setLogNotes]           = useState("")
+  const [savingLog, setSavingLog]         = useState(false)
+  const [logError, setLogError]           = useState<string | null>(null)
+  const [logSaved, setLogSaved]           = useState(false)
+
+  // Qualifying outreach types that mark a company Done
+  const QUALIFYING = new Set(["EMAIL_SENT", "CALL_CONNECTED", "CALL_VOICEMAIL", "CALL_NO_ANSWER", "MEETING", "MEETING_HELD", "LINKEDIN", "LINKEDIN_MESSAGE"])
 
   useEffect(() => {
     async function fetchDetails() {
@@ -502,6 +562,8 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
       setEmailSubject("")
       setEmailBody("")
       setSelectedTemplate("")
+      // Outreach confirmed — notify parent to update progress
+      if (company.resultId) onOutreachLogged?.(company.resultId)
     } finally {
       setSendingEmail(false)
     }
@@ -567,6 +629,8 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
       setLogDuration("")
       setLogNotes("")
       setLogCustomType("")
+      // Notify parent if this is a qualifying outreach type
+      if (company.resultId && QUALIFYING.has(logType)) onOutreachLogged?.(company.resultId)
     } finally {
       setSavingLog(false)
     }
@@ -651,13 +715,18 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-white font-semibold text-base leading-snug">{company.companyName}</h2>
-              {company.crmStatus === "contacted" && (
+              {company.isDone && (
+                <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-green-900/30 text-green-400 border border-green-800/50">
+                  <CheckCheck className="w-2 h-2" /> Done
+                </span>
+              )}
+              {!company.isDone && company.crmStatus === "contacted" && (
                 <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-orange-900/30 text-orange-400 border border-orange-800/50">
                   <CheckCircle2 className="w-2 h-2" />
                   Contacted {company.lastContactAt ? formatDate(company.lastContactAt) : ""}
                 </span>
               )}
-              {company.crmStatus === "in_crm" && (
+              {!company.isDone && company.crmStatus === "in_crm" && (
                 <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-900/30 text-indigo-400 border border-indigo-800/50">
                   <Building2 className="w-2 h-2" />
                   In CRM
@@ -746,7 +815,7 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
             )}
           </div>
 
-          {/* ── Section 1: Contact ──────────────────────────────────────── */}
+          {/* Contact */}
           <div className="border-b border-gray-800/60">
             <button className={sectionHdrCls} onClick={() => toggleSection("contact")}>
               <User className="w-3.5 h-3.5 text-gray-400" />
@@ -790,7 +859,7 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
             )}
           </div>
 
-          {/* ── Section 2: Outreach ─────────────────────────────────────── */}
+          {/* Outreach */}
           <div className="border-b border-gray-800/60">
             <button className={sectionHdrCls} onClick={() => toggleSection("outreach")}>
               <Mail className="w-3.5 h-3.5 text-gray-400" />
@@ -825,10 +894,8 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
 
                     <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-lg p-0.5 mb-3">
                       {(["email", "log", "followup"] as OutreachTab[]).map(tab => (
-                        <button key={tab}
-                          onClick={() => setOutreachTab(tab)}
-                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-colors ${outreachTab === tab ? "bg-gray-700 text-white" : "text-gray-400 hover:text-gray-200"}`}
-                        >
+                        <button key={tab} onClick={() => setOutreachTab(tab)}
+                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-colors ${outreachTab === tab ? "bg-gray-700 text-white" : "text-gray-400 hover:text-gray-200"}`}>
                           {tab === "email"    && <><Mail className="w-3 h-3" /> Email</>}
                           {tab === "log"      && <><FileText className="w-3 h-3" /> Log</>}
                           {tab === "followup" && <><Clock className="w-3 h-3" /> Follow-up</>}
@@ -855,11 +922,8 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
                           onChange={e => setEmailSubject(e.target.value)} className={inputCls} />
                         <textarea ref={emailBodyRef} rows={6} placeholder="Message…" value={emailBody}
                           onChange={e => setEmailBody(e.target.value)} className={`${inputCls} resize-none`} />
-                        <button
-                          onClick={() => void insertDemoLink()}
-                          disabled={insertingLink}
-                          className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
-                        >
+                        <button onClick={() => void insertDemoLink()} disabled={insertingLink}
+                          className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
                           <Link2 className="w-3 h-3" />
                           {insertingLink ? "Inserting…" : "Insert demo link"}
                         </button>
@@ -955,7 +1019,7 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
             )}
           </div>
 
-          {/* ── Section 3: Saved Contacts ───────────────────────────────── */}
+          {/* Saved Contacts */}
           {savedContacts.length > 0 && (
             <div>
               <button className={sectionHdrCls} onClick={() => toggleSection("contacts")}>
@@ -970,16 +1034,13 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
                   {savedContacts.map(c => {
                     const isActive = c.id === outreachContactId
                     return (
-                      <button
-                        key={c.id || c.email}
+                      <button key={c.id || c.email}
                         onClick={() => {
                           setOutreachContactId(c.id)
                           if (c.email) setEmailTo(c.email)
                           setSectionOpen(prev => ({ ...prev, outreach: true }))
                         }}
-                        className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-colors ${
-                          isActive ? "bg-indigo-900/30 border border-indigo-800/40" : "hover:bg-gray-800/40"
-                        }`}
+                        className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-colors ${isActive ? "bg-indigo-900/30 border border-indigo-800/40" : "hover:bg-gray-800/40"}`}
                       >
                         <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
                           <User className="w-3.5 h-3.5 text-gray-400" />
@@ -991,15 +1052,10 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           {isActive && (
-                            <span className="text-[10px] text-indigo-400 font-medium px-1.5 py-0.5 rounded-full bg-indigo-900/30 border border-indigo-800/40">
-                              Active
-                            </span>
+                            <span className="text-[10px] text-indigo-400 font-medium px-1.5 py-0.5 rounded-full bg-indigo-900/30 border border-indigo-800/40">Active</span>
                           )}
-                          <Link
-                            href={`/sales/prospects/${c.prospectId}`}
-                            onClick={e => e.stopPropagation()}
-                            className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5"
-                          >
+                          <Link href={`/sales/prospects/${c.prospectId}`} onClick={e => e.stopPropagation()}
+                            className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-0.5">
                             CRM <ExternalLink className="w-2.5 h-2.5" />
                           </Link>
                         </div>
@@ -1018,13 +1074,9 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
 
 // ─── Saved Lists Section ──────────────────────────────────────────────────────
 
-function SavedListsSection({ onSelectCompany }: {
-  onSelectCompany: (
-    company:    DiscoveredCompanyBasic,
-    all:        DiscoveredCompanyBasic[],
-    index:      number,
-    resultIds:  (string | null)[],
-  ) => void
+function SavedListsSection({ onSelectCompany, externalDoneIds }: {
+  onSelectCompany: (all: CompanyWithProgress[], index: number, listId: string) => void
+  externalDoneIds: Set<string>
 }) {
   const [lists,       setLists]       = useState<ResearchList[] | null>(null)
   const [loading,     setLoading]     = useState(true)
@@ -1035,23 +1087,25 @@ function SavedListsSection({ onSelectCompany }: {
   const [renameVal,   setRenameVal]   = useState("")
   const [savingRename, setSavingRename] = useState(false)
   const [deletingId,  setDeletingId]  = useState<string | null>(null)
-
-  // Track in-session CRM status updates (prospectId set by SlideOver during this session)
+  const [togglingDone, setTogglingDone] = useState<string | null>(null)
+  const [togglingList, setTogglingList] = useState<string | null>(null)
+  // CRM status overrides set during this session
   const [localProspectIds, setLocalProspectIds] = useState<Record<string, string>>({})
 
-  useEffect(() => {
+  function loadLists() {
     setLoading(true)
     fetch("/api/super-admin/crm/prospects/discover/lists")
       .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
       .then(d => { setLists(d as ResearchList[]); setLoading(false) })
       .catch(() => { setError("Failed to load lists"); setLoading(false) })
-  }, [])
+  }
+  useEffect(loadLists, [])
 
   async function openListDetail(list: ResearchList) {
     setLoadingList(list.id)
     try {
       const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${list.id}`)
-      if (!res.ok) throw new Error("Failed to load list")
+      if (!res.ok) throw new Error()
       const data = await res.json() as ResearchListWithResults
       setOpenList(data)
     } catch {
@@ -1093,24 +1147,79 @@ function SavedListsSection({ onSelectCompany }: {
     }
   }
 
-  // Called by parent when a prospect is created from a saved-list company
-  function markInCRM(companyName: string, prospectId: string) {
-    setLocalProspectIds(prev => ({ ...prev, [companyName]: prospectId }))
+  async function handleToggleListStatus(list: ResearchList) {
+    const newStatus = list.status === "completed" ? "active" : "completed"
+    setTogglingList(list.id)
+    try {
+      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${list.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      })
+      if (!res.ok) return
+      const updated = await res.json() as ResearchList
+      setLists(prev => prev?.map(l => l.id === list.id ? { ...l, ...updated } : l) ?? null)
+      if (openList?.id === list.id) {
+        setOpenList(prev => prev ? { ...prev, status: updated.status, completedAt: updated.completedAt, manuallyCompleted: updated.manuallyCompleted } : null)
+      }
+    } finally {
+      setTogglingList(null)
+    }
   }
 
-  // Expose markInCRM via a ref-compatible callback pattern
-  // Parent calls onProspectCreated → needs to know which company & list is open
-  // We store the callback so parent can call it after SlideOver fires
-  // (see usage in SalesDiscoverPage)
-
-  function getCompanies(): DiscoveredCompanyBasic[] {
-    if (!openList) return []
-    return openList.results.map(r => {
-      const localPid = localProspectIds[r.companyName]
-      return resultToBasic({
-        ...r,
-        prospectId: localPid ?? r.prospectId,
+  async function handleToggleDone(result: ResearchResult, currentIsDone: boolean) {
+    if (!openList) return
+    const newIsDone = !currentIsDone
+    setTogglingDone(result.id)
+    try {
+      const res = await fetch(`/api/super-admin/crm/prospects/discover/results/${result.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ isDone: newIsDone }),
       })
+      if (!res.ok) return
+      const updated = await res.json() as { id: string; isDone: boolean; listAutoCompleted?: boolean }
+
+      // Update the open list's results in-place
+      setOpenList(prev => {
+        if (!prev) return null
+        return {
+          ...prev,
+          status: updated.listAutoCompleted ? "completed" : (
+            !newIsDone && prev.status === "completed" && !prev.manuallyCompleted ? "active" : prev.status
+          ),
+          results: prev.results.map(r => r.id === result.id ? { ...r, isDone: updated.isDone, doneAt: updated.isDone ? new Date().toISOString() : null } : r),
+        }
+      })
+
+      // Update the list index counts
+      setLists(prev => prev?.map(l => {
+        if (l.id !== openList.id) return l
+        const delta = newIsDone ? 1 : -1
+        const newDoneCount = Math.max(0, l.doneCount + delta)
+        return {
+          ...l,
+          doneCount: newDoneCount,
+          status: updated.listAutoCompleted ? "completed" :
+            (!newIsDone && l.status === "completed" && !l.manuallyCompleted ? "active" : l.status),
+        }
+      }) ?? null)
+    } finally {
+      setTogglingDone(null)
+    }
+  }
+
+  // Build CompanyWithProgress array for a given list, applying external overrides
+  function getCompanies(list: ResearchListWithResults): CompanyWithProgress[] {
+    return list.results.map(r => {
+      const localPid = localProspectIds[r.companyName]
+      const isDone = externalDoneIds.has(r.id) || r.isDone
+      return {
+        ...resultToProgress(r),
+        crmStatus:    localPid ? "in_crm" as const : (r.prospectId ? "in_crm" as const : "none" as const),
+        crmProspectId: localPid ?? r.prospectId ?? undefined,
+        isDone,
+      }
     })
   }
 
@@ -1119,35 +1228,31 @@ function SavedListsSection({ onSelectCompany }: {
       <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
     </div>
   )
-  if (error) return (
-    <div className="p-6 text-center text-red-400 text-sm">{error}</div>
-  )
+  if (error) return <div className="p-6 text-center text-red-400 text-sm">{error}</div>
 
   // ── Detail view ─────────────────────────────────────────────────────────────
   if (openList) {
-    const companies = getCompanies()
-    const inCRMCount = companies.filter(c => c.crmStatus === "in_crm").length
+    const companies = getCompanies(openList)
+    const toDo      = companies.filter(c => !c.isDone)
+    const done      = companies.filter(c =>  c.isDone)
+    const allDone   = companies.length > 0 && toDo.length === 0
+    const isComplete = openList.status === "completed" || allDone
 
     return (
       <div className="flex flex-col h-full">
         {/* List header */}
         <div className="border-b border-gray-800 px-4 py-3 flex-shrink-0">
           <div className="flex items-center gap-2 mb-1">
-            <button
-              onClick={() => setOpenList(null)}
-              className="text-gray-400 hover:text-gray-200 transition-colors p-0.5 flex-shrink-0"
-            >
+            <button onClick={() => setOpenList(null)}
+              className="text-gray-400 hover:text-gray-200 transition-colors p-0.5 flex-shrink-0">
               <ChevronLeft className="w-4 h-4" />
             </button>
             {renamingId === openList.id ? (
               <div className="flex items-center gap-2 flex-1">
-                <input
-                  autoFocus
-                  value={renameVal}
+                <input autoFocus value={renameVal}
                   onChange={e => setRenameVal(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") void handleRename(openList.id); if (e.key === "Escape") { setRenamingId(null); setRenameVal("") } }}
-                  className="flex-1 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none"
-                />
+                  className="flex-1 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none" />
                 <button onClick={() => void handleRename(openList.id)} disabled={savingRename}
                   className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md">
                   {savingRename ? "…" : "Save"}
@@ -1159,36 +1264,49 @@ function SavedListsSection({ onSelectCompany }: {
             ) : (
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <h2 className="text-sm font-semibold text-white truncate">{openList.name}</h2>
-                <button
-                  onClick={() => { setRenamingId(openList.id); setRenameVal(openList.name) }}
-                  className="text-gray-500 hover:text-gray-300 flex-shrink-0"
-                  title="Rename list"
-                >
+                <button onClick={() => { setRenamingId(openList.id); setRenameVal(openList.name) }}
+                  className="text-gray-500 hover:text-gray-300 flex-shrink-0" title="Rename list">
                   <PenLine className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
+            {/* Complete / Reopen */}
+            <button
+              onClick={() => void handleToggleListStatus(openList)}
+              disabled={togglingList === openList.id}
+              className={`flex-shrink-0 flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border transition-colors ${
+                isComplete
+                  ? "text-green-400 border-green-800/40 bg-green-900/20 hover:bg-green-900/30"
+                  : "text-gray-500 border-gray-700 bg-gray-800 hover:text-gray-300"
+              }`}
+            >
+              {togglingList === openList.id
+                ? <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                : isComplete
+                  ? <><RefreshCw className="w-2.5 h-2.5" /> Reopen</>
+                  : <><CheckCheck className="w-2.5 h-2.5" /> Complete</>
+              }
+            </button>
           </div>
-          <div className="flex items-center gap-3 text-[11px] text-gray-500 ml-6">
-            <span>{openList.results.length} companies</span>
-            {inCRMCount > 0 && (
-              <span className="text-indigo-400">{inCRMCount} in CRM</span>
-            )}
-            {openList.results.length - inCRMCount > 0 && (
-              <span className="text-gray-400">{openList.results.length - inCRMCount} remaining</span>
-            )}
-            {openList.searchState && (
-              <span className="flex items-center gap-0.5">
-                <MapPin className="w-2.5 h-2.5" />{openList.searchState}
-              </span>
-            )}
-            {openList.searchIndustry && <span>{openList.searchIndustry}</span>}
-            <span>{formatDate(openList.createdAt)}</span>
+
+          {/* Progress bar */}
+          <div className="ml-6">
+            <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-1">
+              <span className="text-gray-400 font-medium">{done.length} of {companies.length} done</span>
+              {openList.searchState && <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{openList.searchState}</span>}
+              {openList.searchIndustry && <span>{openList.searchIndustry}</span>}
+            </div>
+            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${isComplete ? "bg-green-500" : "bg-indigo-500"}`}
+                style={{ width: companies.length > 0 ? `${(done.length / companies.length) * 100}%` : "0%" }}
+              />
+            </div>
+            <p className="text-[10px] text-gray-600 mt-1">Click any company to open the full prospecting workflow · use card button to mark done</p>
           </div>
-          <p className="text-[11px] text-gray-600 ml-6 mt-1">Click any company to open the full prospecting workflow</p>
         </div>
 
-        {/* Company cards — same component as fresh search */}
+        {/* Company cards */}
         <div className="flex-1 overflow-y-auto p-4">
           {companies.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
@@ -1196,15 +1314,56 @@ function SavedListsSection({ onSelectCompany }: {
               <p>No companies in this list yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {companies.map((c, i) => (
-                <CompanyCard
-                  key={c.companyName}
-                  company={c}
-                  selected={false}
-                  onClick={() => onSelectCompany(c, companies, i, openList.results.map(r => r.id))}
-                />
-              ))}
+            <div className="space-y-6">
+              {/* To Do section */}
+              {toDo.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <Circle className="w-2.5 h-2.5" /> To Do ({toDo.length})
+                  </p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    {toDo.map(c => (
+                      <CompanyCard
+                        key={c.companyName}
+                        company={c}
+                        selected={false}
+                        showDoneToggle
+                        onToggleDone={e => {
+                          e.stopPropagation()
+                          const result = openList.results.find(r => r.id === c.resultId)
+                          if (result) void handleToggleDone(result, c.isDone)
+                        }}
+                        onClick={() => onSelectCompany(companies, companies.indexOf(c), openList.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Already Done section */}
+              {done.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-medium text-green-600/70 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <CheckCheck className="w-2.5 h-2.5" /> Already Done ({done.length})
+                  </p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    {done.map(c => (
+                      <CompanyCard
+                        key={c.companyName}
+                        company={c}
+                        selected={false}
+                        showDoneToggle
+                        onToggleDone={e => {
+                          e.stopPropagation()
+                          const result = openList.results.find(r => r.id === c.resultId)
+                          if (result) void handleToggleDone(result, c.isDone)
+                        }}
+                        onClick={() => onSelectCompany(companies, companies.indexOf(c), openList.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1213,6 +1372,9 @@ function SavedListsSection({ onSelectCompany }: {
   }
 
   // ── List index ──────────────────────────────────────────────────────────────
+  const activeLists    = lists?.filter(l => l.status !== "completed") ?? []
+  const completedLists = lists?.filter(l => l.status === "completed") ?? []
+
   return (
     <div className="flex-1 overflow-y-auto p-4">
       {(!lists || lists.length === 0) ? (
@@ -1224,79 +1386,144 @@ function SavedListsSection({ onSelectCompany }: {
           </p>
         </div>
       ) : (
-        <>
-          <p className="text-[11px] text-gray-500 mb-3">{lists.length} saved {lists.length === 1 ? "list" : "lists"}</p>
-          <div className="space-y-2">
-            {lists.map(list => (
-              <div key={list.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    {renamingId === list.id ? (
-                      <div className="flex items-center gap-2 mb-1">
-                        <input
-                          autoFocus
-                          value={renameVal}
-                          onChange={e => setRenameVal(e.target.value)}
-                          onKeyDown={e => { if (e.key === "Enter") void handleRename(list.id); if (e.key === "Escape") { setRenamingId(null); setRenameVal("") } }}
-                          className="flex-1 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none"
-                        />
-                        <button onClick={() => void handleRename(list.id)} disabled={savingRename}
-                          className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md">
-                          {savingRename ? "…" : "Save"}
-                        </button>
-                        <button onClick={() => { setRenamingId(null); setRenameVal("") }} className="text-gray-400 hover:text-gray-200">
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        className="flex items-center gap-2 mb-1 group w-full text-left"
-                        onClick={() => void openListDetail(list)}
-                      >
-                        <h3 className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors truncate">
-                          {list.name}
-                        </h3>
-                        {loadingList === list.id && <Loader2 className="w-3 h-3 animate-spin text-indigo-400 flex-shrink-0" />}
-                      </button>
-                    )}
-                    <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
-                      <span className="text-gray-400 font-medium">{list._count.results} companies</span>
-                      {list.searchState && (
-                        <span className="flex items-center gap-0.5">
-                          <MapPin className="w-2.5 h-2.5" />{list.searchState}
-                        </span>
-                      )}
-                      {list.searchIndustry && <span>{list.searchIndustry}</span>}
-                      {list.searchEmpMin && list.searchEmpMax && (
-                        <span className="flex items-center gap-0.5">
-                          <Users className="w-2.5 h-2.5" />{list.searchEmpMin}–{list.searchEmpMax}
-                        </span>
-                      )}
-                      <span>{formatDate(list.createdAt)}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => { setRenamingId(list.id); setRenameVal(list.name) }}
-                      className="text-gray-600 hover:text-gray-400 transition-colors p-1"
-                      title="Rename"
-                    >
-                      <PenLine className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => void handleDelete(list.id)}
-                      disabled={deletingId === list.id}
-                      className="text-gray-600 hover:text-red-400 transition-colors p-1"
-                    >
-                      {deletingId === list.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                    </button>
-                  </div>
-                </div>
+        <div className="space-y-6">
+          {/* Active lists */}
+          {activeLists.length > 0 && (
+            <div>
+              {completedLists.length > 0 && (
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Active</p>
+              )}
+              <div className="space-y-2">
+                {activeLists.map(list => <ListCard key={list.id} list={list} onOpen={openListDetail} onRename={(id, val) => { setRenamingId(id); setRenameVal(val) }} renamingId={renamingId} renameVal={renameVal} savingRename={savingRename} onRenameConfirm={handleRename} onRenameCancel={() => { setRenamingId(null); setRenameVal("") }} onRenameChange={setRenameVal} onDelete={handleDelete} deletingId={deletingId} loadingList={loadingList} onToggleStatus={handleToggleListStatus} togglingList={togglingList} />)}
               </div>
-            ))}
-          </div>
-        </>
+            </div>
+          )}
+
+          {/* Completed lists */}
+          {completedLists.length > 0 && (
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <CheckCheck className="w-2.5 h-2.5" /> Completed Lists ({completedLists.length})
+              </p>
+              <div className="space-y-2 opacity-70">
+                {completedLists.map(list => <ListCard key={list.id} list={list} onOpen={openListDetail} onRename={(id, val) => { setRenamingId(id); setRenameVal(val) }} renamingId={renamingId} renameVal={renameVal} savingRename={savingRename} onRenameConfirm={handleRename} onRenameCancel={() => { setRenamingId(null); setRenameVal("") }} onRenameChange={setRenameVal} onDelete={handleDelete} deletingId={deletingId} loadingList={loadingList} onToggleStatus={handleToggleListStatus} togglingList={togglingList} />)}
+              </div>
+            </div>
+          )}
+        </div>
       )}
+    </div>
+  )
+}
+
+// ─── List Card (extracted for reuse in active + completed sections) ───────────
+
+function ListCard({ list, onOpen, onRename, renamingId, renameVal, savingRename, onRenameConfirm, onRenameCancel, onRenameChange, onDelete, deletingId, loadingList, onToggleStatus, togglingList }: {
+  list:              ResearchList
+  onOpen:            (list: ResearchList) => void
+  onRename:          (id: string, val: string) => void
+  renamingId:        string | null
+  renameVal:         string
+  savingRename:      boolean
+  onRenameConfirm:   (id: string) => void
+  onRenameCancel:    () => void
+  onRenameChange:    (v: string) => void
+  onDelete:          (id: string) => void
+  deletingId:        string | null
+  loadingList:       string | null
+  onToggleStatus:    (list: ResearchList) => void
+  togglingList:      string | null
+}) {
+  const total     = list._count.results
+  const done      = list.doneCount
+  const pct       = total > 0 ? Math.round((done / total) * 100) : 0
+  const statusLbl = listStatusLabel(list)
+  const statusCls = listStatusColor(list)
+  const isComplete = list.status === "completed"
+
+  return (
+    <div className={`bg-gray-900 border rounded-xl p-4 hover:border-gray-700 transition-colors ${isComplete ? "border-gray-800/50" : "border-gray-800"}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          {renamingId === list.id ? (
+            <div className="flex items-center gap-2 mb-1">
+              <input autoFocus value={renameVal} onChange={e => onRenameChange(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") void onRenameConfirm(list.id); if (e.key === "Escape") onRenameCancel() }}
+                className="flex-1 bg-gray-800 border border-indigo-500 rounded-lg px-2 py-1 text-sm text-white focus:outline-none" />
+              <button onClick={() => void onRenameConfirm(list.id)} disabled={savingRename}
+                className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md">
+                {savingRename ? "…" : "Save"}
+              </button>
+              <button onClick={onRenameCancel} className="text-gray-400 hover:text-gray-200">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 mb-1">
+              <button onClick={() => onOpen(list)}
+                className="flex items-center gap-1.5 group flex-1 min-w-0 text-left">
+                <h3 className={`text-sm font-semibold truncate group-hover:text-indigo-300 transition-colors ${isComplete ? "text-gray-400" : "text-white"}`}>
+                  {list.name}
+                </h3>
+                {loadingList === list.id && <Loader2 className="w-3 h-3 animate-spin text-indigo-400 flex-shrink-0" />}
+              </button>
+              <span className={`flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full border font-medium ${statusCls}`}>
+                {statusLbl}
+              </span>
+            </div>
+          )}
+
+          {/* Progress bar */}
+          <div className="mb-2">
+            <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1">
+              <span>{done} of {total} done</span>
+              <span>{pct}%</span>
+            </div>
+            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${isComplete ? "bg-green-500" : pct > 0 ? "bg-indigo-500" : "bg-gray-700"}`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+            <span className="text-gray-400 font-medium">{total} companies</span>
+            {list.searchState && <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{list.searchState}</span>}
+            {list.searchIndustry && <span>{list.searchIndustry}</span>}
+            <span>{formatDate(list.createdAt)}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => onRename(list.id, list.name)}
+              className="text-gray-600 hover:text-gray-400 transition-colors p-1" title="Rename">
+              <PenLine className="w-3.5 h-3.5" />
+            </button>
+            <button onClick={() => void onDelete(list.id)} disabled={deletingId === list.id}
+              className="text-gray-600 hover:text-red-400 transition-colors p-1">
+              {deletingId === list.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+          <button
+            onClick={() => onToggleStatus(list)}
+            disabled={togglingList === list.id}
+            className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded border transition-colors ${
+              isComplete
+                ? "text-green-400/70 border-green-800/30 hover:text-green-300"
+                : "text-gray-500 border-gray-700 hover:text-gray-300"
+            }`}
+          >
+            {togglingList === list.id
+              ? <Loader2 className="w-2 h-2 animate-spin" />
+              : isComplete
+                ? <><RefreshCw className="w-2 h-2" /> Reopen</>
+                : <><CheckCheck className="w-2 h-2" /> Complete</>
+            }
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -1320,10 +1547,8 @@ const COUNTRY_OPTIONS = [
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SalesDiscoverPage() {
-  // ── Navigation ──────────────────────────────────────────────────────────────
   const [section, setSection] = useState<NavSection>("search")
 
-  // ── Search form ─────────────────────────────────────────────────────────────
   const [country,       setCountry]       = useState("United States")
   const [stateProvince, setStateProvince] = useState("")
   const [industry,      setIndustry]      = useState("")
@@ -1334,21 +1559,24 @@ export default function SalesDiscoverPage() {
   const [context,       setContext]       = useState("")
 
   const [searchState, setSearchState] = useState<SearchState>("idle")
-  const [companies,   setCompanies]   = useState<DiscoveredCompanyBasic[]>([])
+  const [companies,   setCompanies]   = useState<CompanyWithProgress[]>([])
   const [searchError, setSearchError] = useState<string | null>(null)
 
-  // ── Save dialog ─────────────────────────────────────────────────────────────
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [savingList,     setSavingList]     = useState(false)
   const [savedListId,    setSavedListId]    = useState<string | null>(null)
   const [savedListName,  setSavedListName]  = useState<string | null>(null)
   const saveDialogSuggestion = buildAutoName({ industry, stateProvince, country, keywords })
 
-  // ── Active company selection (shared by both search and saved-list contexts) ─
-  const [activeCompanies,   setActiveCompanies]   = useState<DiscoveredCompanyBasic[]>([])
-  const [activeResultIds,   setActiveResultIds]   = useState<(string | null)[]>([])
-  const [selectedIndex,     setSelectedIndex]     = useState<number | null>(null)
+  // Shared company selection — works for both search and saved-list contexts
+  const [activeCompanies, setActiveCompanies] = useState<CompanyWithProgress[]>([])
+  const [selectedIndex,   setSelectedIndex]   = useState<number | null>(null)
+  const [activeListId,    setActiveListId]     = useState<string | null>(null)
   const selected = selectedIndex !== null ? (activeCompanies[selectedIndex] ?? null) : null
+
+  // Tracks result IDs marked done in this session, passed down to SavedListsSection
+  // so it can update card rendering without a full re-fetch
+  const [externalDoneIds, setExternalDoneIds] = useState<Set<string>>(new Set())
 
   const stateLabel = country === "Canada" ? "Province" : country === "United States" ? "State" : "Region"
 
@@ -1360,6 +1588,7 @@ export default function SalesDiscoverPage() {
     setSelectedIndex(null)
     setSavedListId(null)
     setSavedListName(null)
+    setActiveListId(null)
 
     const body: Record<string, unknown> = { country }
     if (stateProvince) body.stateProvince     = stateProvince
@@ -1379,10 +1608,9 @@ export default function SalesDiscoverPage() {
         throw new Error(data.error ?? `Search failed (${res.status})`)
       }
       const data = await res.json() as { companies: DiscoveredCompanyBasic[] }
-      const found = data.companies ?? []
+      const found = (data.companies ?? []).map(basicToProgress)
       setCompanies(found)
       setActiveCompanies(found)
-      setActiveResultIds(found.map(() => null))
       setSearchState("done")
     } catch (err) {
       setSearchError(err instanceof Error ? err.message : "Search failed")
@@ -1423,17 +1651,17 @@ export default function SalesDiscoverPage() {
     }
   }
 
-  // Called by SlideOver when a prospect is created
+  // Called by SlideOver when a prospect is created from a research result
   function handleProspectCreated(prospectId: string) {
     if (selectedIndex === null) return
+    const resultId = activeCompanies[selectedIndex]?.resultId
     const updated = activeCompanies.map((c, i) =>
       i === selectedIndex ? { ...c, crmStatus: "in_crm" as const, crmProspectId: prospectId } : c
     )
     setActiveCompanies(updated)
     if (section === "search") setCompanies(updated)
 
-    // Persist the link to the DB so the status survives page refresh
-    const resultId = activeResultIds[selectedIndex]
+    // Persist the link to the DB row if this is a saved-list result
     if (resultId) {
       void fetch(`/api/super-admin/crm/prospects/discover/results/${resultId}`, {
         method: "PATCH",
@@ -1443,56 +1671,64 @@ export default function SalesDiscoverPage() {
     }
   }
 
+  // Called by SlideOver after confirmed outreach — optimistic UI update
+  // (server already marked the DB rows done via markOutreachDone)
+  function handleOutreachLogged(resultId: string) {
+    if (!resultId) return
+    setExternalDoneIds(prev => new Set([...prev, resultId]))
+    setActiveCompanies(prev => prev.map(c =>
+      c.resultId === resultId ? { ...c, isDone: true } : c
+    ))
+    if (section === "search") {
+      setCompanies(prev => prev.map(c =>
+        c.resultId === resultId ? { ...c, isDone: true } : c
+      ))
+    }
+  }
+
   const inputCls = "w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
   const labelCls = "block text-[11px] font-medium text-gray-400 mb-1.5"
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* ── Top bar ──────────────────────────────────────────────────────── */}
+      {/* Top bar */}
       <div className="sticky top-0 z-30 bg-gray-950/95 backdrop-blur border-b border-gray-800 px-4 py-0 flex items-center gap-0">
         <Link href="/sales/prospects"
           className="text-gray-400 hover:text-gray-200 transition-colors p-3 mr-1 border-r border-gray-800">
           <ChevronLeft className="w-5 h-5" />
         </Link>
         {(["search", "lists"] as NavSection[]).map(tab => (
-          <button
-            key={tab}
+          <button key={tab}
             onClick={() => { setSection(tab); setSelectedIndex(null) }}
             className={`flex items-center gap-1.5 px-5 py-4 text-[12px] font-medium border-b-2 transition-colors ${
               section === tab
                 ? "border-indigo-500 text-white"
                 : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600"
-            }`}
-          >
+            }`}>
             {tab === "search" && <><Search className="w-3.5 h-3.5" /> Find Prospects</>}
             {tab === "lists"  && <><Bookmark className="w-3.5 h-3.5" /> Saved Lists</>}
           </button>
         ))}
       </div>
 
-      {/* ── Find Prospects ───────────────────────────────────────────────── */}
+      {/* Find Prospects */}
       {section === "search" && (
         <div className="flex h-[calc(100vh-57px)]">
-          {/* Left: Search form */}
+          {/* Search form */}
           <div className="w-72 flex-shrink-0 border-r border-gray-800 overflow-y-auto">
             <form onSubmit={e => void handleSearch(e)} className="p-4 space-y-3">
-
               <div>
                 <label className={labelCls}>Country</label>
                 <select value={country} onChange={e => { setCountry(e.target.value); setStateProvince("") }} className={inputCls}>
                   {COUNTRY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
-
               <div>
                 <label className={labelCls}>{country === "Other" ? "Region / Location" : stateLabel}</label>
                 <input type="text"
                   placeholder={country === "Canada" ? "e.g. Ontario, BC" : country === "United States" ? "e.g. Texas, Midwest" : "e.g. Southeast Asia"}
-                  value={stateProvince} onChange={e => setStateProvince(e.target.value)}
-                  className={inputCls}
-                />
+                  value={stateProvince} onChange={e => setStateProvince(e.target.value)} className={inputCls} />
               </div>
-
               <div>
                 <label className={labelCls}>Industry</label>
                 <select value={industry} onChange={e => setIndustry(e.target.value)} className={inputCls}>
@@ -1500,7 +1736,6 @@ export default function SalesDiscoverPage() {
                   {INDUSTRY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
               </div>
-
               <div>
                 <label className={labelCls}>Employee Count</label>
                 <div className="flex gap-2">
@@ -1508,33 +1743,25 @@ export default function SalesDiscoverPage() {
                   <input type="number" placeholder="Max" value={empMax} onChange={e => setEmpMax(e.target.value)} className={inputCls} />
                 </div>
               </div>
-
               <div>
                 <label className={labelCls}>Min. Locations</label>
                 <input type="number" placeholder="e.g. 3" value={locMin} onChange={e => setLocMin(e.target.value)} className={inputCls} />
               </div>
-
               <div>
                 <label className={labelCls}>Keywords</label>
                 <input type="text" placeholder="e.g. warehousing, cold storage" value={keywords}
                   onChange={e => setKeywords(e.target.value)} className={inputCls} />
               </div>
-
               <div>
                 <label className={labelCls}>Additional Context</label>
                 <textarea rows={3} placeholder="Any other targeting details…" value={context}
                   onChange={e => setContext(e.target.value)} className={`${inputCls} resize-none`} />
               </div>
-
-              <button
-                type="submit"
-                disabled={searchState === "loading"}
-                className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-              >
+              <button type="submit" disabled={searchState === "loading"}
+                className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors">
                 {searchState === "loading"
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Searching…</>
-                  : <><Search className="w-4 h-4" /> Find Prospects</>
-                }
+                  : <><Search className="w-4 h-4" /> Find Prospects</>}
               </button>
               {searchState === "loading" && (
                 <p className="text-[11px] text-gray-500 text-center">Claude is finding real companies — this takes ~20 seconds</p>
@@ -1542,15 +1769,13 @@ export default function SalesDiscoverPage() {
             </form>
           </div>
 
-          {/* Right: Results */}
+          {/* Results */}
           <div className="flex-1 overflow-y-auto p-4">
             {searchState === "idle" && (
               <div className="h-full flex flex-col items-center justify-center text-center px-8">
                 <Search className="w-12 h-12 text-gray-700 mb-3" />
                 <p className="text-gray-400 font-medium mb-1">Find sales prospects</p>
-                <p className="text-sm text-gray-600">
-                  Fill in your criteria and click <strong className="text-gray-400">Find Prospects</strong>. Click any card to open the full outreach workflow.
-                </p>
+                <p className="text-sm text-gray-600">Fill in your criteria and click Find Prospects. Click any card to open the full outreach workflow.</p>
                 <button onClick={() => setSection("lists")}
                   className="mt-4 flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
                   <Bookmark className="w-4 h-4" /> View saved lists
@@ -1594,10 +1819,8 @@ export default function SalesDiscoverPage() {
                         Saved as <button onClick={() => setSection("lists")} className="font-medium underline underline-offset-2 hover:text-green-300">{savedListName}</button>
                       </span>
                     ) : (
-                      <button
-                        onClick={() => setShowSaveDialog(true)}
-                        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-lg transition-colors"
-                      >
+                      <button onClick={() => setShowSaveDialog(true)}
+                        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-lg transition-colors">
                         <Save className="w-3 h-3" /> Save List
                       </button>
                     )}
@@ -1628,20 +1851,21 @@ export default function SalesDiscoverPage() {
         </div>
       )}
 
-      {/* ── Saved Lists ──────────────────────────────────────────────────── */}
+      {/* Saved Lists */}
       {section === "lists" && (
         <div className="flex flex-col h-[calc(100vh-57px)]">
           <SavedListsSection
-            onSelectCompany={(company, all, index, resultIds) => {
+            externalDoneIds={externalDoneIds}
+            onSelectCompany={(all, index, listId) => {
               setActiveCompanies(all)
-              setActiveResultIds(resultIds)
+              setActiveListId(listId)
               setSelectedIndex(index)
             }}
           />
         </div>
       )}
 
-      {/* ── Save dialog ──────────────────────────────────────────────────── */}
+      {/* Save dialog */}
       {showSaveDialog && (
         <SaveListDialog
           suggestedName={saveDialogSuggestion}
@@ -1651,7 +1875,7 @@ export default function SalesDiscoverPage() {
         />
       )}
 
-      {/* ── SlideOver — shared by both search and saved-list contexts ────── */}
+      {/* Shared SlideOver — same for both fresh search and saved-list contexts */}
       {selected !== null && (
         <SlideOver
           key={selected.companyName}
@@ -1661,6 +1885,7 @@ export default function SalesDiscoverPage() {
           selectedIndex={selectedIndex!}
           onNavigate={newIdx => setSelectedIndex(newIdx)}
           onProspectCreated={handleProspectCreated}
+          onOutreachLogged={handleOutreachLogged}
         />
       )}
     </div>

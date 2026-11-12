@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { createSalesActivity } from "@/lib/sales-activities"
+import { markOutreachDone, OUTREACH_ACTIVITY_TYPES } from "@/lib/research-progress"
 
 export async function GET(req: NextRequest) {
   const session = await getSession()
@@ -64,6 +65,15 @@ export async function POST(req: NextRequest) {
     salesUserId: session.salesUserId ?? null,
     occurredAt:  body.occurredAt ? new Date(body.occurredAt) : undefined,
   })
+
+  // After a confirmed qualifying outreach, mark research results done server-side
+  if (body.prospectId && OUTREACH_ACTIVITY_TYPES.has(body.activityType)) {
+    await markOutreachDone({
+      prospectId:   body.prospectId,
+      salesUserId:  session.salesUserId  ?? null,
+      superAdminId: session.superAdminId ?? null,
+    }).catch(() => {}) // Non-fatal
+  }
 
   return NextResponse.json(activity, { status: 201 })
 }

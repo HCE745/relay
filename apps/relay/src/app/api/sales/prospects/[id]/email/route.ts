@@ -9,6 +9,7 @@ import { decryptField } from "@/lib/crypto-utils"
 import { sendViaTitanSmtp } from "@/lib/titan-smtp"
 import { htmlToText } from "@/lib/html-to-text"
 import { getSession } from "@/lib/session"
+import { markOutreachDone } from "@/lib/research-progress"
 
 function plainToHtml(plain: string): string {
   return plain
@@ -143,6 +144,13 @@ export async function POST(
       ...(prospect.currentCrmStatus === "researched" ? { currentCrmStatus: "contacted" } : {}),
     },
   })
+
+  // Mark research results for this prospect as done (server-controlled, after confirmed send)
+  await markOutreachDone({
+    prospectId,
+    salesUserId:  session?.salesUserId ?? null,
+    superAdminId: session?.superAdminId ?? null,
+  }).catch(() => {}) // Non-fatal — email was sent; progress tracking is best-effort
 
   return NextResponse.json({ emailId: email.id, prospectId })
 }

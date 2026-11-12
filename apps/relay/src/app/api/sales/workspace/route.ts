@@ -86,16 +86,28 @@ export async function GET() {
       take: 20,
     }),
 
-    // Unread received emails (last 7 days)
+    // Unread received emails (last 7 days).
+    // For reps: only show replies to contacts they originally emailed.
+    // sentBySalesUserId is null on received emails so we can't filter directly;
+    // instead find the rep's outbound contact emails, then filter inbound by those.
     prisma.crmEmail.findMany({
-      where: {
-        direction: "received",
-        isRead:    false,
-        isDeleted: false,
-        isArchived: false,
-        sentAt:    { gte: new Date(Date.now() - 7 * 86400_000) },
-        ...(isManager ? {} : { sentBySalesUserId: userId }),
-      },
+      where: await (async () => {
+        const base = {
+          direction: "received" as const,
+          isRead:    false,
+          isDeleted: false,
+          isArchived: false,
+          sentAt:    { gte: new Date(Date.now() - 7 * 86400_000) },
+        }
+        if (isManager || !userId) return base
+        const sentByRep = await prisma.crmEmail.findMany({
+          where:  { sentBySalesUserId: userId },
+          select: { contactEmail: true },
+        })
+        const contacts = [...new Set(sentByRep.map(e => e.contactEmail).filter(Boolean))] as string[]
+        if (contacts.length === 0) return { ...base, id: "none" } // no contacts → no results
+        return { ...base, contactEmail: { in: contacts } }
+      })(),
       select: {
         id: true, subject: true, fromAddress: true, sentAt: true, contactEmail: true,
         demoCall:  { select: { id: true, companyName: true } },

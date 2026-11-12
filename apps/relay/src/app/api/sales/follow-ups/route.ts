@@ -9,6 +9,8 @@ export async function GET() {
   const session = await getSession()
   if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const isManager = session.superAdmin || session.salesUserRole === "admin_sales"
+
   // Seed default stages if none exist
   const stageCount = await prisma.followUpStage.count()
   if (stageCount === 0) {
@@ -32,6 +34,10 @@ export async function GET() {
       followUpDate:   { not: null },
       followUpDoneAt: null,
       isDeleted:      false,
+      // Reps see only their own follow-up queue; managers/SA see all.
+      ...(!isManager && session.salesUserId
+        ? { sentBySalesUserId: session.salesUserId }
+        : {}),
     },
     orderBy: { followUpDate: "asc" },
     select: {

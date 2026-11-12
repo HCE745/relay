@@ -116,7 +116,7 @@ export async function syncImapForConfig(imapConfigId: string): Promise<SyncResul
         console.error(`[imap-sync] fetchFolder returned ${messages.length} parsed messages`)
 
         for (const msg of messages) {
-          const sub = await processMessage(msg, config.id, config.emailAddress, result)
+          const sub = await processMessage(msg, config.id, config.emailAddress, config.salesUserId ?? null, result)
           if (sub === "synced")  result.synced++
           if (sub === "skipped") result.skipped++
         }
@@ -235,6 +235,7 @@ async function processMessage(
   msg:          ParsedMessage,
   imapConfigId: string,
   configEmail:  string,
+  salesUserId:  string | null,
   result:       SyncResult,
 ): Promise<"synced" | "skipped"> {
   // Skip if already stored (deduplicate by messageId)
@@ -302,20 +303,24 @@ async function processMessage(
 
   const created = await prisma.crmEmail.create({
     data: {
-      demoCallId:   demoCall?.id ?? null,
+      demoCallId:          demoCall?.id ?? null,
       contactEmail,
       direction,
-      fromAddress:  msg.from,
-      toAddress:    msg.to,
-      subject:      msg.subject,
-      bodyHtml:     msg.bodyHtml,
-      bodyText:     msg.bodyText,
-      messageId:    msg.messageId,
-      inReplyTo:    msg.inReplyTo,
+      fromAddress:         msg.from,
+      toAddress:           msg.to,
+      subject:             msg.subject,
+      bodyHtml:            msg.bodyHtml,
+      bodyText:            msg.bodyText,
+      messageId:           msg.messageId,
+      inReplyTo:           msg.inReplyTo,
       threadId,
-      sentAt:       msg.sentAt,
-      source:       "imap_sync",
+      sentAt:              msg.sentAt,
+      source:              "imap_sync",
       imapConfigId,
+      // Attribute to the sales user (or leave null for SA configs) so per-user
+      // inbox filters work correctly. Without this, synced emails are unowned
+      // and all reps would see each other's email history.
+      sentBySalesUserId:   salesUserId,
     },
   })
 

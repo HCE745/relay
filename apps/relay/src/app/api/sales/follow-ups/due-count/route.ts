@@ -8,11 +8,16 @@ export async function GET() {
   const session = await getSession()
   if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ count: 0 }, { status: 401 })
 
+  const isManager = session.superAdmin || session.salesUserRole === "admin_sales"
+
   const count = await prisma.crmEmail.count({
     where: {
       followUpDate:   { lte: new Date() },
       followUpDoneAt: null,
       isDeleted:      false,
+      ...(!isManager && session.salesUserId
+        ? { sentBySalesUserId: session.salesUserId }
+        : {}),
     },
   })
 

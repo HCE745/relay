@@ -28,6 +28,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "Sentiment only applies to received emails" }, { status: 400 })
     }
 
+    // Reps can only tag received emails that are replies to their own outbound messages.
+    // Super admins and managers can tag any received email.
+    if (!session.superAdmin && session.salesUserRole !== "admin_sales") {
+      const isMyThread = await prisma.crmEmail.findFirst({
+        where: {
+          sentBySalesUserId: session.salesUserId!,
+          ...(email.threadId ? { threadId: email.threadId } : { contactEmail: email.contactEmail ?? undefined }),
+        },
+        select: { id: true },
+      })
+      if (!isMyThread) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const updated = await prisma.crmEmail.update({
       where: { id },
       data:  { sentiment: body.sentiment ?? null },

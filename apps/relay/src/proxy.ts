@@ -69,6 +69,15 @@ const SA_API_PATHS     = ["/api/super-admin"]
 // API paths excluded from global rate limiting
 const RATE_LIMIT_EXEMPT = ["/api/webhooks", "/api/cron", "/monitoring-tunnel"]
 
+// HTTP methods that modify server state (must be blocked during CRM rep impersonation)
+const MUTATION_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"])
+
+// Sales routes always permitted even during impersonation (logout/exit paths)
+const IMPERSONATION_EXEMPT_SALES = new Set([
+  "/api/sales/logout",
+  "/api/sales/auth/logout",
+])
+
 // Stamp the relay-vm cookie onto a successful (non-redirect) response when
 // ?videomode=true or ?videomode=false is present in the URL.
 function applyVideoMode(response: NextResponse, param: string | null): NextResponse {
@@ -162,6 +171,22 @@ export async function proxy(request: NextRequest) {
     if (!session.superAdmin && !session.salesUserId) {
       return NextResponse.redirect(new URL("/sales/login", request.url))
     }
+
+    // Block all state-mutating requests on /api/sales/* during CRM rep impersonation.
+    // The JWT is already verified above (jwtVerify with SECRET), so session.crmImpersonatedSalesUserId
+    // is authentic.  Logout/exit paths are exempted so the SA can always leave.
+    if (
+      pathname.startsWith("/api/sales/") &&
+      MUTATION_METHODS.has(request.method) &&
+      !IMPERSONATION_EXEMPT_SALES.has(pathname) &&
+      session.crmImpersonatedSalesUserId
+    ) {
+      return NextResponse.json(
+        { error: "This action is not permitted during CRM rep impersonation. Exit impersonation first." },
+        { status: 403 },
+      )
+    }
+
     return applyVideoMode(NextResponse.next(), vmParam)
   }
 

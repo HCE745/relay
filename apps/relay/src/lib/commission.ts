@@ -100,6 +100,16 @@ export async function createCommissionPaymentFromStripe(params: {
       // Skip if payment is before commissionStartDate
       if (attribution.commissionStartDate && attribution.commissionStartDate > paymentReceivedAt) continue
 
+      // Idempotency: skip if a commission payment for this attribution + billing period
+      // already exists (protects against duplicate Stripe webhook delivery).
+      if (periodStart && periodEnd) {
+        const dupe = await prisma.commissionPayment.findFirst({
+          where: { attributionId: attribution.id, periodStart, periodEnd },
+          select: { id: true },
+        })
+        if (dupe) continue
+      }
+
       // Each attribution earns commission on its attributed portion of revenue
       const attributedRevenue = grossRevenue * (attribution.splitPercent / 100)
       const commissionAmount = (attributedRevenue * Number(attribution.commissionRate)) / 100

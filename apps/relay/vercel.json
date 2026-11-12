@@ -51,7 +51,7 @@
     },
     {
       "path":     "/api/cron/dashboard-reports",
-      "schedule": "* 6 * * *"
+      "schedule": "0 6 * * *"
     },
     {
       "path":     "/api/cron/ack-escalation",

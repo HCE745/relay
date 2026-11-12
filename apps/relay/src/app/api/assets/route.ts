@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { isWashEssentials } from "@/lib/pricing"
 import { CARWASH_ASSET_SUBTYPES } from "@/lib/car-wash-config"
+import { requireActiveSubscription } from "@/lib/subscription-guard"
 
 export async function GET(request: NextRequest) {
   const session = await getSession()
@@ -35,6 +36,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const deny = await requireActiveSubscription()
+  if (deny) return deny
+
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 

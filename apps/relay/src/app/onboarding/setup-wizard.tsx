@@ -1175,7 +1175,7 @@ function Step5({
 
 // ─── Step 6 — Workspace Ready / Subscription Choice ──────────────────────────
 
-function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: WizardData }) {
+function Step6({ router, data, emailFailures }: { router: ReturnType<typeof useRouter>; data: WizardData; emailFailures?: string[] }) {
   const [starting,    setStarting]    = useState(false)
   const [trialError,  setTrialError]  = useState("")
 
@@ -1228,6 +1228,19 @@ function Step6({ router, data }: { router: ReturnType<typeof useRouter>; data: W
 
       {trialError && (
         <p className="text-red-600 text-sm text-center mb-4">{trialError}</p>
+      )}
+
+      {emailFailures && emailFailures.length > 0 && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+          <p className="font-semibold mb-1">
+            {emailFailures.length} invitation{emailFailures.length > 1 ? "s" : ""} couldn&apos;t be delivered
+          </p>
+          <p className="mb-2">The following addresses did not receive an invite email:</p>
+          <ul className="list-disc list-inside space-y-0.5 text-xs font-mono mb-2">
+            {emailFailures.map(e => <li key={e}>{e}</li>)}
+          </ul>
+          <p className="text-xs text-amber-700">You can resend invitations from <strong>Settings → Team</strong> after setup.</p>
+        </div>
       )}
 
       <div className="space-y-4">
@@ -1314,6 +1327,7 @@ export function SetupWizard({
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [emailFailures, setEmailFailures] = useState<string[]>([])
   const [data, setData] = useState<WizardData>(() => ({
     ...defaultData(orgName),
     ...(initialIndustry ? { industry: initialIndustry } : {}),
@@ -1403,6 +1417,8 @@ export function SetupWizard({
         setLoading(false)
         return
       }
+      const json = await res.json().catch(() => ({})) as { emailFailures?: string[] }
+      if (json.emailFailures?.length) setEmailFailures(json.emailFailures)
       localStorage.removeItem(storageKey(userId))
       // Mark server session as completed
       updateServerSession({ draftOps: [] }).catch(() => {/* ignore */})
@@ -1427,7 +1443,7 @@ export function SetupWizard({
   const teamMembers = getFilledTeamMembers()
 
   if (step === 6) {
-    return <Step6 router={router} data={data} />
+    return <Step6 router={router} data={data} emailFailures={emailFailures} />
   }
 
   return (

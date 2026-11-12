@@ -75,6 +75,15 @@ export async function POST(request: NextRequest) {
   const isValidWashEssentialsPlan = packagePlan === "wash_essentials" && industry === "Car Wash"
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 
+  // Require at least one named location to complete onboarding.
+  const hasValidLocation = locations.some((l) => l.name?.trim())
+  if (!hasValidLocation) {
+    return NextResponse.json(
+      { error: "At least one facility or location is required to complete setup. Add a location and try again." },
+      { status: 400 },
+    )
+  }
+
   // Collect emails to send after the transaction commits
   const pendingEmails: Array<{ to: string; subject: string; html: string }> = []
 
@@ -228,9 +237,15 @@ export async function POST(request: NextRequest) {
     })
   })
 
-  // Send invitation emails after transaction commits
+  // Send invitation emails after transaction commits.
+  // Log failures individually so admins can observe and retry via /team.
+  const emailFailures: string[] = []
   for (const mail of pendingEmails) {
-    await sendEmail(mail).catch(() => {})
+    const result = await sendEmail(mail).catch((err: unknown) => {
+      console.error("[Onboarding] Invitation email failed for", mail.to, err)
+      return { ok: false }
+    })
+    if (!result?.ok) emailFailures.push(mail.to)
   }
 
   // Async CRM updates — non-blocking
@@ -251,5 +266,8 @@ export async function POST(request: NextRequest) {
     productLine:         updatedOrg.productLine ?? session.productLine,
   })
 
-  return NextResponse.json({ success: true })
+  return NextResponse.json({
+    success: true,
+    ...(emailFailures.length > 0 ? { emailFailures } : {}),
+  })
 }

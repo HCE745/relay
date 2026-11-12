@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { logActivationEvent } from "@/lib/analytics"
+import { requireActiveSubscription } from "@/lib/subscription-guard"
 
 const VALID_MODES         = ["PUBLIC_ISSUE", "EMPLOYEE_REPORTING", "ASSET_REPORTING", "VISITOR_FEEDBACK", "SAFETY_REPORTING"]
 const VALID_CATEGORIES    = ["GENERAL", "EQUIPMENT_BREAKDOWN", "SAFETY", "MAINTENANCE", "VEHICLE", "FACILITY"]
@@ -82,6 +83,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const deny = await requireActiveSubscription()
+  if (deny) return deny
+
   const session = await getSession()
   if (!session || !["ADMIN", "MANAGER"].includes(session.role)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

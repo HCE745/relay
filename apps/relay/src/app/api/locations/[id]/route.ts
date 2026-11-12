@@ -3,8 +3,12 @@ import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { isWashEssentials } from "@/lib/pricing"
 import { syncWashEssentialsLocationBilling } from "@/lib/wash-billing"
+import { requireActiveSubscription } from "@/lib/subscription-guard"
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const deny = await requireActiveSubscription()
+  if (deny) return deny
+
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { id } = await params
@@ -27,6 +31,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const deny = await requireActiveSubscription()
+  if (deny) return deny
+
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   if (!["ADMIN"].includes(session.role)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })

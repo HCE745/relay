@@ -28,6 +28,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 })
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 })
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 })
+    }
+
     // Server-side detection of authorized test registrations via HMAC-signed HttpOnly cookie.
     // The SA generates this token from /api/super-admin/crm/test-mode/registration-token.
     // A plain query param or client-side flag would be trivially forged; this is not.

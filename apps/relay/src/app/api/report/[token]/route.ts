@@ -65,10 +65,30 @@ export async function POST(
     if (photoFile && typeof photoFile !== "string" && (photoFile as File).size > 0) {
       photoAttached = true
       const file = photoFile as File
+
+      // Allowlist image MIME types; reject anything else before uploading.
+      const ALLOWED_IMAGE_TYPES = new Set([
+        "image/jpeg", "image/jpg", "image/png", "image/webp", "image/heic", "image/heif",
+      ])
+      const MAX_PHOTO_BYTES = 10 * 1024 * 1024 // 10 MB
+
+      if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+        return NextResponse.json(
+          { error: "Only image files (JPEG, PNG, WEBP, HEIC) are accepted." },
+          { status: 400 },
+        )
+      }
+      if (file.size > MAX_PHOTO_BYTES) {
+        return NextResponse.json(
+          { error: "Photo must be 10 MB or smaller." },
+          { status: 400 },
+        )
+      }
+
       const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase()
       const pathname = `relay/${qrCode.organizationId}/qr-submissions/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
       try {
-        const blob = await put(pathname, file, { access: "private", contentType: file.type || "image/jpeg" })
+        const blob = await put(pathname, file, { access: "private", contentType: file.type })
         photoUrls.push(blob.url)
       } catch (uploadErr) {
         console.error("[QR Submission] Photo upload failed:", uploadErr)

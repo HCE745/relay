@@ -1115,8 +1115,21 @@ export function ConversationalOnboarding({
         setFinishing(false)
         return
       }
+      const json = await res.json().catch(() => ({})) as { emailFailures?: string[] }
+      const emailFailures = json.emailFailures ?? []
       dispatch({ type: "collapse", chapter: "review" })
       dispatch({ type: "add", item: { kind: "ai_msg", id: "complete_msg", text: `🎉 ${data.companyName || orgName} is set up! Choose how you'd like to get started.` } })
+      if (emailFailures.length > 0) {
+        dispatch({
+          type: "add",
+          item: {
+            kind: "ai_msg",
+            id: "email_fail_msg",
+            text: `${emailFailures.length} invitation${emailFailures.length > 1 ? "s" : ""} couldn't be delivered to: ${emailFailures.join(", ")}. You can resend them from Settings → Team after setup.`,
+            error: true,
+          },
+        })
+      }
       dispatch({ type: "add", item: { kind: "chapter_card", id: "c_complete", chapter: "review", collapsed: false } })
       setSetupDone(true)
     } catch {

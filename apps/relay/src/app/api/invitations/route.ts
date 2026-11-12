@@ -5,6 +5,7 @@ import { sendEmail, teamInviteEmail } from "@/lib/email"
 import { randomUUID } from "crypto"
 import { checkLimit, limiters } from "@/lib/ratelimit"
 import { logActivationEvent } from "@/lib/analytics"
+import { requireActiveSubscription } from "@/lib/subscription-guard"
 
 export async function GET() {
   const session = await getSession()
@@ -26,6 +27,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const deny = await requireActiveSubscription()
+  if (deny) return deny
+
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 

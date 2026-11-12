@@ -65,8 +65,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   const org = await prisma.organization.findUnique({
     where:  { id: orgId },
-    select: { lifecycleStatus: true, plan: true },
+    select: { lifecycleStatus: true, plan: true, checkoutIntentStatus: true, stripeSubscriptionId: true },
   })
+
+  // Idempotency: skip if this checkout session was already applied to this org.
+  // checkoutIntentStatus "completed" is set only by this handler, so a second delivery
+  // of the same event (or a Stripe retry) will find it already set and bail out.
+  if (
+    org?.checkoutIntentStatus === "completed" &&
+    org?.stripeSubscriptionId === (session.subscription as string | null)
+  ) {
+    return
+  }
 
   // Derive productLine: prefer session metadata (set by checkout-intent), fall back to DB plan.
   const productLine =
@@ -139,6 +149,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 }
 
+const TERMINAL_SUBSCRIPTION_STATUSES = new Set(["canceled", "incomplete_expired"])
+
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
   if (!invoice.customer) return
 
@@ -147,6 +159,10 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
     include: { users: { where: { role: "ADMIN", isActive: true }, select: { name: true, email: true }, take: 1 } },
   })
   if (!org) return
+
+  // Guard: don't reactivate an org that is already in a terminal state.
+  // invoice.payment_succeeded can arrive out-of-order after subscription.deleted.
+  if (org.subscriptionStatus && TERMINAL_SUBSCRIPTION_STATUSES.has(org.subscriptionStatus)) return
 
   const admin = org.users[0]
   if (!admin?.email) return
@@ -207,6 +223,9 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
     include: { users: { where: { role: "ADMIN", isActive: true }, select: { name: true, email: true }, take: 1 } },
   })
   if (!org) return
+
+  // Guard: don't set past_due on a terminal-state org.
+  if (org.subscriptionStatus && TERMINAL_SUBSCRIPTION_STATUSES.has(org.subscriptionStatus)) return
 
   const admin = org.users[0]
   if (!admin?.email) return
@@ -307,7 +326,12 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
 
   await prisma.organization.updateMany({
     where: { stripeCustomerId: customerId },
-    data:  { subscriptionStatus: "canceled", canceledAt: new Date() },
+    data:  { subscriptionStatus: "canceled" },
+  })
+  // Set canceledAt only on first delivery — don't overwrite if already set.
+  await prisma.organization.updateMany({
+    where: { stripeCustomerId: customerId, canceledAt: null },
+    data:  { canceledAt: new Date() },
   })
 
   for (const org of orgs) {

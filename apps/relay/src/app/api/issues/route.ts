@@ -12,6 +12,7 @@ import { applyPriorityRules, parsePriorityRules } from "@/lib/priority-rules"
 import { sendPushNotification } from "@/lib/push-notifications"
 import { checkDuplicateIssue, suggestIssueTitle } from "@/lib/ai-haiku"
 import { logActivationEvent } from "@/lib/analytics"
+import { requireActiveSubscription } from "@/lib/subscription-guard"
 
 // ── AI category + priority inference ──────────────────────────────────────────
 
@@ -133,6 +134,9 @@ export async function GET(request: NextRequest) {
 // ── POST /api/issues ───────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  const deny = await requireActiveSubscription()
+  if (deny) return deny
+
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 

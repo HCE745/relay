@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { isWashEssentials, WASH_ESSENTIALS_MAX_LOCATIONS } from "@/lib/pricing"
 import { syncWashEssentialsLocationBilling } from "@/lib/wash-billing"
 import { generateSlug } from "@/lib/slug"
+import { requireActiveSubscription } from "@/lib/subscription-guard"
 
 export async function GET() {
   const session = await getSession()
@@ -20,6 +21,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const deny = await requireActiveSubscription()
+  if (deny) return deny
+
   const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const body = await request.json()

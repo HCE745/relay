@@ -215,12 +215,16 @@ export async function POST(req: NextRequest) {
       ? "province abbreviation (e.g. ON, BC, AB)"
       : "2-letter state code"
 
+    const stateFilter = body.stateProvince
+      ? `CRITICAL — GEOGRAPHIC FILTER: Every company you return MUST have its headquarters physically located in ${body.stateProvince}, ${country}. Do not return any company headquartered in a different state or province. Do not return a company just because it has operations or facilities in ${body.stateProvince} — the headquarters must be there. If you are not certain a company is headquartered in ${body.stateProvince}, exclude it.`
+      : ""
+
     const systemPrompt = `You must respond with ONLY a valid JSON array. No markdown. No tables. No headers. No explanation. No code blocks. Just a raw JSON array starting with [ and ending with ]. Each element must be a JSON object with these exact keys: companyName, website, city, state, country, industry, estimatedEmployees, summary, fitScore (integer 0-100). If you cannot find companies return []. Do not return anything other than the JSON array.`
 
     const userPrompt = `Based on your training knowledge, list exactly 8 to 10 REAL companies that would be strong sales prospects for Relay, an operations management platform for multi-location businesses. Relay helps with: issue reporting and tracking across locations, maintenance request routing, QR-code asset management, facility checklists, and team communications across shifts and sites.
 
 CRITICAL — COUNTRY FILTER: Only return companies headquartered in ${country}. Do not return companies from any other country under any circumstances.
-
+${stateFilter ? `\n${stateFilter}\n` : ""}
 CRITICAL — WEBSITE REQUIRED: You MUST include a real working website URL (with https://) for every company. If you cannot verify a real website for a company, do not include that company. No placeholder URLs.
 
 CRITERIA:
@@ -233,7 +237,7 @@ CRITICAL — DOMAIN EXCLUSION: Do not suggest any company whose website domain a
 For each company provide:
 - companyName: exact legal or trade name
 - website: real website URL with https:// — required for every entry
-- city: headquarters city
+- city: headquarters city (must be in ${body.stateProvince ?? country})
 - state: ${stateOrProvince}
 - country: "${country}"
 - industry: specific industry (e.g. "Cold Storage & Warehousing")
@@ -306,6 +310,55 @@ Your entire response must be only the JSON array — nothing before [, nothing a
 
     // Drop entries with no name
     companies = companies.filter(c => c.companyName && c.companyName !== "Unknown")
+
+    // Post-process: validate state match when a state filter was requested.
+    // The model is instructed to only return companies in the requested state, but we
+    // flag and move mismatches to the end rather than silently dropping them.
+    if (body.stateProvince) {
+      const requestedState = body.stateProvince.trim().toLowerCase()
+      // Build a set of common abbreviations and full names the model might return
+      const stateVariants = new Set([requestedState])
+      const US_ABBREVS: Record<string, string> = {
+        "new york": "ny", "new jersey": "nj", "california": "ca", "texas": "tx",
+        "florida": "fl", "illinois": "il", "ohio": "oh", "indiana": "in",
+        "michigan": "mi", "georgia": "ga", "pennsylvania": "pa", "north carolina": "nc",
+        "washington": "wa", "colorado": "co", "arizona": "az", "virginia": "va",
+        "massachusetts": "ma", "tennessee": "tn", "minnesota": "mn", "wisconsin": "wi",
+        "maryland": "md", "missouri": "mo", "oregon": "or", "nevada": "nv",
+        "connecticut": "ct", "iowa": "ia", "arkansas": "ar", "mississippi": "ms",
+        "kansas": "ks", "utah": "ut", "nebraska": "ne", "new mexico": "nm",
+        "west virginia": "wv", "idaho": "id", "hawaii": "hi", "new hampshire": "nh",
+        "maine": "me", "montana": "mt", "rhode island": "ri", "delaware": "de",
+        "south dakota": "sd", "north dakota": "nd", "alaska": "ak", "vermont": "vt",
+        "wyoming": "wy", "louisiana": "la", "south carolina": "sc", "kentucky": "ky",
+        "oklahoma": "ok", "alabama": "al",
+      }
+      // Add abbreviation if full name given, or full name if abbreviation given
+      const abbrev = US_ABBREVS[requestedState]
+      if (abbrev) stateVariants.add(abbrev)
+      for (const [full, ab] of Object.entries(US_ABBREVS)) {
+        if (ab === requestedState) stateVariants.add(full)
+      }
+
+      companies = companies.map(c => {
+        const companyState = c.state.trim().toLowerCase()
+        const matches = stateVariants.has(companyState)
+        return { ...c, _stateMatch: matches }
+      }).sort((a, b) => {
+        const aMatch = (a as typeof a & { _stateMatch?: boolean })._stateMatch
+        const bMatch = (b as typeof b & { _stateMatch?: boolean })._stateMatch
+        if (aMatch && !bMatch) return -1
+        if (!aMatch && bMatch) return 1
+        return 0
+      }).map(c => {
+        const { _stateMatch, ...rest } = c as typeof c & { _stateMatch?: boolean }
+        return rest
+      })
+
+      console.log("[discover] state filter applied:", requestedState,
+        "matches:", companies.filter(c => stateVariants.has(c.state.trim().toLowerCase())).length,
+        "total:", companies.length)
+    }
 
     // Annotate CRM status for each result
     for (const company of companies) {

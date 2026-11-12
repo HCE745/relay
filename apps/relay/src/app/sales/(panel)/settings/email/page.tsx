@@ -7,19 +7,17 @@ type ImapConfig = {
   id?: string
   host: string
   port: number
-  user: string
-  secure: boolean
-  fromName: string
-  signature: string
+  emailAddress: string
+  smtpHost: string
+  smtpPort: number
 }
 
 const DEFAULTS: ImapConfig = {
   host: "",
   port: 993,
-  user: "",
-  secure: true,
-  fromName: "",
-  signature: "",
+  emailAddress: "",
+  smtpHost: "smtp.titan.email",
+  smtpPort: 465,
 }
 
 export default function EmailSettingsPage() {
@@ -40,13 +38,12 @@ export default function EmailSettingsPage() {
           const data = await res.json()
           if (data) {
             setConfig({
-              id:        data.id,
-              host:      data.host      ?? "",
-              port:      data.port      ?? 993,
-              user:      data.user      ?? "",
-              secure:    data.secure    ?? true,
-              fromName:  data.fromName  ?? "",
-              signature: data.signature ?? "",
+              id:           data.id,
+              host:         data.host         ?? "",
+              port:         data.port         ?? 993,
+              emailAddress: data.emailAddress ?? "",
+              smtpHost:     data.smtpHost     ?? "smtp.titan.email",
+              smtpPort:     data.smtpPort     ?? 465,
             })
             setExists(true)
           }
@@ -65,7 +62,13 @@ export default function EmailSettingsPage() {
     setSaving(true)
     setError(null)
     try {
-      const body: Record<string, unknown> = { ...config }
+      const body: Record<string, unknown> = {
+        host:         config.host,
+        port:         config.port,
+        emailAddress: config.emailAddress,
+        smtpHost:     config.smtpHost,
+        smtpPort:     config.smtpPort,
+      }
       if (password) body.password = password
       const res = await fetch("/api/sales/imap-config", {
         method:  "POST",
@@ -126,20 +129,48 @@ export default function EmailSettingsPage() {
       </div>
 
       <form onSubmit={save} className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
-        {/* Host + port */}
+        {/* Email address */}
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Email Address</label>
+          <input
+            type="email"
+            value={config.emailAddress}
+            onChange={e => set("emailAddress", e.target.value)}
+            placeholder="you@example.com"
+            required
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-600"
+          />
+        </div>
+
+        {/* Password */}
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">
+            Password {exists && <span className="text-gray-600">(leave blank to keep existing)</span>}
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder={exists ? "••••••••" : "App password or SMTP password…"}
+            required={!exists}
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-600"
+          />
+        </div>
+
+        {/* IMAP host + port */}
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
             <label className="block text-xs text-gray-500 mb-1">IMAP Host</label>
             <input
               value={config.host}
               onChange={e => set("host", e.target.value)}
-              placeholder="imap.gmail.com"
+              placeholder="imap.titan.email"
               required
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-600"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Port</label>
+            <label className="block text-xs text-gray-500 mb-1">IMAP Port</label>
             <input
               type="number"
               value={config.port}
@@ -150,63 +181,28 @@ export default function EmailSettingsPage() {
           </div>
         </div>
 
-        {/* User + password */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Email / Username</label>
+        {/* SMTP host + port */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">SMTP Host</label>
             <input
-              value={config.user}
-              onChange={e => set("user", e.target.value)}
-              placeholder="you@example.com"
+              value={config.smtpHost}
+              onChange={e => set("smtpHost", e.target.value)}
+              placeholder="smtp.titan.email"
               required
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-600"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Password {exists && <span className="text-gray-600">(leave blank to keep)</span>}</label>
+            <label className="block text-xs text-gray-500 mb-1">SMTP Port</label>
             <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder={exists ? "••••••••" : "App password…"}
-              required={!exists}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-600"
+              type="number"
+              value={config.smtpPort}
+              onChange={e => set("smtpPort", Number(e.target.value))}
+              required
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-600"
             />
           </div>
-        </div>
-
-        {/* Secure */}
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={config.secure}
-            onChange={e => set("secure", e.target.checked)}
-            className="w-4 h-4 accent-emerald-500"
-          />
-          <span className="text-sm text-gray-300">Use TLS/SSL (recommended)</span>
-        </label>
-
-        {/* From name */}
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">From Name</label>
-          <input
-            value={config.fromName}
-            onChange={e => set("fromName", e.target.value)}
-            placeholder="Your Name"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-600"
-          />
-        </div>
-
-        {/* Signature */}
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Email Signature</label>
-          <textarea
-            value={config.signature}
-            onChange={e => set("signature", e.target.value)}
-            placeholder="Best,&#10;Your Name&#10;Your Title | Company"
-            rows={4}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-600 resize-y"
-          />
         </div>
 
         {error && (

@@ -799,14 +799,37 @@ export default function DiscoverPage() {
           {searchState === "done" && (
             <>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-gray-300 font-medium">
-                  Found {companies.length} {companies.length === 1 ? "company" : "companies"}
-                  {companies.some(c => c.crmStatus !== "none") && (
-                    <span className="text-[11px] text-gray-500 ml-2 font-normal">
-                      · {companies.filter(c => c.crmStatus !== "none").length} flagged in CRM
+                <div>
+                  <p className="text-sm text-gray-300 font-medium">
+                    Found {companies.length} {companies.length === 1 ? "company" : "companies"}
+                    {companies.some(c => c.crmStatus !== "none") && (
+                      <span className="text-[11px] text-gray-500 ml-2 font-normal">
+                        · {companies.filter(c => c.crmStatus !== "none").length} flagged in CRM
+                      </span>
+                    )}
+                  </p>
+                  {/* Applied filters summary */}
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">
+                      {country}
                     </span>
-                  )}
-                </p>
+                    {stateProvince && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-900/40 text-indigo-300 border border-indigo-800/50">
+                        {stateProvince}
+                      </span>
+                    )}
+                    {industry && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">
+                        {industry}
+                      </span>
+                    )}
+                    {(empMin || empMax) && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">
+                        {empMin || "any"}–{empMax || "any"} emp
+                      </span>
+                    )}
+                  </div>
+                </div>
                 {companies.length > 0 && (
                   <p className="text-[11px] text-gray-500">Click a card to research + draft email</p>
                 )}

@@ -126,14 +126,16 @@ export async function POST(req: NextRequest) {
 
   const imapCfg = session.superAdminId
     ? await prisma.imapConfig.findUnique({ where: { superAdminId: session.superAdminId } })
-    : null
+    : session.salesUserId
+      ? await prisma.imapConfig.findUnique({ where: { salesUserId: session.salesUserId } })
+      : null
 
   if (imapCfg) {
     let smtpPass: string
     try { smtpPass = decryptField(imapCfg.encryptedPassword) }
     catch { return NextResponse.json({ error: "Failed to decrypt SMTP credentials" }, { status: 500 }) }
     await sendViaTitanSmtp(
-      { smtpHost: imapCfg.smtpHost, smtpPort: imapCfg.smtpPort, emailAddress: imapCfg.emailAddress, password: smtpPass, fromName: "Will @ Relay" },
+      { smtpHost: imapCfg.smtpHost, smtpPort: imapCfg.smtpPort, emailAddress: imapCfg.emailAddress, password: smtpPass, fromName: session.name ? `${session.name} @ Relay` : "Relay" },
       { to, subject, bodyHtml, bodyText, messageId },
     )
   } else {
@@ -147,7 +149,7 @@ export async function POST(req: NextRequest) {
     if (!r.ok) { const err = await r.text(); return NextResponse.json({ error: `Send failed: ${err}` }, { status: 502 }) }
   }
 
-  const fromAddress = imapCfg ? imapCfg.emailAddress : "will@getrelay.software"
+  const fromAddress = imapCfg?.emailAddress ?? "will@getrelay.software"
 
   // ── Log email in CRM ────────────────────────────────────────────────────────
   const email = await prisma.crmEmail.create({

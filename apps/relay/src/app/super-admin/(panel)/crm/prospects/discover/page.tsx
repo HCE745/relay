@@ -6,6 +6,7 @@ import {
   Search, Loader2, X, ChevronLeft, ExternalLink,
   MapPin, Users, Zap, CheckCircle2, AlertTriangle,
   RefreshCw, Send, Building2, Star, Mail, Globe,
+  Bookmark, BookmarkCheck, Trash2, FolderOpen, List,
 } from "lucide-react"
 import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api/super-admin/crm/prospects/discover/route"
 
@@ -13,10 +14,27 @@ import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api
 
 interface EmailDraft { subject: string; body: string }
 
-type SearchState  = "idle" | "loading" | "done" | "error"
-type DetailsState = "loading" | "ready" | "error"
-type EmailState   = "idle" | "loading" | "ready" | "sending" | "sent" | "error"
-type SaveState    = "idle" | "saving" | "saved" | "error"
+type SearchState     = "idle" | "loading" | "done" | "error"
+type DetailsState   = "loading" | "ready" | "error"
+type EmailState     = "idle" | "loading" | "ready" | "sending" | "sent" | "error"
+type SaveState      = "idle" | "saving" | "saved" | "error"
+type ListSaveState  = "idle" | "naming" | "saving" | "saved" | "error"
+type ActiveTab      = "search" | "lists"
+
+interface ResearchList {
+  id:              string
+  name:            string
+  description:     string | null
+  isShared:        boolean
+  ownedByMe:       boolean
+  searchCountry:   string | null
+  searchState:     string | null
+  searchIndustry:  string | null
+  searchEmpMin:    number | null
+  searchEmpMax:    number | null
+  createdAt:       string
+  _count:          { results: number }
+}
 
 interface DuplicateInfo {
   companyName: string | null
@@ -559,6 +577,144 @@ function SlideOver({ company, onClose }: {
   )
 }
 
+// ─── Saved Lists Tab ─────────────────────────────────────────────────────────
+
+function SavedListsTab({ onLoad }: { onLoad: (companies: DiscoveredCompanyBasic[], listName: string) => void }) {
+  const [lists, setLists]     = useState<ResearchList[] | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError]     = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
+
+  useEffect(() => {
+    setLoading(true)
+    fetch("/api/super-admin/crm/prospects/discover/lists")
+      .then(r => r.json())
+      .then(d => { setLists(d as ResearchList[]); setLoading(false) })
+      .catch(() => { setError("Failed to load saved lists"); setLoading(false) })
+  }, [])
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this research list? Results already promoted to CRM will be preserved.")) return
+    setDeleting(id)
+    try {
+      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error("Delete failed")
+      setLists(prev => prev?.filter(l => l.id !== id) ?? null)
+    } catch { alert("Could not delete list") }
+    finally { setDeleting(null) }
+  }
+
+  async function handleLoad(list: ResearchList) {
+    try {
+      const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${list.id}`)
+      if (!res.ok) throw new Error("Load failed")
+      const data = await res.json() as { results: (DiscoveredCompanyBasic & { verifiedCity?: string; verifiedState?: string; verifiedCountry?: string })[] }
+      // Map ProspectResearchResult shape back to DiscoveredCompanyBasic
+      const companies: DiscoveredCompanyBasic[] = data.results.map(r => ({
+        companyName:       r.companyName,
+        website:           r.website ?? undefined,
+        city:              r.verifiedCity ?? r.city ?? undefined,
+        state:             r.verifiedState ?? r.state ?? undefined,
+        country:           r.verifiedCountry ?? r.country ?? undefined,
+        industry:          r.industry ?? undefined,
+        estimatedEmployees: r.estimatedEmployees ?? undefined,
+        summary:           r.summary ?? undefined,
+        fitScore:          r.fitScore ?? 50,
+        crmStatus:         r.crmStatus ?? "none",
+        lastContactAt:     r.lastContactAt ?? undefined,
+      }))
+      onLoad(companies, list.name)
+    } catch { alert("Could not load list") }
+  }
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-48">
+      <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+    </div>
+  )
+
+  if (error) return (
+    <div className="flex items-center justify-center h-48 text-sm text-red-400">{error}</div>
+  )
+
+  if (!lists || lists.length === 0) return (
+    <div className="flex flex-col items-center justify-center h-64 text-center px-8">
+      <FolderOpen className="w-10 h-10 text-gray-700 mb-3" />
+      <p className="text-gray-400 font-medium mb-1">No saved lists yet</p>
+      <p className="text-sm text-gray-600">Run a search and use &quot;Save to list&quot; to preserve your results.</p>
+    </div>
+  )
+
+  return (
+    <div className="p-4 space-y-3">
+      {lists.map(list => (
+        <div key={list.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-white font-semibold text-sm">{list.name}</h3>
+                {list.isShared && (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-900/30 text-indigo-400 border border-indigo-800/50">
+                    Shared
+                  </span>
+                )}
+                {!list.ownedByMe && (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-500 border border-gray-700">
+                    Read-only
+                  </span>
+                )}
+              </div>
+              {/* Search criteria chips */}
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {list.searchCountry && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">
+                    {list.searchCountry}
+                  </span>
+                )}
+                {list.searchState && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-900/40 text-indigo-300 border border-indigo-800/50">
+                    {list.searchState}
+                  </span>
+                )}
+                {list.searchIndustry && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">
+                    {list.searchIndustry}
+                  </span>
+                )}
+                {(list.searchEmpMin || list.searchEmpMax) && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">
+                    {list.searchEmpMin ?? "any"}–{list.searchEmpMax ?? "any"} emp
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1">
+                {list._count.results} {list._count.results === 1 ? "company" : "companies"} · saved {formatDate(list.createdAt)}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <button
+                onClick={() => void handleLoad(list)}
+                className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-800/50 rounded-lg transition-colors"
+              >
+                <List className="w-3 h-3" /> Load
+              </button>
+              {list.ownedByMe && (
+                <button
+                  onClick={() => void handleDelete(list.id)}
+                  disabled={deleting === list.id}
+                  className="p-1.5 text-gray-600 hover:text-red-400 disabled:opacity-50 rounded-lg transition-colors"
+                >
+                  {deleting === list.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const INDUSTRY_OPTIONS = [
@@ -579,6 +735,7 @@ const COUNTRY_OPTIONS = [
 
 export default function DiscoverPage() {
   const [discoveryEnabled, setDiscoveryEnabled] = useState<boolean | null>(null)
+  const [activeTab,        setActiveTab]        = useState<ActiveTab>("search")
 
   const [country,       setCountry]       = useState("United States")
   const [stateProvince, setStateProvince] = useState("")
@@ -593,6 +750,57 @@ export default function DiscoverPage() {
   const [companies,   setCompanies]   = useState<DiscoveredCompanyBasic[]>([])
   const [searchError, setSearchError] = useState<string | null>(null)
   const [selected,    setSelected]    = useState<DiscoveredCompanyBasic | null>(null)
+
+  const [listSaveState, setListSaveState] = useState<ListSaveState>("idle")
+  const [listName,      setListName]      = useState("")
+  const [listSaveError, setListSaveError] = useState<string | null>(null)
+
+  async function handleSaveToList() {
+    if (!listName.trim()) return
+    setListSaveState("saving")
+    setListSaveError(null)
+    try {
+      const res = await fetch("/api/super-admin/crm/prospects/discover/lists", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          name:           listName.trim(),
+          searchCountry:  country       || null,
+          searchState:    stateProvince || null,
+          searchIndustry: industry      || null,
+          searchEmpMin:   empMin        ? parseInt(empMin,  10) : null,
+          searchEmpMax:   empMax        ? parseInt(empMax,  10) : null,
+          searchKeywords: keywords      || null,
+          searchContext:  context       || null,
+          results:        companies.map(c => ({
+            companyName:        c.companyName,
+            website:            c.website,
+            city:               c.city,
+            state:              c.state,
+            country:            c.country,
+            industry:           c.industry,
+            estimatedEmployees: c.estimatedEmployees,
+            summary:            c.summary,
+            fitScore:           c.fitScore,
+          })),
+        }),
+      })
+      if (!res.ok) throw new Error("Save failed")
+      setListSaveState("saved")
+      setListName("")
+    } catch (err) {
+      setListSaveError(err instanceof Error ? err.message : "Save failed")
+      setListSaveState("error")
+    }
+  }
+
+  function handleLoadList(loadedCompanies: DiscoveredCompanyBasic[], loadedName: string) {
+    setCompanies(loadedCompanies)
+    setSearchState("done")
+    setActiveTab("search")
+    setListName(loadedName)
+    setListSaveState("saved") // it's already saved
+  }
 
   // Load enabled/disabled setting from CRM settings
   useEffect(() => {
@@ -613,6 +821,8 @@ export default function DiscoverPage() {
     setSearchError(null)
     setCompanies([])
     setSelected(null)
+    setListSaveState("idle")
+    setListName("")
 
     const body: Record<string, unknown> = { country }
     if (stateProvince) body.stateProvince     = stateProvince
@@ -651,13 +861,43 @@ export default function DiscoverPage() {
           className="text-gray-400 hover:text-gray-200 transition-colors p-1 rounded">
           <ChevronLeft className="w-5 h-5" />
         </Link>
-        <div>
+        <div className="flex-1 min-w-0">
           <h1 className="text-sm font-semibold text-white">Prospect Discovery</h1>
           <p className="text-[11px] text-gray-500">AI-powered search for new sales prospects</p>
         </div>
+        {/* Tab switcher */}
+        <div className="flex items-center gap-1 bg-gray-900 border border-gray-800 rounded-lg p-0.5">
+          <button
+            onClick={() => setActiveTab("search")}
+            className={`flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-md font-medium transition-colors ${
+              activeTab === "search"
+                ? "bg-gray-800 text-white"
+                : "text-gray-500 hover:text-gray-300"
+            }`}
+          >
+            <Search className="w-3 h-3" /> Search
+          </button>
+          <button
+            onClick={() => setActiveTab("lists")}
+            className={`flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-md font-medium transition-colors ${
+              activeTab === "lists"
+                ? "bg-gray-800 text-white"
+                : "text-gray-500 hover:text-gray-300"
+            }`}
+          >
+            <Bookmark className="w-3 h-3" /> Saved Lists
+          </button>
+        </div>
       </div>
 
-      <div className="flex h-[calc(100vh-57px)]">
+      {/* Saved Lists Tab */}
+      {activeTab === "lists" && (
+        <div className="h-[calc(100vh-57px)] overflow-y-auto">
+          <SavedListsTab onLoad={handleLoadList} />
+        </div>
+      )}
+
+      <div className={`flex h-[calc(100vh-57px)] ${activeTab !== "search" ? "hidden" : ""}`}>
         {/* ── Left: Search form ─────────────────────────────────────────── */}
         <div className="w-72 flex-shrink-0 border-r border-gray-800 overflow-y-auto">
           <form onSubmit={handleSearch} className="p-4 space-y-3">
@@ -831,7 +1071,47 @@ export default function DiscoverPage() {
                   </div>
                 </div>
                 {companies.length > 0 && (
-                  <p className="text-[11px] text-gray-500">Click a card to research + draft email</p>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <p className="text-[11px] text-gray-500 hidden sm:block">Click a card to research + draft email</p>
+                    {/* Save to list */}
+                    {listSaveState === "saved" ? (
+                      <span className="flex items-center gap-1 text-[11px] text-emerald-400">
+                        <BookmarkCheck className="w-3.5 h-3.5" /> Saved
+                      </span>
+                    ) : listSaveState === "naming" || listSaveState === "saving" || listSaveState === "error" ? (
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="text"
+                          autoFocus
+                          placeholder="List name…"
+                          value={listName}
+                          onChange={e => setListName(e.target.value)}
+                          onKeyDown={e => { if (e.key === "Enter") void handleSaveToList(); if (e.key === "Escape") { setListSaveState("idle"); setListName("") } }}
+                          className="bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 w-36"
+                        />
+                        <button
+                          onClick={() => void handleSaveToList()}
+                          disabled={!listName.trim() || listSaveState === "saving"}
+                          className="text-[11px] px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg transition-colors"
+                        >
+                          {listSaveState === "saving" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Save"}
+                        </button>
+                        <button onClick={() => { setListSaveState("idle"); setListName("") }} className="text-gray-500 hover:text-gray-300">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                        {listSaveState === "error" && listSaveError && (
+                          <span className="text-[10px] text-red-400">{listSaveError}</span>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setListSaveState("naming")}
+                        className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 rounded-lg transition-colors"
+                      >
+                        <Bookmark className="w-3 h-3" /> Save to list
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
 

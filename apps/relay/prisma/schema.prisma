@@ -790,6 +790,7 @@ model SuperAdmin {
   supportConvsAssigned        SupportConversation[] @relation("SupportAssignment")
   createdOffers               SalesOffer[]          @relation("SACreatedOffers")
   abTestCampaigns             AbTestCampaign[]      @relation("AbTestCampaignSA")
+  researchLists               ProspectResearchList[] @relation("SuperAdminResearchLists")
 }
 
 model ImpersonationLog {
@@ -2605,6 +2606,7 @@ model Prospect {
   objections      CrmObjection[]      @relation("ProspectObjections")
   emails          CrmEmail[]          @relation("ProspectEmails")
   goals           SalesGoal[]         @relation("ProspectGoals")
+  researchResults ProspectResearchResult[] @relation("ResearchResultProspect")
 
   @@index([aiFitScore])
   @@index([currentCrmStatus])
@@ -2809,6 +2811,7 @@ model SalesUser {
   goals                    SalesGoal[]
   createdGoals             SalesGoal[]          @relation("GoalCreator")
   demoLinks                LinkClick[]          @relation("SalesUserDemoLinks")
+  researchLists            ProspectResearchList[] @relation("SalesUserResearchLists")
 }
 
 model SalesUserInvite {
@@ -3677,4 +3680,94 @@ model ConfigurationAuditLog {
 
   @@index([organizationId, appliedAt(sort: Desc)])
   @@index([batchId])
+}
+
+// ── Prospect Research Library ────────────────────────────────────────────────
+
+// A named, persisted collection of AI-discovered companies from one search run.
+// Owned by either a SalesUser OR a SuperAdmin (exactly one FK is set).
+// isShared = true makes the list readable by all CRM users.
+model ProspectResearchList {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+
+  // Ownership
+  salesUserId  String?
+  superAdminId String?
+
+  // Visibility — owner always has full access; shared = readable by all CRM users
+  isShared Boolean @default(false)
+
+  // Search criteria recorded at save time (what was actually requested)
+  searchCountry  String?
+  searchState    String?
+  searchIndustry String?
+  searchEmpMin   Int?
+  searchEmpMax   Int?
+  searchKeywords String?
+  searchContext  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salesUser  SalesUser?  @relation("SalesUserResearchLists",  fields: [salesUserId],  references: [id], onDelete: Cascade)
+  superAdmin SuperAdmin? @relation("SuperAdminResearchLists", fields: [superAdminId], references: [id], onDelete: Cascade)
+  results    ProspectResearchResult[]
+
+  @@index([salesUserId])
+  @@index([superAdminId])
+  @@index([createdAt])
+}
+
+// One AI-discovered company within a ProspectResearchList.
+// normalizedDomain enforces per-list dedup for companies with websites.
+// Companies without websites can coexist — NULLs are excluded from the unique index.
+// Promoted companies (prospectId set) are preserved when the list is deleted (SetNull).
+model ProspectResearchResult {
+  id     String @id @default(cuid())
+  listId String
+
+  companyName      String
+  website          String?
+  normalizedDomain String? @db.VarChar(253) // stripped of www., lowercased; used for dedup
+
+  // Search geography that was active when this result was returned
+  requestedCountry String?
+  requestedState   String?
+
+  // Location the AI reported for this company
+  verifiedCity    String?
+  verifiedState   String?
+  verifiedCountry String?
+  locationVerified Boolean @default(false) // true when verifiedState matches requestedState
+
+  industry           String?
+  estimatedEmployees String?
+  summary            String? @db.Text
+  fitScore           Int?
+
+  // Deep research fields (populated lazily via details API call)
+  painPoints          String[] @default([])
+  relayFitReasons     String[] @default([])
+  outreachAngle       String?
+  detailsResearchedAt DateTime?
+
+  source       String   @default("ai_discover")
+  researchDate DateTime @default(now())
+
+  // CRM promotion — preserved when the owning list is deleted (SetNull, not Cascade)
+  prospectId String?
+  promotedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  list     ProspectResearchList @relation(fields: [listId],    references: [id], onDelete: Cascade)
+  prospect Prospect?            @relation("ResearchResultProspect", fields: [prospectId], references: [id], onDelete: SetNull)
+
+  @@unique([listId, normalizedDomain]) // per-list domain dedup; NULLs excluded by Postgres
+  @@index([listId])
+  @@index([companyName])
+  @@index([prospectId])
 }

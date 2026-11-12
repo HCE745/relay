@@ -110,6 +110,12 @@ export async function POST(req: NextRequest) {
     const session = await requireCrmSender()
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+    // Block email sending during CRM rep impersonation (read-only mode)
+    const rawSession = await (await import("@/lib/session")).getSession()
+    if (rawSession?.crmImpersonatedSalesUserId) {
+      return NextResponse.json({ error: "Email sending is disabled during rep impersonation" }, { status: 403 })
+    }
+
     const body = await req.json() as {
       demoCallId?:       string
       prospectId?:       string
@@ -193,7 +199,8 @@ export async function POST(req: NextRequest) {
         source:              "compose",
         abTestGroup:         variantLabel,
         abTestCampaignId:    abTestCampaignId ?? null,
-        sentBySalesUserId:   session.salesUserId ?? null,
+        sentBySalesUserId:        session.salesUserId ?? null,
+        mailboxOwnerSalesUserId:  session.salesUserId ?? null,
       },
     })
 

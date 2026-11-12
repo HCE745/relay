@@ -39,6 +39,10 @@ export type SessionPayload = {
   impersonatedByName?: string
   impersonatedOrgName?: string
   impersonationLogId?: string // ImpersonationLog.id for closing the audit record on exit
+  // CRM rep impersonation (set when a super admin views the CRM as a sales rep)
+  crmImpersonatedSalesUserId?: string   // SalesUser.id being viewed
+  crmImpersonationExpiresAt?:  string   // ISO string; session auto-expires after 8h
+  crmImpersonationLogId?:      string   // CrmRepImpersonationLog.id
   // Demo sessions
   isDemo?: boolean            // true = this session is an isolated sales demo
   exp?: number

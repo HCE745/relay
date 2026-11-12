@@ -311,13 +311,13 @@ Your entire response must be only the JSON array — nothing before [, nothing a
     // Drop entries with no name
     companies = companies.filter(c => c.companyName && c.companyName !== "Unknown")
 
-    // Post-process: validate state match when a state filter was requested.
-    // The model is instructed to only return companies in the requested state, but we
-    // flag and move mismatches to the end rather than silently dropping them.
+    // Post-process: hard-filter to the requested state.
+    // The model is instructed via CRITICAL prompt text to only return companies
+    // in the requested state, but it occasionally slips.  Any company whose
+    // returned state field does not match (after normalising abbreviations and
+    // full names) is REMOVED — we return fewer results rather than wrong ones.
     if (body.stateProvince) {
       const requestedState = body.stateProvince.trim().toLowerCase()
-      // Build a set of common abbreviations and full names the model might return
-      const stateVariants = new Set([requestedState])
       const US_ABBREVS: Record<string, string> = {
         "new york": "ny", "new jersey": "nj", "california": "ca", "texas": "tx",
         "florida": "fl", "illinois": "il", "ohio": "oh", "indiana": "in",
@@ -333,31 +333,24 @@ Your entire response must be only the JSON array — nothing before [, nothing a
         "wyoming": "wy", "louisiana": "la", "south carolina": "sc", "kentucky": "ky",
         "oklahoma": "ok", "alabama": "al",
       }
-      // Add abbreviation if full name given, or full name if abbreviation given
+      // Build the full set of accepted values (abbreviation + full name)
+      const stateVariants = new Set([requestedState])
       const abbrev = US_ABBREVS[requestedState]
       if (abbrev) stateVariants.add(abbrev)
       for (const [full, ab] of Object.entries(US_ABBREVS)) {
         if (ab === requestedState) stateVariants.add(full)
       }
 
-      companies = companies.map(c => {
+      const before = companies.length
+      companies = companies.filter(c => {
         const companyState = c.state.trim().toLowerCase()
-        const matches = stateVariants.has(companyState)
-        return { ...c, _stateMatch: matches }
-      }).sort((a, b) => {
-        const aMatch = (a as typeof a & { _stateMatch?: boolean })._stateMatch
-        const bMatch = (b as typeof b & { _stateMatch?: boolean })._stateMatch
-        if (aMatch && !bMatch) return -1
-        if (!aMatch && bMatch) return 1
-        return 0
-      }).map(c => {
-        const { _stateMatch, ...rest } = c as typeof c & { _stateMatch?: boolean }
-        return rest
+        // Also accept "unknown" or empty state only if city strongly suggests the state
+        // (heuristic: if state is blank, we cannot verify — exclude to be safe)
+        return companyState !== "" && stateVariants.has(companyState)
       })
 
-      console.log("[discover] state filter applied:", requestedState,
-        "matches:", companies.filter(c => stateVariants.has(c.state.trim().toLowerCase())).length,
-        "total:", companies.length)
+      console.log("[discover] state hard-filter:", requestedState,
+        `kept ${companies.length} / dropped ${before - companies.length}`)
     }
 
     // Annotate CRM status for each result

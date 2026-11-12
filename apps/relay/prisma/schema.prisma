@@ -791,6 +791,7 @@ model SuperAdmin {
   createdOffers               SalesOffer[]          @relation("SACreatedOffers")
   abTestCampaigns             AbTestCampaign[]      @relation("AbTestCampaignSA")
   researchLists               ProspectResearchList[] @relation("SuperAdminResearchLists")
+  crmRepImpersonationLogs     CrmRepImpersonationLog[] @relation("SARepImpersonation")
 }
 
 model ImpersonationLog {
@@ -809,6 +810,23 @@ model ImpersonationLog {
 
   @@index([superAdminId])
   @@index([organizationId])
+}
+
+// Audit log for super-admin "View CRM as Rep" impersonation sessions
+model CrmRepImpersonationLog {
+  id             String    @id @default(cuid())
+  superAdminId   String
+  superAdminName String    // denormalized for durability
+  salesUserId    String
+  salesUserName  String    // denormalized for durability
+  startedAt      DateTime  @default(now())
+  endedAt        DateTime?
+
+  superAdmin SuperAdmin @relation("SARepImpersonation",  fields: [superAdminId], references: [id], onDelete: Cascade)
+  salesUser  SalesUser  @relation("RepImpersonationLog", fields: [salesUserId],  references: [id], onDelete: Cascade)
+
+  @@index([superAdminId])
+  @@index([salesUserId])
 }
 
 model SuperAdminAuditLog {
@@ -1968,8 +1986,9 @@ model CrmEmail {
   openedAt       DateTime?
   openCount      Int       @default(0)
   lastOpenedAt   DateTime?
-  imapConfigId      String?
-  sentBySalesUserId String?
+  imapConfigId              String?
+  sentBySalesUserId         String?
+  mailboxOwnerSalesUserId   String?
   bouncedAt         DateTime?
   bounceType        String?
   sentiment         String?   // "positive" | "neutral" | "negative" — manually classified on received emails
@@ -1980,8 +1999,9 @@ model CrmEmail {
   createdAt         DateTime  @default(now())
 
   demoCall        DemoCall?        @relation(fields: [demoCallId], references: [id], onDelete: SetNull)
-  imapConfig      ImapConfig?      @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
-  sentBySalesUser SalesUser?       @relation("SentBySalesUser", fields: [sentBySalesUserId], references: [id])
+  imapConfig            ImapConfig?      @relation(fields: [imapConfigId], references: [id], onDelete: SetNull)
+  sentBySalesUser       SalesUser?       @relation("SentBySalesUser", fields: [sentBySalesUserId], references: [id])
+  mailboxOwnerSalesUser SalesUser?       @relation("MailboxOwnerEmails", fields: [mailboxOwnerSalesUserId], references: [id], onDelete: SetNull)
   linkClicks      LinkClick[]
   abTestCampaign  AbTestCampaign?  @relation(fields: [abTestCampaignId], references: [id], onDelete: SetNull)
   prospect        Prospect?        @relation("ProspectEmails", fields: [prospectId], references: [id], onDelete: SetNull)
@@ -1994,6 +2014,7 @@ model CrmEmail {
   @@index([abTestCampaignId])
   @@index([prospectId])
   @@index([contactId])
+  @@index([mailboxOwnerSalesUserId])
 }
 
 model AbTestCampaign {
@@ -2787,6 +2808,7 @@ model SalesUser {
   // Phase 3: email attribution
   imapConfig          ImapConfig?  @relation("SalesUserImap")
   sentEmails          CrmEmail[]   @relation("SentBySalesUser")
+  mailboxEmails       CrmEmail[]   @relation("MailboxOwnerEmails")
   // Phase 4-7
   opportunities        CrmOpportunity[]
   closedOpportunities  CrmOpportunity[] @relation("OpportunityClosedBy")
@@ -2812,6 +2834,7 @@ model SalesUser {
   createdGoals             SalesGoal[]          @relation("GoalCreator")
   demoLinks                LinkClick[]          @relation("SalesUserDemoLinks")
   researchLists            ProspectResearchList[] @relation("SalesUserResearchLists")
+  crmRepImpersonationLogs  CrmRepImpersonationLog[] @relation("RepImpersonationLog")
 }
 
 model SalesUserInvite {

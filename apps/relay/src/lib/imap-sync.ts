@@ -317,10 +317,13 @@ async function processMessage(
       sentAt:              msg.sentAt,
       source:              "imap_sync",
       imapConfigId,
-      // Attribute to the sales user (or leave null for SA configs) so per-user
-      // inbox filters work correctly. Without this, synced emails are unowned
-      // and all reps would see each other's email history.
-      sentBySalesUserId:   salesUserId,
+      // sentBySalesUserId identifies WHO composed/sent the message.
+      // Only set it for outbound (sent) emails — received emails were sent by
+      // the prospect, not the rep, so their sentBySalesUserId stays null.
+      sentBySalesUserId:   direction === "sent" ? salesUserId : null,
+      // mailboxOwnerSalesUserId identifies WHOSE MAILBOX this email belongs to,
+      // regardless of direction.  This is what inbox / unread filters use.
+      mailboxOwnerSalesUserId: salesUserId,
     },
   })
 

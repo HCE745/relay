@@ -52,19 +52,16 @@ export async function GET(req: NextRequest) {
   let where: Record<string, unknown> = { isDeleted: false, isArchived: false }
 
   if (!session.superAdmin && session.salesUserId) {
-    // Sales user: show emails they sent, plus received replies to their contact emails
-    const sentEmails = await prisma.crmEmail.findMany({
-      where: { sentBySalesUserId: session.salesUserId },
-      select: { contactEmail: true },
-    })
-    const contactEmails = [...new Set(sentEmails.map(e => e.contactEmail))]
-
+    // Sales user: show emails attributed to their account.
+    // - sentBySalesUserId: emails THEY composed/sent
+    // - mailboxOwnerSalesUserId + received: emails received in THEIR mailbox
+    // The two conditions together give the full per-user inbox.
     where = {
       isDeleted:  false,
       isArchived: false,
       OR: [
         { sentBySalesUserId: session.salesUserId },
-        { contactEmail: { in: contactEmails }, direction: "received" },
+        { mailboxOwnerSalesUserId: session.salesUserId, direction: "received" },
       ],
     }
   }

@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import {
   Users, Plus, X, Check, Loader2, AlertCircle,
-  ShieldCheck, UserCircle, Power, PowerOff, KeyRound, Mail, ChevronDown, ChevronUp,
+  ShieldCheck, UserCircle, Power, PowerOff, KeyRound, Mail, ChevronDown, ChevronUp, Eye,
 } from "lucide-react"
 
 interface SalesUser {
@@ -438,12 +439,14 @@ function EmailSettingsModal({ user, onDone, onCancel }: EmailSettingsModalProps)
 }
 
 export default function SalesUsersPage() {
+  const router = useRouter()
   const [users,        setUsers]        = useState<SalesUser[]>([])
   const [loading,      setLoading]      = useState(true)
   const [showCreate,   setShowCreate]   = useState(false)
   const [resetTarget,  setResetTarget]  = useState<SalesUser | null>(null)
   const [emailTarget,  setEmailTarget]  = useState<SalesUser | null>(null)
   const [actionId,     setActionId]     = useState<string | null>(null)
+  const [impersonatingId, setImpersonatingId] = useState<string | null>(null)
   const [toast,        setToast]        = useState("")
 
   function showToast(msg: string) {
@@ -492,6 +495,26 @@ export default function SalesUsersPage() {
       }
     } finally {
       setActionId(null)
+    }
+  }
+
+  async function viewAsCrmRep(user: SalesUser) {
+    setImpersonatingId(user.id)
+    try {
+      const res = await fetch("/api/super-admin/crm/impersonate-rep", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ salesUserId: user.id }),
+      })
+      const j = await res.json() as { ok?: boolean; error?: string }
+      if (res.ok && j.ok) {
+        // Redirect into the sales panel as the impersonated rep
+        router.push("/sales/workspace")
+      } else {
+        showToast(j.error ?? "Failed to start impersonation")
+      }
+    } finally {
+      setImpersonatingId(null)
     }
   }
 
@@ -648,6 +671,19 @@ export default function SalesUsersPage() {
                       >
                         <Mail className="w-4 h-4" />
                       </button>
+                      {/* View CRM as Rep (active users only) */}
+                      {u.isActive && !u.invitePending && (
+                        <button
+                          onClick={() => void viewAsCrmRep(u)}
+                          disabled={impersonatingId === u.id}
+                          title="View CRM as this rep (read-only)"
+                          className="p-1.5 rounded-lg text-gray-500 hover:text-purple-400 hover:bg-purple-900/20 transition-colors"
+                        >
+                          {impersonatingId === u.id
+                            ? <Loader2 className="w-4 h-4 animate-spin" />
+                            : <Eye className="w-4 h-4" />}
+                        </button>
+                      )}
                       {/* Toggle active */}
                       <button
                         onClick={() => void toggleActive(u)}

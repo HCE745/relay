@@ -21,6 +21,11 @@ export async function POST(req: NextRequest) {
   const session = await getSession()
   if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
+  // Block email sending during CRM rep impersonation (read-only mode)
+  if (session.crmImpersonatedSalesUserId) {
+    return NextResponse.json({ error: "Email sending is disabled during rep impersonation" }, { status: 403 })
+  }
+
   const body = await req.json() as {
     company:   DiscoveredCompany
     to:        string

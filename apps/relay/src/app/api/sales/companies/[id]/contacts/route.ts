@@ -20,6 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     title?:           string
     email?:           string
     phone?:           string
+    mobile?:          string
     linkedinUrl?:     string
     department?:      string
     jobLevel?:        string
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       title:            body.title            ?? null,
       email:            body.email            ?? null,
       phone:            body.phone            ?? null,
+      mobile:           body.mobile           ?? null,
       linkedinUrl:      body.linkedinUrl       ?? null,
       department:       body.department       ?? null,
       jobLevel:         body.jobLevel         ?? null,

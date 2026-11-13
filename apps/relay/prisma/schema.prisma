@@ -2651,6 +2651,7 @@ model ProspectContact {
   discoveryDate        DateTime?
   linkedinUrl          String?
   phone                String?
+  mobile               String?
   role                 String?
   roles                String[]             @default([])
   notes                String?              @db.Text

@@ -33,6 +33,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<Para
       ...(body.title            !== undefined && { title:            body.title as string | null }),
       ...(body.email            !== undefined && { email:            body.email as string | null }),
       ...(body.phone            !== undefined && { phone:            body.phone as string | null }),
+      ...(body.mobile           !== undefined && { mobile:           body.mobile as string | null }),
       ...(body.linkedinUrl      !== undefined && { linkedinUrl:      body.linkedinUrl as string | null }),
       ...(body.department       !== undefined && { department:       body.department as string | null }),
       ...(body.jobLevel         !== undefined && { jobLevel:         body.jobLevel as string | null }),

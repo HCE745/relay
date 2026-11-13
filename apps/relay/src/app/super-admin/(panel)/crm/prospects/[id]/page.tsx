@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   ArrowLeft, Globe, ExternalLink, Mail, RefreshCw, Loader2, Plus, Trash2,
   Building2, ChevronDown, X, Copy, CheckCircle2, Send, Zap, User,
-  MessageSquare, StickyNote, Link2,
+  MessageSquare, StickyNote, Link2, Pencil, Phone,
 } from "lucide-react"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -29,6 +29,7 @@ interface ProspectContact {
   emailConfidence: EmailConfidenceLevel | null
   linkedinUrl: string | null
   phone: string | null
+  mobile: string | null
   role: string | null
   notes: string | null
   createdAt: string
@@ -190,6 +191,11 @@ export default function ProspectDetailPage() {
   })
   const [contactLoading, setContactLoading] = useState(false)
 
+  // Contact edit
+  const [editingContactId, setEditingContactId]   = useState<string | null>(null)
+  const [contactEditDraft, setContactEditDraft]   = useState<Partial<ProspectContact>>({})
+  const [contactEditLoading, setContactEditLoading] = useState(false)
+
   // Right column quick edits
   const [outreachDateEdit, setOutreachDateEdit] = useState("")
   const [replyDateEdit, setReplyDateEdit] = useState("")
@@ -347,6 +353,29 @@ export default function ProspectDetailPage() {
         setProspect(p => p ? { ...p, contacts: p.contacts.filter(c => c.id !== contactId) } : p)
       }
     } catch { /* ignore */ }
+  }
+
+  async function handleSaveContactEdit(contactId: string) {
+    if (contactEditLoading) return
+    setContactEditLoading(true)
+    try {
+      const res = await fetch(`/api/sales/companies/${id}/contacts/${contactId}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(contactEditDraft),
+      })
+      const json = await res.json() as { contact?: ProspectContact }
+      if (res.ok && json.contact) {
+        setProspect(p => p
+          ? { ...p, contacts: p.contacts.map(c => c.id === contactId ? json.contact! : c) }
+          : p
+        )
+        setEditingContactId(null)
+        setContactEditDraft({})
+      }
+    } finally {
+      setContactEditLoading(false)
+    }
   }
 
   function handleCopyEmail() {
@@ -616,6 +645,21 @@ export default function ProspectDetailPage() {
                 <ContactCard
                   key={contact.id}
                   contact={contact}
+                  isEditing={editingContactId === contact.id}
+                  editDraft={contactEditDraft}
+                  editLoading={contactEditLoading}
+                  onStartEdit={() => {
+                    setEditingContactId(contact.id)
+                    setContactEditDraft({
+                      name: contact.name, title: contact.title ?? "",
+                      email: contact.email ?? "", phone: contact.phone ?? "",
+                      mobile: contact.mobile ?? "", linkedinUrl: contact.linkedinUrl ?? "",
+                      notes: contact.notes ?? "",
+                    })
+                  }}
+                  onCancelEdit={() => { setEditingContactId(null); setContactEditDraft({}) }}
+                  onChangeEdit={patch => setContactEditDraft(d => ({ ...d, ...patch }))}
+                  onSaveEdit={() => void handleSaveContactEdit(contact.id)}
                   onDelete={() => void handleDeleteContact(contact.id)}
                 />
               ))}
@@ -1058,11 +1102,76 @@ function DetailRow({ label, value }: { label: string; value: string | null | und
 }
 
 function ContactCard({
-  contact, onDelete,
+  contact, isEditing, editDraft, editLoading,
+  onStartEdit, onCancelEdit, onChangeEdit, onSaveEdit, onDelete,
 }: {
   contact: ProspectContact
+  isEditing: boolean
+  editDraft: Partial<ProspectContact>
+  editLoading: boolean
+  onStartEdit: () => void
+  onCancelEdit: () => void
+  onChangeEdit: (patch: Partial<ProspectContact>) => void
+  onSaveEdit: () => void
   onDelete: () => void
 }) {
+  const inputCls = "w-full px-3 py-1.5 bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+
+  if (isEditing) {
+    return (
+      <div className="bg-gray-900 border border-indigo-800 rounded-xl p-4 space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">Name *</label>
+            <input className={inputCls} value={(editDraft.name ?? "") as string}
+              onChange={e => onChangeEdit({ name: e.target.value })} placeholder="Full name" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Title</label>
+            <input className={inputCls} value={(editDraft.title ?? "") as string}
+              onChange={e => onChangeEdit({ title: e.target.value })} placeholder="Job title" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Email</label>
+            <input className={inputCls} type="email" value={(editDraft.email ?? "") as string}
+              onChange={e => onChangeEdit({ email: e.target.value })} placeholder="email@company.com" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Phone</label>
+            <input className={inputCls} value={(editDraft.phone ?? "") as string}
+              onChange={e => onChangeEdit({ phone: e.target.value })} placeholder="Office / direct" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Mobile</label>
+            <input className={inputCls} value={(editDraft.mobile ?? "") as string}
+              onChange={e => onChangeEdit({ mobile: e.target.value })} placeholder="Mobile number" />
+          </div>
+          <div className="col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">LinkedIn URL</label>
+            <input className={inputCls} value={(editDraft.linkedinUrl ?? "") as string}
+              onChange={e => onChangeEdit({ linkedinUrl: e.target.value })} placeholder="https://linkedin.com/in/..." />
+          </div>
+          <div className="col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">Notes</label>
+            <textarea className={`${inputCls} resize-none`} rows={2} value={(editDraft.notes ?? "") as string}
+              onChange={e => onChangeEdit({ notes: e.target.value })} placeholder="Notes about this contact" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={onSaveEdit} disabled={editLoading || !(editDraft.name as string)?.trim()}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors">
+            {editLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+            Save
+          </button>
+          <button onClick={onCancelEdit}
+            className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-400 text-xs rounded-lg transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 group">
       <div className="flex items-start justify-between gap-2">
@@ -1092,8 +1201,13 @@ function ContactCard({
             </div>
           )}
           {contact.phone && (
-            <a href={`tel:${contact.phone}`} className="text-xs text-gray-400 hover:text-gray-200 transition-colors">
-              {contact.phone}
+            <a href={`tel:${contact.phone}`} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-200 transition-colors">
+              <Phone className="w-3 h-3" />{contact.phone}
+            </a>
+          )}
+          {contact.mobile && (
+            <a href={`tel:${contact.mobile}`} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-200 transition-colors">
+              <Phone className="w-3 h-3" />{contact.mobile} (mobile)
             </a>
           )}
           {contact.linkedinUrl && (
@@ -1106,13 +1220,18 @@ function ContactCard({
             <p className="text-xs text-gray-500 leading-relaxed">{contact.notes}</p>
           )}
         </div>
-        <button
-          onClick={onDelete}
-          className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-all p-1 shrink-0"
-          title="Delete contact"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+          <button onClick={onStartEdit}
+            className="text-gray-600 hover:text-indigo-400 transition-colors p-1"
+            title="Edit contact">
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={onDelete}
+            className="text-gray-600 hover:text-red-400 transition-colors p-1"
+            title="Delete contact">
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   )

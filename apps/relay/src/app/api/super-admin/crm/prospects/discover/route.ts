@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
 
     const systemPrompt = `You must respond with ONLY a valid JSON array. No markdown. No tables. No headers. No explanation. No code blocks. Just a raw JSON array starting with [ and ending with ]. Each element must be a JSON object with these exact keys: companyName, website, city, state, country, industry, estimatedEmployees, summary, fitScore (integer 0-100). If you cannot find companies return []. Do not return anything other than the JSON array.`
 
-    const userPrompt = `Based on your training knowledge, list exactly 8 to 10 REAL companies that would be strong sales prospects for Relay, an operations management platform for multi-location businesses. Relay helps with: issue reporting and tracking across locations, maintenance request routing, QR-code asset management, facility checklists, and team communications across shifts and sites.
+    const userPrompt = `Based on your training knowledge, list exactly 15 to 20 REAL companies that would be strong sales prospects for Relay, an operations management platform for multi-location businesses. Relay helps with: issue reporting and tracking across locations, maintenance request routing, QR-code asset management, facility checklists, and team communications across shifts and sites.
 
 CRITICAL — COUNTRY FILTER: Only return companies headquartered in ${country}. Do not return companies from any other country under any circumstances.
 ${stateFilter ? `\n${stateFilter}\n` : ""}

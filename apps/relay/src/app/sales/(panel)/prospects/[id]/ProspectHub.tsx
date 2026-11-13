@@ -18,7 +18,7 @@ import type { DemoSession, DemoEngagementResponse } from "@/app/api/sales/prospe
 
 interface Contact {
   id: string; name: string; title: string | null; email: string | null
-  phone: string | null; linkedinUrl: string | null; department: string | null
+  phone: string | null; mobile: string | null; linkedinUrl: string | null; department: string | null
   jobLevel: string | null; isPrimaryContact: boolean; isDecisionMaker: boolean
   isChampion: boolean; notes: string | null; createdAt: string
 }
@@ -216,7 +216,7 @@ export function ProspectHub({
 
   // ── Contact state ───────────────────────────────────────────────────────────
   const [addingContact, setAddingContact] = useState(false)
-  const [contactForm, setContactForm]     = useState({ name: "", title: "", email: "", phone: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
+  const [contactForm, setContactForm]     = useState({ name: "", title: "", email: "", phone: "", mobile: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
   const [savingContact, setSavingContact] = useState(false)
   const [expandedContactId, setExpandedContactId] = useState<string | null>(null)
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null)
@@ -242,7 +242,7 @@ export function ProspectHub({
       if (res.ok) {
         const data = await res.json() as { contact: Contact }
         setCompany(c => ({ ...c, contacts: [...c.contacts, data.contact] }))
-        setAddingContact(false); setContactForm({ name: "", title: "", email: "", phone: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
+        setAddingContact(false); setContactForm({ name: "", title: "", email: "", phone: "", mobile: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
       }
     } finally { setSavingContact(false) }
   }
@@ -578,7 +578,7 @@ export function ProspectHub({
                 )}
                 {!isEditing
                   ? <>
-                      <button onClick={() => { setEditingContactId(selectedContactId); setContactEditDraft({ name: sc.name, title: sc.title ?? "", email: sc.email ?? "", phone: sc.phone ?? "", linkedinUrl: sc.linkedinUrl ?? "", isDecisionMaker: sc.isDecisionMaker, isPrimaryContact: sc.isPrimaryContact }) }}
+                      <button onClick={() => { setEditingContactId(selectedContactId); setContactEditDraft({ name: sc.name, title: sc.title ?? "", email: sc.email ?? "", phone: sc.phone ?? "", mobile: sc.mobile ?? "", linkedinUrl: sc.linkedinUrl ?? "", isDecisionMaker: sc.isDecisionMaker, isPrimaryContact: sc.isPrimaryContact }) }}
                         className="text-xs text-gray-400 hover:text-white transition-colors">Edit</button>
                       <button onClick={() => { setDeletingContact({ id: sc.id, name: sc.name }); setDeleteContactError(null) }}
                         className="text-xs text-red-500/70 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
@@ -606,6 +606,7 @@ export function ProspectHub({
                         { key: "title",       label: "Title"           },
                         { key: "email",       label: "Email"           },
                         { key: "phone",       label: "Phone"           },
+                        { key: "mobile",      label: "Mobile"          },
                         { key: "linkedinUrl", label: "LinkedIn URL", span: 2 },
                       ] as { key: keyof typeof contactEditDraft; label: string; span?: number }[]).map(f => (
                         <input key={f.key} placeholder={f.label}
@@ -638,6 +639,7 @@ export function ProspectHub({
                       <div className="flex flex-wrap gap-4 mt-2 text-sm">
                         {sc.email && <button onClick={() => { setComposeEmail({ toEmail: sc.email!, contactId: sc.id, contactName: sc.name }); setComposeSubject(""); setComposeBody("") }} className="text-indigo-400 hover:underline flex items-center gap-1 text-sm"><Mail className="w-3.5 h-3.5" />{sc.email}</button>}
                         {sc.phone && <span className="text-gray-400 flex items-center gap-1"><Phone className="w-3.5 h-3.5" />{sc.phone}</span>}
+                        {sc.mobile && <span className="text-gray-400 flex items-center gap-1"><Phone className="w-3.5 h-3.5" />{sc.mobile} (m)</span>}
                         {sc.linkedinUrl && <a href={sc.linkedinUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline flex items-center gap-1"><Link2 className="w-3.5 h-3.5" />LinkedIn</a>}
                       </div>
                       <p className="text-xs text-gray-600 mt-1">{company.companyName}</p>
@@ -965,6 +967,7 @@ export function ProspectHub({
                   { placeholder: "Job title",   key: "title" },
                   { placeholder: "Email",        key: "email" },
                   { placeholder: "Phone",        key: "phone" },
+                  { placeholder: "Mobile",       key: "mobile" },
                   { placeholder: "LinkedIn URL", key: "linkedinUrl" },
                 ].map(f => (
                   <input key={f.key} placeholder={f.placeholder}
@@ -1037,6 +1040,12 @@ export function ProspectHub({
                       <div>
                         <p className="text-xs text-gray-600 mb-0.5">Phone</p>
                         <p className="text-gray-300">{c.phone}</p>
+                      </div>
+                    )}
+                    {c.mobile && (
+                      <div>
+                        <p className="text-xs text-gray-600 mb-0.5">Mobile</p>
+                        <p className="text-gray-300">{c.mobile}</p>
                       </div>
                     )}
                     {c.linkedinUrl && (

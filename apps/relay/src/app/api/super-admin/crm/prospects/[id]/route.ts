@@ -138,6 +138,7 @@ export async function POST(
       emailConfidence?: string
       linkedinUrl?:    string
       phone?:          string
+      mobile?:         string
       role?:           string
       notes?:          string
     }
@@ -164,6 +165,7 @@ export async function POST(
           emailConfidence: (body.contact.emailConfidence as never) ?? null,
           linkedinUrl:     body.contact.linkedinUrl      ?? null,
           phone:           body.contact.phone            ?? null,
+          mobile:          body.contact.mobile           ?? null,
           role:            body.contact.role             ?? null,
           notes:           body.contact.notes            ?? null,
         },

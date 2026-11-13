@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       port:         port     ?? existing.port,
       smtpHost:     smtpHost ?? existing.smtpHost,
       smtpPort:     smtpPort ?? existing.smtpPort,
-      emailAddress: emailAddress.trim(),
+      emailAddress: emailAddress.trim().toLowerCase(),
       enabled:      enabled  ?? existing.enabled,
     }
     if (password) updateData.encryptedPassword = encryptField(password)
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
         port:              port     ?? 993,
         smtpHost:          smtpHost ?? "smtp.titan.email",
         smtpPort:          smtpPort ?? 465,
-        emailAddress:      emailAddress.trim(),
+        emailAddress:      emailAddress.trim().toLowerCase(),
         encryptedPassword: encryptField(password),
         enabled:           enabled ?? true,
       },

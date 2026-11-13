@@ -1,20 +1,24 @@
 export const dynamic = "force-dynamic"
 
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
-
-async function requireSales() {
-  const s = await getSession()
-  return s?.superAdmin || s?.salesUserId ? s : null
-}
 
 // POST /api/sales/companies/[id]/contacts — create a new contact
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireSales()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id: prospectId } = await params
+
+  // Reps can only add contacts to their own assigned prospects
+  if (!info.isManager && !info.isSuperAdmin) {
+    const prospect = await prisma.prospect.findUnique({ where: { id: prospectId }, select: { assignedToId: true } })
+    if (!prospect || prospect.assignedToId !== info.salesUserId) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 })
+    }
+  }
+
   const body = await req.json() as {
     name:             string
     title?:           string

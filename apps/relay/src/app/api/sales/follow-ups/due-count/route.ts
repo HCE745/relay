@@ -1,22 +1,23 @@
 import { NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ count: 0 }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ count: 0 }, { status: 401 })
 
-  const isManager = session.superAdmin || session.salesUserRole === "admin_sales"
+  const isManager = info.isManager || info.isSuperAdmin
+  const userId = info.isSuperAdmin ? null : info.salesUserId
 
   const count = await prisma.crmEmail.count({
     where: {
       followUpDate:   { lte: new Date() },
       followUpDoneAt: null,
       isDeleted:      false,
-      ...(!isManager && session.salesUserId
-        ? { sentBySalesUserId: session.salesUserId }
+      ...(!isManager && userId
+        ? { sentBySalesUserId: userId }
         : {}),
     },
   })

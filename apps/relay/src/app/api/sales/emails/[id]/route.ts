@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
-
-async function requireSalesAuth() {
-  const s = await getSession()
-  return s?.superAdmin || s?.salesUserId ? s : null
-}
 
 // PATCH /api/sales/emails/[id]
 // action: set_sentiment — classifies a received email as positive, neutral, or negative
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireSalesAuth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
   const body   = await req.json() as { action: string; sentiment?: string }
@@ -30,10 +25,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     // Reps can only tag received emails that are replies to their own outbound messages.
     // Super admins and managers can tag any received email.
-    if (!session.superAdmin && session.salesUserRole !== "admin_sales") {
+    if (!info.isSuperAdmin && !info.isManager) {
       const isMyThread = await prisma.crmEmail.findFirst({
         where: {
-          sentBySalesUserId: session.salesUserId!,
+          sentBySalesUserId: info.salesUserId,
           ...(email.threadId ? { threadId: email.threadId } : { contactEmail: email.contactEmail ?? undefined }),
         },
         select: { id: true },

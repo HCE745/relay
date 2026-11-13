@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
 import { computeEngagementScore, scoreLabel } from "@/lib/engagement-score"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const isManager = session.superAdmin || session.salesUserRole === "admin_sales"
+  const isManager = info.isManager || info.isSuperAdmin
+  const session = { salesUserId: info.isSuperAdmin ? null : info.salesUserId }
 
   // Seed default stages if none exist
   const stageCount = await prisma.followUpStage.count()

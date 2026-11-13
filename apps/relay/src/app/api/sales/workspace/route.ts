@@ -1,17 +1,17 @@
 export const dynamic = "force-dynamic"
 
 import { NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
 
 // GET /api/sales/workspace — returns today's action items for the logged-in rep
 export async function GET() {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const userId = session.salesUserId ?? ""
-  const isManager = session.superAdmin || session.salesUserRole === "admin_sales"
+  // getSalesSession() re-validates role from DB, so isManager is always current.
+  const isManager = info.isManager || info.isSuperAdmin
+  const userId = info.isSuperAdmin ? "" : info.salesUserId
   const repFilter = isManager ? { NOT: { assignedTo: { isDemo: true } } } : { assignedToId: userId }
   // For managers: show all non-demo tasks, but always include the manager's OWN tasks even
   // if their own account has isDemo=true (the demo manager filter would otherwise hide them).

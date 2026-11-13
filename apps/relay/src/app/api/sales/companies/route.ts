@@ -1,26 +1,22 @@
 export const dynamic = "force-dynamic"
 
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
 
 const excludeDemo = { NOT: { assignedTo: { isDemo: true } } }
 
-function salesFilter(session: Awaited<ReturnType<typeof getSession>>) {
-  if (!session) return null
-  if (session.superAdmin || session.salesUserRole === "admin_sales") return excludeDemo
-  return { assignedToId: session.salesUserId ?? "" }
-}
-
 // GET /api/sales/companies?q=&status=&sort=&page=
 // Returns Prospect records as "companies" with contact count and latest activity
 export async function GET(req: NextRequest) {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const filter = salesFilter(session)
-  if (!filter) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  // Role is re-validated from DB on every request via getSalesSession(), so stale
+  // session JWTs cannot bypass ownership filters.
+  const filter = info.isManager || info.isSuperAdmin
+    ? excludeDemo
+    : { assignedToId: info.salesUserId }
 
   const { searchParams } = new URL(req.url)
   const q       = searchParams.get("q")?.trim() ?? ""

@@ -1,14 +1,15 @@
 export const dynamic = "force-dynamic"
 
 import { NextRequest, NextResponse } from "next/server"
+import { getSalesSession } from "@/lib/sales-auth"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { createSalesActivity } from "@/lib/sales-activities"
 import { markOutreachDone, OUTREACH_ACTIVITY_TYPES } from "@/lib/research-progress"
 
 export async function GET(req: NextRequest) {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId) {
+  const info = await getSalesSession()
+  if (!info) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -19,6 +20,14 @@ export async function GET(req: NextRequest) {
 
   if (!prospectId && !demoCallId && !opportunityId) {
     return NextResponse.json({ error: "prospectId, demoCallId, or opportunityId required" }, { status: 400 })
+  }
+
+  // Reps can only fetch activities for their own assigned prospects
+  if (!info.isManager && !info.isSuperAdmin && prospectId) {
+    const prospect = await prisma.prospect.findUnique({ where: { id: prospectId }, select: { assignedToId: true } })
+    if (!prospect || prospect.assignedToId !== info.salesUserId) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 })
+    }
   }
 
   const activities = await prisma.salesCrmActivity.findMany({
@@ -38,8 +47,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId) {
+  const info = await getSalesSession()
+  if (!info) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -60,18 +69,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "activityType required" }, { status: 400 })
   }
 
+  const salesUserId = info.isSuperAdmin ? null : info.salesUserId
   const activity = await createSalesActivity({
     ...body,
-    salesUserId: session.salesUserId ?? null,
+    salesUserId,
     occurredAt:  body.occurredAt ? new Date(body.occurredAt) : undefined,
   })
 
   // After a confirmed qualifying outreach, mark research results done server-side
   if (body.prospectId && OUTREACH_ACTIVITY_TYPES.has(body.activityType)) {
+    // Need the raw session's superAdminId UUID for research progress tracking
+    const rawSession = await getSession()
     await markOutreachDone({
       prospectId:   body.prospectId,
-      salesUserId:  session.salesUserId  ?? null,
-      superAdminId: session.superAdminId ?? null,
+      salesUserId:  salesUserId,
+      superAdminId: rawSession?.superAdminId ?? null,
     }).catch(() => {}) // Non-fatal
   }
 

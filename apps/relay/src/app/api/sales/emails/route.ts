@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic"
 
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
 
 const EMAIL_SELECT = {
@@ -40,9 +40,8 @@ const EMAIL_SELECT = {
 // Returns emails for the current sales user (by sentBySalesUserId).
 // SuperAdmins get all emails the same as the super-admin endpoint.
 export async function GET(req: NextRequest) {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const all = searchParams.get("all") === "true"
@@ -51,7 +50,7 @@ export async function GET(req: NextRequest) {
 
   let where: Record<string, unknown> = { isDeleted: false, isArchived: false }
 
-  if (!session.superAdmin && session.salesUserId) {
+  if (!info.isSuperAdmin) {
     // Sales user: show emails attributed to their account.
     // - sentBySalesUserId: emails THEY composed/sent
     // - mailboxOwnerSalesUserId + received: emails received in THEIR mailbox
@@ -60,8 +59,8 @@ export async function GET(req: NextRequest) {
       isDeleted:  false,
       isArchived: false,
       OR: [
-        { sentBySalesUserId: session.salesUserId },
-        { mailboxOwnerSalesUserId: session.salesUserId, direction: "received" },
+        { sentBySalesUserId: info.salesUserId },
+        { mailboxOwnerSalesUserId: info.salesUserId, direction: "received" },
       ],
     }
   }

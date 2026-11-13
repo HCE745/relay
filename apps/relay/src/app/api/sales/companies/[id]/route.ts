@@ -1,18 +1,13 @@
 export const dynamic = "force-dynamic"
 
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
-
-async function requireSales() {
-  const s = await getSession()
-  return s?.superAdmin || s?.salesUserId ? s : null
-}
 
 // GET /api/sales/companies/[id] — full company detail with all relations
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireSales()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
 
@@ -70,15 +65,29 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   })
 
   if (!company) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+  // Reps can only view their own assigned prospects
+  if (!info.isManager && !info.isSuperAdmin && company.assignedToId !== info.salesUserId) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 })
+  }
+
   return NextResponse.json({ company })
 }
 
 // PATCH /api/sales/companies/[id] — update company profile fields
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireSales()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const info = await getSalesSession()
+  if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
+
+  // Reps can only update their own assigned prospects
+  if (!info.isManager && !info.isSuperAdmin) {
+    const existing = await prisma.prospect.findUnique({ where: { id }, select: { assignedToId: true } })
+    if (!existing || existing.assignedToId !== info.salesUserId) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 })
+    }
+  }
   const body = await req.json() as {
     companyName?:       string
     website?:           string

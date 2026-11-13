@@ -3,8 +3,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { getPlatformConfig } from "@/lib/platform-config"
+import Anthropic from "@anthropic-ai/sdk"
 
-export const maxDuration = 60
+// 90s gives web-search calls room to breathe; 60s is too close to the wall
+export const maxDuration = 90
+
+export type EmployeeCountTier    = "web_confirmed" | "web_estimated" | "unknown"
+export type QualificationTier    = "qualified" | "potential" | "location_unverified"
 
 export interface DiscoveredCompanyBasic {
   companyName:        string
@@ -14,6 +19,10 @@ export interface DiscoveredCompanyBasic {
   country:            string
   industry:           string
   estimatedEmployees: string
+  employeeCountTier:  EmployeeCountTier
+  qualificationTier:  QualificationTier
+  sourceCitations:    string[]
+  locationVerified:   boolean
   summary:            string
   fitScore:           number
   crmStatus:          "none" | "in_crm" | "contacted"
@@ -35,12 +44,47 @@ function extractDomain(url: string): string | null {
   catch { return null }
 }
 
-function extractArray(raw: string, prependBracket = false): Record<string, unknown>[] | null {
-  const text = prependBracket ? "[" + raw : raw
+// Third-party company data/directory sites — not acceptable as the company's official website
+const THIRD_PARTY_PROFILE_DOMAINS = new Set([
+  "linkedin.com", "pitchbook.com", "glassdoor.com", "zoominfo.com",
+  "crunchbase.com", "dnb.com", "hoovers.com", "manta.com",
+  "bloomberg.com", "owler.com", "craft.co", "signalhire.com",
+  "rocketreach.co", "apollo.io",
+])
 
+function isThirdPartyProfileUrl(url: string): boolean {
+  try {
+    const hostname = new URL(url.startsWith("http") ? url : `https://${url}`).hostname.toLowerCase().replace(/^www\./, "")
+    const parts = hostname.split(".")
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (THIRD_PARTY_PROFILE_DOMAINS.has(parts.slice(i).join("."))) return true
+    }
+    return false
+  } catch { return false }
+}
+
+const US_ABBREVS: Record<string, string> = {
+  "alabama": "al", "alaska": "ak", "arizona": "az", "arkansas": "ar", "california": "ca",
+  "colorado": "co", "connecticut": "ct", "delaware": "de", "florida": "fl", "georgia": "ga",
+  "hawaii": "hi", "idaho": "id", "illinois": "il", "indiana": "in", "iowa": "ia",
+  "kansas": "ks", "kentucky": "ky", "louisiana": "la", "maine": "me", "maryland": "md",
+  "massachusetts": "ma", "michigan": "mi", "minnesota": "mn", "mississippi": "ms", "missouri": "mo",
+  "montana": "mt", "nebraska": "ne", "nevada": "nv", "new hampshire": "nh", "new jersey": "nj",
+  "new mexico": "nm", "new york": "ny", "north carolina": "nc", "north dakota": "nd", "ohio": "oh",
+  "oklahoma": "ok", "oregon": "or", "pennsylvania": "pa", "rhode island": "ri", "south carolina": "sc",
+  "south dakota": "sd", "tennessee": "tn", "texas": "tx", "utah": "ut", "vermont": "vt",
+  "virginia": "va", "washington": "wa", "west virginia": "wv", "wisconsin": "wi", "wyoming": "wy",
+}
+
+function normaliseState(raw: string): string {
+  const lower = raw.trim().toLowerCase()
+  return US_ABBREVS[lower] ?? lower
+}
+
+function extractArray(raw: string): Record<string, unknown>[] | null {
   // 1. Direct parse
   try {
-    const p = JSON.parse(text)
+    const p = JSON.parse(raw)
     if (Array.isArray(p) && p.length > 0) return p as Record<string, unknown>[]
     if (p && typeof p === "object") {
       for (const v of Object.values(p as Record<string, unknown>)) {
@@ -50,7 +94,7 @@ function extractArray(raw: string, prependBracket = false): Record<string, unkno
   } catch { /* fall through */ }
 
   // 2. Code fence
-  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+  const fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/)
   if (fence?.[1]) {
     try {
       const p = JSON.parse(fence[1].trim())
@@ -58,22 +102,22 @@ function extractArray(raw: string, prependBracket = false): Record<string, unkno
     } catch { /* fall through */ }
   }
 
-  // 3. Bracket-count scan — skips non-JSON uses of "[" (e.g. "[Note: ...]")
-  for (let i = 0; i < text.length; i++) {
-    if (text[i] !== "[") continue
+  // 3. Bracket-count scan
+  for (let i = 0; i < raw.length; i++) {
+    if (raw[i] !== "[") continue
     let depth = 0, inStr = false, esc = false, end = -1
-    for (let j = i; j < text.length; j++) {
-      const c = text[j]
-      if (esc)             { esc = false; continue }
-      if (c === "\\" && inStr) { esc = true; continue }
-      if (c === '"')       { inStr = !inStr; continue }
-      if (inStr)           { continue }
+    for (let j = i; j < raw.length; j++) {
+      const c = raw[j]
+      if (esc)                  { esc = false; continue }
+      if (c === "\\" && inStr)  { esc = true; continue }
+      if (c === '"')            { inStr = !inStr; continue }
+      if (inStr)                { continue }
       if (c === "[" || c === "{") depth++
       else if (c === "]" || c === "}") { depth--; if (depth === 0) { end = j; break } }
     }
     if (end !== -1) {
       try {
-        const p = JSON.parse(text.slice(i, end + 1))
+        const p = JSON.parse(raw.slice(i, end + 1))
         if (Array.isArray(p) && p.length > 0) return p as Record<string, unknown>[]
       } catch { /* try next [ */ }
     }
@@ -82,53 +126,36 @@ function extractArray(raw: string, prependBracket = false): Record<string, unkno
   return null
 }
 
+const VALID_TIER = new Set<string>(["web_confirmed", "web_estimated", "unknown"])
+
 function normalise(raw: Record<string, unknown>): DiscoveredCompanyBasic {
-  const fitScore = Number(raw.fitScore ?? raw.aiFitScore ?? raw.fit_score ?? 70)
+  const fitScore  = Number(raw.fitScore ?? raw.aiFitScore ?? raw.fit_score ?? 70)
+  const tierRaw   = String(raw.employeeCountTier ?? raw.employee_count_tier ?? "unknown").toLowerCase()
+  const citations = Array.isArray(raw.sourceCitations)
+    ? (raw.sourceCitations as unknown[]).filter((u): u is string => typeof u === "string")
+    : []
+  let websiteRaw = String(raw.website ?? raw.url ?? "")
+  // If the AI returned a third-party profile URL as the official website, demote it to a citation
+  if (websiteRaw && isThirdPartyProfileUrl(websiteRaw)) {
+    if (!citations.includes(websiteRaw)) citations.push(websiteRaw)
+    websiteRaw = ""
+  }
   return {
     companyName:        String(raw.companyName ?? raw.company_name ?? raw.name ?? "Unknown"),
-    website:            String(raw.website ?? raw.url ?? ""),
+    website:            websiteRaw,
     city:               String(raw.city ?? raw.headquartersCity ?? ""),
     state:              String(raw.state ?? raw.headquartersState ?? ""),
     country:            String(raw.country ?? raw.headquartersCountry ?? "United States"),
     industry:           String(raw.industry ?? ""),
     estimatedEmployees: String(raw.estimatedEmployees ?? raw.employeeCount ?? raw.employees ?? ""),
+    employeeCountTier:  VALID_TIER.has(tierRaw) ? (tierRaw as EmployeeCountTier) : "unknown",
+    qualificationTier:  "potential" as QualificationTier, // overwritten server-side after geo check
+    sourceCitations:    citations,
+    locationVerified:   false, // set server-side below
     summary:            String(raw.summary ?? raw.researchSummary ?? raw.description ?? raw.oneSentenceSummary ?? ""),
     fitScore:           Math.min(100, Math.max(0, isNaN(fitScore) ? 70 : fitScore)),
     crmStatus:          "none",
   }
-}
-
-const SKIP_NAMES = new Set([
-  "summary", "summary table", "table", "overview", "results", "companies",
-  "company", "list", "note", "notes", "findings", "prospects", "company name",
-  "final list", "all companies",
-])
-
-function extractFromProse(text: string): DiscoveredCompanyBasic[] {
-  const results: DiscoveredCompanyBasic[] = []
-  const sections = text.split(/(?=\n#{1,3}\s+[A-Z]|\n\d+\.\s+\*?\*?[A-Z])/)
-  for (const sec of sections) {
-    const heading = sec.match(/^#{1,3}\s+(.+?)$/m) ?? sec.match(/^\d+\.\s+\*?\*?(.+?)\*?\*?$/m)
-    if (!heading) continue
-    const companyName = heading[1].replace(/\*\*/g, "").replace(/[|#*]/g, "").trim()
-    if (companyName.length < 3 || companyName.length > 100) continue
-    if (SKIP_NAMES.has(companyName.toLowerCase())) continue
-    if (/^\d+$/.test(companyName)) continue
-    const website    = sec.match(/https?:\/\/[^\s\)\]]+/)?.[0] ?? ""
-    const csMatch    = sec.match(/([A-Z][a-z]+(?: [A-Z][a-z]+)*),\s+([A-Z]{2})\b/)
-    const scoreMatch = sec.match(/(?:fit\s*score|score)[:\s]+(\d+)/i)
-    const empMatch   = sec.match(/(\d[\d,]*(?:\s*[-–]\s*\d[\d,]*)?)\s*employees?/i)
-    results.push({
-      companyName, website,
-      city:    csMatch?.[1] ?? "", state: csMatch?.[2] ?? "",
-      country: "United States",
-      industry: "", estimatedEmployees: empMatch?.[1] ?? "",
-      summary: sec.trim().slice(0, 400).replace(/\n+/g, " "),
-      fitScore: scoreMatch ? parseInt(scoreMatch[1]) : 70,
-      crmStatus: "none",
-    })
-  }
-  return results
 }
 
 export async function POST(req: NextRequest) {
@@ -136,7 +163,6 @@ export async function POST(req: NextRequest) {
     const session = await getSession()
     if (!session?.superAdmin && !session?.salesUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
-    // Check if AI discovery is enabled
     const discoveryEnabled = (await getPlatformConfig("ai_prospect_discovery_enabled")) !== "false"
     if (!discoveryEnabled) {
       return NextResponse.json(
@@ -150,14 +176,14 @@ export async function POST(req: NextRequest) {
       console.error("[discover] ANTHROPIC_API_KEY is not set")
       return NextResponse.json({ error: "ANTHROPIC_API_KEY is not configured" }, { status: 500 })
     }
-    console.log("[discover] API key present, length:", apiKey.length)
 
     const body = await req.json() as {
       industry?: string; location?: string; employeeCountMin?: number; employeeCountMax?: number
       locationsMin?: number; keywords?: string; additionalContext?: string
-      country?: string; stateProvince?: string
+      country?: string; stateProvince?: string; requestedCount?: number
     }
-    const country = body.country || "United States"
+    const country        = body.country || "United States"
+    const requestedCount = Math.min(body.requestedCount ?? 20, 20)
     console.log("[discover] request body:", JSON.stringify(body))
 
     // Load existing prospects — for exclusion prompt + CRM annotation
@@ -172,13 +198,11 @@ export async function POST(req: NextRequest) {
       }
     }
     const exclusionList = existingProspects.map(p => p.companyName).slice(0, 100).join(", ")
-
-    // Build complete domain list for hard exclusion
     const existingDomains = existingProspects
       .flatMap(p => { const d = p.website ? extractDomain(p.website) : null; return d ? [d] : [] })
-      .slice(0, 500)
+      .slice(0, 300)
 
-    // Load sent emails — for "contacted" annotation
+    // Load sent emails for "contacted" annotation
     const sentEmails = await prisma.crmEmail.findMany({
       where:   { direction: "sent" },
       select:  { toAddress: true, sentAt: true },
@@ -193,167 +217,182 @@ export async function POST(req: NextRequest) {
       if (!domainToLastContact.has(domain)) domainToLastContact.set(domain, email.sentAt)
     }
 
-    const stateLabel  = country === "Canada" ? "province" : "state"
-    const locationCtx = body.stateProvince
-      ? `${stateLabel}: ${body.stateProvince}`
-      : body.location
-        ? `Region: ${body.location}`
-        : null
+    const empMin         = body.employeeCountMin ?? 50
+    const empMax         = body.employeeCountMax ?? 300
+    const empRange       = `${empMin}–${empMax} employees`
+    const industryTarget = body.industry ?? "manufacturing"
+    const locationTarget = body.stateProvince
+      ? `${body.stateProvince}, ${country}`
+      : body.location ?? country
+    const stateLabel     = country === "Canada" ? "province abbreviation" : "2-letter US state code (e.g. IN)"
+    const keywordsLine   = body.keywords         ? `\nFocus on: ${body.keywords}` : ""
+    const contextLine    = body.additionalContext ? `\nAdditional context: ${body.additionalContext}` : ""
 
-    const criteria: string[] = []
-    if (body.industry)                                  criteria.push(`Industry: ${body.industry}`)
-    if (locationCtx)                                    criteria.push(locationCtx)
-    if (body.employeeCountMin ?? body.employeeCountMax) criteria.push(`Employees: ${body.employeeCountMin ?? "any"}–${body.employeeCountMax ?? "any"}`)
-    if (body.locationsMin)                              criteria.push(`Min locations: ${body.locationsMin}`)
-    if (body.keywords)                                  criteria.push(`Keywords: ${body.keywords}`)
-    if (body.additionalContext)                         criteria.push(`Notes: ${body.additionalContext}`)
-    const criteriaText = criteria.length
-      ? criteria.join("\n")
-      : `Multi-location businesses in ${country} in any operational industry`
+    const systemPrompt = `You are a B2B prospect researcher. Use the web_search tool to find real, verifiable ${industryTarget} companies. Return ONLY a valid JSON array — starting with [ and ending with ]. No markdown, headers, or explanation. If no qualifying companies are found, return [].`
 
-    const stateOrProvince = country === "Canada"
-      ? "province abbreviation (e.g. ON, BC, AB)"
-      : "2-letter state code"
+    const userPrompt = `Find up to ${requestedCount} real ${industryTarget} companies headquartered in ${locationTarget} with approximately ${empRange} that could benefit from Relay — operational coordination software for manufacturing facilities (issue reporting and routing, maintenance request management, digital shift handoffs, QR-code asset tracking).
 
-    const stateFilter = body.stateProvince
-      ? `CRITICAL — GEOGRAPHIC FILTER: Every company you return MUST have its headquarters physically located in ${body.stateProvince}, ${country}. Do not return any company headquartered in a different state or province. Do not return a company just because it has operations or facilities in ${body.stateProvince} — the headquarters must be there. If you are not certain a company is headquartered in ${body.stateProvince}, exclude it.`
-      : ""
+USE WEB SEARCH with this two-step process for every company:
 
-    const systemPrompt = `You must respond with ONLY a valid JSON array. No markdown. No tables. No headers. No explanation. No code blocks. Just a raw JSON array starting with [ and ending with ]. Each element must be a JSON object with these exact keys: companyName, website, city, state, country, industry, estimatedEmployees, summary, fitScore (integer 0-100). If you cannot find companies return []. Do not return anything other than the JSON array.`
+STEP 1 — DISCOVERY (use 2-3 broad searches):
+Search for "${industryTarget} companies ${locationTarget}" or similar to build a candidate list of real companies with Indiana headquarters.${keywordsLine}${contextLine}
 
-    const userPrompt = `Based on your training knowledge, list exactly 15 to 20 REAL companies that would be strong sales prospects for Relay, an operations management platform for multi-location businesses. Relay helps with: issue reporting and tracking across locations, maintenance request routing, QR-code asset management, facility checklists, and team communications across shifts and sites.
+STEP 2 — HEADCOUNT VERIFICATION (required for each candidate — use a dedicated search per company):
+For each company found in Step 1, run a targeted search:
+  - Search: "{company name} linkedin.com employees" or "{company name} site:linkedin.com"
+  - LinkedIn company pages show employee ranges like "51-200 employees", "201-500 employees" — use these
+  - If LinkedIn gives nothing, try: "{company name} glassdoor employees ${locationTarget}"
+  - Classify based on what you actually found:
+    * "web_confirmed" — LinkedIn or Glassdoor shows an employee count or range entirely within ${empRange}
+    * "web_estimated" — LinkedIn or Glassdoor shows a range that OVERLAPS with ${empRange} (e.g., "51-200" overlaps 50-300; "201-500" overlaps 50-300)
+    * "unknown" — company is verified as a real ${locationTarget} ${industryTarget} business but NO headcount evidence found after searching LinkedIn and Glassdoor
 
-CRITICAL — COUNTRY FILTER: Only return companies headquartered in ${country}. Do not return companies from any other country under any circumstances.
-${stateFilter ? `\n${stateFilter}\n` : ""}
-CRITICAL — WEBSITE REQUIRED: You MUST include a real working website URL (with https://) for every company. If you cannot verify a real website for a company, do not include that company. No placeholder URLs.
+IMPORTANT: Most established manufacturers have LinkedIn company pages. Allocate enough searches so you do a headcount lookup for every company you plan to include. Only mark "unknown" after genuinely trying LinkedIn and Glassdoor.
 
-CRITERIA:
-${criteriaText}
+GEOGRAPHIC RULE: Only return companies with confirmed headquarters in ${locationTarget}. Do not include companies merely with facilities there.
 
-EXCLUDE — company names already in our CRM: ${exclusionList || "(none yet)"}
+HONESTY RULE: Return what you verified. Do not fabricate. If you cannot reach ${requestedCount}, return fewer.
 
-CRITICAL — DOMAIN EXCLUSION: Do not suggest any company whose website domain appears in this list: ${existingDomains.length > 0 ? existingDomains.join(", ") : "(none yet)"}. Only return companies whose domain is NOT on this list.
+EXCLUDE — already in our CRM: ${exclusionList || "(none)"}
+EXCLUDE — these domains already tracked: ${existingDomains.length > 0 ? existingDomains.join(", ") : "(none)"}
 
-For each company provide:
-- companyName: exact legal or trade name
-- website: real website URL with https:// — required for every entry
-- city: headquarters city (must be in ${body.stateProvince ?? country})
-- state: ${stateOrProvince}
+Return ONLY a JSON array. Each object must have exactly these keys:
+- companyName: exact company name
+- website: working HTTPS URL (required — omit the company if not verified)
+- city: headquarters city
+- state: ${stateLabel}
 - country: "${country}"
-- industry: specific industry (e.g. "Cold Storage & Warehousing")
-- estimatedEmployees: employee range (e.g. "80-150")
-- summary: ONE sentence about what they do and their multi-location operations
-- fitScore: integer 0-100 (higher = more locations + more operational complexity)
+- industry: specific ${industryTarget} subsector (e.g. "Metal Fabrication", "Food Processing", "Automotive Parts")
+- estimatedEmployees: employee range string (e.g. "80-150") or "unknown"
+- employeeCountTier: "web_confirmed" | "web_estimated" | "unknown"
+- sourceCitations: array of URLs from your web searches — include the LinkedIn/Glassdoor URL when found
+- summary: one sentence describing their ${industryTarget} operations and what they produce
+- fitScore: integer 0-100 (higher = more complex shop floor operations, more Relay fit)
 
 Your entire response must be only the JSON array — nothing before [, nothing after ].`
 
-    console.log("[discover] sending to Anthropic (no web search)")
-    console.log("[discover] user prompt length:", userPrompt.length)
+    console.log("[discover] calling claude-sonnet-5-5 with web_search_20260209")
+    const anthropic = new Anthropic({ apiKey })
 
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:  "POST",
-      headers: {
-        "x-api-key":         apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type":      "application/json",
-      },
-      body: JSON.stringify({
-        model:      "claude-haiku-4-5-20251001",
-        max_tokens: 4000,
-        system:     systemPrompt,
-        messages:   [{ role: "user", content: userPrompt }],
-      }),
-      signal: AbortSignal.timeout(55_000),
+    // 2-3 broad discovery + ~1 LinkedIn headcount search per company.
+    // 12 gives enough budget for 8-10 companies without blowing the 90s wall clock.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tools: any[] = [{ type: "web_search_20260209", name: "web_search", max_uses: 12 }]
+
+    const response = await anthropic.messages.create({
+      model:      "claude-sonnet-5-5",
+      max_tokens: 6000,
+      tools,
+      system:     systemPrompt,
+      messages:   [{ role: "user", content: userPrompt }],
     })
 
-    const responseText = await res.text()
-    console.log("[discover] Anthropic response status:", res.status)
-
-    if (!res.ok) {
-      console.error("[discover] Anthropic API error:", res.status, responseText.slice(0, 600))
-      return NextResponse.json(
-        { error: `Anthropic API returned ${res.status}: ${responseText.slice(0, 300)}`, companies: [] },
-        { status: 502 }
-      )
+    // Log usage — web_search tool charges are billed separately and not reflected here
+    const usage = response.usage as {
+      input_tokens:                number
+      output_tokens:               number
+      cache_creation_input_tokens?: number
+      cache_read_input_tokens?:     number
     }
+    const estimatedTokenCost =
+      (usage.input_tokens  * 2.00  / 1_000_000) +
+      (usage.output_tokens * 10.00 / 1_000_000)
+    console.log("[discover] usage:", {
+      model:          "claude-sonnet-5-5",
+      input_tokens:   usage.input_tokens,
+      output_tokens:  usage.output_tokens,
+      cache_creation: usage.cache_creation_input_tokens ?? 0,
+      cache_read:     usage.cache_read_input_tokens     ?? 0,
+    })
+    console.log("[discover] estimated token cost (Sonnet 5.5 rates, excludes search tool charges):",
+      `$${estimatedTokenCost.toFixed(4)}`)
+    console.log("[discover] stop_reason:", response.stop_reason)
 
-    const data = JSON.parse(responseText) as {
-      content:     { type: string; text?: string }[]
-      stop_reason: string
+    // Collect all URLs returned by actual web search results — used to validate citations
+    const confirmedSearchUrls = new Set<string>()
+    for (const block of response.content) {
+      if (block.type === "web_search_tool_result") {
+        const wsBlock = block as unknown as {
+          content: Array<{ type: string; url?: string }>
+        }
+        for (const item of wsBlock.content ?? []) {
+          if (item.url) confirmedSearchUrls.add(item.url)
+        }
+      }
     }
+    console.log("[discover] confirmed search URL count:", confirmedSearchUrls.size)
 
-    console.log("[discover] stop_reason:", data.stop_reason)
-    console.log("[discover] content block types:", data.content.map(b => b.type).join(", "))
-
-    const textBlocks = data.content
-      .filter((b): b is { type: "text"; text: string } => b.type === "text" && typeof b.text === "string")
-    console.log("[discover] text block count:", textBlocks.length)
-
+    // Extract final text block (after all tool uses)
+    const textBlocks = response.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
     if (textBlocks.length === 0) {
-      console.error("[discover] No text blocks. Full content:", JSON.stringify(data.content).slice(0, 800))
+      console.error("[discover] no text blocks; content types:", response.content.map(b => b.type).join(", "))
       return NextResponse.json({ error: "AI returned no text content", companies: [] }, { status: 502 })
     }
 
-    const rawContinuation = textBlocks.at(-1)!.text.trim()
-    console.log("[discover] raw (first 800 chars):\n", rawContinuation.slice(0, 800))
+    const rawText = textBlocks.at(-1)!.text.trim()
+    console.log("[discover] raw text (first 500 chars):", rawText.slice(0, 500))
 
-    let companies: DiscoveredCompanyBasic[] = []
-    const parsed = extractArray(rawContinuation, false)
-    if (parsed && parsed.length > 0) {
-      companies = parsed.map(p => normalise(p))
-      console.log("[discover] JSON extraction succeeded:", companies.length, "companies")
-    } else {
-      console.warn("[discover] JSON extraction failed — trying prose fallback")
-      companies = extractFromProse(rawContinuation)
-      console.log("[discover] Prose fallback:", companies.length, "companies")
+    const parsed = extractArray(rawText)
+    if (!parsed || parsed.length === 0) {
+      console.error("[discover] JSON extraction failed; raw:", rawText.slice(0, 800))
+      return NextResponse.json({ error: "AI returned unparseable content", companies: [] }, { status: 502 })
     }
 
-    // Drop entries with no name
-    companies = companies.filter(c => c.companyName && c.companyName !== "Unknown")
+    let companies: DiscoveredCompanyBasic[] = parsed
+      .map(p => normalise(p))
+      .filter(c => c.companyName && c.companyName !== "Unknown")
 
-    // Post-process: hard-filter to the requested state.
-    // The model is instructed via CRITICAL prompt text to only return companies
-    // in the requested state, but it occasionally slips.  Any company whose
-    // returned state field does not match (after normalising abbreviations and
-    // full names) is REMOVED — we return fewer results rather than wrong ones.
+    // Validate citations — only keep URLs that appeared in actual search results.
+    // If no search results were captured (e.g. web search didn't fire), pass through as-is.
+    if (confirmedSearchUrls.size > 0) {
+      for (const company of companies) {
+        const before = company.sourceCitations.length
+        company.sourceCitations = company.sourceCitations.filter(url => confirmedSearchUrls.has(url))
+        if (company.sourceCitations.length < before) {
+          console.warn(`[discover] dropped ${before - company.sourceCitations.length} unverified citations for ${company.companyName}`)
+        }
+      }
+    }
+
+    // Server-side geographic validation — flag but do not drop.
+    // Replaces the old hard-filter that silently discarded results.
     if (body.stateProvince) {
-      const requestedState = body.stateProvince.trim().toLowerCase()
-      const US_ABBREVS: Record<string, string> = {
-        "new york": "ny", "new jersey": "nj", "california": "ca", "texas": "tx",
-        "florida": "fl", "illinois": "il", "ohio": "oh", "indiana": "in",
-        "michigan": "mi", "georgia": "ga", "pennsylvania": "pa", "north carolina": "nc",
-        "washington": "wa", "colorado": "co", "arizona": "az", "virginia": "va",
-        "massachusetts": "ma", "tennessee": "tn", "minnesota": "mn", "wisconsin": "wi",
-        "maryland": "md", "missouri": "mo", "oregon": "or", "nevada": "nv",
-        "connecticut": "ct", "iowa": "ia", "arkansas": "ar", "mississippi": "ms",
-        "kansas": "ks", "utah": "ut", "nebraska": "ne", "new mexico": "nm",
-        "west virginia": "wv", "idaho": "id", "hawaii": "hi", "new hampshire": "nh",
-        "maine": "me", "montana": "mt", "rhode island": "ri", "delaware": "de",
-        "south dakota": "sd", "north dakota": "nd", "alaska": "ak", "vermont": "vt",
-        "wyoming": "wy", "louisiana": "la", "south carolina": "sc", "kentucky": "ky",
-        "oklahoma": "ok", "alabama": "al",
+      const reqNorm = normaliseState(body.stateProvince)
+      let geoMatch  = 0
+      for (const c of companies) {
+        c.locationVerified = normaliseState(c.state) !== "" && normaliseState(c.state) === reqNorm
+        if (c.locationVerified) geoMatch++
       }
-      // Build the full set of accepted values (abbreviation + full name)
-      const stateVariants = new Set([requestedState])
-      const abbrev = US_ABBREVS[requestedState]
-      if (abbrev) stateVariants.add(abbrev)
-      for (const [full, ab] of Object.entries(US_ABBREVS)) {
-        if (ab === requestedState) stateVariants.add(full)
-      }
-
-      const before = companies.length
-      companies = companies.filter(c => {
-        const companyState = c.state.trim().toLowerCase()
-        // Also accept "unknown" or empty state only if city strongly suggests the state
-        // (heuristic: if state is blank, we cannot verify — exclude to be safe)
-        return companyState !== "" && stateVariants.has(companyState)
+      console.log("[discover] geographic validation:", {
+        requested:  body.stateProvince,
+        normalised: reqNorm,
+        matched:    geoMatch,
+        total:      companies.length,
       })
-
-      console.log("[discover] state hard-filter:", requestedState,
-        `kept ${companies.length} / dropped ${before - companies.length}`)
+    } else {
+      for (const c of companies) c.locationVerified = true
     }
 
-    // Annotate CRM status for each result
+    // Compute qualification tier: qualified = location + size evidence; potential = location only
+    for (const c of companies) {
+      if (!c.locationVerified) {
+        c.qualificationTier = "location_unverified"
+      } else if (c.employeeCountTier === "web_confirmed" || c.employeeCountTier === "web_estimated") {
+        c.qualificationTier = "qualified"
+      } else {
+        c.qualificationTier = "potential"
+      }
+    }
+
+    // Sort: qualified first, then potential, then location_unverified; within tier by fitScore desc
+    const TIER_ORDER: Record<QualificationTier, number> = { qualified: 0, potential: 1, location_unverified: 2 }
+    companies.sort((a, b) =>
+      (TIER_ORDER[a.qualificationTier] - TIER_ORDER[b.qualificationTier]) ||
+      (b.fitScore - a.fitScore)
+    )
+
+    // Annotate CRM status
     for (const company of companies) {
       const websiteDomain = company.website ? extractDomain(company.website) : null
       if (!websiteDomain) continue
@@ -369,8 +408,27 @@ Your entire response must be only the JSON array — nothing before [, nothing a
       }
     }
 
-    console.log("[discover] final:", companies.length, "companies")
-    return NextResponse.json({ companies })
+    const locationVerifiedCount = companies.filter(c => c.locationVerified).length
+    const qualifiedCount        = companies.filter(c => c.qualificationTier === "qualified").length
+    const potentialCount        = companies.filter(c => c.qualificationTier === "potential").length
+    const webConfirmedCount     = companies.filter(c => c.employeeCountTier === "web_confirmed").length
+    const webEstimatedCount     = companies.filter(c => c.employeeCountTier === "web_estimated").length
+    const unknownTierCount      = companies.filter(c => c.employeeCountTier === "unknown").length
+    const limitationNote = companies.length < requestedCount
+      ? `Found ${companies.length} companies (searched for up to ${requestedCount}). ${qualifiedCount} meet both location and size criteria; ${potentialCount} have unverified employee counts.`
+      : undefined
+
+    console.log("[discover] final result:", {
+      total:              companies.length,
+      qualified:          qualifiedCount,
+      potential:          potentialCount,
+      locationVerified:   locationVerifiedCount,
+      webConfirmed:       webConfirmedCount,
+      webEstimated:       webEstimatedCount,
+      unknownTier:        unknownTierCount,
+    })
+
+    return NextResponse.json({ companies, qualifiedCount, potentialCount, locationVerifiedCount, limitationNote })
 
   } catch (err) {
     const msg   = err instanceof Error ? err.message : String(err)

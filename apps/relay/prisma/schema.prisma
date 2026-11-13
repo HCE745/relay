@@ -3784,6 +3784,9 @@ model ProspectResearchResult {
   outreachAngle       String?
   detailsResearchedAt DateTime?
 
+  sourceCitations     String[] @default([])
+  employeeCountSource String?  // "web_confirmed" | "web_estimated" | "unknown"
+
   source       String   @default("ai_discover")
   researchDate DateTime @default(now())
 

@@ -2,9 +2,8 @@ import "server-only"
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import type { DiscoveredCompany } from "../route"
+import Anthropic from "@anthropic-ai/sdk"
 
-// Email generation uses claude-sonnet-5 without web search but claude is slow —
-// extend Vercel's default 10 s timeout so the function doesn't 502.
 export const maxDuration = 60
 
 export async function POST(req: NextRequest) {
@@ -21,18 +20,17 @@ export async function POST(req: NextRequest) {
     const senderName  = session.name ?? "Will"
     const location    = [company.city, company.state].filter(Boolean).join(", ") || "the US"
     const employees   = company.estimatedEmployees ? `${company.estimatedEmployees} employees` : "a mid-size team"
-    const painPt      = company.painPoints?.[0] ?? "coordinating operations across multiple locations"
-    const fitReason   = company.relayFitReasons?.[0] ?? "Relay streamlines multi-location operations"
+    const painPt      = company.painPoints?.[0] ?? "coordinating operations across the facility"
+    const fitReason   = company.relayFitReasons?.[0] ?? "Relay streamlines manufacturing operations"
     const angle       = company.suggestedOutreachAngle ?? ""
 
-    // Focused, short prompt — no web search needed, research is already done
-    const prompt = `Write a short B2B cold outreach email from ${senderName} at Relay to a decision-maker at ${company.companyName} (${company.industry || "operations"} company, ${location}, ${employees}).
+    const prompt = `Write a short B2B cold outreach email from ${senderName} at Relay to a decision-maker at ${company.companyName} (${company.industry || "manufacturing"} company, ${location}, ${employees}).
 
 Key context:
 - Their pain: ${painPt}
 - Why Relay fits: ${fitReason}
 - Angle: ${angle}
-- What Relay does: operations platform for multi-location businesses — issue tracking, maintenance routing, QR-code asset management, cross-site team communication.
+- What Relay does: operational coordination software for manufacturing facilities — issue reporting and routing, maintenance request management, QR-code asset tracking, digital shift handoffs.
 
 Rules:
 - Subject: specific to their business (not "Quick question" or "Following up")
@@ -42,28 +40,17 @@ Rules:
 
 Return ONLY valid JSON: {"subject": "...", "body": "..."}`
 
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({
-        model:      "claude-haiku-4-5-20251001",
-        max_tokens: 800,
-        system:     "You are a B2B cold email writer. Output only valid JSON with keys 'subject' and 'body'. No markdown. No explanation.",
-        messages: [
-          { role: "user", content: prompt },
-        ],
-      }),
-      signal: AbortSignal.timeout(55_000),
+    const anthropic = new Anthropic({ apiKey })
+    const response = await anthropic.messages.create({
+      model:      "claude-haiku-5-5",
+      max_tokens: 800,
+      system:     "You are a B2B cold email writer. Output only valid JSON with keys 'subject' and 'body'. No markdown. No explanation.",
+      messages:   [{ role: "user", content: prompt }],
     })
 
-    if (!res.ok) {
-      const err = await res.text()
-      console.error("[discover/email] Anthropic error", res.status, err.slice(0, 300))
-      return NextResponse.json({ error: `Email generation failed (${res.status})` }, { status: 502 })
-    }
-
-    const data = await res.json() as { content: { type: string; text?: string }[] }
-    const rawText = data.content.filter(b => b.type === "text").at(-1)?.text?.trim() ?? ""
+    const rawText = response.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .at(-1)?.text?.trim() ?? ""
 
     try {
       const parsed = JSON.parse(rawText) as { subject?: string; body?: string }
@@ -72,7 +59,6 @@ Return ONLY valid JSON: {"subject": "...", "body": "..."}`
         body:    parsed.body?.trim()    ?? "",
       })
     } catch {
-      // Regex fallback if JSON is slightly malformed
       const subMatch  = rawText.match(/"subject"\s*:\s*"([^"]*)"/)
       const bodyMatch = rawText.match(/"body"\s*:\s*"([\s\S]*?)"(?:\s*[,}])/)
       return NextResponse.json({

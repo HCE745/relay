@@ -14,10 +14,14 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
+  // Plain sales_rep users only see their own lists — not shared lists from other users.
+  // Managers (admin_sales) and super-admins can see shared lists.
+  const canSeeShared = !!session.superAdminId || session.salesUserRole === "admin_sales"
+
   const lists = await prisma.prospectResearchList.findMany({
     where: session.superAdminId
-      ? { OR: [{ superAdminId: session.superAdminId }, { isShared: true }] }
-      : { OR: [{ salesUserId: session.salesUserId },   { isShared: true }] },
+      ? { OR: [{ superAdminId: session.superAdminId }, ...(canSeeShared ? [{ isShared: true }] : [])] }
+      : { OR: [{ salesUserId: session.salesUserId },   ...(canSeeShared ? [{ isShared: true }] : [])] },
     include: { _count: { select: { results: true } } },
     // Active lists first (by createdAt desc), then completed
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
@@ -112,26 +116,30 @@ function buildResultData(
   requestedState?: string,
 ) {
   const verifiedState  = (r.state  as string | undefined) ?? null
+  // Case-insensitive comparison — the discover route normalises state to 2-letter codes,
+  // but handle full names gracefully in case results come from another path.
   const locationVerified = !!(requestedState && verifiedState &&
-    verifiedState.toLowerCase() === requestedState.toLowerCase())
+    verifiedState.trim().toLowerCase() === requestedState.trim().toLowerCase())
 
   return {
-    companyName:       String(r.companyName ?? ""),
-    website:           (r.website as string | null) ?? null,
-    normalizedDomain:  normalizeDomain(r.website as string | null),
-    requestedCountry:  requestedCountry ?? null,
-    requestedState:    requestedState   ?? null,
-    verifiedCity:      (r.city    as string | null) ?? null,
-    verifiedState:     verifiedState,
-    verifiedCountry:   (r.country as string | null) ?? null,
+    companyName:         String(r.companyName ?? ""),
+    website:             (r.website as string | null) ?? null,
+    normalizedDomain:    normalizeDomain(r.website as string | null),
+    requestedCountry:    requestedCountry ?? null,
+    requestedState:      requestedState   ?? null,
+    verifiedCity:        (r.city    as string | null) ?? null,
+    verifiedState,
+    verifiedCountry:     (r.country as string | null) ?? null,
     locationVerified,
-    industry:           (r.industry           as string | null) ?? null,
-    estimatedEmployees: (r.employeeCount       as string | null) ?? null,
-    summary:            (r.summary            as string | null) ?? null,
-    fitScore:           typeof r.fitScore === "number" ? r.fitScore : null,
-    painPoints:         Array.isArray(r.painPoints)      ? r.painPoints      : [],
-    relayFitReasons:    Array.isArray(r.relayFitReasons) ? r.relayFitReasons : [],
-    outreachAngle:      (r.suggestedOutreachAngle as string | null) ?? null,
-    source:             "ai_discover",
+    industry:            (r.industry           as string | null) ?? null,
+    estimatedEmployees:  (r.estimatedEmployees  as string | null) ?? (r.employeeCount as string | null) ?? null,
+    summary:             (r.summary            as string | null) ?? null,
+    fitScore:            typeof r.fitScore === "number" ? r.fitScore : null,
+    painPoints:          Array.isArray(r.painPoints)      ? r.painPoints      : [],
+    relayFitReasons:     Array.isArray(r.relayFitReasons) ? r.relayFitReasons : [],
+    outreachAngle:       (r.suggestedOutreachAngle as string | null) ?? null,
+    sourceCitations:     Array.isArray(r.sourceCitations) ? (r.sourceCitations as string[]) : [],
+    employeeCountSource: typeof r.employeeCountTier === "string" ? (r.employeeCountTier as string) : null,
+    source:              "ai_discover",
   }
 }

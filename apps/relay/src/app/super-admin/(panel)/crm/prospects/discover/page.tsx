@@ -92,6 +92,30 @@ function CompanyCard({ company, selected, onClick }: {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-white font-semibold text-[14px] leading-snug">{company.companyName}</h3>
+            {company.qualificationTier === "qualified" && company.employeeCountTier === "web_confirmed" && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-green-900/30 text-green-400 border border-green-800/50 flex-shrink-0">
+                <CheckCircle2 className="w-2 h-2" />
+                Size confirmed
+              </span>
+            )}
+            {company.qualificationTier === "qualified" && company.employeeCountTier === "web_estimated" && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/30 text-amber-400 border border-amber-800/50 flex-shrink-0">
+                <CheckCircle2 className="w-2 h-2" />
+                Size estimated
+              </span>
+            )}
+            {company.qualificationTier === "potential" && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/30 text-amber-400 border border-amber-800/50 flex-shrink-0">
+                <AlertTriangle className="w-2 h-2" />
+                Size unverified
+              </span>
+            )}
+            {company.qualificationTier === "location_unverified" && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-red-900/20 text-red-400 border border-red-800/50 flex-shrink-0">
+                <AlertTriangle className="w-2 h-2" />
+                Location unclear
+              </span>
+            )}
             {company.crmStatus === "contacted" && (
               <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-orange-900/30 text-orange-400 border border-orange-800/50 flex-shrink-0">
                 <CheckCircle2 className="w-2 h-2" />
@@ -112,11 +136,17 @@ function CompanyCard({ company, selected, onClick }: {
                 {[company.city, company.state].filter(Boolean).join(", ")}
               </span>
             )}
-            {company.estimatedEmployees && (
+            {company.estimatedEmployees && company.estimatedEmployees !== "unknown" ? (
               <span className="flex items-center gap-0.5">
                 <Users className="w-2.5 h-2.5" />{company.estimatedEmployees} emp.
+                {company.employeeCountTier === "web_confirmed" && <span className="text-green-500/70">✓</span>}
+                {company.employeeCountTier === "web_estimated" && <span className="text-amber-500/70">~</span>}
               </span>
-            )}
+            ) : company.qualificationTier !== "qualified" ? (
+              <span className="flex items-center gap-0.5 text-gray-600">
+                <Users className="w-2.5 h-2.5" />size unknown
+              </span>
+            ) : null}
             {company.website && (
               <a href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
                 target="_blank" rel="noopener noreferrer"
@@ -611,17 +641,21 @@ function SavedListsTab({ onLoad }: { onLoad: (companies: DiscoveredCompanyBasic[
       const data = await res.json() as { results: (DiscoveredCompanyBasic & { verifiedCity?: string; verifiedState?: string; verifiedCountry?: string })[] }
       // Map ProspectResearchResult shape back to DiscoveredCompanyBasic
       const companies: DiscoveredCompanyBasic[] = data.results.map(r => ({
-        companyName:       r.companyName,
-        website:           r.website ?? undefined,
-        city:              r.verifiedCity ?? r.city ?? undefined,
-        state:             r.verifiedState ?? r.state ?? undefined,
-        country:           r.verifiedCountry ?? r.country ?? undefined,
-        industry:          r.industry ?? undefined,
-        estimatedEmployees: r.estimatedEmployees ?? undefined,
-        summary:           r.summary ?? undefined,
-        fitScore:          r.fitScore ?? 50,
-        crmStatus:         r.crmStatus ?? "none",
-        lastContactAt:     r.lastContactAt ?? undefined,
+        companyName:        r.companyName,
+        website:            r.website ?? "",
+        city:               r.verifiedCity ?? r.city ?? "",
+        state:              r.verifiedState ?? r.state ?? "",
+        country:            r.verifiedCountry ?? r.country ?? "United States",
+        industry:           r.industry ?? "",
+        estimatedEmployees: r.estimatedEmployees ?? "",
+        employeeCountTier:  r.employeeCountTier  ?? "unknown",
+        qualificationTier:  r.qualificationTier  ?? (r.employeeCountTier && r.employeeCountTier !== "unknown" ? "qualified" : "potential"),
+        sourceCitations:    r.sourceCitations     ?? [],
+        locationVerified:   r.locationVerified    ?? false,
+        summary:            r.summary ?? "",
+        fitScore:           r.fitScore ?? 50,
+        crmStatus:          r.crmStatus ?? "none",
+        lastContactAt:      r.lastContactAt ?? undefined,
       }))
       onLoad(companies, list.name)
     } catch { alert("Could not load list") }
@@ -746,10 +780,11 @@ export default function DiscoverPage() {
   const [keywords,      setKeywords]      = useState("")
   const [context,       setContext]       = useState("")
 
-  const [searchState, setSearchState] = useState<SearchState>("idle")
-  const [companies,   setCompanies]   = useState<DiscoveredCompanyBasic[]>([])
-  const [searchError, setSearchError] = useState<string | null>(null)
-  const [selected,    setSelected]    = useState<DiscoveredCompanyBasic | null>(null)
+  const [searchState,    setSearchState]    = useState<SearchState>("idle")
+  const [companies,      setCompanies]      = useState<DiscoveredCompanyBasic[]>([])
+  const [searchError,    setSearchError]    = useState<string | null>(null)
+  const [selected,       setSelected]       = useState<DiscoveredCompanyBasic | null>(null)
+  const [limitationNote, setLimitationNote] = useState<string | null>(null)
 
   const [listSaveState, setListSaveState] = useState<ListSaveState>("idle")
   const [listName,      setListName]      = useState("")
@@ -821,6 +856,7 @@ export default function DiscoverPage() {
     setSearchError(null)
     setCompanies([])
     setSelected(null)
+    setLimitationNote(null)
     setListSaveState("idle")
     setListName("")
 
@@ -841,8 +877,9 @@ export default function DiscoverPage() {
         const data = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(data.error ?? `Search failed (${res.status})`)
       }
-      const data = await res.json() as { companies: DiscoveredCompanyBasic[] }
+      const data = await res.json() as { companies: DiscoveredCompanyBasic[]; limitationNote?: string }
       setCompanies(data.companies ?? [])
+      setLimitationNote(data.limitationNote ?? null)
       setSearchState("done")
     } catch (err) {
       setSearchError(err instanceof Error ? err.message : "Search failed")
@@ -1038,6 +1075,12 @@ export default function DiscoverPage() {
 
           {searchState === "done" && (
             <>
+              {limitationNote && (
+                <div className="mb-4 flex items-start gap-2 bg-amber-950/30 border border-amber-800/40 rounded-lg px-3.5 py-2.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-[12px] text-amber-300/90 leading-relaxed">{limitationNote}</p>
+                </div>
+              )}
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-sm text-gray-300 font-medium">

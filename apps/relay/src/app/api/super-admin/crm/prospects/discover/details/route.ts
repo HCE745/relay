@@ -2,6 +2,7 @@ import "server-only"
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "../route"
+import Anthropic from "@anthropic-ai/sdk"
 
 export const maxDuration = 60
 
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const location = [company.city, company.state, company.country].filter(Boolean).join(", ")
 
-    const prompt = `You are a B2B sales researcher. Generate targeted sales research for Relay (operations platform for multi-location businesses: issue tracking, maintenance routing, QR-code asset management, facility checklists, cross-site communications).
+    const prompt = `You are a B2B sales researcher. Generate targeted sales research for Relay — operational coordination software for manufacturing facilities (issue reporting and routing, maintenance request management, work order assignment, digital shift handoffs, QR-code asset tracking, real-time shop floor visibility).
 
 Company: ${company.companyName}
 Industry: ${company.industry || "unknown"}
@@ -34,30 +35,21 @@ Return ONLY valid JSON with exactly these keys:
 }
 
 Rules:
-- painPoints: specific multi-location challenges (coordination gaps, maintenance blindspots, asset tracking, shift handoffs, cross-site reporting)
-- relayFitReasons: name the specific Relay capability (e.g. "QR-code asset tagging", "cross-location issue queue", "facility checklist templates")
-- suggestedOutreachAngle: reference their specific industry or a recognizable operational bottleneck they face`
+- painPoints: specific manufacturing operational challenges (maintenance tracking gaps, shift handoff breakdowns, equipment issue reporting delays, work order visibility, floor-level coordination)
+- relayFitReasons: name the specific Relay capability (e.g. "QR-code asset tagging", "work order assignment queue", "digital shift handoff checklists", "real-time issue routing")
+- suggestedOutreachAngle: reference their specific manufacturing subsector or a recognizable operational bottleneck they face`
 
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:  "POST",
-      headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({
-        model:      "claude-haiku-4-5-20251001",
-        max_tokens: 600,
-        system:     "You are a B2B sales researcher. Output only valid JSON. No markdown. No explanation.",
-        messages:   [{ role: "user", content: prompt }],
-      }),
-      signal: AbortSignal.timeout(55_000),
+    const anthropic = new Anthropic({ apiKey })
+    const response = await anthropic.messages.create({
+      model:      "claude-haiku-5-5",
+      max_tokens: 600,
+      system:     "You are a B2B sales researcher. Output only valid JSON. No markdown. No explanation.",
+      messages:   [{ role: "user", content: prompt }],
     })
 
-    if (!res.ok) {
-      const err = await res.text()
-      console.error("[discover/details] Anthropic error", res.status, err.slice(0, 300))
-      return NextResponse.json({ error: `Details generation failed (${res.status})` }, { status: 502 })
-    }
-
-    const data = await res.json() as { content: { type: string; text?: string }[] }
-    const rawText = data.content.filter(b => b.type === "text").at(-1)?.text?.trim() ?? ""
+    const rawText = response.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .at(-1)?.text?.trim() ?? ""
 
     try {
       const p = JSON.parse(rawText) as { painPoints?: unknown; relayFitReasons?: unknown; suggestedOutreachAngle?: unknown }
@@ -69,7 +61,7 @@ Rules:
       }
       return NextResponse.json(details)
     } catch {
-      // Regex fallback
+      // Regex fallback for slightly malformed JSON
       const ptsMatch = rawText.match(/"painPoints"\s*:\s*\[([\s\S]*?)\]/)
       const rfrMatch = rawText.match(/"relayFitReasons"\s*:\s*\[([\s\S]*?)\]/)
       const angMatch = rawText.match(/"suggestedOutreachAngle"\s*:\s*"([^"]*)"/)

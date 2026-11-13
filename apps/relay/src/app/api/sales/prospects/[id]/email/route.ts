@@ -10,6 +10,7 @@ import { sendViaTitanSmtp } from "@/lib/titan-smtp"
 import { htmlToText } from "@/lib/html-to-text"
 import { getSession } from "@/lib/session"
 import { markOutreachDone } from "@/lib/research-progress"
+import { appendToSentFolder } from "@/lib/imap-sent"
 
 function plainToHtml(plain: string): string {
   return plain
@@ -64,12 +65,15 @@ export async function POST(
       ? await prisma.imapConfig.findFirst({ where: { salesUserId: session.salesUserId } }).catch(() => null)
       : null
 
+  let sentFolderSaved = false
+  let sentFolderError: string | null = null
+
   if (imapCfg) {
     let smtpPass: string
     try { smtpPass = decryptField(imapCfg.encryptedPassword) }
     catch { return NextResponse.json({ error: "Failed to decrypt SMTP credentials" }, { status: 500 }) }
 
-    await sendViaTitanSmtp(
+    const mimeBuffer = await sendViaTitanSmtp(
       {
         smtpHost: imapCfg.smtpHost,
         smtpPort: imapCfg.smtpPort,
@@ -80,6 +84,18 @@ export async function POST(
       { to, subject, bodyHtml, bodyText, messageId },
     )
     fromAddress = imapCfg.emailAddress
+
+    // Append to sender's IMAP Sent folder — non-fatal if it fails
+    const appendResult = await appendToSentFolder(
+      { host: imapCfg.host, port: imapCfg.port, emailAddress: imapCfg.emailAddress },
+      smtpPass,
+      mimeBuffer,
+    )
+    sentFolderSaved = appendResult.ok
+    if (!appendResult.ok) {
+      sentFolderError = appendResult.error ?? "IMAP append failed"
+      console.error(`[email/send] Sent-folder append failed for ${imapCfg.emailAddress}: ${sentFolderError}`)
+    }
   } else {
     const RESEND_API_KEY = process.env.RESEND_API_KEY
     if (!RESEND_API_KEY) {
@@ -121,6 +137,8 @@ export async function POST(
       sentAt: new Date(),
       source: "prospect_outreach",
       sentBySalesUserId: info.salesUserId !== "sa" ? info.salesUserId : null,
+      sentFolderSaved,
+      sentFolderError,
     },
   })
   await prisma.crmEmail.update({ where: { id: email.id }, data: { threadId: email.id } })

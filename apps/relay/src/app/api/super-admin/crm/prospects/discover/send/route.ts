@@ -8,6 +8,7 @@ export const maxDuration = 60
 import { sendViaTitanSmtp } from "@/lib/titan-smtp"
 import { htmlToText } from "@/lib/html-to-text"
 import { enrollInSequence, getDefaultSequence } from "@/lib/crm-sequences"
+import { appendToSentFolder } from "@/lib/imap-sent"
 import type { DiscoveredCompany } from "../route"
 
 function bodyToHtml(plain: string): string {
@@ -135,14 +136,30 @@ export async function POST(req: NextRequest) {
       ? await prisma.imapConfig.findUnique({ where: { salesUserId: session.salesUserId } })
       : null
 
+  let sentFolderSaved = false
+  let sentFolderError: string | null = null
+
   if (imapCfg) {
     let smtpPass: string
     try { smtpPass = decryptField(imapCfg.encryptedPassword) }
     catch { return NextResponse.json({ error: "Failed to decrypt SMTP credentials" }, { status: 500 }) }
-    await sendViaTitanSmtp(
+
+    const mimeBuffer = await sendViaTitanSmtp(
       { smtpHost: imapCfg.smtpHost, smtpPort: imapCfg.smtpPort, emailAddress: imapCfg.emailAddress, password: smtpPass, fromName: session.name ? `${session.name} @ Relay` : "Relay" },
       { to, subject, bodyHtml, bodyText, messageId },
     )
+
+    // Append to sender's IMAP Sent folder — non-fatal if it fails
+    const appendResult = await appendToSentFolder(
+      { host: imapCfg.host, port: imapCfg.port, emailAddress: imapCfg.emailAddress },
+      smtpPass,
+      mimeBuffer,
+    )
+    sentFolderSaved = appendResult.ok
+    if (!appendResult.ok) {
+      sentFolderError = appendResult.error ?? "IMAP append failed"
+      console.error(`[discover/send] Sent-folder append failed for ${imapCfg.emailAddress}: ${sentFolderError}`)
+    }
   } else {
     const RESEND_API_KEY = process.env.RESEND_API_KEY
     if (!RESEND_API_KEY) return NextResponse.json({ error: "No SMTP configuration — add one in CRM Settings" }, { status: 500 })
@@ -170,6 +187,8 @@ export async function POST(req: NextRequest) {
       messageId,
       sentAt:       new Date(),
       source:       "discover",
+      sentFolderSaved,
+      sentFolderError,
     },
   })
   // Set threadId to self (initial outreach)

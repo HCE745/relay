@@ -23,10 +23,34 @@ export interface SmtpSendOptions {
 export async function sendViaTitanSmtp(
   config:  SmtpConfig,
   options: SmtpSendOptions,
-): Promise<void> {
+): Promise<Buffer> {
   const from = config.fromName
     ? `"${config.fromName}" <${config.emailAddress}>`
     : config.emailAddress
+
+  const sentAt = new Date()
+
+  const mailOptions = {
+    from,
+    to:      options.to,
+    ...(options.cc ? { cc: options.cc } : {}),
+    subject: options.subject,
+    html:    options.bodyHtml,
+    text:    options.bodyText,
+    date:    sentAt,
+    headers: {
+      "Message-ID": options.messageId,
+      ...(options.inReplyTo ? { "In-Reply-To": `<${options.inReplyTo}>`, "References": `<${options.inReplyTo}>` } : {}),
+      ...(options.unsubscribeUrl ? {
+        "List-Unsubscribe":      `<${options.unsubscribeUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      } : {}),
+    },
+  }
+
+  // Capture the raw MIME before sending (same options → same Message-ID, Date, headers)
+  const streamTransport = createTransport({ streamTransport: true, newline: "unix", buffer: true })
+  const streamResult = await streamTransport.sendMail(mailOptions) as { message: Buffer }
 
   const transport = createTransport({
     host:   config.smtpHost,
@@ -36,22 +60,8 @@ export async function sendViaTitanSmtp(
     tls:    { rejectUnauthorized: false },
   })
 
-  await transport.sendMail({
-    from,
-    to:      options.to,
-    ...(options.cc ? { cc: options.cc } : {}),
-    subject: options.subject,
-    html:    options.bodyHtml,
-    text:    options.bodyText,
-    headers: {
-      "Message-ID": options.messageId,
-      ...(options.inReplyTo ? { "In-Reply-To": `<${options.inReplyTo}>`, "References": `<${options.inReplyTo}>` } : {}),
-      ...(options.unsubscribeUrl ? {
-        "List-Unsubscribe":      `<${options.unsubscribeUrl}>`,
-        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-      } : {}),
-    },
-  })
-
+  await transport.sendMail(mailOptions)
   transport.close()
+
+  return streamResult.message
 }

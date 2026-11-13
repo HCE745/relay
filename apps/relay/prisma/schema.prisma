@@ -1996,6 +1996,8 @@ model CrmEmail {
   abTestCampaignId  String?
   prospectId        String?   // direct link to Prospect (Company) record
   contactId         String?   // direct link to ProspectContact record
+  sentFolderSaved   Boolean   @default(false)
+  sentFolderError   String?
   createdAt         DateTime  @default(now())
 
   demoCall        DemoCall?        @relation(fields: [demoCallId], references: [id], onDelete: SetNull)

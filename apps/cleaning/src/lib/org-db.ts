@@ -113,6 +113,7 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
 export const SYSTEM_MODELS: ReadonlySet<string> = new Set([
   "Organization", // the tenant root itself
   "PasswordResetToken", // pre-auth, looked up by single-use token
+  "EmailVerificationToken", // pre-auth, looked up by single-use token (Phase 50)
   // Child/line rows with no organizationId — scoped via their parent, which IS
   // org-scoped (the parent's id filter carries the tenant boundary):
   "ChecklistTemplateItem", // → ChecklistTemplate

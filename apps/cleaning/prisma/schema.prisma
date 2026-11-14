@@ -466,6 +466,20 @@ model Organization {
   correctiveDueDaysStandard Int     @default(3)
   correctiveDueDaysCritical Int     @default(1)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
+  // ── CleanWare SaaS subscription (Phase 50) ───────────────────────────────
+  // Stripe is the source of truth for subscription STATE; these columns mirror
+  // it for fast reads and to map inbound webhooks back to the org. ALL nullable
+  // or safe-default so existing organizations are untouched by the migration and
+  // NO enforcement is implied by adding them (enforcement ships in a later phase,
+  // deliberately). The two Stripe ids are unique (Postgres permits many NULLs),
+  // binding one org to at most one Stripe customer/subscription — part of the
+  // guard against duplicate subscriptions.
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  billingInterval      String?   // "monthly" | "annual" (null until subscribed)
+  purchasedSeats       Int       @default(0) // extra seats beyond the plan's included count
+  currentPeriodEnd     DateTime? // paid-through date, from Stripe
+  cancelAtPeriodEnd    Boolean   @default(false) // set via portal; access ends at period end
   // Default IANA timezone for scheduling. Service locations may override.
   timezone              String    @default("America/New_York")
 
@@ -591,6 +605,7 @@ model User {
   recordedSupplyUsages SupplyUsage[]      @relation("SupplyUsageRecorder")
   supplyAdjustments    SupplyAdjustment[] @relation("SupplyAdjuster")
   passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
   availabilities       Availability[]     @relation("UserAvailability")
   timeOffRequests      TimeOffRequest[]   @relation("UserTimeOff")
   credentials          Credential[]       @relation("UserCredential")
@@ -1663,6 +1678,25 @@ model IssueComment {
 // intentionally NOT organization-scoped. Only a SHA-256 hash of the token is
 // stored; the raw token lives only in the emailed link and is single-use.
 model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@schema("cleaning")
+}
+
+// Email-verification token for self-service registration (Phase 50). Same secure
+// pattern as PasswordResetToken: only a SHA-256 hash of the opaque token is
+// stored (@unique, so the hash is the lookup key), with an expiry and a single-
+// use `usedAt`. The raw token travels only in the emailed link and is never
+// persisted. Tokens cascade-delete with the user.
+model EmailVerificationToken {
   id        String    @id @default(cuid())
   userId    String
   tokenHash String    @unique

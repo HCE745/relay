@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 
 interface Contact {
   id: string; name: string; title: string | null; email: string | null
-  phone: string | null; linkedinUrl: string | null; department: string | null
+  phone: string | null; mobile: string | null; linkedinUrl: string | null; department: string | null
   jobLevel: string | null; isPrimaryContact: boolean; isDecisionMaker: boolean
   isChampion: boolean; notes: string | null; createdAt: string
 }
@@ -198,9 +198,12 @@ export function CompanyHub({
 
   // ── Contact state ───────────────────────────────────────────────────────────
   const [addingContact, setAddingContact] = useState(false)
-  const [contactForm, setContactForm]     = useState({ name: "", title: "", email: "", phone: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
+  const [contactForm, setContactForm]     = useState({ name: "", title: "", email: "", phone: "", mobile: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
   const [savingContact, setSavingContact] = useState(false)
   const [expandedContactId, setExpandedContactId] = useState<string | null>(null)
+  const [editingContactId, setEditingContactId]   = useState<string | null>(null)
+  const [contactEditDraft, setContactEditDraft]   = useState<{ name: string; title: string; email: string; phone: string; mobile: string; linkedinUrl: string; isDecisionMaker: boolean; isPrimaryContact: boolean; isChampion: boolean }>({ name: "", title: "", email: "", phone: "", mobile: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false, isChampion: false })
+  const [savingEditContact, setSavingEditContact] = useState(false)
 
   async function createContact() {
     if (!contactForm.name.trim()) return
@@ -213,9 +216,43 @@ export function CompanyHub({
       if (res.ok) {
         const data = await res.json() as { contact: Contact }
         setCompany(c => ({ ...c, contacts: [...c.contacts, data.contact] }))
-        setAddingContact(false); setContactForm({ name: "", title: "", email: "", phone: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
+        setAddingContact(false); setContactForm({ name: "", title: "", email: "", phone: "", mobile: "", linkedinUrl: "", isDecisionMaker: false, isPrimaryContact: false })
       }
     } finally { setSavingContact(false) }
+  }
+
+  function startEditContact(c: Contact) {
+    setContactEditDraft({
+      name: c.name, title: c.title ?? "", email: c.email ?? "",
+      phone: c.phone ?? "", mobile: c.mobile ?? "", linkedinUrl: c.linkedinUrl ?? "",
+      isDecisionMaker: c.isDecisionMaker, isPrimaryContact: c.isPrimaryContact, isChampion: c.isChampion,
+    })
+    setEditingContactId(c.id)
+  }
+
+  async function saveEditContact(contactId: string) {
+    setSavingEditContact(true)
+    try {
+      const res = await fetch(`/api/sales/companies/${company.id}/contacts/${contactId}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name:             contactEditDraft.name.trim() || undefined,
+          title:            contactEditDraft.title || null,
+          email:            contactEditDraft.email || null,
+          phone:            contactEditDraft.phone || null,
+          mobile:           contactEditDraft.mobile || null,
+          linkedinUrl:      contactEditDraft.linkedinUrl || null,
+          isDecisionMaker:  contactEditDraft.isDecisionMaker,
+          isPrimaryContact: contactEditDraft.isPrimaryContact,
+          isChampion:       contactEditDraft.isChampion,
+        }),
+      })
+      if (res.ok) {
+        const updated = await res.json() as Contact
+        setCompany(c => ({ ...c, contacts: c.contacts.map(ct => ct.id === contactId ? { ...ct, ...updated } : ct) }))
+        setEditingContactId(null)
+      }
+    } finally { setSavingEditContact(false) }
   }
 
   // ── Task state ──────────────────────────────────────────────────────────────
@@ -595,6 +632,7 @@ export function CompanyHub({
                   { placeholder: "Job title",   key: "title" },
                   { placeholder: "Email",        key: "email" },
                   { placeholder: "Phone",        key: "phone" },
+                  { placeholder: "Mobile",       key: "mobile" },
                   { placeholder: "LinkedIn URL", key: "linkedinUrl" },
                 ].map(f => (
                   <input key={f.key} placeholder={f.placeholder}
@@ -635,7 +673,7 @@ export function CompanyHub({
               <div key={c.id} className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
                 <div
                   className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-800/40 transition-colors"
-                  onClick={() => setExpandedContactId(id => id === c.id ? null : c.id)}
+                  onClick={() => { setExpandedContactId(id => id === c.id ? null : c.id); setEditingContactId(null) }}
                 >
                   <div className="w-9 h-9 rounded-full bg-indigo-900/40 flex items-center justify-center text-sm font-bold text-indigo-300 shrink-0">
                     {c.name.charAt(0).toUpperCase()}
@@ -651,46 +689,107 @@ export function CompanyHub({
                   </div>
                   {expandedContactId === c.id ? <ChevronUp className="w-4 h-4 text-gray-600" /> : <ChevronDown className="w-4 h-4 text-gray-600" />}
                 </div>
-                {expandedContactId === c.id && (
-                  <div className="px-4 pb-4 pt-1 border-t border-gray-800 grid grid-cols-2 gap-3 text-sm">
-                    {c.email && (
-                      <div>
-                        <p className="text-xs text-gray-600 mb-0.5">Email</p>
-                        <a href={`mailto:${c.email}`} className="text-indigo-400 hover:underline">{c.email}</a>
+                {expandedContactId === c.id && editingContactId !== c.id && (
+                  <div className="px-4 pb-4 pt-1 border-t border-gray-800 text-sm">
+                    <div className="grid grid-cols-2 gap-3">
+                      {c.email && (
+                        <div>
+                          <p className="text-xs text-gray-600 mb-0.5">Email</p>
+                          <a href={`mailto:${c.email}`} className="text-indigo-400 hover:underline">{c.email}</a>
+                        </div>
+                      )}
+                      {c.phone && (
+                        <div>
+                          <p className="text-xs text-gray-600 mb-0.5">Phone</p>
+                          <p className="text-gray-300">{c.phone}</p>
+                        </div>
+                      )}
+                      {c.mobile && (
+                        <div>
+                          <p className="text-xs text-gray-600 mb-0.5">Mobile</p>
+                          <p className="text-gray-300">{c.mobile}</p>
+                        </div>
+                      )}
+                      {c.linkedinUrl && (
+                        <div>
+                          <p className="text-xs text-gray-600 mb-0.5">LinkedIn</p>
+                          <a href={c.linkedinUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
+                            <Link2 className="w-3 h-3" /> Profile
+                          </a>
+                        </div>
+                      )}
+                      {c.department && (
+                        <div>
+                          <p className="text-xs text-gray-600 mb-0.5">Department</p>
+                          <p className="text-gray-300">{c.department}</p>
+                        </div>
+                      )}
+                      {c.jobLevel && (
+                        <div>
+                          <p className="text-xs text-gray-600 mb-0.5">Level</p>
+                          <p className="text-gray-300">{c.jobLevel.replace(/_/g, " ")}</p>
+                        </div>
+                      )}
+                      {c.notes && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-gray-600 mb-0.5">Notes</p>
+                          <p className="text-gray-400 whitespace-pre-wrap">{c.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={e => { e.stopPropagation(); startEditContact(c) }}
+                      className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg transition-colors"
+                    >
+                      <Edit3 className="w-3 h-3" /> Edit contact
+                    </button>
+                  </div>
+                )}
+                {expandedContactId === c.id && editingContactId === c.id && (
+                  <div className="px-4 pb-4 pt-3 border-t border-gray-800 space-y-3">
+                    <p className="text-sm font-medium text-white">Edit Contact</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {([
+                        { placeholder: "Full name *", key: "name" },
+                        { placeholder: "Job title",   key: "title" },
+                        { placeholder: "Email",        key: "email" },
+                        { placeholder: "Phone",        key: "phone" },
+                        { placeholder: "Mobile",       key: "mobile" },
+                        { placeholder: "LinkedIn URL", key: "linkedinUrl" },
+                      ] as { placeholder: string; key: keyof typeof contactEditDraft }[]).map(f => (
+                        <input key={f.key} placeholder={f.placeholder}
+                          value={typeof contactEditDraft[f.key] === "string" ? contactEditDraft[f.key] as string : ""}
+                          onChange={e => setContactEditDraft(d => ({ ...d, [f.key]: e.target.value }))}
+                          className="col-span-2 md:col-span-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                      ))}
+                      <div className="col-span-2 flex items-center gap-4">
+                        <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+                          <input type="checkbox" checked={contactEditDraft.isDecisionMaker}
+                            onChange={e => setContactEditDraft(d => ({ ...d, isDecisionMaker: e.target.checked }))}
+                            className="accent-indigo-500" />
+                          Decision maker
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+                          <input type="checkbox" checked={contactEditDraft.isPrimaryContact}
+                            onChange={e => setContactEditDraft(d => ({ ...d, isPrimaryContact: e.target.checked }))}
+                            className="accent-indigo-500" />
+                          Primary contact
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+                          <input type="checkbox" checked={contactEditDraft.isChampion}
+                            onChange={e => setContactEditDraft(d => ({ ...d, isChampion: e.target.checked }))}
+                            className="accent-indigo-500" />
+                          Champion
+                        </label>
                       </div>
-                    )}
-                    {c.phone && (
-                      <div>
-                        <p className="text-xs text-gray-600 mb-0.5">Phone</p>
-                        <p className="text-gray-300">{c.phone}</p>
-                      </div>
-                    )}
-                    {c.linkedinUrl && (
-                      <div>
-                        <p className="text-xs text-gray-600 mb-0.5">LinkedIn</p>
-                        <a href={c.linkedinUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
-                          <Link2 className="w-3 h-3" /> Profile
-                        </a>
-                      </div>
-                    )}
-                    {c.department && (
-                      <div>
-                        <p className="text-xs text-gray-600 mb-0.5">Department</p>
-                        <p className="text-gray-300">{c.department}</p>
-                      </div>
-                    )}
-                    {c.jobLevel && (
-                      <div>
-                        <p className="text-xs text-gray-600 mb-0.5">Level</p>
-                        <p className="text-gray-300">{c.jobLevel.replace(/_/g, " ")}</p>
-                      </div>
-                    )}
-                    {c.notes && (
-                      <div className="col-span-2">
-                        <p className="text-xs text-gray-600 mb-0.5">Notes</p>
-                        <p className="text-gray-400 whitespace-pre-wrap">{c.notes}</p>
-                      </div>
-                    )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => saveEditContact(c.id)} disabled={savingEditContact || !contactEditDraft.name.trim()}
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors">
+                        {savingEditContact ? "Saving…" : "Save"}
+                      </button>
+                      <button onClick={() => setEditingContactId(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+                    </div>
                   </div>
                 )}
               </div>

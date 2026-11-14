@@ -25,11 +25,14 @@ export async function POST(req: NextRequest) {
     targetId = typeof body.emailId === "string" ? body.emailId : null
   } catch { /* empty body */ }
 
-  // Find candidates: sent emails where Sent-folder append hasn't succeeded yet
+  // Find candidates: sent emails where an IMAP append was attempted but hasn't succeeded yet.
+  // sentFolderAttempted=false means the email was sent before this feature existed (historical),
+  // or was sent via Resend (no IMAP config). Never retry those automatically.
   const candidates = await prisma.crmEmail.findMany({
     where: {
-      direction:        "sent",
-      sentFolderSaved:  false,
+      direction:            "sent",
+      sentFolderAttempted:  true,
+      sentFolderSaved:      false,
       ...(targetId ? { id: targetId } : {}),
     },
     select: {
@@ -55,13 +58,14 @@ export async function POST(req: NextRequest) {
   const failures: { id: string; error: string }[] = []
 
   for (const email of candidates) {
-    // Find the ImapConfig for the sender
+    // Find the ImapConfig for the original sender, identified by their stored fromAddress.
+    // Never fall back to the requesting SA's mailbox — if the sender's config is gone, fail this record.
     const imapCfg = email.sentBySalesUserId
       ? await prisma.imapConfig.findUnique({ where: { salesUserId: email.sentBySalesUserId } })
-      : await prisma.imapConfig.findFirst({ where: { superAdminId: session.superAdminId! } })
+      : await prisma.imapConfig.findFirst({ where: { emailAddress: email.fromAddress } })
 
     if (!imapCfg) {
-      const err = "No ImapConfig found for sender"
+      const err = `No ImapConfig found for sender (${email.fromAddress}) — cannot retry without original mailbox credentials`
       await prisma.crmEmail.update({ where: { id: email.id }, data: { sentFolderError: err } })
       failures.push({ id: email.id, error: err })
       failed++

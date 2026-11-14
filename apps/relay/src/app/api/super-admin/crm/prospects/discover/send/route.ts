@@ -136,10 +136,12 @@ export async function POST(req: NextRequest) {
       ? await prisma.imapConfig.findUnique({ where: { salesUserId: session.salesUserId } })
       : null
 
+  let sentFolderAttempted = false
   let sentFolderSaved = false
   let sentFolderError: string | null = null
 
   if (imapCfg) {
+    sentFolderAttempted = true
     let smtpPass: string
     try { smtpPass = decryptField(imapCfg.encryptedPassword) }
     catch { return NextResponse.json({ error: "Failed to decrypt SMTP credentials" }, { status: 500 }) }
@@ -187,6 +189,7 @@ export async function POST(req: NextRequest) {
       messageId,
       sentAt:       new Date(),
       source:       "discover",
+      sentFolderAttempted,
       sentFolderSaved,
       sentFolderError,
     },

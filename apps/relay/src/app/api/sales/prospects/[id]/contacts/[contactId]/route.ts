@@ -18,6 +18,8 @@ export async function PATCH(
     name?:                string
     title?:               string
     email?:               string
+    phone?:               string
+    mobile?:              string
     verifiedPhone?:       string
     directEmail?:         string
     emailConfidenceScore?: number
@@ -37,6 +39,8 @@ export async function PATCH(
       ...(body.name                !== undefined ? { name:                body.name }                : {}),
       ...(body.title               !== undefined ? { title:               body.title }               : {}),
       ...(body.email               !== undefined ? { email:               body.email }               : {}),
+      ...(body.phone               !== undefined ? { phone:               body.phone || null }       : {}),
+      ...(body.mobile              !== undefined ? { mobile:              body.mobile || null }      : {}),
       ...(body.verifiedPhone       !== undefined ? { verifiedPhone:       body.verifiedPhone }       : {}),
       ...(body.directEmail         !== undefined ? { directEmail:         body.directEmail }         : {}),
       ...(body.emailConfidenceScore !== undefined ? { emailConfidenceScore: body.emailConfidenceScore } : {}),
@@ -45,7 +49,7 @@ export async function PATCH(
       ...(typeof body.isPrimaryContact === "boolean" ? { isPrimaryContact: body.isPrimaryContact } : {}),
       ...(typeof body.isDecisionMaker  === "boolean" ? { isDecisionMaker:  body.isDecisionMaker }  : {}),
       ...(typeof body.isChampion       === "boolean" ? { isChampion:       body.isChampion }       : {}),
-      ...(body.linkedinUrl         !== undefined ? { linkedinUrl:         body.linkedinUrl }         : {}),
+      ...(body.linkedinUrl         !== undefined ? { linkedinUrl:         body.linkedinUrl }        : {}),
       ...(body.notes               !== undefined ? { notes:               body.notes }               : {}),
       ...(body.verify ? { lastVerifiedAt: new Date() } : {}),
     },

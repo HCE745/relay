@@ -99,7 +99,8 @@ describe("validateCommissionSplits", () => {
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     prospect: {
-      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      findMany:  vi.fn(),
     },
   },
 }))
@@ -125,16 +126,22 @@ const mockProspects = [
 
 describe("findDuplicateProspect", () => {
   beforeEach(() => {
+    // findFirst handles domain lookups; default to null (no match)
+    vi.mocked(prisma.prospect.findFirst).mockResolvedValue(null as never)
+    // findMany handles name lookups
     vi.mocked(prisma.prospect.findMany).mockResolvedValue(mockProspects as never)
   })
 
   it("returns duplicate on matching company name (normalized)", async () => {
+    // No website → skips findFirst, falls through to name scan via findMany
     const result = await findDuplicateProspect({ companyName: "Midwest Precision Inc." })
     expect(result).not.toBeNull()
     expect(result?.id).toBe("p_existing_1")
   })
 
   it("returns duplicate on matching domain", async () => {
+    // findFirst returns a domain match
+    vi.mocked(prisma.prospect.findFirst).mockResolvedValue(mockProspects[1] as never)
     const result = await findDuplicateProspect({
       companyName: "Some Other Name",
       website: "www.lakefrontps.com",
@@ -144,6 +151,9 @@ describe("findDuplicateProspect", () => {
   })
 
   it("returns null when no match", async () => {
+    // findFirst returns null (no domain match), findMany returns empty (no name match)
+    vi.mocked(prisma.prospect.findFirst).mockResolvedValue(null as never)
+    vi.mocked(prisma.prospect.findMany).mockResolvedValue([] as never)
     const result = await findDuplicateProspect({
       companyName: "Totally New Company",
       website: "totallynew.com",

@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { getPlatformConfig } from "@/lib/platform-config"
 import Anthropic from "@anthropic-ai/sdk"
+import { normalizeCompanyName } from "@/lib/prospect-utils"
 
 // 90s gives web-search calls room to breathe; 60s is too close to the wall
 export const maxDuration = 90
@@ -191,11 +192,14 @@ export async function POST(req: NextRequest) {
       select: { id: true, companyName: true, website: true },
     })
     const domainToProspect = new Map<string, { id: string }>()
+    const nameToProspect   = new Map<string, { id: string }>()
     for (const p of existingProspects) {
       if (p.website) {
         const d = extractDomain(p.website)
         if (d) domainToProspect.set(d, { id: p.id })
       }
+      const norm = normalizeCompanyName(p.companyName)
+      if (norm && !nameToProspect.has(norm)) nameToProspect.set(norm, { id: p.id })
     }
     const exclusionList = existingProspects.map(p => p.companyName).slice(0, 100).join(", ")
     const existingDomains = existingProspects
@@ -396,21 +400,46 @@ Your entire response must be only the JSON array — nothing before [, nothing a
       (b.fitScore - a.fitScore)
     )
 
-    // Annotate CRM status
+    // Annotate CRM status.
+    // Domain match is preferred (fastest and most precise). When a company has no
+    // discoverable domain, or its domain differs from what's stored in the CRM,
+    // fall back to normalised company name. Both paths feed the hard filter below.
     for (const company of companies) {
       const websiteDomain = company.website ? extractDomain(company.website) : null
-      if (!websiteDomain) continue
-      const prospectMatch = domainToProspect.get(websiteDomain)
-      const lastContact   = domainToLastContact.get(websiteDomain)
-      if (lastContact) {
-        company.crmStatus     = "contacted"
-        company.lastContactAt = lastContact.toISOString()
-        if (prospectMatch) company.crmProspectId = prospectMatch.id
-      } else if (prospectMatch) {
+
+      if (websiteDomain) {
+        const prospectMatch = domainToProspect.get(websiteDomain)
+        const lastContact   = domainToLastContact.get(websiteDomain)
+        if (lastContact) {
+          company.crmStatus     = "contacted"
+          company.lastContactAt = lastContact.toISOString()
+          if (prospectMatch) company.crmProspectId = prospectMatch.id
+          continue
+        }
+        if (prospectMatch) {
+          company.crmStatus     = "in_crm"
+          company.crmProspectId = prospectMatch.id
+          continue
+        }
+      }
+
+      // Name-based fallback — catches companies with no website, or whose CRM entry
+      // has a different/missing domain. Uses the same normalisation as the dedup utility.
+      const normName   = normalizeCompanyName(company.companyName)
+      const nameMatch  = normName ? nameToProspect.get(normName) : null
+      if (nameMatch) {
         company.crmStatus     = "in_crm"
-        company.crmProspectId = prospectMatch.id
+        company.crmProspectId = nameMatch.id
       }
     }
+
+    // Hard-filter: remove companies already tracked in the global CRM.
+    // The prompt exclusion list is a soft hint (capped at 100 names and may be ignored);
+    // this filter is the authoritative gate. Filtering is domain-based — name-only
+    // CRM entries without a matching domain are not filtered here (covered by the
+    // prompt exclusion and by dedup at promote time). Reps see only that a company
+    // is unavailable; they do not see who owns it.
+    companies = companies.filter(c => c.crmStatus === "none")
 
     const locationVerifiedCount = companies.filter(c => c.locationVerified).length
     const qualifiedCount        = companies.filter(c => c.qualificationTier === "qualified").length

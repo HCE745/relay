@@ -28,6 +28,7 @@ export function normalizeDomain(raw: string | null | undefined): string | null {
 export type DuplicateWarning = {
   id: string
   companyName: string
+  assignedToId: string | null
   assignedToName: string | null
   currentCrmStatus: string
 }
@@ -59,7 +60,7 @@ export async function findDuplicateProspect(params: {
         ...excludeFilter,
         website: { contains: domain, mode: "insensitive" },
       },
-      select: { id: true, companyName: true, assignedToName: true, currentCrmStatus: true },
+      select: { id: true, companyName: true, assignedToId: true, assignedToName: true, currentCrmStatus: true },
     })
     if (domainMatch) return domainMatch
   }
@@ -67,7 +68,7 @@ export async function findDuplicateProspect(params: {
   // ── 2. Name match — load minimal columns, no row limit ───────────────────
   const rows = await prisma.prospect.findMany({
     where:  excludeFilter,
-    select: { id: true, companyName: true, assignedToName: true, currentCrmStatus: true },
+    select: { id: true, companyName: true, assignedToId: true, assignedToName: true, currentCrmStatus: true },
   })
 
   for (const p of rows) {

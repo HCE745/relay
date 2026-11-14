@@ -18,12 +18,22 @@ import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api
 type NavSection  = "search" | "lists"
 type SearchState = "idle" | "loading" | "done" | "error"
 type DetailsState = "loading" | "ready" | "error"
+type VerifState   = "pending" | "done" | "error"
 
 // Extended type used by saved-list context — fresh-search results use resultId=""
 type CompanyWithProgress = DiscoveredCompanyBasic & {
-  resultId: string   // "" for fresh search, UUID for saved-list results
-  isDone:   boolean
-  doneAt:   string | null
+  resultId:          string   // "" for fresh search, UUID for saved-list results
+  isDone:            boolean
+  doneAt:            string | null
+  verificationState?: VerifState
+}
+
+interface VerifyResult {
+  employeeCountTier:  import("@/app/api/super-admin/crm/prospects/discover/route").EmployeeCountTier
+  estimatedEmployees: string
+  qualificationTier:  import("@/app/api/super-admin/crm/prospects/discover/route").QualificationTier
+  locationVerified:   boolean
+  sourceCitations:    string[]
 }
 
 interface ContactDraft {
@@ -222,12 +232,13 @@ function SaveListDialog({ suggestedName, onSave, onCancel, saving }: {
 
 // ─── Company Card ─────────────────────────────────────────────────────────────
 
-function CompanyCard({ company, selected, onClick, onToggleDone, showDoneToggle }: {
-  company:        CompanyWithProgress
-  selected:       boolean
-  onClick:        () => void
-  onToggleDone?:  (e: React.MouseEvent) => void
+function CompanyCard({ company, selected, onClick, onToggleDone, showDoneToggle, onVerify }: {
+  company:         CompanyWithProgress
+  selected:        boolean
+  onClick:         () => void
+  onToggleDone?:   (e: React.MouseEvent) => void
   showDoneToggle?: boolean
+  onVerify?:       () => void
 }) {
   const badge = fitBadge(company.fitScore)
   const isDone = company.isDone
@@ -266,6 +277,38 @@ function CompanyCard({ company, selected, onClick, onToggleDone, showDoneToggle 
                 In CRM
               </span>
             )}
+            {!isDone && company.qualificationTier === "qualified" && company.employeeCountTier === "web_confirmed" && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-green-900/30 text-green-400 border border-green-800/50 flex-shrink-0">
+                <CheckCircle2 className="w-2 h-2" />Size confirmed
+              </span>
+            )}
+            {!isDone && company.qualificationTier === "qualified" && company.employeeCountTier === "web_estimated" && (
+              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/30 text-amber-400 border border-amber-800/50 flex-shrink-0">
+                <CheckCircle2 className="w-2 h-2" />Size estimated
+              </span>
+            )}
+            {!isDone && company.qualificationTier === "potential" && (
+              company.verificationState === "pending" ? (
+                <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700/50 flex-shrink-0">
+                  <Loader2 className="w-2 h-2 animate-spin" />Verifying...
+                </span>
+              ) : (
+                <>
+                  <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/30 text-amber-400 border border-amber-800/50 flex-shrink-0">
+                    <AlertTriangle className="w-2 h-2" />Size unverified
+                  </span>
+                  {onVerify && company.verificationState !== "done" && (
+                    <button
+                      onClick={e => { e.stopPropagation(); onVerify() }}
+                      className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700/50 hover:border-indigo-600/50 hover:text-indigo-400 transition-colors flex-shrink-0"
+                    >
+                      <RefreshCw className="w-2 h-2" />
+                      {company.verificationState === "error" ? "Retry" : "Verify"}
+                    </button>
+                  )}
+                </>
+              )
+            )}
           </div>
           <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5 text-[11px] text-gray-400">
             {(company.city || company.state) && (
@@ -274,11 +317,17 @@ function CompanyCard({ company, selected, onClick, onToggleDone, showDoneToggle 
                 {[company.city, company.state].filter(Boolean).join(", ")}
               </span>
             )}
-            {company.estimatedEmployees && (
+            {company.estimatedEmployees && company.estimatedEmployees !== "unknown" ? (
               <span className="flex items-center gap-0.5">
                 <Users className="w-2.5 h-2.5" />{company.estimatedEmployees} emp.
+                {company.employeeCountTier === "web_confirmed" && <span className="text-green-500/70">✓</span>}
+                {company.employeeCountTier === "web_estimated" && <span className="text-amber-500/70">~</span>}
               </span>
-            )}
+            ) : company.qualificationTier !== "qualified" ? (
+              <span className="flex items-center gap-0.5 text-gray-600">
+                <Users className="w-2.5 h-2.5" />size unknown
+              </span>
+            ) : null}
             {company.website && (
               <a
                 href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
@@ -1584,6 +1633,60 @@ export default function SalesDiscoverPage() {
 
   const stateLabel = country === "Canada" ? "Province" : country === "United States" ? "State" : "Region"
 
+  async function verifyCompany(company: CompanyWithProgress) {
+    if (company.verificationState === "pending" || company.verificationState === "done") return
+
+    const setPending = (prev: CompanyWithProgress[]) =>
+      prev.map(c => c.companyName === company.companyName ? { ...c, verificationState: "pending" as VerifState } : c)
+    setActiveCompanies(setPending)
+    setCompanies(setPending)
+
+    try {
+      const res = await fetch("/api/super-admin/crm/prospects/discover/verify", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          companyName:      company.companyName,
+          website:          company.website,
+          empMin:           empMin ? parseInt(empMin,  10) : 50,
+          empMax:           empMax ? parseInt(empMax, 10) : 300,
+          locationVerified: company.locationVerified,
+        }),
+      })
+      if (!res.ok) throw new Error(`Verification failed (${res.status})`)
+      const result = await res.json() as VerifyResult
+
+      const applyResult = (prev: CompanyWithProgress[]) =>
+        prev.map(c =>
+          c.companyName === company.companyName
+            ? {
+                ...c,
+                employeeCountTier:  result.employeeCountTier,
+                estimatedEmployees: result.estimatedEmployees,
+                qualificationTier:  result.qualificationTier,
+                sourceCitations:    [...new Set([...c.sourceCitations, ...result.sourceCitations])],
+                verificationState:  "done" as VerifState,
+              }
+            : c
+        )
+      setActiveCompanies(applyResult)
+      setCompanies(applyResult)
+    } catch {
+      const setError = (prev: CompanyWithProgress[]) =>
+        prev.map(c => c.companyName === company.companyName ? { ...c, verificationState: "error" as VerifState } : c)
+      setActiveCompanies(setError)
+      setCompanies(setError)
+    }
+  }
+
+  function autoVerifyTop5(cos: CompanyWithProgress[]) {
+    const top5 = [...cos]
+      .filter(c => c.qualificationTier !== "location_unverified" && !c.verificationState)
+      .sort((a, b) => b.fitScore - a.fitScore)
+      .slice(0, 5)
+    for (const c of top5) void verifyCompany(c)
+  }
+
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
     setSearchState("loading")
@@ -1619,6 +1722,7 @@ export default function SalesDiscoverPage() {
       setCompanies(found)
       setActiveCompanies(found)
       setSearchState("done")
+      autoVerifyTop5(found)
     } catch (err) {
       const isTimeout = err instanceof DOMException && err.name === "AbortError"
       setSearchError(isTimeout ? "Search timed out — try a narrower query or fewer results" : (err instanceof Error ? err.message : "Search failed"))
@@ -1852,6 +1956,7 @@ export default function SalesDiscoverPage() {
                       company={c}
                       selected={selectedIndex === i}
                       onClick={() => { setActiveCompanies(activeCompanies); setSelectedIndex(i) }}
+                      onVerify={() => void verifyCompany(c)}
                     />
                   ))}
                 </div>

@@ -20,6 +20,16 @@ type EmailState     = "idle" | "loading" | "ready" | "sending" | "sent" | "error
 type SaveState      = "idle" | "saving" | "saved" | "error"
 type ListSaveState  = "idle" | "naming" | "saving" | "saved" | "error"
 type ActiveTab      = "search" | "lists"
+type VerifState     = "pending" | "done" | "error"
+type CompanyWithVerify = DiscoveredCompanyBasic & { verificationState?: VerifState }
+
+interface VerifyResult {
+  employeeCountTier:  import("@/app/api/super-admin/crm/prospects/discover/route").EmployeeCountTier
+  estimatedEmployees: string
+  qualificationTier:  import("@/app/api/super-admin/crm/prospects/discover/route").QualificationTier
+  locationVerified:   boolean
+  sourceCitations:    string[]
+}
 
 interface ResearchList {
   id:              string
@@ -74,10 +84,11 @@ function suggestEmailsFromDomain(website: string): string[] {
 
 // ─── Company Card ─────────────────────────────────────────────────────────────
 
-function CompanyCard({ company, selected, onClick }: {
-  company:  DiscoveredCompanyBasic
-  selected: boolean
-  onClick:  () => void
+function CompanyCard({ company, selected, onClick, onVerify }: {
+  company:   CompanyWithVerify
+  selected:  boolean
+  onClick:   () => void
+  onVerify?: () => void
 }) {
   const badge = fitBadge(company.fitScore)
   return (
@@ -105,10 +116,28 @@ function CompanyCard({ company, selected, onClick }: {
               </span>
             )}
             {company.qualificationTier === "potential" && (
-              <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/30 text-amber-400 border border-amber-800/50 flex-shrink-0">
-                <AlertTriangle className="w-2 h-2" />
-                Size unverified
-              </span>
+              company.verificationState === "pending" ? (
+                <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700/50 flex-shrink-0">
+                  <Loader2 className="w-2 h-2 animate-spin" />
+                  Verifying...
+                </span>
+              ) : (
+                <>
+                  <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/30 text-amber-400 border border-amber-800/50 flex-shrink-0">
+                    <AlertTriangle className="w-2 h-2" />
+                    Size unverified
+                  </span>
+                  {onVerify && company.verificationState !== "done" && (
+                    <button
+                      onClick={e => { e.stopPropagation(); onVerify() }}
+                      className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700/50 hover:border-indigo-600/50 hover:text-indigo-400 transition-colors flex-shrink-0"
+                    >
+                      <RefreshCw className="w-2 h-2" />
+                      {company.verificationState === "error" ? "Retry" : "Verify"}
+                    </button>
+                  )}
+                </>
+              )
             )}
             {company.qualificationTier === "location_unverified" && (
               <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-red-900/20 text-red-400 border border-red-800/50 flex-shrink-0">
@@ -781,9 +810,9 @@ export default function DiscoverPage() {
   const [context,       setContext]       = useState("")
 
   const [searchState,    setSearchState]    = useState<SearchState>("idle")
-  const [companies,      setCompanies]      = useState<DiscoveredCompanyBasic[]>([])
+  const [companies,      setCompanies]      = useState<CompanyWithVerify[]>([])
   const [searchError,    setSearchError]    = useState<string | null>(null)
-  const [selected,       setSelected]       = useState<DiscoveredCompanyBasic | null>(null)
+  const [selected,       setSelected]       = useState<CompanyWithVerify | null>(null)
   const [limitationNote, setLimitationNote] = useState<string | null>(null)
 
   const [listSaveState, setListSaveState] = useState<ListSaveState>("idle")
@@ -830,11 +859,65 @@ export default function DiscoverPage() {
   }
 
   function handleLoadList(loadedCompanies: DiscoveredCompanyBasic[], loadedName: string) {
-    setCompanies(loadedCompanies)
+    setCompanies(loadedCompanies as CompanyWithVerify[])
     setSearchState("done")
     setActiveTab("search")
     setListName(loadedName)
     setListSaveState("saved") // it's already saved
+  }
+
+  async function verifyCompany(company: CompanyWithVerify) {
+    if (company.verificationState === "pending" || company.verificationState === "done") return
+
+    setCompanies(prev => prev.map(c =>
+      c.companyName === company.companyName ? { ...c, verificationState: "pending" as VerifState } : c
+    ))
+
+    try {
+      const res = await fetch("/api/super-admin/crm/prospects/discover/verify", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          companyName:      company.companyName,
+          website:          company.website,
+          empMin:           empMin ? parseInt(empMin,  10) : 50,
+          empMax:           empMax ? parseInt(empMax, 10) : 300,
+          locationVerified: company.locationVerified,
+        }),
+      })
+      if (!res.ok) throw new Error(`Verification failed (${res.status})`)
+      const result = await res.json() as VerifyResult
+
+      setCompanies(prev => prev.map(c =>
+        c.companyName === company.companyName
+          ? {
+              ...c,
+              employeeCountTier:  result.employeeCountTier,
+              estimatedEmployees: result.estimatedEmployees,
+              qualificationTier:  result.qualificationTier,
+              sourceCitations:    [...new Set([...c.sourceCitations, ...result.sourceCitations])],
+              verificationState:  "done" as VerifState,
+            }
+          : c
+      ))
+      setSelected(prev =>
+        prev?.companyName === company.companyName
+          ? { ...prev, ...result, verificationState: "done" as VerifState }
+          : prev
+      )
+    } catch {
+      setCompanies(prev => prev.map(c =>
+        c.companyName === company.companyName ? { ...c, verificationState: "error" as VerifState } : c
+      ))
+    }
+  }
+
+  function autoVerifyTop5(cos: CompanyWithVerify[]) {
+    const top5 = [...cos]
+      .filter(c => c.qualificationTier !== "location_unverified" && !c.verificationState)
+      .sort((a, b) => b.fitScore - a.fitScore)
+      .slice(0, 5)
+    for (const c of top5) void verifyCompany(c)
   }
 
   // Load enabled/disabled setting from CRM settings
@@ -881,9 +964,11 @@ export default function DiscoverPage() {
         throw new Error(data.error ?? `Search failed (${res.status})`)
       }
       const data = await res.json() as { companies: DiscoveredCompanyBasic[]; limitationNote?: string }
-      setCompanies(data.companies ?? [])
+      const found = (data.companies ?? []) as CompanyWithVerify[]
+      setCompanies(found)
       setLimitationNote(data.limitationNote ?? null)
       setSearchState("done")
+      autoVerifyTop5(found)
     } catch (err) {
       const isTimeout = err instanceof DOMException && err.name === "AbortError"
       setSearchError(isTimeout ? "Search timed out — try a narrower query or fewer results" : (err instanceof Error ? err.message : "Search failed"))
@@ -1179,6 +1264,7 @@ export default function DiscoverPage() {
                     company={c}
                     selected={selected?.companyName === c.companyName}
                     onClick={() => setSelected(prev => prev?.companyName === c.companyName ? null : c)}
+                    onVerify={() => void verifyCompany(c)}
                   />
                 ))}
               </div>

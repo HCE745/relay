@@ -234,31 +234,38 @@ export async function POST(req: NextRequest) {
 
     const systemPrompt = `You are a B2B prospect researcher. Use the web_search tool to find real, verifiable ${industryTarget} companies. Return ONLY a valid JSON array — starting with [ and ending with ]. No markdown, headers, or explanation. If no qualifying companies are found, return [].`
 
-    const userPrompt = `Find up to ${requestedCount} real ${industryTarget} companies headquartered in ${locationTarget} with approximately ${empRange} that could benefit from Relay — operational coordination software for manufacturing facilities (issue reporting and routing, maintenance request management, digital shift handoffs, QR-code asset tracking).
+    // Discovery-only prompt — employee-count verification is handled separately after discovery
+    function buildDiscoveryPrompt(opts: {
+      count:                    number
+      isBatch2?:                boolean
+      additionalExcludeNames?:  string
+      additionalExcludeDomains?: string[]
+    }): string {
+      const excludeNames   = exclusionList || "(none)"
+      const excludeDomains = [
+        ...existingDomains,
+        ...(opts.additionalExcludeDomains ?? []),
+      ].slice(0, 400).join(", ") || "(none)"
+      const batch2Note = opts.isBatch2 && opts.additionalExcludeNames
+        ? `\nIMPORTANT: Do NOT repeat any of these companies already found: ${opts.additionalExcludeNames}`
+        : ""
 
-USE WEB SEARCH with this two-step process for every company:
+      return `Find up to ${opts.count} real ${industryTarget} companies headquartered in ${locationTarget} that could benefit from Relay — operational coordination software for manufacturing facilities (issue reporting, maintenance requests, digital shift handoffs, QR-code asset tracking).${keywordsLine}${contextLine}${batch2Note}
 
-STEP 1 — DISCOVERY (use 2-3 broad searches):
-Search for "${industryTarget} companies ${locationTarget}" or similar to build a candidate list of real companies with Indiana headquarters.${keywordsLine}${contextLine}
+USE WEB SEARCH with 3–5 searches to find diverse companies:
+- Search for "${industryTarget} manufacturers ${locationTarget}", "${industryTarget} companies ${locationTarget}", and similar
+- Vary your searches to cover different ${industryTarget} subsectors
 
-STEP 2 — HEADCOUNT VERIFICATION (required for each candidate — use a dedicated search per company):
-For each company found in Step 1, run a targeted search:
-  - Search: "{company name} linkedin.com employees" or "{company name} site:linkedin.com"
-  - LinkedIn company pages show employee ranges like "51-200 employees", "201-500 employees" — use these
-  - If LinkedIn gives nothing, try: "{company name} glassdoor employees ${locationTarget}"
-  - Classify based on what you actually found:
-    * "web_confirmed" — LinkedIn or Glassdoor shows an employee count or range entirely within ${empRange}
-    * "web_estimated" — LinkedIn or Glassdoor shows a range that OVERLAPS with ${empRange} (e.g., "51-200" overlaps 50-300; "201-500" overlaps 50-300)
-    * "unknown" — company is verified as a real ${locationTarget} ${industryTarget} business but NO headcount evidence found after searching LinkedIn and Glassdoor
+REQUIREMENTS for each company:
+- Official, working HTTPS website (required — omit the company if not verified; LinkedIn/ZoomInfo/directories are NOT acceptable)
+- Headquarters confirmed in ${locationTarget}
+- Looks like it could have roughly ${empRange} (judgment only — do NOT search for headcount)
 
-IMPORTANT: Most established manufacturers have LinkedIn company pages. Allocate enough searches so you do a headcount lookup for every company you plan to include. Only mark "unknown" after genuinely trying LinkedIn and Glassdoor.
+GEOGRAPHIC RULE: Only return companies with confirmed headquarters in ${locationTarget}.
+HONESTY RULE: Return what you verified. Do not fabricate. If fewer than ${opts.count}, return fewer.
 
-GEOGRAPHIC RULE: Only return companies with confirmed headquarters in ${locationTarget}. Do not include companies merely with facilities there.
-
-HONESTY RULE: Return what you verified. Do not fabricate. If you cannot reach ${requestedCount}, return fewer.
-
-EXCLUDE — already in our CRM: ${exclusionList || "(none)"}
-EXCLUDE — these domains already tracked: ${existingDomains.length > 0 ? existingDomains.join(", ") : "(none)"}
+EXCLUDE — already in our CRM: ${excludeNames}
+EXCLUDE — these domains already tracked: ${excludeDomains}
 
 Return ONLY a JSON array. Each object must have exactly these keys:
 - companyName: exact company name
@@ -266,180 +273,202 @@ Return ONLY a JSON array. Each object must have exactly these keys:
 - city: headquarters city
 - state: ${stateLabel}
 - country: "${country}"
-- industry: specific ${industryTarget} subsector (e.g. "Metal Fabrication", "Food Processing", "Automotive Parts")
-- estimatedEmployees: employee range string (e.g. "80-150") or "unknown"
-- employeeCountTier: "web_confirmed" | "web_estimated" | "unknown"
-- sourceCitations: array of URLs from your web searches — include the LinkedIn/Glassdoor URL when found
+- industry: specific subsector (e.g. "Metal Fabrication", "Food Processing")
 - summary: one sentence describing their ${industryTarget} operations and what they produce
-- fitScore: integer 0-100 (higher = more complex shop floor operations, more Relay fit)
+- fitScore: integer 0-100 (higher = more complex shop floor, more Relay fit)
+- sourceCitations: array of URLs from your web searches
 
 Your entire response must be only the JSON array — nothing before [, nothing after ].`
+    }
 
-    console.log("[discover] calling claude-sonnet-5-5 with web_search_20260209")
-    // maxRetries:0 prevents the SDK from eating time on backoff retries inside a 90s Vercel wall clock
+    // Collect confirmed search result URLs for citation validation
+    function collectUrls(content: Anthropic.ContentBlock[]): Set<string> {
+      const urls = new Set<string>()
+      for (const block of content) {
+        if (block.type === "web_search_tool_result") {
+          const wsBlock = block as unknown as { content: Array<{ url?: string }> }
+          for (const item of wsBlock.content ?? []) {
+            if (item.url) urls.add(item.url)
+          }
+        }
+      }
+      return urls
+    }
+
+    // Process a raw API response into filtered, annotated companies.
+    // excludeDomains / excludeNormNames: skip companies already found in a prior batch.
+    function processRawText(
+      content:          Anthropic.ContentBlock[],
+      confirmedUrls:    Set<string>,
+      excludeDomains:   Set<string>,
+      excludeNormNames: Set<string>
+    ): { companies: DiscoveredCompanyBasic[], preFilterCompanies: DiscoveredCompanyBasic[], rawText: string } {
+      const textBlocks = content.filter((b): b is Anthropic.TextBlock => b.type === "text")
+      if (textBlocks.length === 0) return { companies: [], preFilterCompanies: [], rawText: "" }
+
+      const rawText = textBlocks.at(-1)!.text.trim()
+      const parsed  = extractArray(rawText)
+      if (!parsed || parsed.length === 0) return { companies: [], preFilterCompanies: [], rawText }
+
+      let cos: DiscoveredCompanyBasic[] = parsed
+        .map(p => normalise(p))
+        .filter(c => {
+          if (!c.companyName || c.companyName === "Unknown") return false
+          const dom  = c.website ? extractDomain(c.website) : null
+          if (dom  && excludeDomains.has(dom))   return false
+          const norm = normalizeCompanyName(c.companyName)
+          if (norm && excludeNormNames.has(norm)) return false
+          return true
+        })
+
+      // Citation validation — drop invented URLs
+      if (confirmedUrls.size > 0) {
+        for (const c of cos) {
+          c.sourceCitations = c.sourceCitations.filter(url => confirmedUrls.has(url))
+        }
+      }
+
+      // Geographic validation
+      if (body.stateProvince) {
+        const reqNorm = normaliseState(body.stateProvince)
+        for (const c of cos) {
+          c.locationVerified = normaliseState(c.state) !== "" && normaliseState(c.state) === reqNorm
+        }
+      } else {
+        for (const c of cos) c.locationVerified = true
+      }
+
+      // Qualification tier — discovery only: most will be "potential" until verified
+      for (const c of cos) {
+        if (!c.locationVerified) {
+          c.qualificationTier = "location_unverified"
+        } else if (c.employeeCountTier === "web_confirmed" || c.employeeCountTier === "web_estimated") {
+          c.qualificationTier = "qualified"
+        } else {
+          c.qualificationTier = "potential"
+        }
+      }
+
+      // CRM annotation — domain first, name fallback
+      for (const c of cos) {
+        const websiteDomain = c.website ? extractDomain(c.website) : null
+        let annotated = false
+        if (websiteDomain) {
+          const prospectMatch = domainToProspect.get(websiteDomain)
+          const lastContact   = domainToLastContact.get(websiteDomain)
+          if (lastContact) {
+            c.crmStatus     = "contacted"
+            c.lastContactAt = lastContact.toISOString()
+            if (prospectMatch) c.crmProspectId = prospectMatch.id
+            annotated = true
+          } else if (prospectMatch) {
+            c.crmStatus     = "in_crm"
+            c.crmProspectId = prospectMatch.id
+            annotated = true
+          }
+        }
+        if (!annotated) {
+          const normName  = normalizeCompanyName(c.companyName)
+          const nameMatch = normName ? nameToProspect.get(normName) : null
+          if (nameMatch) {
+            c.crmStatus     = "in_crm"
+            c.crmProspectId = nameMatch.id
+          }
+        }
+      }
+
+      const preFilterCompanies = [...cos]
+      cos = cos.filter(c => c.crmStatus === "none")
+      return { companies: cos, preFilterCompanies, rawText }
+    }
+
+    // maxRetries:0 prevents the SDK from eating time on backoff retries inside a 90s wall clock
     const anthropic = new Anthropic({ apiKey, maxRetries: 0 })
-
-    // 2-3 broad discovery + ~1 LinkedIn headcount search per company.
-    // 8 searches × ~6s avg = ~50s, which fits inside the 80s SDK timeout with room for inference.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const tools: any[] = [{ type: "web_search_20260209", name: "web_search", max_uses: 8 }]
+    const tools: any[] = [{ type: "web_search_20260209", name: "web_search", max_uses: 5 }]
 
-    // 80s SDK timeout leaves a 10s buffer before Vercel's 90s maxDuration wall clock.
-    // Without this the SDK defaults to 600s and Vercel kills the process mid-request,
-    // which can leave the browser fetch hanging indefinitely instead of receiving a 504.
-    const response = await anthropic.messages.create({
+    // === BATCH 1 — discovery-only (3–5 searches, ~20–30s) ===
+    console.log("[discover] batch 1: calling claude-sonnet-5-5 (max_uses: 5, discovery-only)")
+    const response1 = await anthropic.messages.create({
       model:      "claude-sonnet-5-5",
-      max_tokens: 6000,
+      max_tokens: 5000,
       tools,
       system:     systemPrompt,
-      messages:   [{ role: "user", content: userPrompt }],
-    }, { timeout: 80_000 })
+      messages:   [{ role: "user", content: buildDiscoveryPrompt({ count: requestedCount }) }],
+    }, { timeout: 65_000 })
 
-    // Log usage — web_search tool charges are billed separately and not reflected here
-    const usage = response.usage as {
-      input_tokens:                number
-      output_tokens:               number
-      cache_creation_input_tokens?: number
-      cache_read_input_tokens?:     number
-    }
-    const estimatedTokenCost =
-      (usage.input_tokens  * 2.00  / 1_000_000) +
-      (usage.output_tokens * 10.00 / 1_000_000)
-    console.log("[discover] usage:", {
-      model:          "claude-sonnet-5-5",
-      input_tokens:   usage.input_tokens,
-      output_tokens:  usage.output_tokens,
-      cache_creation: usage.cache_creation_input_tokens ?? 0,
-      cache_read:     usage.cache_read_input_tokens     ?? 0,
+    const usage1 = response1.usage as { input_tokens: number; output_tokens: number }
+    console.log("[discover] batch 1 usage:", {
+      input_tokens: usage1.input_tokens, output_tokens: usage1.output_tokens,
     })
-    console.log("[discover] estimated token cost (Sonnet 5.5 rates, excludes search tool charges):",
-      `$${estimatedTokenCost.toFixed(4)}`)
-    console.log("[discover] stop_reason:", response.stop_reason)
+    console.log("[discover] batch 1 stop_reason:", response1.stop_reason)
 
-    // Collect all URLs returned by actual web search results — used to validate citations
-    const confirmedSearchUrls = new Set<string>()
-    for (const block of response.content) {
-      if (block.type === "web_search_tool_result") {
-        const wsBlock = block as unknown as {
-          content: Array<{ type: string; url?: string }>
-        }
-        for (const item of wsBlock.content ?? []) {
-          if (item.url) confirmedSearchUrls.add(item.url)
-        }
-      }
-    }
-    console.log("[discover] confirmed search URL count:", confirmedSearchUrls.size)
+    const confirmedUrls1 = collectUrls(response1.content)
+    console.log("[discover] batch 1 search URL count:", confirmedUrls1.size)
 
-    // Extract final text block (after all tool uses)
-    const textBlocks = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    if (textBlocks.length === 0) {
-      console.error("[discover] no text blocks; content types:", response.content.map(b => b.type).join(", "))
-      return NextResponse.json({ error: "AI returned no text content", companies: [] }, { status: 502 })
-    }
+    const { companies: batch1New, preFilterCompanies: batch1All, rawText: rawText1 } = processRawText(
+      response1.content, confirmedUrls1, new Set(), new Set()
+    )
+    console.log("[discover] batch 1 raw text (first 300):", rawText1.slice(0, 300))
+    console.log("[discover] batch 1:", { total: batch1All.length, afterCrmFilter: batch1New.length })
 
-    const rawText = textBlocks.at(-1)!.text.trim()
-    console.log("[discover] raw text (first 500 chars):", rawText.slice(0, 500))
+    let companies = [...batch1New]
+    let totalFilteredByCrm = batch1All.length - batch1New.length
 
-    const parsed = extractArray(rawText)
-    if (!parsed || parsed.length === 0) {
-      console.error("[discover] JSON extraction failed; raw:", rawText.slice(0, 800))
-      return NextResponse.json({ error: "AI returned unparseable content", companies: [] }, { status: 502 })
-    }
+    // === BATCH 2 — if fewer than half the requested count survived CRM filtering ===
+    if (companies.length < Math.ceil(requestedCount / 2)) {
+      console.log("[discover] batch 2: results below threshold, running additional discovery")
 
-    let companies: DiscoveredCompanyBasic[] = parsed
-      .map(p => normalise(p))
-      .filter(c => c.companyName && c.companyName !== "Unknown")
+      const batch1Domains = new Set(
+        batch1All.flatMap(c => { const d = c.website ? extractDomain(c.website) : null; return d ? [d] : [] })
+      )
+      const batch1NormNames = new Set(
+        batch1All.map(c => normalizeCompanyName(c.companyName)).filter(Boolean)
+      )
+      const needed = requestedCount - companies.length
 
-    // Validate citations — only keep URLs that appeared in actual search results.
-    // If no search results were captured (e.g. web search didn't fire), pass through as-is.
-    if (confirmedSearchUrls.size > 0) {
-      for (const company of companies) {
-        const before = company.sourceCitations.length
-        company.sourceCitations = company.sourceCitations.filter(url => confirmedSearchUrls.has(url))
-        if (company.sourceCitations.length < before) {
-          console.warn(`[discover] dropped ${before - company.sourceCitations.length} unverified citations for ${company.companyName}`)
-        }
-      }
-    }
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tools2: any[] = [{ type: "web_search_20260209", name: "web_search", max_uses: 4 }]
+        const response2 = await anthropic.messages.create({
+          model:      "claude-sonnet-5-5",
+          max_tokens: 3500,
+          tools:      tools2,
+          system:     systemPrompt,
+          messages:   [{
+            role:    "user",
+            content: buildDiscoveryPrompt({
+              count:                   needed,
+              isBatch2:                true,
+              additionalExcludeNames:  batch1All.map(c => c.companyName).join(", "),
+              additionalExcludeDomains: [...batch1Domains],
+            }),
+          }],
+        }, { timeout: 40_000 })
 
-    // Server-side geographic validation — flag but do not drop.
-    // Replaces the old hard-filter that silently discarded results.
-    if (body.stateProvince) {
-      const reqNorm = normaliseState(body.stateProvince)
-      let geoMatch  = 0
-      for (const c of companies) {
-        c.locationVerified = normaliseState(c.state) !== "" && normaliseState(c.state) === reqNorm
-        if (c.locationVerified) geoMatch++
-      }
-      console.log("[discover] geographic validation:", {
-        requested:  body.stateProvince,
-        normalised: reqNorm,
-        matched:    geoMatch,
-        total:      companies.length,
-      })
-    } else {
-      for (const c of companies) c.locationVerified = true
-    }
+        const usage2 = response2.usage as { input_tokens: number; output_tokens: number }
+        console.log("[discover] batch 2 usage:", usage2)
 
-    // Compute qualification tier: qualified = location + size evidence; potential = location only
-    for (const c of companies) {
-      if (!c.locationVerified) {
-        c.qualificationTier = "location_unverified"
-      } else if (c.employeeCountTier === "web_confirmed" || c.employeeCountTier === "web_estimated") {
-        c.qualificationTier = "qualified"
-      } else {
-        c.qualificationTier = "potential"
+        const confirmedUrls2 = collectUrls(response2.content)
+        const { companies: batch2New, preFilterCompanies: batch2All } = processRawText(
+          response2.content, confirmedUrls2, batch1Domains, batch1NormNames
+        )
+        console.log("[discover] batch 2:", { total: batch2All.length, afterCrmFilter: batch2New.length })
+
+        totalFilteredByCrm += batch2All.length - batch2New.length
+        companies = [...companies, ...batch2New]
+      } catch (err2) {
+        // Second batch failure is non-fatal — log and continue with batch 1 results
+        console.error("[discover] batch 2 error (non-fatal):", err2 instanceof Error ? err2.message : String(err2))
       }
     }
 
-    // Sort: qualified first, then potential, then location_unverified; within tier by fitScore desc
+    // Sort: qualified first (after verification), then potential (by fitScore), then location_unverified
     const TIER_ORDER: Record<QualificationTier, number> = { qualified: 0, potential: 1, location_unverified: 2 }
     companies.sort((a, b) =>
       (TIER_ORDER[a.qualificationTier] - TIER_ORDER[b.qualificationTier]) ||
       (b.fitScore - a.fitScore)
     )
-
-    // Annotate CRM status.
-    // Domain match is preferred (fastest and most precise). When a company has no
-    // discoverable domain, or its domain differs from what's stored in the CRM,
-    // fall back to normalised company name. Both paths feed the hard filter below.
-    for (const company of companies) {
-      const websiteDomain = company.website ? extractDomain(company.website) : null
-
-      if (websiteDomain) {
-        const prospectMatch = domainToProspect.get(websiteDomain)
-        const lastContact   = domainToLastContact.get(websiteDomain)
-        if (lastContact) {
-          company.crmStatus     = "contacted"
-          company.lastContactAt = lastContact.toISOString()
-          if (prospectMatch) company.crmProspectId = prospectMatch.id
-          continue
-        }
-        if (prospectMatch) {
-          company.crmStatus     = "in_crm"
-          company.crmProspectId = prospectMatch.id
-          continue
-        }
-      }
-
-      // Name-based fallback — catches companies with no website, or whose CRM entry
-      // has a different/missing domain. Uses the same normalisation as the dedup utility.
-      const normName   = normalizeCompanyName(company.companyName)
-      const nameMatch  = normName ? nameToProspect.get(normName) : null
-      if (nameMatch) {
-        company.crmStatus     = "in_crm"
-        company.crmProspectId = nameMatch.id
-      }
-    }
-
-    // Hard-filter: remove companies already tracked in the global CRM.
-    // The prompt exclusion list is a soft hint (capped at 100 names and may be ignored);
-    // this filter is the authoritative gate. Filtering is domain-based — name-only
-    // CRM entries without a matching domain are not filtered here (covered by the
-    // prompt exclusion and by dedup at promote time). Reps see only that a company
-    // is unavailable; they do not see who owns it.
-    companies = companies.filter(c => c.crmStatus === "none")
 
     const locationVerifiedCount = companies.filter(c => c.locationVerified).length
     const qualifiedCount        = companies.filter(c => c.qualificationTier === "qualified").length
@@ -459,9 +488,17 @@ Your entire response must be only the JSON array — nothing before [, nothing a
       webConfirmed:       webConfirmedCount,
       webEstimated:       webEstimatedCount,
       unknownTier:        unknownTierCount,
+      filteredByCrm:      totalFilteredByCrm,
     })
 
-    return NextResponse.json({ companies, qualifiedCount, potentialCount, locationVerifiedCount, limitationNote })
+    return NextResponse.json({
+      companies,
+      qualifiedCount,
+      potentialCount,
+      locationVerifiedCount,
+      filteredCount: totalFilteredByCrm,
+      limitationNote,
+    })
 
   } catch (err) {
     const msg   = err instanceof Error ? err.message : String(err)

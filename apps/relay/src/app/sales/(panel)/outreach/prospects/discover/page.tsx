@@ -1603,9 +1603,12 @@ export default function SalesDiscoverPage() {
     if (keywords)      body.keywords           = keywords
     if (context)       body.additionalContext  = context
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 88_000)
     try {
       const res = await fetch("/api/super-admin/crm/prospects/discover", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+        signal: controller.signal,
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({})) as { error?: string }
@@ -1617,8 +1620,11 @@ export default function SalesDiscoverPage() {
       setActiveCompanies(found)
       setSearchState("done")
     } catch (err) {
-      setSearchError(err instanceof Error ? err.message : "Search failed")
+      const isTimeout = err instanceof DOMException && err.name === "AbortError"
+      setSearchError(isTimeout ? "Search timed out — try a narrower query or fewer results" : (err instanceof Error ? err.message : "Search failed"))
       setSearchState("error")
+    } finally {
+      clearTimeout(timeoutId)
     }
   }
 

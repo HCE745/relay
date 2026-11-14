@@ -272,20 +272,24 @@ Return ONLY a JSON array. Each object must have exactly these keys:
 Your entire response must be only the JSON array — nothing before [, nothing after ].`
 
     console.log("[discover] calling claude-sonnet-5-5 with web_search_20260209")
-    const anthropic = new Anthropic({ apiKey })
+    // maxRetries:0 prevents the SDK from eating time on backoff retries inside a 90s Vercel wall clock
+    const anthropic = new Anthropic({ apiKey, maxRetries: 0 })
 
     // 2-3 broad discovery + ~1 LinkedIn headcount search per company.
-    // 12 gives enough budget for 8-10 companies without blowing the 90s wall clock.
+    // 8 searches × ~6s avg = ~50s, which fits inside the 80s SDK timeout with room for inference.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const tools: any[] = [{ type: "web_search_20260209", name: "web_search", max_uses: 12 }]
+    const tools: any[] = [{ type: "web_search_20260209", name: "web_search", max_uses: 8 }]
 
+    // 80s SDK timeout leaves a 10s buffer before Vercel's 90s maxDuration wall clock.
+    // Without this the SDK defaults to 600s and Vercel kills the process mid-request,
+    // which can leave the browser fetch hanging indefinitely instead of receiving a 504.
     const response = await anthropic.messages.create({
       model:      "claude-sonnet-5-5",
       max_tokens: 6000,
       tools,
       system:     systemPrompt,
       messages:   [{ role: "user", content: userPrompt }],
-    })
+    }, { timeout: 80_000 })
 
     // Log usage — web_search tool charges are billed separately and not reflected here
     const usage = response.usage as {

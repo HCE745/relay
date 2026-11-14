@@ -56,6 +56,7 @@ export function AddProspectModal() {
   const [contactTitle, setContactTitle] = useState("")
   const [contactEmail, setContactEmail] = useState("")
   const [contactPhone, setContactPhone] = useState("")
+  const [contactMobile, setContactMobile] = useState("")
 
   // Interaction fields
   const [showInteraction, setShowInteraction] = useState(false)
@@ -75,7 +76,7 @@ export function AddProspectModal() {
   function resetForm() {
     setCompanyName(""); setWebsite(""); setIndustry("")
     setShowContact(false)
-    setContactName(""); setContactTitle(""); setContactEmail(""); setContactPhone("")
+    setContactName(""); setContactTitle(""); setContactEmail(""); setContactPhone(""); setContactMobile("")
     setShowInteraction(false)
     setInteractionType("CALL_CONNECTED"); setInteractionOutcome("")
     setInteractionOccurredAt(nowLocalDatetime())
@@ -103,6 +104,7 @@ export function AddProspectModal() {
         title: contactTitle.trim() || null,
         email: contactEmail.trim() || null,
         phone: contactPhone.trim() || null,
+        mobile: contactMobile.trim() || null,
       } : null
 
       const initialInteraction = showInteraction ? {
@@ -308,6 +310,16 @@ export function AddProspectModal() {
                             type="text"
                             value={contactPhone}
                             onChange={e => setContactPhone(e.target.value)}
+                            placeholder="(555) 000-0000"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1.5">Mobile</label>
+                          <input
+                            type="text"
+                            value={contactMobile}
+                            onChange={e => setContactMobile(e.target.value)}
                             placeholder="(555) 000-0000"
                             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
                           />

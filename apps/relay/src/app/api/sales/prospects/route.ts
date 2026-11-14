@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
       title?: string | null
       email?: string | null
       phone?: string | null
+      mobile?: string | null
     } | null
     initialInteraction?: {
       activityType: string
@@ -187,6 +188,7 @@ export async function POST(req: NextRequest) {
         title: body.initialContact.title ?? null,
         email: body.initialContact.email ?? null,
         phone: body.initialContact.phone ?? null,
+        mobile: body.initialContact.mobile ?? null,
         isPrimaryContact: true,
         discoveryDate: new Date(),
       },

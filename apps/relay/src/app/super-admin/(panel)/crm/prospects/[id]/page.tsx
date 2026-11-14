@@ -187,7 +187,7 @@ export default function ProspectDetailPage() {
   // Contacts inline add form
   const [showAddContact, setShowAddContact] = useState(false)
   const [contactForm, setContactForm] = useState({
-    name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", role: "", notes: "",
+    name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", mobile: "", role: "", notes: "",
   })
   const [contactLoading, setContactLoading] = useState(false)
 
@@ -326,6 +326,7 @@ export default function ProspectDetailPage() {
             emailConfidence: contactForm.emailConfidence || undefined,
             linkedinUrl:     contactForm.linkedinUrl || undefined,
             phone:           contactForm.phone   || undefined,
+            mobile:          contactForm.mobile  || undefined,
             role:            contactForm.role    || undefined,
             notes:           contactForm.notes   || undefined,
           },
@@ -334,7 +335,7 @@ export default function ProspectDetailPage() {
       const json = await res.json() as { contact?: ProspectContact }
       if (res.ok && json.contact) {
         setProspect(p => p ? { ...p, contacts: [...p.contacts, json.contact!] } : p)
-        setContactForm({ name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", role: "", notes: "" })
+        setContactForm({ name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", mobile: "", role: "", notes: "" })
         setShowAddContact(false)
       }
     } finally {
@@ -713,11 +714,21 @@ export default function ProspectDetailPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Phone</label>
+                      <label className="block text-xs text-gray-500 mb-1">Phone (office/direct)</label>
                       <input
                         type="tel"
                         value={contactForm.phone}
                         onChange={e => setContactForm(f => ({ ...f, phone: e.target.value }))}
+                        placeholder="+1 (555) 000-0000"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Mobile</label>
+                      <input
+                        type="tel"
+                        value={contactForm.mobile}
+                        onChange={e => setContactForm(f => ({ ...f, mobile: e.target.value }))}
                         placeholder="+1 (555) 000-0000"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
@@ -772,7 +783,7 @@ export default function ProspectDetailPage() {
                     <button
                       onClick={() => {
                         setShowAddContact(false)
-                        setContactForm({ name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", role: "", notes: "" })
+                        setContactForm({ name: "", title: "", email: "", emailConfidence: "", linkedinUrl: "", phone: "", mobile: "", role: "", notes: "" })
                       }}
                       className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 text-sm rounded-lg transition-colors"
                     >

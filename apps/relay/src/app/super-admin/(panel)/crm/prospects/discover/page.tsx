@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import Link from "next/link"
 import {
-  Search, Loader2, X, ChevronLeft, ExternalLink,
+  Search, Loader2, X, ChevronLeft, ChevronDown, ChevronUp, ExternalLink,
   MapPin, Users, Zap, CheckCircle2, AlertTriangle,
   RefreshCw, Send, Building2, Star, Mail, Globe,
   Bookmark, BookmarkCheck, Trash2, FolderOpen, List,
@@ -22,6 +22,25 @@ type ListSaveState  = "idle" | "naming" | "saving" | "saved" | "error"
 type ActiveTab      = "search" | "lists"
 type VerifState     = "pending" | "done" | "error"
 type CompanyWithVerify = DiscoveredCompanyBasic & { verificationState?: VerifState }
+
+interface RoundDiagRecord {
+  round:                number
+  rawCount:             number
+  sessionDedupExcluded: number
+  geoMismatch:          number
+  crmExcluded:          number
+  netNew:               number
+  roundDurationMs:      number
+  hasMore:              boolean
+  error?:               string
+}
+
+const ROUND_STRATEGY_LABELS: Record<number, string> = {
+  1: "broad",
+  2: "subsector diversify",
+  3: "alternate terms",
+  4: "association directory",
+}
 
 interface VerifyResult {
   employeeCountTier:  import("@/app/api/super-admin/crm/prospects/discover/route").EmployeeCountTier
@@ -846,6 +865,8 @@ export default function DiscoverPage() {
   const sessionVerifyCountRef = useRef(0)
   const [currentRound,     setCurrentRound]     = useState(0)
   const [isSearchRunning,  setIsSearchRunning]  = useState(false)
+  const [roundDiags,       setRoundDiags]       = useState<RoundDiagRecord[]>([])
+  const [diagsOpen,        setDiagsOpen]        = useState(false)
 
   async function handleSaveToList() {
     if (!listName.trim()) return
@@ -1021,7 +1042,14 @@ export default function DiscoverPage() {
         subsectorsFound: string[]
         citiesFound:     string[]
         hasMore:         boolean
-        diagnostics:     { rawCount: number; netNew: number }
+        roundDurationMs: number
+        diagnostics: {
+          rawCount:             number
+          sessionDedupExcluded: number
+          geoMismatch:          number
+          crmExcluded:          number
+          netNew:               number
+        }
       }
 
       if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
@@ -1056,6 +1084,21 @@ export default function DiscoverPage() {
       // Session-capped auto-verify
       autoVerifyFromSession(roundCompanies)
 
+      // Record diagnostics for this round
+      const diagRec: RoundDiagRecord = {
+        round,
+        rawCount:             data.diagnostics.rawCount,
+        sessionDedupExcluded: data.diagnostics.sessionDedupExcluded,
+        geoMismatch:          data.diagnostics.geoMismatch,
+        crmExcluded:          data.diagnostics.crmExcluded,
+        netNew:               data.diagnostics.netNew,
+        roundDurationMs:      data.roundDurationMs,
+        hasMore:              data.hasMore,
+      }
+      setRoundDiags(prev => [...prev, diagRec])
+      // Auto-open if Claude found companies but all were filtered — the user needs to see why
+      if (data.diagnostics.netNew === 0 && data.diagnostics.rawCount > 0) setDiagsOpen(true)
+
       isRoundRunningRef.current = false
 
       // Continue to next round if server says hasMore and session still active
@@ -1073,6 +1116,14 @@ export default function DiscoverPage() {
         setIsSearchRunning(false)
         return
       }
+
+      // Record the error so it appears in the diagnostics panel
+      const errMsg = err instanceof Error ? err.message : String(err)
+      setRoundDiags(prev => [...prev, {
+        round, rawCount: 0, sessionDedupExcluded: 0, geoMismatch: 0, crmExcluded: 0, netNew: 0,
+        roundDurationMs: 0, hasMore: false, error: errMsg,
+      }])
+      setDiagsOpen(true)
 
       if (round === 1) {
         setSearchError(err instanceof Error ? err.message : "Search failed")
@@ -1114,6 +1165,8 @@ export default function DiscoverPage() {
     setListSaveState("idle")
     setListName("")
     setCurrentRound(0)
+    setRoundDiags([])
+    setDiagsOpen(false)
     setIsSearchRunning(true)
 
     void runRound(1, newSessionId)
@@ -1257,7 +1310,7 @@ export default function DiscoverPage() {
             ) : (
               <button
                 type="submit"
-                disabled={searchState === "loading"}
+                disabled={searchState === "loading" || isSearchRunning}
                 className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {searchState === "loading"
@@ -1277,6 +1330,65 @@ export default function DiscoverPage() {
 
         {/* ── Right: Results ──────────────────────────────────────────── */}
         <div className="flex-1 overflow-y-auto p-4">
+          {/* ── Search Diagnostics (admin only) ─────────────────── */}
+          {roundDiags.length > 0 && (
+            <div className="mb-4 bg-gray-900/60 border border-gray-700/40 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setDiagsOpen(o => !o)}
+                className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-gray-800/40 transition-colors"
+              >
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Search Diagnostics</span>
+                  <span className="text-[10px] text-gray-600">
+                    {roundDiags.filter(d => !d.error).length} round{roundDiags.filter(d => !d.error).length !== 1 ? "s" : ""} completed
+                    {roundDiags.some(d => d.error) && (
+                      <span className="text-red-400 ml-1">· {roundDiags.filter(d => d.error).length} error{roundDiags.filter(d => d.error).length !== 1 ? "s" : ""}</span>
+                    )}
+                  </span>
+                  <span className="text-[10px] text-gray-600">· {companies.length} shown</span>
+                  {isSearchRunning && <Loader2 className="w-3 h-3 text-indigo-400 animate-spin" />}
+                </div>
+                {diagsOpen
+                  ? <ChevronUp className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                  : <ChevronDown className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                }
+              </button>
+              {diagsOpen && (
+                <div className="border-t border-gray-800 divide-y divide-gray-800 font-mono text-[10px]">
+                  {roundDiags.map((d, i) => (
+                    <div key={i} className="px-4 py-2.5">
+                      <div className="flex items-center gap-2 flex-wrap mb-1.5 font-sans">
+                        <span className="text-[11px] font-semibold text-gray-300">Round {d.round}</span>
+                        <span className="text-gray-600">{ROUND_STRATEGY_LABELS[d.round]}</span>
+                        {d.roundDurationMs > 0 && <span className="text-gray-600">{(d.roundDurationMs / 1000).toFixed(1)}s</span>}
+                        {d.error
+                          ? <span className="text-red-400 font-semibold">FAILED</span>
+                          : d.hasMore
+                            ? <span className="text-indigo-400">→ continued</span>
+                            : <span className="text-gray-600">→ stopped</span>
+                        }
+                      </div>
+                      {d.error ? (
+                        <p className="text-red-400/80 break-all">{d.error}</p>
+                      ) : (
+                        <div className="grid grid-cols-5 gap-x-4">
+                          <div><span className="text-gray-600">raw </span><span className="text-gray-300">{d.rawCount}</span></div>
+                          <div><span className="text-gray-600">crm </span><span className={d.crmExcluded > 0 ? "text-amber-400" : "text-gray-300"}>{d.crmExcluded}</span></div>
+                          <div><span className="text-gray-600">geo </span><span className={d.geoMismatch > 0 ? "text-amber-400" : "text-gray-300"}>{d.geoMismatch}</span></div>
+                          <div><span className="text-gray-600">dedup </span><span className="text-gray-300">{d.sessionDedupExcluded}</span></div>
+                          <div><span className="text-gray-600">net </span><span className={d.netNew > 0 ? "text-green-400" : "text-amber-400"}>{d.netNew}</span></div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <div className="px-4 py-2 text-gray-500 font-sans">
+                    total displayed: {companies.length}{isSearchRunning ? ` · round ${currentRound}/4 running` : ""}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {searchState === "idle" && (
             <div className="h-full flex flex-col items-center justify-center text-center px-8">
               <Search className="w-12 h-12 text-gray-700 mb-3" />
@@ -1306,7 +1418,7 @@ export default function DiscoverPage() {
           )}
 
           {searchState === "error" && (
-            <div className="h-full flex items-center justify-center">
+            <div className="flex items-center justify-center py-16">
               <div className="bg-red-900/20 border border-red-800/40 rounded-xl p-6 text-center max-w-sm">
                 <AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-2" />
                 <p className="text-red-300 font-medium mb-1">Search failed</p>

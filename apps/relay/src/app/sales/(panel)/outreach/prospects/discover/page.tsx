@@ -1993,7 +1993,7 @@ export default function SalesDiscoverPage() {
                 <textarea rows={3} placeholder="Any other targeting details…" value={context}
                   onChange={e => setContext(e.target.value)} className={`${inputCls} resize-none`} />
               </div>
-              <button type="submit" disabled={searchState === "loading"}
+              <button type="submit" disabled={searchState === "loading" || isSearchRunning}
                 className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors">
                 {searchState === "loading"
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Searching…</>

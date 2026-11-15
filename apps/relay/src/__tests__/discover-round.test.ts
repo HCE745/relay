@@ -348,3 +348,114 @@ describe("round route — round number handling", () => {
     expect(data.round).toBe(4) // clamped to max 4
   })
 })
+
+// ─── Diagnostics completeness ─────────────────────────────────────────────────
+
+describe("diagnostics completeness", () => {
+  it("response includes all required diagnostic fields and round metadata", async () => {
+    companiesResponse([company("Diag Test Co")])
+    const res  = await POST(makeReq({ round: 1, stateProvince: "IN" }))
+    const data = await res.json() as {
+      diagnostics:     Record<string, number>
+      roundDurationMs: number
+      hasMore:         boolean
+      round:           number
+    }
+    expect(res.status).toBe(200)
+    // All five diagnostic counters must be present and numeric
+    expect(typeof data.diagnostics.rawCount).toBe("number")
+    expect(typeof data.diagnostics.sessionDedupExcluded).toBe("number")
+    expect(typeof data.diagnostics.geoMismatch).toBe("number")
+    expect(typeof data.diagnostics.crmExcluded).toBe("number")
+    expect(typeof data.diagnostics.netNew).toBe("number")
+    // Round metadata
+    expect(typeof data.roundDurationMs).toBe("number")
+    expect(typeof data.hasMore).toBe("boolean")
+    expect(typeof data.round).toBe("number")
+  })
+
+  it("geo mismatch is counted but company is not removed — only tagged location_unverified", async () => {
+    companiesResponse([
+      company("Ohio Co",    { state: "OH" }),  // wrong state → geoMismatch++, stays in results
+      company("Indiana Co", { state: "IN" }),  // correct state
+    ])
+    const res  = await POST(makeReq({ round: 1, stateProvince: "IN" }))
+    const data = await res.json() as {
+      companies: { companyName: string; qualificationTier: string }[]
+      diagnostics: { geoMismatch: number; netNew: number }
+    }
+    expect(res.status).toBe(200)
+    expect(data.diagnostics.geoMismatch).toBe(1)
+    expect(data.diagnostics.netNew).toBe(2) // both kept — geo mismatch is a tag, not a filter
+    expect(data.companies).toHaveLength(2)
+    const ohio = data.companies.find(c => c.companyName === "Ohio Co")
+    expect(ohio?.qualificationTier).toBe("location_unverified")
+  })
+
+  it("crmExcluded counts companies hard-filtered by CRM match", async () => {
+    vi.mocked(prisma.prospect.findMany).mockResolvedValueOnce([
+      { id: "p1", companyName: "Alpha Corp", website: "https://alphacorp.com" },
+      { id: "p2", companyName: "Beta Corp",  website: "https://betacorp.com"  },
+    ] as never)
+    companiesResponse([
+      company("Alpha Corp", { website: "https://alphacorp.com" }), // in CRM
+      company("Beta Corp",  { website: "https://betacorp.com"  }), // in CRM
+      company("Gamma Corp", { website: "https://gammacorp.com" }), // new
+    ])
+    const res  = await POST(makeReq({ round: 1 }))
+    const data = await res.json() as {
+      companies:   { companyName: string }[]
+      diagnostics: { rawCount: number; crmExcluded: number; netNew: number }
+    }
+    expect(res.status).toBe(200)
+    expect(data.diagnostics.rawCount).toBe(3)
+    expect(data.diagnostics.crmExcluded).toBe(2)
+    expect(data.diagnostics.netNew).toBe(1)
+    expect(data.companies).toHaveLength(1)
+    expect(data.companies[0].companyName).toBe("Gamma Corp")
+  })
+
+  it("all CRM-excluded → netNew=0 → hasMore=false (stops search)", async () => {
+    vi.mocked(prisma.prospect.findMany).mockResolvedValueOnce([
+      { id: "p1", companyName: "Only Corp", website: "https://onlycorp.com" },
+    ] as never)
+    companiesResponse([company("Only Corp", { website: "https://onlycorp.com" })])
+    const res  = await POST(makeReq({ round: 1, stateProvince: "IN" }))
+    const data = await res.json() as {
+      companies:   unknown[]
+      diagnostics: { crmExcluded: number; netNew: number }
+      hasMore:     boolean
+    }
+    expect(res.status).toBe(200)
+    expect(data.companies).toHaveLength(0)
+    expect(data.diagnostics.crmExcluded).toBe(1)
+    expect(data.diagnostics.netNew).toBe(0)
+    expect(data.hasMore).toBe(false) // netNew=0 → no further rounds
+  })
+
+  it("no text block in Claude response returns rawCount=0 without error", async () => {
+    // Claude response with only tool_use blocks (no final text block)
+    mockCreate.mockResolvedValueOnce({
+      content:    [{ type: "tool_use", id: "tu1", name: "web_search", input: { query: "test" } }],
+      usage:      { input_tokens: 50, output_tokens: 0 },
+      stop_reason: "end_turn",
+    })
+    const res  = await POST(makeReq({ round: 1 }))
+    expect(res.status).toBe(200)
+    const data = await res.json() as { companies: unknown[]; diagnostics: { rawCount: number } }
+    expect(data.companies).toHaveLength(0)
+    expect(data.diagnostics.rawCount).toBe(0)
+  })
+
+  it("Anthropic timeout returns 500 with error field and empty companies array", async () => {
+    const timeoutErr = Object.assign(new Error("Request timed out after 50000ms"), { name: "APITimeoutError" })
+    mockCreate.mockRejectedValueOnce(timeoutErr)
+    const res  = await POST(makeReq({ round: 1 }))
+    const data = await res.json() as { error: string; companies: unknown[] }
+    expect(res.status).toBe(500)
+    expect(typeof data.error).toBe("string")
+    expect(data.error.toLowerCase()).toContain("timed")
+    expect(Array.isArray(data.companies)).toBe(true)
+    expect(data.companies).toHaveLength(0)
+  })
+})

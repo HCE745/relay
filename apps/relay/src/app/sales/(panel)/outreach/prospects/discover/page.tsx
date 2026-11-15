@@ -461,26 +461,30 @@ function SlideOver({ company, onClose, allCompanies, selectedIndex, onNavigate, 
   const QUALIFYING = new Set(["EMAIL_SENT", "CALL_CONNECTED", "CALL_VOICEMAIL", "CALL_NO_ANSWER", "MEETING", "MEETING_HELD", "LINKEDIN", "LINKEDIN_MESSAGE"])
 
   useEffect(() => {
+    const ctrl = new AbortController()
     async function fetchDetails() {
       setDetailsState("loading")
       setDetailsErr(null)
       try {
         const res = await fetch("/api/super-admin/crm/prospects/discover/details", {
-          method: "POST",
+          method:  "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company }),
+          body:    JSON.stringify({ company }),
+          signal:  ctrl.signal,
         })
         if (!res.ok) throw new Error(`Details failed (${res.status})`)
         const data = await res.json() as DiscoveredCompanyDetails
         setDetails(data)
         setDetailsState("ready")
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return
         setDetailsErr(err instanceof Error ? err.message : "Failed to load research")
         setDetailsState("error")
       }
     }
     void fetchDetails()
-  }, [company])
+    return () => ctrl.abort()
+  }, [company.companyName])
 
   useEffect(() => {
     if (!sectionOpen.outreach || templates.length > 0) return
@@ -1617,6 +1621,15 @@ export default function SalesDiscoverPage() {
   const [companies,   setCompanies]   = useState<CompanyWithProgress[]>([])
   const [searchError, setSearchError] = useState<string | null>(null)
 
+  // Multi-round session tracking
+  const sessionIdRef          = useRef<string | null>(null)
+  const isRoundRunningRef     = useRef(false)
+  const roundAbortRef         = useRef<AbortController | null>(null)
+  const sessionAccRef         = useRef({ names: [] as string[], domains: [] as string[], subsectorCounts: {} as Record<string, number>, citiesTried: [] as string[] })
+  const sessionVerifyCountRef = useRef(0)
+  const [currentRound,     setCurrentRound]     = useState(0)
+  const [isSearchRunning,  setIsSearchRunning]  = useState(false)
+
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [savingList,     setSavingList]     = useState(false)
   const [savedListId,    setSavedListId]    = useState<string | null>(null)
@@ -1681,15 +1694,19 @@ export default function SalesDiscoverPage() {
     }
   }
 
-  function autoVerifyTop5(cos: CompanyWithProgress[]) {
+  function autoVerifyFromSession(cos: CompanyWithProgress[]) {
+    const remaining = 5 - sessionVerifyCountRef.current
+    if (remaining <= 0) return
     const queue = [...cos]
       .filter(c => c.qualificationTier !== "location_unverified" && !c.verificationState)
       .sort((a, b) => b.fitScore - a.fitScore)
-      .slice(0, 5)
+      .slice(0, remaining)
     // Max 2 concurrent verify calls; each worker pulls the next item from the queue
     async function drain(): Promise<void> {
+      if (sessionVerifyCountRef.current >= 5) return
       const c = queue.shift()
       if (!c) return
+      sessionVerifyCountRef.current++
       await verifyCompany(c)
       await drain()
     }
@@ -1697,8 +1714,133 @@ export default function SalesDiscoverPage() {
     void Promise.all(Array.from({ length: concurrency }, drain))
   }
 
+  async function runRound(round: number, sessionId: string) {
+    if (sessionIdRef.current !== sessionId) return
+    if (isRoundRunningRef.current) return
+    isRoundRunningRef.current = true
+
+    const ctrl = new AbortController()
+    roundAbortRef.current = ctrl
+    setCurrentRound(round)
+
+    const acc = sessionAccRef.current
+    const body: Record<string, unknown> = {
+      country,
+      requestedCount: 20,
+      round,
+      accumulatedNames:   acc.names,
+      accumulatedDomains: acc.domains,
+      subsectorCounts:    acc.subsectorCounts,
+      citiesTried:        acc.citiesTried,
+    }
+    if (stateProvince) body.stateProvince    = stateProvince
+    if (industry)      body.industry         = industry
+    if (empMin)        body.employeeCountMin  = parseInt(empMin,  10)
+    if (empMax)        body.employeeCountMax  = parseInt(empMax,  10)
+    if (keywords)      body.keywords          = keywords
+    if (context)       body.additionalContext = context
+
+    try {
+      const res = await fetch("/api/super-admin/crm/prospects/discover/round", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(body),
+        signal:  ctrl.signal,
+      })
+
+      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(data.error ?? `Round ${round} failed (${res.status})`)
+      }
+
+      const data = await res.json() as {
+        companies:       DiscoveredCompanyBasic[]
+        subsectorsFound: string[]
+        citiesFound:     string[]
+        hasMore:         boolean
+        diagnostics:     { rawCount: number; netNew: number }
+      }
+
+      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
+
+      const roundCompanies = data.companies.map(basicToProgress)
+
+      // Update session accumulator
+      for (const c of roundCompanies) {
+        acc.names.push(c.companyName)
+        if (c.website) {
+          try {
+            acc.domains.push(new URL(c.website.startsWith("http") ? c.website : `https://${c.website}`).hostname.replace(/^www\./, ""))
+          } catch { /* skip */ }
+        }
+      }
+      for (const s of data.subsectorsFound) {
+        acc.subsectorCounts[s] = (acc.subsectorCounts[s] ?? 0) + 1
+      }
+      for (const city of data.citiesFound) {
+        if (!acc.citiesTried.includes(city)) acc.citiesTried.push(city)
+      }
+
+      // Merge new companies into the list (capped at 20)
+      const updateFn = (prev: CompanyWithProgress[]) => {
+        const prevNames = new Set(prev.map(c => c.companyName))
+        const newOnes = roundCompanies.filter(c => !prevNames.has(c.companyName))
+        return [...prev, ...newOnes].slice(0, 20)
+      }
+      setCompanies(updateFn)
+      setActiveCompanies(updateFn)
+
+      if (round === 1) setSearchState("done")
+
+      autoVerifyFromSession(roundCompanies)
+
+      isRoundRunningRef.current = false
+
+      if (data.hasMore && sessionIdRef.current === sessionId) {
+        void runRound(round + 1, sessionId)
+      } else {
+        setIsSearchRunning(false)
+      }
+    } catch (err) {
+      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
+      isRoundRunningRef.current = false
+
+      if (err instanceof DOMException && err.name === "AbortError") {
+        setIsSearchRunning(false)
+        return
+      }
+
+      if (round === 1) {
+        setSearchError(err instanceof Error ? err.message : "Search failed")
+        setSearchState("error")
+        setIsSearchRunning(false)
+      } else {
+        console.error(`[discover] round ${round} failed (non-fatal):`, err instanceof Error ? err.message : err)
+        setIsSearchRunning(false)
+      }
+    }
+  }
+
+  function handleStopSearch() {
+    roundAbortRef.current?.abort()
+    sessionIdRef.current = null
+    setIsSearchRunning(false)
+  }
+
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
+
+    roundAbortRef.current?.abort()
+
+    const newSessionId = Math.random().toString(36).slice(2)
+    sessionIdRef.current = newSessionId
+    isRoundRunningRef.current = false
+
+    sessionAccRef.current         = { names: [], domains: [], subsectorCounts: {}, citiesTried: [] }
+    sessionVerifyCountRef.current = 0
+
     setSearchState("loading")
     setSearchError(null)
     setCompanies([])
@@ -1706,40 +1848,10 @@ export default function SalesDiscoverPage() {
     setSavedListId(null)
     setSavedListName(null)
     setActiveListId(null)
+    setCurrentRound(0)
+    setIsSearchRunning(true)
 
-    const body: Record<string, unknown> = { country }
-    if (stateProvince) body.stateProvince     = stateProvince
-    if (industry)      body.industry          = industry
-    if (empMin)        body.employeeCountMin   = parseInt(empMin,  10)
-    if (empMax)        body.employeeCountMax   = parseInt(empMax,  10)
-    if (locMin)        body.locationsMin       = parseInt(locMin,  10)
-    if (keywords)      body.keywords           = keywords
-    if (context)       body.additionalContext  = context
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 88_000)
-    try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
-        signal: controller.signal,
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(data.error ?? `Search failed (${res.status})`)
-      }
-      const data = await res.json() as { companies: DiscoveredCompanyBasic[] }
-      const found = (data.companies ?? []).map(basicToProgress)
-      setCompanies(found)
-      setActiveCompanies(found)
-      setSearchState("done")
-      autoVerifyTop5(found)
-    } catch (err) {
-      const isTimeout = err instanceof DOMException && err.name === "AbortError"
-      setSearchError(isTimeout ? "Search timed out — try a narrower query or fewer results" : (err instanceof Error ? err.message : "Search failed"))
-      setSearchState("error")
-    } finally {
-      clearTimeout(timeoutId)
-    }
+    void runRound(1, newSessionId)
   }
 
   async function handleSaveList(name: string) {
@@ -1888,7 +2000,9 @@ export default function SalesDiscoverPage() {
                   : <><Search className="w-4 h-4" /> Find Prospects</>}
               </button>
               {searchState === "loading" && (
-                <p className="text-[11px] text-gray-500 text-center">Claude is finding real companies — this takes ~20 seconds</p>
+                <p className="text-[11px] text-gray-500 text-center">
+                  {currentRound > 0 ? `Round ${currentRound}/4 — finding prospects…` : "Starting search…"}
+                </p>
               )}
             </form>
           </div>
@@ -1911,7 +2025,17 @@ export default function SalesDiscoverPage() {
               <div className="h-full flex flex-col items-center justify-center">
                 <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
                 <p className="text-gray-400 font-medium">Finding prospects…</p>
-                <p className="text-sm text-gray-600 mt-1">Using Claude to find real companies</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {currentRound > 0 ? `Round ${currentRound}/4 — searching the web` : "Starting up…"}
+                </p>
+                {currentRound > 0 && (
+                  <button
+                    onClick={handleStopSearch}
+                    className="mt-4 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
+                  >
+                    Stop search
+                  </button>
+                )}
               </div>
             )}
 
@@ -1928,14 +2052,28 @@ export default function SalesDiscoverPage() {
             {searchState === "done" && (
               <>
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-gray-300 font-medium">
-                    Found {companies.length} {companies.length === 1 ? "company" : "companies"}
-                    {activeCompanies.some(c => c.crmStatus !== "none") && (
-                      <span className="text-[11px] text-gray-500 ml-2 font-normal">
-                        · {activeCompanies.filter(c => c.crmStatus !== "none").length} in CRM
-                      </span>
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm text-gray-300 font-medium">
+                      Found {companies.length} {companies.length === 1 ? "company" : "companies"}
+                      {activeCompanies.some(c => c.crmStatus !== "none") && (
+                        <span className="text-[11px] text-gray-500 ml-2 font-normal">
+                          · {activeCompanies.filter(c => c.crmStatus !== "none").length} in CRM
+                        </span>
+                      )}
+                    </p>
+                    {isSearchRunning && (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-3 h-3 text-indigo-400 animate-spin" />
+                        <span className="text-[11px] text-gray-500">Round {currentRound}/4</span>
+                        <button
+                          onClick={handleStopSearch}
+                          className="text-[10px] text-red-400 hover:text-red-300 px-2 py-0.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
+                        >
+                          Stop
+                        </button>
+                      </div>
                     )}
-                  </p>
+                  </div>
                   <div className="flex items-center gap-2">
                     {savedListId ? (
                       <span className="flex items-center gap-1.5 text-[11px] text-green-400">

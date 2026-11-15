@@ -72,6 +72,26 @@ async function stripePost(
   return data
 }
 
+/**
+ * Fetch the authoritative current state of a subscription from Stripe. The
+ * webhook calls this on every lifecycle event so it always writes CURRENT state
+ * — which is what makes out-of-order webhook delivery safe. Returns the parsed
+ * subscription object (shape validated by the caller, not here).
+ */
+export async function fetchSubscription(subscriptionId: string): Promise<Record<string, unknown>> {
+  const res = await fetch(`${STRIPE_API}/subscriptions/${encodeURIComponent(subscriptionId)}`, {
+    method: "GET",
+    headers: { authorization: `Bearer ${billingKey()}` },
+  })
+  const data = (await res.json().catch(() => null)) as Record<string, unknown> | null
+  if (!res.ok || !data) {
+    const message =
+      (data?.error as { message?: string } | undefined)?.message ?? `Stripe error ${res.status}`
+    throw new Error(message)
+  }
+  return data
+}
+
 export type SubscriptionCheckoutInput = {
   orgId: string
   tier: BillingTier

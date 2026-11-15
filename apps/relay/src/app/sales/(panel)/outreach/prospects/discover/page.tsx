@@ -97,6 +97,8 @@ interface ResearchResult {
   painPoints:        string[]
   relayFitReasons:   string[]
   outreachAngle:     string | null
+  sourceCitations:   string[]
+  employeeCountSource: string | null
   prospectId:        string | null
   isDone:            boolean
   doneAt:            string | null
@@ -140,9 +142,9 @@ function resultToProgress(r: ResearchResult): CompanyWithProgress {
     country:            r.verifiedCountry ?? "United States",
     industry:           r.industry ?? "",
     estimatedEmployees: r.estimatedEmployees ?? "",
-    employeeCountTier:  "unknown",
-    qualificationTier:  "potential",
-    sourceCitations:    [],
+    employeeCountTier:  (r.employeeCountSource as import("@/app/api/super-admin/crm/prospects/discover/route").EmployeeCountTier | null) ?? "unknown",
+    qualificationTier:  r.employeeCountSource && r.employeeCountSource !== "unknown" ? "qualified" : "potential",
+    sourceCitations:    r.sourceCitations ?? [],
     locationVerified:   false,
     summary:            r.summary ?? "",
     fitScore:           r.fitScore ?? 70,
@@ -1680,11 +1682,19 @@ export default function SalesDiscoverPage() {
   }
 
   function autoVerifyTop5(cos: CompanyWithProgress[]) {
-    const top5 = [...cos]
+    const queue = [...cos]
       .filter(c => c.qualificationTier !== "location_unverified" && !c.verificationState)
       .sort((a, b) => b.fitScore - a.fitScore)
       .slice(0, 5)
-    for (const c of top5) void verifyCompany(c)
+    // Max 2 concurrent verify calls; each worker pulls the next item from the queue
+    async function drain(): Promise<void> {
+      const c = queue.shift()
+      if (!c) return
+      await verifyCompany(c)
+      await drain()
+    }
+    const concurrency = Math.min(2, queue.length)
+    void Promise.all(Array.from({ length: concurrency }, drain))
   }
 
   async function handleSearch(e: React.FormEvent) {

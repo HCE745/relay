@@ -667,9 +667,12 @@ function SavedListsTab({ onLoad }: { onLoad: (companies: DiscoveredCompanyBasic[
     try {
       const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${list.id}`)
       if (!res.ok) throw new Error("Load failed")
-      const data = await res.json() as { results: (DiscoveredCompanyBasic & { verifiedCity?: string; verifiedState?: string; verifiedCountry?: string })[] }
-      // Map ProspectResearchResult shape back to DiscoveredCompanyBasic
-      const companies: DiscoveredCompanyBasic[] = data.results.map(r => ({
+      const data = await res.json() as { results: (DiscoveredCompanyBasic & { verifiedCity?: string; verifiedState?: string; verifiedCountry?: string; employeeCountSource?: string })[] }
+      // Map ProspectResearchResult shape back to DiscoveredCompanyBasic.
+      // DB stores employeeCountTier as "employeeCountSource" — read both for forward/back compat.
+      const companies: DiscoveredCompanyBasic[] = data.results.map(r => {
+        const empTier = ((r.employeeCountSource ?? r.employeeCountTier ?? "unknown") as import("@/app/api/super-admin/crm/prospects/discover/route").EmployeeCountTier)
+        return {
         companyName:        r.companyName,
         website:            r.website ?? "",
         city:               r.verifiedCity ?? r.city ?? "",
@@ -677,15 +680,16 @@ function SavedListsTab({ onLoad }: { onLoad: (companies: DiscoveredCompanyBasic[
         country:            r.verifiedCountry ?? r.country ?? "United States",
         industry:           r.industry ?? "",
         estimatedEmployees: r.estimatedEmployees ?? "",
-        employeeCountTier:  r.employeeCountTier  ?? "unknown",
-        qualificationTier:  r.qualificationTier  ?? (r.employeeCountTier && r.employeeCountTier !== "unknown" ? "qualified" : "potential"),
+        employeeCountTier:  empTier,
+        qualificationTier:  r.qualificationTier  ?? (empTier !== "unknown" ? "qualified" : "potential"),
         sourceCitations:    r.sourceCitations     ?? [],
         locationVerified:   r.locationVerified    ?? false,
         summary:            r.summary ?? "",
         fitScore:           r.fitScore ?? 50,
         crmStatus:          r.crmStatus ?? "none",
         lastContactAt:      r.lastContactAt ?? undefined,
-      }))
+      }
+      })
       onLoad(companies, list.name)
     } catch { alert("Could not load list") }
   }
@@ -844,6 +848,8 @@ export default function DiscoverPage() {
             country:            c.country,
             industry:           c.industry,
             estimatedEmployees: c.estimatedEmployees,
+            employeeCountTier:  c.employeeCountTier,
+            sourceCitations:    c.sourceCitations,
             summary:            c.summary,
             fitScore:           c.fitScore,
           })),
@@ -913,11 +919,19 @@ export default function DiscoverPage() {
   }
 
   function autoVerifyTop5(cos: CompanyWithVerify[]) {
-    const top5 = [...cos]
+    const queue = [...cos]
       .filter(c => c.qualificationTier !== "location_unverified" && !c.verificationState)
       .sort((a, b) => b.fitScore - a.fitScore)
       .slice(0, 5)
-    for (const c of top5) void verifyCompany(c)
+    // Max 2 concurrent verify calls; each worker pulls the next item from the queue
+    async function drain(): Promise<void> {
+      const c = queue.shift()
+      if (!c) return
+      await verifyCompany(c)
+      await drain()
+    }
+    const concurrency = Math.min(2, queue.length)
+    void Promise.all(Array.from({ length: concurrency }, drain))
   }
 
   // Load enabled/disabled setting from CRM settings

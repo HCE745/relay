@@ -1623,12 +1623,18 @@ export default function SalesDiscoverPage() {
 
   const sessionVerifyCountRef = useRef(0)
   const searchAbortRef        = useRef<AbortController | null>(null)
+  const jobListAcceptedRef    = useRef(0)
 
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [savingList,     setSavingList]     = useState(false)
   const [savedListId,    setSavedListId]    = useState<string | null>(null)
   const [savedListName,  setSavedListName]  = useState<string | null>(null)
   const saveDialogSuggestion = buildAutoName({ industry, stateProvince, country, keywords })
+
+  const [activeJobId,        setActiveJobId]        = useState<string | null>(null)
+  const [jobRoundsCompleted, setJobRoundsCompleted] = useState(0)
+  const [jobRoundsMax,       setJobRoundsMax]       = useState(5)
+  const [activeJobStatus,    setActiveJobStatus]    = useState<string | null>(null)
 
   // Shared company selection — works for both search and saved-list contexts
   const [activeCompanies, setActiveCompanies] = useState<CompanyWithProgress[]>([])
@@ -1641,6 +1647,83 @@ export default function SalesDiscoverPage() {
   const [externalDoneIds, setExternalDoneIds] = useState<Set<string>>(new Set())
 
   const stateLabel = country === "Canada" ? "Province" : country === "United States" ? "State" : "Region"
+
+  // Restore in-flight job from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const jobId     = sessionStorage.getItem("discover_job_id_sales")
+      const listId    = sessionStorage.getItem("discover_list_id_sales")
+      const jobStatus = sessionStorage.getItem("discover_job_status_sales")
+      if (jobId && listId && jobStatus && (jobStatus === "pending" || jobStatus === "running")) {
+        setActiveJobId(jobId)
+        setSavedListId(listId)
+        setJobRoundsCompleted(1)
+        setActiveJobStatus(jobStatus)
+        setSearchState("done")
+        // Fetch the existing list results
+        void fetch(`/api/super-admin/crm/prospects/discover/lists/${listId}`)
+          .then(r => r.ok ? r.json() : null)
+          .then((data: ResearchListWithResults | null) => {
+            if (data) {
+              const loaded = data.results.map(resultToProgress)
+              setCompanies(loaded)
+              setActiveCompanies(loaded)
+              jobListAcceptedRef.current = loaded.length
+            }
+          })
+      }
+    } catch {}
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Poll job status while pending/running
+  useEffect(() => {
+    if (!activeJobId || !activeJobStatus || !["pending", "running"].includes(activeJobStatus)) return
+
+    const interval = setInterval(() => {
+      void (async () => {
+        try {
+          const res = await fetch(`/api/super-admin/crm/prospects/discover/jobs/${activeJobId}`)
+          if (!res.ok) return
+          const job = await res.json() as {
+            status: string; roundsCompleted: number; roundsMax: number
+            acceptedCount: number; listId: string | null
+          }
+          setJobRoundsCompleted(job.roundsCompleted)
+          setJobRoundsMax(job.roundsMax)
+          setActiveJobStatus(job.status)
+          try { sessionStorage.setItem("discover_job_status_sales", job.status) } catch {}
+
+          if (job.acceptedCount > jobListAcceptedRef.current && job.listId) {
+            jobListAcceptedRef.current = job.acceptedCount
+            const r2 = await fetch(`/api/super-admin/crm/prospects/discover/lists/${job.listId}`)
+            if (r2.ok) {
+              const listData = await r2.json() as ResearchListWithResults
+              const fetched  = listData.results.map(resultToProgress)
+              setCompanies(prev => {
+                const byName = new Map(prev.map(c => [c.companyName, c]))
+                return fetched.map(c => ({ ...c, verificationState: byName.get(c.companyName)?.verificationState }))
+              })
+              setActiveCompanies(prev => {
+                const byName = new Map(prev.map(c => [c.companyName, c]))
+                return fetched.map(c => ({ ...c, verificationState: byName.get(c.companyName)?.verificationState }))
+              })
+            }
+          }
+
+          if (!["pending", "running"].includes(job.status)) {
+            clearInterval(interval)
+            try {
+              sessionStorage.removeItem("discover_job_id_sales")
+              sessionStorage.removeItem("discover_list_id_sales")
+              sessionStorage.removeItem("discover_job_status_sales")
+            } catch {}
+          }
+        } catch {}
+      })()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [activeJobId, activeJobStatus])
 
   async function verifyCompany(company: CompanyWithProgress) {
     if (company.verificationState === "pending" || company.verificationState === "done") return
@@ -1710,6 +1793,20 @@ export default function SalesDiscoverPage() {
 
   function handleStopSearch() {
     searchAbortRef.current?.abort()
+    if (activeJobId) {
+      void fetch(`/api/super-admin/crm/prospects/discover/jobs/${activeJobId}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "cancel" }),
+      })
+      setActiveJobId(null)
+      setActiveJobStatus(null)
+      try {
+        sessionStorage.removeItem("discover_job_id_sales")
+        sessionStorage.removeItem("discover_list_id_sales")
+        sessionStorage.removeItem("discover_job_status_sales")
+      } catch {}
+    }
   }
 
   async function handleSearch(e: React.FormEvent) {
@@ -1720,6 +1817,7 @@ export default function SalesDiscoverPage() {
     searchAbortRef.current = ctrl
 
     sessionVerifyCountRef.current = 0
+    jobListAcceptedRef.current    = 0
 
     setSearchState("loading")
     setSearchError(null)
@@ -1729,6 +1827,8 @@ export default function SalesDiscoverPage() {
     setSavedListId(null)
     setSavedListName(null)
     setActiveListId(null)
+    setActiveJobId(null)
+    setActiveJobStatus(null)
 
     const body: Record<string, unknown> = { country, requestedCount: 20 }
     if (stateProvince) body.stateProvince    = stateProvince
@@ -1739,7 +1839,7 @@ export default function SalesDiscoverPage() {
     if (context)       body.additionalContext = context
 
     try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover", {
+      const res = await fetch("/api/super-admin/crm/prospects/discover/jobs", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(body),
@@ -1751,11 +1851,26 @@ export default function SalesDiscoverPage() {
         throw new Error(data.error ?? `Search failed (${res.status})`)
       }
 
-      const data = await res.json() as { companies: DiscoveredCompanyBasic[] }
+      const data = await res.json() as {
+        jobId: string; listId: string; jobStatus: string
+        roundsCompleted: number; roundsMax: number
+        companies: DiscoveredCompanyBasic[]
+      }
       const found = (data.companies ?? []).map(basicToProgress)
       setCompanies(found)
       setActiveCompanies(found)
       setSearchState("done")
+      setActiveJobId(data.jobId)
+      setSavedListId(data.listId)
+      setJobRoundsCompleted(data.roundsCompleted ?? 1)
+      setJobRoundsMax(data.roundsMax ?? 5)
+      setActiveJobStatus(data.jobStatus)
+      jobListAcceptedRef.current = found.length
+      try {
+        sessionStorage.setItem("discover_job_id_sales",     data.jobId)
+        sessionStorage.setItem("discover_list_id_sales",    data.listId)
+        sessionStorage.setItem("discover_job_status_sales", data.jobStatus)
+      } catch {}
       autoVerifyFromSession(found)
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return
@@ -1910,7 +2025,7 @@ export default function SalesDiscoverPage() {
                   : <><Search className="w-4 h-4" /> Find Prospects</>}
               </button>
               {searchState === "loading" && (
-                <p className="text-[11px] text-gray-500 text-center">Searching the web — takes ~60s…</p>
+                <p className="text-[11px] text-gray-500 text-center">Researching the web — round 1 takes ~90s…</p>
               )}
             </form>
           </div>
@@ -1932,8 +2047,8 @@ export default function SalesDiscoverPage() {
             {searchState === "loading" && (
               <div className="h-full flex flex-col items-center justify-center">
                 <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
-                <p className="text-gray-400 font-medium">Finding prospects…</p>
-                <p className="text-sm text-gray-600 mt-1">Searching the web — typically takes ~60s</p>
+                <p className="text-gray-400 font-medium">Researching prospects…</p>
+                <p className="text-sm text-gray-600 mt-1">Round 1 — discovery + headcount verification (~90s)</p>
                 <button
                   onClick={handleStopSearch}
                   className="mt-4 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
@@ -1955,6 +2070,28 @@ export default function SalesDiscoverPage() {
 
             {searchState === "done" && (
               <>
+                {/* Job progress banner */}
+                {activeJobId && activeJobStatus && ["pending", "running"].includes(activeJobStatus) && (
+                  <div className="flex items-center justify-between mb-3 px-3 py-2 bg-indigo-950/60 border border-indigo-800/40 rounded-lg">
+                    <div className="flex items-center gap-2 text-[11px] text-indigo-300">
+                      <Loader2 className="w-3 h-3 animate-spin flex-shrink-0" />
+                      <span>Continuing research — round {jobRoundsCompleted} of {jobRoundsMax} complete, more companies arriving…</span>
+                    </div>
+                    <button
+                      onClick={handleStopSearch}
+                      className="text-[10px] text-red-400 hover:text-red-300 px-2 py-0.5 rounded border border-red-900/50 hover:border-red-800 transition-colors flex-shrink-0 ml-2"
+                    >
+                      Stop
+                    </button>
+                  </div>
+                )}
+                {activeJobId && activeJobStatus && activeJobStatus === "completed" && (
+                  <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-green-950/40 border border-green-800/30 rounded-lg text-[11px] text-green-400">
+                    <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
+                    <span>Research complete — {jobRoundsCompleted} round{jobRoundsCompleted !== 1 ? "s" : ""} finished</span>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm text-gray-300 font-medium">
                     Found {companies.length} {companies.length === 1 ? "company" : "companies"}
@@ -1968,7 +2105,9 @@ export default function SalesDiscoverPage() {
                     {savedListId ? (
                       <span className="flex items-center gap-1.5 text-[11px] text-green-400">
                         <Bookmark className="w-3 h-3" />
-                        Saved as <button onClick={() => setSection("lists")} className="font-medium underline underline-offset-2 hover:text-green-300">{savedListName}</button>
+                        <button onClick={() => setSection("lists")} className="font-medium underline underline-offset-2 hover:text-green-300">
+                          {savedListName ?? "Saved to list"}
+                        </button>
                       </span>
                     ) : (
                       <button onClick={() => setShowSaveDialog(true)}

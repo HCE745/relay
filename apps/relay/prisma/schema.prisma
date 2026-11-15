@@ -791,6 +791,7 @@ model SuperAdmin {
   createdOffers               SalesOffer[]          @relation("SACreatedOffers")
   abTestCampaigns             AbTestCampaign[]      @relation("AbTestCampaignSA")
   researchLists               ProspectResearchList[] @relation("SuperAdminResearchLists")
+  researchJobs                ProspectResearchJob[]  @relation("SuperAdminResearchJobs")
   crmRepImpersonationLogs     CrmRepImpersonationLog[] @relation("SARepImpersonation")
 }
 
@@ -2838,6 +2839,7 @@ model SalesUser {
   createdGoals             SalesGoal[]          @relation("GoalCreator")
   demoLinks                LinkClick[]          @relation("SalesUserDemoLinks")
   researchLists            ProspectResearchList[] @relation("SalesUserResearchLists")
+  researchJobs             ProspectResearchJob[]  @relation("SalesUserResearchJobs")
   crmRepImpersonationLogs  CrmRepImpersonationLog[] @relation("RepImpersonationLog")
 }
 
@@ -3813,4 +3815,59 @@ model ProspectResearchResult {
   @@index([companyName])
   @@index([prospectId])
   @@index([isDone])
+}
+
+// ── Persistent research job ───────────────────────────────────────────────────
+// Each job owns one ProspectResearchList; results are saved incrementally as
+// each round completes. The cron at */2 * * * * advances pending jobs.
+model ProspectResearchJob {
+  id           String @id @default(cuid())
+
+  salesUserId  String?
+  superAdminId String?
+
+  // Linked research list (created at job start; never null after creation)
+  listId String? @unique
+
+  // Search criteria (denormalized for cron access without loading the list)
+  country           String
+  stateProvince     String?
+  industry          String
+  employeeCountMin  Int
+  employeeCountMax  Int
+  keywords          String?
+  additionalContext String?
+  requestedCount    Int
+
+  // Status — pending | running | completed | failed | cancelled
+  status          String @default("pending")
+  roundsCompleted Int    @default(0)
+  roundsMax       Int    @default(5)
+  acceptedCount   Int    @default(0)
+
+  // Agent memory: previously seen companies, subsectors, search strategies
+  agentState Json?
+
+  // Distributed lock (cron worker sets lockedUntil = now+180s when claiming)
+  lockedAt    DateTime?
+  lockedUntil DateTime?
+
+  // Anthropic API cost tracking
+  inputTokensTotal  Int @default(0)
+  outputTokensTotal Int @default(0)
+  searchCallsTotal  Int @default(0)
+
+  lastError String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salesUser  SalesUser?  @relation("SalesUserResearchJobs",  fields: [salesUserId],  references: [id], onDelete: Cascade)
+  superAdmin SuperAdmin? @relation("SuperAdminResearchJobs", fields: [superAdminId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([salesUserId])
+  @@index([superAdminId])
+  @@index([createdAt])
+  @@index([lockedUntil])
 }

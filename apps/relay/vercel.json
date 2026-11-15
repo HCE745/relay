@@ -60,6 +60,10 @@
     {
       "path":     "/api/cron/onboarding-stall",
       "schedule": "0 * * * *"
+    },
+    {
+      "path":     "/api/cron/prospect-research",
+      "schedule": "*/2 * * * *"
     }
   ]
 }

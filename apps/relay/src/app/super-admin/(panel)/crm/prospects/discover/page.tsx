@@ -846,8 +846,106 @@ export default function DiscoverPage() {
 
   const sessionVerifyCountRef = useRef(0)
   const searchAbortRef        = useRef<AbortController | null>(null)
+  const jobListAcceptedRef    = useRef(0)
   const [diagRec,   setDiagRec]   = useState<SearchDiagRec | null>(null)
   const [diagsOpen, setDiagsOpen] = useState(false)
+
+  // Research-job state (persisted in sessionStorage so Rachel can leave and return)
+  const [activeJobId,          setActiveJobId]          = useState<string | null>(null)
+  const [activeListId,         setActiveListId]         = useState<string | null>(null)
+  const [jobRoundsCompleted,   setJobRoundsCompleted]   = useState(0)
+  const [jobRoundsMax,         setJobRoundsMax]         = useState(5)
+  const [activeJobStatus,      setActiveJobStatus]      = useState<string>("idle")
+
+  // Restore in-flight job from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const jid  = sessionStorage.getItem("discover_job_id")
+      const lid  = sessionStorage.getItem("discover_list_id")
+      const stat = sessionStorage.getItem("discover_job_status") ?? "idle"
+      if (jid && ["pending", "running"].includes(stat)) {
+        setActiveJobId(jid)
+        if (lid) setActiveListId(lid)
+        setActiveJobStatus(stat)
+        setSearchState("done")
+      }
+    } catch { /* sessionStorage unavailable */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Poll job status while research is running
+  useEffect(() => {
+    if (!activeJobId || !["pending", "running"].includes(activeJobStatus)) return
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/super-admin/crm/prospects/discover/jobs/${activeJobId}`)
+        if (!res.ok) return
+        const job = await res.json() as {
+          status: string; roundsCompleted: number; roundsMax: number
+          acceptedCount: number; listId: string | null; lastError: string | null
+        }
+        setJobRoundsCompleted(job.roundsCompleted)
+        setJobRoundsMax(job.roundsMax)
+        try { sessionStorage.setItem("discover_job_status", job.status) } catch { /* ignore */ }
+
+        if (job.acceptedCount > jobListAcceptedRef.current && job.listId) {
+          jobListAcceptedRef.current = job.acceptedCount
+          const lr = await fetch(`/api/super-admin/crm/prospects/discover/lists/${job.listId}`)
+          if (lr.ok) {
+            const data = await lr.json() as {
+              results: Array<{
+                companyName: string; website: string | null; verifiedCity: string | null
+                verifiedState: string | null; verifiedCountry: string | null
+                industry: string | null; estimatedEmployees: string | null
+                employeeCountSource: string | null; qualificationTier?: string
+                sourceCitations: string[]; locationVerified: boolean
+                summary: string | null; fitScore: number | null; crmStatus?: string
+              }>
+            }
+            const listCompanies: CompanyWithVerify[] = data.results.map(r => {
+              const empTier = (r.employeeCountSource ?? "unknown") as import("@/app/api/super-admin/crm/prospects/discover/route").EmployeeCountTier
+              return {
+                companyName:        r.companyName,
+                website:            r.website            ?? "",
+                city:               r.verifiedCity       ?? "",
+                state:              r.verifiedState      ?? "",
+                country:            r.verifiedCountry    ?? "United States",
+                industry:           r.industry           ?? "",
+                estimatedEmployees: r.estimatedEmployees ?? "",
+                employeeCountTier:  empTier,
+                qualificationTier:  (r.locationVerified && empTier !== "unknown" ? "qualified" : r.locationVerified ? "potential" : "location_unverified") as import("@/app/api/super-admin/crm/prospects/discover/route").QualificationTier,
+                sourceCitations:    r.sourceCitations    ?? [],
+                locationVerified:   r.locationVerified,
+                summary:            r.summary            ?? "",
+                fitScore:           r.fitScore           ?? 50,
+                crmStatus:          "none" as const,
+                // preserve any existing verificationState for already-displayed companies
+                verificationState:  undefined,
+              }
+            })
+            setCompanies(prev => {
+              const prevByName = new Map(prev.map(c => [c.companyName, c]))
+              return listCompanies.map(c => ({ ...c, verificationState: prevByName.get(c.companyName)?.verificationState }))
+            })
+            const newOnes = listCompanies.filter(c => !companies.some(e => e.companyName === c.companyName))
+            if (newOnes.length > 0) autoVerifyFromSession(newOnes)
+          }
+        }
+
+        if (["completed", "failed", "cancelled"].includes(job.status)) {
+          setActiveJobStatus(job.status)
+          clearInterval(interval)
+          if (job.status === "failed" && job.lastError) {
+            setLimitationNote(`Research stopped after round ${job.roundsCompleted}: ${job.lastError}`)
+          }
+        } else {
+          setActiveJobStatus(job.status)
+        }
+      } catch { /* ignore polling errors */ }
+    }, 5000)
+    return () => clearInterval(interval)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeJobId, activeJobStatus])
 
   async function handleSaveToList() {
     if (!listName.trim()) return
@@ -979,6 +1077,15 @@ export default function DiscoverPage() {
 
   function handleStopSearch() {
     searchAbortRef.current?.abort()
+    // Also cancel an in-flight background job
+    if (activeJobId && ["pending", "running"].includes(activeJobStatus)) {
+      void fetch(`/api/super-admin/crm/prospects/discover/jobs/${activeJobId}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cancel" }),
+      })
+      setActiveJobStatus("cancelled")
+      try { sessionStorage.removeItem("discover_job_id"); sessionStorage.removeItem("discover_list_id") } catch { /* ignore */ }
+    }
   }
 
   async function handleSearch(e: React.FormEvent) {
@@ -989,6 +1096,7 @@ export default function DiscoverPage() {
     searchAbortRef.current = ctrl
 
     sessionVerifyCountRef.current = 0
+    jobListAcceptedRef.current    = 0
 
     setSearchState("loading")
     setSearchError(null)
@@ -999,6 +1107,10 @@ export default function DiscoverPage() {
     setListName("")
     setDiagRec(null)
     setDiagsOpen(false)
+    setActiveJobId(null)
+    setActiveListId(null)
+    setActiveJobStatus("idle")
+    setJobRoundsCompleted(0)
 
     const startMs = Date.now()
     const body: Record<string, unknown> = { country, requestedCount: 20 }
@@ -1010,7 +1122,7 @@ export default function DiscoverPage() {
     if (context)       body.additionalContext = context
 
     try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover", {
+      const res = await fetch("/api/super-admin/crm/prospects/discover/jobs", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(body),
@@ -1027,6 +1139,11 @@ export default function DiscoverPage() {
         filteredCount?: number
         rawCount?:      number
         limitationNote?: string
+        jobId?:         string
+        listId?:        string
+        jobStatus?:     string
+        roundsCompleted?: number
+        roundsMax?:     number
       }
 
       const found = (data.companies ?? []) as CompanyWithVerify[]
@@ -1040,6 +1157,23 @@ export default function DiscoverPage() {
       }
       setDiagRec(rec)
       if (found.length === 0 && rec.filteredCount > 0) setDiagsOpen(true)
+
+      if (data.jobId) {
+        setActiveJobId(data.jobId)
+        if (data.listId) {
+          setActiveListId(data.listId)
+          setListSaveState("saved") // already saved to list by server
+          try {
+            sessionStorage.setItem("discover_job_id",     data.jobId)
+            sessionStorage.setItem("discover_list_id",    data.listId)
+            sessionStorage.setItem("discover_job_status", data.jobStatus ?? "pending")
+          } catch { /* ignore */ }
+        }
+        setJobRoundsCompleted(data.roundsCompleted ?? 1)
+        setJobRoundsMax(data.roundsMax ?? 5)
+        setActiveJobStatus(data.jobStatus ?? "pending")
+        jobListAcceptedRef.current = found.length
+      }
 
       setSearchState("done")
       autoVerifyFromSession(found)
@@ -1199,7 +1333,7 @@ export default function DiscoverPage() {
             )}
 
             {searchState === "loading" && (
-              <p className="text-[11px] text-gray-500 text-center">Searching the web — takes ~60s…</p>
+              <p className="text-[11px] text-gray-500 text-center">Researching the web — round 1 takes ~90s…</p>
             )}
           </form>
         </div>
@@ -1254,13 +1388,13 @@ export default function DiscoverPage() {
           {searchState === "loading" && (
             <div className="h-full flex flex-col items-center justify-center">
               <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
-              <p className="text-gray-400 font-medium">Finding prospects…</p>
-              <p className="text-sm text-gray-600 mt-1">Searching the web — typically takes ~60s</p>
+              <p className="text-gray-400 font-medium">Researching prospects…</p>
+              <p className="text-sm text-gray-600 mt-1">Round 1 — discovery + headcount verification (~90s)</p>
               <button
                 onClick={handleStopSearch}
                 className="mt-4 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
               >
-                Stop search
+                Stop
               </button>
             </div>
           )}
@@ -1283,6 +1417,28 @@ export default function DiscoverPage() {
                   <p className="text-[12px] text-amber-300/90 leading-relaxed">{limitationNote}</p>
                 </div>
               )}
+              {/* Job progress banner */}
+              {activeJobId && ["pending", "running"].includes(activeJobStatus) && (
+                <div className="mb-3 flex items-center gap-2 bg-indigo-950/40 border border-indigo-800/40 rounded-lg px-3.5 py-2 text-[12px]">
+                  <Loader2 className="w-3 h-3 text-indigo-400 animate-spin flex-shrink-0" />
+                  <span className="text-indigo-300">
+                    Research continuing — round {jobRoundsCompleted} of up to {jobRoundsMax} complete, more companies arriving shortly
+                  </span>
+                  <button
+                    onClick={handleStopSearch}
+                    className="ml-auto text-[11px] text-red-400/70 hover:text-red-400 flex-shrink-0"
+                  >
+                    Stop
+                  </button>
+                </div>
+              )}
+              {activeJobId && activeJobStatus === "completed" && (
+                <div className="mb-3 flex items-center gap-2 bg-emerald-950/30 border border-emerald-800/40 rounded-lg px-3.5 py-2 text-[12px]">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                  <span className="text-emerald-300">Research complete — {jobRoundsCompleted} rounds, {companies.length} companies found</span>
+                </div>
+              )}
+
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-sm text-gray-300 font-medium">
@@ -1318,8 +1474,15 @@ export default function DiscoverPage() {
                 {companies.length > 0 && (
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <p className="text-[11px] text-gray-500 hidden sm:block">Click a card to research + draft email</p>
-                    {/* Save to list */}
-                    {listSaveState === "saved" ? (
+                    {/* When from a research job, results are auto-saved; show a link to the list */}
+                    {activeListId ? (
+                      <button
+                        onClick={() => setActiveTab("lists")}
+                        className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 bg-emerald-900/30 hover:bg-emerald-900/50 text-emerald-400 border border-emerald-800/50 rounded-lg transition-colors"
+                      >
+                        <BookmarkCheck className="w-3 h-3" /> Saved to list
+                      </button>
+                    ) : listSaveState === "saved" ? (
                       <span className="flex items-center gap-1 text-[11px] text-emerald-400">
                         <BookmarkCheck className="w-3.5 h-3.5" /> Saved
                       </span>

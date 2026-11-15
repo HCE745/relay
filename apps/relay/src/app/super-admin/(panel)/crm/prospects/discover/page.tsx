@@ -23,23 +23,10 @@ type ActiveTab      = "search" | "lists"
 type VerifState     = "pending" | "done" | "error"
 type CompanyWithVerify = DiscoveredCompanyBasic & { verificationState?: VerifState }
 
-interface RoundDiagRecord {
-  round:                number
-  rawCount:             number
-  sessionDedupExcluded: number
-  geoMismatch:          number
-  crmExcluded:          number
-  netNew:               number
-  roundDurationMs:      number
-  hasMore:              boolean
-  error?:               string
-}
-
-const ROUND_STRATEGY_LABELS: Record<number, string> = {
-  1: "broad",
-  2: "subsector diversify",
-  3: "alternate terms",
-  4: "association directory",
+interface SearchDiagRec {
+  rawCount:     number
+  filteredCount: number
+  durationMs:   number
 }
 
 interface VerifyResult {
@@ -857,16 +844,10 @@ export default function DiscoverPage() {
   const [listName,      setListName]      = useState("")
   const [listSaveError, setListSaveError] = useState<string | null>(null)
 
-  // Multi-round session tracking
-  const sessionIdRef          = useRef<string | null>(null)
-  const isRoundRunningRef     = useRef(false)
-  const roundAbortRef         = useRef<AbortController | null>(null)
-  const sessionAccRef         = useRef({ names: [] as string[], domains: [] as string[], subsectorCounts: {} as Record<string, number>, citiesTried: [] as string[] })
   const sessionVerifyCountRef = useRef(0)
-  const [currentRound,     setCurrentRound]     = useState(0)
-  const [isSearchRunning,  setIsSearchRunning]  = useState(false)
-  const [roundDiags,       setRoundDiags]       = useState<RoundDiagRecord[]>([])
-  const [diagsOpen,        setDiagsOpen]        = useState(false)
+  const searchAbortRef        = useRef<AbortController | null>(null)
+  const [diagRec,   setDiagRec]   = useState<SearchDiagRec | null>(null)
+  const [diagsOpen, setDiagsOpen] = useState(false)
 
   async function handleSaveToList() {
     if (!listName.trim()) return
@@ -996,165 +977,17 @@ export default function DiscoverPage() {
 
   const stateLabel = country === "Canada" ? "Province" : country === "United States" ? "State" : "Region"
 
-  async function runRound(round: number, sessionId: string) {
-    if (sessionIdRef.current !== sessionId) return
-    if (isRoundRunningRef.current) return
-    isRoundRunningRef.current = true
-
-    const ctrl = new AbortController()
-    roundAbortRef.current = ctrl
-    setCurrentRound(round)
-
-    const acc = sessionAccRef.current
-    const body: Record<string, unknown> = {
-      country,
-      requestedCount: 20,
-      round,
-      accumulatedNames:   acc.names,
-      accumulatedDomains: acc.domains,
-      subsectorCounts:    acc.subsectorCounts,
-      citiesTried:        acc.citiesTried,
-    }
-    if (stateProvince) body.stateProvince    = stateProvince
-    if (industry)      body.industry         = industry
-    if (empMin)        body.employeeCountMin  = parseInt(empMin,  10)
-    if (empMax)        body.employeeCountMax  = parseInt(empMax,  10)
-    if (keywords)      body.keywords          = keywords
-    if (context)       body.additionalContext = context
-
-    try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover/round", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(body),
-        signal:  ctrl.signal,
-      })
-
-      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(data.error ?? `Round ${round} failed (${res.status})`)
-      }
-
-      const data = await res.json() as {
-        companies:       DiscoveredCompanyBasic[]
-        subsectorsFound: string[]
-        citiesFound:     string[]
-        hasMore:         boolean
-        roundDurationMs: number
-        diagnostics: {
-          rawCount:             number
-          sessionDedupExcluded: number
-          geoMismatch:          number
-          crmExcluded:          number
-          netNew:               number
-        }
-      }
-
-      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
-
-      const roundCompanies = data.companies as CompanyWithVerify[]
-
-      // Update session accumulator for the next round
-      for (const c of roundCompanies) {
-        acc.names.push(c.companyName)
-        if (c.website) {
-          try {
-            acc.domains.push(new URL(c.website.startsWith("http") ? c.website : `https://${c.website}`).hostname.replace(/^www\./, ""))
-          } catch { /* skip bad URLs */ }
-        }
-      }
-      for (const s of data.subsectorsFound) {
-        acc.subsectorCounts[s] = (acc.subsectorCounts[s] ?? 0) + 1
-      }
-      for (const city of data.citiesFound) {
-        if (!acc.citiesTried.includes(city)) acc.citiesTried.push(city)
-      }
-
-      // Merge new companies into the displayed list (capped at 20)
-      setCompanies(prev => {
-        const prevNames = new Set(prev.map(c => c.companyName))
-        const newOnes = roundCompanies.filter(c => !prevNames.has(c.companyName))
-        return [...prev, ...newOnes].slice(0, 20)
-      })
-
-      if (round === 1) setSearchState("done")
-
-      // Session-capped auto-verify
-      autoVerifyFromSession(roundCompanies)
-
-      // Record diagnostics for this round
-      const diagRec: RoundDiagRecord = {
-        round,
-        rawCount:             data.diagnostics.rawCount,
-        sessionDedupExcluded: data.diagnostics.sessionDedupExcluded,
-        geoMismatch:          data.diagnostics.geoMismatch,
-        crmExcluded:          data.diagnostics.crmExcluded,
-        netNew:               data.diagnostics.netNew,
-        roundDurationMs:      data.roundDurationMs,
-        hasMore:              data.hasMore,
-      }
-      setRoundDiags(prev => [...prev, diagRec])
-      // Auto-open if Claude found companies but all were filtered — the user needs to see why
-      if (data.diagnostics.netNew === 0 && data.diagnostics.rawCount > 0) setDiagsOpen(true)
-
-      isRoundRunningRef.current = false
-
-      // Continue to next round if server says hasMore and session still active
-      if (data.hasMore && sessionIdRef.current === sessionId) {
-        void runRound(round + 1, sessionId)
-      } else {
-        setIsSearchRunning(false)
-      }
-    } catch (err) {
-      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
-      isRoundRunningRef.current = false
-
-      if (err instanceof DOMException && err.name === "AbortError") {
-        // Aborted — either new search started or user stopped; don't show error
-        setIsSearchRunning(false)
-        return
-      }
-
-      // Record the error so it appears in the diagnostics panel
-      const errMsg = err instanceof Error ? err.message : String(err)
-      setRoundDiags(prev => [...prev, {
-        round, rawCount: 0, sessionDedupExcluded: 0, geoMismatch: 0, crmExcluded: 0, netNew: 0,
-        roundDurationMs: 0, hasMore: false, error: errMsg,
-      }])
-      setDiagsOpen(true)
-
-      if (round === 1) {
-        setSearchError(err instanceof Error ? err.message : "Search failed")
-        setSearchState("error")
-        setIsSearchRunning(false)
-      } else {
-        // Later round failure is non-fatal — results so far remain usable
-        console.error(`[discover] round ${round} failed (non-fatal):`, err instanceof Error ? err.message : err)
-        setIsSearchRunning(false)
-      }
-    }
-  }
-
   function handleStopSearch() {
-    roundAbortRef.current?.abort()
-    sessionIdRef.current = null
-    setIsSearchRunning(false)
+    searchAbortRef.current?.abort()
   }
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
 
-    // Cancel any in-flight round
-    roundAbortRef.current?.abort()
+    searchAbortRef.current?.abort()
+    const ctrl = new AbortController()
+    searchAbortRef.current = ctrl
 
-    const newSessionId = Math.random().toString(36).slice(2)
-    sessionIdRef.current = newSessionId
-    isRoundRunningRef.current = false
-
-    // Reset session state
-    sessionAccRef.current         = { names: [], domains: [], subsectorCounts: {}, citiesTried: [] }
     sessionVerifyCountRef.current = 0
 
     setSearchState("loading")
@@ -1164,12 +997,57 @@ export default function DiscoverPage() {
     setLimitationNote(null)
     setListSaveState("idle")
     setListName("")
-    setCurrentRound(0)
-    setRoundDiags([])
+    setDiagRec(null)
     setDiagsOpen(false)
-    setIsSearchRunning(true)
 
-    void runRound(1, newSessionId)
+    const startMs = Date.now()
+    const body: Record<string, unknown> = { country, requestedCount: 20 }
+    if (stateProvince) body.stateProvince    = stateProvince
+    if (industry)      body.industry         = industry
+    if (empMin)        body.employeeCountMin  = parseInt(empMin,  10)
+    if (empMax)        body.employeeCountMax  = parseInt(empMax,  10)
+    if (keywords)      body.keywords          = keywords
+    if (context)       body.additionalContext = context
+
+    try {
+      const res = await fetch("/api/super-admin/crm/prospects/discover", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(body),
+        signal:  ctrl.signal,
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(data.error ?? `Search failed (${res.status})`)
+      }
+
+      const data = await res.json() as {
+        companies:      DiscoveredCompanyBasic[]
+        filteredCount?: number
+        rawCount?:      number
+        limitationNote?: string
+      }
+
+      const found = (data.companies ?? []) as CompanyWithVerify[]
+      setCompanies(found)
+      setLimitationNote(data.limitationNote ?? null)
+
+      const rec: SearchDiagRec = {
+        rawCount:     data.rawCount      ?? found.length,
+        filteredCount: data.filteredCount ?? 0,
+        durationMs:   Date.now() - startMs,
+      }
+      setDiagRec(rec)
+      if (found.length === 0 && rec.filteredCount > 0) setDiagsOpen(true)
+
+      setSearchState("done")
+      autoVerifyFromSession(found)
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return
+      setSearchError(err instanceof Error ? err.message : "Search failed")
+      setSearchState("error")
+    }
   }
 
   const inputCls = "w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
@@ -1310,7 +1188,7 @@ export default function DiscoverPage() {
             ) : (
               <button
                 type="submit"
-                disabled={searchState === "loading" || isSearchRunning}
+                disabled={searchState === "loading"}
                 className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {searchState === "loading"
@@ -1321,9 +1199,7 @@ export default function DiscoverPage() {
             )}
 
             {searchState === "loading" && (
-              <p className="text-[11px] text-gray-500 text-center">
-                {currentRound > 0 ? `Round ${currentRound}/4 — finding prospects…` : "Starting search…"}
-              </p>
+              <p className="text-[11px] text-gray-500 text-center">Searching the web — takes ~60s…</p>
             )}
           </form>
         </div>
@@ -1331,7 +1207,7 @@ export default function DiscoverPage() {
         {/* ── Right: Results ──────────────────────────────────────────── */}
         <div className="flex-1 overflow-y-auto p-4">
           {/* ── Search Diagnostics (admin only) ─────────────────── */}
-          {roundDiags.length > 0 && (
+          {diagRec && (
             <div className="mb-4 bg-gray-900/60 border border-gray-700/40 rounded-xl overflow-hidden">
               <button
                 onClick={() => setDiagsOpen(o => !o)}
@@ -1339,14 +1215,10 @@ export default function DiscoverPage() {
               >
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Search Diagnostics</span>
-                  <span className="text-[10px] text-gray-600">
-                    {roundDiags.filter(d => !d.error).length} round{roundDiags.filter(d => !d.error).length !== 1 ? "s" : ""} completed
-                    {roundDiags.some(d => d.error) && (
-                      <span className="text-red-400 ml-1">· {roundDiags.filter(d => d.error).length} error{roundDiags.filter(d => d.error).length !== 1 ? "s" : ""}</span>
-                    )}
-                  </span>
                   <span className="text-[10px] text-gray-600">· {companies.length} shown</span>
-                  {isSearchRunning && <Loader2 className="w-3 h-3 text-indigo-400 animate-spin" />}
+                  {diagRec.filteredCount > 0 && (
+                    <span className="text-[10px] text-amber-500/80">· {diagRec.filteredCount} filtered by CRM</span>
+                  )}
                 </div>
                 {diagsOpen
                   ? <ChevronUp className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
@@ -1354,36 +1226,16 @@ export default function DiscoverPage() {
                 }
               </button>
               {diagsOpen && (
-                <div className="border-t border-gray-800 divide-y divide-gray-800 font-mono text-[10px]">
-                  {roundDiags.map((d, i) => (
-                    <div key={i} className="px-4 py-2.5">
-                      <div className="flex items-center gap-2 flex-wrap mb-1.5 font-sans">
-                        <span className="text-[11px] font-semibold text-gray-300">Round {d.round}</span>
-                        <span className="text-gray-600">{ROUND_STRATEGY_LABELS[d.round]}</span>
-                        {d.roundDurationMs > 0 && <span className="text-gray-600">{(d.roundDurationMs / 1000).toFixed(1)}s</span>}
-                        {d.error
-                          ? <span className="text-red-400 font-semibold">FAILED</span>
-                          : d.hasMore
-                            ? <span className="text-indigo-400">→ continued</span>
-                            : <span className="text-gray-600">→ stopped</span>
-                        }
-                      </div>
-                      {d.error ? (
-                        <p className="text-red-400/80 break-all">{d.error}</p>
-                      ) : (
-                        <div className="grid grid-cols-5 gap-x-4">
-                          <div><span className="text-gray-600">raw </span><span className="text-gray-300">{d.rawCount}</span></div>
-                          <div><span className="text-gray-600">crm </span><span className={d.crmExcluded > 0 ? "text-amber-400" : "text-gray-300"}>{d.crmExcluded}</span></div>
-                          <div><span className="text-gray-600">geo </span><span className={d.geoMismatch > 0 ? "text-amber-400" : "text-gray-300"}>{d.geoMismatch}</span></div>
-                          <div><span className="text-gray-600">dedup </span><span className="text-gray-300">{d.sessionDedupExcluded}</span></div>
-                          <div><span className="text-gray-600">net </span><span className={d.netNew > 0 ? "text-green-400" : "text-amber-400"}>{d.netNew}</span></div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  <div className="px-4 py-2 text-gray-500 font-sans">
-                    total displayed: {companies.length}{isSearchRunning ? ` · round ${currentRound}/4 running` : ""}
+                <div className="border-t border-gray-800 font-mono text-[10px] px-4 py-2.5">
+                  <div className="grid grid-cols-4 gap-x-6">
+                    <div><span className="text-gray-600">found </span><span className="text-gray-300">{diagRec.rawCount}</span></div>
+                    <div><span className="text-gray-600">crm </span><span className={diagRec.filteredCount > 0 ? "text-amber-400" : "text-gray-300"}>{diagRec.filteredCount}</span></div>
+                    <div><span className="text-gray-600">net </span><span className={companies.length > 0 ? "text-green-400" : "text-amber-400"}>{companies.length}</span></div>
+                    <div><span className="text-gray-600">time </span><span className="text-gray-300">{(diagRec.durationMs / 1000).toFixed(1)}s</span></div>
                   </div>
+                  {diagRec.filteredCount > 0 && diagRec.filteredCount === diagRec.rawCount && (
+                    <p className="text-amber-400/70 text-[10px] mt-1.5 font-sans">All companies Claude found are already in the CRM. Try different keywords or a different location.</p>
+                  )}
                 </div>
               )}
             </div>
@@ -1403,17 +1255,13 @@ export default function DiscoverPage() {
             <div className="h-full flex flex-col items-center justify-center">
               <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
               <p className="text-gray-400 font-medium">Finding prospects…</p>
-              <p className="text-sm text-gray-600 mt-1">
-                {currentRound > 0 ? `Round ${currentRound}/4 — searching the web` : "Starting up…"}
-              </p>
-              {currentRound > 0 && (
-                <button
-                  onClick={handleStopSearch}
-                  className="mt-4 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
-                >
-                  Stop search
-                </button>
-              )}
+              <p className="text-sm text-gray-600 mt-1">Searching the web — typically takes ~60s</p>
+              <button
+                onClick={handleStopSearch}
+                className="mt-4 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
+              >
+                Stop search
+              </button>
             </div>
           )}
 
@@ -1437,28 +1285,14 @@ export default function DiscoverPage() {
               )}
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm text-gray-300 font-medium">
-                      Found {companies.length} {companies.length === 1 ? "company" : "companies"}
-                      {companies.some(c => c.crmStatus !== "none") && (
-                        <span className="text-[11px] text-gray-500 ml-2 font-normal">
-                          · {companies.filter(c => c.crmStatus !== "none").length} flagged in CRM
-                        </span>
-                      )}
-                    </p>
-                    {isSearchRunning && (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-3 h-3 text-indigo-400 animate-spin" />
-                        <span className="text-[11px] text-gray-500">Round {currentRound}/4</span>
-                        <button
-                          onClick={handleStopSearch}
-                          className="text-[10px] text-red-400 hover:text-red-300 px-2 py-0.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
-                        >
-                          Stop
-                        </button>
-                      </div>
+                  <p className="text-sm text-gray-300 font-medium">
+                    Found {companies.length} {companies.length === 1 ? "company" : "companies"}
+                    {companies.some(c => c.crmStatus !== "none") && (
+                      <span className="text-[11px] text-gray-500 ml-2 font-normal">
+                        · {companies.filter(c => c.crmStatus !== "none").length} flagged in CRM
+                      </span>
                     )}
-                  </div>
+                  </p>
                   {/* Applied filters summary */}
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">

@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       const norm = normalizeCompanyName(p.companyName)
       if (norm && !nameToProspect.has(norm)) nameToProspect.set(norm, { id: p.id })
     }
-    const exclusionList = existingProspects.map(p => p.companyName).slice(0, 100).join(", ")
+    const exclusionList = existingProspects.map(p => p.companyName).slice(0, 300).join(", ")
     const existingDomains = existingProspects
       .flatMap(p => { const d = p.website ? extractDomain(p.website) : null; return d ? [d] : [] })
       .slice(0, 300)
@@ -107,16 +107,45 @@ export async function POST(req: NextRequest) {
         ? `\nIMPORTANT: Do NOT repeat any of these companies already found: ${opts.additionalExcludeNames}`
         : ""
 
-      return `Find up to ${opts.count} real ${industryTarget} companies headquartered in ${locationTarget} that could benefit from Relay — operational coordination software for manufacturing facilities (issue reporting, maintenance requests, digital shift handoffs, QR-code asset tracking).${keywordsLine}${contextLine}${batch2Note}
+      if (opts.isBatch2) {
+        // Batch 2 is a fast fallback — discovery only, no headcount verification
+        return `Find up to ${opts.count} real ${industryTarget} companies headquartered in ${locationTarget} with approximately ${empRange} that could benefit from Relay — operational coordination software for manufacturing facilities.${keywordsLine}${contextLine}${batch2Note}
 
-USE WEB SEARCH with 3–5 searches to find diverse companies:
-- Search for "${industryTarget} manufacturers ${locationTarget}", "${industryTarget} companies ${locationTarget}", and similar
-- Vary your searches to cover different ${industryTarget} subsectors
+USE WEB SEARCH with 2–3 searches targeting DIFFERENT areas than your previous search:
+- Try different ${industryTarget} subsectors, different cities, or adjacent industry terms
+- Do NOT repeat any of the excluded companies below
+
+REQUIREMENTS: official HTTPS website required; headquarters confirmed in ${locationTarget}; LinkedIn/ZoomInfo/directories are NOT acceptable as the company website.
+
+EXCLUDE — already in our CRM: ${excludeNames}
+EXCLUDE — these domains already tracked: ${excludeDomains}
+
+Return ONLY a JSON array. Each object: companyName, website, city, state (${stateLabel}), country ("${country}"), industry, summary, fitScore (0-100), estimatedEmployees ("unknown"), employeeCountTier ("unknown"), sourceCitations.
+Your entire response must be only the JSON array — nothing before [, nothing after ].`
+      }
+
+      return `Find up to ${opts.count} real ${industryTarget} companies headquartered in ${locationTarget} with approximately ${empRange} that could benefit from Relay — operational coordination software for manufacturing facilities (issue reporting, maintenance requests, digital shift handoffs, QR-code asset tracking).${keywordsLine}${contextLine}
+
+USE WEB SEARCH with this two-step process:
+
+STEP 1 — DISCOVERY (use 2–3 broad searches):
+Search for "${industryTarget} companies ${locationTarget}", "${industryTarget} manufacturers ${locationTarget}", and similar. Build a candidate list. Vary searches across different ${industryTarget} subsectors.
+
+STEP 2 — HEADCOUNT VERIFICATION (use 1 targeted search per candidate):
+For each company from Step 1, run a targeted search:
+  - Search: "{company name} linkedin.com employees" or "{company name} site:linkedin.com"
+  - LinkedIn company pages show ranges like "51-200 employees", "201-500 employees" — use these
+  - If LinkedIn gives nothing, try: "{company name} glassdoor employees ${locationTarget}"
+  - Classify based on what you actually found:
+    * "web_confirmed" — LinkedIn or Glassdoor shows an employee count or range entirely within ${empRange}
+    * "web_estimated" — LinkedIn or Glassdoor shows a range that OVERLAPS with ${empRange}
+    * "unknown" — real ${locationTarget} ${industryTarget} company but NO headcount evidence found after searching LinkedIn and Glassdoor
+
+IMPORTANT: Allocate enough searches so you do a headcount lookup for every company you plan to include. Only mark "unknown" after genuinely trying LinkedIn and Glassdoor.
 
 REQUIREMENTS for each company:
 - Official, working HTTPS website (required — omit the company if not verified; LinkedIn/ZoomInfo/directories are NOT acceptable)
 - Headquarters confirmed in ${locationTarget}
-- Looks like it could have roughly ${empRange} (judgment only — do NOT search for headcount)
 
 GEOGRAPHIC RULE: Only return companies with confirmed headquarters in ${locationTarget}.
 HONESTY RULE: Return what you verified. Do not fabricate. If fewer than ${opts.count}, return fewer.
@@ -130,10 +159,12 @@ Return ONLY a JSON array. Each object must have exactly these keys:
 - city: headquarters city
 - state: ${stateLabel}
 - country: "${country}"
-- industry: specific subsector (e.g. "Metal Fabrication", "Food Processing")
+- industry: specific ${industryTarget} subsector (e.g. "Metal Fabrication", "Food Processing")
+- estimatedEmployees: employee range string (e.g. "80-150") or "unknown"
+- employeeCountTier: "web_confirmed" | "web_estimated" | "unknown"
 - summary: one sentence describing their ${industryTarget} operations and what they produce
-- fitScore: integer 0-100 (higher = more complex shop floor, more Relay fit)
-- sourceCitations: array of URLs from your web searches
+- fitScore: integer 0-100 (higher = more complex shop floor operations, more Relay fit)
+- sourceCitations: array of URLs from your web searches — include the LinkedIn/Glassdoor URL when found
 
 Your entire response must be only the JSON array — nothing before [, nothing after ].`
     }
@@ -147,17 +178,18 @@ Your entire response must be only the JSON array — nothing before [, nothing a
 
     const anthropic = new Anthropic({ apiKey, maxRetries: 0 })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const tools: any[] = [{ type: "web_search_20260209", name: "web_search", max_uses: 5 }]
+    const tools: any[] = [{ type: "web_search_20260209", name: "web_search", max_uses: 8 }]
 
-    // === BATCH 1 ===
-    console.log("[discover] batch 1: calling claude-sonnet-5-5 (max_uses: 5, discovery-only)")
+    // === BATCH 1: discovery + headcount verification ===
+    console.log("[discover] batch 1: calling claude-sonnet-5-5 (max_uses: 8, discovery+verify)")
     const response1 = await anthropic.messages.create({
       model:      "claude-sonnet-5-5",
       max_tokens: 5000,
       tools,
       system:     systemPrompt,
       messages:   [{ role: "user", content: buildDiscoveryPrompt({ count: requestedCount }) }],
-    }, { timeout: 65_000 })
+    // 8 searches × ~6s avg = ~48s; 80s SDK timeout leaves a buffer before Vercel's 90s wall
+    }, { timeout: 80_000 })
 
     const usage1 = response1.usage as { input_tokens: number; output_tokens: number }
     console.log("[discover] batch 1 usage:", { input_tokens: usage1.input_tokens, output_tokens: usage1.output_tokens })
@@ -166,12 +198,20 @@ Your entire response must be only the JSON array — nothing before [, nothing a
     const confirmedUrls1 = collectUrls(response1.content)
     console.log("[discover] batch 1 search URL count:", confirmedUrls1.size)
 
+    // Guard: Claude must return at least one text block
+    const hasTextBlock = response1.content.some(b => b.type === "text")
+    if (!hasTextBlock) {
+      console.error("[discover] no text blocks; content types:", response1.content.map(b => b.type).join(", "))
+      return NextResponse.json({ error: "AI returned no text content", companies: [] }, { status: 502 })
+    }
+
     const batch1Result = processDiscoveryBatch(response1.content, confirmedUrls1, batchOpts)
     const { companies: batch1New, preFilterCompanies: batch1All, rawText: rawText1 } = batch1Result
     console.log("[discover] batch 1 raw text (first 300):", rawText1.slice(0, 300))
     console.log("[discover] batch 1:", { total: batch1All.length, afterCrmFilter: batch1New.length })
 
-    let companies = [...batch1New]
+    let companies      = [...batch1New]
+    let rawCount       = batch1All.length
     let totalFilteredByCrm = batch1All.length - batch1New.length
 
     // === BATCH 2 — if fewer than half the requested count survived CRM filtering ===
@@ -217,6 +257,7 @@ Your entire response must be only the JSON array — nothing before [, nothing a
         const { companies: batch2New, preFilterCompanies: batch2All } = batch2Result
         console.log("[discover] batch 2:", { total: batch2All.length, afterCrmFilter: batch2New.length })
 
+        rawCount           += batch2All.length
         totalFilteredByCrm += batch2All.length - batch2New.length
         companies = [...companies, ...batch2New]
       } catch (err2) {
@@ -258,6 +299,7 @@ Your entire response must be only the JSON array — nothing before [, nothing a
       potentialCount,
       locationVerifiedCount,
       filteredCount: totalFilteredByCrm,
+      rawCount,
       limitationNote,
     })
 

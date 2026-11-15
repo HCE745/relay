@@ -1621,14 +1621,8 @@ export default function SalesDiscoverPage() {
   const [companies,   setCompanies]   = useState<CompanyWithProgress[]>([])
   const [searchError, setSearchError] = useState<string | null>(null)
 
-  // Multi-round session tracking
-  const sessionIdRef          = useRef<string | null>(null)
-  const isRoundRunningRef     = useRef(false)
-  const roundAbortRef         = useRef<AbortController | null>(null)
-  const sessionAccRef         = useRef({ names: [] as string[], domains: [] as string[], subsectorCounts: {} as Record<string, number>, citiesTried: [] as string[] })
   const sessionVerifyCountRef = useRef(0)
-  const [currentRound,     setCurrentRound]     = useState(0)
-  const [isSearchRunning,  setIsSearchRunning]  = useState(false)
+  const searchAbortRef        = useRef<AbortController | null>(null)
 
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [savingList,     setSavingList]     = useState(false)
@@ -1714,25 +1708,29 @@ export default function SalesDiscoverPage() {
     void Promise.all(Array.from({ length: concurrency }, drain))
   }
 
-  async function runRound(round: number, sessionId: string) {
-    if (sessionIdRef.current !== sessionId) return
-    if (isRoundRunningRef.current) return
-    isRoundRunningRef.current = true
+  function handleStopSearch() {
+    searchAbortRef.current?.abort()
+  }
 
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+
+    searchAbortRef.current?.abort()
     const ctrl = new AbortController()
-    roundAbortRef.current = ctrl
-    setCurrentRound(round)
+    searchAbortRef.current = ctrl
 
-    const acc = sessionAccRef.current
-    const body: Record<string, unknown> = {
-      country,
-      requestedCount: 20,
-      round,
-      accumulatedNames:   acc.names,
-      accumulatedDomains: acc.domains,
-      subsectorCounts:    acc.subsectorCounts,
-      citiesTried:        acc.citiesTried,
-    }
+    sessionVerifyCountRef.current = 0
+
+    setSearchState("loading")
+    setSearchError(null)
+    setCompanies([])
+    setActiveCompanies([])
+    setSelectedIndex(null)
+    setSavedListId(null)
+    setSavedListName(null)
+    setActiveListId(null)
+
+    const body: Record<string, unknown> = { country, requestedCount: 20 }
     if (stateProvince) body.stateProvince    = stateProvince
     if (industry)      body.industry         = industry
     if (empMin)        body.employeeCountMin  = parseInt(empMin,  10)
@@ -1741,117 +1739,29 @@ export default function SalesDiscoverPage() {
     if (context)       body.additionalContext = context
 
     try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover/round", {
+      const res = await fetch("/api/super-admin/crm/prospects/discover", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(body),
         signal:  ctrl.signal,
       })
 
-      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
-
       if (!res.ok) {
         const data = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(data.error ?? `Round ${round} failed (${res.status})`)
+        throw new Error(data.error ?? `Search failed (${res.status})`)
       }
 
-      const data = await res.json() as {
-        companies:       DiscoveredCompanyBasic[]
-        subsectorsFound: string[]
-        citiesFound:     string[]
-        hasMore:         boolean
-        diagnostics:     { rawCount: number; netNew: number }
-      }
-
-      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
-
-      const roundCompanies = data.companies.map(basicToProgress)
-
-      // Update session accumulator
-      for (const c of roundCompanies) {
-        acc.names.push(c.companyName)
-        if (c.website) {
-          try {
-            acc.domains.push(new URL(c.website.startsWith("http") ? c.website : `https://${c.website}`).hostname.replace(/^www\./, ""))
-          } catch { /* skip */ }
-        }
-      }
-      for (const s of data.subsectorsFound) {
-        acc.subsectorCounts[s] = (acc.subsectorCounts[s] ?? 0) + 1
-      }
-      for (const city of data.citiesFound) {
-        if (!acc.citiesTried.includes(city)) acc.citiesTried.push(city)
-      }
-
-      // Merge new companies into the list (capped at 20)
-      const updateFn = (prev: CompanyWithProgress[]) => {
-        const prevNames = new Set(prev.map(c => c.companyName))
-        const newOnes = roundCompanies.filter(c => !prevNames.has(c.companyName))
-        return [...prev, ...newOnes].slice(0, 20)
-      }
-      setCompanies(updateFn)
-      setActiveCompanies(updateFn)
-
-      if (round === 1) setSearchState("done")
-
-      autoVerifyFromSession(roundCompanies)
-
-      isRoundRunningRef.current = false
-
-      if (data.hasMore && sessionIdRef.current === sessionId) {
-        void runRound(round + 1, sessionId)
-      } else {
-        setIsSearchRunning(false)
-      }
+      const data = await res.json() as { companies: DiscoveredCompanyBasic[] }
+      const found = (data.companies ?? []).map(basicToProgress)
+      setCompanies(found)
+      setActiveCompanies(found)
+      setSearchState("done")
+      autoVerifyFromSession(found)
     } catch (err) {
-      if (sessionIdRef.current !== sessionId) { isRoundRunningRef.current = false; return }
-      isRoundRunningRef.current = false
-
-      if (err instanceof DOMException && err.name === "AbortError") {
-        setIsSearchRunning(false)
-        return
-      }
-
-      if (round === 1) {
-        setSearchError(err instanceof Error ? err.message : "Search failed")
-        setSearchState("error")
-        setIsSearchRunning(false)
-      } else {
-        console.error(`[discover] round ${round} failed (non-fatal):`, err instanceof Error ? err.message : err)
-        setIsSearchRunning(false)
-      }
+      if (err instanceof DOMException && err.name === "AbortError") return
+      setSearchError(err instanceof Error ? err.message : "Search failed")
+      setSearchState("error")
     }
-  }
-
-  function handleStopSearch() {
-    roundAbortRef.current?.abort()
-    sessionIdRef.current = null
-    setIsSearchRunning(false)
-  }
-
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-
-    roundAbortRef.current?.abort()
-
-    const newSessionId = Math.random().toString(36).slice(2)
-    sessionIdRef.current = newSessionId
-    isRoundRunningRef.current = false
-
-    sessionAccRef.current         = { names: [], domains: [], subsectorCounts: {}, citiesTried: [] }
-    sessionVerifyCountRef.current = 0
-
-    setSearchState("loading")
-    setSearchError(null)
-    setCompanies([])
-    setSelectedIndex(null)
-    setSavedListId(null)
-    setSavedListName(null)
-    setActiveListId(null)
-    setCurrentRound(0)
-    setIsSearchRunning(true)
-
-    void runRound(1, newSessionId)
   }
 
   async function handleSaveList(name: string) {
@@ -1993,16 +1903,14 @@ export default function SalesDiscoverPage() {
                 <textarea rows={3} placeholder="Any other targeting details…" value={context}
                   onChange={e => setContext(e.target.value)} className={`${inputCls} resize-none`} />
               </div>
-              <button type="submit" disabled={searchState === "loading" || isSearchRunning}
+              <button type="submit" disabled={searchState === "loading"}
                 className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors">
                 {searchState === "loading"
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Searching…</>
                   : <><Search className="w-4 h-4" /> Find Prospects</>}
               </button>
               {searchState === "loading" && (
-                <p className="text-[11px] text-gray-500 text-center">
-                  {currentRound > 0 ? `Round ${currentRound}/4 — finding prospects…` : "Starting search…"}
-                </p>
+                <p className="text-[11px] text-gray-500 text-center">Searching the web — takes ~60s…</p>
               )}
             </form>
           </div>
@@ -2025,17 +1933,13 @@ export default function SalesDiscoverPage() {
               <div className="h-full flex flex-col items-center justify-center">
                 <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
                 <p className="text-gray-400 font-medium">Finding prospects…</p>
-                <p className="text-sm text-gray-600 mt-1">
-                  {currentRound > 0 ? `Round ${currentRound}/4 — searching the web` : "Starting up…"}
-                </p>
-                {currentRound > 0 && (
-                  <button
-                    onClick={handleStopSearch}
-                    className="mt-4 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
-                  >
-                    Stop search
-                  </button>
-                )}
+                <p className="text-sm text-gray-600 mt-1">Searching the web — typically takes ~60s</p>
+                <button
+                  onClick={handleStopSearch}
+                  className="mt-4 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
+                >
+                  Stop search
+                </button>
               </div>
             )}
 
@@ -2052,28 +1956,14 @@ export default function SalesDiscoverPage() {
             {searchState === "done" && (
               <>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm text-gray-300 font-medium">
-                      Found {companies.length} {companies.length === 1 ? "company" : "companies"}
-                      {activeCompanies.some(c => c.crmStatus !== "none") && (
-                        <span className="text-[11px] text-gray-500 ml-2 font-normal">
-                          · {activeCompanies.filter(c => c.crmStatus !== "none").length} in CRM
-                        </span>
-                      )}
-                    </p>
-                    {isSearchRunning && (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-3 h-3 text-indigo-400 animate-spin" />
-                        <span className="text-[11px] text-gray-500">Round {currentRound}/4</span>
-                        <button
-                          onClick={handleStopSearch}
-                          className="text-[10px] text-red-400 hover:text-red-300 px-2 py-0.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"
-                        >
-                          Stop
-                        </button>
-                      </div>
+                  <p className="text-sm text-gray-300 font-medium">
+                    Found {companies.length} {companies.length === 1 ? "company" : "companies"}
+                    {activeCompanies.some(c => c.crmStatus !== "none") && (
+                      <span className="text-[11px] text-gray-500 ml-2 font-normal">
+                        · {activeCompanies.filter(c => c.crmStatus !== "none").length} in CRM
+                      </span>
                     )}
-                  </div>
+                  </p>
                   <div className="flex items-center gap-2">
                     {savedListId ? (
                       <span className="flex items-center gap-1.5 text-[11px] text-green-400">

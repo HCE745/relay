@@ -339,7 +339,7 @@ export async function runResearchRound(opts: RunRoundOpts): Promise<RoundResult>
 
   const response = await anthropic.messages.create({
     model:      "claude-sonnet-5-5",
-    max_tokens: 5000,
+    max_tokens: 8192,
     tools,
     system:     systemPrompt,
     messages:   [{ role: "user", content: userPrompt }],
@@ -348,6 +348,9 @@ export async function runResearchRound(opts: RunRoundOpts): Promise<RoundResult>
   const usage       = response.usage as { input_tokens: number; output_tokens: number }
   const confirmedUrls = collectUrls(response.content)
   console.log(`[research-agent] round ${roundNum} stop_reason=${response.stop_reason} searches=${confirmedUrls.size} tokens=${usage.input_tokens}/${usage.output_tokens}`)
+  if (response.stop_reason === "max_tokens") {
+    console.warn(`[research-agent] round ${roundNum}: TRUNCATED — response hit max_tokens, JSON likely incomplete`)
+  }
 
   // Guard: no text block → return empty
   const hasText = response.content.some(b => b.type === "text")
@@ -359,7 +362,7 @@ export async function runResearchRound(opts: RunRoundOpts): Promise<RoundResult>
   const batch = processDiscoveryBatch(response.content, confirmedUrls, batchOpts)
   const { companies: accepted, preFilterCompanies: all, diagnostics: diag } = batch
 
-  console.log(`[research-agent] round ${roundNum}: total=${all.length} crm_filtered=${diag.crmExcluded} geo_filtered=${diag.geoMismatch} accepted=${accepted.length}`)
+  console.log(`[research-agent] round ${roundNum}: rawCount=${diag.rawCount} total=${all.length} crm_filtered=${diag.crmExcluded} geo_mismatch=${diag.geoMismatch} accepted=${accepted.length}`)
 
   // Save accepted companies to the research list
   if (accepted.length > 0) {
@@ -395,6 +398,7 @@ async function appendResultsToList(
   requestedCountry: string,
   requestedState:   string | null,
 ): Promise<void> {
+  let saved = 0, skipped = 0
   for (const c of companies) {
     const nd             = normalizeDomain(c.website || null)
     const verifiedState  = c.state || null
@@ -423,9 +427,14 @@ async function appendResultsToList(
           source:              "ai_discover",
         },
       })
+      saved++
     } catch {
       // Duplicate domain in list — skip silently (the @@unique constraint fires)
+      skipped++
     }
+  }
+  if (skipped > 0) {
+    console.log(`[research-agent] appendResultsToList: saved=${saved} skipped=${skipped} (duplicates)`)
   }
 }
 

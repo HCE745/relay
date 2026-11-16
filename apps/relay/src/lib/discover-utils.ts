@@ -85,10 +85,10 @@ export function extractArray(raw: string): Record<string, unknown>[] | null {
   // 1. Direct parse
   try {
     const p = JSON.parse(raw)
-    if (Array.isArray(p) && p.length > 0) return p as Record<string, unknown>[]
+    if (Array.isArray(p)) return p as Record<string, unknown>[]
     if (p && typeof p === "object") {
       for (const v of Object.values(p as Record<string, unknown>)) {
-        if (Array.isArray(v) && v.length > 0) return v as Record<string, unknown>[]
+        if (Array.isArray(v)) return v as Record<string, unknown>[]
       }
     }
   } catch { /* fall through */ }
@@ -98,7 +98,7 @@ export function extractArray(raw: string): Record<string, unknown>[] | null {
   if (fence?.[1]) {
     try {
       const p = JSON.parse(fence[1].trim())
-      if (Array.isArray(p) && p.length > 0) return p as Record<string, unknown>[]
+      if (Array.isArray(p)) return p as Record<string, unknown>[]
     } catch { /* fall through */ }
   }
 
@@ -118,7 +118,7 @@ export function extractArray(raw: string): Record<string, unknown>[] | null {
     if (end !== -1) {
       try {
         const p = JSON.parse(raw.slice(i, end + 1))
-        if (Array.isArray(p) && p.length > 0) return p as Record<string, unknown>[]
+        if (Array.isArray(p)) return p as Record<string, unknown>[]
       } catch { /* try next [ */ }
     }
   }
@@ -206,7 +206,13 @@ export function processDiscoveryBatch(
 
   const rawText = textBlocks.at(-1)!.text.trim()
   const parsed  = extractArray(rawText)
-  if (!parsed || parsed.length === 0) {
+  if (!parsed) {
+    const snippet = rawText.slice(0, 200).replace(/\n/g, " ")
+    console.warn(`[discover-utils] extractArray failed — parse error or empty response. raw[0:200]="${snippet}"`)
+    return { companies: [], preFilterCompanies: [], rawText, diagnostics: { rawCount: 0, sessionDedupExcluded: 0, geoMismatch: 0, crmExcluded: 0, netNew: 0 } }
+  }
+  if (parsed.length === 0) {
+    console.warn("[discover-utils] Claude returned [] — no companies found for this search")
     return { companies: [], preFilterCompanies: [], rawText, diagnostics: { rawCount: 0, sessionDedupExcluded: 0, geoMismatch: 0, crmExcluded: 0, netNew: 0 } }
   }
 

@@ -79,10 +79,11 @@ export async function POST(req: NextRequest) {
     const { job, list } = await prisma.$transaction(async tx => {
       const list = await tx.prospectResearchList.create({
         data: {
-          name:            listLabel,
-          isShared:        false,
-          salesUserId:     session.salesUserId  ?? null,
-          superAdminId:    session.superAdminId ?? null,
+          name:               listLabel,
+          isShared:           false,
+          isExplicitlySaved:  false,
+          salesUserId:        session.salesUserId  ?? null,
+          superAdminId:       session.superAdminId ?? null,
           searchCountry:   criteria.country,
           searchState:     criteria.stateProvince ?? null,
           searchIndustry:  criteria.industry,

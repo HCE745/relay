@@ -6,7 +6,7 @@ import {
   Search, Loader2, X, ChevronLeft, ChevronDown, ChevronUp, ExternalLink,
   MapPin, Users, Zap, CheckCircle2, AlertTriangle,
   RefreshCw, Send, Building2, Star, Mail, Globe,
-  Bookmark, BookmarkCheck, Trash2, FolderOpen, List,
+  Bookmark, BookmarkCheck, Trash2, FolderOpen, List, Save,
 } from "lucide-react"
 import type { DiscoveredCompanyBasic, DiscoveredCompanyDetails } from "@/app/api/super-admin/crm/prospects/discover/route"
 
@@ -803,6 +803,68 @@ function SavedListsTab({ onLoad }: { onLoad: (companies: DiscoveredCompanyBasic[
   )
 }
 
+// ─── Save helpers ────────────────────────────────────────────────────────────
+
+function buildAutoName({ industry, stateProvince, country, empMin, empMax }: {
+  industry?: string; stateProvince?: string; country?: string; empMin?: string; empMax?: string
+}): string {
+  const parts: string[] = []
+  if (stateProvince) parts.push(stateProvince)
+  if (industry)      parts.push(industry)
+  if (parts.length === 0 && country && country !== "United States") parts.push(country)
+  if (parts.length === 0) parts.push("Prospect Search")
+  const empPart = (empMin || empMax)
+    ? `${empMin || "any"}–${empMax || "any"} Employees`
+    : null
+  const now = new Date()
+  const datePart = now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  const timePart = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+  return empPart
+    ? `${parts.join(" · ")} — ${empPart} — ${datePart}, ${timePart}`
+    : `${parts.join(" · ")} — ${datePart}, ${timePart}`
+}
+
+function SaveListDialog({ suggestedName, onSave, onCancel, saving }: {
+  suggestedName: string
+  onSave:        (name: string) => void
+  onCancel:      () => void
+  saving:        boolean
+}) {
+  const [name, setName] = useState(suggestedName)
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+        <h2 className="text-base font-semibold text-white mb-4">Save Prospect List</h2>
+        <input
+          autoFocus
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter" && name.trim() && !saving) onSave(name.trim()); if (e.key === "Escape") onCancel() }}
+          placeholder="List name…"
+          className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 mb-4"
+        />
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={onCancel}
+            disabled={saving}
+            className="text-sm px-4 py-2 text-gray-400 hover:text-gray-200 transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => { if (name.trim()) onSave(name.trim()) }}
+            disabled={!name.trim() || saving}
+            className="flex items-center gap-1.5 text-sm px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg transition-colors font-medium"
+          >
+            {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving…</> : <><Save className="w-3.5 h-3.5" /> Save</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const INDUSTRY_OPTIONS = [
@@ -840,9 +902,9 @@ export default function DiscoverPage() {
   const [selected,       setSelected]       = useState<CompanyWithVerify | null>(null)
   const [limitationNote, setLimitationNote] = useState<string | null>(null)
 
-  const [listSaveState, setListSaveState] = useState<ListSaveState>("idle")
-  const [listName,      setListName]      = useState("")
-  const [listSaveError, setListSaveError] = useState<string | null>(null)
+  const [listSaveState,  setListSaveState]  = useState<ListSaveState>("idle")
+  const [listSaveError,  setListSaveError]  = useState<string | null>(null)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
 
   const sessionVerifyCountRef = useRef(0)
   const searchAbortRef        = useRef<AbortController | null>(null)
@@ -857,17 +919,70 @@ export default function DiscoverPage() {
   const [jobRoundsMax,         setJobRoundsMax]         = useState(5)
   const [activeJobStatus,      setActiveJobStatus]      = useState<string>("idle")
 
-  // Restore in-flight job from sessionStorage on mount
+  // Restore search form values and job state from sessionStorage on mount
   useEffect(() => {
     try {
+      const c   = sessionStorage.getItem("discover_country")
+      const s   = sessionStorage.getItem("discover_state")
+      const ind = sessionStorage.getItem("discover_industry")
+      const mn  = sessionStorage.getItem("discover_emp_min")
+      const mx  = sessionStorage.getItem("discover_emp_max")
+      const kw  = sessionStorage.getItem("discover_keywords")
+      const ctx = sessionStorage.getItem("discover_context")
+      if (c)   setCountry(c)
+      if (s)   setStateProvince(s)
+      if (ind) setIndustry(ind)
+      if (mn)  setEmpMin(mn)
+      if (mx)  setEmpMax(mx)
+      if (kw)  setKeywords(kw)
+      if (ctx) setContext(ctx)
+
       const jid  = sessionStorage.getItem("discover_job_id")
       const lid  = sessionStorage.getItem("discover_list_id")
       const stat = sessionStorage.getItem("discover_job_status") ?? "idle"
-      if (jid && ["pending", "running"].includes(stat)) {
+      if (jid) {
         setActiveJobId(jid)
         if (lid) setActiveListId(lid)
         setActiveJobStatus(stat)
         setSearchState("done")
+        // Restore accumulated companies from the working list
+        if (lid) {
+          void fetch(`/api/super-admin/crm/prospects/discover/lists/${lid}`)
+            .then(r => r.ok ? r.json() : null)
+            .then((data: null | { results: Array<{
+              companyName: string; website: string | null; verifiedCity: string | null
+              verifiedState: string | null; verifiedCountry: string | null
+              industry: string | null; estimatedEmployees: string | null
+              employeeCountSource: string | null; qualificationTier?: string
+              sourceCitations: string[]; locationVerified: boolean
+              summary: string | null; fitScore: number | null; crmStatus?: string
+            }> }) => {
+              if (data?.results && data.results.length > 0) {
+                const loaded: CompanyWithVerify[] = data.results.map(r => {
+                  const empTier = (r.employeeCountSource ?? "unknown") as import("@/app/api/super-admin/crm/prospects/discover/route").EmployeeCountTier
+                  return {
+                    companyName:        r.companyName,
+                    website:            r.website            ?? "",
+                    city:               r.verifiedCity       ?? "",
+                    state:              r.verifiedState      ?? "",
+                    country:            r.verifiedCountry    ?? "United States",
+                    industry:           r.industry           ?? "",
+                    estimatedEmployees: r.estimatedEmployees ?? "",
+                    employeeCountTier:  empTier,
+                    qualificationTier:  (r.locationVerified && empTier !== "unknown" ? "qualified" : r.locationVerified ? "potential" : "location_unverified") as import("@/app/api/super-admin/crm/prospects/discover/route").QualificationTier,
+                    sourceCitations:    r.sourceCitations    ?? [],
+                    locationVerified:   r.locationVerified,
+                    summary:            r.summary            ?? "",
+                    fitScore:           r.fitScore           ?? 50,
+                    crmStatus:          "none" as const,
+                    verificationState:  undefined,
+                  }
+                })
+                setCompanies(loaded)
+                jobListAcceptedRef.current = loaded.length
+              }
+            })
+        }
       }
     } catch { /* sessionStorage unavailable */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -947,53 +1062,64 @@ export default function DiscoverPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeJobId, activeJobStatus])
 
-  async function handleSaveToList() {
-    if (!listName.trim()) return
+  async function handleSaveToList(name: string) {
     setListSaveState("saving")
     setListSaveError(null)
     try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover/lists", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({
-          name:           listName.trim(),
-          searchCountry:  country       || null,
-          searchState:    stateProvince || null,
-          searchIndustry: industry      || null,
-          searchEmpMin:   empMin        ? parseInt(empMin,  10) : null,
-          searchEmpMax:   empMax        ? parseInt(empMax,  10) : null,
-          searchKeywords: keywords      || null,
-          searchContext:  context       || null,
-          results:        companies.map(c => ({
-            companyName:        c.companyName,
-            website:            c.website,
-            city:               c.city,
-            state:              c.state,
-            country:            c.country,
-            industry:           c.industry,
-            estimatedEmployees: c.estimatedEmployees,
-            employeeCountTier:  c.employeeCountTier,
-            sourceCitations:    c.sourceCitations,
-            summary:            c.summary,
-            fitScore:           c.fitScore,
-          })),
-        }),
-      })
-      if (!res.ok) throw new Error("Save failed")
+      if (activeListId) {
+        // Rename + mark the existing working list as explicitly saved
+        const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${activeListId}`, {
+          method:  "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ name: name.trim(), isExplicitlySaved: true }),
+        })
+        if (!res.ok) throw new Error("Save failed")
+      } else {
+        // No working list (old non-job search path) — create a new one
+        const res = await fetch("/api/super-admin/crm/prospects/discover/lists", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({
+            name:           name.trim(),
+            searchCountry:  country       || null,
+            searchState:    stateProvince || null,
+            searchIndustry: industry      || null,
+            searchEmpMin:   empMin        ? parseInt(empMin,  10) : null,
+            searchEmpMax:   empMax        ? parseInt(empMax,  10) : null,
+            searchKeywords: keywords      || null,
+            searchContext:  context       || null,
+            results:        companies.map(c => ({
+              companyName:        c.companyName,
+              website:            c.website,
+              city:               c.city,
+              state:              c.state,
+              country:            c.country,
+              industry:           c.industry,
+              estimatedEmployees: c.estimatedEmployees,
+              employeeCountTier:  c.employeeCountTier,
+              sourceCitations:    c.sourceCitations,
+              summary:            c.summary,
+              fitScore:           c.fitScore,
+            })),
+          }),
+        })
+        if (!res.ok) throw new Error("Save failed")
+        const saved = await res.json() as { id: string }
+        setActiveListId(saved.id)
+      }
       setListSaveState("saved")
-      setListName("")
+      setShowSaveDialog(false)
     } catch (err) {
       setListSaveError(err instanceof Error ? err.message : "Save failed")
       setListSaveState("error")
     }
   }
 
-  function handleLoadList(loadedCompanies: DiscoveredCompanyBasic[], loadedName: string) {
+  function handleLoadList(loadedCompanies: DiscoveredCompanyBasic[], _listName: string) {
     setCompanies(loadedCompanies as CompanyWithVerify[])
     setSearchState("done")
     setActiveTab("search")
-    setListName(loadedName)
-    setListSaveState("saved") // it's already saved
+    setListSaveState("saved") // loaded from an already-saved list
   }
 
   async function verifyCompany(company: CompanyWithVerify) {
@@ -1104,7 +1230,8 @@ export default function DiscoverPage() {
     setSelected(null)
     setLimitationNote(null)
     setListSaveState("idle")
-    setListName("")
+    setShowSaveDialog(false)
+    setListSaveError(null)
     setDiagRec(null)
     setDiagsOpen(false)
     setActiveJobId(null)
@@ -1162,11 +1289,18 @@ export default function DiscoverPage() {
         setActiveJobId(data.jobId)
         if (data.listId) {
           setActiveListId(data.listId)
-          setListSaveState("saved") // already saved to list by server
+          // Do NOT auto-mark as saved — user must explicitly save via the dialog
           try {
             sessionStorage.setItem("discover_job_id",     data.jobId)
             sessionStorage.setItem("discover_list_id",    data.listId)
             sessionStorage.setItem("discover_job_status", data.jobStatus ?? "pending")
+            sessionStorage.setItem("discover_country",    country)
+            sessionStorage.setItem("discover_state",      stateProvince)
+            sessionStorage.setItem("discover_industry",   industry)
+            sessionStorage.setItem("discover_emp_min",    empMin)
+            sessionStorage.setItem("discover_emp_max",    empMax)
+            sessionStorage.setItem("discover_keywords",   keywords)
+            sessionStorage.setItem("discover_context",    context)
           } catch { /* ignore */ }
         }
         setJobRoundsCompleted(data.roundsCompleted ?? 0)
@@ -1492,49 +1626,19 @@ export default function DiscoverPage() {
                 {companies.length > 0 && (
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <p className="text-[11px] text-gray-500 hidden sm:block">Click a card to research + draft email</p>
-                    {/* When from a research job, results are auto-saved; show a link to the list */}
-                    {activeListId ? (
+                    {listSaveState === "saved" ? (
                       <button
                         onClick={() => setActiveTab("lists")}
-                        className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 bg-emerald-900/30 hover:bg-emerald-900/50 text-emerald-400 border border-emerald-800/50 rounded-lg transition-colors"
+                        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-emerald-900/30 hover:bg-emerald-900/50 text-emerald-400 border border-emerald-800/50 rounded-lg transition-colors"
                       >
-                        <BookmarkCheck className="w-3 h-3" /> Saved to list
+                        <BookmarkCheck className="w-3.5 h-3.5" /> Saved to list
                       </button>
-                    ) : listSaveState === "saved" ? (
-                      <span className="flex items-center gap-1 text-[11px] text-emerald-400">
-                        <BookmarkCheck className="w-3.5 h-3.5" /> Saved
-                      </span>
-                    ) : listSaveState === "naming" || listSaveState === "saving" || listSaveState === "error" ? (
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="text"
-                          autoFocus
-                          placeholder="List name…"
-                          value={listName}
-                          onChange={e => setListName(e.target.value)}
-                          onKeyDown={e => { if (e.key === "Enter") void handleSaveToList(); if (e.key === "Escape") { setListSaveState("idle"); setListName("") } }}
-                          className="bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 w-36"
-                        />
-                        <button
-                          onClick={() => void handleSaveToList()}
-                          disabled={!listName.trim() || listSaveState === "saving"}
-                          className="text-[11px] px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg transition-colors"
-                        >
-                          {listSaveState === "saving" ? <Loader2 className="w-3 h-3 animate-spin" /> : "Save"}
-                        </button>
-                        <button onClick={() => { setListSaveState("idle"); setListName("") }} className="text-gray-500 hover:text-gray-300">
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                        {listSaveState === "error" && listSaveError && (
-                          <span className="text-[10px] text-red-400">{listSaveError}</span>
-                        )}
-                      </div>
                     ) : (
                       <button
-                        onClick={() => setListSaveState("naming")}
-                        className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 rounded-lg transition-colors"
+                        onClick={() => setShowSaveDialog(true)}
+                        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium"
                       >
-                        <Bookmark className="w-3 h-3" /> Save to list
+                        <Save className="w-3.5 h-3.5" /> Save to List
                       </button>
                     )}
                   </div>
@@ -1572,6 +1676,16 @@ export default function DiscoverPage() {
           )}
         </div>
       </div>
+
+      {/* Save to List dialog */}
+      {showSaveDialog && (
+        <SaveListDialog
+          suggestedName={buildAutoName({ industry, stateProvince, country, empMin, empMax })}
+          onSave={name => void handleSaveToList(name)}
+          onCancel={() => { setShowSaveDialog(false); setListSaveError(null) }}
+          saving={listSaveState === "saving"}
+        />
+      )}
 
       {/* Slide-over — key ensures remount on company switch, not just on prop update */}
       {selected && (

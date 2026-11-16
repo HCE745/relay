@@ -3726,7 +3726,10 @@ model ProspectResearchList {
   superAdminId String?
 
   // Visibility — owner always has full access; shared = readable by all CRM users
-  isShared Boolean @default(false)
+  isShared          Boolean @default(false)
+  // Set to false for auto-created working lists; true only after explicit user save.
+  // Default true preserves all pre-migration lists as visible in Saved Lists.
+  isExplicitlySaved Boolean @default(true)
 
   // Search criteria recorded at save time (what was actually requested)
   searchCountry  String?

@@ -162,6 +162,7 @@ function basicToProgress(c: DiscoveredCompanyBasic): CompanyWithProgress {
 
 function buildAutoName(params: {
   industry?: string; stateProvince?: string; country?: string; keywords?: string
+  empMin?: string; empMax?: string
 }): string {
   const parts: string[] = []
   if (params.stateProvince) parts.push(params.stateProvince)
@@ -169,8 +170,15 @@ function buildAutoName(params: {
   if (parts.length === 0 && params.country) parts.push(params.country)
   if (params.keywords)      parts.push(params.keywords)
   if (parts.length === 0)   parts.push("Prospect Search")
-  const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-  return `${parts.join(" · ")} — ${date}`
+  const empPart = (params.empMin || params.empMax)
+    ? `${params.empMin || "any"}–${params.empMax || "any"} Employees`
+    : null
+  const now = new Date()
+  const datePart = now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  const timePart = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+  return empPart
+    ? `${parts.join(" · ")} — ${empPart} — ${datePart}, ${timePart}`
+    : `${parts.join(" · ")} — ${datePart}, ${timePart}`
 }
 
 function listStatusLabel(list: ResearchList): string {
@@ -200,10 +208,7 @@ function SaveListDialog({ suggestedName, onSave, onCancel, saving }: {
       <div className="fixed inset-0 bg-black/60 z-50" onClick={onCancel} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-          <h3 className="text-white font-semibold text-sm mb-1">Save this list</h3>
-          <p className="text-[12px] text-gray-500 mb-4">
-            Give this set of research results a name so you can return to it later.
-          </p>
+          <h3 className="text-white font-semibold text-sm mb-4">Save Prospect List</h3>
           <input
             autoFocus
             type="text"
@@ -1627,9 +1632,10 @@ export default function SalesDiscoverPage() {
 
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [savingList,     setSavingList]     = useState(false)
-  const [savedListId,    setSavedListId]    = useState<string | null>(null)
+  const [workingListId,  setWorkingListId]  = useState<string | null>(null)  // job's internal list
+  const [savedListId,    setSavedListId]    = useState<string | null>(null)  // explicitly named by user
   const [savedListName,  setSavedListName]  = useState<string | null>(null)
-  const saveDialogSuggestion = buildAutoName({ industry, stateProvince, country, keywords })
+  const saveDialogSuggestion = buildAutoName({ industry, stateProvince, country, keywords, empMin, empMax })
 
   const [activeJobId,        setActiveJobId]        = useState<string | null>(null)
   const [jobRoundsCompleted, setJobRoundsCompleted] = useState(0)
@@ -1648,19 +1654,34 @@ export default function SalesDiscoverPage() {
 
   const stateLabel = country === "Canada" ? "Province" : country === "United States" ? "State" : "Region"
 
-  // Restore in-flight job from sessionStorage on mount
+  // Restore search form values and job state from sessionStorage on mount
   useEffect(() => {
     try {
+      const c   = sessionStorage.getItem("discover_country_sales")
+      const s   = sessionStorage.getItem("discover_state_sales")
+      const ind = sessionStorage.getItem("discover_industry_sales")
+      const mn  = sessionStorage.getItem("discover_emp_min_sales")
+      const mx  = sessionStorage.getItem("discover_emp_max_sales")
+      const kw  = sessionStorage.getItem("discover_keywords_sales")
+      const ctx = sessionStorage.getItem("discover_context_sales")
+      if (c)   setCountry(c)
+      if (s)   setStateProvince(s)
+      if (ind) setIndustry(ind)
+      if (mn)  setEmpMin(mn)
+      if (mx)  setEmpMax(mx)
+      if (kw)  setKeywords(kw)
+      if (ctx) setContext(ctx)
+
       const jobId     = sessionStorage.getItem("discover_job_id_sales")
       const listId    = sessionStorage.getItem("discover_list_id_sales")
       const jobStatus = sessionStorage.getItem("discover_job_status_sales")
-      if (jobId && listId && jobStatus && (jobStatus === "pending" || jobStatus === "running")) {
+      if (jobId && listId) {
         setActiveJobId(jobId)
-        setSavedListId(listId)
+        setWorkingListId(listId)
         setJobRoundsCompleted(1)
-        setActiveJobStatus(jobStatus)
+        setActiveJobStatus(jobStatus ?? "pending")
         setSearchState("done")
-        // Fetch the existing list results
+        // Restore accumulated companies from the working list
         void fetch(`/api/super-admin/crm/prospects/discover/lists/${listId}`)
           .then(r => r.ok ? r.json() : null)
           .then((data: ResearchListWithResults | null) => {
@@ -1824,6 +1845,7 @@ export default function SalesDiscoverPage() {
     setCompanies([])
     setActiveCompanies([])
     setSelectedIndex(null)
+    setWorkingListId(null)
     setSavedListId(null)
     setSavedListName(null)
     setActiveListId(null)
@@ -1861,15 +1883,22 @@ export default function SalesDiscoverPage() {
       setActiveCompanies(found)
       setSearchState("done")
       setActiveJobId(data.jobId)
-      setSavedListId(data.listId)
+      setWorkingListId(data.listId)
       setJobRoundsCompleted(data.roundsCompleted ?? 0)
       setJobRoundsMax(data.roundsMax ?? 5)
       setActiveJobStatus(data.jobStatus)
       jobListAcceptedRef.current = found.length
       try {
-        sessionStorage.setItem("discover_job_id_sales",     data.jobId)
-        sessionStorage.setItem("discover_list_id_sales",    data.listId)
-        sessionStorage.setItem("discover_job_status_sales", data.jobStatus)
+        sessionStorage.setItem("discover_job_id_sales",       data.jobId)
+        sessionStorage.setItem("discover_list_id_sales",      data.listId)
+        sessionStorage.setItem("discover_job_status_sales",   data.jobStatus)
+        sessionStorage.setItem("discover_country_sales",      country)
+        sessionStorage.setItem("discover_state_sales",        stateProvince)
+        sessionStorage.setItem("discover_industry_sales",     industry)
+        sessionStorage.setItem("discover_emp_min_sales",      empMin)
+        sessionStorage.setItem("discover_emp_max_sales",      empMax)
+        sessionStorage.setItem("discover_keywords_sales",     keywords)
+        sessionStorage.setItem("discover_context_sales",      context)
       } catch {}
       autoVerifyFromSession(found)
     } catch (err) {
@@ -1882,28 +1911,45 @@ export default function SalesDiscoverPage() {
   async function handleSaveList(name: string) {
     setSavingList(true)
     try {
-      const res = await fetch("/api/super-admin/crm/prospects/discover/lists", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          name,
-          searchCountry:  country || null,
-          searchState:    stateProvince || null,
-          searchIndustry: industry || null,
-          searchEmpMin:   empMin ? parseInt(empMin, 10) : null,
-          searchEmpMax:   empMax ? parseInt(empMax, 10) : null,
-          searchKeywords: keywords || null,
-          searchContext:  context || null,
-          results:        companies,
-        }),
-      })
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(d.error ?? "Save failed")
+      if (workingListId) {
+        // Rename + mark the existing working list as explicitly saved
+        const res = await fetch(`/api/super-admin/crm/prospects/discover/lists/${workingListId}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name, isExplicitlySaved: true }),
+        })
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({})) as { error?: string }
+          throw new Error(d.error ?? "Save failed")
+        }
+        setSavedListId(workingListId)
+        setSavedListName(name)
+      } else {
+        // No working list (edge case) — create a new one
+        const res = await fetch("/api/super-admin/crm/prospects/discover/lists", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name,
+            searchCountry:  country || null,
+            searchState:    stateProvince || null,
+            searchIndustry: industry || null,
+            searchEmpMin:   empMin ? parseInt(empMin, 10) : null,
+            searchEmpMax:   empMax ? parseInt(empMax, 10) : null,
+            searchKeywords: keywords || null,
+            searchContext:  context || null,
+            results:        companies,
+          }),
+        })
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({})) as { error?: string }
+          throw new Error(d.error ?? "Save failed")
+        }
+        const saved = await res.json() as ResearchList
+        setSavedListId(saved.id)
+        setSavedListName(saved.name)
+        setWorkingListId(saved.id)
       }
-      const saved = await res.json() as ResearchList
-      setSavedListId(saved.id)
-      setSavedListName(saved.name)
       setShowSaveDialog(false)
     } catch (err) {
       alert(err instanceof Error ? err.message : "Could not save list — please try again")
@@ -2129,8 +2175,8 @@ export default function SalesDiscoverPage() {
                       </span>
                     ) : (
                       <button onClick={() => setShowSaveDialog(true)}
-                        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-lg transition-colors">
-                        <Save className="w-3 h-3" /> Save List
+                        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium">
+                        <Save className="w-3 h-3" /> Save to List
                       </button>
                     )}
                     <p className="text-[11px] text-gray-500">Click a company to start</p>

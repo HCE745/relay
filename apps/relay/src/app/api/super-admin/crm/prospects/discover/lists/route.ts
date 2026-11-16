@@ -20,8 +20,8 @@ export async function GET() {
 
   const lists = await prisma.prospectResearchList.findMany({
     where: session.superAdminId
-      ? { OR: [{ superAdminId: session.superAdminId }, ...(canSeeShared ? [{ isShared: true }] : [])] }
-      : { OR: [{ salesUserId: session.salesUserId },   ...(canSeeShared ? [{ isShared: true }] : [])] },
+      ? { isExplicitlySaved: true, OR: [{ superAdminId: session.superAdminId }, ...(canSeeShared ? [{ isShared: true }] : [])] }
+      : { isExplicitlySaved: true, OR: [{ salesUserId: session.salesUserId },   ...(canSeeShared ? [{ isShared: true }] : [])] },
     include: { _count: { select: { results: true } } },
     // Active lists first (by createdAt desc), then completed
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],

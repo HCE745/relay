@@ -64,16 +64,18 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
   if (!isOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const body = await req.json() as {
-    name?:        string
-    description?: string
-    status?:      "active" | "completed"
+    name?:              string
+    description?:       string
+    status?:            "active" | "completed"
+    isExplicitlySaved?: boolean
   }
   const data: {
-    name?:             string
-    description?:      string | null
-    status?:           string
-    completedAt?:      Date | null
+    name?:              string
+    description?:       string | null
+    status?:            string
+    completedAt?:       Date | null
     manuallyCompleted?: boolean
+    isExplicitlySaved?: boolean
   } = {}
 
   if (typeof body.name === "string") {
@@ -82,6 +84,8 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
     data.name = trimmed
   }
   if ("description" in body) data.description = body.description ?? null
+
+  if (body.isExplicitlySaved === true) data.isExplicitlySaved = true
 
   if (body.status === "completed") {
     data.status            = "completed"

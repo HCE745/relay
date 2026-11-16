@@ -18,6 +18,16 @@ export function forbidden(message = "Forbidden") {
   return NextResponse.json({ error: message }, { status: 403 })
 }
 
+/**
+ * 402 Payment Required — the org's CleanWare subscription has lapsed (expired
+ * trial, past_due, or canceled) and this operational route is gated. `code` lets
+ * the client route the user to billing. Admin recovery routes (billing,
+ * payment-method, data export) never reach this.
+ */
+export function paymentRequired(message = "Subscription required") {
+  return NextResponse.json({ error: message, code: "subscription_required" }, { status: 402 })
+}
+
 export function badRequest(details: unknown) {
   return NextResponse.json({ error: "Invalid request", details }, { status: 400 })
 }

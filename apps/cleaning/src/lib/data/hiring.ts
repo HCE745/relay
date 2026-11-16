@@ -4,6 +4,7 @@ import { orgDb, systemDb } from "../org-db"
 import { assertFound, ForbiddenActionError, ReferenceError, ConflictError, RequirementsError } from "./errors"
 import { enforceIntakeLimits, INTAKE_LIMITS } from "../public-intake"
 import { assignOnHirePackets } from "./onboarding"
+import { assertSeatAvailable } from "./seats"
 import type { z } from "zod"
 import type { jobPostingCreateSchema, applicantCreateSchema, publicApplicationSchema, interviewCreateSchema, convertApplicantSchema } from "../zod-schemas"
 
@@ -123,6 +124,8 @@ export async function convertApplicantToEmployee(orgId: string, id: string, inpu
   if (!applicant!.email) throw new RequirementsError("An email is required to create the employee account", ["Add the applicant's email first"])
   const existing = await systemDb.user.findUnique({ where: { email: applicant!.email }, select: { id: true } })
   if (existing) throw new ConflictError("A user with that email already exists")
+  // Converting an applicant creates an active staff user → consumes a seat.
+  await assertSeatAvailable(orgId)
 
   const password = await bcrypt.hash(randomBytes(24).toString("hex"), 10)
   const userId = await systemDb.$transaction(async (tx) => {

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs"
 import { orgDb, isUniqueViolation } from "../org-db"
 import { assertFound, ForbiddenActionError, ConflictError } from "./errors"
 import { countUserHeldItems, markUnrecoveredForUser } from "./custody"
+import { assertSeatAvailable } from "./seats"
 import type { z } from "zod"
 import type { userCreateSchema, userUpdateSchema } from "../zod-schemas"
 
@@ -36,6 +37,10 @@ export function getUser(orgId: string, id: string) {
 
 export async function createUser(orgId: string, actorRole: string, input: CreateInput) {
   assertCanAssign(actorRole, input.role)
+  // A new active user consumes a staff seat — validate before create. Team
+  // creation only mints staff roles (portal CLIENT users come in via portal
+  // invites, which never touch this path); users created inactive don't count.
+  if (input.isActive ?? true) await assertSeatAvailable(orgId)
   const hashed = await bcrypt.hash(input.password, 10)
   try {
     return await orgDb(orgId).user.create({
@@ -67,10 +72,19 @@ export async function createUser(orgId: string, actorRole: string, input: Create
 
 export async function updateUser(orgId: string, actorRole: string, id: string, input: UpdateInput, actorUserId?: string) {
   const db = orgDb(orgId)
-  const existing = await db.user.findFirst({ where: { id }, select: { id: true, role: true } })
+  const existing = await db.user.findFirst({ where: { id }, select: { id: true, role: true, isActive: true } })
   if (!existing) return null
   assertCanManageTarget(actorRole, existing.role)
   if (input.role) assertCanAssign(actorRole, input.role)
+
+  // Seat validation: block only when this update would turn a non-seat into an
+  // active staff seat — i.e. reactivating, or promoting a CLIENT to staff, so the
+  // user becomes active + non-CLIENT when they weren't counted before.
+  const newRole = input.role ?? existing.role
+  const newActive = input.isActive ?? existing.isActive
+  const wasSeat = existing.isActive && existing.role !== "CLIENT"
+  const willBeSeat = newActive && newRole !== "CLIENT"
+  if (!wasSeat && willBeSeat) await assertSeatAvailable(orgId)
 
   // Offboarding guard (Phase 36): do not deactivate someone who still holds keys
   // or assets. Keys are a security matter: check them in or transfer them first.

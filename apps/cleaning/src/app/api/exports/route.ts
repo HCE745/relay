@@ -9,7 +9,7 @@ const isDate = (s: string | null): s is string => !!s && /^\d{4}-\d{2}-\d{2}$/.t
 // Generate and download a CSV export, recording the run in history. CSV only —
 // no API integration (see report). Guarded to OWNER/ADMIN/MANAGER.
 export async function GET(request: Request) {
-  const g = await requireAccountManager(CAP)
+  const g = await requireAccountManager(CAP, { recovery: true }) // data export stays open to admins while lapsed
   if (!g.ok) return g.response
   const url = new URL(request.url)
   const kind = url.searchParams.get("kind") as ExportKind | null

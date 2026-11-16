@@ -4,6 +4,8 @@ import {
   subscriptionAccess,
   seatLimit,
   canAddActiveSeat,
+  subscriptionGuardOutcome,
+  seatActivationOutcome,
   type OrgAccessInput,
 } from "../access"
 
@@ -96,5 +98,58 @@ describe("seat limits (validated against Stripe-synced quantities)", () => {
     expect(canAddActiveSeat("TEAM", 0, 10)).toBe(false) // at limit
     expect(canAddActiveSeat("TEAM", 2, 11)).toBe(true) // limit 12
     expect(canAddActiveSeat("SOLO", 0, 3)).toBe(false) // Solo included 3, full
+  })
+})
+
+describe("subscriptionGuardOutcome (pure guard decision)", () => {
+  const denied: OrgAccessInput = { ...base } // canceled, no stripe sub → denied
+  const paid: OrgAccessInput = { ...base, subscriptionStatus: "active", stripeSubscriptionId: "sub_1", currentPeriodEnd: future }
+
+  it("never blocks while the master switch is off (ships dark)", () => {
+    expect(subscriptionGuardOutcome({ enforcementEnabled: false, org: denied, now: NOW, recovery: false, actorIsAdmin: false }).block).toBe(false)
+  })
+
+  it("never blocks when org state is unresolved (fails open on a data glitch)", () => {
+    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: null, now: NOW, recovery: false, actorIsAdmin: true }).block).toBe(false)
+  })
+
+  it("allows a paid org and blocks a lapsed one", () => {
+    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: paid, now: NOW, recovery: false, actorIsAdmin: false }).block).toBe(false)
+    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: denied, now: NOW, recovery: false, actorIsAdmin: false }).block).toBe(true)
+  })
+
+  it("lets an ADMIN through a recovery route even when lapsed, but not a non-admin", () => {
+    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: denied, now: NOW, recovery: true, actorIsAdmin: true }).block).toBe(false)
+    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: denied, now: NOW, recovery: true, actorIsAdmin: false }).block).toBe(true)
+  })
+
+  it("admin recovery does NOT open non-recovery operational routes", () => {
+    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: denied, now: NOW, recovery: false, actorIsAdmin: true }).block).toBe(true)
+  })
+})
+
+describe("seatActivationOutcome (pure seat decision)", () => {
+  const p = { tier: "TEAM", purchasedSeats: 0 }
+
+  it("never blocks while the master switch is off", () => {
+    expect(seatActivationOutcome({ enforcementEnabled: false, isDemo: false, ...p, currentActiveNonClientCount: 99 }).block).toBe(false)
+  })
+
+  it("exempts demo orgs", () => {
+    expect(seatActivationOutcome({ enforcementEnabled: true, isDemo: true, ...p, currentActiveNonClientCount: 99 }).block).toBe(false)
+  })
+
+  it("allows under the limit, blocks at it, and reports the limit", () => {
+    expect(seatActivationOutcome({ enforcementEnabled: true, isDemo: false, ...p, currentActiveNonClientCount: 9 }).block).toBe(false)
+    const atLimit = seatActivationOutcome({ enforcementEnabled: true, isDemo: false, ...p, currentActiveNonClientCount: 10 })
+    expect(atLimit.block).toBe(true)
+    if (atLimit.block) expect(atLimit.limit).toBe(10)
+  })
+
+  it("after a downgrade the shrunken ceiling blocks new activations until seats free up", () => {
+    // Org was BUSINESS (limit 25), downgraded to TEAM (limit 10) still holding 12 active staff.
+    const r = seatActivationOutcome({ enforcementEnabled: true, isDemo: false, tier: "TEAM", purchasedSeats: 0, currentActiveNonClientCount: 12 })
+    expect(r.block).toBe(true)
+    if (r.block) expect(r.limit).toBe(10)
   })
 })

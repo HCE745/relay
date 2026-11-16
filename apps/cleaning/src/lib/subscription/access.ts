@@ -94,3 +94,55 @@ export function canAddActiveSeat(
 ): boolean {
   return currentActiveNonClientCount < seatLimit(tier, purchasedSeats)
 }
+
+// ── Pure guard outcomes ──────────────────────────────────────────────────────
+// The DB + HTTP glue (subscription/enforce.ts, data/seats.ts) stays trivial by
+// delegating every decision to these pure functions, which are unit-tested here
+// rather than through a mocked database.
+
+/**
+ * Decide whether the subscription gate should BLOCK a request. Independent of
+ * transport. Fails OPEN in two deliberate cases so enforcement can never lock a
+ * customer out by accident:
+ *   • enforcement master switch off → never block (ships dark);
+ *   • org state unresolved (null) → never block (a data/read glitch is not
+ *     evidence of non-payment, and must not strand account recovery).
+ * Admin recovery: a denied org whose actor is an administrator is let through on
+ * routes flagged `recovery` (billing, payment-method, data export) so admins can
+ * always reach the controls needed to pay or export, even while lapsed.
+ */
+export function subscriptionGuardOutcome(params: {
+  enforcementEnabled: boolean
+  org: OrgAccessInput | null
+  now: Date
+  recovery: boolean
+  actorIsAdmin: boolean
+}): { block: false } | { block: true; reason: string } {
+  if (!params.enforcementEnabled) return { block: false }
+  if (!params.org) return { block: false }
+  const access = subscriptionAccess(params.org, params.now)
+  if (access.allowed) return { block: false }
+  if (params.recovery && params.actorIsAdmin) return { block: false }
+  return { block: true, reason: access.reason }
+}
+
+/**
+ * Decide whether activating another staff seat should BLOCK. Off while the master
+ * switch is off; demo orgs are exempt (sandbox). `currentActiveNonClientCount`
+ * must already EXCLUDE portal/CLIENT users and inactive users — seats count only
+ * active staff.
+ */
+export function seatActivationOutcome(params: {
+  enforcementEnabled: boolean
+  isDemo: boolean
+  tier: string
+  purchasedSeats: number
+  currentActiveNonClientCount: number
+}): { block: false } | { block: true; limit: number } {
+  if (!params.enforcementEnabled) return { block: false }
+  if (params.isDemo) return { block: false }
+  if (canAddActiveSeat(params.tier, params.purchasedSeats, params.currentActiveNonClientCount)) {
+    return { block: false }
+  }
+  return { block: true, limit: seatLimit(params.tier, params.purchasedSeats) }
+}

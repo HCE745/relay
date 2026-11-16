@@ -14,7 +14,7 @@ function csvCell(v: string | number): string {
 }
 
 export async function GET(request: Request) {
-  const g = await requireAccountManager(CAP)
+  const g = await requireAccountManager(CAP, { recovery: true }) // payroll/data export stays open to admins while lapsed
   if (!g.ok) return g.response
 
   const url = new URL(request.url)

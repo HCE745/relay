@@ -577,7 +577,7 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     )
   })
 
-  it("auto-fails jobs older than 20 minutes", async () => {
+  it("auto-fails jobs older than 60 minutes", async () => {
     mockJobUpdateMany.mockResolvedValue({ count: 1 })  // auto-fail fires
     mockJobFindFirst.mockResolvedValue(null)            // no pending after auto-fail
 

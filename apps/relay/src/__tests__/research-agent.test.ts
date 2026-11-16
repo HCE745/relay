@@ -289,13 +289,13 @@ describe("buildRoundPrompt adaptive hints", () => {
     expect(p).toContain("acmecorp.com")
   })
 
-  it("includes fallback prompt without verification steps", () => {
+  it("prompt is discovery-only (no per-company LinkedIn verification step)", () => {
     const p = buildRoundPrompt({
       criteria: BASE_CRITERIA, state: EMPTY_AGENT_STATE, roundNum: 1, needed: 5,
       exclusionNames: "", exclusionDomains: [], subsectors: [], strategy: "general_web",
-      isFallback: true,
     })
-    expect(p).not.toContain("STEP 2 — HEADCOUNT VERIFICATION")
+    expect(p).not.toContain("STEP 2")
+    expect(p).not.toContain("linkedin.com employees")
     expect(p).toContain("unknown")
   })
 })

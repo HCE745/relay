@@ -13,6 +13,11 @@ import {
 export const dynamic    = "force-dynamic"
 export const maxDuration = 110
 
+// Vercel sends POST on Pro plans; GET is a defensive fallback.
+export async function GET(req: NextRequest) {
+  return POST(req)
+}
+
 // Called every 2 minutes by Vercel cron.
 // Finds the oldest pending research job, claims it, advances it by one round,
 // then releases the lock (pending) or marks it complete/failed.
@@ -29,8 +34,8 @@ export async function POST(req: NextRequest) {
 
   const now = new Date()
 
-  // 1. Auto-fail jobs that have been stuck or running too long (> 20 min)
-  const staleThreshold = new Date(now.getTime() - 20 * 60 * 1000)
+  // 1. Auto-fail jobs that have been stuck for > 60 min (5 rounds × ~10 min each with cron)
+  const staleThreshold = new Date(now.getTime() - 60 * 60 * 1000)
   await prisma.prospectResearchJob.updateMany({
     where: {
       status:    { in: ["pending", "running"] },
@@ -38,7 +43,7 @@ export async function POST(req: NextRequest) {
     },
     data: {
       status:    "failed",
-      lastError: "Job timed out (exceeded 20-minute limit without completing)",
+      lastError: "Job timed out (exceeded 60-minute limit without completing)",
       lockedUntil: null,
     },
   })
@@ -118,7 +123,7 @@ export async function POST(req: NextRequest) {
       criteria,
       state,
       roundNum,
-      needed: Math.max(needed, 5), // always try for at least 5 to fill gaps
+      needed: Math.max(needed, 20), // always search broadly even when gap is small
       listId: job.listId,
       batchOpts,
       listSearchState: criteria.stateProvince ?? null,

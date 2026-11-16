@@ -94,7 +94,7 @@ type SourceStrategy = "general_web" | "thomasnet" | "associations" | "industrial
 
 const STRATEGY_PROMPTS: Record<SourceStrategy, string> = {
   general_web:
-    "Search Google and LinkedIn for company names, then verify on LinkedIn for employee counts.",
+    "Search Google and company directories for manufacturer names, websites, and locations. Focus on finding as many different companies as possible from each search.",
   thomasnet:
     "Search site:thomasnet.com and site:manta.com for manufacturers. Use ThomasNet product category pages to find suppliers in this region. Also try site:kompass.com.",
   associations:
@@ -172,86 +172,55 @@ export function buildRoundPrompt(opts: {
   exclusionDomains: string[] // CRM domains to exclude
   subsectors:       string[]
   strategy:         SourceStrategy
-  isFallback?:      boolean  // batch-2 fast-path: skip headcount verification
 }): string {
-  const { criteria, state, roundNum, needed, exclusionNames, exclusionDomains, subsectors, strategy, isFallback } = opts
-  const empRange    = `${criteria.employeeCountMin}–${criteria.employeeCountMax} employees`
-  const location    = criteria.stateProvince
+  const { criteria, state, roundNum, needed, exclusionNames, exclusionDomains, subsectors, strategy } = opts
+  const location   = criteria.stateProvince
     ? `${criteria.stateProvince}, ${criteria.country}`
     : criteria.country
-  const stateLabel  = criteria.country === "Canada" ? "province abbreviation" : "2-letter US state code (e.g. IN)"
-  const keywordsLine  = criteria.keywords         ? `\nFocus on: ${criteria.keywords}` : ""
+  const stateLabel = criteria.country === "Canada" ? "province abbreviation" : "2-letter US state code (e.g. IN)"
+  const keywordsLine  = criteria.keywords          ? `\nFocus on: ${criteria.keywords}` : ""
   const contextLine   = criteria.additionalContext ? `\nAdditional context: ${criteria.additionalContext}` : ""
 
-  // Build the exclusion block (CRM + previously seen this job)
-  const allExcludedDomains = [...exclusionDomains, ...state.seenDomains].slice(0, 500).join(", ") || "(none)"
-  const prevSeenNames      = state.seenNormNames.length > 0
-    ? `\nDo NOT repeat these companies already found in this research session: ${state.seenNormNames.slice(0, 100).join(", ")}`
+  // Limit exclusion lists to control input token cost
+  const allExcludedDomains = [...exclusionDomains, ...state.seenDomains].slice(0, 200).join(", ") || "(none)"
+  const prevSeenNames = state.seenNormNames.length > 0
+    ? `\nDo NOT repeat these already-found companies: ${state.seenNormNames.slice(0, 100).join(", ")}`
     : ""
-  const adaptiveHints      = roundNum > 1 ? buildAdaptiveHints(state) : ""
-
+  const adaptiveHints  = roundNum > 1 ? buildAdaptiveHints(state) : ""
   const subsectorFocus = subsectors.length > 0
-    ? `\nFocus on these ${criteria.industry} subsectors: ${subsectors.join(", ")}.`
+    ? `\nFocus on these ${criteria.industry} subsectors this round: ${subsectors.join(", ")}.`
     : ""
 
   const strategyInstructions = STRATEGY_PROMPTS[strategy]
 
-  if (isFallback) {
-    return (
-      `Find up to ${needed} real ${criteria.industry} companies headquartered in ${location} ` +
-      `with approximately ${empRange} that could benefit from Relay — operational coordination software for manufacturing facilities.` +
-      `${keywordsLine}${contextLine}${subsectorFocus}${prevSeenNames}${adaptiveHints}\n\n` +
-      `SOURCE STRATEGY: ${strategyInstructions}\n\n` +
-      `USE WEB SEARCH with 2–3 searches targeting DIFFERENT areas than your previous searches.\n` +
-      `REQUIREMENTS: official HTTPS website required; headquarters confirmed in ${location}.\n` +
-      `EXCLUDE — already in our CRM: ${exclusionNames || "(none)"}\n` +
-      `EXCLUDE — these domains already tracked: ${allExcludedDomains}\n\n` +
-      `Return ONLY a JSON array. Each object: companyName, website, city, state (${stateLabel}), ` +
-      `country ("${criteria.country}"), industry, summary, fitScore (0-100), ` +
-      `estimatedEmployees ("unknown"), employeeCountTier ("unknown"), sourceCitations.\n` +
-      `Your entire response must be only the JSON array — nothing before [, nothing after ].`
-    )
-  }
-
   return (
-    `Find up to ${needed} real ${criteria.industry} companies headquartered in ${location} ` +
-    `with approximately ${empRange} that could benefit from Relay — operational coordination software ` +
-    `for manufacturing facilities (issue reporting, maintenance requests, digital shift handoffs, QR-code asset tracking).` +
+    `Find up to ${Math.max(needed, 20)} real ${criteria.industry} companies headquartered in ${location} ` +
+    `with approximately ${criteria.employeeCountMin}–${criteria.employeeCountMax} employees ` +
+    `that could benefit from Relay — operational coordination software for manufacturing facilities.` +
     `${keywordsLine}${contextLine}${subsectorFocus}${prevSeenNames}${adaptiveHints}\n\n` +
     `SOURCE STRATEGY: ${strategyInstructions}\n\n` +
-    `USE WEB SEARCH with this two-step process:\n\n` +
-    `STEP 1 — DISCOVERY (use 2–3 broad searches):\n` +
-    `Search for "${criteria.industry} companies ${location}", ` +
-    `"${criteria.industry} manufacturers ${location}", and similar. ` +
-    `Build a candidate list. Vary searches across different ${criteria.industry} subsectors.\n\n` +
-    `STEP 2 — HEADCOUNT VERIFICATION (use 1 targeted search per candidate):\n` +
-    `For each company from Step 1, run a targeted search:\n` +
-    `  - Search: "{company name} linkedin.com employees" or "{company name} site:linkedin.com"\n` +
-    `  - LinkedIn company pages show ranges like "51-200 employees", "201-500 employees" — use these\n` +
-    `  - If LinkedIn gives nothing, try: "{company name} glassdoor employees ${location}"\n` +
-    `  - Classify based on what you actually found:\n` +
-    `    * "web_confirmed" — LinkedIn or Glassdoor shows an employee count or range entirely within ${empRange}\n` +
-    `    * "web_estimated" — LinkedIn or Glassdoor shows a range that OVERLAPS with ${empRange}\n` +
-    `    * "unknown" — real ${location} ${criteria.industry} company but NO headcount evidence found\n\n` +
+    `USE ALL web searches to DISCOVER companies — do NOT search LinkedIn per-company for employee counts. ` +
+    `Make 5–8 broad searches covering different subsectors and areas within ${location} to find as many different companies as possible:\n` +
+    `- "${criteria.industry} manufacturers ${location}"\n` +
+    `- "${subsectors[0] ?? criteria.industry} companies ${location}"\n` +
+    `- Other searches targeting different subsectors, cities, or directories\n\n` +
     `REQUIREMENTS for each company:\n` +
-    `- Official, working HTTPS website (required — omit if not verified; LinkedIn/ZoomInfo are NOT acceptable)\n` +
+    `- Official, working HTTPS website (required — omit if not found; LinkedIn/ZoomInfo/Manta are NOT acceptable as a company website)\n` +
     `- Headquarters confirmed in ${location}\n\n` +
-    `GEOGRAPHIC RULE: Only return companies with confirmed headquarters in ${location}.\n` +
-    `HONESTY RULE: Return what you verified. Do not fabricate. If fewer than ${needed}, return fewer.\n\n` +
     `EXCLUDE — already in our CRM: ${exclusionNames || "(none)"}\n` +
     `EXCLUDE — these domains already tracked: ${allExcludedDomains}\n\n` +
-    `Return ONLY a JSON array. Each object must have exactly these keys:\n` +
+    `Return ONLY a valid JSON array. Each object must have exactly these keys:\n` +
     `- companyName: exact company name\n` +
-    `- website: working HTTPS URL (required — omit the company if not verified)\n` +
+    `- website: working HTTPS URL (official site only — required, omit the company if not found)\n` +
     `- city: headquarters city\n` +
     `- state: ${stateLabel}\n` +
     `- country: "${criteria.country}"\n` +
     `- industry: specific ${criteria.industry} subsector (e.g. "Metal Fabrication", "Food Processing")\n` +
-    `- estimatedEmployees: employee range string (e.g. "80-150") or "unknown"\n` +
+    `- estimatedEmployees: estimate from search results, or "unknown"\n` +
     `- employeeCountTier: "web_confirmed" | "web_estimated" | "unknown"\n` +
-    `- summary: one sentence describing their ${criteria.industry} operations and what they produce\n` +
+    `- summary: one sentence about their ${criteria.industry} operations and what they produce\n` +
     `- fitScore: integer 0-100 (higher = more complex shop floor operations, more Relay fit)\n` +
-    `- sourceCitations: array of URLs from your web searches — include the LinkedIn/Glassdoor URL when found\n\n` +
+    `- sourceCitations: array of source URLs from your searches\n\n` +
     `Your entire response must be only the JSON array — nothing before [, nothing after ].`
   )
 }
@@ -364,7 +333,6 @@ export async function runResearchRound(opts: RunRoundOpts): Promise<RoundResult>
     exclusionDomains,
     subsectors,
     strategy,
-    isFallback:       false,
   })
 
   console.log(`[research-agent] round ${roundNum}: strategy=${strategy} subsectors=${subsectors.join(",")}`)

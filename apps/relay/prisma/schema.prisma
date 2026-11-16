@@ -3853,9 +3853,14 @@ model ProspectResearchJob {
   lockedUntil DateTime?
 
   // Anthropic API cost tracking
-  inputTokensTotal  Int @default(0)
-  outputTokensTotal Int @default(0)
-  searchCallsTotal  Int @default(0)
+  inputTokensTotal  Int   @default(0)
+  outputTokensTotal Int   @default(0)
+  searchCallsTotal  Int   @default(0)
+
+  // Per-job spending cap (dollars); default 2.00 USD
+  budgetUsd    Float @default(2.0)
+  // Consecutive round failures; resets to 0 on success; job fails at 3
+  failedRounds Int   @default(0)
 
   lastError String? @db.Text
 

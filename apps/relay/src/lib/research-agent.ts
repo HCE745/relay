@@ -463,17 +463,42 @@ async function appendResultsToList(
 
 // ─── Job helpers ──────────────────────────────────────────────────────────────
 
+// Conservative per-unit costs — slightly above public list prices so the cap
+// acts as a true backstop rather than a soft estimate.
+// Claude Sonnet 5.5: $5/1M input, $20/1M output (rounded up from list price).
+// Web search: Anthropic charges $10/1000 results ≈ $0.01/call.
+const COST_PER_INPUT_TOKEN  = 5e-6   // $5 / 1,000,000
+const COST_PER_OUTPUT_TOKEN = 2e-5   // $20 / 1,000,000
+const COST_PER_SEARCH       = 0.01   // $10 / 1,000 searches
+
+export function estimatedJobCost(
+  inputTokensTotal:  number,
+  outputTokensTotal: number,
+  searchCallsTotal:  number,
+): number {
+  return (
+    inputTokensTotal  * COST_PER_INPUT_TOKEN +
+    outputTokensTotal * COST_PER_OUTPUT_TOKEN +
+    searchCallsTotal  * COST_PER_SEARCH
+  )
+}
+
 export function shouldRunNextRound(
-  roundsCompleted:  number,
-  roundsMax:        number,
-  acceptedCount:    number,
-  requestedCount:   number,
-  createdAt:        Date,
-  timeLimitMs       = 15 * 60 * 1000,
+  roundsCompleted:   number,
+  roundsMax:         number,
+  acceptedCount:     number,
+  requestedCount:    number,
+  createdAt:         Date,
+  timeLimitMs        = 15 * 60 * 1000,
+  inputTokensTotal   = 0,
+  outputTokensTotal  = 0,
+  searchCallsTotal   = 0,
+  budgetUsd          = 2.0,
 ): boolean {
-  if (acceptedCount >= requestedCount)             return false
-  if (roundsCompleted >= roundsMax)                return false
-  if (Date.now() - createdAt.getTime() > timeLimitMs) return false
+  if (acceptedCount >= requestedCount)                  return false
+  if (roundsCompleted >= roundsMax)                     return false
+  if (Date.now() - createdAt.getTime() > timeLimitMs)  return false
+  if (estimatedJobCost(inputTokensTotal, outputTokensTotal, searchCallsTotal) >= budgetUsd) return false
   return true
 }
 

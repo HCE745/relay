@@ -138,12 +138,21 @@ export async function POST(req: NextRequest) {
     const newAccepted = job.acceptedCount + round.accepted.length
     const newRounds   = roundNum
 
+    const newInputTokens  = job.inputTokensTotal  + round.inputTokens
+    const newOutputTokens = job.outputTokensTotal + round.outputTokens
+    const newSearchCalls  = job.searchCallsTotal  + round.searchCalls
+
     const continueJob = shouldRunNextRound(
       newRounds,
       job.roundsMax,
       newAccepted,
       criteria.requestedCount,
       job.createdAt,
+      15 * 60 * 1000,
+      newInputTokens,
+      newOutputTokens,
+      newSearchCalls,
+      job.budgetUsd,
     )
 
     await prisma.prospectResearchJob.update({
@@ -156,6 +165,7 @@ export async function POST(req: NextRequest) {
         inputTokensTotal:  { increment: round.inputTokens },
         outputTokensTotal: { increment: round.outputTokens },
         searchCallsTotal:  { increment: round.searchCalls },
+        failedRounds:      0,
         lockedUntil:       null,
         lockedAt:          null,
         lastError:         null,
@@ -177,13 +187,18 @@ export async function POST(req: NextRequest) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error(`[cron/prospect-research] job ${job.id} round ${roundNum} error:`, msg)
 
+    // Increment failedRounds; only mark permanently failed after 3 consecutive errors.
+    // This lets transient API timeouts recover on the next cron invocation.
+    const newFailed = (job.failedRounds ?? 0) + 1
+
     await prisma.prospectResearchJob.update({
       where: { id: job.id },
       data:  {
-        status:      "failed",
-        lastError:   msg.slice(0, 2000),
-        lockedUntil: null,
-        lockedAt:    null,
+        status:       newFailed >= 3 ? "failed" : "pending",
+        lastError:    msg.slice(0, 2000),
+        failedRounds: newFailed,
+        lockedUntil:  null,
+        lockedAt:     null,
       },
     })
 

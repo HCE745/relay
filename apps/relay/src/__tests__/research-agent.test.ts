@@ -147,7 +147,7 @@ describe("updateAgentState", () => {
 describe("shouldRunNextRound", () => {
   const recentDate = new Date()
 
-  it("returns true when under target, rounds, and time", () => {
+  it("returns true when under target, rounds, time, and budget", () => {
     expect(shouldRunNextRound(1, 5, 10, 20, recentDate)).toBe(true)
   })
 
@@ -166,10 +166,23 @@ describe("shouldRunNextRound", () => {
 
   it("respects custom timeLimitMs", () => {
     const oldDate = new Date(Date.now() - 5 * 60 * 1000)
-    // 10 min limit — 5 min old should still pass
     expect(shouldRunNextRound(1, 5, 5, 20, oldDate, 10 * 60 * 1000)).toBe(true)
-    // 3 min limit — 5 min old should fail
     expect(shouldRunNextRound(1, 5, 5, 20, oldDate, 3 * 60 * 1000)).toBe(false)
+  })
+
+  it("returns false when estimated cost >= budgetUsd", () => {
+    // 200k input × $5/1M = $1.00, 0 output, 0 searches → exceeds $0.90 budget
+    expect(shouldRunNextRound(1, 5, 5, 20, recentDate, 15 * 60 * 1000, 200_000, 0, 0, 0.90)).toBe(false)
+  })
+
+  it("returns true when estimated cost is under budget", () => {
+    // 100k input × $5/1M = $0.50, well under $2 budget
+    expect(shouldRunNextRound(1, 5, 5, 20, recentDate, 15 * 60 * 1000, 100_000, 0, 0, 2.0)).toBe(true)
+  })
+
+  it("counts web searches in cost check", () => {
+    // 200 searches × $0.01 = $2.00 ≥ $1.99 budget → stop
+    expect(shouldRunNextRound(1, 5, 5, 20, recentDate, 15 * 60 * 1000, 0, 0, 200, 1.99)).toBe(false)
   })
 })
 

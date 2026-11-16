@@ -24,6 +24,8 @@ CREATE TABLE "ProspectResearchJob" (
   "inputTokensTotal"  INTEGER       NOT NULL DEFAULT 0,
   "outputTokensTotal" INTEGER       NOT NULL DEFAULT 0,
   "searchCallsTotal"  INTEGER       NOT NULL DEFAULT 0,
+  "budgetUsd"         REAL          NOT NULL DEFAULT 2.0,  -- per-job dollar spending cap
+  "failedRounds"      INTEGER       NOT NULL DEFAULT 0,    -- consecutive round failures; resets on success
   "lastError"         TEXT,
   "createdAt"         TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt"         TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,

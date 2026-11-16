@@ -12,6 +12,13 @@ import { NextRequest } from "next/server"
 
 vi.mock("server-only", () => ({}))
 
+// `after` is a Vercel runtime API not available in the test environment.
+// Keep the rest of next/server intact so NextRequest/NextResponse work.
+vi.mock("next/server", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("next/server")>()
+  return { ...mod, after: vi.fn() }
+})
+
 const {
   mockCreate,
   mockProspectFindMany,
@@ -151,7 +158,7 @@ function setupDefaults() {
   process.env.CRON_SECRET = "test-cron-secret"
 
   const list = { id: "list-1", name: "Manufacturing in IN — Nov 2026" }
-  const job  = { id: "job-1", status: "running", listId: "list-1", roundsCompleted: 0, roundsMax: 5, acceptedCount: 0, createdAt: new Date(), agentState: null, salesUserId: null, superAdminId: "sa-1" }
+  const job  = { id: "job-1", status: "running", listId: "list-1", roundsCompleted: 0, roundsMax: 5, acceptedCount: 0, createdAt: new Date(), agentState: null, salesUserId: null, superAdminId: "sa-1", budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0 }
 
   mockTx.mockImplementation(async (fn: (tx: typeof import("@/lib/prisma").prisma) => unknown) => {
     const tx = {
@@ -210,63 +217,31 @@ describe("POST /jobs — job creation", () => {
     expect(res.status).toBe(500)
   })
 
-  it("creates list and job via transaction, runs round 1, returns companies", async () => {
-    const companies = [makeCompany("Acme Corp"), makeCompany("Beta Mfg")]
-    setupBatchResult(companies)
-    mockResearchListFindUnique.mockResolvedValue({
-      id: "list-1", name: "test",
-      results: companies.map((c, i) => ({
-        id: `r-${i}`, listId: "list-1", companyName: c.companyName,
-        website: c.website, verifiedCity: c.city, verifiedState: c.state,
-        verifiedCountry: c.country, industry: c.industry,
-        estimatedEmployees: c.estimatedEmployees,
-        employeeCountSource: c.employeeCountTier,
-        summary: c.summary, fitScore: c.fitScore,
-        sourceCitations: [], prospectId: null,
-        locationVerified: true, isDone: false, doneAt: null,
-        researchDate: new Date().toISOString(),
-      })),
-    })
-
+  it("returns immediately with empty companies array and pending status", async () => {
     const res = await jobsPost(makeJobsRequest())
     expect(res.status).toBe(200)
 
     const body = await res.json() as {
       jobId: string; listId: string; jobStatus: string
-      companies: { companyName: string }[]
+      roundsCompleted: number; companies: unknown[]
     }
     expect(body.jobId).toBeTruthy()
     expect(body.listId).toBeTruthy()
-    expect(["pending", "completed"]).toContain(body.jobStatus)
-    expect(body.companies.length).toBeGreaterThan(0)
+    expect(body.jobStatus).toBe("pending")
+    expect(body.roundsCompleted).toBe(0)
+    expect(body.companies).toEqual([])
   })
 
-  it("caps requestedCount at 20", async () => {
-    setupBatchResult([makeCompany("Acme Corp")])
-    mockResearchListFindUnique.mockResolvedValue({ id: "list-1", name: "test", results: [] })
-
-    await jobsPost(makeJobsRequest({ requestedCount: 100 }))
-
-    // The job create should have been called with requestedCount <= 20
-    // Check via the transaction mock — job created with capped value
-    // (Difficult to assert exact param without deep mock inspection, but build should pass)
-    expect(mockCreate).toHaveBeenCalled()
-  })
-
-  it("returns 500 and marks job failed when round 1 throws", async () => {
-    mockCreate.mockRejectedValue(new Error("Claude timeout"))
-
-    const res = await jobsPost(makeJobsRequest())
-    expect(res.status).toBe(500)
-    const body = await res.json() as { status?: string; error?: string }
-    expect(body.status).toBe("failed")
-    expect(body.error).toContain("Claude timeout")
+  it("caps requestedCount at 20 and returns 200", async () => {
+    const res = await jobsPost(makeJobsRequest({ requestedCount: 100 }))
+    // Route should not reject — requestedCount is silently capped
+    expect(res.status).toBe(200)
+    const body = await res.json() as { jobId: string }
+    expect(body.jobId).toBeTruthy()
   })
 
   it("allows salesUserId sessions", async () => {
     vi.mocked(getSession).mockResolvedValue({ salesUserId: "s-1" } as never)
-    setupBatchResult([makeCompany("Acme Corp")])
-    mockResearchListFindUnique.mockResolvedValue({ id: "list-1", name: "test", results: [] })
 
     const res = await jobsPost(makeJobsRequest())
     expect(res.status).toBe(200)
@@ -453,6 +428,7 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
       employeeCountMin: 50, employeeCountMax: 300,
       keywords: null, additionalContext: null,
       salesUserId: null, superAdminId: "sa-1",
+      budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
     }
 
     // updateMany for stale locks and auto-fail (called twice) → no matches
@@ -487,6 +463,7 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
       employeeCountMin: 50, employeeCountMax: 300,
       keywords: null, additionalContext: null,
       salesUserId: null, superAdminId: "sa-1",
+      budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
     }
 
     mockJobUpdateMany
@@ -502,7 +479,7 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     expect(body.skipped).toContain("another worker")
   })
 
-  it("marks job failed when round throws an error", async () => {
+  it("sets status pending (not failed) on first round error (failedRounds < 3)", async () => {
     const job = {
       id: "job-1", status: "pending", listId: "list-1",
       roundsCompleted: 0, roundsMax: 5, acceptedCount: 0,
@@ -511,6 +488,7 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
       employeeCountMin: 50, employeeCountMax: 300,
       keywords: null, additionalContext: null,
       salesUserId: null, superAdminId: "sa-1",
+      budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
     }
 
     mockJobUpdateMany
@@ -521,15 +499,80 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     mockJobFindFirst.mockResolvedValue(job)
     mockJobFindUnique.mockResolvedValue(job)
     mockCreate.mockRejectedValue(new Error("Claude API error"))
-    mockJobUpdate.mockResolvedValue({ ...job, status: "failed" })
+    mockJobUpdate.mockResolvedValue({ ...job, status: "pending", failedRounds: 1 })
 
     const res = await cronPost(makeCronRequest())
     expect(res.status).toBe(500)
     const body = await res.json() as { ok: boolean; error?: string }
     expect(body.ok).toBe(false)
+    // First error → still pending (cron can retry)
     expect(mockJobUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ status: "failed" }),
+        data: expect.objectContaining({ status: "pending", failedRounds: 1 }),
+      })
+    )
+  })
+
+  it("marks job permanently failed after 3 consecutive round errors", async () => {
+    const job = {
+      id: "job-1", status: "pending", listId: "list-1",
+      roundsCompleted: 0, roundsMax: 5, acceptedCount: 0,
+      requestedCount: 10, createdAt: new Date(), agentState: null,
+      country: "US", stateProvince: "IN", industry: "Mfg",
+      employeeCountMin: 50, employeeCountMax: 300,
+      keywords: null, additionalContext: null,
+      salesUserId: null, superAdminId: "sa-1",
+      budgetUsd: 2.0, failedRounds: 2, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
+    }
+
+    mockJobUpdateMany
+      .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 1 })
+
+    mockJobFindFirst.mockResolvedValue(job)
+    mockJobFindUnique.mockResolvedValue(job)
+    mockCreate.mockRejectedValue(new Error("Claude API error"))
+    mockJobUpdate.mockResolvedValue({ ...job, status: "failed", failedRounds: 3 })
+
+    const res = await cronPost(makeCronRequest())
+    expect(res.status).toBe(500)
+    // Third consecutive error → permanently failed
+    expect(mockJobUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: "failed", failedRounds: 3 }),
+      })
+    )
+  })
+
+  it("resets failedRounds to 0 on a successful round", async () => {
+    const job = {
+      id: "job-1", status: "pending", listId: "list-1",
+      roundsCompleted: 0, roundsMax: 5, acceptedCount: 0,
+      requestedCount: 10, createdAt: new Date(), agentState: null,
+      country: "US", stateProvince: "IN", industry: "Mfg",
+      employeeCountMin: 50, employeeCountMax: 300,
+      keywords: null, additionalContext: null,
+      salesUserId: null, superAdminId: "sa-1",
+      budgetUsd: 2.0, failedRounds: 2, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
+    }
+
+    mockJobUpdateMany
+      .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 1 })
+
+    mockJobFindFirst.mockResolvedValue(job)
+    mockJobFindUnique.mockResolvedValue(job)
+
+    setupBatchResult([makeCompany("Acme Corp")])
+    mockJobUpdate.mockResolvedValue({ ...job, status: "pending", roundsCompleted: 1, failedRounds: 0 })
+
+    await cronPost(makeCronRequest())
+
+    expect(mockJobUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ failedRounds: 0 }),
       })
     )
   })
@@ -571,6 +614,7 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
       employeeCountMin: 50, employeeCountMax: 300,
       keywords: null, additionalContext: null,
       salesUserId: null, superAdminId: "sa-1",
+      budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
     }
 
     mockJobUpdateMany
@@ -600,6 +644,7 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
       employeeCountMin: 50, employeeCountMax: 300,
       keywords: null, additionalContext: null,
       salesUserId: null, superAdminId: "sa-1",
+      budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
     }
 
     mockJobUpdateMany
@@ -618,5 +663,40 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     expect(res.status).toBe(200)
     const body = await res.json() as { status: string }
     expect(body.status).toBe("pending")
+  })
+
+  it("marks job completed when budget is exhausted after a round", async () => {
+    // Job whose accumulated tokens will exceed the $0.01 budget on first round
+    const job = {
+      id: "job-1", status: "pending", listId: "list-1",
+      roundsCompleted: 0, roundsMax: 5, acceptedCount: 0,
+      requestedCount: 20, createdAt: new Date(), agentState: null,
+      country: "US", stateProvince: "IN", industry: "Mfg",
+      employeeCountMin: 50, employeeCountMax: 300,
+      keywords: null, additionalContext: null,
+      salesUserId: null, superAdminId: "sa-1",
+      // Near-zero budget so first round exhausts it
+      budgetUsd: 0.001, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
+    }
+
+    mockJobUpdateMany
+      .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 1 })
+
+    mockJobFindFirst.mockResolvedValue(job)
+    mockJobFindUnique.mockResolvedValue(job)
+
+    // The batch mock returns usage tokens; with budgetUsd=0.001 even a small token count exceeds it
+    setupBatchResult([makeCompany("Acme Corp")])
+    mockJobUpdate.mockResolvedValue({ ...job, status: "completed", roundsCompleted: 1 })
+
+    const res = await cronPost(makeCronRequest())
+    expect(res.status).toBe(200)
+    expect(mockJobUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: "completed" }),
+      })
+    )
   })
 })

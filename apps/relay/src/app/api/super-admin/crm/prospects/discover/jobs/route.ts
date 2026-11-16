@@ -1,5 +1,5 @@
 import "server-only"
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse, after } from "next/server"
 import { getSession } from "@/lib/session"
 import { getPlatformConfig } from "@/lib/platform-config"
 import { prisma } from "@/lib/prisma"
@@ -18,9 +18,9 @@ export const maxDuration = 100
 const ROUNDS_MAX = 5
 
 // ── POST /api/super-admin/crm/prospects/discover/jobs ─────────────────────────
-// Creates a research job, runs round 1 synchronously, saves results to a new
-// research list, then marks the job pending for the cron to continue.
-// Returns the job ID, list ID, round-1 results, and current status.
+// Creates a research job and immediately returns the job ID. Round 1 runs in
+// the background via next/server `after()` — Rachel's browser does not need to
+// stay connected. The cron at */2 * * * * handles rounds 2–N.
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession()
@@ -74,7 +74,8 @@ export async function POST(req: NextRequest) {
       new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
     ].join(" ")
 
-    // Create list + job in one transaction
+    // Create list + job in one transaction; job starts 'running' so the cron
+    // won't claim it while after() is working on round 1.
     const { job, list } = await prisma.$transaction(async tx => {
       const list = await tx.prospectResearchList.create({
         data: {
@@ -115,127 +116,99 @@ export async function POST(req: NextRequest) {
       return { job, list }
     })
 
-    // Run round 1
-    const batchOpts = await buildBatchOpts(criteria)
+    // ── Run round 1 after the response is sent ────────────────────────────────
+    // `after()` lets this Vercel function return immediately while the research
+    // continues in the background within the same invocation (up to maxDuration).
+    // If this invocation is killed before after() completes, lockedUntil expires
+    // and the stale-lock recovery in the cron resets the job to pending.
+    after(async () => {
+      try {
+        const batchOpts = await buildBatchOpts(criteria)
+        let state: AgentState = EMPTY_AGENT_STATE
 
-    let state: AgentState = EMPTY_AGENT_STATE
-    let acceptedCount     = 0
-    let inputTokensTotal  = 0
-    let outputTokensTotal = 0
-    let searchCallsTotal  = 0
+        const round1 = await runResearchRound({
+          apiKey,
+          criteria,
+          state,
+          roundNum: 1,
+          needed:   criteria.requestedCount,
+          listId:   list.id,
+          batchOpts,
+          listSearchState: criteria.stateProvince ?? null,
+        })
 
-    try {
-      const round1 = await runResearchRound({
-        apiKey,
-        criteria,
-        state,
-        roundNum: 1,
-        needed:   criteria.requestedCount,
-        listId:   list.id,
-        batchOpts,
-        listSearchState: criteria.stateProvince ?? null,
-      })
+        state = updateAgentState(
+          state,
+          round1.allCandidates,
+          round1.accepted,
+          round1.crmFiltered,
+          round1.geoFiltered,
+          1,
+          round1.subsectors,
+          round1.sourceStrategy,
+        )
 
-      state = updateAgentState(
-        state,
-        round1.allCandidates,
-        round1.accepted,
-        round1.crmFiltered,
-        round1.geoFiltered,
-        1,
-        round1.subsectors,
-        round1.sourceStrategy,
-      )
+        const acceptedCount     = round1.accepted.length
+        const inputTokensTotal  = round1.inputTokens
+        const outputTokensTotal = round1.outputTokens
+        const searchCallsTotal  = round1.searchCalls
 
-      acceptedCount     += round1.accepted.length
-      inputTokensTotal  += round1.inputTokens
-      outputTokensTotal += round1.outputTokens
-      searchCallsTotal  += round1.searchCalls
+        const continueJob = shouldRunNextRound(
+          1, ROUNDS_MAX, acceptedCount, criteria.requestedCount, job.createdAt,
+          15 * 60 * 1000, inputTokensTotal, outputTokensTotal, searchCallsTotal, 2.0,
+        )
 
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
-      console.error("[jobs] round 1 error:", msg)
-      await prisma.prospectResearchJob.update({
-        where: { id: job.id },
-        data:  { status: "failed", lastError: msg, lockedUntil: null },
-      })
-      return NextResponse.json({
-        error:   `Research failed during round 1: ${msg}`,
-        jobId:   job.id,
-        listId:  list.id,
-        status:  "failed",
-        companies: [],
-      }, { status: 500 })
-    }
+        await prisma.prospectResearchJob.update({
+          where: { id: job.id },
+          data: {
+            status:           continueJob ? "pending" : "completed",
+            roundsCompleted:  1,
+            acceptedCount,
+            agentState:       state as object,
+            inputTokensTotal,
+            outputTokensTotal,
+            searchCallsTotal,
+            failedRounds:     0,
+            lockedUntil:      null,
+            lockedAt:         null,
+          },
+        })
 
-    // Determine next status
-    const continueJob = shouldRunNextRound(1, ROUNDS_MAX, acceptedCount, criteria.requestedCount, job.createdAt)
-
-    await prisma.prospectResearchJob.update({
-      where: { id: job.id },
-      data: {
-        status:           continueJob ? "pending" : "completed",
-        roundsCompleted:  1,
-        acceptedCount,
-        agentState:       state as object,
-        inputTokensTotal,
-        outputTokensTotal,
-        searchCallsTotal,
-        lockedUntil:      null,
-        lockedAt:         null,
-      },
+        console.log(`[jobs] round 1 done: accepted=${acceptedCount} continue=${continueJob}`)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        console.error("[jobs] round 1 error:", msg)
+        // Reset to pending for cron retry (up to 3 consecutive failures before permanent fail)
+        const current = await prisma.prospectResearchJob.findUnique({
+          where:  { id: job.id },
+          select: { failedRounds: true },
+        })
+        const newFailed = (current?.failedRounds ?? 0) + 1
+        await prisma.prospectResearchJob.update({
+          where: { id: job.id },
+          data: {
+            status:       newFailed >= 3 ? "failed" : "pending",
+            lastError:    msg.slice(0, 2000),
+            failedRounds: newFailed,
+            lockedUntil:  null,
+            lockedAt:     null,
+          },
+        })
+      }
     })
 
-    // Load the results we just saved to return them
-    const listWithResults = await prisma.prospectResearchList.findUnique({
-      where:   { id: list.id },
-      include: { results: { orderBy: [{ fitScore: "desc" }, { companyName: "asc" }] } },
-    })
-
-    const companies = (listWithResults?.results ?? []).map(r => ({
-      companyName:        r.companyName,
-      website:            r.website            ?? "",
-      city:               r.verifiedCity       ?? "",
-      state:              r.verifiedState      ?? "",
-      country:            r.verifiedCountry    ?? criteria.country,
-      industry:           r.industry           ?? "",
-      estimatedEmployees: r.estimatedEmployees ?? "",
-      employeeCountTier:  (r.employeeCountSource ?? "unknown") as "web_confirmed" | "web_estimated" | "unknown",
-      qualificationTier:  (r.locationVerified && r.employeeCountSource && r.employeeCountSource !== "unknown"
-        ? "qualified" : r.locationVerified ? "potential" : "location_unverified") as "qualified" | "potential" | "location_unverified",
-      sourceCitations:    r.sourceCitations    ?? [],
-      locationVerified:   r.locationVerified,
-      summary:            r.summary            ?? "",
-      fitScore:           r.fitScore           ?? 50,
-      crmStatus:          "none" as const,
-    }))
-
-    const qualifiedCount  = companies.filter(c => c.qualificationTier === "qualified").length
-    const potentialCount  = companies.filter(c => c.qualificationTier === "potential").length
-    const locationVerifiedCount = companies.filter(c => c.locationVerified).length
-
-    const limitationNote = companies.length < criteria.requestedCount
-      ? `Found ${companies.length} companies after round 1 (searching for up to ${criteria.requestedCount}). ` +
-        (continueJob ? `Research is continuing in the background — more companies will appear shortly.` : ``)
-      : undefined
-
+    // ── Return immediately ────────────────────────────────────────────────────
     return NextResponse.json({
-      jobId:                job.id,
-      listId:               list.id,
-      jobStatus:            continueJob ? "pending" : "completed",
-      roundsCompleted:      1,
-      roundsMax:            ROUNDS_MAX,
-      companies,
-      qualifiedCount,
-      potentialCount,
-      locationVerifiedCount,
-      filteredCount:        0,
-      rawCount:             companies.length,
-      limitationNote,
+      jobId:           job.id,
+      listId:          list.id,
+      jobStatus:       "pending",
+      roundsCompleted: 0,
+      roundsMax:       ROUNDS_MAX,
+      companies:       [],
     })
 
   } catch (err) {
-    const msg   = err instanceof Error ? err.message : String(err)
+    const msg = err instanceof Error ? err.message : String(err)
     console.error("[jobs] UNHANDLED ERROR:", msg)
     return NextResponse.json({ error: msg, companies: [] }, { status: 500 })
   }

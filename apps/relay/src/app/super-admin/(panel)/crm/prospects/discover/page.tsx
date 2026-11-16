@@ -1333,7 +1333,7 @@ export default function DiscoverPage() {
             )}
 
             {searchState === "loading" && (
-              <p className="text-[11px] text-gray-500 text-center">Researching the web — round 1 takes ~90s…</p>
+              <p className="text-[11px] text-gray-500 text-center">Starting research job…</p>
             )}
           </form>
         </div>
@@ -1388,8 +1388,8 @@ export default function DiscoverPage() {
           {searchState === "loading" && (
             <div className="h-full flex flex-col items-center justify-center">
               <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mb-3" />
-              <p className="text-gray-400 font-medium">Researching prospects…</p>
-              <p className="text-sm text-gray-600 mt-1">Round 1 — discovery + headcount verification (~90s)</p>
+              <p className="text-gray-400 font-medium">Starting research job…</p>
+              <p className="text-sm text-gray-600 mt-1">Creating the list and queuing round 1</p>
               <button
                 onClick={handleStopSearch}
                 className="mt-4 text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded border border-red-900/50 hover:border-red-800 transition-colors"

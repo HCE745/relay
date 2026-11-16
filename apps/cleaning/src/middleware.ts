@@ -21,6 +21,8 @@ const DEMO_SECRET = new TextEncoder().encode(`demo:${RAW_SECRET}`) // matches de
 const PUBLIC_PATHS = [
   "/login",
   "/register",
+  "/signup", // public self-service trial signup (Phase E) — gated by flag in the page
+  "/verify-email", // email-verification landing — consumes a single-use token (Phase E)
   "/forgot-password",
   "/reset-password",
   "/portal", // customer portal — SEPARATE trust boundary, guards via its own session
@@ -38,6 +40,7 @@ const PUBLIC_PATHS = [
   "/api/demo", // demo provisioning — self rate-limits + caps
   "/api/sms/inbound", // Twilio inbound webhook — verified by X-Twilio-Signature
   "/api/stripe/webhook", // Stripe webhook — verified by signature (Phase 22)
+  "/api/billing/webhook", // CleanWare SaaS-billing webhook — verified by signature (Phase C). NOTE: /api/billing/checkout|portal|reconcile stay authenticated (not listed here).
   "/api/auth", // forgot/reset — self-contained, token-based
   "/api/cron", // self-guards via CRON_SECRET
   "/api/health",

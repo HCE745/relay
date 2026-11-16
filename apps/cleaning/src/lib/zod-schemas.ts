@@ -669,6 +669,24 @@ export const registerOrgSchema = z.object({
   bootstrapToken: z.string().min(1, "A setup code is required"),
 })
 
+// Self-service trial signup (Phase E) — the public registration form, which
+// carries no setup code (the sales-assisted path uses registerOrgSchema).
+export const signUpSchema = z.object({
+  orgName: z.string().trim().min(1, "Company name is required").max(200),
+  name: z.string().trim().min(1, "Your name is required").max(200),
+  email: z.string().trim().toLowerCase().email(),
+  password,
+  timezone: ianaTimezone,
+})
+
+// Subscription checkout (Phase E) — choose a purchasable plan, billing interval,
+// and any extra seats. Validated at the /api/billing/checkout boundary.
+export const billingCheckoutSchema = z.object({
+  tier: z.enum(["SOLO", "TEAM", "BUSINESS"]),
+  interval: z.enum(["monthly", "annual"]),
+  extraSeats: z.number().int().min(0).max(100).optional(),
+})
+
 export const forgotPasswordSchema = z.object({ email: z.string().trim().toLowerCase().email() })
 export const resetPasswordSchema = z.object({ token: z.string().min(1), password })
 export const changePasswordSchema = z.object({

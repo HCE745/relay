@@ -80,6 +80,14 @@ export default async function SettingsPage() {
         <Link href="/settings/notifications" className="text-sm font-medium text-brand hover:underline">Manage notification preferences →</Link>
       </Card>
 
+      {isOrgAdmin ? (
+        <Card className="p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Billing &amp; plan</h2>
+          <p className="mb-3 text-sm text-slate-500">View your subscription, start a trial upgrade, or manage your payment method.</p>
+          <Link href="/settings/billing" className="text-sm font-medium text-brand hover:underline">Manage billing &amp; plan →</Link>
+        </Card>
+      ) : null}
+
       {canSetup && setup ? (
         <Card className="p-6">
           <h2 className="mb-1 text-sm font-semibold text-slate-700">Setup guide</h2>

@@ -298,6 +298,34 @@ describe("buildRoundPrompt adaptive hints", () => {
     expect(p).not.toContain("linkedin.com employees")
     expect(p).toContain("unknown")
   })
+
+  it("targets at least 30 companies even when fewer are needed", () => {
+    const p = buildRoundPrompt({
+      criteria: BASE_CRITERIA, state: EMPTY_AGENT_STATE, roundNum: 1, needed: 5,
+      exclusionNames: "", exclusionDomains: [], subsectors: ["Metal Fabrication"], strategy: "general_web",
+    })
+    expect(p).toContain("Find up to 30")
+  })
+
+  it("includes TARGET SIZE note with explicit unknown-tier permission", () => {
+    const p = buildRoundPrompt({
+      criteria: BASE_CRITERIA, state: EMPTY_AGENT_STATE, roundNum: 1, needed: 5,
+      exclusionNames: "", exclusionDomains: [], subsectors: [], strategy: "general_web",
+    })
+    expect(p).toContain("TARGET SIZE")
+    expect(p).toContain("Include companies even if you CANNOT verify their employee count")
+  })
+
+  it("does not hard-require website in discovery instruction", () => {
+    const p = buildRoundPrompt({
+      criteria: BASE_CRITERIA, state: EMPTY_AGENT_STATE, roundNum: 1, needed: 5,
+      exclusionNames: "", exclusionDomains: [], subsectors: [], strategy: "general_web",
+    })
+    // Website is optional — the old "required, omit the company if not found" text must be gone
+    expect(p).not.toContain("omit the company if not found")
+    // The JSON schema should allow empty string
+    expect(p).toContain('empty string ""')
+  })
 })
 
 // ─── runResearchRound ─────────────────────────────────────────────────────────
@@ -445,5 +473,31 @@ describe("runResearchRound", () => {
     const callArgs = mockCreate.mock.calls[0][0] as { messages: { content: string }[] }
     const userMsg = callArgs.messages[0].content
     expect(userMsg).toContain("existing.com")
+  })
+
+  it("passes already-seen domains/names to processDiscoveryBatch for hard cross-round dedup", async () => {
+    vi.mocked(prisma.prospectResearchResult.findMany).mockResolvedValue([
+      { normalizedDomain: "existing.com", companyName: "Existing Co" },
+    ] as never)
+
+    const co = makeCompany("New Co", "https://newco.com")
+    mockCreate.mockResolvedValue(makeResponse([co]))
+    vi.mocked(processDiscoveryBatch).mockReturnValue({
+      companies: [co], preFilterCompanies: [co],
+      diagnostics: { crmExcluded: 0, geoMismatch: 0, totalRaw: 1 },
+    } as never)
+
+    await runResearchRound({
+      apiKey: "test", criteria: BASE_CRITERIA,
+      state: { ...EMPTY_AGENT_STATE, seenDomains: ["state-domain.com"], seenNormNames: [] },
+      roundNum: 2, needed: 20, listId: "list-1", batchOpts: baseBatchOpts,
+    })
+
+    // processDiscoveryBatch must receive excludeDomains with both DB list domains AND agentState domains
+    const callArg = vi.mocked(processDiscoveryBatch).mock.calls[0][2]
+    expect(callArg.excludeDomains).toBeInstanceOf(Set)
+    expect(callArg.excludeDomains?.has("existing.com")).toBe(true)   // from DB list
+    expect(callArg.excludeDomains?.has("state-domain.com")).toBe(true) // from agentState
+    expect(callArg.excludeNormNames).toBeInstanceOf(Set)
   })
 })

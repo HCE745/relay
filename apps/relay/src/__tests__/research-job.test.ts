@@ -431,13 +431,14 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
       budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
     }
 
-    // updateMany for stale locks and auto-fail (called twice) → no matches
+    // All updateMany calls before findFirst return no matches
     mockJobUpdateMany.mockResolvedValue({ count: 0 })
     // findFirst returns our pending job
     mockJobFindFirst.mockResolvedValue(job)
-    // Atomic claim succeeds
+    // Atomic claim sequence
     mockJobUpdateMany.mockResolvedValueOnce({ count: 0 })  // auto-fail
-      .mockResolvedValueOnce({ count: 0 })                 // release stale locks
+      .mockResolvedValueOnce({ count: 0 })                 // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })                 // stale-lock: reset to pending
       .mockResolvedValueOnce({ count: 1 })                 // claim
     // Re-read with agentState
     mockJobFindUnique.mockResolvedValue(job)
@@ -468,7 +469,8 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
 
     mockJobUpdateMany
       .mockResolvedValueOnce({ count: 0 })  // auto-fail
-      .mockResolvedValueOnce({ count: 0 })  // release stale
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
       .mockResolvedValueOnce({ count: 0 })  // claim — returns 0 (another worker got it)
 
     mockJobFindFirst.mockResolvedValue(job)
@@ -492,9 +494,10 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     }
 
     mockJobUpdateMany
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 1 })
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
+      .mockResolvedValueOnce({ count: 1 })  // claim
 
     mockJobFindFirst.mockResolvedValue(job)
     mockJobFindUnique.mockResolvedValue(job)
@@ -526,9 +529,10 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     }
 
     mockJobUpdateMany
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 1 })
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
+      .mockResolvedValueOnce({ count: 1 })  // claim
 
     mockJobFindFirst.mockResolvedValue(job)
     mockJobFindUnique.mockResolvedValue(job)
@@ -558,9 +562,10 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     }
 
     mockJobUpdateMany
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 1 })
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
+      .mockResolvedValueOnce({ count: 1 })  // claim
 
     mockJobFindFirst.mockResolvedValue(job)
     mockJobFindUnique.mockResolvedValue(job)
@@ -590,17 +595,44 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     )
   })
 
-  it("releases stale locks (crashed worker recovery)", async () => {
+  it("releases stale locks and increments failedRounds (crashed worker recovery)", async () => {
     mockJobUpdateMany
-      .mockResolvedValueOnce({ count: 0 })  // auto-fail
-      .mockResolvedValueOnce({ count: 1 })  // stale lock release
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail (no matches)
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit (no matches)
+      .mockResolvedValueOnce({ count: 1 })  // stale-lock: reset to pending (1 job reset)
     mockJobFindFirst.mockResolvedValue(null)
 
     await cronPost(makeCronRequest())
 
+    // Reset-to-pending call must increment failedRounds (not just reset the lock)
     expect(mockJobUpdateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ status: "pending", lockedUntil: null }),
+        data: expect.objectContaining({
+          status:       "pending",
+          lockedUntil:  null,
+          failedRounds: { increment: 1 },
+        }),
+      })
+    )
+  })
+
+  it("permanently fails a stale-locked job that has exhausted retries", async () => {
+    mockJobUpdateMany
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail (no matches)
+      .mockResolvedValueOnce({ count: 1 })  // stale-lock: fail at limit (1 job failed)
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending (none)
+    mockJobFindFirst.mockResolvedValue(null)
+
+    await cronPost(makeCronRequest())
+
+    // The fail-at-limit call sets status=failed and increments failedRounds
+    expect(mockJobUpdateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status:       "failed",
+          lockedUntil:  null,
+          failedRounds: { increment: 1 },
+        }),
       })
     )
   })
@@ -618,9 +650,10 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     }
 
     mockJobUpdateMany
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 1 })
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
+      .mockResolvedValueOnce({ count: 1 })  // claim
 
     mockJobFindFirst.mockResolvedValue(job)
     mockJobFindUnique.mockResolvedValue(job)
@@ -648,9 +681,10 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     }
 
     mockJobUpdateMany
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 1 })
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
+      .mockResolvedValueOnce({ count: 1 })  // claim
 
     mockJobFindFirst.mockResolvedValue(job)
     mockJobFindUnique.mockResolvedValue(job)
@@ -680,9 +714,10 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     }
 
     mockJobUpdateMany
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 1 })
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
+      .mockResolvedValueOnce({ count: 1 })  // claim
 
     mockJobFindFirst.mockResolvedValue(job)
     mockJobFindUnique.mockResolvedValue(job)
@@ -734,9 +769,10 @@ describe("multi-round accumulation", () => {
       }
 
       mockJobUpdateMany
-        .mockResolvedValueOnce({ count: 0 })
-        .mockResolvedValueOnce({ count: 0 })
-        .mockResolvedValueOnce({ count: 1 })
+        .mockResolvedValueOnce({ count: 0 })  // auto-fail
+        .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+        .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
+        .mockResolvedValueOnce({ count: 1 })  // claim
 
       mockJobFindFirst.mockResolvedValue(job)
       mockJobFindUnique.mockResolvedValue(job)
@@ -820,9 +856,10 @@ describe("multi-round accumulation", () => {
     }
 
     mockJobUpdateMany
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce({ count: 1 })
+      .mockResolvedValueOnce({ count: 0 })  // auto-fail
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: fail at limit
+      .mockResolvedValueOnce({ count: 0 })  // stale-lock: reset to pending
+      .mockResolvedValueOnce({ count: 1 })  // claim
 
     mockJobFindFirst.mockResolvedValue(job)
     mockJobFindUnique.mockResolvedValue(job)

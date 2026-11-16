@@ -194,10 +194,12 @@ export function buildRoundPrompt(opts: {
   const strategyInstructions = STRATEGY_PROMPTS[strategy]
 
   return (
-    `Find up to ${Math.max(needed, 20)} real ${criteria.industry} companies headquartered in ${location} ` +
-    `with approximately ${criteria.employeeCountMin}–${criteria.employeeCountMax} employees ` +
+    `Find up to ${Math.max(needed, 30)} real ${criteria.industry} companies headquartered in ${location} ` +
     `that could benefit from Relay — operational coordination software for manufacturing facilities.` +
     `${keywordsLine}${contextLine}${subsectorFocus}${prevSeenNames}${adaptiveHints}\n\n` +
+    `TARGET SIZE: approximately ${criteria.employeeCountMin}–${criteria.employeeCountMax} employees. ` +
+    `Include companies even if you CANNOT verify their employee count — ` +
+    `use employeeCountTier: "unknown" rather than omitting them.\n\n` +
     `SOURCE STRATEGY: ${strategyInstructions}\n\n` +
     `USE ALL web searches to DISCOVER companies — do NOT search LinkedIn per-company for employee counts. ` +
     `Make 5–8 broad searches covering different subsectors and areas within ${location} to find as many different companies as possible:\n` +
@@ -205,13 +207,13 @@ export function buildRoundPrompt(opts: {
     `- "${subsectors[0] ?? criteria.industry} companies ${location}"\n` +
     `- Other searches targeting different subsectors, cities, or directories\n\n` +
     `REQUIREMENTS for each company:\n` +
-    `- Official, working HTTPS website (required — omit if not found; LinkedIn/ZoomInfo/Manta are NOT acceptable as a company website)\n` +
-    `- Headquarters confirmed in ${location}\n\n` +
+    `- Headquarters in ${location}\n` +
+    `- Do NOT use LinkedIn, ZoomInfo, Manta, or other directory profiles as the company website\n\n` +
     `EXCLUDE — already in our CRM: ${exclusionNames || "(none)"}\n` +
     `EXCLUDE — these domains already tracked: ${allExcludedDomains}\n\n` +
     `Return ONLY a valid JSON array. Each object must have exactly these keys:\n` +
     `- companyName: exact company name\n` +
-    `- website: working HTTPS URL (official site only — required, omit the company if not found)\n` +
+    `- website: official HTTPS URL if found, empty string "" if not found (never use directory profile URLs)\n` +
     `- city: headquarters city\n` +
     `- state: ${stateLabel}\n` +
     `- country: "${criteria.country}"\n` +
@@ -359,7 +361,14 @@ export async function runResearchRound(opts: RunRoundOpts): Promise<RoundResult>
     return { accepted: [], allCandidates: [], crmFiltered: 0, geoFiltered: 0, inputTokens: usage.input_tokens, outputTokens: usage.output_tokens, searchCalls: confirmedUrls.size, subsectors, sourceStrategy: strategy }
   }
 
-  const batch = processDiscoveryBatch(response.content, confirmedUrls, batchOpts)
+  // Enforce cross-round dedup in code (not just in the prompt).
+  // combinedSeenDomains/Names includes both agentState and DB list records.
+  const batchOptsWithDedup: BatchProcessOpts = {
+    ...batchOpts,
+    excludeDomains:   new Set(combinedSeenDomains),
+    excludeNormNames: new Set(combinedSeenNormNames),
+  }
+  const batch = processDiscoveryBatch(response.content, confirmedUrls, batchOptsWithDedup)
   const { companies: accepted, preFilterCompanies: all, diagnostics: diag } = batch
 
   console.log(`[research-agent] round ${roundNum}: rawCount=${diag.rawCount} total=${all.length} crm_filtered=${diag.crmExcluded} geo_mismatch=${diag.geoMismatch} accepted=${accepted.length}`)

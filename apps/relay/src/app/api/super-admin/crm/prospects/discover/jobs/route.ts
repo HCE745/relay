@@ -13,7 +13,7 @@ import {
   type AgentState,
 } from "@/lib/research-agent"
 
-export const maxDuration = 200
+export const maxDuration = 100
 
 const ROUNDS_MAX = 5
 
@@ -110,33 +110,27 @@ export async function POST(req: NextRequest) {
           budgetUsd:         3.0,
           status:            "running",
           lockedAt:          new Date(),
-          lockedUntil:       new Date(Date.now() + 240_000), // 4-min lock covers both rounds in after()
+          lockedUntil:       new Date(Date.now() + 180_000), // 3-min lock — matches cron claim duration
         },
       })
 
       return { job, list }
     })
 
-    // ── Run rounds 1–2 after the response is sent ────────────────────────────
-    // `after()` runs within the same Vercel invocation (up to maxDuration=200s).
-    // Running 2 rounds here (each ~25-45s) means users get initial results without
-    // depending on the cron. The cron handles rounds 3+ for any remaining gap.
+    // ── Run round 1 after the response is sent ───────────────────────────────
+    // `after()` runs within the same Vercel invocation (up to maxDuration=100s).
+    // Round 1 gives users initial results without depending on the cron.
+    // The cron at */2 * * * * handles rounds 2–N for any remaining gap.
     // If this invocation is killed mid-flight, lockedUntil expires and stale-lock
     // recovery in the cron resets the job to pending for retry.
     after(async () => {
       try {
         const batchOpts = await buildBatchOpts(criteria)
-        let state: AgentState  = EMPTY_AGENT_STATE
-        let acceptedCount      = 0
-        let inputTokensTotal   = 0
-        let outputTokensTotal  = 0
-        let searchCallsTotal   = 0
 
-        // ── Round 1 ─────────────────────────────────────────────────────
         const round1 = await runResearchRound({
           apiKey,
           criteria,
-          state,
+          state:           EMPTY_AGENT_STATE,
           roundNum:        1,
           needed:          criteria.requestedCount,
           listId:          list.id,
@@ -144,8 +138,8 @@ export async function POST(req: NextRequest) {
           listSearchState: criteria.stateProvince ?? null,
         })
 
-        state = updateAgentState(
-          state,
+        const state = updateAgentState(
+          EMPTY_AGENT_STATE,
           round1.allCandidates,
           round1.accepted,
           round1.crmFiltered,
@@ -155,92 +149,21 @@ export async function POST(req: NextRequest) {
           round1.sourceStrategy,
         )
 
-        acceptedCount    += round1.accepted.length
-        inputTokensTotal  = round1.inputTokens
-        outputTokensTotal = round1.outputTokens
-        searchCallsTotal  = round1.searchCalls
+        const acceptedCount     = round1.accepted.length
+        const inputTokensTotal  = round1.inputTokens
+        const outputTokensTotal = round1.outputTokens
+        const searchCallsTotal  = round1.searchCalls
 
-        const continueToRound2 = shouldRunNextRound(
+        const continueJob = shouldRunNextRound(
           1, ROUNDS_MAX, acceptedCount, criteria.requestedCount, job.createdAt,
           15 * 60 * 1000, inputTokensTotal, outputTokensTotal, searchCallsTotal, 3.0,
         )
 
-        if (!continueToRound2) {
-          await prisma.prospectResearchJob.update({
-            where: { id: job.id },
-            data: {
-              status:           "completed",
-              roundsCompleted:  1,
-              acceptedCount,
-              agentState:       state as object,
-              inputTokensTotal,
-              outputTokensTotal,
-              searchCallsTotal,
-              failedRounds:     0,
-              lockedUntil:      null,
-              lockedAt:         null,
-            },
-          })
-          console.log(`[jobs] round 1 done (complete): accepted=${acceptedCount}`)
-          return
-        }
-
-        // ── Persist round 1 results, extend lock, start round 2 ─────────
-        // Keep status="running" so the cron cannot claim the job mid-flight.
-        // The UI reads roundsCompleted=1 and shows "Round 2 of 5 — researching..."
         await prisma.prospectResearchJob.update({
           where: { id: job.id },
           data: {
-            status:           "running",
+            status:           continueJob ? "pending" : "completed",
             roundsCompleted:  1,
-            acceptedCount,
-            agentState:       state as object,
-            inputTokensTotal,
-            outputTokensTotal,
-            searchCallsTotal,
-            failedRounds:     0,
-            lockedUntil:      new Date(Date.now() + 180_000), // 3-min fresh lock covers round 2
-          },
-        })
-
-        // ── Round 2 ─────────────────────────────────────────────────────
-        const round2 = await runResearchRound({
-          apiKey,
-          criteria,
-          state,
-          roundNum:        2,
-          needed:          criteria.requestedCount - acceptedCount,
-          listId:          list.id,
-          batchOpts,
-          listSearchState: criteria.stateProvince ?? null,
-        })
-
-        state = updateAgentState(
-          state,
-          round2.allCandidates,
-          round2.accepted,
-          round2.crmFiltered,
-          round2.geoFiltered,
-          2,
-          round2.subsectors,
-          round2.sourceStrategy,
-        )
-
-        acceptedCount     += round2.accepted.length
-        inputTokensTotal  += round2.inputTokens
-        outputTokensTotal += round2.outputTokens
-        searchCallsTotal  += round2.searchCalls
-
-        const continueToRound3 = shouldRunNextRound(
-          2, ROUNDS_MAX, acceptedCount, criteria.requestedCount, job.createdAt,
-          15 * 60 * 1000, inputTokensTotal, outputTokensTotal, searchCallsTotal, 3.0,
-        )
-
-        await prisma.prospectResearchJob.update({
-          where: { id: job.id },
-          data: {
-            status:           continueToRound3 ? "pending" : "completed",
-            roundsCompleted:  2,
             acceptedCount,
             agentState:       state as object,
             inputTokensTotal,
@@ -252,12 +175,11 @@ export async function POST(req: NextRequest) {
           },
         })
 
-        console.log(`[jobs] rounds 1–2 done: accepted=${acceptedCount} continue=${continueToRound3}`)
+        console.log(`[jobs] round 1 done: accepted=${acceptedCount} continue=${continueJob}`)
 
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
-        console.error("[jobs] initial rounds error:", msg)
-        // Reset to pending for cron retry (up to 3 consecutive failures before permanent fail)
+        console.error("[jobs] round 1 error:", msg)
         const current = await prisma.prospectResearchJob.findUnique({
           where:  { id: job.id },
           select: { failedRounds: true },

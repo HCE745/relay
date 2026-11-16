@@ -11,7 +11,7 @@ import {
 } from "@/lib/research-agent"
 
 export const dynamic    = "force-dynamic"
-export const maxDuration = 110
+export const maxDuration = 150
 
 // Vercel sends POST on Pro plans; GET is a defensive fallback.
 export async function GET(req: NextRequest) {
@@ -48,13 +48,30 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  // 2. Release stale locks (worker crashed without releasing)
+  // 2a. Permanently fail timed-out jobs that have exhausted retries.
+  //     failedRounds counts explicit errors (from the catch block) PLUS function-kill timeouts
+  //     (from this stale-lock recovery). Without incrementing here, a killed function never
+  //     reaches the 3-failure threshold and blocks the queue indefinitely.
   await prisma.prospectResearchJob.updateMany({
-    where: {
-      status:      "running",
-      lockedUntil: { lt: now },
+    where: { status: "running", lockedUntil: { lt: now }, failedRounds: { gte: 2 } },
+    data: {
+      status:       "failed",
+      lastError:    "Exceeded consecutive timeout limit (function killed 3+ times without completing)",
+      failedRounds: { increment: 1 },
+      lockedUntil:  null,
+      lockedAt:     null,
     },
-    data: { status: "pending", lockedUntil: null, lockedAt: null },
+  })
+  // 2b. Reset other timed-out jobs to pending, counting each timeout as a failure.
+  await prisma.prospectResearchJob.updateMany({
+    where: { status: "running", lockedUntil: { lt: now }, failedRounds: { lt: 2 } },
+    data: {
+      status:       "pending",
+      lastError:    "Lock expired: worker timed out or function was killed",
+      failedRounds: { increment: 1 },
+      lockedUntil:  null,
+      lockedAt:     null,
+    },
   })
 
   // 3. Find the oldest pending job

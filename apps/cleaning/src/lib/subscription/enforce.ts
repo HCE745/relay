@@ -38,7 +38,8 @@ async function loadOrgAccess(orgId: string): Promise<OrgAccessInput | null> {
 /**
  * If the org may not use operational functions, return a ready 402 Response;
  * otherwise null (allowed). `isDemo`/paid/trial are all decided from the DB, so
- * demo status cannot be forged via the session to bypass billing. On recovery
+ * demo status cannot be forged via the session to bypass billing. Fails CLOSED
+ * when the org cannot be resolved (see subscriptionGuardOutcome). On recovery
  * routes an administrator is always let through so billing/payment-method/export
  * stay reachable while lapsed.
  */

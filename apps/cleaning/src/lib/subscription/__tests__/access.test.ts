@@ -109,8 +109,17 @@ describe("subscriptionGuardOutcome (pure guard decision)", () => {
     expect(subscriptionGuardOutcome({ enforcementEnabled: false, org: denied, now: NOW, recovery: false, actorIsAdmin: false }).block).toBe(false)
   })
 
-  it("never blocks when org state is unresolved (fails open on a data glitch)", () => {
-    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: null, now: NOW, recovery: false, actorIsAdmin: true }).block).toBe(false)
+  it("fails CLOSED when org state is unresolved (a data gap is not entitlement)", () => {
+    // Non-recovery route: unresolved billing state must NOT grant operational access.
+    const r = subscriptionGuardOutcome({ enforcementEnabled: true, org: null, now: NOW, recovery: false, actorIsAdmin: true })
+    expect(r.block).toBe(true)
+    if (r.block) expect(r.reason).toMatch(/unavailable/)
+  })
+
+  it("still lets an ADMIN reach a recovery route when org state is unresolved", () => {
+    // Recovery (billing/payment/export) must survive even a data gap, for admins.
+    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: null, now: NOW, recovery: true, actorIsAdmin: true }).block).toBe(false)
+    expect(subscriptionGuardOutcome({ enforcementEnabled: true, org: null, now: NOW, recovery: true, actorIsAdmin: false }).block).toBe(true)
   })
 
   it("allows a paid org and blocks a lapsed one", () => {

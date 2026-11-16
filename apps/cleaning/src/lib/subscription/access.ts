@@ -102,14 +102,18 @@ export function canAddActiveSeat(
 
 /**
  * Decide whether the subscription gate should BLOCK a request. Independent of
- * transport. Fails OPEN in two deliberate cases so enforcement can never lock a
- * customer out by accident:
- *   • enforcement master switch off → never block (ships dark);
- *   • org state unresolved (null) → never block (a data/read glitch is not
- *     evidence of non-payment, and must not strand account recovery).
- * Admin recovery: a denied org whose actor is an administrator is let through on
- * routes flagged `recovery` (billing, payment-method, data export) so admins can
- * always reach the controls needed to pay or export, even while lapsed.
+ * transport. Fails OPEN in exactly one case — the enforcement master switch is
+ * off (ships dark). It otherwise fails CLOSED: when the org's billing state
+ * cannot be resolved (null), the org is treated as not-entitled, so a data gap
+ * can never hand out unrestricted operational access. (A transient DB read error
+ * throws upstream and surfaces as a 500 — it never reaches here as null — so
+ * failing closed on null does not punish customers for infra blips.)
+ *
+ * Admin recovery is honored in BOTH the denied and the unresolved case: an
+ * administrator on a route flagged `recovery` (billing, payment-method, data
+ * export) is always let through, so enforcement never strands the controls a
+ * customer needs to pay or export. Auth and account self-service stay reachable
+ * independently (their guards are ungated).
  */
 export function subscriptionGuardOutcome(params: {
   enforcementEnabled: boolean
@@ -119,10 +123,14 @@ export function subscriptionGuardOutcome(params: {
   actorIsAdmin: boolean
 }): { block: false } | { block: true; reason: string } {
   if (!params.enforcementEnabled) return { block: false }
-  if (!params.org) return { block: false }
+  const adminRecovery = params.recovery && params.actorIsAdmin
+  if (!params.org) {
+    if (adminRecovery) return { block: false }
+    return { block: true, reason: "billing state unavailable" }
+  }
   const access = subscriptionAccess(params.org, params.now)
   if (access.allowed) return { block: false }
-  if (params.recovery && params.actorIsAdmin) return { block: false }
+  if (adminRecovery) return { block: false }
   return { block: true, reason: access.reason }
 }
 

@@ -26,7 +26,10 @@ export async function assertSeatAvailable(orgId: string): Promise<void> {
     where: { id: orgId },
     select: { isDemo: true, packageTier: true, purchasedSeats: true },
   })
-  if (!org) return
+  // Fail closed: if the org's plan cannot be resolved while enforcement is on, do
+  // not let an unverifiable seat be added. (A transient read throws instead of
+  // returning null, so this does not punish infra blips.)
+  if (!org) throw new ConflictError("Unable to verify your plan's seat limit right now. Please try again.")
   const current = await countActiveSeats(orgId)
   const outcome = seatActivationOutcome({
     enforcementEnabled: true,

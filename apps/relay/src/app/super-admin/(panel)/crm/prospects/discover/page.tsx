@@ -1169,7 +1169,7 @@ export default function DiscoverPage() {
             sessionStorage.setItem("discover_job_status", data.jobStatus ?? "pending")
           } catch { /* ignore */ }
         }
-        setJobRoundsCompleted(data.roundsCompleted ?? 1)
+        setJobRoundsCompleted(data.roundsCompleted ?? 0)
         setJobRoundsMax(data.roundsMax ?? 5)
         setActiveJobStatus(data.jobStatus ?? "pending")
         jobListAcceptedRef.current = found.length
@@ -1417,26 +1417,44 @@ export default function DiscoverPage() {
                   <p className="text-[12px] text-amber-300/90 leading-relaxed">{limitationNote}</p>
                 </div>
               )}
-              {/* Job progress banner */}
-              {activeJobId && ["pending", "running"].includes(activeJobStatus) && (
-                <div className="mb-3 flex items-center gap-2 bg-indigo-950/40 border border-indigo-800/40 rounded-lg px-3.5 py-2 text-[12px]">
-                  <Loader2 className="w-3 h-3 text-indigo-400 animate-spin flex-shrink-0" />
-                  <span className="text-indigo-300">
-                    Research continuing — round {jobRoundsCompleted} of up to {jobRoundsMax} complete, more companies arriving shortly
-                  </span>
-                  <button
-                    onClick={handleStopSearch}
-                    className="ml-auto text-[11px] text-red-400/70 hover:text-red-400 flex-shrink-0"
-                  >
-                    Stop
-                  </button>
-                </div>
-              )}
-              {activeJobId && activeJobStatus === "completed" && (
-                <div className="mb-3 flex items-center gap-2 bg-emerald-950/30 border border-emerald-800/40 rounded-lg px-3.5 py-2 text-[12px]">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                  <span className="text-emerald-300">Research complete — {jobRoundsCompleted} rounds, {companies.length} companies found</span>
-                </div>
+              {/* Job progress banner — 9 states */}
+              {activeJobId && (
+                <>
+                  {(activeJobStatus === "running" || activeJobStatus === "pending") && (
+                    <div className="mb-3 flex items-center gap-2 bg-indigo-950/40 border border-indigo-800/40 rounded-lg px-3.5 py-2 text-[12px]">
+                      <Loader2 className="w-3 h-3 text-indigo-400 animate-spin flex-shrink-0" />
+                      <span className="text-indigo-300">
+                        {activeJobStatus === "running"
+                          ? `Researching manufacturers — Round ${jobRoundsCompleted + 1} of ${jobRoundsMax}`
+                          : jobRoundsCompleted === 0
+                            ? `Starting research — Round 1 of ${jobRoundsMax}`
+                            : `Round ${jobRoundsCompleted} of ${jobRoundsMax} complete — next round starts in up to 2 minutes`
+                        }
+                      </span>
+                      <button
+                        onClick={handleStopSearch}
+                        className="ml-auto text-[11px] text-red-400/70 hover:text-red-400 flex-shrink-0"
+                      >
+                        Stop
+                      </button>
+                    </div>
+                  )}
+                  {activeJobStatus === "completed" && (
+                    <div className="mb-3 flex items-center gap-2 bg-emerald-950/30 border border-emerald-800/40 rounded-lg px-3.5 py-2 text-[12px]">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                      <span className="text-emerald-300">Research complete — {companies.length} {companies.length === 1 ? "company" : "companies"} found</span>
+                    </div>
+                  )}
+                  {(activeJobStatus === "failed" || activeJobStatus === "cancelled") && (
+                    <div className="mb-3 flex items-center gap-2 bg-amber-950/30 border border-amber-800/40 rounded-lg px-3.5 py-2 text-[12px]">
+                      <AlertTriangle className="w-3 h-3 text-amber-400 flex-shrink-0" />
+                      <span className="text-amber-300">
+                        Research stopped after Round {jobRoundsCompleted}
+                        {companies.length > 0 ? ` — ${companies.length} ${companies.length === 1 ? "company" : "companies"} found` : ""}
+                      </span>
+                    </div>
+                  )}
+                </>
               )}
 
               <div className="flex items-center justify-between mb-4">
@@ -1526,8 +1544,16 @@ export default function DiscoverPage() {
               {companies.length === 0 && (
                 <div className="text-center py-16 text-gray-500">
                   <Building2 className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                  <p>No companies found for this search.</p>
-                  <p className="text-sm mt-1">Try broader criteria.</p>
+                  {activeJobId && (activeJobStatus === "running" || activeJobStatus === "pending")
+                    ? <>
+                        <p>Searching for manufacturers that match your criteria.</p>
+                        <p className="text-sm mt-1">Companies will appear here as they&apos;re found.</p>
+                      </>
+                    : <>
+                        <p>No companies found for this search.</p>
+                        <p className="text-sm mt-1">Try broader criteria.</p>
+                      </>
+                  }
                 </div>
               )}
 

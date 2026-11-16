@@ -1862,7 +1862,7 @@ export default function SalesDiscoverPage() {
       setSearchState("done")
       setActiveJobId(data.jobId)
       setSavedListId(data.listId)
-      setJobRoundsCompleted(data.roundsCompleted ?? 1)
+      setJobRoundsCompleted(data.roundsCompleted ?? 0)
       setJobRoundsMax(data.roundsMax ?? 5)
       setActiveJobStatus(data.jobStatus)
       jobListAcceptedRef.current = found.length
@@ -2070,26 +2070,44 @@ export default function SalesDiscoverPage() {
 
             {searchState === "done" && (
               <>
-                {/* Job progress banner */}
-                {activeJobId && activeJobStatus && ["pending", "running"].includes(activeJobStatus) && (
-                  <div className="flex items-center justify-between mb-3 px-3 py-2 bg-indigo-950/60 border border-indigo-800/40 rounded-lg">
-                    <div className="flex items-center gap-2 text-[11px] text-indigo-300">
-                      <Loader2 className="w-3 h-3 animate-spin flex-shrink-0" />
-                      <span>Continuing research — round {jobRoundsCompleted} of {jobRoundsMax} complete, more companies arriving…</span>
-                    </div>
-                    <button
-                      onClick={handleStopSearch}
-                      className="text-[10px] text-red-400 hover:text-red-300 px-2 py-0.5 rounded border border-red-900/50 hover:border-red-800 transition-colors flex-shrink-0 ml-2"
-                    >
-                      Stop
-                    </button>
-                  </div>
-                )}
-                {activeJobId && activeJobStatus && activeJobStatus === "completed" && (
-                  <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-green-950/40 border border-green-800/30 rounded-lg text-[11px] text-green-400">
-                    <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
-                    <span>Research complete — {jobRoundsCompleted} round{jobRoundsCompleted !== 1 ? "s" : ""} finished</span>
-                  </div>
+                {/* Job progress banner — 9 states */}
+                {activeJobId && activeJobStatus && (
+                  <>
+                    {(activeJobStatus === "running" || activeJobStatus === "pending") && (
+                      <div className="flex items-center justify-between mb-3 px-3 py-2 bg-indigo-950/60 border border-indigo-800/40 rounded-lg">
+                        <div className="flex items-center gap-2 text-[11px] text-indigo-300">
+                          <Loader2 className="w-3 h-3 animate-spin flex-shrink-0" />
+                          {activeJobStatus === "running"
+                            ? <span>Researching manufacturers — Round {jobRoundsCompleted + 1} of {jobRoundsMax}</span>
+                            : jobRoundsCompleted === 0
+                              ? <span>Starting research — Round 1 of {jobRoundsMax}</span>
+                              : <span>Round {jobRoundsCompleted} of {jobRoundsMax} complete — next round starts in up to 2 minutes</span>
+                          }
+                        </div>
+                        <button
+                          onClick={handleStopSearch}
+                          className="text-[10px] text-red-400 hover:text-red-300 px-2 py-0.5 rounded border border-red-900/50 hover:border-red-800 transition-colors flex-shrink-0 ml-2"
+                        >
+                          Stop
+                        </button>
+                      </div>
+                    )}
+                    {activeJobStatus === "completed" && (
+                      <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-green-950/40 border border-green-800/30 rounded-lg text-[11px] text-green-400">
+                        <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
+                        <span>Research complete — {companies.length} {companies.length === 1 ? "company" : "companies"} found</span>
+                      </div>
+                    )}
+                    {(activeJobStatus === "failed" || activeJobStatus === "cancelled") && (
+                      <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-amber-950/40 border border-amber-800/30 rounded-lg text-[11px] text-amber-400">
+                        <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+                        <span>
+                          Research stopped after Round {jobRoundsCompleted}
+                          {companies.length > 0 ? ` — ${companies.length} ${companies.length === 1 ? "company" : "companies"} found` : ""}
+                        </span>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <div className="flex items-center justify-between mb-4">
@@ -2122,7 +2140,13 @@ export default function SalesDiscoverPage() {
                 {companies.length === 0 && (
                   <div className="text-center py-16 text-gray-500">
                     <Building2 className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                    <p>No companies found. Try broader criteria.</p>
+                    {activeJobId && (activeJobStatus === "running" || activeJobStatus === "pending")
+                      ? <>
+                          <p>Searching for manufacturers that match your criteria.</p>
+                          <p className="text-sm mt-1">Companies will appear here as they&apos;re found.</p>
+                        </>
+                      : <p>No companies found. Try broader criteria.</p>
+                    }
                   </div>
                 )}
 

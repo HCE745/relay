@@ -700,3 +700,163 @@ describe("cron worker — POST /api/cron/prospect-research", () => {
     )
   })
 })
+
+// ─── Multi-round accumulation ─────────────────────────────────────────────────
+
+describe("multi-round accumulation", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    setupDefaults()
+  })
+
+  it("accumulates companies across 3 cron-driven rounds (8 + 5 + 7 = 20)", async () => {
+    const roundBatches = [8, 5, 7]
+    const requestedCount = 20
+    let totalAccepted = 0
+
+    for (let roundNum = 1; roundNum <= roundBatches.length; roundNum++) {
+      vi.clearAllMocks()
+      setupDefaults()
+
+      const batchSize    = roundBatches[roundNum - 1]
+      const prevAccepted = totalAccepted
+      totalAccepted     += batchSize
+      const isLast       = totalAccepted >= requestedCount
+
+      const job = {
+        id: "job-1", status: "pending", listId: "list-1",
+        roundsCompleted: roundNum - 1, roundsMax: 5, acceptedCount: prevAccepted,
+        requestedCount, createdAt: new Date(), agentState: null,
+        country: "US", stateProvince: "IN", industry: "Mfg",
+        employeeCountMin: 50, employeeCountMax: 300,
+        keywords: null, additionalContext: null, salesUserId: null, superAdminId: "sa-1",
+        budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
+      }
+
+      mockJobUpdateMany
+        .mockResolvedValueOnce({ count: 0 })
+        .mockResolvedValueOnce({ count: 0 })
+        .mockResolvedValueOnce({ count: 1 })
+
+      mockJobFindFirst.mockResolvedValue(job)
+      mockJobFindUnique.mockResolvedValue(job)
+
+      const companies = Array.from({ length: batchSize }, (_, i) =>
+        makeCompany(`Company ${prevAccepted + i + 1}`)
+      )
+      setupBatchResult(companies)
+
+      const expectedStatus = isLast ? "completed" : "pending"
+      mockJobUpdate.mockResolvedValue({
+        ...job, status: expectedStatus, roundsCompleted: roundNum, acceptedCount: totalAccepted,
+      })
+
+      const res  = await cronPost(makeCronRequest())
+      const body = await res.json() as { ok: boolean; status: string; roundCompleted: number }
+      expect(res.status).toBe(200)
+      expect(body.ok).toBe(true)
+      expect(body.roundCompleted).toBe(roundNum)
+      expect(body.status).toBe(expectedStatus)
+
+      // Verify the DB update carried the accumulated count correctly
+      expect(mockJobUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ acceptedCount: totalAccepted }),
+        })
+      )
+    }
+
+    expect(totalAccepted).toBe(20)
+  })
+
+  it("GET /jobs/:id returns status=running and 0 companies while round is executing (State B)", async () => {
+    // DB state while after() / cron is running round 1: status="running", acceptedCount=0
+    mockJobFindUnique.mockResolvedValue({
+      id: "job-1", status: "running", listId: "list-1",
+      roundsCompleted: 0, roundsMax: 5, acceptedCount: 0, requestedCount: 20,
+      salesUserId: null, superAdminId: "sa-1",
+      country: "US", stateProvince: "IN", industry: "Mfg",
+      inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
+      lastError: null, createdAt: new Date(), updatedAt: new Date(),
+    })
+
+    const res  = await jobIdGet(makeJobIdRequest("job-1"), { params: Promise.resolve({ id: "job-1" }) })
+    const body = await res.json() as { status: string; roundsCompleted: number; acceptedCount: number }
+    expect(res.status).toBe(200)
+    expect(body.status).toBe("running")
+    expect(body.roundsCompleted).toBe(0)
+    expect(body.acceptedCount).toBe(0)
+  })
+
+  it("GET /jobs/:id returns status=pending with roundsCompleted>0 while waiting for cron (State C)", async () => {
+    // After round 1 completes via after(): status="pending", roundsCompleted=1, acceptedCount=8
+    mockJobFindUnique.mockResolvedValue({
+      id: "job-1", status: "pending", listId: "list-1",
+      roundsCompleted: 1, roundsMax: 5, acceptedCount: 8, requestedCount: 20,
+      salesUserId: null, superAdminId: "sa-1",
+      country: "US", stateProvince: "IN", industry: "Mfg",
+      inputTokensTotal: 2000, outputTokensTotal: 400, searchCallsTotal: 2,
+      lastError: null, createdAt: new Date(), updatedAt: new Date(),
+    })
+
+    const res  = await jobIdGet(makeJobIdRequest("job-1"), { params: Promise.resolve({ id: "job-1" }) })
+    const body = await res.json() as { status: string; roundsCompleted: number; acceptedCount: number }
+    expect(res.status).toBe(200)
+    expect(body.status).toBe("pending")
+    expect(body.roundsCompleted).toBe(1)
+    expect(body.acceptedCount).toBe(8)
+  })
+
+  it("marks job completed at round limit even when target count not fully met (partial — State G)", async () => {
+    // Round 5 (last): job has 14 companies, requestedCount=20 — rounds exhausted → completed
+    const job = {
+      id: "job-1", status: "pending", listId: "list-1",
+      roundsCompleted: 4, roundsMax: 5, acceptedCount: 14,
+      requestedCount: 20, createdAt: new Date(), agentState: null,
+      country: "US", stateProvince: "IN", industry: "Mfg",
+      employeeCountMin: 50, employeeCountMax: 300,
+      keywords: null, additionalContext: null, salesUserId: null, superAdminId: "sa-1",
+      budgetUsd: 2.0, failedRounds: 0, inputTokensTotal: 0, outputTokensTotal: 0, searchCallsTotal: 0,
+    }
+
+    mockJobUpdateMany
+      .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 0 })
+      .mockResolvedValueOnce({ count: 1 })
+
+    mockJobFindFirst.mockResolvedValue(job)
+    mockJobFindUnique.mockResolvedValue(job)
+
+    // Round 5 finds 2 more → 16 total, still below 20, but rounds exhausted
+    setupBatchResult([makeCompany("Final A"), makeCompany("Final B")])
+    mockJobUpdate.mockResolvedValue({ ...job, status: "completed", roundsCompleted: 5, acceptedCount: 16 })
+
+    const res = await cronPost(makeCronRequest())
+    expect(res.status).toBe(200)
+    expect(mockJobUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: "completed", roundsCompleted: 5 }),
+      })
+    )
+  })
+
+  it("PATCH cancel only sets status — does not reset acceptedCount (preserves companies, State I)", async () => {
+    mockJobFindUnique.mockResolvedValueOnce({
+      id: "job-1", status: "pending",
+      salesUserId: null, superAdminId: "sa-1",
+    })
+    mockJobUpdate.mockResolvedValue({
+      id: "job-1", status: "cancelled", listId: "list-1",
+      acceptedCount: 13, roundsCompleted: 2,
+    })
+
+    const req = makeJobIdRequest("job-1", "PATCH", { action: "cancel" })
+    const res = await jobIdPatch(req, { params: Promise.resolve({ id: "job-1" }) })
+    expect(res.status).toBe(200)
+    // The DB update should set status=cancelled and clear the lock — not touch acceptedCount
+    const updateCall = mockJobUpdate.mock.calls[0][0] as { data: Record<string, unknown> }
+    expect(updateCall.data.status).toBe("cancelled")
+    expect(updateCall.data.lockedUntil).toBeNull()
+    expect(updateCall.data.acceptedCount).toBeUndefined()
+  })
+})

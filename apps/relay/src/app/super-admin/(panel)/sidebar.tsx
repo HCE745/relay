@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import {
-  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, Tag, Headphones, Megaphone, Gift, ExternalLink, UserCog, Percent, UserCheck, FlaskConical, Mail,
+  Shield, LayoutDashboard, Building2, Users, Activity, LogOut, TrendingUp, Menu, X, Settings, HeartPulse, Bug, Lightbulb, Tag, Headphones, Megaphone, Gift, ExternalLink, UserCog, Percent, UserCheck, FlaskConical, Mail, Sparkles,
 } from "lucide-react"
 
 type NavItem = { href: string; label: string; icon: React.ElementType; exact?: boolean }
@@ -15,8 +15,9 @@ function buildSections(): NavSection[] {
   return [
     {
       items: [
-        { href: "/super-admin",              label: "Overview",  icon: LayoutDashboard, exact: true },
-        { href: "/super-admin/organizations", label: "Customers", icon: Building2 },
+        { href: "/super-admin",              label: "Overview",   icon: LayoutDashboard, exact: true },
+        { href: "/super-admin/organizations", label: "Customers",  icon: Building2 },
+        { href: "/super-admin/onboarding",    label: "Onboarding", icon: Sparkles },
       ],
     },
     {

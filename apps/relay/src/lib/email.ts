@@ -740,3 +740,33 @@ ${card(`
 <p style="margin:16px 0 0;font-size:13px;color:${MUTED};font-family:${FONT}">If you weren't expecting this invitation, you can safely ignore this email. Questions? Contact <a href="mailto:${SUPPORT_EMAIL}" style="color:${BLUE};text-decoration:none">${SUPPORT_EMAIL}</a></p>
 `, `You've been invited to the Relay sales team — set your password to get started`)
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// White-Glove Customer Invitation
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function whiteGloveInviteEmail({ name, orgName, inviteUrl, trialDays }: {
+  name: string
+  orgName: string
+  inviteUrl: string
+  trialDays: number
+}): string {
+  return layout(`
+<h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:${TEXT};font-family:${FONT};letter-spacing:-0.5px">Your Relay account is ready, ${name}!</h1>
+<p style="margin:0 0 28px;font-size:15px;color:${MUTED};font-family:${FONT};line-height:1.6">The Relay team has set up a workspace for <strong style="color:${TEXT}">${orgName}</strong>. Click below to create your password and access your account.</p>
+
+<div style="margin:0 0 32px">
+  ${btn("Set Up My Account →", inviteUrl)}
+</div>
+
+${card(`
+  ${infoRow("Organization", `<strong style="color:${TEXT}">${orgName}</strong>`)}
+  ${infoRow("Trial period", `${trialDays} days, starting today`)}
+  ${infoRow("Need help?", `<a href="mailto:${SUPPORT_EMAIL}" style="color:${BLUE};text-decoration:none">${SUPPORT_EMAIL}</a>`)}
+`)}
+
+${alertBox(`This invitation link expires in 30 days. If you have any questions before getting started, reply to this email or contact <strong>${SUPPORT_EMAIL}</strong>.`)}
+
+<p style="margin:0;font-size:13px;color:${MUTED};font-family:${FONT};line-height:1.6">If you weren't expecting this email, please contact us at <a href="mailto:${SUPPORT_EMAIL}" style="color:${BLUE};text-decoration:none">${SUPPORT_EMAIL}</a>.</p>
+`, `Your ${orgName} Relay workspace is ready — set your password to get started`)
+}

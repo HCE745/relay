@@ -26,6 +26,10 @@ export type AuditAction =
   | "SEND_CRM_EMAIL"
   // Workforce Communications
   | "UPDATE_WC_FLAGS"
+  // White-glove customer onboarding
+  | "CREATE_CUSTOMER_ONBOARDING"
+  | "UPDATE_CUSTOMER_ONBOARDING"
+  | "LAUNCH_CUSTOMER_ONBOARDING"
 
 export async function logSAAction({
   superAdminId,

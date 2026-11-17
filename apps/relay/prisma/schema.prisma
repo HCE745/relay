@@ -226,6 +226,7 @@ model Organization {
   onboardingSession       OnboardingSession?
   configurationAuditLogs  ConfigurationAuditLog[]
   crmProspectId           String?                  @unique // CRM Prospect linked at registration
+  customerOnboarding      CustomerOnboarding?
 }
 
 model CustomView {
@@ -744,15 +745,40 @@ model Invitation {
   departmentId   String?
   locationId     String?
   managerId      String?   // intended manager for the new user (plain ID, no FK)
-  invitedById    String
+  invitedById    String?
   expiresAt      DateTime
   usedAt         DateTime?
   createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  invitedBy    User         @relation("SentInvitations", fields: [invitedById], references: [id])
+  invitedBy    User?        @relation("SentInvitations", fields: [invitedById], references: [id])
   department   Department?  @relation(fields: [departmentId], references: [id])
   location     Location?    @relation(fields: [locationId], references: [id])
+}
+
+// ─── White-Glove Customer Onboarding ─────────────────────────────────────────
+
+model CustomerOnboarding {
+  id                  String    @id @default(cuid())
+  organizationId      String    @unique
+  // "draft" | "configuring" | "ready_for_review" | "ready_to_launch" | "live"
+  status              String    @default("draft")
+  primaryContactName  String
+  primaryContactEmail String
+  plan                String    @default("essentials")
+  estimatedFacilities Int       @default(1)
+  internalNotes       String?
+  ownerId             String    // super admin ID (denormalized; SuperAdmin not FK'd)
+  ownerName           String
+  checklist           Json      @default("[]") // ChecklistItem[]
+  trialStartDate      DateTime?
+  launchedAt          DateTime?
+  invitationSentAt    DateTime?
+  invitationToken     String?   // stored so we can re-send if needed
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 // ─── Super Admin ──────────────────────────────────────────────────────────────

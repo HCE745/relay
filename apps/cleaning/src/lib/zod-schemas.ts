@@ -677,6 +677,9 @@ export const signUpSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   password,
   timezone: ianaTimezone,
+  // Which plan the no-card trial evaluates. Solo/Essentials/Professional only
+  // (ENTERPRISE is contact-sales). Defaults to Essentials when omitted.
+  trialTier: z.enum(["SOLO", "TEAM", "BUSINESS"]).default("TEAM"),
 })
 
 // Subscription checkout (Phase E) — choose a purchasable plan, billing interval,

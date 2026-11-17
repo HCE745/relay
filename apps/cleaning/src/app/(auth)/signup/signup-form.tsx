@@ -1,16 +1,19 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import Link from "next/link"
 import { signUp, type SignUpResult } from "@/lib/registration-actions"
 import { listTimezones } from "@/lib/scheduling/timezones"
+import { purchasablePlans } from "@/lib/subscription/plans"
 
 const input =
   "w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
 
 export function SignUpForm() {
   const [state, action, pending] = useActionState<SignUpResult, FormData>(signUp, undefined)
+  const [trialTier, setTrialTier] = useState("TEAM")
   const zones = listTimezones()
+  const plans = purchasablePlans()
 
   if (state && "ok" in state && state.ok) {
     return (
@@ -49,6 +52,37 @@ export function SignUpForm() {
           ))}
         </select>
       </Field>
+
+      <fieldset>
+        <legend className="mb-1 block text-sm font-medium text-slate-700">Trial plan</legend>
+        <p className="mb-2 text-xs text-slate-400">14 days free, no credit card. You can change plans anytime.</p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {plans.map((p) => {
+            const selected = trialTier === p.tier
+            return (
+              <label
+                key={p.tier}
+                className={`cursor-pointer rounded-xl border p-3 transition ${
+                  selected ? "border-brand ring-2 ring-brand/30" : "border-slate-300 hover:border-slate-400"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="trialTier"
+                  value={p.tier}
+                  checked={selected}
+                  onChange={() => setTrialTier(p.tier)}
+                  className="sr-only"
+                />
+                <span className="block text-sm font-semibold text-slate-900">{p.name}</span>
+                <span className="mt-0.5 block text-xs text-slate-500">
+                  ${Math.round(p.amountCents.monthly / 100)}/mo · {p.includedSeats} users
+                </span>
+              </label>
+            )
+          })}
+        </div>
+      </fieldset>
 
       {state && "error" in state && state.error ? (
         <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">

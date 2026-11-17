@@ -14,11 +14,27 @@ export function isPublicRegistrationEnabled(): boolean {
 }
 
 /**
- * The tier a no-card trial starts on. Essentials (TEAM) gives a meaningful
- * mid-tier evaluation (employees, field app, inspections, portal) without
- * unlocking the top ERP tier. Changeable here as a product decision.
+ * The DEFAULT tier a no-card trial starts on when the signer picks nothing.
+ * Essentials (TEAM) gives a meaningful mid-tier evaluation (employees, field app,
+ * inspections, portal) without unlocking the top ERP tier. The signup form lets
+ * the customer choose Solo / Essentials / Professional instead; this is only the
+ * fallback. Changeable here as a product decision.
  */
 export const TRIAL_TIER: BillingTier = "TEAM"
+
+/** The tiers a self-serve trial may start on (ENTERPRISE is contact-sales). */
+const TRIALABLE_TIERS: readonly BillingTier[] = ["SOLO", "TEAM", "BUSINESS"]
+
+/**
+ * Validate a requested trial tier, falling back to TRIAL_TIER for anything that
+ * isn't a self-serve purchasable tier. A defensive second gate behind the zod
+ * schema so the DB layer never persists an off-menu packageTier.
+ */
+export function coerceTrialTier(value: unknown): BillingTier {
+  return typeof value === "string" && (TRIALABLE_TIERS as readonly string[]).includes(value)
+    ? (value as BillingTier)
+    : TRIAL_TIER
+}
 
 /** Build a collision-resistant org slug from a company name + a random suffix. */
 export function buildOrgSlug(orgName: string, randomSuffix: string): string {

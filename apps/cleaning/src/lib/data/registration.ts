@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs"
 import crypto from "crypto"
 import { systemDb } from "../org-db"
 import { ConflictError } from "./errors"
-import { buildOrgSlug, TRIAL_TIER } from "../registration"
-import { TRIAL_DAYS } from "../subscription/plans"
+import { buildOrgSlug, coerceTrialTier } from "../registration"
+import { TRIAL_DAYS, type BillingTier } from "../subscription/plans"
 
 // Self-service trial provisioning (Phase E). Creates an organization on a 14-day
 // no-card trial plus its INACTIVE owner and a verification token, atomically. The
@@ -17,6 +17,7 @@ export type TrialRegistrationInput = {
   email: string
   password: string
   timezone: string
+  trialTier?: BillingTier
 }
 
 /**
@@ -37,6 +38,7 @@ export async function registerTrialCompany(
   const slug = buildOrgSlug(input.orgName, crypto.randomBytes(3).toString("hex"))
   const password = await bcrypt.hash(input.password, 10)
   const trialEndsAt = new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000)
+  const packageTier = coerceTrialTier(input.trialTier)
 
   const token = crypto.randomBytes(32).toString("hex")
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex")
@@ -46,7 +48,7 @@ export async function registerTrialCompany(
       data: {
         name: input.orgName,
         slug,
-        packageTier: TRIAL_TIER,
+        packageTier,
         subscriptionStatus: "trialing",
         trialEndsAt,
         timezone: input.timezone,

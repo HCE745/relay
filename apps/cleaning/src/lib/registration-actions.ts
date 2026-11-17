@@ -31,6 +31,7 @@ export async function signUp(_prev: SignUpResult, formData: FormData): Promise<S
     email: formData.get("email"),
     password: formData.get("password"),
     timezone: formData.get("timezone"),
+    trialTier: formData.get("trialTier") ?? undefined,
   })
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Please check the form" }
 

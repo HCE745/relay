@@ -4,6 +4,7 @@ import { orgDb, systemDb } from "../org-db"
 import { assertFound, ForbiddenActionError } from "./errors"
 import { recordAudit } from "./audit"
 import { clockIn, clockOut } from "../scheduling/execution"
+import { isSubscriptionEnforcementEnabled, backgroundOperationBlocked } from "../subscription/access"
 
 // Shared time-clock kiosk (Phase 49). A kiosk is a device authenticated by a
 // bcrypt-hashed activation token (NOT a staff session). Every punch is routed
@@ -198,6 +199,17 @@ export async function kioskPunch(kiosk: AuthedKiosk, input: { userId: string; pi
     entryId = resolved.entryId
     action = "out"
   } else {
+    // Device-authenticated clock-IN is a background operational action: starting
+    // new labor. When enforcement is on, a lapsed org cannot clock staff IN
+    // (clock-OUTs above are always allowed, so no one is stranded on the clock).
+    // Fails closed if the org's billing state can't be resolved.
+    const org = await systemDb.organization.findUnique({
+      where: { id: orgId },
+      select: { isDemo: true, subscriptionStatus: true, trialEndsAt: true, stripeSubscriptionId: true, currentPeriodEnd: true },
+    })
+    if (backgroundOperationBlocked({ enforcementEnabled: isSubscriptionEnforcementEnabled(), org, now })) {
+      throw new ForbiddenActionError("This workspace's subscription is inactive — new clock-ins are paused. Please contact your administrator. You can still clock out.")
+    }
     const res = await clockIn(orgId, resolved.jobId, input.userId, loc)
     entryId = res.timeEntryId
     action = "in"

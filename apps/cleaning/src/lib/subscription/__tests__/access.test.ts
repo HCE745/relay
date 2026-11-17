@@ -6,6 +6,7 @@ import {
   canAddActiveSeat,
   subscriptionGuardOutcome,
   seatActivationOutcome,
+  backgroundOperationBlocked,
   type OrgAccessInput,
 } from "../access"
 
@@ -160,5 +161,32 @@ describe("seatActivationOutcome (pure seat decision)", () => {
     const r = seatActivationOutcome({ enforcementEnabled: true, isDemo: false, tier: "TEAM", purchasedSeats: 0, currentActiveNonClientCount: 12 })
     expect(r.block).toBe(true)
     if (r.block) expect(r.limit).toBe(10)
+  })
+})
+
+describe("backgroundOperationBlocked (cron job generation + kiosk clock-in)", () => {
+  const paid: OrgAccessInput = { isDemo: false, subscriptionStatus: "active", trialEndsAt: null, stripeSubscriptionId: "sub_1", currentPeriodEnd: future }
+  const lapsed: OrgAccessInput = { isDemo: false, subscriptionStatus: "past_due", trialEndsAt: null, stripeSubscriptionId: "sub_1", currentPeriodEnd: past }
+
+  it("is a no-op while the master switch is off (ships dark)", () => {
+    expect(backgroundOperationBlocked({ enforcementEnabled: false, org: lapsed, now: NOW })).toBe(false)
+    expect(backgroundOperationBlocked({ enforcementEnabled: false, org: null, now: NOW })).toBe(false)
+  })
+
+  it("lets a paid / valid-trial / demo org operate when enforcement is on", () => {
+    expect(backgroundOperationBlocked({ enforcementEnabled: true, org: paid, now: NOW })).toBe(false)
+    expect(backgroundOperationBlocked({ enforcementEnabled: true, org: { ...paid, subscriptionStatus: "trialing", stripeSubscriptionId: null, currentPeriodEnd: null, trialEndsAt: future }, now: NOW })).toBe(false)
+    expect(backgroundOperationBlocked({ enforcementEnabled: true, org: { ...lapsed, isDemo: true }, now: NOW })).toBe(false)
+  })
+
+  it("blocks a lapsed / past-due / canceled org when enforcement is on", () => {
+    expect(backgroundOperationBlocked({ enforcementEnabled: true, org: lapsed, now: NOW })).toBe(true)
+    expect(backgroundOperationBlocked({ enforcementEnabled: true, org: { ...paid, subscriptionStatus: "canceled" }, now: NOW })).toBe(true)
+    // Legacy "active" with NO Stripe subscription is blocked (why the backfill must run first).
+    expect(backgroundOperationBlocked({ enforcementEnabled: true, org: { ...paid, stripeSubscriptionId: null }, now: NOW })).toBe(true)
+  })
+
+  it("fails CLOSED with no actor/recovery carve-out when billing state is unresolvable", () => {
+    expect(backgroundOperationBlocked({ enforcementEnabled: true, org: null, now: NOW })).toBe(true)
   })
 })

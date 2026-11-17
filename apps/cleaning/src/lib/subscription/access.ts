@@ -135,6 +135,27 @@ export function subscriptionGuardOutcome(params: {
 }
 
 /**
+ * Decide whether a BACKGROUND or device-authenticated operational action should
+ * run for an org — the cron that generates new work, a kiosk clock-IN. Same
+ * access rule as the request guard, but with NO actor and NO recovery carve-out:
+ * these paths have no administrator to exempt. Off while the master switch is
+ * off; fails CLOSED on an unresolvable org (null), so a lapsed, expired,
+ * canceled, past-due, or unknown org can never keep producing new work in the
+ * background. It answers only "may NEW work start?" — closing actions a lapsed
+ * org still needs (e.g. a kiosk clock-OUT so no one is stranded on the clock) are
+ * the caller's responsibility to keep open.
+ */
+export function backgroundOperationBlocked(params: {
+  enforcementEnabled: boolean
+  org: OrgAccessInput | null
+  now?: Date
+}): boolean {
+  if (!params.enforcementEnabled) return false
+  if (!params.org) return true
+  return !subscriptionAccess(params.org, params.now ?? new Date()).allowed
+}
+
+/**
  * Decide whether activating another staff seat should BLOCK. Off while the master
  * switch is off; demo orgs are exempt (sandbox). `currentActiveNonClientCount`
  * must already EXCLUDE portal/CLIENT users and inactive users — seats count only

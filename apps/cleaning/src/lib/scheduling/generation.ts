@@ -1,5 +1,6 @@
 import { orgDb, systemDb, isUniqueViolation } from "../org-db"
 import { assertFound } from "../data/errors"
+import { isSubscriptionEnforcementEnabled, backgroundOperationBlocked } from "../subscription/access"
 import { generateOccurrences, type Frequency, type PlanRecurrence } from "./recurrence"
 
 // Deliberate, idempotent, concurrency-safe Job generation from ServicePlans.
@@ -116,13 +117,28 @@ export async function generateUpcomingForOrg(
   return { plans: plans.length, created, skipped }
 }
 
-export type OrgGenerationResult = { orgId: string; created?: number; skipped?: number; plans?: number; error?: string }
+export type OrgGenerationResult = { orgId: string; created?: number; skipped?: number; plans?: number; error?: string; skippedBilling?: boolean }
 
-/** Roll the schedule forward for EVERY organization — the cron entry point. */
+/** Roll the schedule forward for EVERY organization — the cron entry point.
+ *
+ * Subscription enforcement (when the master switch is on): a lapsed, expired,
+ * canceled, or past-due org generates NO new work — existing Jobs are never
+ * touched or deleted, we simply stop producing more until it is paid up. This is
+ * the "background operational action" choke-point for job generation, mirroring
+ * the request-time guard; it fails closed on any org whose billing state cannot
+ * be resolved. While enforcement is off it is a complete no-op. */
 export async function generateUpcomingAllOrgs(days: number, now: Date = new Date()): Promise<OrgGenerationResult[]> {
-  const orgs = await systemDb.organization.findMany({ where: { isDemo: false }, select: { id: true } })
+  const orgs = await systemDb.organization.findMany({
+    where: { isDemo: false },
+    select: { id: true, isDemo: true, subscriptionStatus: true, trialEndsAt: true, stripeSubscriptionId: true, currentPeriodEnd: true },
+  })
+  const enforcementEnabled = isSubscriptionEnforcementEnabled()
   const results: OrgGenerationResult[] = []
   for (const org of orgs) {
+    if (backgroundOperationBlocked({ enforcementEnabled, org, now })) {
+      results.push({ orgId: org.id, skippedBilling: true })
+      continue
+    }
     try {
       const r = await generateUpcomingForOrg(org.id, days, now)
       results.push({ orgId: org.id, ...r })

@@ -9,11 +9,12 @@ export async function GET(request: Request) {
     const results = await generateUpcomingAllOrgs(Number.isFinite(days) ? days : 60)
     const created = results.reduce((s, r) => s + (r.created ?? 0), 0)
     const failed = results.filter((r) => r.error).length
+    const skippedBilling = results.filter((r) => r.skippedBilling).length
     return {
       failed,
-      line: `orgs=${results.length} created=${created} failed=${failed}`,
+      line: `orgs=${results.length} created=${created} skippedBilling=${skippedBilling} failed=${failed}`,
       failures: results.filter((r) => r.error).map((r) => `${r.orgId}: ${r.error}`),
-      body: { orgs: results.length, created, failed, results },
+      body: { orgs: results.length, created, skippedBilling, failed, results },
     }
   })
 }

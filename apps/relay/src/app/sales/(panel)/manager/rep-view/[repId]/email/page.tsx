@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { getManagerRepView } from "@/lib/manager-rep-auth"
-import { Mail } from "lucide-react"
+import RepViewEmailClient from "./email-client"
 
 export const dynamic = "force-dynamic"
 
@@ -14,12 +14,13 @@ export default async function RepViewEmailPage({
   const view = await getManagerRepView(repId)
   if (!view) redirect("/sales/manager/rep-view")
 
+  const basePath = `/sales/manager/rep-view/${repId}`
+
   return (
-    <div className="p-6">
-      <div className="rounded-lg border border-gray-800 bg-gray-900/40 px-6 py-10 text-center">
-        <Mail className="w-8 h-8 text-gray-600 mx-auto mb-3" />
-        <p className="text-sm text-gray-400">Email view coming in Stage C.</p>
-      </div>
-    </div>
+    <RepViewEmailClient
+      repId={repId}
+      repName={view.viewingRep.name}
+      basePath={basePath}
+    />
   )
 }

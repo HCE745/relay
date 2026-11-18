@@ -10,12 +10,14 @@ import { prisma } from "@/lib/prisma"
 //   incomplete  — checkout not finalized yet (new signup flow)
 //   null/unknown — brand new org, no subscription started
 // We block:
+//   draft              — white-glove org not yet launched; no customer access allowed
 //   expired            — trial ended or subscription lapsed
 //   read_only          — manually restricted
 //   canceled           — subscription canceled
 //   incomplete_expired — checkout expired without payment
 //   paused             — subscription intentionally paused
 const BLOCKED_STATUSES = new Set([
+  "draft",
   "expired",
   "read_only",
   "canceled",

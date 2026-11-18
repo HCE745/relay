@@ -761,7 +761,7 @@ model Invitation {
 model CustomerOnboarding {
   id                  String    @id @default(cuid())
   organizationId      String    @unique
-  // "draft" | "configuring" | "ready_for_review" | "ready_to_launch" | "live"
+  // "draft" | "configuring" | "ready_for_review" | "ready_to_launch" → (via /launch) → "invitation_sent" → "live"
   status              String    @default("draft")
   primaryContactName  String
   primaryContactEmail String

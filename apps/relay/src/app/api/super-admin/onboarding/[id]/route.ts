@@ -8,15 +8,29 @@ export const dynamic = "force-dynamic"
 
 type RouteCtx = { params: Promise<{ id: string }> }
 
-// Valid forward-only status transitions (backward allowed for non-live statuses)
-const STATUS_ORDER = ["draft", "configuring", "ready_for_review", "ready_to_launch", "live"] as const
+// Status flow:
+//   draft → configuring → ready_for_review → ready_to_launch
+//                                                ↓ (via /launch)
+//                                         invitation_sent → live (SA marks live)
+//
+// /launch sets invitation_sent; "live" is set here via PATCH from invitation_sent.
+// Backward transitions are allowed within the pre-launch section (draft..ready_to_launch).
+// Once invitation_sent, the only allowed PATCH transition is → live.
+const STATUS_ORDER = ["draft", "configuring", "ready_for_review", "ready_to_launch", "invitation_sent", "live"] as const
 type OnboardingStatus = typeof STATUS_ORDER[number]
 
 function isValidTransition(from: string, to: string): boolean {
-  if (to === "live") return false // live only via /launch
+  // Once live, nothing can change via PATCH
+  if (from === "live") return false
+  // invitation_sent can only go to live
+  if (from === "invitation_sent") return to === "live"
+  // live can only be set from invitation_sent (enforced above)
+  if (to === "live") return from === "invitation_sent"
+  // invitation_sent cannot be set via PATCH (only via /launch)
+  if (to === "invitation_sent") return false
   const fi = STATUS_ORDER.indexOf(from as OnboardingStatus)
   const ti = STATUS_ORDER.indexOf(to as OnboardingStatus)
-  return fi >= 0 && ti >= 0 && ti !== fi && fi < STATUS_ORDER.indexOf("live")
+  return fi >= 0 && ti >= 0 && ti !== fi
 }
 
 // ── GET /api/super-admin/onboarding/[id] ────────────────────────────────────
@@ -58,7 +72,7 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
   })
   if (!record) return NextResponse.json({ error: "Not found" }, { status: 404 })
   if (record.status === "live") {
-    return NextResponse.json({ error: "Live onboarding records are read-only" }, { status: 409 })
+    return NextResponse.json({ error: "This onboarding record is live and read-only" }, { status: 409 })
   }
 
   const body = await req.json() as {
@@ -71,6 +85,22 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
     trialStartDate?:        string | null
     checklist?:             unknown[]
     checklistToggle?:       { key: string; completed: boolean }
+  }
+
+  // Once invitation is sent, only allow the status→live transition; block all field edits.
+  if (record.status === "invitation_sent") {
+    const hasFieldEdits = [
+      body.primaryContactName, body.primaryContactEmail, body.plan,
+      body.estimatedFacilities, body.internalNotes, body.trialStartDate,
+      body.checklist, body.checklistToggle,
+    ].some(v => v !== undefined)
+
+    if (hasFieldEdits) {
+      return NextResponse.json(
+        { error: "Cannot edit fields after invitation has been sent. Only status transitions are allowed." },
+        { status: 409 },
+      )
+    }
   }
 
   const data: Record<string, unknown> = {}

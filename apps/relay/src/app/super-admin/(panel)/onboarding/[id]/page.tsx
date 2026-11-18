@@ -6,7 +6,7 @@ import Link from "next/link"
 import { format } from "date-fns"
 import {
   ChevronLeft, Loader2, CheckSquare, Square, Save, Rocket, AlertTriangle,
-  ExternalLink, CheckCircle2, Clock,
+  ExternalLink, CheckCircle2, Clock, Mail, UserCheck,
 } from "lucide-react"
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ type Onboarding = {
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const STATUS_ORDER = ["draft", "configuring", "ready_for_review", "ready_to_launch", "live"] as const
+const STATUS_ORDER = ["draft", "configuring", "ready_for_review", "ready_to_launch", "invitation_sent", "live"] as const
 type OnboardingStatus = typeof STATUS_ORDER[number]
 
 const STATUS_LABEL: Record<string, string> = {
@@ -58,6 +58,7 @@ const STATUS_LABEL: Record<string, string> = {
   configuring:      "Configuring",
   ready_for_review: "Ready for Review",
   ready_to_launch:  "Ready to Launch",
+  invitation_sent:  "Invitation Sent",
   live:             "Live",
 }
 
@@ -66,6 +67,7 @@ const STATUS_COLOR: Record<string, string> = {
   configuring:      "bg-blue-900/50 text-blue-300 border-blue-700",
   ready_for_review: "bg-yellow-900/50 text-yellow-300 border-yellow-700",
   ready_to_launch:  "bg-indigo-900/50 text-indigo-300 border-indigo-700",
+  invitation_sent:  "bg-purple-900/50 text-purple-300 border-purple-700",
   live:             "bg-green-900/50 text-green-300 border-green-700",
 }
 
@@ -81,6 +83,7 @@ export default function OnboardingDetailPage() {
   const [loading, setLoading]     = useState(true)
   const [saving, setSaving]       = useState(false)
   const [launching, setLaunching] = useState(false)
+  const [resending, setResending] = useState(false)
   const [error, setError]         = useState<string | null>(null)
   const [success, setSuccess]     = useState<string | null>(null)
   const [showLaunchConfirm, setShowLaunchConfirm] = useState(false)
@@ -167,6 +170,31 @@ export default function OnboardingDetailPage() {
     await patch({ checklistToggle: { key, completed } })
   }
 
+  async function handleResendInvitation() {
+    setResending(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/super-admin/onboarding/${id}/resend-invitation`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({}),
+      })
+      const json = await res.json() as { ok?: boolean; error?: string; freshInvitation?: boolean }
+      if (!res.ok) throw new Error(json.error ?? "Resend failed")
+      await load()
+      setSuccess(json.freshInvitation ? "Fresh invitation sent (previous was expired)." : "Invitation resent.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Resend failed")
+    } finally {
+      setResending(false)
+    }
+  }
+
+  async function handleMarkLive() {
+    await patch({ status: "live" })
+    if (!error) setSuccess("Customer marked as live.")
+  }
+
   async function handleLaunch(force = false) {
     setLaunching(true)
     setError(null)
@@ -216,14 +244,17 @@ export default function OnboardingDetailPage() {
     )
   }
 
-  const statusIdx    = STATUS_ORDER.indexOf(data.status as OnboardingStatus)
-  const isLive       = data.status === "live"
-  const canLaunch    = data.status === "ready_to_launch"
-  const nextStatuses = STATUS_ORDER.filter((s, i) => !isLive && i !== statusIdx && s !== "live")
-  const checklist    = data.checklist as ChecklistItem[]
-  const doneCt       = checklist.filter(i => i.completedAt).length
-
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.getrelay.software"
+  const statusIdx         = STATUS_ORDER.indexOf(data.status as OnboardingStatus)
+  const isLive            = data.status === "live"
+  const isInvitationSent  = data.status === "invitation_sent"
+  const canLaunch         = data.status === "ready_to_launch"
+  const isReadOnly        = isLive || isInvitationSent
+  // Only show pre-launch status transitions; invitation_sent→live is handled by Mark Live button
+  const nextStatuses      = STATUS_ORDER.filter((s, i) =>
+    !isLive && !isInvitationSent && i !== statusIdx && s !== "live" && s !== "invitation_sent"
+  )
+  const checklist = data.checklist as ChecklistItem[]
+  const doneCt    = checklist.filter(i => i.completedAt).length
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -265,8 +296,8 @@ export default function OnboardingDetailPage() {
         </div>
       )}
 
-      {/* Status progression */}
-      {!isLive && (
+      {/* Status progression (only pre-launch stages) */}
+      {!isLive && !isInvitationSent && nextStatuses.length > 0 && (
         <section className="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-white">Status</h2>
@@ -298,8 +329,8 @@ export default function OnboardingDetailPage() {
             return (
               <div key={item.key} className="flex items-start gap-3">
                 <button
-                  onClick={() => !isLive && handleChecklistToggle(item.key, !done)}
-                  disabled={saving || isLive}
+                  onClick={() => !isReadOnly && handleChecklistToggle(item.key, !done)}
+                  disabled={saving || isReadOnly}
                   className="mt-0.5 flex-shrink-0 text-gray-500 hover:text-indigo-400 disabled:cursor-default transition-colors"
                 >
                   {done ? (
@@ -333,7 +364,7 @@ export default function OnboardingDetailPage() {
             <input
               value={form.primaryContactName}
               onChange={e => setForm(f => ({ ...f, primaryContactName: e.target.value }))}
-              disabled={isLive}
+              disabled={isReadOnly}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
             />
           </div>
@@ -343,7 +374,7 @@ export default function OnboardingDetailPage() {
               type="email"
               value={form.primaryContactEmail}
               onChange={e => setForm(f => ({ ...f, primaryContactEmail: e.target.value }))}
-              disabled={isLive}
+              disabled={isReadOnly}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
             />
           </div>
@@ -354,7 +385,7 @@ export default function OnboardingDetailPage() {
             <select
               value={form.plan}
               onChange={e => setForm(f => ({ ...f, plan: e.target.value }))}
-              disabled={isLive}
+              disabled={isReadOnly}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
             >
               {PLAN_OPTIONS.map(p => (
@@ -369,7 +400,7 @@ export default function OnboardingDetailPage() {
               min={1}
               value={form.estimatedFacilities}
               onChange={e => setForm(f => ({ ...f, estimatedFacilities: e.target.value }))}
-              disabled={isLive}
+              disabled={isReadOnly}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
             />
           </div>
@@ -379,7 +410,7 @@ export default function OnboardingDetailPage() {
               type="date"
               value={form.trialStartDate}
               onChange={e => setForm(f => ({ ...f, trialStartDate: e.target.value }))}
-              disabled={isLive}
+              disabled={isReadOnly}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
             />
           </div>
@@ -389,12 +420,12 @@ export default function OnboardingDetailPage() {
           <textarea
             value={form.internalNotes}
             onChange={e => setForm(f => ({ ...f, internalNotes: e.target.value }))}
-            disabled={isLive}
+            disabled={isReadOnly}
             rows={3}
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
           />
         </div>
-        {!isLive && (
+        {!isReadOnly && (
           <button
             onClick={handleSaveDetails}
             disabled={saving}
@@ -411,24 +442,57 @@ export default function OnboardingDetailPage() {
         <section className="bg-gray-900 border border-green-900/50 rounded-xl p-4 mb-5">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="w-4 h-4 text-green-400" />
-            <h2 className="text-sm font-semibold text-green-300">Launched</h2>
+            <h2 className="text-sm font-semibold text-green-300">Live</h2>
           </div>
-          {data.launchedAt && (
-            <p className="text-xs text-gray-500 mb-2">
-              Launched {format(new Date(data.launchedAt), "MMM d, yyyy 'at' h:mma")}
-            </p>
-          )}
           {data.invitationSentAt && (
-            <div className="flex items-center gap-2 text-xs text-gray-400">
+            <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
               <Clock className="w-3.5 h-3.5" />
               Invitation sent to {data.primaryContactEmail}
             </div>
           )}
           {data.organization.trialEndsAt && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500">
               Trial ends {format(new Date(data.organization.trialEndsAt), "MMM d, yyyy")}
             </p>
           )}
+        </section>
+      ) : isInvitationSent ? (
+        <section className="bg-gray-900 border border-purple-800/60 rounded-xl p-4 mb-5">
+          <div className="flex items-center gap-2 mb-2">
+            <Mail className="w-4 h-4 text-purple-400" />
+            <h2 className="text-sm font-semibold text-purple-300">Invitation Sent</h2>
+          </div>
+          <p className="text-xs text-gray-400 mb-1">
+            Waiting for <strong className="text-gray-200">{data.primaryContactEmail}</strong> to set up their account.
+          </p>
+          {data.invitationSentAt && (
+            <p className="text-xs text-gray-500 mb-3">
+              Last sent {format(new Date(data.invitationSentAt), "MMM d, yyyy 'at' h:mma")}
+            </p>
+          )}
+          {data.organization.trialEndsAt && (
+            <p className="text-xs text-gray-500 mb-4">
+              Trial ends {format(new Date(data.organization.trialEndsAt), "MMM d, yyyy")}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={handleResendInvitation}
+              disabled={resending}
+              className="flex items-center gap-2 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              {resending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
+              Resend Invitation
+            </button>
+            <button
+              onClick={handleMarkLive}
+              disabled={saving}
+              className="flex items-center gap-2 px-3 py-1.5 bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserCheck className="w-3.5 h-3.5" />}
+              Mark as Live
+            </button>
+          </div>
         </section>
       ) : canLaunch ? (
         <section className="bg-gray-900 border border-indigo-800/60 rounded-xl p-4 mb-5">

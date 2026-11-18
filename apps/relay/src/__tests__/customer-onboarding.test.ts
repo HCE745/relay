@@ -7,11 +7,14 @@
  * - GET /onboarding/[id]: returns record or 404
  * - PATCH /onboarding/[id]: fields, status transitions, checklist toggle
  * - PATCH /onboarding/[id]: live records are read-only
+ * - PATCH /onboarding/[id]: invitation_sent blocks field edits
+ * - PATCH /onboarding/[id]: invitation_sent → live transition allowed
  * - POST /onboarding/[id]/launch: validation (wrong status, missing trial date)
  * - POST /onboarding/[id]/launch: checklist warning (422) + force launch
- * - POST /onboarding/[id]/launch: creates invitation, activates trial, marks live
+ * - POST /onboarding/[id]/launch: creates invitation, activates trial, marks invitation_sent
  * - POST /onboarding/[id]/launch: idempotency (already launched → 409)
  * - POST /onboarding/[id]/launch: existing user account blocks launch (409)
+ * - POST /onboarding/[id]/resend-invitation: resends or rotates token
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
@@ -38,12 +41,16 @@ vi.mock("@/lib/sa-audit", () => ({
   logSAAction: vi.fn(),
 }))
 
-const mockFindMany   = vi.fn()
-const mockFindUnique = vi.fn()
-const mockFindFirst  = vi.fn()
-const mockCreate     = vi.fn()
-const mockUpdate     = vi.fn()
-const mockTx         = vi.fn()
+const mockFindMany            = vi.fn()
+const mockFindUnique          = vi.fn()
+const mockFindFirst           = vi.fn()
+const mockCreate              = vi.fn()
+const mockUpdate              = vi.fn()
+const mockTx                  = vi.fn()
+const mockInvitationFindUnique = vi.fn()
+const mockInvitationUpdateMany = vi.fn()
+const mockInvitationCreate    = vi.fn()
+const mockUserFindUnique      = vi.fn()
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -59,10 +66,12 @@ vi.mock("@/lib/prisma", () => ({
       update: vi.fn(),
     },
     user: {
-      findUnique: vi.fn(),
+      findUnique: (...a: unknown[]) => mockUserFindUnique(...a),
     },
     invitation: {
-      create: vi.fn(),
+      create:      (...a: unknown[]) => mockInvitationCreate(...a),
+      findUnique:  (...a: unknown[]) => mockInvitationFindUnique(...a),
+      updateMany:  (...a: unknown[]) => mockInvitationUpdateMany(...a),
     },
     $transaction: (...a: unknown[]) => mockTx(...a),
   },
@@ -72,6 +81,7 @@ import { getSession } from "@/lib/session"
 import { GET as LIST, POST as CREATE } from "@/app/api/super-admin/onboarding/route"
 import { GET, PATCH } from "@/app/api/super-admin/onboarding/[id]/route"
 import { POST as LAUNCH } from "@/app/api/super-admin/onboarding/[id]/launch/route"
+import { POST as RESEND } from "@/app/api/super-admin/onboarding/[id]/resend-invitation/route"
 
 const mockGetSession = vi.mocked(getSession)
 
@@ -142,16 +152,14 @@ describe("POST /onboarding", () => {
 
   it("returns 409 when contact email already has a user account", async () => {
     mockGetSession.mockResolvedValue(SA_SESSION as never)
-    const { prisma } = await import("@/lib/prisma")
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u-1" } as never)
+    mockUserFindUnique.mockResolvedValue({ id: "u-1" })
     const res = await CREATE(jsonReq({ companyName: "Acme", primaryContactName: "Jane", primaryContactEmail: "jane@acme.com" }))
     expect(res.status).toBe(409)
   })
 
   it("returns 409 when active onboarding already exists for email", async () => {
     mockGetSession.mockResolvedValue(SA_SESSION as never)
-    const { prisma } = await import("@/lib/prisma")
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
+    mockUserFindUnique.mockResolvedValue(null)
     mockFindFirst.mockResolvedValue({ id: "ob-existing" })
     const res = await CREATE(jsonReq({ companyName: "Acme", primaryContactName: "Jane", primaryContactEmail: "jane@acme.com" }))
     expect(res.status).toBe(409)
@@ -159,8 +167,7 @@ describe("POST /onboarding", () => {
 
   it("creates org and onboarding record on success", async () => {
     mockGetSession.mockResolvedValue(SA_SESSION as never)
-    const { prisma } = await import("@/lib/prisma")
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
+    mockUserFindUnique.mockResolvedValue(null)
     mockFindFirst.mockResolvedValue(null)
     const fakeOrg = { id: "org-new", name: "Acme", slug: "acme-123", subscriptionStatus: "draft", plan: "essentials" }
     const fakeOb  = { id: "ob-new", organizationId: "org-new", status: "draft", primaryContactEmail: "jane@acme.com" }
@@ -248,11 +255,39 @@ describe("PATCH /onboarding/[id]", () => {
     }))
   })
 
-  it("rejects transition to live via PATCH", async () => {
+  it("rejects transition to live via PATCH when not in invitation_sent", async () => {
     mockGetSession.mockResolvedValue(SA_SESSION as never)
     mockFindUnique.mockResolvedValue({ ...BASE_ONBOARDING, status: "ready_to_launch", organization: { id: "org-1", name: "Acme Co" } })
     const res = await PATCH(jsonReq({ status: "live" }, "PATCH"), params("ob-1"))
     expect(res.status).toBe(400)
+  })
+
+  it("allows invitation_sent → live transition via PATCH", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({
+      ...BASE_ONBOARDING,
+      status: "invitation_sent",
+      invitationSentAt: "2026-11-15T00:00:00Z",
+      organization: { id: "org-1", name: "Acme Co" },
+    })
+    mockUpdate.mockResolvedValue({ ...BASE_ONBOARDING, status: "live" })
+    const res = await PATCH(jsonReq({ status: "live" }, "PATCH"), params("ob-1"))
+    expect(res.status).toBe(200)
+    expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: "live" }),
+    }))
+  })
+
+  it("blocks field edits when status is invitation_sent", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({
+      ...BASE_ONBOARDING,
+      status: "invitation_sent",
+      invitationSentAt: "2026-11-15T00:00:00Z",
+      organization: { id: "org-1", name: "Acme Co" },
+    })
+    const res = await PATCH(jsonReq({ internalNotes: "changed after send" }, "PATCH"), params("ob-1"))
+    expect(res.status).toBe(409)
   })
 
   it("toggles a checklist item on", async () => {
@@ -325,8 +360,7 @@ describe("POST /onboarding/[id]/launch", () => {
         { key: "trial_date",  label: "Trial date",  completedAt: "2026-01-01T00:00:00Z", completedByName: "Admin" },
       ],
     })
-    const { prisma } = await import("@/lib/prisma")
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
+    mockUserFindUnique.mockResolvedValue(null)
     const res = await LAUNCH(jsonReq({ force: false }), params("ob-1"))
     expect(res.status).toBe(422)
     const data = await res.json() as { incomplete: string[]; canForce: boolean }
@@ -337,17 +371,15 @@ describe("POST /onboarding/[id]/launch", () => {
   it("returns 409 when contact email already has a user account", async () => {
     mockGetSession.mockResolvedValue(SA_SESSION as never)
     mockFindUnique.mockResolvedValue(BASE_ONBOARDING)
-    const { prisma } = await import("@/lib/prisma")
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u-existing" } as never)
+    mockUserFindUnique.mockResolvedValue({ id: "u-existing" })
     const res = await LAUNCH(jsonReq({ force: true }), params("ob-1"))
     expect(res.status).toBe(409)
   })
 
-  it("successfully launches: creates invitation, activates trial, marks live", async () => {
+  it("successfully launches: creates invitation, activates trial, marks invitation_sent (not live)", async () => {
     mockGetSession.mockResolvedValue(SA_SESSION as never)
     mockFindUnique.mockResolvedValue(BASE_ONBOARDING)
-    const { prisma } = await import("@/lib/prisma")
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
+    mockUserFindUnique.mockResolvedValue(null)
     mockTx.mockImplementation(async (fn: (tx: unknown) => Promise<unknown>) => {
       const tx = {
         invitation:         { create: vi.fn() },
@@ -368,17 +400,20 @@ describe("POST /onboarding/[id]/launch", () => {
           data: expect.objectContaining({ subscriptionStatus: "trialing" }),
         }),
       )
+      // Status must be invitation_sent, NOT live — activation is a separate step
       expect(tx.customerOnboarding.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ status: "live" }),
+          data: expect.objectContaining({ status: "invitation_sent" }),
         }),
       )
     })
     const res = await LAUNCH(jsonReq({ force: true }), params("ob-1"))
     expect(res.status).toBe(200)
-    const data = await res.json() as { ok: boolean; status: string }
+    const data = await res.json() as { ok: boolean; status: string; trialStartDate: string; trialEndsAt: string }
     expect(data.ok).toBe(true)
-    expect(data.status).toBe("live")
+    expect(data.status).toBe("invitation_sent")
+    // Trial must be calculated from trialStartDate, not from now
+    expect(data.trialStartDate).toBe(new Date("2026-11-20T00:00:00Z").toISOString())
   })
 
   it("returns 409 if invitation was already sent (invitationSentAt set)", async () => {
@@ -387,9 +422,103 @@ describe("POST /onboarding/[id]/launch", () => {
       ...BASE_ONBOARDING,
       invitationSentAt: "2026-11-01T00:00:00Z",
     })
-    const { prisma } = await import("@/lib/prisma")
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
+    mockUserFindUnique.mockResolvedValue(null)
     const res = await LAUNCH(jsonReq({ force: true }), params("ob-1"))
     expect(res.status).toBe(409)
+  })
+})
+
+// ─── POST /onboarding/[id]/resend-invitation ──────────────────────────────────
+
+const INVITATION_SENT_ONBOARDING = {
+  ...BASE_ONBOARDING,
+  status:           "invitation_sent",
+  invitationSentAt: "2026-11-15T00:00:00Z",
+  invitationToken:  "existing-token-uuid",
+}
+
+describe("POST /onboarding/[id]/resend-invitation", () => {
+  beforeEach(() => { vi.clearAllMocks() })
+
+  it("returns 403 for unauthenticated", async () => {
+    mockGetSession.mockResolvedValue(null)
+    const res = await RESEND(jsonReq({}), params("ob-1"))
+    expect(res.status).toBe(403)
+  })
+
+  it("returns 404 for missing record", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue(null)
+    const res = await RESEND(jsonReq({}), params("ob-nope"))
+    expect(res.status).toBe(404)
+  })
+
+  it("returns 400 when status is not invitation_sent", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({ ...BASE_ONBOARDING, status: "ready_to_launch" })
+    const res = await RESEND(jsonReq({}), params("ob-1"))
+    expect(res.status).toBe(400)
+  })
+
+  it("returns 409 when contact already has a user account", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue(INVITATION_SENT_ONBOARDING)
+    mockUserFindUnique.mockResolvedValue({ id: "u-exists" })
+    const res = await RESEND(jsonReq({}), params("ob-1"))
+    expect(res.status).toBe(409)
+  })
+
+  it("reuses valid token and resends email", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue(INVITATION_SENT_ONBOARDING)
+    mockUserFindUnique.mockResolvedValue(null)
+    // Invitation is still valid
+    mockInvitationFindUnique.mockResolvedValue({
+      expiresAt: new Date(Date.now() + 7 * 86400000),
+      usedAt:    null,
+    })
+    mockUpdate.mockResolvedValue({})
+    const res = await RESEND(jsonReq({}), params("ob-1"))
+    expect(res.status).toBe(200)
+    const data = await res.json() as { ok: boolean; freshInvitation: boolean }
+    expect(data.ok).toBe(true)
+    expect(data.freshInvitation).toBe(false)
+    // Should NOT have called $transaction (no token rotation needed)
+    expect(mockTx).not.toHaveBeenCalled()
+  })
+
+  it("rotates expired token without creating duplicate org or re-activating trial", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue(INVITATION_SENT_ONBOARDING)
+    mockUserFindUnique.mockResolvedValue(null)
+    // Invitation is expired
+    mockInvitationFindUnique.mockResolvedValue({
+      expiresAt: new Date(Date.now() - 86400000), // yesterday
+      usedAt:    null,
+    })
+    mockTx.mockImplementation(async (fn: (tx: unknown) => Promise<unknown>) => {
+      const tx = {
+        invitation:         { updateMany: vi.fn(), create: vi.fn() },
+        customerOnboarding: { update: vi.fn() },
+      }
+      await fn(tx)
+      // Must expire old invitation and create new one — no org.create call
+      expect(tx.invitation.updateMany).toHaveBeenCalled()
+      expect(tx.invitation.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            email: "jane@acme.com",
+            role:  "ADMIN",
+          }),
+        }),
+      )
+      // Must NOT touch organization (no trial re-activation)
+      expect((tx as unknown as { organization?: unknown }).organization).toBeUndefined()
+    })
+    const res = await RESEND(jsonReq({}), params("ob-1"))
+    expect(res.status).toBe(200)
+    const data = await res.json() as { ok: boolean; freshInvitation: boolean }
+    expect(data.ok).toBe(true)
+    expect(data.freshInvitation).toBe(true)
   })
 })

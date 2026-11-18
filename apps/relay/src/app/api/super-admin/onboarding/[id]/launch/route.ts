@@ -12,8 +12,21 @@ export const dynamic = "force-dynamic"
 type RouteCtx = { params: Promise<{ id: string }> }
 
 // ── POST /api/super-admin/onboarding/[id]/launch ─────────────────────────────
-// Validates, sends invitation, activates trial, marks org+onboarding as live.
-// Requires status = "ready_to_launch" and a trialStartDate.
+//
+// Sends the invitation and activates the trial.
+// Sets onboarding status → "invitation_sent" (NOT "live").
+// "Live" is a separate, explicit SA action (PATCH status=live) after the
+// customer has set up their account.
+//
+// Trial clock: trialEndsAt = trialStartDate + TRIAL_DAYS (not "now + TRIAL_DAYS"),
+// so a future trialStartDate is honoured. subscriptionStatus is set to "trialing"
+// immediately so the customer can start using Relay when they accept the
+// invitation; the trial simply ends on the agreed calendar date.
+//
+// Atomicity: DB writes are in a transaction. Email is sent after commit.
+// If email delivery fails the invitation token is stored so the SA can resend
+// via POST /onboarding/[id]/resend-invitation without creating a duplicate org
+// or re-activating the trial.
 export async function POST(req: NextRequest, { params }: RouteCtx) {
   const session = await getSession()
   if (!session?.superAdmin || !session.superAdminId) {
@@ -21,20 +34,21 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
   }
 
   const { id } = await params
-
-  // Parse optional body: { force?: boolean } — force=true skips checklist warning
   const body = await req.json().catch(() => ({})) as { force?: boolean }
 
   const record = await prisma.customerOnboarding.findUnique({
-    where: { id },
+    where:   { id },
     include: { organization: true },
   })
   if (!record) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   // ── Safety checks ──────────────────────────────────────────────────────────
 
-  if (record.status === "live") {
-    return NextResponse.json({ error: "This onboarding has already been launched." }, { status: 409 })
+  if (record.status === "live" || record.status === "invitation_sent") {
+    return NextResponse.json(
+      { error: `Cannot launch: status is already '${record.status}'. Use /resend-invitation to resend.` },
+      { status: 409 },
+    )
   }
 
   if (record.status !== "ready_to_launch") {
@@ -51,16 +65,16 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     )
   }
 
-  // Check for incomplete checklist items (warning, not hard block — force=true overrides)
+  // ── Checklist warning (non-blocking, force=true overrides) ─────────────────
   const checklist = record.checklist as Array<{ key: string; label: string; completedAt: string | null }>
   const incomplete = checklist.filter(item => !item.completedAt).map(i => i.label)
   if (incomplete.length > 0 && !body.force) {
     return NextResponse.json(
       {
-        error:      "Some checklist items are not complete.",
+        error:    "Some checklist items are not complete.",
         incomplete,
-        canForce:   true,
-        message:    "Pass { force: true } to launch anyway.",
+        canForce: true,
+        message:  "Pass { force: true } to launch anyway.",
       },
       { status: 422 },
     )
@@ -69,7 +83,7 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
   // ── Duplicate-send prevention ──────────────────────────────────────────────
   if (record.invitationSentAt) {
     return NextResponse.json(
-      { error: "An invitation has already been sent for this onboarding." },
+      { error: "An invitation has already been sent. Use /resend-invitation to resend it." },
       { status: 409 },
     )
   }
@@ -85,13 +99,16 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     )
   }
 
-  const appUrl       = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.getrelay.software"
-  const inviteToken  = randomUUID()
-  const inviteExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+  const appUrl      = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.getrelay.software"
+  const inviteToken = randomUUID()
+  // 30-day invitation window — matches the email body
+  const inviteExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
 
+  // Trial clock starts from the agreed trialStartDate (not "now")
   const trialStart = new Date(record.trialStartDate)
   const trialEnd   = new Date(trialStart.getTime() + TRIAL_DAYS * 86400000)
 
+  // DB writes are atomic — email is sent after commit
   await prisma.$transaction(async (tx) => {
     // Create the invitation for the primary contact
     await tx.invitation.create({
@@ -105,7 +122,9 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
       },
     })
 
-    // Activate the org: set subscription to trialing + trial dates
+    // Activate the org: trialing + trial dates computed from agreed start date.
+    // subscriptionStatus="trialing" allows the customer to use Relay once they
+    // accept the invitation; trialEndsAt enforces the agreed end date.
     await tx.organization.update({
       where: { id: record.organizationId },
       data: {
@@ -116,12 +135,12 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
       },
     })
 
-    // Mark onboarding as live
+    // Mark as invitation_sent — NOT live. SA marks live after the customer
+    // has set up their account (via PATCH status=live).
     await tx.customerOnboarding.update({
       where: { id },
       data: {
-        status:           "live",
-        launchedAt:       new Date(),
+        status:           "invitation_sent",
         invitationSentAt: new Date(),
         invitationToken:  inviteToken,
         updatedAt:        new Date(),
@@ -129,18 +148,22 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     })
   })
 
-  // Send invitation email (after transaction commits)
-  const inviteUrl = `${appUrl}/invite/${inviteToken}`
-  await sendEmail({
+  // Email delivery is best-effort. The invitation token is persisted in the DB,
+  // so the SA can resend via /resend-invitation if delivery fails.
+  const inviteUrl  = `${appUrl}/invite/${inviteToken}`
+  const emailResult = await sendEmail({
     to:      record.primaryContactEmail,
     subject: `Your Relay account for ${record.organization.name} is ready`,
     html:    whiteGloveInviteEmail({
-      name:       record.primaryContactName,
-      orgName:    record.organization.name,
+      name:      record.primaryContactName,
+      orgName:   record.organization.name,
       inviteUrl,
-      trialDays:  TRIAL_DAYS,
+      trialDays: TRIAL_DAYS,
     }),
-  }).catch(err => console.error("[launch] invitation email failed:", err))
+  }).catch(err => {
+    console.error("[launch] invitation email failed:", err)
+    return { ok: false, error: String(err) }
+  })
 
   await logSAAction({
     superAdminId:   session.superAdminId!,
@@ -153,19 +176,21 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     targetName:     record.organization.name,
     before: { status: record.status },
     after: {
-      status:              "live",
-      trialStartDate:      trialStart.toISOString(),
-      trialEndsAt:         trialEnd.toISOString(),
-      invitationSentTo:    record.primaryContactEmail,
-      inviteToken,
+      status:           "invitation_sent",
+      trialStartDate:   trialStart.toISOString(),
+      trialEndsAt:      trialEnd.toISOString(),
+      invitationSentTo: record.primaryContactEmail,
+      emailDelivered:   emailResult.ok,
     },
   })
 
   return NextResponse.json({
-    ok:           true,
-    status:       "live",
-    trialStartDate: trialStart.toISOString(),
-    trialEndsAt:    trialEnd.toISOString(),
+    ok:              true,
+    status:          "invitation_sent",
+    trialStartDate:  trialStart.toISOString(),
+    trialEndsAt:     trialEnd.toISOString(),
     inviteUrl,
+    emailDelivered:  emailResult.ok,
+    emailError:      emailResult.ok ? undefined : emailResult.error,
   })
 }

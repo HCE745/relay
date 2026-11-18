@@ -134,10 +134,6 @@ export default async function RepViewOverviewPage({
         </div>
       )}
 
-      {/* Stage A placeholder notice for unimplemented sub-views */}
-      <p className="text-xs text-gray-600 italic">
-        Prospects, Opportunities, Email, Follow-Ups, and Activity tabs are coming in Stage B–D.
-      </p>
     </div>
   )
 }

@@ -226,14 +226,21 @@ describe("trialEndForCheckout — exact trial preservation, no rounding", () => 
     expect(out).toBeLessThan(nowSec + 10 * 86400) // proves it did NOT round up past the real end
   })
 
-  it("omits the trial (immediate billing) when under Stripe's 48h minimum — never extends", () => {
+  it("CLAMPS up to the 48h floor when under 2 days remain — charges later, never before the original end", () => {
     const soon = new Date("2026-11-19T00:00:00Z") // only 24h left
-    expect(trialEndForCheckout({ subscriptionStatus: "trialing", trialEndsAt: soon }, now)).toBeUndefined()
+    const out = trialEndForCheckout({ subscriptionStatus: "trialing", trialEndsAt: soon }, now)!
+    expect(out).toBe(nowSec + 48 * 3600) // pushed to the 48h minimum
+    expect(out).toBeGreaterThan(Math.floor(soon.getTime() / 1000)) // strictly AFTER the original end — never earlier
   })
 
-  it("carries the trial when exactly at the 48h boundary", () => {
+  it("carries the trial when exactly at the 48h boundary (no clamp needed)", () => {
     const at48h = new Date(now.getTime() + 48 * 3600 * 1000)
     expect(trialEndForCheckout({ subscriptionStatus: "trialing", trialEndsAt: at48h }, now)).toBe(Math.floor(at48h.getTime() / 1000))
+  })
+
+  it("bills immediately only when the trial has ALREADY ended (not 'before' the original end)", () => {
+    const past = new Date("2026-11-10T00:00:00Z")
+    expect(trialEndForCheckout({ subscriptionStatus: "trialing", trialEndsAt: past }, now)).toBeUndefined()
   })
 
   it("no trial for a non-trialing org or a missing trial date (bills immediately)", () => {

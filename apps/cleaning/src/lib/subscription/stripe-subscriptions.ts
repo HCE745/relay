@@ -113,21 +113,35 @@ export type SubscriptionCheckoutInput = {
   idempotencyKey?: string
 }
 
+/** Stripe requires a Checkout `trial_end` to be at least 48 hours in the future. */
+export const STRIPE_MIN_TRIAL_SECONDS = 48 * 3600
+
 /**
- * The exact Unix-seconds `trial_end` to carry onto a subscription at checkout, or
- * undefined to bill immediately. Uses the EXACT remaining-trial instant — never
- * rounded, so the trial can never be unintentionally extended — and only when at
- * least Stripe's 48-hour minimum remains; otherwise no trial (immediate first
- * charge, which shortens but never extends). Pure + unit-tested.
+ * The Unix-seconds `trial_end` to carry onto a subscription at checkout, or
+ * undefined to bill immediately. The guiding rule: the customer must NEVER be
+ * charged before their original trial end.
+ *
+ *   • Not trialing / no trial date → undefined (nothing to defer).
+ *   • Trial already ended (trialEndsAt ≤ now) → undefined. Billing now is still
+ *     AFTER the original end, so it does not charge "early".
+ *   • ≥ 48h remaining → the EXACT original trialEndsAt instant. No rounding, so
+ *     the trial is never unintentionally extended; the first charge lands on the
+ *     agreed date.
+ *   • < 48h remaining → clamp UP to now + 48h (Stripe's minimum). The first
+ *     charge slips slightly LATER than the original end — never earlier — which
+ *     is the safe direction and is communicated to the customer at checkout.
+ *
+ * Pure + unit-tested.
  */
 export function trialEndForCheckout(
   org: { subscriptionStatus: string; trialEndsAt: Date | null },
   now: Date = new Date(),
 ): number | undefined {
   if (org.subscriptionStatus !== "trialing" || !org.trialEndsAt) return undefined
+  const nowSec = Math.floor(now.getTime() / 1000)
   const endSec = Math.floor(org.trialEndsAt.getTime() / 1000)
-  const minSec = Math.floor(now.getTime() / 1000) + 48 * 3600
-  return endSec >= minSec ? endSec : undefined
+  if (endSec <= nowSec) return undefined // trial already over → billing now is not "before" the original end
+  return Math.max(endSec, nowSec + STRIPE_MIN_TRIAL_SECONDS)
 }
 
 /**

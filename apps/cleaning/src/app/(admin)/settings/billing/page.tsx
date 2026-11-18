@@ -72,6 +72,14 @@ export default async function BillingSettingsPage() {
             Your subscription is set to cancel at the end of the current period. Your data is preserved.
           </p>
         ) : null}
+        {trialing ? (
+          <p className="mt-4 rounded-lg bg-sky-50 px-3 py-2 text-sm text-sky-800 ring-1 ring-sky-200">
+            Adding a payment method now saves your plan but does <strong>not</strong> charge you &mdash; your first
+            payment is scheduled for when your trial ends{fmtDate(org?.trialEndsAt ?? null) ? ` (${fmtDate(org?.trialEndsAt ?? null)})` : ""}.
+            You&rsquo;ll never be charged before then; if fewer than two days remain when you subscribe, your first
+            charge may fall up to 48 hours later, never sooner.
+          </p>
+        ) : null}
       </Card>
 
       {isOrgAdmin ? (

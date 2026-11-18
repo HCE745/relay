@@ -2,16 +2,18 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { LayoutDashboard, Building2, Briefcase, Mail, Bell, Activity } from "lucide-react"
+import { LayoutDashboard, Building2, Briefcase, Mail, Bell, Activity, List, BarChart2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const TABS = [
-  { label: "Overview",      suffix: "",               icon: LayoutDashboard },
-  { label: "Prospects",     suffix: "/prospects",     icon: Building2 },
-  { label: "Opportunities", suffix: "/opportunities", icon: Briefcase },
-  { label: "Email",         suffix: "/email",         icon: Mail },
-  { label: "Follow-Ups",    suffix: "/follow-ups",    icon: Bell },
-  { label: "Activity",      suffix: "/activity",      icon: Activity },
+  { label: "Overview",       suffix: "",                icon: LayoutDashboard },
+  { label: "Prospects",      suffix: "/prospects",      icon: Building2 },
+  { label: "Opportunities",  suffix: "/opportunities",  icon: Briefcase },
+  { label: "Email",          suffix: "/email",          icon: Mail },
+  { label: "Follow-Ups",     suffix: "/follow-ups",     icon: Bell },
+  { label: "Activity",       suffix: "/activity",       icon: Activity },
+  { label: "Research Lists", suffix: "/research-lists", icon: List },
+  { label: "Performance",    suffix: "/performance",    icon: BarChart2 },
 ]
 
 export function RepViewTabNav({ basePath }: { basePath: string }) {

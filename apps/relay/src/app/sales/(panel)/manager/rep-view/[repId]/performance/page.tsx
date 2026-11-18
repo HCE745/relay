@@ -117,9 +117,9 @@ export default async function RepViewPerformancePage({
       where: { sentBySalesUserId: repId, direction: "sent", sentAt: { gte: since } },
     }),
 
-    // Emails received (inbound replies to this rep's mailbox)
+    // Emails received — only messages that have an in-reply-to header (actual replies to outreach)
     prisma.crmEmail.count({
-      where: { mailboxOwnerSalesUserId: repId, direction: "received", sentAt: { gte: since } },
+      where: { mailboxOwnerSalesUserId: repId, direction: "received", inReplyTo: { not: null }, sentAt: { gte: since } },
     }),
   ])
 
@@ -137,7 +137,6 @@ export default async function RepViewPerformancePage({
   crmActivityRows.forEach(r => { actMap[r.activityType] = r._count._all })
   const callsAttempted = actMap["CALL_ATTEMPTED"] ?? 0
   const callsConnected = actMap["CALL_CONNECTED"] ?? 0
-  const meetingsHeld   = actMap["MEETING_HELD"]   ?? 0
 
   // --- Won value ---
   const wonValue = oppsWon.reduce((s, o) => s + Number(o.value ?? 0), 0)
@@ -157,7 +156,7 @@ export default async function RepViewPerformancePage({
       iconColor: "text-blue-400",
       stats: [
         { label: "Emails Sent",          value: emailsSentCount,           note: "from CrmEmail records",    link: null },
-        { label: "Replies Received",      value: emailsReceivedCount,       note: "inbound to rep mailbox",   link: null },
+        { label: "Replies Received",      value: emailsReceivedCount,       note: "inbound with reply-to header", link: null },
         { label: "Prospects Contacted",   value: totalProspectsContacted,   note: "from activity log",        link: `${basePath}/prospects` },
         { label: "Prospects Added",       value: totalProspectsAdded,       note: "new records created",      link: `${basePath}/prospects` },
       ],
@@ -169,7 +168,7 @@ export default async function RepViewPerformancePage({
       stats: [
         { label: "Calls Attempted",       value: callsAttempted,            note: "from CRM events",          link: null },
         { label: "Calls Connected",       value: callsConnected,            note: "from CRM events",          link: null },
-        { label: "Meetings / Demos",      value: totalDemosLogged + meetingsHeld, note: "logged demos + held meetings", link: null },
+        { label: "Meetings / Demos",      value: totalDemosLogged,               note: "MEETING_HELD events (activity log)", link: null },
       ],
     },
     {

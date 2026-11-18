@@ -5,6 +5,7 @@ import {
   verifyBillingSignature,
   createSubscriptionCheckout,
   createBillingPortalSession,
+  trialEndForCheckout,
 } from "../stripe-subscriptions"
 import { signStripePayload } from "../../stripe"
 
@@ -127,17 +128,19 @@ describe("createSubscriptionCheckout", () => {
     expect(b.get("customer_email")).toBeNull()
   })
 
-  it("carries remaining trial days so adding a card mid-trial does not charge immediately", async () => {
+  it("carries an exact trial_end so adding a card mid-trial does not charge immediately or extend the trial", async () => {
     mockStripe({ id: "cs_3", url: "https://checkout/3" })
+    const end = 1_800_000_000
     await createSubscriptionCheckout({
       orgId: "org_3",
       tier: "SOLO",
       interval: "monthly",
-      trialPeriodDays: 9,
+      trialEndUnix: end,
       successUrl: "https://app/ok",
       cancelUrl: "https://app/cancel",
     })
-    expect(last!.body.get("subscription_data[trial_period_days]")).toBe("9")
+    expect(last!.body.get("subscription_data[trial_end]")).toBe(String(end))
+    expect(last!.body.get("subscription_data[trial_period_days]")).toBeNull()
   })
 
   it("refuses extra seats on Solo (no add-on — upgrade required) without calling Stripe", async () => {
@@ -208,5 +211,33 @@ describe("createBillingPortalSession", () => {
     expect(last!.url).toBe("https://api.stripe.com/v1/billing_portal/sessions")
     expect(last!.body.get("customer")).toBe("cus_9")
     expect(last!.body.get("return_url")).toBe("https://app/settings/billing")
+  })
+})
+
+describe("trialEndForCheckout — exact trial preservation, no rounding", () => {
+  const now = new Date("2026-11-18T00:00:00Z")
+  const nowSec = Math.floor(now.getTime() / 1000)
+
+  it("returns the EXACT trialEndsAt instant (never rounded up to extend)", () => {
+    // 9 days, 7 hours, 33 minutes out — a deliberately non-whole-day remainder.
+    const end = new Date("2026-11-27T07:33:00Z")
+    const out = trialEndForCheckout({ subscriptionStatus: "trialing", trialEndsAt: end }, now)
+    expect(out).toBe(Math.floor(end.getTime() / 1000)) // to the second; no ceil to day 10
+    expect(out).toBeLessThan(nowSec + 10 * 86400) // proves it did NOT round up past the real end
+  })
+
+  it("omits the trial (immediate billing) when under Stripe's 48h minimum — never extends", () => {
+    const soon = new Date("2026-11-19T00:00:00Z") // only 24h left
+    expect(trialEndForCheckout({ subscriptionStatus: "trialing", trialEndsAt: soon }, now)).toBeUndefined()
+  })
+
+  it("carries the trial when exactly at the 48h boundary", () => {
+    const at48h = new Date(now.getTime() + 48 * 3600 * 1000)
+    expect(trialEndForCheckout({ subscriptionStatus: "trialing", trialEndsAt: at48h }, now)).toBe(Math.floor(at48h.getTime() / 1000))
+  })
+
+  it("no trial for a non-trialing org or a missing trial date (bills immediately)", () => {
+    expect(trialEndForCheckout({ subscriptionStatus: "active", trialEndsAt: new Date("2027-01-01") }, now)).toBeUndefined()
+    expect(trialEndForCheckout({ subscriptionStatus: "trialing", trialEndsAt: null }, now)).toBeUndefined()
   })
 })

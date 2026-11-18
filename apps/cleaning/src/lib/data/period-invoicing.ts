@@ -1,5 +1,6 @@
 import { orgDb, systemDb } from "../org-db"
 import { generateInvoice } from "./invoices"
+import { isSubscriptionEnforcementEnabled, backgroundOperationBlocked } from "../subscription/access"
 
 // Recurring auto-invoicing (Phase 9). At period end a cron drafts invoices for
 // every flat-period plan whose period has closed. DRAFT only — never auto-sent.
@@ -8,7 +9,7 @@ import { generateInvoice } from "./invoices"
 
 const isoDate = (d: Date) => d.toISOString().slice(0, 10)
 
-export type PeriodInvoiceResult = { orgId: string; customers: number; created: number; error?: string }
+export type PeriodInvoiceResult = { orgId: string; customers: number; created: number; error?: string; skippedBilling?: boolean }
 
 export async function generatePeriodInvoicesForOrg(
   orgId: string,
@@ -39,9 +40,19 @@ export async function generatePeriodInvoicesForOrg(
 }
 
 export async function generatePeriodInvoicesAllOrgs(opts: { windowDays?: number; now?: Date } = {}): Promise<PeriodInvoiceResult[]> {
-  const orgs = await systemDb.organization.findMany({ where: { isDemo: false }, select: { id: true } })
+  const orgs = await systemDb.organization.findMany({
+    where: { isDemo: false },
+    select: { id: true, isDemo: true, subscriptionStatus: true, trialEndsAt: true, stripeSubscriptionId: true, currentPeriodEnd: true },
+  })
+  const enforcementEnabled = isSubscriptionEnforcementEnabled()
   const results: PeriodInvoiceResult[] = []
   for (const org of orgs) {
+    // When enforcement is on, a lapsed org stops generating new recurring
+    // invoices (existing invoices are untouched). Fails closed.
+    if (backgroundOperationBlocked({ enforcementEnabled, org, now: opts.now })) {
+      results.push({ orgId: org.id, customers: 0, created: 0, skippedBilling: true })
+      continue
+    }
     try {
       results.push(await generatePeriodInvoicesForOrg(org.id, opts))
     } catch (e) {

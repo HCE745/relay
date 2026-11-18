@@ -2,7 +2,7 @@ import { requireOrgAdmin } from "@/lib/guards"
 import { parseBody, ok, forbidden } from "@/lib/api"
 import { prisma } from "@/lib/prisma"
 import { billingCheckoutSchema } from "@/lib/zod-schemas"
-import { isBillingConfigured, createSubscriptionCheckout } from "@/lib/subscription/stripe-subscriptions"
+import { isBillingConfigured, createSubscriptionCheckout, trialEndForCheckout } from "@/lib/subscription/stripe-subscriptions"
 
 // Start a Stripe Checkout (subscription mode) to put a card on file / upgrade.
 // OWNER/ADMIN only, and NOT subscription-gated (requireOrgAdmin is the recovery
@@ -26,13 +26,9 @@ export async function POST(request: Request) {
   })
   if (!org) return forbidden("Organization not found")
 
-  // Carry remaining trial days onto the subscription so adding a card mid-trial
-  // does not charge immediately.
-  let trialPeriodDays: number | undefined
-  if (org.subscriptionStatus === "trialing" && org.trialEndsAt) {
-    const days = Math.ceil((org.trialEndsAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
-    if (days > 0) trialPeriodDays = days
-  }
+  // Carry the EXACT remaining trial onto the subscription so adding a card
+  // mid-trial charges on the original end date — never rounded up/extended.
+  const trialEndUnix = trialEndForCheckout(org)
 
   const base = appBaseUrl()
   const { url } = await createSubscriptionCheckout({
@@ -44,7 +40,7 @@ export async function POST(request: Request) {
     cancelUrl: `${base}/settings/billing?checkout=cancelled`,
     stripeCustomerId: org.stripeCustomerId ?? undefined,
     customerEmail: org.stripeCustomerId ? undefined : g.session.email,
-    trialPeriodDays,
+    trialEndUnix,
   })
   return ok({ url })
 }

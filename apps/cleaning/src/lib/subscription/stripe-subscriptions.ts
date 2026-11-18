@@ -104,11 +104,30 @@ export type SubscriptionCheckoutInput = {
   stripeCustomerId?: string
   /** Prefill the email when no customer exists yet (Stripe creates the customer). */
   customerEmail?: string
-  /** Remaining free-trial days to carry onto the subscription, so adding a card
-   *  mid-trial does NOT charge immediately. Omit for immediate first-period billing. */
-  trialPeriodDays?: number
+  /** EXACT Unix-seconds instant the carried trial should end — the original
+   *  trialEndsAt, so the first charge lands on the agreed date and the trial is
+   *  neither extended nor reset. Omit for immediate first-period billing. Must be
+   *  >= Stripe's 48-hour minimum (see trialEndForCheckout). */
+  trialEndUnix?: number
   /** Idempotency key (e.g. `sub-checkout:<orgId>`) — blocks duplicate subscriptions. */
   idempotencyKey?: string
+}
+
+/**
+ * The exact Unix-seconds `trial_end` to carry onto a subscription at checkout, or
+ * undefined to bill immediately. Uses the EXACT remaining-trial instant — never
+ * rounded, so the trial can never be unintentionally extended — and only when at
+ * least Stripe's 48-hour minimum remains; otherwise no trial (immediate first
+ * charge, which shortens but never extends). Pure + unit-tested.
+ */
+export function trialEndForCheckout(
+  org: { subscriptionStatus: string; trialEndsAt: Date | null },
+  now: Date = new Date(),
+): number | undefined {
+  if (org.subscriptionStatus !== "trialing" || !org.trialEndsAt) return undefined
+  const endSec = Math.floor(org.trialEndsAt.getTime() / 1000)
+  const minSec = Math.floor(now.getTime() / 1000) + 48 * 3600
+  return endSec >= minSec ? endSec : undefined
 }
 
 /**
@@ -150,8 +169,10 @@ export async function createSubscriptionCheckout(
   if (input.stripeCustomerId) form.set("customer", input.stripeCustomerId)
   else if (input.customerEmail) form.set("customer_email", input.customerEmail)
 
-  if (typeof input.trialPeriodDays === "number" && input.trialPeriodDays > 0) {
-    form.set("subscription_data[trial_period_days]", String(Math.floor(input.trialPeriodDays)))
+  if (typeof input.trialEndUnix === "number" && input.trialEndUnix > 0) {
+    // Absolute instant, so Stripe bills the first period exactly at the original
+    // trial end — no day-rounding that could extend the trial.
+    form.set("subscription_data[trial_end]", String(Math.floor(input.trialEndUnix)))
   }
 
   // Base plan line.

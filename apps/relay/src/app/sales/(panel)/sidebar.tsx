@@ -62,7 +62,8 @@ function buildSections(followUpsDue: number, isManager: boolean): { label?: stri
     ...(isManager ? [{
       label: "Manager",
       items: [
-        { label: "Team Dashboard",  href: "/sales/manager",          icon: UsersRound },
+        { label: "Team Dashboard",       href: "/sales/manager",          icon: UsersRound },
+        { label: "View Rep Workspace",   href: "/sales/manager/rep-view", icon: Eye },
       ],
     }] : []),
     {

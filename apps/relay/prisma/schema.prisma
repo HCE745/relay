@@ -2832,6 +2832,11 @@ model SalesUser {
   commissionDuration String  @default("LIFETIME") // LIFETIME | FIRST_YEAR | CUSTOM
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  // Manager-rep relationship: a sales_rep is assigned to one admin_sales manager.
+  // null = unassigned (super-admin only can view).
+  managerId        String?
+  manager          SalesUser?    @relation("ManagerRep", fields: [managerId], references: [id], onDelete: SetNull)
+  managedReps      SalesUser[]   @relation("ManagerRep")
 
   // Phase 2: ownership
   assignedDemoCalls   DemoCall[]   @relation("DemoCallAssigned")

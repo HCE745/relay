@@ -20,6 +20,8 @@ export async function PATCH(
     // update_imap fields
     imapPassword?: unknown; imapEmail?: unknown;
     imapHost?: unknown; imapPort?: unknown; smtpHost?: unknown; smtpPort?: unknown;
+    // assign_manager fields
+    managerId?: unknown;
   }
 
   const user = await prisma.salesUser.findUnique({ where: { id } })
@@ -27,6 +29,36 @@ export async function PATCH(
 
   // action: "deactivate" | "reactivate" | "reset_password" | "resend_invite" — or plain field patch
   const action = typeof body.action === "string" ? body.action : null
+
+  if (action === "assign_manager") {
+    // managerId: null = unassign; string = assign to that manager
+    if (!("managerId" in body)) {
+      return NextResponse.json({ error: "managerId is required (use null to unassign)" }, { status: 400 })
+    }
+    const rawManagerId = body.managerId
+    const managerId = rawManagerId === null ? null : typeof rawManagerId === "string" ? rawManagerId.trim() : undefined
+    if (managerId === undefined) {
+      return NextResponse.json({ error: "managerId must be a string or null" }, { status: 400 })
+    }
+    if (user.role !== "sales_rep") {
+      return NextResponse.json({ error: "Only sales_rep users can be assigned to a manager" }, { status: 400 })
+    }
+    if (managerId !== null) {
+      const manager = await prisma.salesUser.findUnique({
+        where: { id: managerId },
+        select: { role: true, isActive: true },
+      })
+      if (!manager || manager.role !== "admin_sales" || !manager.isActive) {
+        return NextResponse.json({ error: "Manager not found or not an active admin_sales user" }, { status: 400 })
+      }
+    }
+    const updated = await prisma.salesUser.update({
+      where: { id },
+      data: { managerId },
+      select: { id: true, name: true, email: true, role: true, managerId: true },
+    })
+    return NextResponse.json(updated)
+  }
 
   if (action === "update_imap") {
     const imapPassword = typeof body.imapPassword === "string" ? body.imapPassword.trim() : ""
@@ -124,7 +156,7 @@ export async function PATCH(
   const updated = await prisma.salesUser.update({
     where:  { id },
     data,
-    select: { id: true, email: true, name: true, role: true, isActive: true, employmentStatus: true, commissionRate: true, commissionEligible: true, createdAt: true, updatedAt: true },
+    select: { id: true, email: true, name: true, role: true, isActive: true, employmentStatus: true, commissionRate: true, commissionEligible: true, managerId: true, createdAt: true, updatedAt: true },
   })
   return NextResponse.json(updated)
 }

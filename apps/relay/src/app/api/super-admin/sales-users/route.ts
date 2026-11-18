@@ -17,6 +17,7 @@ export async function GET() {
     select: {
       id: true, email: true, name: true, role: true,
       isActive: true, invitePending: true, createdAt: true, updatedAt: true,
+      managerId: true,
     },
   })
 

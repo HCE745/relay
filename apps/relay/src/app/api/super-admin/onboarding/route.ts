@@ -30,7 +30,7 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
     include: {
       organization: {
-        select: { id: true, name: true, subscriptionStatus: true, plan: true },
+        select: { id: true, name: true, subscriptionStatus: true, plan: true, isDemo: true },
       },
     },
   })
@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
     estimatedFacilities?: number
     internalNotes?:       string
     trialStartDate?:      string
+    isTest?:              boolean // when true: org.isDemo=true, bypasses CRM sync
   }
 
   // ── Validation ─────────────────────────────────────────────────────────────
@@ -68,6 +69,17 @@ export async function POST(req: NextRequest) {
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.primaryContactEmail.trim())) {
     return NextResponse.json({ error: "primaryContactEmail is not a valid email address" }, { status: 400 })
+  }
+
+  // Test orgs require a recognizably-fake email to prevent accidentally marking real customers
+  if (body.isTest) {
+    const e = body.primaryContactEmail.trim().toLowerCase()
+    if (!e.includes("+test") && !e.endsWith("@example.com") && !e.endsWith("@relay-test.internal")) {
+      return NextResponse.json(
+        { error: "Test organizations require a test email address (must contain '+test', end with '@example.com', or '@relay-test.internal')." },
+        { status: 400 },
+      )
+    }
   }
 
   const companyName  = body.companyName.trim()
@@ -107,7 +119,7 @@ export async function POST(req: NextRequest) {
         slug:               slug + "-" + randomUUID().slice(0, 6),
         subscriptionStatus: "draft",
         plan,
-        isDemo:             false,
+        isDemo:             body.isTest === true,
       },
     })
 

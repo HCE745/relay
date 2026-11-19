@@ -46,7 +46,7 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
     include: {
       organization: {
         select: {
-          id: true, name: true, slug: true, plan: true,
+          id: true, name: true, slug: true, plan: true, isDemo: true,
           subscriptionStatus: true, trialStartDate: true, trialEndsAt: true,
           createdAt: true,
         },

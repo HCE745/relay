@@ -34,6 +34,7 @@ type Onboarding = {
   launchedAt:          string | null
   invitationSentAt:    string | null
   invitationToken:     string | null
+  inviteUrl:           string | null  // computed server-side from token
   createdAt:           string
   updatedAt:           string
   organization: {
@@ -41,6 +42,7 @@ type Onboarding = {
     name:               string
     slug:               string
     plan:               string
+    isDemo:             boolean
     subscriptionStatus: string
     trialStartDate:     string | null
     trialEndsAt:        string | null
@@ -89,6 +91,7 @@ export default function OnboardingDetailPage() {
   const [showLaunchConfirm, setShowLaunchConfirm] = useState(false)
   const [launchWarning, setLaunchWarning]         = useState<string[] | null>(null)
   const [forceLaunch, setForceLaunch]             = useState(false)
+  const [testInviteUrl, setTestInviteUrl]         = useState<string | null>(null)
 
   // Editable form state
   const [form, setForm] = useState({
@@ -107,6 +110,7 @@ export default function OnboardingDetailPage() {
       if (!res.ok) throw new Error("Not found")
       const json = await res.json() as Onboarding
       setData(json)
+      if (json.inviteUrl) setTestInviteUrl(json.inviteUrl)
       setForm({
         primaryContactName:  json.primaryContactName,
         primaryContactEmail: json.primaryContactEmail,
@@ -179,10 +183,18 @@ export default function OnboardingDetailPage() {
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({}),
       })
-      const json = await res.json() as { ok?: boolean; error?: string; freshInvitation?: boolean }
+      const json = await res.json() as {
+        ok?: boolean; error?: string; freshInvitation?: boolean
+        inviteUrl?: string; emailSuppressed?: boolean
+      }
       if (!res.ok) throw new Error(json.error ?? "Resend failed")
+      if (json.inviteUrl) setTestInviteUrl(json.inviteUrl)
       await load()
-      setSuccess(json.freshInvitation ? "Fresh invitation sent (previous was expired)." : "Invitation resent.")
+      if (json.emailSuppressed) {
+        setSuccess("Test org: fresh token generated. Copy the invite URL below.")
+      } else {
+        setSuccess(json.freshInvitation ? "Fresh invitation sent (previous was expired)." : "Invitation resent.")
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Resend failed")
     } finally {
@@ -209,6 +221,8 @@ export default function OnboardingDetailPage() {
         error?: string
         incomplete?: string[]
         canForce?: boolean
+        inviteUrl?: string
+        emailSuppressed?: boolean
       }
       if (res.status === 422 && json.incomplete) {
         // Checklist warning — offer force
@@ -217,10 +231,15 @@ export default function OnboardingDetailPage() {
         return
       }
       if (!res.ok) throw new Error(json.error ?? "Launch failed")
+      if (json.inviteUrl) setTestInviteUrl(json.inviteUrl)
       setShowLaunchConfirm(false)
       setLaunchWarning(null)
       await load()
-      setSuccess("Customer launched! Invitation email sent.")
+      setSuccess(
+        json.emailSuppressed
+          ? "Test org launched. Email suppressed — copy the invite URL below."
+          : "Customer launched! Invitation email sent.",
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : "Launch failed")
     } finally {
@@ -269,6 +288,11 @@ export default function OnboardingDetailPage() {
             <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-semibold rounded border ${STATUS_COLOR[data.status] ?? "bg-gray-800 text-gray-400 border-gray-700"}`}>
               {STATUS_LABEL[data.status] ?? data.status}
             </span>
+            {data.organization.isDemo && (
+              <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-bold rounded bg-amber-900/50 text-amber-300 border border-amber-700/60 tracking-wide">
+                TEST ORG
+              </span>
+            )}
           </div>
           <p className="text-xs text-gray-500 mt-0.5">
             Created {format(new Date(data.createdAt), "MMM d, yyyy")} · Owner: {data.ownerName}
@@ -460,20 +484,36 @@ export default function OnboardingDetailPage() {
         <section className="bg-gray-900 border border-purple-800/60 rounded-xl p-4 mb-5">
           <div className="flex items-center gap-2 mb-2">
             <Mail className="w-4 h-4 text-purple-400" />
-            <h2 className="text-sm font-semibold text-purple-300">Invitation Sent</h2>
+            <h2 className="text-sm font-semibold text-purple-300">
+              {data.organization.isDemo ? "Test Invitation Ready" : "Invitation Sent"}
+            </h2>
           </div>
-          <p className="text-xs text-gray-400 mb-1">
-            Waiting for <strong className="text-gray-200">{data.primaryContactEmail}</strong> to set up their account.
-          </p>
+          {data.organization.isDemo ? (
+            <p className="text-xs text-amber-400/80 mb-2">
+              Email suppressed (test org). Use the invite URL below to test the onboarding flow.
+            </p>
+          ) : (
+            <p className="text-xs text-gray-400 mb-1">
+              Waiting for <strong className="text-gray-200">{data.primaryContactEmail}</strong> to set up their account.
+            </p>
+          )}
           {data.invitationSentAt && (
             <p className="text-xs text-gray-500 mb-3">
-              Last sent {format(new Date(data.invitationSentAt), "MMM d, yyyy 'at' h:mma")}
+              {data.organization.isDemo ? "Token generated" : "Last sent"}{" "}
+              {format(new Date(data.invitationSentAt), "MMM d, yyyy 'at' h:mma")}
             </p>
           )}
           {data.organization.trialEndsAt && (
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-gray-500 mb-3">
               Trial ends {format(new Date(data.organization.trialEndsAt), "MMM d, yyyy")}
             </p>
+          )}
+          {/* Invite URL — shown prominently for test orgs */}
+          {data.organization.isDemo && testInviteUrl && (
+            <div className="mb-4 p-3 bg-gray-800 border border-amber-700/40 rounded-lg">
+              <p className="text-[11px] font-semibold text-amber-400 mb-1.5">Invite URL (copy to use)</p>
+              <p className="text-[11px] text-gray-300 font-mono break-all select-all">{testInviteUrl}</p>
+            </div>
           )}
           <div className="flex flex-wrap gap-3">
             <button
@@ -482,7 +522,7 @@ export default function OnboardingDetailPage() {
               className="flex items-center gap-2 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors"
             >
               {resending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
-              Resend Invitation
+              {data.organization.isDemo ? "Refresh Invite URL" : "Resend Invitation"}
             </button>
             <button
               onClick={handleMarkLive}
@@ -501,9 +541,14 @@ export default function OnboardingDetailPage() {
             <h2 className="text-sm font-semibold text-white">Ready to Launch</h2>
           </div>
           <p className="text-xs text-gray-500 mb-4">
-            Launching will activate the trial, create an admin invitation for{" "}
-            <strong className="text-gray-300">{data.primaryContactEmail}</strong>,
-            and send the welcome email. This cannot be undone.
+            {data.organization.isDemo
+              ? "Launching will activate the trial and generate an invite URL. Email is suppressed for test orgs."
+              : <>
+                  Launching will activate the trial, create an admin invitation for{" "}
+                  <strong className="text-gray-300">{data.primaryContactEmail}</strong>,
+                  and send the welcome email. This cannot be undone.
+                </>
+            }
           </p>
           {!form.trialStartDate && (
             <p className="text-xs text-yellow-400 mb-3">
@@ -538,7 +583,15 @@ export default function OnboardingDetailPage() {
             <p className="text-sm text-gray-400 mb-4">
               This will:
               <br />• Activate a {data.plan} trial for {form.trialStartDate ? format(new Date(form.trialStartDate), "MMM d, yyyy") : "today"}
-              <br />• Send a setup invitation to <strong className="text-gray-200">{data.primaryContactEmail}</strong>
+              {data.organization.isDemo ? (
+                <>
+                  <br />• Generate an invite URL (email suppressed — test org)
+                </>
+              ) : (
+                <>
+                  <br />• Send a setup invitation to <strong className="text-gray-200">{data.primaryContactEmail}</strong>
+                </>
+              )}
               <br />• Set org subscription to <strong className="text-gray-200">trialing</strong>
             </p>
             <div className="flex justify-end gap-3">

@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
 
   const record = await prisma.customerOnboarding.findUnique({
     where:   { id },
-    include: { organization: { select: { id: true, name: true } } },
+    include: { organization: { select: { id: true, name: true, isDemo: true } } },
   })
   if (!record) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
@@ -57,8 +57,9 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     )
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.getrelay.software"
-  const now    = new Date()
+  const isTestOrg = record.organization.isDemo
+  const appUrl    = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.getrelay.software"
+  const now       = new Date()
 
   // Check whether the stored invitation is still valid
   let inviteToken = record.invitationToken
@@ -121,17 +122,22 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     })
   }
 
-  const inviteUrl   = `${appUrl}/invite/${inviteToken}`
-  const emailResult = await sendEmail({
-    to:      record.primaryContactEmail,
-    subject: `Your Relay account for ${record.organization.name} is ready`,
-    html:    whiteGloveInviteEmail({
-      name:      record.primaryContactName,
-      orgName:   record.organization.name,
-      inviteUrl,
-      trialDays: TRIAL_DAYS,
-    }),
-  }).catch(err => ({ ok: false, error: String(err) }))
+  const inviteUrl = `${appUrl}/invite/${inviteToken}`
+
+  // Skip email delivery for test orgs — return the URL in the response instead
+  let emailResult: { ok: boolean; error?: string } = { ok: true }
+  if (!isTestOrg) {
+    emailResult = await sendEmail({
+      to:      record.primaryContactEmail,
+      subject: `Your Relay account for ${record.organization.name} is ready`,
+      html:    whiteGloveInviteEmail({
+        name:      record.primaryContactName,
+        orgName:   record.organization.name,
+        inviteUrl,
+        trialDays: TRIAL_DAYS,
+      }),
+    }).catch(err => ({ ok: false, error: String(err) }))
+  }
 
   await logSAAction({
     superAdminId:   session.superAdminId!,
@@ -146,14 +152,17 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
       action:          "resend_invitation",
       freshInvitation,
       sentTo:          record.primaryContactEmail,
-      emailDelivered:  emailResult.ok,
+      emailSuppressed: isTestOrg,
+      emailDelivered:  isTestOrg ? false : emailResult.ok,
     },
   })
 
   return NextResponse.json({
-    ok:             true,
+    ok:              true,
     freshInvitation,
-    emailDelivered: emailResult.ok,
-    emailError:     emailResult.ok ? undefined : emailResult.error,
+    inviteUrl,
+    emailSuppressed: isTestOrg,
+    emailDelivered:  isTestOrg ? false : emailResult.ok,
+    emailError:      isTestOrg ? undefined : (emailResult.ok ? undefined : emailResult.error),
   })
 }

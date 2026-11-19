@@ -108,6 +108,8 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
   const trialStart = new Date(record.trialStartDate)
   const trialEnd   = new Date(trialStart.getTime() + TRIAL_DAYS * 86400000)
 
+  const isTestOrg = record.organization.isDemo
+
   // DB writes are atomic — email is sent after commit
   await prisma.$transaction(async (tx) => {
     // Create the invitation for the primary contact
@@ -148,22 +150,27 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     })
   })
 
-  // Email delivery is best-effort. The invitation token is persisted in the DB,
-  // so the SA can resend via /resend-invitation if delivery fails.
-  const inviteUrl  = `${appUrl}/invite/${inviteToken}`
-  const emailResult = await sendEmail({
-    to:      record.primaryContactEmail,
-    subject: `Your Relay account for ${record.organization.name} is ready`,
-    html:    whiteGloveInviteEmail({
-      name:      record.primaryContactName,
-      orgName:   record.organization.name,
-      inviteUrl,
-      trialDays: TRIAL_DAYS,
-    }),
-  }).catch(err => {
-    console.error("[launch] invitation email failed:", err)
-    return { ok: false, error: String(err) }
-  })
+  const inviteUrl = `${appUrl}/invite/${inviteToken}`
+
+  // Email delivery is best-effort. Skip entirely for test (isDemo) orgs so the
+  // invitation never reaches an unintended real recipient. The token is stored in
+  // the DB and the URL is returned in the response for secure SA access.
+  let emailResult: { ok: boolean; error?: string } = { ok: true }
+  if (!isTestOrg) {
+    emailResult = await sendEmail({
+      to:      record.primaryContactEmail,
+      subject: `Your Relay account for ${record.organization.name} is ready`,
+      html:    whiteGloveInviteEmail({
+        name:      record.primaryContactName,
+        orgName:   record.organization.name,
+        inviteUrl,
+        trialDays: TRIAL_DAYS,
+      }),
+    }).catch(err => {
+      console.error("[launch] invitation email failed:", err)
+      return { ok: false, error: String(err) }
+    })
+  }
 
   await logSAAction({
     superAdminId:   session.superAdminId!,
@@ -180,7 +187,8 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
       trialStartDate:   trialStart.toISOString(),
       trialEndsAt:      trialEnd.toISOString(),
       invitationSentTo: record.primaryContactEmail,
-      emailDelivered:   emailResult.ok,
+      emailSuppressed:  isTestOrg,
+      emailDelivered:   isTestOrg ? false : emailResult.ok,
     },
   })
 
@@ -190,7 +198,8 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     trialStartDate:  trialStart.toISOString(),
     trialEndsAt:     trialEnd.toISOString(),
     inviteUrl,
-    emailDelivered:  emailResult.ok,
-    emailError:      emailResult.ok ? undefined : emailResult.error,
+    emailSuppressed: isTestOrg,
+    emailDelivered:  isTestOrg ? false : emailResult.ok,
+    emailError:      isTestOrg ? undefined : (emailResult.ok ? undefined : emailResult.error),
   })
 }

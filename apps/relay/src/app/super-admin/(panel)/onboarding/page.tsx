@@ -26,7 +26,7 @@ export default async function OnboardingListPage() {
   const records = await prisma.customerOnboarding.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      organization: { select: { id: true, name: true } },
+      organization: { select: { id: true, name: true, isDemo: true } },
     },
   })
 
@@ -86,9 +86,16 @@ export default async function OnboardingListPage() {
                 return (
                   <tr key={r.id} className="hover:bg-gray-800/40 transition-colors">
                     <td className="px-4 py-3">
-                      <Link href={`/super-admin/onboarding/${r.id}`} className="text-white font-medium hover:text-indigo-400 transition-colors">
-                        {r.organization.name}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link href={`/super-admin/onboarding/${r.id}`} className="text-white font-medium hover:text-indigo-400 transition-colors">
+                          {r.organization.name}
+                        </Link>
+                        {r.organization.isDemo && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-900/50 text-amber-300 border border-amber-700/60 tracking-wide">
+                            TEST
+                          </span>
+                        )}
+                      </div>
                       <div className="text-[11px] text-gray-500 mt-0.5">{r.plan}</div>
                     </td>
                     <td className="px-4 py-3">

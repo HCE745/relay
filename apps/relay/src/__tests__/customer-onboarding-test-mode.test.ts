@@ -86,8 +86,11 @@ vi.mock("@/lib/prisma", () => ({
 }))
 
 import { getSession } from "@/lib/session"
+import { sendEmail } from "@/lib/email"
 import { GET as LIST, POST as CREATE } from "@/app/api/super-admin/onboarding/route"
 import { GET } from "@/app/api/super-admin/onboarding/[id]/route"
+import { POST as LAUNCH } from "@/app/api/super-admin/onboarding/[id]/launch/route"
+import { POST as RESEND } from "@/app/api/super-admin/onboarding/[id]/resend-invitation/route"
 import { syncRegistrationToCrm } from "@/lib/registration-crm-sync"
 
 const mockGetSession = vi.mocked(getSession)
@@ -379,5 +382,150 @@ describe("syncRegistrationToCrm — isDemo CRM isolation", () => {
     })
 
     expect(mockProspectCreate).not.toHaveBeenCalled()
+  })
+})
+
+// ─── Launch email suppression for test orgs ───────────────────────────────────
+
+const LAUNCH_RECORD_BASE = {
+  id:                  "ob-1",
+  organizationId:      "org-1",
+  status:              "ready_to_launch",
+  primaryContactName:  "Tester",
+  primaryContactEmail: "tester@example.com",
+  plan:                "essentials",
+  trialStartDate:      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  invitationSentAt:    null,
+  invitationToken:     null,
+  checklist:           [],
+}
+
+function setupLaunchTx() {
+  mockTx.mockImplementation(async (fn: (tx: unknown) => Promise<unknown>) => {
+    const tx = {
+      invitation:         { create: vi.fn().mockResolvedValue({}) },
+      organization:       { update: vi.fn().mockResolvedValue({}) },
+      customerOnboarding: { update: vi.fn().mockResolvedValue({}) },
+    }
+    return fn(tx)
+  })
+}
+
+describe("POST /onboarding/[id]/launch — email suppression", () => {
+  beforeEach(() => { vi.clearAllMocks() })
+
+  it("skips sendEmail for isDemo=true org and returns emailSuppressed=true", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({
+      ...LAUNCH_RECORD_BASE,
+      organization: { id: "org-1", name: "Test Co", isDemo: true },
+    })
+    mockUserFindUnique.mockResolvedValue(null)
+    setupLaunchTx()
+
+    const res = await LAUNCH(jsonReq({ force: true }), params("ob-1"))
+    expect(res.status).toBe(200)
+
+    const body = await res.json() as { emailSuppressed: boolean; inviteUrl: string }
+    expect(body.emailSuppressed).toBe(true)
+    expect(body.inviteUrl).toMatch(/^https?:\/\/.+\/invite\/.+/)
+    expect(vi.mocked(sendEmail)).not.toHaveBeenCalled()
+  })
+
+  it("calls sendEmail for isDemo=false org and returns emailSuppressed=false", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({
+      ...LAUNCH_RECORD_BASE,
+      primaryContactEmail: "alice@realco.com",
+      organization: { id: "org-1", name: "Real Co", isDemo: false },
+    })
+    mockUserFindUnique.mockResolvedValue(null)
+    setupLaunchTx()
+    vi.mocked(sendEmail).mockResolvedValue({ ok: true } as never)
+
+    const res = await LAUNCH(jsonReq({ force: true }), params("ob-1"))
+    expect(res.status).toBe(200)
+
+    const body = await res.json() as { emailSuppressed: boolean; emailDelivered: boolean }
+    expect(body.emailSuppressed).toBe(false)
+    expect(body.emailDelivered).toBe(true)
+    expect(vi.mocked(sendEmail)).toHaveBeenCalledOnce()
+  })
+})
+
+// ─── Resend invitation email suppression for test orgs ────────────────────────
+
+describe("POST /onboarding/[id]/resend-invitation — email suppression", () => {
+  beforeEach(() => { vi.clearAllMocks() })
+
+  const RESEND_RECORD = {
+    id:                  "ob-1",
+    organizationId:      "org-1",
+    status:              "invitation_sent",
+    primaryContactName:  "Tester",
+    primaryContactEmail: "tester@example.com",
+    invitationToken:     "existing-token",
+    invitationSentAt:    new Date(),
+    organization:        { id: "org-1", name: "Test Co", isDemo: true },
+  }
+
+  it("skips sendEmail for isDemo=true org", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue(RESEND_RECORD)
+    mockUserFindUnique.mockResolvedValue(null)
+    // existing invitation is still valid
+    const { prisma } = await import("@/lib/prisma")
+    vi.mocked(prisma.invitation.findUnique).mockResolvedValue({
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      usedAt:    null,
+    } as never)
+
+    const res = await RESEND(jsonReq({}), params("ob-1"))
+    expect(res.status).toBe(200)
+
+    const body = await res.json() as { emailSuppressed: boolean; inviteUrl: string }
+    expect(body.emailSuppressed).toBe(true)
+    expect(body.inviteUrl).toMatch(/\/invite\//)
+    expect(vi.mocked(sendEmail)).not.toHaveBeenCalled()
+  })
+})
+
+// ─── GET /onboarding/[id] — returns inviteUrl when token is set ───────────────
+
+describe("GET /onboarding/[id] — inviteUrl computed from token", () => {
+  beforeEach(() => { vi.clearAllMocks() })
+
+  it("includes inviteUrl when invitationToken is present", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({
+      id: "ob-1", status: "invitation_sent",
+      invitationToken: "abc-token-123",
+      organization: {
+        id: "org-1", name: "Test Co", slug: "test-co", plan: "essentials", isDemo: true,
+        subscriptionStatus: "trialing", trialStartDate: null, trialEndsAt: null, createdAt: new Date(),
+      },
+    })
+
+    const res = await GET(getReq(), params("ob-1"))
+    expect(res.status).toBe(200)
+    const data = await res.json() as { inviteUrl: string }
+    expect(data.inviteUrl).toMatch(/\/invite\/abc-token-123$/)
+  })
+
+  it("returns inviteUrl=null when no invitationToken", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({
+      id: "ob-2", status: "draft",
+      invitationToken: null,
+      organization: {
+        id: "org-2", name: "Test Co 2", slug: "test-co-2", plan: "essentials", isDemo: true,
+        subscriptionStatus: "draft", trialStartDate: null, trialEndsAt: null, createdAt: new Date(),
+      },
+    })
+
+    const res = await GET(getReq(), params("ob-2"))
+    expect(res.status).toBe(200)
+    const data = await res.json() as { inviteUrl: string | null }
+    expect(data.inviteUrl).toBeNull()
   })
 })

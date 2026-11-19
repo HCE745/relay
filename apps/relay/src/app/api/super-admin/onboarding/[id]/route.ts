@@ -55,7 +55,12 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!record) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  return NextResponse.json(record)
+
+  // Compute the invite URL server-side so the SA can copy it without knowing the base URL
+  const appUrl    = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.getrelay.software"
+  const inviteUrl = record.invitationToken ? `${appUrl}/invite/${record.invitationToken}` : null
+
+  return NextResponse.json({ ...record, inviteUrl })
 }
 
 // ── PATCH /api/super-admin/onboarding/[id] ──────────────────────────────────

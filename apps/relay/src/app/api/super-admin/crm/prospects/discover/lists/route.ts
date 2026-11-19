@@ -1,6 +1,6 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getResearchIdentity } from "@/lib/research-list-auth"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
@@ -9,15 +9,15 @@ export const dynamic = "force-dynamic"
 // Returns only the lists the caller personally owns.
 // isShared is a metadata flag and does NOT grant visibility to other users.
 export async function GET() {
-  const session = await getSession()
-  if (!session?.superAdminId && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
   const lists = await prisma.prospectResearchList.findMany({
-    where: session.superAdminId
-      ? { isExplicitlySaved: true, superAdminId: session.superAdminId }
-      : { isExplicitlySaved: true, salesUserId:  session.salesUserId  },
+    where: identity.superAdminId
+      ? { isExplicitlySaved: true, superAdminId: identity.superAdminId }
+      : { isExplicitlySaved: true, salesUserId:  identity.salesUserId  },
     include: { _count: { select: { results: true } } },
     // Active lists first (by createdAt desc), then completed
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
@@ -37,8 +37,8 @@ export async function GET() {
   const withOwnership = lists.map(list => ({
     ...list,
     ownedByMe:
-      (!!session.superAdminId && list.superAdminId === session.superAdminId) ||
-      (!!session.salesUserId  && list.salesUserId  === session.salesUserId),
+      (!!identity.superAdminId && list.superAdminId === identity.superAdminId) ||
+      (!!identity.salesUserId  && list.salesUserId  === identity.salesUserId),
     doneCount: doneByListId[list.id] ?? 0,
   }))
 
@@ -51,8 +51,8 @@ export async function GET() {
 //         searchIndustry?, searchEmpMin?, searchEmpMax?, searchKeywords?,
 //         searchContext?, results?: DiscoveredCompany[] }
 export async function POST(req: NextRequest) {
-  const session = await getSession()
-  if (!session?.superAdminId && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -72,11 +72,10 @@ export async function POST(req: NextRequest) {
     data: {
       name: name.trim(),
       description: description ?? null,
-      // Only super-admins may create shared lists; ordinary sales users cannot
-      // set isShared via this API even with a forged request body.
-      isShared: session.superAdminId ? isShared === true : false,
-      salesUserId:  session.salesUserId  ?? null,
-      superAdminId: session.superAdminId ?? null,
+      // Only a non-impersonating super-admin may create shared lists.
+      isShared: identity.superAdminId ? isShared === true : false,
+      salesUserId:  identity.salesUserId  ?? null,
+      superAdminId: identity.superAdminId ?? null,
       searchCountry:  searchCountry  ?? null,
       searchState:    searchState    ?? null,
       searchIndustry: searchIndustry ?? null,

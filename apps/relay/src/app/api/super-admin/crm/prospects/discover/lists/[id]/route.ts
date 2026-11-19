@@ -1,8 +1,7 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getResearchIdentity, listIsOwner } from "@/lib/research-list-auth"
 import { prisma } from "@/lib/prisma"
-import { listIsOwner } from "@/lib/research-list-auth"
 
 export const dynamic = "force-dynamic"
 
@@ -11,8 +10,8 @@ type RouteCtx = { params: Promise<{ id: string }> }
 // ── GET /api/super-admin/crm/prospects/discover/lists/[id] ───────────────────
 // Returns a list with all its results. Requires ownership.
 export async function GET(_req: NextRequest, { params }: RouteCtx) {
-  const session = await getSession()
-  if (!session?.superAdminId && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -23,7 +22,7 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!listIsOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(list, identity)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   return NextResponse.json(list)
 }
@@ -31,8 +30,8 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
 // ── PATCH /api/super-admin/crm/prospects/discover/lists/[id] ─────────────────
 // Updates the list's name and/or description. Owner only.
 export async function PATCH(req: NextRequest, { params }: RouteCtx) {
-  const session = await getSession()
-  if (!session?.superAdminId && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -43,7 +42,7 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!listIsOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(list, identity)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const body = await req.json() as {
     name?:              string
@@ -92,8 +91,8 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
 // Deletes a list (and cascades to its results). Owner only.
 // Results with prospectId set are preserved via ON DELETE SET NULL on that FK.
 export async function DELETE(_req: NextRequest, { params }: RouteCtx) {
-  const session = await getSession()
-  if (!session?.superAdminId && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -104,7 +103,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!listIsOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(list, identity)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   await prisma.prospectResearchList.delete({ where: { id } })
 
@@ -117,8 +116,8 @@ export async function DELETE(_req: NextRequest, { params }: RouteCtx) {
 // Skips duplicates by normalizedDomain (same domain already in list = ignored).
 // Returns { appended: number, skipped: number, updatedList }.
 export async function POST(req: NextRequest, { params }: RouteCtx) {
-  const session = await getSession()
-  if (!session?.superAdminId && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -128,7 +127,7 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     include: { _count: { select: { results: true } }, results: { select: { normalizedDomain: true } } },
   })
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!listIsOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(list, identity)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const { results = [] } = await req.json() as { results: Record<string, unknown>[] }
   if (!Array.isArray(results) || results.length === 0) {

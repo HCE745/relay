@@ -1,26 +1,17 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
+import { getResearchIdentity, listIsOwner } from "@/lib/research-list-auth"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
 
 type RouteCtx = { params: Promise<{ id: string }> }
 
-function isOwner(
-  job: { salesUserId: string | null; superAdminId: string | null },
-  session: { salesUserId?: string; superAdminId?: string },
-): boolean {
-  if (session.superAdminId && job.superAdminId === session.superAdminId) return true
-  if (session.salesUserId  && job.salesUserId  === session.salesUserId)  return true
-  return false
-}
-
 // ── GET /api/super-admin/crm/prospects/discover/jobs/[id] ────────────────────
 // Returns current job status and progress for the polling UI.
 export async function GET(_req: NextRequest, { params }: RouteCtx) {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -53,7 +44,7 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!job) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!isOwner(job, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(job, identity)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   return NextResponse.json({
     id:                job.id,
@@ -80,8 +71,8 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
 // ── PATCH /api/super-admin/crm/prospects/discover/jobs/[id] ──────────────────
 // Body: { action: "cancel" }
 export async function PATCH(req: NextRequest, { params }: RouteCtx) {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -93,7 +84,7 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!job) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!isOwner(job, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(job, identity)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const body = await req.json() as { action?: string }
 

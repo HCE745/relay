@@ -5,6 +5,15 @@ import { NextRequest } from "next/server"
 
 vi.mock("server-only", () => ({}))
 
+vi.mock("@/lib/session", () => ({
+  getSession: vi.fn(),
+}))
+
+vi.mock("@/lib/research-list-auth", async () => {
+  const actual = await import("@/lib/research-list-auth")
+  return { ...actual, getResearchIdentity: vi.fn() }
+})
+
 vi.mock("@/lib/sales-auth", () => ({
   getSalesSession: vi.fn(),
 }))
@@ -23,6 +32,7 @@ vi.mock("@/lib/prospect-utils", () => ({
 }))
 
 import { getSalesSession } from "@/lib/sales-auth"
+import { getResearchIdentity } from "@/lib/research-list-auth"
 import { prisma } from "@/lib/prisma"
 import { findDuplicateProspect } from "@/lib/prospect-utils"
 import { POST } from "@/app/api/super-admin/crm/prospects/discover/lists/[id]/promote/route"
@@ -80,6 +90,7 @@ function setupListAndResults() {
 describe("promote route — auth", () => {
   it("returns 403 when no session", async () => {
     vi.mocked(getSalesSession).mockResolvedValue(null)
+    vi.mocked(getResearchIdentity).mockResolvedValue(null)
     const res = await POST(makeRequest(["res_acme"]), makeParams())
     expect(res.status).toBe(403)
   })
@@ -90,6 +101,7 @@ describe("promote route — auth", () => {
 describe("promote route — successful promotion by rep", () => {
   beforeEach(() => {
     vi.mocked(getSalesSession).mockResolvedValue(REP_A)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: "rep_a", superAdminId: null, isCrmImpersonation: false })
     setupListAndResults()
     vi.mocked(findDuplicateProspect).mockResolvedValue(null) // no existing match
     vi.mocked(prisma.prospect.create).mockResolvedValue({ id: "prospect_new" } as never)
@@ -137,6 +149,7 @@ describe("promote route — successful promotion by rep", () => {
 describe("promote route — duplicate domain detection", () => {
   beforeEach(() => {
     vi.mocked(getSalesSession).mockResolvedValue(REP_A)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: "rep_a", superAdminId: null, isCrmImpersonation: false })
     setupListAndResults()
   })
 
@@ -197,6 +210,7 @@ describe("promote route — duplicate domain detection", () => {
 describe("promote route — alternate company name match", () => {
   it("reuses an existing Prospect found by normalised name when no domain match", async () => {
     vi.mocked(getSalesSession).mockResolvedValue(REP_A)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: "rep_a", superAdminId: null, isCrmImpersonation: false })
     setupListAndResults()
 
     // findDuplicateProspect found it by name normalisation (no domain in its data)
@@ -223,6 +237,7 @@ describe("promote route — ownership conflict (two salesperson accounts)", () =
   it("returns 409 when Rep B tries to promote a company already owned by Rep A", async () => {
     // Rep B is trying to promote
     vi.mocked(getSalesSession).mockResolvedValue(REP_B)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: "rep_b", superAdminId: null, isCrmImpersonation: false })
 
     // Rep B's list (or shared list they can access)
     vi.mocked(prisma.prospectResearchList.findUnique).mockResolvedValue(
@@ -256,6 +271,7 @@ describe("promote route — ownership conflict (two salesperson accounts)", () =
 describe("promote route — super-admin bypass", () => {
   beforeEach(() => {
     vi.mocked(getSalesSession).mockResolvedValue(SA)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: null, superAdminId: "sa_record_id", isCrmImpersonation: false })
     // SA-owned list
     vi.mocked(prisma.prospectResearchList.findUnique).mockResolvedValue(
       { salesUserId: null, superAdminId: "sa_record_id", isShared: false } as never
@@ -305,6 +321,7 @@ describe("promote route — super-admin bypass", () => {
 describe("promote route — access control", () => {
   it("returns 404 when list does not exist", async () => {
     vi.mocked(getSalesSession).mockResolvedValue(REP_A)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: "rep_a", superAdminId: null, isCrmImpersonation: false })
     vi.mocked(prisma.prospectResearchList.findUnique).mockResolvedValue(null)
 
     const res = await POST(makeRequest(["res_acme"]), makeParams())
@@ -313,6 +330,7 @@ describe("promote route — access control", () => {
 
   it("returns 403 when rep tries to access another rep's private list", async () => {
     vi.mocked(getSalesSession).mockResolvedValue(REP_B) // Rep B
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: "rep_b", superAdminId: null, isCrmImpersonation: false })
     vi.mocked(prisma.prospectResearchList.findUnique).mockResolvedValue(
       { salesUserId: "rep_a", superAdminId: null, isShared: false } as never // Rep A's list
     )
@@ -321,23 +339,21 @@ describe("promote route — access control", () => {
     expect(res.status).toBe(403)
   })
 
-  it("allows rep to access a shared list they don't own", async () => {
+  it("returns 403 when rep tries to promote from a shared list they don't own", async () => {
+    // isShared is a display/metadata flag and does NOT grant promote access to non-owners
     vi.mocked(getSalesSession).mockResolvedValue(REP_B)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: "rep_b", superAdminId: null, isCrmImpersonation: false })
     vi.mocked(prisma.prospectResearchList.findUnique).mockResolvedValue(
-      { salesUserId: "rep_a", superAdminId: null, isShared: true } as never // shared
+      { salesUserId: "rep_a", superAdminId: null, isShared: true } as never // shared but not owned by REP_B
     )
-    vi.mocked(prisma.prospectResearchResult.findMany).mockResolvedValue([RESULT_ACME] as never)
-    vi.mocked(prisma.prospectResearchResult.update).mockResolvedValue({} as never)
-    vi.mocked(findDuplicateProspect).mockResolvedValue(null)
-    vi.mocked(prisma.prospect.create).mockResolvedValue({ id: "new_p" } as never)
-    vi.mocked(prisma.accountAssignmentHistory.create).mockResolvedValue({} as never)
 
     const res = await POST(makeRequest(["res_acme"]), makeParams())
-    expect(res.status).toBe(200)
+    expect(res.status).toBe(403)
   })
 
   it("returns 400 for empty resultIds", async () => {
     vi.mocked(getSalesSession).mockResolvedValue(REP_A)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ salesUserId: "rep_a", superAdminId: null, isCrmImpersonation: false })
     vi.mocked(prisma.prospectResearchList.findUnique).mockResolvedValue(LIST_OWNED_BY_REP_A as never)
 
     const res = await POST(makeRequest([]), makeParams())

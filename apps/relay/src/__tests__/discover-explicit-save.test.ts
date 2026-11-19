@@ -19,6 +19,15 @@ vi.mock("@/lib/session", () => ({
   getSession: vi.fn(),
 }))
 
+vi.mock("@/lib/sales-auth", () => ({
+  getSalesSession: vi.fn(),
+}))
+
+vi.mock("@/lib/research-list-auth", async () => {
+  const actual = await import("@/lib/research-list-auth")
+  return { ...actual, getResearchIdentity: vi.fn() }
+})
+
 vi.mock("@/lib/platform-config", () => ({
   getPlatformConfig: vi.fn(),
 }))
@@ -48,11 +57,9 @@ vi.mock("@/lib/prisma", () => ({
   },
 }))
 
-import { getSession } from "@/lib/session"
+import { getResearchIdentity } from "@/lib/research-list-auth"
 import { GET, POST } from "@/app/api/super-admin/crm/prospects/discover/lists/route"
 import { PATCH } from "@/app/api/super-admin/crm/prospects/discover/lists/[id]/route"
-
-const mockGetSession = vi.mocked(getSession)
 
 function req(body?: unknown): NextRequest {
   return new NextRequest("https://test.example/api/", {
@@ -68,7 +75,7 @@ describe("GET /lists", () => {
   beforeEach(() => { vi.clearAllMocks() })
 
   it("filters to isExplicitlySaved: true for super-admin", async () => {
-    mockGetSession.mockResolvedValue({ superAdminId: "sa-1" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-1", salesUserId: null, isCrmImpersonation: false })
     mockFindMany.mockResolvedValue([])
     mockGroupBy.mockResolvedValue([])
 
@@ -82,7 +89,7 @@ describe("GET /lists", () => {
   })
 
   it("filters to isExplicitlySaved: true for sales user", async () => {
-    mockGetSession.mockResolvedValue({ salesUserId: "u-1", salesUserRole: "sales_rep" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: null, salesUserId: "u-1", isCrmImpersonation: false })
     mockFindMany.mockResolvedValue([])
     mockGroupBy.mockResolvedValue([])
 
@@ -96,7 +103,7 @@ describe("GET /lists", () => {
   })
 
   it("returns 403 for unauthenticated requests", async () => {
-    mockGetSession.mockResolvedValue(null)
+    vi.mocked(getResearchIdentity).mockResolvedValue(null)
     const res = await GET()
     expect(res.status).toBe(403)
   })
@@ -108,7 +115,7 @@ describe("PATCH /lists/[id] — isExplicitlySaved", () => {
   beforeEach(() => { vi.clearAllMocks() })
 
   it("sets isExplicitlySaved: true when requested", async () => {
-    mockGetSession.mockResolvedValue({ superAdminId: "sa-1" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-1", salesUserId: null, isCrmImpersonation: false })
     mockFindUnique.mockResolvedValue({ salesUserId: null, superAdminId: "sa-1", isShared: false })
     mockUpdate.mockResolvedValue({ id: "list-1", name: "My List", isExplicitlySaved: true, _count: { results: 0 } })
 
@@ -131,7 +138,7 @@ describe("PATCH /lists/[id] — isExplicitlySaved", () => {
   })
 
   it("does not allow setting isExplicitlySaved: false (downgrade not permitted)", async () => {
-    mockGetSession.mockResolvedValue({ superAdminId: "sa-1" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-1", salesUserId: null, isCrmImpersonation: false })
     mockFindUnique.mockResolvedValue({ salesUserId: null, superAdminId: "sa-1", isShared: false })
     mockUpdate.mockResolvedValue({ id: "list-1", name: "Draft", isExplicitlySaved: false, _count: { results: 0 } })
 
@@ -155,7 +162,7 @@ describe("PATCH /lists/[id] — isExplicitlySaved", () => {
   })
 
   it("returns 403 for non-owners", async () => {
-    mockGetSession.mockResolvedValue({ superAdminId: "sa-other" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-other", salesUserId: null, isCrmImpersonation: false })
     mockFindUnique.mockResolvedValue({ salesUserId: null, superAdminId: "sa-1", isShared: false })
 
     const params = Promise.resolve({ id: "list-1" })
@@ -164,7 +171,7 @@ describe("PATCH /lists/[id] — isExplicitlySaved", () => {
   })
 
   it("returns 404 for missing list", async () => {
-    mockGetSession.mockResolvedValue({ superAdminId: "sa-1" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-1", salesUserId: null, isCrmImpersonation: false })
     mockFindUnique.mockResolvedValue(null)
 
     const params = Promise.resolve({ id: "no-such" })
@@ -179,7 +186,7 @@ describe("account isolation", () => {
   beforeEach(() => { vi.clearAllMocks() })
 
   it("super-admin GET only sees own lists via superAdminId filter", async () => {
-    mockGetSession.mockResolvedValue({ superAdminId: "sa-A" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-A", salesUserId: null, isCrmImpersonation: false })
     mockFindMany.mockResolvedValue([])
     mockGroupBy.mockResolvedValue([])
 
@@ -193,7 +200,7 @@ describe("account isolation", () => {
   })
 
   it("sales user GET only sees own lists via salesUserId filter", async () => {
-    mockGetSession.mockResolvedValue({ salesUserId: "u-X", salesUserRole: "sales_rep" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: null, salesUserId: "u-X", isCrmImpersonation: false })
     mockFindMany.mockResolvedValue([])
     mockGroupBy.mockResolvedValue([])
 

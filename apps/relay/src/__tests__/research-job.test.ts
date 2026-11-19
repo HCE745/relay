@@ -61,6 +61,15 @@ vi.mock("@/lib/session", () => ({
   getSession: vi.fn(),
 }))
 
+vi.mock("@/lib/sales-auth", () => ({
+  getSalesSession: vi.fn(),
+}))
+
+vi.mock("@/lib/research-list-auth", async () => {
+  const actual = await import("@/lib/research-list-auth")
+  return { ...actual, getResearchIdentity: vi.fn() }
+})
+
 vi.mock("@/lib/platform-config", () => ({
   getPlatformConfig: vi.fn(),
 }))
@@ -98,6 +107,7 @@ vi.mock("@/lib/discover-utils", () => ({
 }))
 
 import { getSession } from "@/lib/session"
+import { getResearchIdentity } from "@/lib/research-list-auth"
 import { getPlatformConfig } from "@/lib/platform-config"
 import { processDiscoveryBatch } from "@/lib/discover-utils"
 import { POST as jobsPost, GET as jobsGet } from "@/app/api/super-admin/crm/prospects/discover/jobs/route"
@@ -149,6 +159,7 @@ function makeCompany(name: string) {
 
 function setupDefaults() {
   vi.mocked(getSession).mockResolvedValue({ superAdmin: true, superAdminId: "sa-1" } as never)
+  vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-1", salesUserId: null, isCrmImpersonation: false })
   vi.mocked(getPlatformConfig).mockResolvedValue("true")
   mockProspectFindMany.mockResolvedValue([])
   mockCrmEmailFindMany.mockResolvedValue([])
@@ -199,6 +210,7 @@ describe("POST /jobs — job creation", () => {
 
   it("returns 403 without session", async () => {
     vi.mocked(getSession).mockResolvedValue(null as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue(null)
     const res = await jobsPost(makeJobsRequest())
     expect(res.status).toBe(403)
   })
@@ -242,6 +254,7 @@ describe("POST /jobs — job creation", () => {
 
   it("allows salesUserId sessions", async () => {
     vi.mocked(getSession).mockResolvedValue({ salesUserId: "s-1" } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: null, salesUserId: "s-1", isCrmImpersonation: false })
 
     const res = await jobsPost(makeJobsRequest())
     expect(res.status).toBe(200)
@@ -258,6 +271,7 @@ describe("GET /jobs — list own jobs", () => {
 
   it("returns 403 without session", async () => {
     vi.mocked(getSession).mockResolvedValue(null as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue(null)
     const req = new NextRequest("http://localhost/api/super-admin/crm/prospects/discover/jobs")
     const res = await jobsGet(req)
     expect(res.status).toBe(403)
@@ -313,6 +327,7 @@ describe("GET /jobs/[id] — status polling", () => {
 
   it("returns 403 when session does not own the job", async () => {
     vi.mocked(getSession).mockResolvedValue({ superAdminId: "sa-other", superAdmin: true } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-other", salesUserId: null, isCrmImpersonation: false })
     mockJobFindUnique.mockResolvedValue({
       id: "job-1", status: "pending", listId: "list-1",
       roundsCompleted: 1, roundsMax: 5, acceptedCount: 3, requestedCount: 20,
@@ -381,6 +396,7 @@ describe("PATCH /jobs/[id] — cancellation", () => {
 
   it("returns 403 for a session that doesn't own the job", async () => {
     vi.mocked(getSession).mockResolvedValue({ superAdminId: "sa-other", superAdmin: true } as never)
+    vi.mocked(getResearchIdentity).mockResolvedValue({ superAdminId: "sa-other", salesUserId: null, isCrmImpersonation: false })
     mockJobFindUnique.mockResolvedValue({
       id: "job-1", status: "pending",
       salesUserId: null, superAdminId: "sa-1",

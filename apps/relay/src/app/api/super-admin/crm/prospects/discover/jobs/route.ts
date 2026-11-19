@@ -1,6 +1,6 @@
 import "server-only"
 import { NextRequest, NextResponse, after } from "next/server"
-import { getSession } from "@/lib/session"
+import { getResearchIdentity } from "@/lib/research-list-auth"
 import { getPlatformConfig } from "@/lib/platform-config"
 import { prisma } from "@/lib/prisma"
 import {
@@ -23,8 +23,8 @@ const ROUNDS_MAX = 5
 // stay connected. The cron at */2 * * * * handles rounds 2–N.
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession()
-    if (!session?.superAdmin && !session?.salesUserId) {
+    const identity = await getResearchIdentity()
+    if (!identity) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -82,8 +82,8 @@ export async function POST(req: NextRequest) {
           name:               listLabel,
           isShared:           false,
           isExplicitlySaved:  false,
-          salesUserId:        session.salesUserId  ?? null,
-          superAdminId:       session.superAdminId ?? null,
+          salesUserId:        identity.salesUserId  ?? null,
+          superAdminId:       identity.superAdminId ?? null,
           searchCountry:   criteria.country,
           searchState:     criteria.stateProvince ?? null,
           searchIndustry:  criteria.industry,
@@ -97,8 +97,8 @@ export async function POST(req: NextRequest) {
       const job = await tx.prospectResearchJob.create({
         data: {
           listId:            list.id,
-          salesUserId:       session.salesUserId  ?? null,
-          superAdminId:      session.superAdminId ?? null,
+          salesUserId:       identity.salesUserId  ?? null,
+          superAdminId:      identity.superAdminId ?? null,
           country:           criteria.country,
           stateProvince:     criteria.stateProvince ?? null,
           industry:          criteria.industry,
@@ -219,15 +219,15 @@ export async function POST(req: NextRequest) {
 // ── GET /api/super-admin/crm/prospects/discover/jobs ─────────────────────────
 // Lists the caller's own research jobs (most recent first).
 export async function GET() {
-  const session = await getSession()
-  if (!session?.superAdmin && !session?.salesUserId) {
+  const identity = await getResearchIdentity()
+  if (!identity) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
   const jobs = await prisma.prospectResearchJob.findMany({
-    where: session.superAdminId
-      ? { superAdminId: session.superAdminId }
-      : { salesUserId:  session.salesUserId },
+    where: identity.superAdminId
+      ? { superAdminId: identity.superAdminId }
+      : { salesUserId:  identity.salesUserId },
     orderBy: { createdAt: "desc" },
     take:    50,
     select: {

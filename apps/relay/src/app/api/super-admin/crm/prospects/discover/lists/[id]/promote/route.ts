@@ -1,10 +1,9 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/session"
 import { getSalesSession } from "@/lib/sales-auth"
+import { getResearchIdentity, listIsOwner } from "@/lib/research-list-auth"
 import { prisma } from "@/lib/prisma"
 import { findDuplicateProspect } from "@/lib/prospect-utils"
-import { listIsOwner } from "@/lib/research-list-auth"
 
 export const dynamic = "force-dynamic"
 
@@ -30,9 +29,9 @@ export const dynamic = "force-dynamic"
 // company at the same instant) but it exists and should be tracked.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // getSalesSession provides user metadata (name, role) needed for Prospect creation.
-  // getSession provides the raw superAdminId needed for list ownership checks.
-  const [info, session] = await Promise.all([getSalesSession(), getSession()])
-  if (!info || !session) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  // getResearchIdentity provides the effective CRM identity for list ownership checks.
+  const [info, identity] = await Promise.all([getSalesSession(), getResearchIdentity()])
+  if (!info || !identity) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const { id } = await params
 
@@ -43,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   // Only the list owner may promote results from it.
-  if (!listIsOwner(list, session)) {
+  if (!listIsOwner(list, identity)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 

@@ -23,6 +23,7 @@ export type SessionPayload = {
   organizationId: string
   // Onboarding + trial (undefined = old session without field → no restriction)
   onboardingCompleted?: boolean
+  trialStartDate?: string     // ISO string; set for white-glove orgs — trial blocked until this date
   trialEndsAt?: string        // ISO string; undefined = no trial restriction
   subscriptionStatus?: string // "trialing" | "active" | "expired" | "read_only"
   plan?: string               // "essentials" | "professional" | "custom" | "wash_essentials"

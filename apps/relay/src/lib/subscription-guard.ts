@@ -44,7 +44,7 @@ export async function requireActiveSubscription(): Promise<NextResponse | null> 
 
   const org = await prisma.organization.findUnique({
     where:  { id: session.organizationId },
-    select: { subscriptionStatus: true },
+    select: { subscriptionStatus: true, trialStartDate: true },
   })
 
   if (!org) {
@@ -57,6 +57,21 @@ export async function requireActiveSubscription(): Promise<NextResponse | null> 
       {
         error: "Your subscription has ended. Please renew your plan to continue using Relay.",
         code:  "SUBSCRIPTION_REQUIRED",
+      },
+      { status: 402 },
+    )
+  }
+
+  // Block writes before the agreed trial start date to prevent early access.
+  if (
+    org.subscriptionStatus === "trialing" &&
+    org.trialStartDate &&
+    org.trialStartDate > new Date()
+  ) {
+    return NextResponse.json(
+      {
+        error: "Your trial has not started yet. Access will begin on your trial start date.",
+        code:  "TRIAL_NOT_STARTED",
       },
       { status: 402 },
     )

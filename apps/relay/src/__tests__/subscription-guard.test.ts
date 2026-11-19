@@ -39,9 +39,9 @@ function mockSession(overrides = {}) {
   vi.mocked(getSession).mockResolvedValue({ ...SESSION, ...overrides } as never)
 }
 
-function mockOrgStatus(status: string | null) {
+function mockOrgStatus(status: string | null, trialStartDate?: Date | null) {
   vi.mocked(prisma.organization.findUnique).mockResolvedValue(
-    { subscriptionStatus: status } as never
+    { subscriptionStatus: status, trialStartDate: trialStartDate ?? null } as never
   )
 }
 
@@ -80,6 +80,39 @@ describe("requireActiveSubscription", () => {
       expect(result).toBeNull()
     })
   }
+
+  // Future trialStartDate blocks access even when status is "trialing"
+  it("returns 402 (TRIAL_NOT_STARTED) when trialing and trialStartDate is in the future", async () => {
+    mockSession()
+    const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
+    mockOrgStatus("trialing", futureDate)
+
+    const result = await requireActiveSubscription()
+
+    expect(result).not.toBeNull()
+    expect(result!.status).toBe(402)
+    const body = await result!.json()
+    expect(body.code).toBe("TRIAL_NOT_STARTED")
+  })
+
+  it("returns null (allows writes) when trialing and trialStartDate is in the past", async () => {
+    mockSession()
+    const pastDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+    mockOrgStatus("trialing", pastDate)
+
+    const result = await requireActiveSubscription()
+
+    expect(result).toBeNull()
+  })
+
+  it("returns null (allows writes) when trialing and trialStartDate is null", async () => {
+    mockSession()
+    mockOrgStatus("trialing", null)
+
+    const result = await requireActiveSubscription()
+
+    expect(result).toBeNull()
+  })
 
   it("returns 401 when there is no session", async () => {
     vi.mocked(getSession).mockResolvedValue(null as never)

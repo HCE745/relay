@@ -91,7 +91,7 @@ export async function POST(
     // Re-issue session under the new org
     const org = await prisma.organization.findUnique({
       where: { id: invitation.organizationId },
-      select: { plan: true, productLine: true, subscriptionStatus: true, trialEndsAt: true, onboardingCompletedAt: true },
+      select: { plan: true, productLine: true, subscriptionStatus: true, trialStartDate: true, trialEndsAt: true, onboardingCompletedAt: true },
     })
 
     await createSession({
@@ -103,6 +103,7 @@ export async function POST(
       plan: org?.plan,
       productLine: org?.productLine,
       subscriptionStatus: org?.subscriptionStatus,
+      trialStartDate: org?.trialStartDate?.toISOString(),
       trialEndsAt: org?.trialEndsAt?.toISOString(),
       onboardingCompleted: org?.onboardingCompletedAt != null,
     })
@@ -160,7 +161,7 @@ export async function POST(
   // Read org subscription state so the session reflects trialing/plan correctly from first login
   const org = await prisma.organization.findUnique({
     where: { id: user.organizationId },
-    select: { plan: true, productLine: true, subscriptionStatus: true, trialEndsAt: true, onboardingCompletedAt: true },
+    select: { plan: true, productLine: true, subscriptionStatus: true, trialStartDate: true, trialEndsAt: true, onboardingCompletedAt: true },
   })
 
   await createSession({
@@ -172,6 +173,7 @@ export async function POST(
     plan: org?.plan,
     productLine: org?.productLine,
     subscriptionStatus: org?.subscriptionStatus,
+    trialStartDate: org?.trialStartDate?.toISOString(),
     trialEndsAt: org?.trialEndsAt?.toISOString(),
     onboardingCompleted: org?.onboardingCompletedAt != null,
   })

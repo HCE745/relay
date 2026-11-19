@@ -32,7 +32,7 @@ export async function login(formData: FormData) {
 
   const user = await prisma.user.findUnique({
     where: { email },
-    include: { organization: { select: { onboardingCompletedAt: true, trialEndsAt: true, subscriptionStatus: true, plan: true, productLine: true } } },
+    include: { organization: { select: { onboardingCompletedAt: true, trialStartDate: true, trialEndsAt: true, subscriptionStatus: true, plan: true, productLine: true } } },
   })
   if (!user || !user.isActive) return { error: "Invalid credentials" }
 
@@ -48,6 +48,7 @@ export async function login(formData: FormData) {
     role: user.role,
     organizationId: user.organizationId,
     onboardingCompleted: !!user.organization.onboardingCompletedAt,
+    trialStartDate: user.organization.trialStartDate?.toISOString(),
     trialEndsAt: user.organization.trialEndsAt?.toISOString(),
     subscriptionStatus: user.organization.subscriptionStatus,
     plan: user.organization.plan,

@@ -226,6 +226,15 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/billing", request.url))
   }
 
+  const trialNotStarted =
+    session.subscriptionStatus === "trialing" &&
+    session.trialStartDate &&
+    new Date(session.trialStartDate) > new Date()
+
+  if (trialNotStarted) {
+    return NextResponse.redirect(new URL("/billing", request.url))
+  }
+
   // ── Wash Essentials path guard ────────────────────────────────────────────
   // Demo sessions bypass this restriction so the tour can showcase all features
   // regardless of which productLine the demo org was seeded with.

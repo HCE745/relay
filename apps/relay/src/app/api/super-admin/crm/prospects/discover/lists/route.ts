@@ -6,22 +6,18 @@ import { prisma } from "@/lib/prisma"
 export const dynamic = "force-dynamic"
 
 // ── GET /api/super-admin/crm/prospects/discover/lists ─────────────────────────
-// Returns research lists the caller owns OR that are marked isShared=true.
-// Sales users never see another user's private lists.
+// Returns only the lists the caller personally owns.
+// isShared is a metadata flag and does NOT grant visibility to other users.
 export async function GET() {
   const session = await getSession()
   if (!session?.superAdminId && !session?.salesUserId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  // Plain sales_rep users only see their own lists — not shared lists from other users.
-  // Managers (admin_sales) and super-admins can see shared lists.
-  const canSeeShared = !!session.superAdminId || session.salesUserRole === "admin_sales"
-
   const lists = await prisma.prospectResearchList.findMany({
     where: session.superAdminId
-      ? { isExplicitlySaved: true, OR: [{ superAdminId: session.superAdminId }, ...(canSeeShared ? [{ isShared: true }] : [])] }
-      : { isExplicitlySaved: true, OR: [{ salesUserId: session.salesUserId },   ...(canSeeShared ? [{ isShared: true }] : [])] },
+      ? { isExplicitlySaved: true, superAdminId: session.superAdminId }
+      : { isExplicitlySaved: true, salesUserId:  session.salesUserId  },
     include: { _count: { select: { results: true } } },
     // Active lists first (by createdAt desc), then completed
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
@@ -76,7 +72,9 @@ export async function POST(req: NextRequest) {
     data: {
       name: name.trim(),
       description: description ?? null,
-      isShared: isShared === true,
+      // Only super-admins may create shared lists; ordinary sales users cannot
+      // set isShared via this API even with a forged request body.
+      isShared: session.superAdminId ? isShared === true : false,
       salesUserId:  session.salesUserId  ?? null,
       superAdminId: session.superAdminId ?? null,
       searchCountry:  searchCountry  ?? null,

@@ -2,32 +2,14 @@ import "server-only"
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
+import { listIsOwner } from "@/lib/research-list-auth"
 
 export const dynamic = "force-dynamic"
-
-function canAccess(
-  list: { salesUserId: string | null; superAdminId: string | null; isShared: boolean },
-  session: { salesUserId?: string; superAdminId?: string },
-): boolean {
-  if (list.isShared) return true
-  if (session.superAdminId && list.superAdminId === session.superAdminId) return true
-  if (session.salesUserId  && list.salesUserId  === session.salesUserId)  return true
-  return false
-}
-
-function isOwner(
-  list: { salesUserId: string | null; superAdminId: string | null },
-  session: { salesUserId?: string; superAdminId?: string },
-): boolean {
-  if (session.superAdminId && list.superAdminId === session.superAdminId) return true
-  if (session.salesUserId  && list.salesUserId  === session.salesUserId)  return true
-  return false
-}
 
 type RouteCtx = { params: Promise<{ id: string }> }
 
 // ── GET /api/super-admin/crm/prospects/discover/lists/[id] ───────────────────
-// Returns a list with all its results (accessible to owner or if shared).
+// Returns a list with all its results. Requires ownership.
 export async function GET(_req: NextRequest, { params }: RouteCtx) {
   const session = await getSession()
   if (!session?.superAdminId && !session?.salesUserId) {
@@ -41,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!canAccess(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   return NextResponse.json(list)
 }
@@ -61,7 +43,7 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!isOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const body = await req.json() as {
     name?:              string
@@ -122,7 +104,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteCtx) {
   })
 
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  if (!isOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   await prisma.prospectResearchList.delete({ where: { id } })
 
@@ -146,12 +128,7 @@ export async function POST(req: NextRequest, { params }: RouteCtx) {
     include: { _count: { select: { results: true } }, results: { select: { normalizedDomain: true } } },
   })
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
-
-  const hasAccess =
-    list.isShared ||
-    (session.superAdminId && list.superAdminId === session.superAdminId) ||
-    (session.salesUserId  && list.salesUserId  === session.salesUserId)
-  if (!hasAccess) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!listIsOwner(list, session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const { results = [] } = await req.json() as { results: Record<string, unknown>[] }
   if (!Array.isArray(results) || results.length === 0) {

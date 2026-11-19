@@ -1,8 +1,10 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
+import { getSession } from "@/lib/session"
 import { getSalesSession } from "@/lib/sales-auth"
 import { prisma } from "@/lib/prisma"
 import { findDuplicateProspect } from "@/lib/prospect-utils"
+import { listIsOwner } from "@/lib/research-list-auth"
 
 export const dynamic = "force-dynamic"
 
@@ -27,8 +29,10 @@ export const dynamic = "force-dynamic"
 // required migration. The practical risk is low (two reps promoting the same
 // company at the same instant) but it exists and should be tracked.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const info = await getSalesSession()
-  if (!info) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  // getSalesSession provides user metadata (name, role) needed for Prospect creation.
+  // getSession provides the raw superAdminId needed for list ownership checks.
+  const [info, session] = await Promise.all([getSalesSession(), getSession()])
+  if (!info || !session) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const { id } = await params
 
@@ -38,12 +42,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   })
   if (!list) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
-  // SA can access any list; reps and managers can only access their own or shared lists.
-  const hasAccess =
-    list.isShared ||
-    info.isSuperAdmin ||
-    (list.salesUserId !== null && list.salesUserId === info.salesUserId)
-  if (!hasAccess) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  // Only the list owner may promote results from it.
+  if (!listIsOwner(list, session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
 
   const { resultIds } = await req.json() as { resultIds: string[] }
   if (!Array.isArray(resultIds) || resultIds.length === 0) {

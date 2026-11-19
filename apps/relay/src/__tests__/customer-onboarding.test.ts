@@ -278,6 +278,49 @@ describe("PATCH /onboarding/[id]", () => {
     }))
   })
 
+  it("D2: sets launchedAt when transitioning invitation_sent → live", async () => {
+    const before = Date.now()
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({
+      ...BASE_ONBOARDING,
+      status: "invitation_sent",
+      invitationSentAt: "2026-11-15T00:00:00Z",
+      launchedAt: null,
+      organization: { id: "org-1", name: "Acme Co" },
+    })
+    mockUpdate.mockResolvedValue({ ...BASE_ONBOARDING, status: "live" })
+    const res = await PATCH(jsonReq({ status: "live" }, "PATCH"), params("ob-1"))
+    expect(res.status).toBe(200)
+    const updateCall = mockUpdate.mock.calls[0]![0] as { data: Record<string, unknown> }
+    expect(updateCall.data.launchedAt).toBeInstanceOf(Date)
+    expect((updateCall.data.launchedAt as Date).getTime()).toBeGreaterThanOrEqual(before)
+  })
+
+  it("D2: does not set launchedAt on non-live status transitions", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({ ...BASE_ONBOARDING, status: "draft", organization: { id: "org-1", name: "Acme Co" } })
+    mockUpdate.mockResolvedValue({ ...BASE_ONBOARDING, status: "configuring" })
+    const res = await PATCH(jsonReq({ status: "configuring" }, "PATCH"), params("ob-1"))
+    expect(res.status).toBe(200)
+    const updateCall = mockUpdate.mock.calls[0]![0] as { data: Record<string, unknown> }
+    expect(updateCall.data.launchedAt).toBeUndefined()
+  })
+
+  it("D2: does not overwrite launchedAt when already set", async () => {
+    mockGetSession.mockResolvedValue(SA_SESSION as never)
+    mockFindUnique.mockResolvedValue({
+      ...BASE_ONBOARDING,
+      status: "invitation_sent",
+      invitationSentAt: "2026-11-15T00:00:00Z",
+      launchedAt: new Date("2026-11-16T00:00:00Z"), // already set
+      organization: { id: "org-1", name: "Acme Co" },
+    })
+    mockUpdate.mockResolvedValue({ ...BASE_ONBOARDING, status: "live" })
+    await PATCH(jsonReq({ status: "live" }, "PATCH"), params("ob-1"))
+    const updateCall = mockUpdate.mock.calls[0]![0] as { data: Record<string, unknown> }
+    expect(updateCall.data.launchedAt).toBeUndefined()
+  })
+
   it("blocks field edits when status is invitation_sent", async () => {
     mockGetSession.mockResolvedValue(SA_SESSION as never)
     mockFindUnique.mockResolvedValue({

@@ -10,12 +10,16 @@ import { NextRequest } from "next/server"
 
 vi.mock("server-only", () => ({}))
 
+vi.mock("bcryptjs", () => ({
+  default: { hash: vi.fn().mockResolvedValue("hashed-pw") },
+}))
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    invitation: { findUnique: vi.fn() },
-    user:       { findUnique: vi.fn(), create: vi.fn() },
+    invitation: { findUnique: vi.fn(), update: vi.fn() },
+    user:       { findUnique: vi.fn(), create: vi.fn(), findFirst: vi.fn() },
     organization: { findUnique: vi.fn() },
-    userOrgMembership: { create: vi.fn() },
+    userOrgMembership: { create: vi.fn(), upsert: vi.fn() },
   },
 }))
 
@@ -31,6 +35,8 @@ vi.mock("@/lib/ratelimit", () => ({
 }))
 
 import { prisma } from "@/lib/prisma"
+import { createSession } from "@/lib/session"
+import { POST as acceptPOST } from "@/app/api/invite/[token]/route"
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -109,5 +115,106 @@ describe("Password validation on invitation acceptance", () => {
 
     expect(shortPassword.length < 8).toBe(true)
     expect(longPassword.length < 8).toBe(false)
+  })
+})
+
+// ── D1 regression: session includes org subscription state after invite acceptance ──
+
+const TRIALING_ORG = {
+  plan:               "essentials",
+  productLine:        "RELAY_STANDARD",
+  subscriptionStatus: "trialing",
+  trialEndsAt:        new Date("2026-12-19T00:00:00Z"),
+  onboardingCompletedAt: null,
+}
+
+const WHITE_GLOVE_INVITE = {
+  id:             "inv-wg-1",
+  organizationId: "org-wg",
+  email:          "customer@acme.com",
+  token:          "wg-token",
+  role:           "ADMIN",
+  usedAt:         null,
+  expiresAt:      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  invitedById:    null,
+  managerId:      null,
+  departmentId:   null,
+  locationId:     null,
+  userType:       "INTERNAL",
+  accountExpiresAt: null,
+  organization:   { name: "Acme Co" },
+}
+
+describe("D1 — invitation acceptance session includes org subscription state", () => {
+  beforeEach(() => { vi.clearAllMocks() })
+
+  it("new user: createSession includes trialEndsAt, subscriptionStatus, plan, productLine", async () => {
+    vi.mocked(prisma.invitation.findUnique).mockResolvedValue(WHITE_GLOVE_INVITE as never)
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
+    vi.mocked(prisma.user.findFirst).mockResolvedValue(null)
+    vi.mocked(prisma.user.create).mockResolvedValue({ id: "u-new", email: "customer@acme.com", name: "Jane", role: "ADMIN", organizationId: "org-wg" } as never)
+    vi.mocked(prisma.userOrgMembership.create).mockResolvedValue({} as never)
+    vi.mocked(prisma.invitation.update).mockResolvedValue({} as never)
+    vi.mocked(prisma.organization.findUnique).mockResolvedValue(TRIALING_ORG as never)
+
+    const req = new NextRequest("https://test.example/api/invite/wg-token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: "Jane Smith", password: "securepass1" }),
+    })
+    const res = await acceptPOST(req, { params: Promise.resolve({ token: "wg-token" }) })
+    expect(res.status).toBe(200)
+
+    expect(vi.mocked(createSession)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subscriptionStatus: "trialing",
+        trialEndsAt:        TRIALING_ORG.trialEndsAt.toISOString(),
+        plan:               "essentials",
+        productLine:        "RELAY_STANDARD",
+      }),
+    )
+  })
+
+  it("new user: createSession sets onboardingCompleted correctly", async () => {
+    vi.mocked(prisma.invitation.findUnique).mockResolvedValue(WHITE_GLOVE_INVITE as never)
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
+    vi.mocked(prisma.user.findFirst).mockResolvedValue(null)
+    vi.mocked(prisma.user.create).mockResolvedValue({ id: "u-new", email: "customer@acme.com", name: "Jane", role: "ADMIN", organizationId: "org-wg" } as never)
+    vi.mocked(prisma.userOrgMembership.create).mockResolvedValue({} as never)
+    vi.mocked(prisma.invitation.update).mockResolvedValue({} as never)
+    // org with onboardingCompletedAt set
+    vi.mocked(prisma.organization.findUnique).mockResolvedValue({ ...TRIALING_ORG, onboardingCompletedAt: new Date() } as never)
+
+    const req = new NextRequest("https://test.example/api/invite/wg-token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: "Jane Smith", password: "securepass1" }),
+    })
+    await acceptPOST(req, { params: Promise.resolve({ token: "wg-token" }) })
+    expect(vi.mocked(createSession)).toHaveBeenCalledWith(
+      expect.objectContaining({ onboardingCompleted: true }),
+    )
+  })
+
+  it("existing user re-join: createSession includes trialEndsAt", async () => {
+    const existingUser = { id: "u-existing", email: "customer@acme.com", name: "Jane", role: "ADMIN" }
+    vi.mocked(prisma.invitation.findUnique).mockResolvedValue(WHITE_GLOVE_INVITE as never)
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(existingUser as never)
+    vi.mocked(prisma.userOrgMembership.upsert).mockResolvedValue({} as never)
+    vi.mocked(prisma.invitation.update).mockResolvedValue({} as never)
+    vi.mocked(prisma.organization.findUnique).mockResolvedValue(TRIALING_ORG as never)
+
+    const req = new NextRequest("https://test.example/api/invite/wg-token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: "Jane Smith", password: "securepass1" }),
+    })
+    await acceptPOST(req, { params: Promise.resolve({ token: "wg-token" }) })
+    expect(vi.mocked(createSession)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        trialEndsAt:        TRIALING_ORG.trialEndsAt.toISOString(),
+        subscriptionStatus: "trialing",
+      }),
+    )
   })
 })

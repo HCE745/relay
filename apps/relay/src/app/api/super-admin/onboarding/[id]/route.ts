@@ -113,6 +113,11 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
       )
     }
     data.status = body.status
+    // Record the moment the SA marks the customer live (invitation_sent → live is the only path here).
+    // Guard against overwriting in case of a data anomaly where launchedAt is already set.
+    if (body.status === "live" && !record.launchedAt) {
+      data.launchedAt = new Date()
+    }
   }
 
   if (body.primaryContactName !== undefined) {

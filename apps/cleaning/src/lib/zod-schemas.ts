@@ -540,6 +540,62 @@ export const taskVerifySchema = z.object({
   note: optionalString,
 })
 
+// ── P2 Employee Reporting & Supervisor Review ────────────────────────────────
+export const EMPLOYEE_REPORT_CATEGORIES = [
+  // Work quality (NORMAL)
+  "INCOMPLETE_WORK",
+  "MISSED_TASK",
+  "POOR_WORKMANSHIP",
+  "QUALITY_OTHER",
+  // Operational conduct (PRIVATE)
+  "ASSIGNMENT_REFUSAL",
+  "LEFT_EARLY",
+  "PROCEDURE_VIOLATION",
+  "OPERATIONAL_OTHER",
+  // Serious workplace misconduct (CONFIDENTIAL)
+  "HARASSMENT",
+  "THEFT",
+  "THREAT",
+  "SAFETY_CONCERN",
+  "MISCONDUCT_OTHER",
+] as const
+
+export const EMPLOYEE_REPORT_CONFIDENTIALITY = ["NORMAL", "PRIVATE", "CONFIDENTIAL"] as const
+
+const longText = z.string().trim().min(1).max(5000)
+// A non-empty id, or "" → undefined (so an unselected optional picker clears).
+const optionalId = z.string().min(1).optional().nullable().or(z.literal("").transform(() => null))
+
+export const employeeReportCreateSchema = z.object({
+  category: z.enum(EMPLOYEE_REPORT_CATEGORIES),
+  confidentiality: z.enum(EMPLOYEE_REPORT_CONFIDENTIALITY).default("NORMAL"),
+  title: optionalString,
+  description: longText,
+  aboutUserId: optionalId,
+  jobId: optionalId,
+  jobChecklistItemId: optionalId,
+})
+
+export const employeeReportAssignSchema = z.object({ reviewerId: z.string().min(1) })
+
+export const employeeReportStatusSchema = z.object({
+  action: z.enum(["start_review", "substantiate", "unsubstantiate", "inconclusive", "resolve", "reopen"]),
+  note: optionalString,
+})
+
+export const employeeReportResponseSchema = z.object({ response: longText })
+
+export const employeeReportCorrectiveSchema = z.object({
+  action: z.string().trim().min(1).max(2000),
+  dueAt: z.string().datetime().optional().nullable().or(z.literal("").transform(() => null)),
+  assigneeId: optionalId,
+})
+
+export const employeeReportListQuerySchema = z.object({
+  status: z.enum(["SUBMITTED", "PENDING_REVIEW", "UNDER_REVIEW", "SUBSTANTIATED", "UNSUBSTANTIATED", "INCONCLUSIVE", "RESOLVED"]).optional(),
+  mine: z.coerce.boolean().optional(),
+})
+
 export const ISSUE_CATEGORIES = [
   "QUALITY",
   "SAFETY",

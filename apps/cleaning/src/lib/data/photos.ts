@@ -2,6 +2,7 @@ import { randomUUID } from "crypto"
 import { orgDb } from "../org-db"
 import { assertFound } from "./errors"
 import { getStorage, extForContentType } from "../storage"
+import { canManageView, canReporterView, type ActorRole, type Confidentiality } from "../employee-reports/access"
 
 // Proof-of-service + inspection photo upload/retrieval, fully tenant-scoped.
 // Uploader identity comes from the session, never the client.
@@ -11,6 +12,7 @@ type Links = {
   jobId?: string | null
   jobChecklistItemId?: string
   issueId?: string
+  employeeReportId?: string
   inspectionId?: string
   inspectionItemResultId?: string
 }
@@ -34,6 +36,7 @@ async function storeAndCreate(orgId: string, uploaderId: string, photo: PhotoDat
         jobId: links.jobId ?? null,
         jobChecklistItemId: links.jobChecklistItemId,
         issueId: links.issueId,
+        employeeReportId: links.employeeReportId,
         inspectionId: links.inspectionId,
         inspectionItemResultId: links.inspectionItemResultId,
         storageKey: ref,
@@ -96,18 +99,56 @@ export async function uploadInspectionPhoto(
   })
 }
 
+/**
+ * Confidential employee-report evidence (P2). Deliberately carries NO jobId or
+ * checklist-item id, so it never appears in any job's proof-of-service gallery.
+ * The report's existence + the actor's permission to attach are checked by the
+ * caller (src/lib/data/employee-reports.ts); serving is gated in getPhotoForServe.
+ */
+export async function uploadEmployeeReportPhoto(
+  orgId: string,
+  employeeReportId: string,
+  uploaderId: string,
+  opts: PhotoData,
+) {
+  return storeAndCreate(orgId, uploaderId, opts, { jobId: null, employeeReportId })
+}
+
 // Demo orgs never write to Blob — their proof photos use this placeholder.
 export const DEMO_PLACEHOLDER_KEY = "demo-placeholder"
 const PLACEHOLDER_SVG = Buffer.from(
   `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="#e2e8f0"/><g fill="#94a3b8"><circle cx="200" cy="120" r="44"/><rect x="110" y="190" width="180" height="70" rx="10"/></g><text x="200" y="285" text-anchor="middle" font-family="system-ui" font-size="14" fill="#64748b">Demo proof photo</text></svg>`,
 )
 
-export async function getPhotoForServe(orgId: string, photoId: string) {
+export async function getPhotoForServe(
+  orgId: string,
+  photoId: string,
+  viewer: { userId: string; role: string },
+) {
   const photo = await orgDb(orgId).jobPhoto.findFirst({
     where: { id: photoId },
-    select: { storageKey: true, contentType: true },
+    select: {
+      storageKey: true,
+      contentType: true,
+      employeeReportId: true,
+      // When the photo is employee-report evidence, authorize by report access.
+      employeeReport: { select: { reportedById: true, aboutUserId: true, confidentiality: true } },
+    },
   })
   if (!photo) return null
+  // Confidential evidence: only someone who may view the report (or its reporter)
+  // may fetch the bytes. Everyone else gets a 404 — never a different error that
+  // would confirm the photo exists.
+  if (photo.employeeReportId && photo.employeeReport) {
+    const ref = {
+      reportedById: photo.employeeReport.reportedById,
+      aboutUserId: photo.employeeReport.aboutUserId,
+      confidentiality: photo.employeeReport.confidentiality as Confidentiality,
+    }
+    const actor = { role: viewer.role as ActorRole, userId: viewer.userId }
+    const allowed = canManageView(actor, ref).allowed || canReporterView(actor, ref)
+    if (!allowed) return null
+  }
   if (photo.storageKey === DEMO_PLACEHOLDER_KEY) return { bytes: PLACEHOLDER_SVG, contentType: "image/svg+xml" }
   const bytes = await getStorage().get(photo.storageKey)
   if (!bytes) return null

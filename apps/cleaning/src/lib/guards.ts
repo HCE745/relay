@@ -93,6 +93,23 @@ export async function requireOperations(requiredCap?: string, opts?: GuardOption
 }
 
 /**
+ * Internal-staff guard (any role except CLIENT) + optional capability. Used by
+ * employee reporting (P2): every internal employee may FILE a report; who may
+ * VIEW/INVESTIGATE is enforced per-report in the data layer by confidentiality.
+ */
+export async function requireStaff(requiredCap?: string, opts?: GuardOptions): Promise<GuardedActor> {
+  const session = await getSession()
+  if (!session) return { ok: false, response: unauthorized() }
+  if (session.role === "CLIENT") return { ok: false, response: forbidden() }
+  if (requiredCap && !(await orgHasCapability(session.organizationId, requiredCap))) {
+    return { ok: false, response: forbidden(`Missing capability: ${requiredCap}`) }
+  }
+  const blocked = await subscriptionBlock(session, opts)
+  if (blocked) return { ok: false, response: blocked }
+  return { ok: true, session, orgId: session.organizationId, userId: session.userId }
+}
+
+/**
  * Any authenticated user (for self-service actions like changing own password).
  * NOT subscription-gated: authentication and account self-service must survive a
  * lapse so the customer can sign in and recover.

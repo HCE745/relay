@@ -43,6 +43,7 @@ export const CAPABILITIES = [
   "quality.inspections", // inspection program (whole — not split basic/advanced)
   "operations.issues", // issue lifecycle: ownership, routing, SLA, escalation, resolve/verify (whole)
   "operations.workVerification", // peer/supervisor task verification lifecycle (completed→verified/rejected→corrected), self-approval blocked
+  "operations.employeeReports", // employee reporting & supervisor review: work-quality/operational/confidential reports + investigation workflow
   "operations.dataImport", // CSV import of customers/sites/contacts with preview + rollback
   "portal.customerAccess", // customer portal (CLIENT role, isolated) + customer issue reporting
   "integrations.exports", // QBO/Xero/Gusto/ADP CSV exports (no API)

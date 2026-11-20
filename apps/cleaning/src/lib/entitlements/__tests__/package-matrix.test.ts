@@ -45,6 +45,7 @@ const ADDS: Record<PackageTier, Capability[]> = {
     "quality.inspections",
     "operations.issues",
     "operations.workVerification",
+    "operations.employeeReports",
     "operations.dataImport",
     "portal.customerAccess",
     "integrations.exports",

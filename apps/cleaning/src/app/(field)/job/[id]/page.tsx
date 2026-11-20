@@ -38,9 +38,10 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
   const hasSupplies = await orgHasCapability(orgId, "supplies.inventory")
   const supplies = hasSupplies ? await listSuppliesForField(orgId) : []
 
-  const [taskOwnership, workVerification, orgRow] = await Promise.all([
+  const [taskOwnership, workVerification, employeeReports, orgRow] = await Promise.all([
     orgHasCapability(orgId, "operations.taskOwnership"),
     orgHasCapability(orgId, "operations.workVerification"),
+    orgHasCapability(orgId, "operations.employeeReports"),
     prisma.organization.findUnique({ where: { id: orgId }, select: { peerVerificationEnabled: true } }),
   ])
   const peerVerificationEnabled = workVerification && !!orgRow?.peerVerificationEnabled
@@ -65,6 +66,7 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
         openIssues={job.issues.length}
         taskOwnershipEnabled={taskOwnership}
         peerVerificationEnabled={peerVerificationEnabled}
+        employeeReportsEnabled={employeeReports}
         currentUserId={session.userId}
         checklist={job.checklistItems.map((it) => ({
           id: it.id,

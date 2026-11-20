@@ -178,9 +178,9 @@ async function main() {
   console.log("\nStorage:")
   check("production without token cannot select local (throws)", (() => { try { chooseStorageKind({ nodeEnv: "production" }); return false } catch { return true } })())
   const photo = await uploadJobPhoto(sparkle.id, job.id, admin.id, { ...IMG, sizeBytes: 4 })
-  check("photo stored + retrievable", (await getPhotoForServe(sparkle.id, photo.id)) !== null)
+  check("photo stored + retrievable", (await getPhotoForServe(sparkle.id, photo.id, { userId: "verify", role: "OWNER" })) !== null)
   check("deleteJobPhoto removes metadata + object", await deleteJobPhoto(sparkle.id, photo.id))
-  check("deleted photo no longer served", (await getPhotoForServe(sparkle.id, photo.id)) === null)
+  check("deleted photo no longer served", (await getPhotoForServe(sparkle.id, photo.id, { userId: "verify", role: "OWNER" })) === null)
 
   console.log(`\n${failures === 0 ? "ALL PHASE 4 CHECKS PASSED" : `${failures} PHASE 4 CHECK(S) FAILED`}`)
 }

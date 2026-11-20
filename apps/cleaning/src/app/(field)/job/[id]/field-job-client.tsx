@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/modal"
 import { apiSend } from "@/lib/client"
 import { uploadPhoto } from "@/lib/field-upload"
 import { ISSUE_CATEGORIES } from "@/lib/zod-schemas"
+import { ReportConcern } from "@/components/field/report-concern"
 
 type Item = {
   id: string
@@ -61,6 +62,7 @@ export function FieldJobClient(props: {
   openIssues: number
   taskOwnershipEnabled: boolean
   peerVerificationEnabled: boolean
+  employeeReportsEnabled: boolean
   currentUserId: string
   checklist: Item[]
 }) {
@@ -141,6 +143,11 @@ export function FieldJobClient(props: {
           <JobNote jobId={props.jobId} initial={props.jobNoteInitial} />
           <ReportProblem jobId={props.jobId} />
         </>
+      ) : null}
+
+      {/* Employee reporting (P2) — available regardless of clock state */}
+      {props.employeeReportsEnabled && !cancelled ? (
+        <ReportConcern jobId={props.jobId} checklist={props.checklist.map((i) => ({ id: i.id, label: i.label }))} />
       ) : null}
 
       {/* Errors */}

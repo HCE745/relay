@@ -566,6 +566,7 @@ model Organization {
   onboardingAssignments OnboardingAssignment[]
   onboardingTasks       OnboardingTask[]
   timeClockKiosks       TimeClockKiosk[]
+  employeeReports       EmployeeReport[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
@@ -631,6 +632,12 @@ model User {
   checklistAssignedTo  JobChecklistItem[]     @relation("ChecklistAssignedTo")
   checklistVerified    JobChecklistItem[]     @relation("ChecklistVerifier")
   checklistShares      ChecklistItemAssignee[] @relation("ChecklistAssigneeUser")
+  // Employee reporting & supervisor review (P2)
+  filedReports         EmployeeReport[]       @relation("EmployeeReportReporter")
+  reportsAbout         EmployeeReport[]       @relation("EmployeeReportSubject")
+  reviewedReports      EmployeeReport[]       @relation("EmployeeReportReviewer")
+  resolvedReports      EmployeeReport[]       @relation("EmployeeReportResolver")
+  correctiveReports    EmployeeReport[]       @relation("EmployeeReportCorrectiveAssignee")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -973,6 +980,7 @@ model Job {
   timeEntries     TimeEntry[]
   photos          JobPhoto[]
   issues          Issue[]
+  employeeReports EmployeeReport[]
   custodyEvents   CustodyEvent[]
   earnings        JobEarning[]
   inspections     Inspection[]
@@ -1069,6 +1077,7 @@ model JobChecklistItem {
   assignedTo User?                   @relation("ChecklistAssignedTo", fields: [assignedToId], references: [id])
   verifier   User?                   @relation("ChecklistVerifier", fields: [verifierId], references: [id])
   assignees  ChecklistItemAssignee[]
+  employeeReports EmployeeReport[]
 
   @@index([jobId])
   @@index([assignedToId])
@@ -1092,6 +1101,119 @@ model ChecklistItemAssignee {
 
   @@unique([jobChecklistItemId, userId])
   @@index([userId])
+  @@schema("cleaning")
+}
+
+// ─── Employee reporting & supervisor review (P2) ─────────────────────────────
+// Employees report work-quality problems, operational concerns, and (restricted)
+// serious workplace misconduct. This is a DISTINCT domain from the operational
+// `Issue` tracker (site/customer field problems, SLA/routing/escalation): the
+// separation is itself the privacy control, so confidential reports never
+// surface in job notes, coworker views, issue lists, or general analytics. It
+// REUSES AuditEvent (immutable history), JobPhoto (evidence), User/Job/
+// JobChecklistItem (linkage) and the notify layer — it does not duplicate them.
+
+enum EmployeeReportCategory {
+  // Work quality (NORMAL visibility)
+  INCOMPLETE_WORK
+  MISSED_TASK
+  POOR_WORKMANSHIP
+  QUALITY_OTHER
+  // Operational conduct (PRIVATE)
+  ASSIGNMENT_REFUSAL
+  LEFT_EARLY
+  PROCEDURE_VIOLATION
+  OPERATIONAL_OTHER
+  // Serious workplace misconduct (CONFIDENTIAL)
+  HARASSMENT
+  THEFT
+  THREAT
+  SAFETY_CONCERN
+  MISCONDUCT_OTHER
+
+  @@schema("cleaning")
+}
+
+// Access tier. Controls WHO may see/investigate, independent of category.
+enum EmployeeReportConfidentiality {
+  NORMAL // work-quality — operations (OWNER/ADMIN/MANAGER/SUPERVISOR)
+  PRIVATE // operational concern — management (OWNER/ADMIN/MANAGER)
+  CONFIDENTIAL // serious misconduct — authorized management only (OWNER/ADMIN)
+
+  @@schema("cleaning")
+}
+
+// Investigation lifecycle. SUBSTANTIATED/UNSUBSTANTIATED/INCONCLUSIVE are the
+// three findings; a report is an ALLEGATION until it reaches one of them.
+enum EmployeeReportStatus {
+  SUBMITTED
+  PENDING_REVIEW
+  UNDER_REVIEW
+  SUBSTANTIATED
+  UNSUBSTANTIATED
+  INCONCLUSIVE
+  RESOLVED
+
+  @@schema("cleaning")
+}
+
+// The recorded finding, preserved after the report is RESOLVED. Only a
+// SUBSTANTIATED finding may ever be referenced in a performance context, and
+// NOTHING in this phase writes it to any performance record (allegation
+// protection) — it is kept here solely so the finding survives resolution.
+enum EmployeeReportOutcome {
+  SUBSTANTIATED
+  UNSUBSTANTIATED
+  INCONCLUSIVE
+
+  @@schema("cleaning")
+}
+
+model EmployeeReport {
+  id                 String                        @id @default(cuid())
+  organizationId     String
+  reportedById       String // the employee filing (always an internal user)
+  aboutUserId        String? // the subject/accused employee (nullable: quality note may be task-only)
+  jobId              String?
+  jobChecklistItemId String?
+  category           EmployeeReportCategory
+  confidentiality    EmployeeReportConfidentiality @default(NORMAL)
+  title              String?
+  description        String
+  status             EmployeeReportStatus          @default(SUBMITTED)
+  outcome            EmployeeReportOutcome? // the finding, preserved through RESOLVED
+  // Investigation. The reviewer MUST differ from the reporter and the subject
+  // (enforced server-side) — nobody investigates a complaint about themselves.
+  reviewerId         String?
+  reviewStartedAt    DateTime?
+  finding            String? // investigator's written findings
+  // The subject's response, recorded by management (the subject has no direct
+  // access to confidential/private reports — management solicits + records it).
+  employeeResponse   String?
+  respondedAt        DateTime?
+  // Corrective action requested on a substantiated report (follow-up work).
+  correctiveAction     String?
+  correctiveDueAt      DateTime?
+  correctiveAssigneeId String?
+  resolvedById       String?
+  resolvedAt         DateTime?
+  createdAt          DateTime                      @default(now())
+  updatedAt          DateTime                      @updatedAt
+
+  organization       Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  reportedBy         User              @relation("EmployeeReportReporter", fields: [reportedById], references: [id])
+  about              User?             @relation("EmployeeReportSubject", fields: [aboutUserId], references: [id])
+  reviewer           User?             @relation("EmployeeReportReviewer", fields: [reviewerId], references: [id])
+  resolvedBy         User?             @relation("EmployeeReportResolver", fields: [resolvedById], references: [id])
+  correctiveAssignee User?             @relation("EmployeeReportCorrectiveAssignee", fields: [correctiveAssigneeId], references: [id])
+  job                Job?              @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  checklistItem      JobChecklistItem? @relation(fields: [jobChecklistItemId], references: [id], onDelete: SetNull)
+  photos             JobPhoto[]
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([aboutUserId])
+  @@index([reportedById])
   @@schema("cleaning")
 }
 
@@ -1175,6 +1297,10 @@ model JobPhoto {
   jobId                  String?
   jobChecklistItemId     String?
   issueId                String?
+  // Confidential evidence on an employee report (P2). These photos deliberately
+  // carry NO jobId, so they never surface in a job's proof-of-service gallery;
+  // the serve route additionally authorizes by report access.
+  employeeReportId       String?
   inspectionId           String?
   inspectionItemResultId String?
   storageKey             String
@@ -1188,6 +1314,7 @@ model JobPhoto {
   job                  Job?                  @relation(fields: [jobId], references: [id], onDelete: Cascade)
   checklistItem        JobChecklistItem?     @relation(fields: [jobChecklistItemId], references: [id], onDelete: SetNull)
   issue                Issue?                @relation(fields: [issueId], references: [id], onDelete: SetNull)
+  employeeReport       EmployeeReport?       @relation(fields: [employeeReportId], references: [id], onDelete: Cascade)
   inspection           Inspection?           @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
   inspectionItemResult InspectionItemResult? @relation(fields: [inspectionItemResultId], references: [id], onDelete: SetNull)
   uploadedBy           User                  @relation("PhotoUploader", fields: [uploadedById], references: [id])
@@ -1195,6 +1322,7 @@ model JobPhoto {
   @@index([organizationId])
   @@index([jobId])
   @@index([jobChecklistItemId])
+  @@index([employeeReportId])
   @@index([inspectionId])
   @@schema("cleaning")
 }

@@ -9,7 +9,7 @@ export async function GET(_request: Request, { params }: Ctx) {
   const session = await getSession()
   if (!session) return unauthorized()
   const { id } = await params
-  const photo = await getPhotoForServe(session.organizationId, id)
+  const photo = await getPhotoForServe(session.organizationId, id, { userId: session.userId, role: session.role })
   if (!photo) return notFound()
   return new Response(new Uint8Array(photo.bytes), {
     headers: { "content-type": photo.contentType, "cache-control": "private, max-age=3600" },

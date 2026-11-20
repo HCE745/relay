@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Modal } from "@/components/ui/modal"
 import { apiSend } from "@/lib/client"
@@ -63,6 +64,7 @@ export function FieldJobClient(props: {
   taskOwnershipEnabled: boolean
   peerVerificationEnabled: boolean
   employeeReportsEnabled: boolean
+  crew: { id: string; name: string }[]
   currentUserId: string
   checklist: Item[]
 }) {
@@ -147,7 +149,16 @@ export function FieldJobClient(props: {
 
       {/* Employee reporting (P2) — available regardless of clock state */}
       {props.employeeReportsEnabled && !cancelled ? (
-        <ReportConcern jobId={props.jobId} checklist={props.checklist.map((i) => ({ id: i.id, label: i.label }))} />
+        <div className="space-y-2">
+          <ReportConcern
+            jobId={props.jobId}
+            checklist={props.checklist.map((i) => ({ id: i.id, label: i.label }))}
+            crew={props.crew}
+          />
+          <Link href="/my-reports" className="block text-center text-xs font-medium text-slate-500 active:text-brand">
+            View reports I&apos;ve submitted →
+          </Link>
+        </div>
       ) : null}
 
       {/* Errors */}

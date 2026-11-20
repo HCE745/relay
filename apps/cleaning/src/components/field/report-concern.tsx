@@ -13,16 +13,19 @@ import { categoryLabel, CATEGORY_DEFAULT_TIER, CONFIDENTIALITY_META } from "@/li
 export function ReportConcern({
   jobId,
   checklist,
+  crew = [],
   presetItemId,
 }: {
   jobId: string
   checklist: { id: string; label: string }[]
+  crew?: { id: string; name: string }[]
   presetItemId?: string
 }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [category, setCategory] = useState<string>("INCOMPLETE_WORK")
   const [itemId, setItemId] = useState(presetItemId ?? "")
+  const [subjectId, setSubjectId] = useState("")
   const [description, setDescription] = useState("")
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,6 +37,7 @@ export function ReportConcern({
   function reset() {
     setCategory("INCOMPLETE_WORK")
     setItemId(presetItemId ?? "")
+    setSubjectId("")
     setDescription("")
     setError(null)
     setDone(false)
@@ -53,6 +57,7 @@ export function ReportConcern({
       description,
       jobId,
       jobChecklistItemId: itemId || null,
+      aboutUserId: subjectId || null,
     })
     setBusy(false)
     if (!res.ok) return setError(res.error)
@@ -99,6 +104,18 @@ export function ReportConcern({
                   <option value="">None</option>
                   {checklist.map((it) => <option key={it.id} value={it.id}>{it.label}</option>)}
                 </select>
+              </div>
+            ) : null}
+            {crew.length > 0 ? (
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">Who is this about? (optional)</label>
+                <select value={subjectId} onChange={(e) => setSubjectId(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                  <option value="">Not about a specific person</option>
+                  {crew.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+                <p className="mt-1 text-xs text-slate-500">
+                  Naming someone does not establish fault — it only helps management look into what happened. Nothing counts against anyone unless a review finds it substantiated.
+                </p>
               </div>
             ) : null}
             <div>

@@ -49,6 +49,9 @@ export function getFieldJob(orgId: string, userId: string, jobId: string) {
       },
       servicePlan: { select: { name: true } },
       checklistItems: { orderBy: { sortOrder: "asc" }, include: { photos: { select: { id: true } } } },
+      // Crew on this job — used to offer an optional subject when a cleaner files
+      // an employee report about a job. Identity only; no performance data.
+      assignments: { select: { user: { select: { id: true, name: true, isActive: true } } } },
       timeEntries: { where: { userId }, orderBy: { clockInAt: "desc" } },
       photos: { select: { id: true, jobChecklistItemId: true, caption: true } },
       issues: { orderBy: { createdAt: "desc" }, select: { id: true, category: true, description: true, createdAt: true } },

@@ -10,6 +10,7 @@ import {
   canBeReviewer,
   canReporterView,
   canAddEvidence,
+  canViewReportEvidence,
   type ActorRole,
   type Confidentiality,
   type ReportRef,
@@ -89,9 +90,20 @@ describe("self-exclusion & investigation", () => {
 })
 
 describe("reporter view & evidence", () => {
-  it("the reporter may view their own report", () => {
+  it("the reporter may view their own report — at EVERY confidentiality tier", () => {
     expect(canReporterView({ userId: "reporter" }, ref())).toBe(true)
+    expect(canReporterView({ userId: "reporter" }, ref({ confidentiality: "PRIVATE" }))).toBe(true)
+    // A cleaner may follow their OWN confidential report (redacted) even though
+    // their role could never reach the confidential tier for anyone else's.
+    expect(canReporterView({ userId: "reporter" }, ref({ confidentiality: "CONFIDENTIAL" }))).toBe(true)
     expect(canReporterView({ userId: "other" }, ref())).toBe(false)
+  })
+
+  it("a reporter still cannot INVESTIGATE their own confidential report", () => {
+    // Even if they were somehow an admin, filing it makes them conflicted; as a
+    // cleaner their role also can't reach the tier.
+    expect(canInvestigate({ role: "CLEANER", userId: "reporter" }, ref({ confidentiality: "CONFIDENTIAL" })).allowed).toBe(false)
+    expect(canInvestigate({ role: "ADMIN", userId: "reporter" }, ref({ confidentiality: "CONFIDENTIAL" })).allowed).toBe(false)
   })
 
   it("evidence may be attached by the reporter or an authorized investigator", () => {
@@ -99,6 +111,27 @@ describe("reporter view & evidence", () => {
     expect(canAddEvidence({ role: "ADMIN", userId: "other" }, ref())).toBe(true) // investigator
     expect(canAddEvidence({ role: "CLEANER", userId: "other" }, ref())).toBe(false) // neither
     expect(canAddEvidence({ role: "ADMIN", userId: "subject" }, ref())).toBe(false) // subject is conflicted & not reporter
+  })
+
+  it("a reporter sees ONLY their own evidence; investigator evidence stays restricted", () => {
+    const r = ref({ confidentiality: "CONFIDENTIAL" })
+    const reporter = { role: "CLEANER" as ActorRole, userId: "reporter" }
+    const own = { uploadedById: "reporter" }
+    const investigatorPhoto = { uploadedById: "admin" }
+    // Reporter: own upload yes, investigator's upload no.
+    expect(canViewReportEvidence(reporter, r, own)).toBe(true)
+    expect(canViewReportEvidence(reporter, r, investigatorPhoto)).toBe(false)
+    // An authorized manager (ADMIN) sees all of the report's evidence.
+    const admin = { role: "ADMIN" as ActorRole, userId: "admin" }
+    expect(canViewReportEvidence(admin, r, own)).toBe(true)
+    expect(canViewReportEvidence(admin, r, investigatorPhoto)).toBe(true)
+    // The subject (accused) sees none of it.
+    const subject = { role: "ADMIN" as ActorRole, userId: "subject" }
+    expect(canViewReportEvidence(subject, r, own)).toBe(false)
+    expect(canViewReportEvidence(subject, r, investigatorPhoto)).toBe(false)
+    // A supervisor can't reach a confidential report's evidence at all.
+    const supervisor = { role: "SUPERVISOR" as ActorRole, userId: "sup" }
+    expect(canViewReportEvidence(supervisor, r, own)).toBe(false)
   })
 })
 

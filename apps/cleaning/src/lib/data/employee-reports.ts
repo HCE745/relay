@@ -63,7 +63,7 @@ const detailInclude = {
   correctiveAssignee: { select: { id: true, name: true } },
   job: { select: { id: true, title: true } },
   checklistItem: { select: { id: true, label: true } },
-  photos: { select: { id: true, createdAt: true }, orderBy: { createdAt: "asc" } },
+  photos: { select: { id: true, createdAt: true, uploadedById: true }, orderBy: { createdAt: "asc" } },
 } as const
 
 async function assertOrgMember(orgId: string, userId: string, label: string) {
@@ -86,7 +86,14 @@ async function loadReport(orgId: string, id: string) {
 
 type LoadedReport = Awaited<ReturnType<typeof loadReport>>
 
-/** Strip investigation-internal fields for a reporter-only viewer. */
+/**
+ * Strip investigation-internal fields for a reporter-only viewer. The reporter
+ * sees the status + what they filed + their OWN evidence, but never the
+ * investigator's finding, the reviewer's identity, the subject's response, or
+ * restricted evidence an investigator attached. Applies to every confidentiality
+ * tier — a reporter may follow their own confidential report at this same
+ * redacted level.
+ */
 function redactForReporter(report: LoadedReport) {
   return {
     ...report,
@@ -96,6 +103,9 @@ function redactForReporter(report: LoadedReport) {
     reviewerId: null,
     reviewer: null,
     reviewStartedAt: null,
+    // Only evidence the reporter uploaded themselves — investigator evidence is
+    // restricted (see canViewReportEvidence / getPhotoForServe).
+    photos: report.photos.filter((p) => p.uploadedById === report.reportedById),
   }
 }
 

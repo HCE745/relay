@@ -35,6 +35,13 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
 
   const isClockedIn = job.timeEntries.some((t) => t.status === "OPEN")
 
+  // Optional report subjects: other active cleaners assigned to THIS job. The
+  // reporter themselves is excluded (you cannot file a report about yourself).
+  const crew = job.assignments
+    .map((a) => a.user)
+    .filter((u) => u.isActive && u.id !== session.userId)
+    .map((u) => ({ id: u.id, name: u.name }))
+
   const hasSupplies = await orgHasCapability(orgId, "supplies.inventory")
   const supplies = hasSupplies ? await listSuppliesForField(orgId) : []
 
@@ -67,6 +74,7 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
         taskOwnershipEnabled={taskOwnership}
         peerVerificationEnabled={peerVerificationEnabled}
         employeeReportsEnabled={employeeReports}
+        crew={crew}
         currentUserId={session.userId}
         checklist={job.checklistItems.map((it) => ({
           id: it.id,

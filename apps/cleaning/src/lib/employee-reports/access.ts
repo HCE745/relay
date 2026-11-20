@@ -108,6 +108,23 @@ export function canAddEvidence(actor: { role: ActorRole; userId: string }, repor
 }
 
 /**
+ * May the actor fetch a SPECIFIC evidence photo attached to a report?
+ *   • A management viewer may see all of the report's evidence.
+ *   • A reporter may see ONLY evidence they uploaded themselves — never the
+ *     "restricted" evidence an investigator attached during review. This keeps
+ *     investigation material protected even on a report the reporter filed.
+ */
+export function canViewReportEvidence(
+  actor: { role: ActorRole; userId: string },
+  report: ReportRef,
+  photo: { uploadedById: string | null },
+): boolean {
+  if (canManageView(actor, report).allowed) return true
+  if (canReporterView(actor, report) && photo.uploadedById === actor.userId) return true
+  return false
+}
+
+/**
  * Field names that are investigation-internal: visible only to someone with the
  * management view, never to a reporter viewing their own report. The data layer
  * strips these for reporter-only viewers.

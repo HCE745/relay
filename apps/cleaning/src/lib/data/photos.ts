@@ -2,7 +2,7 @@ import { randomUUID } from "crypto"
 import { orgDb } from "../org-db"
 import { assertFound } from "./errors"
 import { getStorage, extForContentType } from "../storage"
-import { canManageView, canReporterView, type ActorRole, type Confidentiality } from "../employee-reports/access"
+import { canViewReportEvidence, type ActorRole, type Confidentiality } from "../employee-reports/access"
 
 // Proof-of-service + inspection photo upload/retrieval, fully tenant-scoped.
 // Uploader identity comes from the session, never the client.
@@ -130,15 +130,17 @@ export async function getPhotoForServe(
     select: {
       storageKey: true,
       contentType: true,
+      uploadedById: true,
       employeeReportId: true,
       // When the photo is employee-report evidence, authorize by report access.
       employeeReport: { select: { reportedById: true, aboutUserId: true, confidentiality: true } },
     },
   })
   if (!photo) return null
-  // Confidential evidence: only someone who may view the report (or its reporter)
-  // may fetch the bytes. Everyone else gets a 404 — never a different error that
-  // would confirm the photo exists.
+  // Confidential evidence: a management viewer may fetch any of the report's
+  // evidence; the reporter may fetch ONLY the evidence they uploaded themselves
+  // (never restricted evidence an investigator attached). Everyone else gets a
+  // 404 — never a different error that would confirm the photo exists.
   if (photo.employeeReportId && photo.employeeReport) {
     const ref = {
       reportedById: photo.employeeReport.reportedById,
@@ -146,8 +148,7 @@ export async function getPhotoForServe(
       confidentiality: photo.employeeReport.confidentiality as Confidentiality,
     }
     const actor = { role: viewer.role as ActorRole, userId: viewer.userId }
-    const allowed = canManageView(actor, ref).allowed || canReporterView(actor, ref)
-    if (!allowed) return null
+    if (!canViewReportEvidence(actor, ref, { uploadedById: photo.uploadedById })) return null
   }
   if (photo.storageKey === DEMO_PLACEHOLDER_KEY) return { bytes: PLACEHOLDER_SVG, contentType: "image/svg+xml" }
   const bytes = await getStorage().get(photo.storageKey)

@@ -393,6 +393,10 @@ export const orgSettingsSchema = z.object({
   correctiveDueDaysCritical: z.coerce.number().int().min(1).max(60).optional(),
   // Labor burden (Phase 43): a percent the user types ("25" or "22.5"); stored as a fraction.
   laborBurdenPct: z.string().trim().regex(/^\d{1,3}(\.\d{1,2})?$/, "Enter a percent like 25").optional(),
+  // Task verification (P1): whether completed work must be independently verified,
+  // and whether coworkers (cleaners) may peer-verify.
+  verificationRequired: z.boolean().optional(),
+  peerVerificationEnabled: z.boolean().optional(),
 })
 
 // ─── Compliance & credentials (Phase 13) ───

@@ -19,6 +19,7 @@ export async function getOrgSettings(orgId: string) {
       defaultIssueAssigneeId: true,
       autoCorrectiveWorkOrders: true, correctiveOnCriticalOnly: true,
       correctiveDueDaysStandard: true, correctiveDueDaysCritical: true,
+      verificationRequired: true, peerVerificationEnabled: true,
     },
   })
 }
@@ -70,7 +71,7 @@ export async function getContractExpiryLeadDays(orgId: string): Promise<number> 
 /** Update org workspace settings (OWNER/ADMIN only, enforced in the route). */
 export async function updateOrgSettings(
   orgId: string,
-  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string; uncoveredAlertLeadHours?: number; missedClockInGraceMin?: number; issueEscalationEnabled?: boolean; defaultIssueAssigneeId?: string | null; autoCorrectiveWorkOrders?: boolean; correctiveOnCriticalOnly?: boolean; correctiveDueDaysStandard?: number; correctiveDueDaysCritical?: number; laborBurdenPct?: string },
+  input: { timezone?: string; contractExpiryLeadDays?: number; credentialExpiryLeadDays?: number; blockAssignmentOnExpiredCredential?: boolean; otWeeklyThresholdHours?: number | null; otDailyThresholdHours?: number | null; otMultiplier?: string; uncoveredAlertLeadHours?: number; missedClockInGraceMin?: number; issueEscalationEnabled?: boolean; defaultIssueAssigneeId?: string | null; autoCorrectiveWorkOrders?: boolean; correctiveOnCriticalOnly?: boolean; correctiveDueDaysStandard?: number; correctiveDueDaysCritical?: number; laborBurdenPct?: string; verificationRequired?: boolean; peerVerificationEnabled?: boolean },
 ) {
   const data: Record<string, unknown> = {}
   if (input.timezone !== undefined) data.timezone = input.timezone
@@ -90,5 +91,7 @@ export async function updateOrgSettings(
   if (input.correctiveDueDaysCritical !== undefined) data.correctiveDueDaysCritical = input.correctiveDueDaysCritical
   // Percent typed by the user → stored as a fraction (25 → 0.25).
   if (input.laborBurdenPct !== undefined) data.laborBurdenPct = new Prisma.Decimal(input.laborBurdenPct).div(100)
+  if (input.verificationRequired !== undefined) data.verificationRequired = input.verificationRequired
+  if (input.peerVerificationEnabled !== undefined) data.peerVerificationEnabled = input.peerVerificationEnabled
   return systemDb.organization.update({ where: { id: orgId }, data })
 }

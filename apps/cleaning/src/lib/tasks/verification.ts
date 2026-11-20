@@ -8,6 +8,8 @@
 export type TaskVerificationStatus =
   | "ASSIGNED"
   | "IN_PROGRESS"
+  // Done, but independent verification was NOT required — distinct from VERIFIED.
+  | "COMPLETED"
   | "COMPLETED_AWAITING_VERIFICATION"
   | "VERIFIED"
   | "REJECTED"
@@ -30,8 +32,11 @@ export function isSupervisory(role: ActorRole): boolean {
 // COMPLETED_AWAITING_VERIFICATION, and only an independent verifier moves it to
 // VERIFIED or REJECTED. A rejected task is corrected and re-enters verification.
 const TRANSITIONS: Record<TaskVerificationStatus, readonly TaskVerificationStatus[]> = {
-  ASSIGNED: ["IN_PROGRESS", "COMPLETED_AWAITING_VERIFICATION"],
-  IN_PROGRESS: ["COMPLETED_AWAITING_VERIFICATION", "ASSIGNED"],
+  ASSIGNED: ["IN_PROGRESS", "COMPLETED", "COMPLETED_AWAITING_VERIFICATION"],
+  IN_PROGRESS: ["COMPLETED", "COMPLETED_AWAITING_VERIFICATION", "ASSIGNED"],
+  // Verification not required: done. A supervisor may still verify it optionally,
+  // or a worker may reopen it to redo.
+  COMPLETED: ["VERIFIED", "REJECTED", "IN_PROGRESS"],
   COMPLETED_AWAITING_VERIFICATION: ["VERIFIED", "REJECTED"],
   REJECTED: ["CORRECTED_AWAITING_REINSPECTION", "IN_PROGRESS"],
   CORRECTED_AWAITING_REINSPECTION: ["VERIFIED", "REJECTED"],
@@ -43,13 +48,25 @@ export function canTransition(from: TaskVerificationStatus, to: TaskVerification
   return TRANSITIONS[from]?.includes(to) ?? false
 }
 
-/** The status an action produces (independent of the current one); null = no-op. */
-export function statusForAction(action: TaskAction): TaskVerificationStatus | null {
+/** The status a worker's "submit" (mark done) produces, given whether the org
+ *  requires independent verification: COMPLETED when it does not (done, no wait),
+ *  COMPLETED_AWAITING_VERIFICATION when it does (waits for an independent check). */
+export function submitTargetStatus(verificationRequired: boolean): TaskVerificationStatus {
+  return verificationRequired ? "COMPLETED_AWAITING_VERIFICATION" : "COMPLETED"
+}
+
+/** The status an action produces (independent of the current one); null = no-op.
+ *  `submit` depends on whether the org requires independent verification. */
+export function statusForAction(
+  action: TaskAction,
+  opts: { verificationRequired?: boolean } = {},
+): TaskVerificationStatus | null {
   switch (action) {
     case "start":
       return "IN_PROGRESS"
     case "submit":
-      return "COMPLETED_AWAITING_VERIFICATION"
+      // Default (flag omitted) preserves the strict, verification-required target.
+      return submitTargetStatus(opts.verificationRequired ?? true)
     case "verify":
       return "VERIFIED"
     case "reject":
@@ -66,6 +83,7 @@ export function statusForAction(action: TaskAction): TaskVerificationStatus | nu
 /** Keep the legacy isComplete boolean in sync: "work reported done or verified". */
 export function isCompleteForStatus(status: TaskVerificationStatus): boolean {
   return (
+    status === "COMPLETED" ||
     status === "COMPLETED_AWAITING_VERIFICATION" ||
     status === "VERIFIED" ||
     status === "CORRECTED_AWAITING_REINSPECTION"
@@ -92,12 +110,19 @@ export type Decision = { allowed: true } | { allowed: false; reason: string }
 
 /**
  * May this actor VERIFY/REJECT this task right now?
- *   • Only when the task is awaiting verification (completed or corrected).
+ *   • Only once work is reported done — awaiting verification (completed or
+ *     corrected), or COMPLETED when verification wasn't required (optional check).
  *   • When independent verification is required, the actor must not be a worker
  *     on the task (no self-approval).
  *   • Supervisory roles may always verify; a CLEANER may verify only when the
  *     org has peer verification enabled.
  */
+const VERIFIABLE: ReadonlySet<TaskVerificationStatus> = new Set([
+  "COMPLETED",
+  "COMPLETED_AWAITING_VERIFICATION",
+  "CORRECTED_AWAITING_REINSPECTION",
+])
+
 export function canVerifyTask(params: {
   role: ActorRole
   independentRequired: boolean
@@ -105,10 +130,7 @@ export function canVerifyTask(params: {
   isSelf: boolean
   currentStatus: TaskVerificationStatus
 }): Decision {
-  if (
-    params.currentStatus !== "COMPLETED_AWAITING_VERIFICATION" &&
-    params.currentStatus !== "CORRECTED_AWAITING_REINSPECTION"
-  ) {
+  if (!VERIFIABLE.has(params.currentStatus)) {
     return { allowed: false, reason: "Task is not awaiting verification" }
   }
   if (params.independentRequired && params.isSelf) {

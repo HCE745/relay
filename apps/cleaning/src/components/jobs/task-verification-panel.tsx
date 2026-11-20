@@ -13,6 +13,8 @@ export type TaskItem = {
   verificationStatus: string
   assignedToId: string | null
   assignedToName: string | null
+  assigneeIds: string[]
+  assigneeNames: string[]
   verifierName: string | null
   rejectionReason: string | null
   note: string | null
@@ -21,11 +23,16 @@ export type TaskItem = {
 const STATUS_META: Record<string, { label: string; cls: string }> = {
   ASSIGNED: { label: "Assigned", cls: "bg-slate-100 text-slate-600" },
   IN_PROGRESS: { label: "In progress", cls: "bg-sky-100 text-sky-700" },
+  COMPLETED: { label: "Done", cls: "bg-emerald-50 text-emerald-700" },
   COMPLETED_AWAITING_VERIFICATION: { label: "Awaiting verification", cls: "bg-amber-100 text-amber-800" },
   VERIFIED: { label: "Verified", cls: "bg-emerald-100 text-emerald-700" },
   REJECTED: { label: "Correction required", cls: "bg-red-100 text-red-700" },
   CORRECTED_AWAITING_REINSPECTION: { label: "Corrected — re-check", cls: "bg-amber-100 text-amber-800" },
 }
+
+// Once work is reported done, a supervisor/inspector can verify it: the awaiting
+// states, plus COMPLETED (an optional verification when it was not required).
+const VERIFIABLE = new Set(["COMPLETED", "COMPLETED_AWAITING_VERIFICATION", "CORRECTED_AWAITING_REINSPECTION"])
 
 function StatusBadge({ status }: { status: string }) {
   const m = STATUS_META[status] ?? { label: status, cls: "bg-slate-100 text-slate-600" }
@@ -39,7 +46,6 @@ export function TaskVerificationPanel(props: {
   canManage: boolean
   canVerify: boolean
 }) {
-  const awaiting = (s: string) => s === "COMPLETED_AWAITING_VERIFICATION" || s === "CORRECTED_AWAITING_REINSPECTION"
   const done = props.items.filter((i) => i.verificationStatus === "VERIFIED").length
   return (
     <div>
@@ -64,7 +70,11 @@ export function TaskVerificationPanel(props: {
                 ) : null}
               </div>
               <div className="mt-1 text-xs text-slate-500">
-                Owner: {it.assignedToName ?? <span className="text-slate-400">unassigned</span>}
+                {it.assigneeNames.length > 0 ? (
+                  <>Owner{it.assigneeNames.length > 1 ? "s" : ""}: {it.assigneeNames.join(", ")}</>
+                ) : (
+                  <>Owner: <span className="text-slate-400">unassigned</span></>
+                )}
                 {it.verifierName ? <> · Verified by {it.verifierName}</> : null}
               </div>
               {it.verificationStatus === "REJECTED" && it.rejectionReason ? (
@@ -73,7 +83,7 @@ export function TaskVerificationPanel(props: {
 
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 {props.canManage ? <AssignControl jobId={props.jobId} item={it} cleaners={props.cleaners} /> : null}
-                {props.canVerify && awaiting(it.verificationStatus) ? (
+                {props.canVerify && VERIFIABLE.has(it.verificationStatus) ? (
                   <VerifyControls jobId={props.jobId} itemId={it.id} />
                 ) : null}
               </div>
@@ -85,46 +95,79 @@ export function TaskVerificationPanel(props: {
   )
 }
 
+function sameSet(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false
+  const s = new Set(a)
+  return b.every((x) => s.has(x))
+}
+
+// Assign a task to one OR MORE employees (shared ownership). The first selected
+// cleaner is the primary owner; the rest are shared owners. No API needed —
+// managers pick the crew right here.
 function AssignControl({ jobId, item, cleaners }: { jobId: string; item: TaskItem; cleaners: { id: string; name: string }[] }) {
   const router = useRouter()
-  const [sel, setSel] = useState(item.assignedToId ?? "")
+  const [open, setOpen] = useState(false)
+  const [sel, setSel] = useState<string[]>(item.assigneeIds)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+
+  function toggle(id: string) {
+    setErr(null)
+    setSel((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
 
   async function save() {
     setBusy(true)
     setErr(null)
-    const res = await apiSend(`/api/jobs/${jobId}/checklist/${item.id}/assign`, "POST", {
-      assigneeIds: sel ? [sel] : [],
-    })
+    // Preserve cleaner list order so the "primary" owner is stable/predictable.
+    const assigneeIds = cleaners.filter((c) => sel.includes(c.id)).map((c) => c.id)
+    const res = await apiSend(`/api/jobs/${jobId}/checklist/${item.id}/assign`, "POST", { assigneeIds })
     setBusy(false)
     if (!res.ok) return setErr(res.error)
+    setOpen(false)
     router.refresh()
   }
 
-  return (
-    <div className="flex items-center gap-1.5">
-      <select
-        value={sel}
-        onChange={(e) => setSel(e.target.value)}
-        className="rounded-lg border border-slate-300 px-2 py-1 text-xs"
-        aria-label="Assign task to"
-      >
-        <option value="">Unassigned</option>
-        {cleaners.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
+  const unchanged = sameSet(sel, item.assigneeIds)
+
+  if (!open) {
+    return (
       <button
-        onClick={save}
-        disabled={busy || sel === (item.assignedToId ?? "")}
-        className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 disabled:opacity-50"
+        onClick={() => { setSel(item.assigneeIds); setOpen(true) }}
+        className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700"
       >
-        {busy ? "Saving…" : "Assign"}
+        {item.assigneeIds.length ? "Edit owners" : "Assign"}
       </button>
-      {err ? <span className="text-xs text-red-600">{err}</span> : null}
+    )
+  }
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-2">
+      {cleaners.length === 0 ? (
+        <p className="text-xs text-slate-500">No assignable employees.</p>
+      ) : (
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          {cleaners.map((c) => (
+            <label key={c.id} className="flex items-center gap-1.5 text-xs text-slate-700">
+              <input type="checkbox" checked={sel.includes(c.id)} onChange={() => toggle(c.id)} aria-label={`Assign ${c.name}`} />
+              {c.name}
+            </label>
+          ))}
+        </div>
+      )}
+      <div className="mt-2 flex items-center gap-1.5">
+        <button
+          onClick={save}
+          disabled={busy || unchanged}
+          className="rounded-lg bg-brand px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
+        >
+          {busy ? "Saving…" : sel.length > 1 ? `Assign ${sel.length}` : sel.length === 1 ? "Assign" : "Unassign"}
+        </button>
+        <button onClick={() => { setOpen(false); setErr(null) }} disabled={busy} className="rounded-lg px-2 py-1 text-xs text-slate-500">
+          Cancel
+        </button>
+        {err ? <span className="text-xs text-red-600">{err}</span> : null}
+      </div>
     </div>
   )
 }

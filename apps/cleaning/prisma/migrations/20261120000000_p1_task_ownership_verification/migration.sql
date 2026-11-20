@@ -5,8 +5,9 @@
 --     NULL default 'ASSIGNED'), verifierId, verifiedAt, verificationNote,
 --     rejectionReason. The default is a constant, so existing rows are left
 --     unchanged and the add is a fast metadata-only change (no table rewrite).
---   * One new Organization column, peerVerificationEnabled (NOT NULL default
---     false) — opting into peer verification is off until a company enables it.
+--   * Two new Organization columns, peerVerificationEnabled and
+--     verificationRequired (both NOT NULL default false) — peer verification and
+--     the independent-verification gate are each off until a company opts in.
 --   * A new ChecklistItemAssignee table for shared task ownership.
 --   * Foreign keys to User are ON DELETE SET NULL (assignedTo/verifier) or
 --     CASCADE (assignee rows), matching the Prisma relations.
@@ -17,7 +18,9 @@
 -- owner/verifier, which the application treats exactly like today's items.
 
 -- CreateEnum
-CREATE TYPE "cleaning"."TaskVerificationStatus" AS ENUM ('ASSIGNED', 'IN_PROGRESS', 'COMPLETED_AWAITING_VERIFICATION', 'VERIFIED', 'REJECTED', 'CORRECTED_AWAITING_REINSPECTION');
+-- COMPLETED = work reported done when independent verification is not required
+-- for the org (distinct from VERIFIED and from COMPLETED_AWAITING_VERIFICATION).
+CREATE TYPE "cleaning"."TaskVerificationStatus" AS ENUM ('ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'COMPLETED_AWAITING_VERIFICATION', 'VERIFIED', 'REJECTED', 'CORRECTED_AWAITING_REINSPECTION');
 
 -- AlterTable
 ALTER TABLE "cleaning"."JobChecklistItem" ADD COLUMN     "assignedToId" TEXT,
@@ -28,7 +31,8 @@ ADD COLUMN     "verifiedAt" TIMESTAMP(3),
 ADD COLUMN     "verifierId" TEXT;
 
 -- AlterTable
-ALTER TABLE "cleaning"."Organization" ADD COLUMN     "peerVerificationEnabled" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "cleaning"."Organization" ADD COLUMN     "peerVerificationEnabled" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "verificationRequired" BOOLEAN NOT NULL DEFAULT false;
 
 -- CreateTable
 CREATE TABLE "cleaning"."ChecklistItemAssignee" (

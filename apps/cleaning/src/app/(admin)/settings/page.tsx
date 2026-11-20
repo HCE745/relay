@@ -19,6 +19,7 @@ import { CorrectiveForm } from "@/components/settings/corrective-form"
 import { BurdenForm } from "@/components/settings/burden-form"
 import { CommsForm } from "@/components/settings/comms-form"
 import { ComplianceForm } from "@/components/settings/compliance-form"
+import { WorkVerificationForm } from "@/components/settings/work-verification-form"
 import { ChangePasswordForm } from "@/components/settings/change-password-form"
 import { orgHasCapability } from "@/lib/page-guards"
 
@@ -34,6 +35,7 @@ export default async function SettingsPage() {
   const showCommission = isOrgAdmin && (await orgHasCapability(session.organizationId, "workforce.commissionPay"))
   const showCorrective = isOrgAdmin && (await orgHasCapability(session.organizationId, "quality.inspections")) && (await orgHasCapability(session.organizationId, "operations.workOrders"))
   const showBurden = isOrgAdmin && (await orgHasCapability(session.organizationId, "workforce.laborCosting"))
+  const showWorkVerification = isOrgAdmin && (await orgHasCapability(session.organizationId, "operations.workVerification"))
 
   const theme = normalizeTheme((await cookies()).get(THEME_COOKIE)?.value)
   const canSetup = canManageAccounts(session.role)
@@ -130,6 +132,17 @@ export default async function SettingsPage() {
           <div className="mt-3">
             <OvertimeForm weekly={org?.otWeeklyThresholdHours ?? null} daily={org?.otDailyThresholdHours ?? null} multiplier={org ? Number(org.otMultiplier).toString() : "1.5"} />
           </div>
+        </Card>
+      ) : null}
+
+      {showWorkVerification ? (
+        <Card className="p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-700">Task verification &amp; accountability</h2>
+          <p className="mb-3 text-sm text-slate-500">Control whether completed work must be independently verified, and who may verify it.</p>
+          <WorkVerificationForm
+            verificationRequired={org?.verificationRequired ?? false}
+            peerVerificationEnabled={org?.peerVerificationEnabled ?? false}
+          />
         </Card>
       ) : null}
 

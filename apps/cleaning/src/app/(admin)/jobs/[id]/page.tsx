@@ -270,6 +270,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               verificationStatus: it.verificationStatus,
               assignedToId: it.assignedToId,
               assignedToName: it.assignedTo?.name ?? null,
+              assigneeIds: it.assignees.map((a) => a.userId),
+              assigneeNames: it.assignees.map((a) => a.user.name),
               verifierName: it.verifier?.name ?? null,
               rejectionReason: it.rejectionReason,
               note: it.note,

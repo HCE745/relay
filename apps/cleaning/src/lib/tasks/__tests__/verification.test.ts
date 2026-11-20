@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest"
 import {
   canTransition,
   statusForAction,
+  submitTargetStatus,
   isCompleteForStatus,
   isSelfVerification,
   canVerifyTask,
@@ -40,8 +41,25 @@ describe("status machine", () => {
     expect(statusForAction("correct")).toBe("CORRECTED_AWAITING_REINSPECTION")
   })
 
+  it("submit resolves by whether the org requires independent verification", () => {
+    expect(submitTargetStatus(true)).toBe("COMPLETED_AWAITING_VERIFICATION")
+    expect(submitTargetStatus(false)).toBe("COMPLETED")
+    expect(statusForAction("submit", { verificationRequired: true })).toBe("COMPLETED_AWAITING_VERIFICATION")
+    expect(statusForAction("submit", { verificationRequired: false })).toBe("COMPLETED")
+  })
+
+  it("allows marking a task done directly when verification is not required", () => {
+    // Worker can complete normally without waiting for a verifier.
+    expect(canTransition("ASSIGNED", "COMPLETED")).toBe(true)
+    expect(canTransition("IN_PROGRESS", "COMPLETED")).toBe(true)
+    // A COMPLETED task can still be verified optionally, or reopened to redo.
+    expect(canTransition("COMPLETED", "VERIFIED")).toBe(true)
+    expect(canTransition("COMPLETED", "REJECTED")).toBe(true)
+    expect(canTransition("COMPLETED", "IN_PROGRESS")).toBe(true)
+  })
+
   it("keeps the legacy isComplete flag in sync with 'work reported or verified'", () => {
-    const complete: TaskVerificationStatus[] = ["COMPLETED_AWAITING_VERIFICATION", "VERIFIED", "CORRECTED_AWAITING_REINSPECTION"]
+    const complete: TaskVerificationStatus[] = ["COMPLETED", "COMPLETED_AWAITING_VERIFICATION", "VERIFIED", "CORRECTED_AWAITING_REINSPECTION"]
     const incomplete: TaskVerificationStatus[] = ["ASSIGNED", "IN_PROGRESS", "REJECTED"]
     for (const s of complete) expect(isCompleteForStatus(s)).toBe(true)
     for (const s of incomplete) expect(isCompleteForStatus(s)).toBe(false)
@@ -90,6 +108,19 @@ describe("canVerifyTask", () => {
 
   it("never lets a CLIENT verify", () => {
     expect(canVerifyTask({ ...base, role: "CLIENT", peerVerificationEnabled: true }).allowed).toBe(false)
+  })
+
+  it("permits OPTIONAL verification of a COMPLETED task (verification was not required)", () => {
+    expect(canVerifyTask({ ...base, role: "MANAGER", currentStatus: "COMPLETED" }).allowed).toBe(true)
+  })
+
+  it("allows self-approval ONLY when independent verification is not required", () => {
+    // Required: a worker can never verify their own work (even a manager).
+    expect(canVerifyTask({ ...base, role: "MANAGER", isSelf: true, independentRequired: true }).allowed).toBe(false)
+    // Not required: verification is optional, so self-attestation is permitted.
+    expect(
+      canVerifyTask({ ...base, role: "MANAGER", isSelf: true, independentRequired: false, currentStatus: "COMPLETED" }).allowed,
+    ).toBe(true)
   })
 })
 

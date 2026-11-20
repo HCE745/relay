@@ -9,6 +9,7 @@ import {
   canTransition,
   isSelfVerification,
   isCompleteForStatus,
+  submitTargetStatus,
   type ActorRole,
   type TaskVerificationStatus,
 } from "../tasks/verification"
@@ -77,12 +78,15 @@ async function assertActiveOrgMember(orgId: string, userId: string) {
   if (!u) throw new ReferenceError(`User ${userId} is not an active member of this organization`)
 }
 
-async function peerEnabled(orgId: string): Promise<boolean> {
+async function orgFlags(orgId: string): Promise<{ peerVerificationEnabled: boolean; verificationRequired: boolean }> {
   const org = await systemDb.organization.findUnique({
     where: { id: orgId },
-    select: { peerVerificationEnabled: true },
+    select: { peerVerificationEnabled: true, verificationRequired: true },
   })
-  return !!org?.peerVerificationEnabled
+  return {
+    peerVerificationEnabled: !!org?.peerVerificationEnabled,
+    verificationRequired: !!org?.verificationRequired,
+  }
 }
 
 function reloadItem(orgId: string, jobId: string, itemId: string) {
@@ -178,7 +182,10 @@ export async function submitChecklistTask(
   if (!canWorkTask({ role: actor.role, userId: actor.userId, assignedToId: item.assignedToId, sharedAssigneeIds: item.assignees.map((a) => a.userId) })) {
     throw new ForbiddenActionError("You are not responsible for this task")
   }
-  const to: TaskVerificationStatus = "COMPLETED_AWAITING_VERIFICATION"
+  // When the org requires independent verification the task waits for a verifier;
+  // otherwise it is simply COMPLETED (done, no wait) — still distinct from VERIFIED.
+  const { verificationRequired } = await orgFlags(orgId)
+  const to: TaskVerificationStatus = submitTargetStatus(verificationRequired)
   if (!canTransition(item.verificationStatus, to)) {
     throw new ConflictError(`Cannot submit a task that is ${item.verificationStatus}`)
   }
@@ -224,10 +231,12 @@ export async function verifyChecklistTask(
     sharedAssigneeIds: item.assignees.map((a) => a.userId),
     verifierId: actor.userId,
   })
+  const { peerVerificationEnabled, verificationRequired } = await orgFlags(orgId)
   const decision = canVerifyTask({
     role: actor.role,
-    independentRequired: true,
-    peerVerificationEnabled: await peerEnabled(orgId),
+    // Self-approval is blocked whenever the org requires independent verification.
+    independentRequired: verificationRequired,
+    peerVerificationEnabled,
     isSelf,
     currentStatus: item.verificationStatus,
   })

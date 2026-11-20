@@ -25,6 +25,7 @@ type Item = {
 const FIELD_STATUS: Record<string, { label: string; cls: string }> = {
   ASSIGNED: { label: "To do", cls: "bg-slate-100 text-slate-600" },
   IN_PROGRESS: { label: "In progress", cls: "bg-sky-100 text-sky-700" },
+  COMPLETED: { label: "Done ✓", cls: "bg-emerald-100 text-emerald-700" },
   COMPLETED_AWAITING_VERIFICATION: { label: "Awaiting check", cls: "bg-amber-100 text-amber-800" },
   VERIFIED: { label: "Verified ✓", cls: "bg-emerald-100 text-emerald-700" },
   REJECTED: { label: "Fix needed", cls: "bg-red-100 text-red-700" },
@@ -275,7 +276,7 @@ function ChecklistRow({
           disabled={disabled || busy || taskOwnershipEnabled}
           aria-label={item.isComplete ? "Mark incomplete" : "Mark complete"}
           className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-sm ${
-            (taskOwnershipEnabled ? status === "VERIFIED" : item.isComplete) ? "border-brand bg-brand text-white" : "border-slate-300 text-transparent"
+            (taskOwnershipEnabled ? status === "VERIFIED" || status === "COMPLETED" : item.isComplete) ? "border-brand bg-brand text-white" : "border-slate-300 text-transparent"
           } disabled:opacity-50`}
         >
           ✓

@@ -470,6 +470,12 @@ model Organization {
   // task — never their own. Off by default: only managers/supervisors/inspectors
   // verify until a company opts in.
   peerVerificationEnabled   Boolean @default(false)
+  // When independent verification IS required, a completed task waits for a
+  // DIFFERENT employee to verify it (self-verification is never allowed). When
+  // it is NOT required (the default), employees complete tasks normally and the
+  // work is marked COMPLETED — still distinct from VERIFIED, and a supervisor
+  // may still verify optionally.
+  verificationRequired      Boolean @default(false)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // ── CleanWare SaaS subscription (Phase 50) ───────────────────────────────
   // Stripe is the source of truth for subscription STATE; these columns mirror
@@ -1018,6 +1024,9 @@ model JobAssignment {
 enum TaskVerificationStatus {
   ASSIGNED
   IN_PROGRESS
+  // Worker reported the task done when independent verification is NOT required
+  // for the org: complete, but deliberately distinct from VERIFIED.
+  COMPLETED
   COMPLETED_AWAITING_VERIFICATION
   VERIFIED
   REJECTED

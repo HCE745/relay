@@ -50,7 +50,15 @@ export function getJob(orgId: string, id: string) {
         include: { user: { select: { id: true, name: true } } },
         orderBy: { assignedAt: "asc" },
       },
-      checklistItems: { orderBy: { sortOrder: "asc" }, include: { photos: { select: { id: true } } } },
+      checklistItems: {
+        orderBy: { sortOrder: "asc" },
+        include: {
+          photos: { select: { id: true } },
+          assignedTo: { select: { id: true, name: true } },
+          verifier: { select: { id: true, name: true } },
+          assignees: { select: { userId: true, user: { select: { name: true } } } },
+        },
+      },
       timeEntries: {
         orderBy: { clockInAt: "desc" },
         include: { user: { select: { id: true, name: true } } },

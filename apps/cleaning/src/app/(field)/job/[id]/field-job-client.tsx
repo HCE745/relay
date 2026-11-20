@@ -16,6 +16,19 @@ type Item = {
   isComplete: boolean
   note: string | null
   hasPhoto: boolean
+  verificationStatus: string
+  assignedToId: string | null
+  completedById: string | null
+  rejectionReason: string | null
+}
+
+const FIELD_STATUS: Record<string, { label: string; cls: string }> = {
+  ASSIGNED: { label: "To do", cls: "bg-slate-100 text-slate-600" },
+  IN_PROGRESS: { label: "In progress", cls: "bg-sky-100 text-sky-700" },
+  COMPLETED_AWAITING_VERIFICATION: { label: "Awaiting check", cls: "bg-amber-100 text-amber-800" },
+  VERIFIED: { label: "Verified ✓", cls: "bg-emerald-100 text-emerald-700" },
+  REJECTED: { label: "Fix needed", cls: "bg-red-100 text-red-700" },
+  CORRECTED_AWAITING_REINSPECTION: { label: "Re-check", cls: "bg-amber-100 text-amber-800" },
 }
 
 type ClockLoc = { lat?: number; lng?: number; accuracyM?: number; source: string }
@@ -45,6 +58,9 @@ export function FieldJobClient(props: {
   isClockedIn: boolean
   jobNoteInitial: string
   openIssues: number
+  taskOwnershipEnabled: boolean
+  peerVerificationEnabled: boolean
+  currentUserId: string
   checklist: Item[]
 }) {
   const router = useRouter()
@@ -101,7 +117,15 @@ export function FieldJobClient(props: {
           </div>
           <ul className="space-y-2">
             {props.checklist.map((it) => (
-              <ChecklistRow key={it.id} jobId={props.jobId} item={it} disabled={completed || cancelled || !props.isClockedIn} />
+              <ChecklistRow
+                key={it.id}
+                jobId={props.jobId}
+                item={it}
+                disabled={completed || cancelled || !props.isClockedIn}
+                taskOwnershipEnabled={props.taskOwnershipEnabled}
+                peerVerificationEnabled={props.peerVerificationEnabled}
+                currentUserId={props.currentUserId}
+              />
             ))}
           </ul>
           {!props.isClockedIn && !completed ? (
@@ -165,14 +189,33 @@ export function FieldJobClient(props: {
   )
 }
 
-function ChecklistRow({ jobId, item, disabled }: { jobId: string; item: Item; disabled: boolean }) {
+function ChecklistRow({
+  jobId,
+  item,
+  disabled,
+  taskOwnershipEnabled,
+  peerVerificationEnabled,
+  currentUserId,
+}: {
+  jobId: string
+  item: Item
+  disabled: boolean
+  taskOwnershipEnabled: boolean
+  peerVerificationEnabled: boolean
+  currentUserId: string
+}) {
   const router = useRouter()
   const fileRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   // Hold the last-picked file so a failed upload can be retried in one tap,
   // without forcing the cleaner to re-open the camera.
   const [pendingFile, setPendingFile] = useState<File | null>(null)
+
+  const status = item.verificationStatus
+  const isOwnWork = currentUserId === item.assignedToId || currentUserId === item.completedById
+  const awaiting = status === "COMPLETED_AWAITING_VERIFICATION" || status === "CORRECTED_AWAITING_REINSPECTION"
 
   async function toggle() {
     if (disabled) return
@@ -180,6 +223,26 @@ function ChecklistRow({ jobId, item, disabled }: { jobId: string; item: Item; di
     await apiSend(`/api/jobs/${jobId}/checklist/${item.id}`, "PATCH", { isComplete: !item.isComplete })
     setBusy(false)
     router.refresh()
+  }
+
+  async function post(path: string, body?: unknown) {
+    if (disabled) return
+    setBusy(true)
+    setActionError(null)
+    const res = await apiSend(`/api/jobs/${jobId}/checklist/${item.id}${path}`, "POST", body)
+    setBusy(false)
+    if (!res.ok) return setActionError(res.error)
+    router.refresh()
+  }
+
+  async function peerVerify(approve: boolean) {
+    let note: string | undefined
+    if (!approve) {
+      const reason = window.prompt("What needs correcting?")
+      if (reason === null) return
+      note = reason
+    }
+    void post("/peer-verify", { approve, note })
   }
 
   async function doUpload(file: File) {
@@ -208,11 +271,11 @@ function ChecklistRow({ jobId, item, disabled }: { jobId: string; item: Item; di
     <li className="rounded-lg border border-slate-200 p-3">
       <div className="flex items-start gap-3">
         <button
-          onClick={toggle}
-          disabled={disabled || busy}
+          onClick={taskOwnershipEnabled ? undefined : toggle}
+          disabled={disabled || busy || taskOwnershipEnabled}
           aria-label={item.isComplete ? "Mark incomplete" : "Mark complete"}
           className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-sm ${
-            item.isComplete ? "border-brand bg-brand text-white" : "border-slate-300 text-transparent"
+            (taskOwnershipEnabled ? status === "VERIFIED" : item.isComplete) ? "border-brand bg-brand text-white" : "border-slate-300 text-transparent"
           } disabled:opacity-50`}
         >
           ✓
@@ -223,6 +286,44 @@ function ChecklistRow({ jobId, item, disabled }: { jobId: string; item: Item; di
             {item.isRequired ? <span className="ml-1 text-red-500">*</span> : null}
           </div>
           {item.instructions ? <div className="text-xs text-slate-500">{item.instructions}</div> : null}
+          {taskOwnershipEnabled ? (
+            <div className="mt-1.5">
+              <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${(FIELD_STATUS[status] ?? FIELD_STATUS.ASSIGNED).cls}`}>
+                {(FIELD_STATUS[status] ?? { label: status }).label}
+              </span>
+              {status === "REJECTED" && item.rejectionReason ? (
+                <div className="mt-1 rounded bg-red-50 px-2 py-1 text-xs text-red-700">Fix: {item.rejectionReason}</div>
+              ) : null}
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {item.assignedToId === null && status === "ASSIGNED" ? (
+                  <button onClick={() => post("/self-assign")} disabled={disabled || busy} className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 disabled:opacity-50">
+                    Claim
+                  </button>
+                ) : null}
+                {status === "ASSIGNED" || status === "IN_PROGRESS" ? (
+                  <button onClick={() => post("/status", { action: "submit" })} disabled={disabled || busy} className="rounded-lg bg-brand px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50">
+                    Mark done
+                  </button>
+                ) : null}
+                {status === "REJECTED" ? (
+                  <button onClick={() => post("/status", { action: "correct" })} disabled={disabled || busy} className="rounded-lg bg-amber-500 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50">
+                    Mark corrected
+                  </button>
+                ) : null}
+                {peerVerificationEnabled && awaiting && !isOwnWork ? (
+                  <>
+                    <button onClick={() => peerVerify(true)} disabled={disabled || busy} className="rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50">
+                      Verify
+                    </button>
+                    <button onClick={() => peerVerify(false)} disabled={disabled || busy} className="rounded-lg bg-red-600 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50">
+                      Reject
+                    </button>
+                  </>
+                ) : null}
+              </div>
+              {actionError ? <p className="mt-1 text-xs text-red-600">{actionError}</p> : null}
+            </div>
+          ) : null}
           {item.requirePhoto ? (
             <div className="mt-2">
               <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={onPick} />

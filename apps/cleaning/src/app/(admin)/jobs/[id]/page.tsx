@@ -15,6 +15,7 @@ import { PageHeader } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
 import { JobStatusBadge } from "@/components/jobs/job-status"
 import { AssignmentsPanel } from "@/components/jobs/assignments-panel"
+import { TaskVerificationPanel } from "@/components/jobs/task-verification-panel"
 import { JobActions } from "@/components/jobs/job-actions"
 import { InspectButton } from "@/components/inspections/inspect-button"
 import { ChangeOrdersPanel } from "@/components/work-orders/change-orders-panel"
@@ -44,11 +45,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
   const canManage = canManageSchedule(session.role)
   const inspector = canInspect(session.role)
-  const [tz, cleaners, hasInspections, templates] = await Promise.all([
+  const [tz, cleaners, hasInspections, templates, hasTaskOwnership, hasWorkVerification] = await Promise.all([
     getOrgTimezone(orgId),
     canManage ? listAssignableCleaners(orgId) : Promise.resolve([]),
     orgHasCapability(orgId, "quality.inspections"),
     inspector ? listInspectionTemplates(orgId) : Promise.resolve([]),
+    orgHasCapability(orgId, "operations.taskOwnership"),
+    orgHasCapability(orgId, "operations.workVerification"),
   ])
   const jtz = job.serviceLocation.timezone ?? tz
   const startDT = DateTime.fromJSDate(job.scheduledStart, { zone: jtz })
@@ -250,31 +253,55 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         )}
       </Card>
 
-      {/* Checklist progress */}
+      {/* Checklist — task ownership & verification (P1) */}
       <Card className="p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-700">Checklist</h2>
-          <span className="text-xs text-slate-400">
-            {checklistDone}/{job.checklistItems.length} complete
-          </span>
-        </div>
-        {job.checklistItems.length === 0 ? (
-          <p className="text-sm text-slate-500">No checklist.</p>
+        {hasTaskOwnership ? (
+          <TaskVerificationPanel
+            jobId={job.id}
+            canManage={canManage}
+            canVerify={inspector && hasWorkVerification}
+            cleaners={cleaners.map((c) => ({ id: c.id, name: c.name }))}
+            items={job.checklistItems.map((it) => ({
+              id: it.id,
+              label: it.label,
+              isRequired: it.isRequired,
+              requirePhoto: it.requirePhoto,
+              photoCount: it.photos.length,
+              verificationStatus: it.verificationStatus,
+              assignedToId: it.assignedToId,
+              assignedToName: it.assignedTo?.name ?? null,
+              verifierName: it.verifier?.name ?? null,
+              rejectionReason: it.rejectionReason,
+              note: it.note,
+            }))}
+          />
         ) : (
-          <ol className="space-y-1.5">
-            {job.checklistItems.map((it) => (
-              <li key={it.id} className="flex items-center gap-2 text-sm">
-                <span className={it.isComplete ? "text-emerald-600" : "text-slate-300"}>{it.isComplete ? "✓" : "○"}</span>
-                <span className={it.isComplete ? "text-slate-500" : "text-slate-800"}>{it.label}</span>
-                {it.requirePhoto ? (
-                  <span className={`text-xs ${it.photos.length ? "text-emerald-600" : "text-orange-500"}`}>
-                    {it.photos.length ? "photo ✓" : "photo pending"}
-                  </span>
-                ) : null}
-                {it.note ? <span className="text-xs text-slate-400">“{it.note}”</span> : null}
-              </li>
-            ))}
-          </ol>
+          <>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-700">Checklist</h2>
+              <span className="text-xs text-slate-400">
+                {checklistDone}/{job.checklistItems.length} complete
+              </span>
+            </div>
+            {job.checklistItems.length === 0 ? (
+              <p className="text-sm text-slate-500">No checklist.</p>
+            ) : (
+              <ol className="space-y-1.5">
+                {job.checklistItems.map((it) => (
+                  <li key={it.id} className="flex items-center gap-2 text-sm">
+                    <span className={it.isComplete ? "text-emerald-600" : "text-slate-300"}>{it.isComplete ? "✓" : "○"}</span>
+                    <span className={it.isComplete ? "text-slate-500" : "text-slate-800"}>{it.label}</span>
+                    {it.requirePhoto ? (
+                      <span className={`text-xs ${it.photos.length ? "text-emerald-600" : "text-orange-500"}`}>
+                        {it.photos.length ? "photo ✓" : "photo pending"}
+                      </span>
+                    ) : null}
+                    {it.note ? <span className="text-xs text-slate-400">“{it.note}”</span> : null}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </>
         )}
       </Card>
 

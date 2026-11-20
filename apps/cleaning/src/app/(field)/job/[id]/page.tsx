@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
+import { prisma } from "@/lib/prisma"
 import { getFieldJob } from "@/lib/data/field"
 import { getOrgTimezone } from "@/lib/data/org"
 import { orgHasCapability } from "@/lib/page-guards"
@@ -37,6 +38,13 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
   const hasSupplies = await orgHasCapability(orgId, "supplies.inventory")
   const supplies = hasSupplies ? await listSuppliesForField(orgId) : []
 
+  const [taskOwnership, workVerification, orgRow] = await Promise.all([
+    orgHasCapability(orgId, "operations.taskOwnership"),
+    orgHasCapability(orgId, "operations.workVerification"),
+    prisma.organization.findUnique({ where: { id: orgId }, select: { peerVerificationEnabled: true } }),
+  ])
+  const peerVerificationEnabled = workVerification && !!orgRow?.peerVerificationEnabled
+
   return (
     <div className="space-y-4">
       <Link href="/today" className="text-sm text-slate-500">
@@ -55,6 +63,9 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
         isClockedIn={isClockedIn}
         jobNoteInitial={job.notes ?? ""}
         openIssues={job.issues.length}
+        taskOwnershipEnabled={taskOwnership}
+        peerVerificationEnabled={peerVerificationEnabled}
+        currentUserId={session.userId}
         checklist={job.checklistItems.map((it) => ({
           id: it.id,
           label: it.label,
@@ -64,6 +75,10 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
           isComplete: it.isComplete,
           note: it.note,
           hasPhoto: it.photos.length > 0,
+          verificationStatus: it.verificationStatus,
+          assignedToId: it.assignedToId,
+          completedById: it.completedById,
+          rejectionReason: it.rejectionReason,
         }))}
       />
       {hasSupplies ? (

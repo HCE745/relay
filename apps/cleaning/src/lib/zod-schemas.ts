@@ -517,6 +517,25 @@ export const checklistItemUpdateSchema = z
     message: "Nothing to update",
   })
 
+// ── P1 Task Ownership & Verification ─────────────────────────────────────────
+// Assign (or reassign) a task to employees. Empty list unassigns; first id is
+// the primary owner, the rest are shared owners.
+export const taskAssignSchema = z.object({
+  assigneeIds: z.array(z.string().min(1)).max(20),
+})
+
+// Worker-side transition on the field app.
+export const taskStatusActionSchema = z.object({
+  action: z.enum(["start", "submit", "correct"]),
+  note: optionalString,
+})
+
+// Verify or reject completed work (verifier differs from the worker).
+export const taskVerifySchema = z.object({
+  approve: z.boolean(),
+  note: optionalString,
+})
+
 export const ISSUE_CATEGORIES = [
   "QUALITY",
   "SAFETY",

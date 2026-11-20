@@ -465,6 +465,11 @@ model Organization {
   correctiveOnCriticalOnly  Boolean @default(false)
   correctiveDueDaysStandard Int     @default(3)
   correctiveDueDaysCritical Int     @default(1)
+  // Task ownership & verification (P1). When peer verification is enabled,
+  // authorized coworkers (cleaners) may verify another employee's completed
+  // task — never their own. Off by default: only managers/supervisors/inspectors
+  // verify until a company opts in.
+  peerVerificationEnabled   Boolean @default(false)
   subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
   // ── CleanWare SaaS subscription (Phase 50) ───────────────────────────────
   // Stripe is the source of truth for subscription STATE; these columns mirror
@@ -616,6 +621,10 @@ model User {
   lockedPayPeriods     PayPeriod[]        @relation("PayPeriodLockedBy")
   skills               EmployeeSkill[]    @relation("UserSkill")
   onboardingAssignments OnboardingAssignment[] @relation("OnboardingUser")
+  // Task ownership & verification (P1)
+  checklistAssignedTo  JobChecklistItem[]     @relation("ChecklistAssignedTo")
+  checklistVerified    JobChecklistItem[]     @relation("ChecklistVerifier")
+  checklistShares      ChecklistItemAssignee[] @relation("ChecklistAssigneeUser")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -1000,6 +1009,23 @@ model JobAssignment {
   @@schema("cleaning")
 }
 
+// Per-task verification lifecycle (P1 Task Ownership & Verification). A checklist
+// item is a unit of work (task / room / zone / section) that can be OWNED by a
+// specific employee, completed, and then INDEPENDENTLY verified. Completion and
+// verification are deliberately separate states. The legacy
+// isComplete/completedAt/completedById are preserved and kept in sync with the
+// status so existing field + reporting code keeps working.
+enum TaskVerificationStatus {
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED_AWAITING_VERIFICATION
+  VERIFIED
+  REJECTED
+  CORRECTED_AWAITING_REINSPECTION
+
+  @@schema("cleaning")
+}
+
 model JobChecklistItem {
   id            String   @id @default(cuid())
   jobId         String
@@ -1012,13 +1038,51 @@ model JobChecklistItem {
   completedAt   DateTime?
   completedById String?
   note          String?
+
+  // ── Task ownership & verification (P1) ──────────────────────────────────────
+  // The clearly-identified responsible employee (primary owner). Null = unowned.
+  // Additional shared owners are listed in ChecklistItemAssignee.
+  assignedToId       String?
+  verificationStatus TaskVerificationStatus @default(ASSIGNED)
+  // The verifier MUST differ from whoever performed the work (enforced in the
+  // pure logic + data layer): no self-approval when independent verification is
+  // required. Snapshot here; full responsibility history lives in AuditEvent.
+  verifierId         String?
+  verifiedAt         DateTime?
+  verificationNote   String? // verifier's note, or the reason on rejection
+  rejectionReason    String?
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  job    Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  photos JobPhoto[]
+  job        Job                     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  photos     JobPhoto[]
+  assignedTo User?                   @relation("ChecklistAssignedTo", fields: [assignedToId], references: [id])
+  verifier   User?                   @relation("ChecklistVerifier", fields: [verifierId], references: [id])
+  assignees  ChecklistItemAssignee[]
 
   @@index([jobId])
+  @@index([assignedToId])
+  @@index([verificationStatus])
+  @@schema("cleaning")
+}
+
+// Shared task ownership (P1): the employees responsible for a checklist item. On
+// assignment the primary owner is also written here, so the full responsible set
+// is a single query; "shared" is simply more than one row. Assignment HISTORY
+// (who assigned/reassigned to whom, and every status transition) is recorded in
+// the generic AuditEvent trail — we do not duplicate that system.
+model ChecklistItemAssignee {
+  id                 String   @id @default(cuid())
+  jobChecklistItemId String
+  userId             String
+  createdAt          DateTime @default(now())
+
+  item JobChecklistItem @relation(fields: [jobChecklistItemId], references: [id], onDelete: Cascade)
+  user User             @relation("ChecklistAssigneeUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([jobChecklistItemId, userId])
+  @@index([userId])
   @@schema("cleaning")
 }
 

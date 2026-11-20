@@ -22,6 +22,7 @@ export const CAPABILITIES = [
   "core.servicePlans",
   "core.scheduling",
   "core.jobs",
+  "operations.taskOwnership", // assign/own/complete individual checklist tasks (rooms/zones/sections) + assignment history — CORE
   "crm.estimates", // basic estimates: leads, line-item estimates, estimate→customer conversion
   "billing.invoicing", // invoices, payments, AR
   "billing.onlinePayments", // Stripe card/ACH payment links + portal pay
@@ -41,6 +42,7 @@ export const CAPABILITIES = [
   "workforce.geofencing", // architecture present; enforcement gated + off by default (unlisted)
   "quality.inspections", // inspection program (whole — not split basic/advanced)
   "operations.issues", // issue lifecycle: ownership, routing, SLA, escalation, resolve/verify (whole)
+  "operations.workVerification", // peer/supervisor task verification lifecycle (completed→verified/rejected→corrected), self-approval blocked
   "operations.dataImport", // CSV import of customers/sites/contacts with preview + rollback
   "portal.customerAccess", // customer portal (CLIENT role, isolated) + customer issue reporting
   "integrations.exports", // QBO/Xero/Gusto/ADP CSV exports (no API)

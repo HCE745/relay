@@ -118,6 +118,7 @@ export const SYSTEM_MODELS: ReadonlySet<string> = new Set([
   // org-scoped (the parent's id filter carries the tenant boundary):
   "ChecklistTemplateItem", // → ChecklistTemplate
   "JobChecklistItem", // → Job
+  "ChecklistItemAssignee", // → JobChecklistItem → Job (P1 shared task ownership)
   "InspectionTemplateItem", // → InspectionTemplate
   "InspectionItemResult", // → Inspection
   "EstimateLine", // → Estimate

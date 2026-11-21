@@ -6,6 +6,7 @@ import { ReferenceError, ForbiddenActionError } from "./errors"
 import { Prisma } from "../../generated/prisma/client"
 import { issueSlaFields } from "./issues"
 import { applyRouting } from "./issue-routing"
+import { notifyComplaintReceived } from "./complaints"
 import { recordAudit } from "./audit"
 
 // Customer portal data access (Phase 16). THE ISOLATION BOUNDARY: every query
@@ -86,7 +87,7 @@ export async function reportPortalIssue(
 ) {
   // Ownership is proven by a customer-scoped read (returns null for a site that
   // isn't this customer's); the write then goes through orgDb.
-  const site = await customerDb(orgId, customerId).serviceLocation.findFirst({ where: { id: input.serviceLocationId }, select: { id: true } })
+  const site = await customerDb(orgId, customerId).serviceLocation.findFirst({ where: { id: input.serviceLocationId }, select: { id: true, name: true } })
   if (!site) throw new ReferenceError("That site is not on your account")
   const sla = await issueSlaFields(orgId, "CUSTOMER")
   const issue = await orgDb(orgId).issue.create({
@@ -100,6 +101,8 @@ export async function reportPortalIssue(
   })
   await recordAudit(orgId, reporterId, "Issue", issue.id, "report", { metadata: { source: "CUSTOMER" } })
   await applyRouting(orgId, issue.id, reporterId, { category: "CUSTOMER", severity: sla.severity, source: "CUSTOMER", serviceLocationId: input.serviceLocationId })
+  // Always alert management that a complaint arrived, regardless of routing.
+  await notifyComplaintReceived(orgId, site.name)
   return { id: issue.id }
 }
 

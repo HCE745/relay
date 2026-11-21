@@ -102,6 +102,7 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "OnboardingTask",
   "TimeClockKiosk",
   "EmployeeReport", // P2 employee reporting & supervisor review (org-scoped)
+  "ComplaintResponsibility", // P3 customer complaint responsibility snapshot (org-scoped)
 ])
 
 // Models that are DELIBERATELY not org-scoped, each with a stated reason. A

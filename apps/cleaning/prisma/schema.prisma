@@ -421,62 +421,62 @@ model Organization {
   packageTier         PackageTier @default(TEAM)
   capabilityOverrides Json? // { "add": string[], "remove": string[] }
 
-  onboardingCompletedAt DateTime?
-  trialEndsAt           DateTime?
+  onboardingCompletedAt              DateTime?
+  trialEndsAt                        DateTime?
   // Public sandbox demo (Phase: demo). A demo org is a normal org with isDemo
   // set — isolation still runs through orgDb. Excluded from all cross-org work
   // (crons, future billing/analytics) and purged after demoExpiresAt. demoIpHash
   // is a salted hash of the creator's IP, for per-IP rate limiting.
-  isDemo                Boolean   @default(false)
-  demoExpiresAt         DateTime?
-  demoIpHash            String?
+  isDemo                             Boolean   @default(false)
+  demoExpiresAt                      DateTime?
+  demoIpHash                         String?
   // Dashboard warning lead time for expiring contracts (Phase 8), configurable.
-  contractExpiryLeadDays Int @default(60)
+  contractExpiryLeadDays             Int       @default(60)
   // Compliance (Phase 13): warning lead time + whether to BLOCK assigning a
   // cleaner missing/expired on a site-required credential (warn by default).
-  credentialExpiryLeadDays Int @default(30)
-  blockAssignmentOnExpiredCredential Boolean @default(false)
+  credentialExpiryLeadDays           Int       @default(30)
+  blockAssignmentOnExpiredCredential Boolean   @default(false)
   // Overtime rules (Phase 24). OT hours only — never payroll processing. A null
   // daily threshold disables daily OT; weekly defaults to 40h; multiplier is the
   // OT premium factor (1.5 = time-and-a-half).
-  otWeeklyThresholdHours Int?    @default(40)
-  otDailyThresholdHours  Int?
-  otMultiplier           Decimal @default(1.5) @db.Decimal(4, 2)
+  otWeeklyThresholdHours             Int?      @default(40)
+  otDailyThresholdHours              Int?
+  otMultiplier                       Decimal   @default(1.5) @db.Decimal(4, 2)
   // Labor burden (Phase 43): employer taxes, insurance and workers comp as a
   // fraction of labor cost (0.25 = 25%), applied for COSTING/profitability only
   // — never payroll. 0 = off (unburdened).
-  laborBurdenPct         Decimal @default(0) @db.Decimal(5, 4)
+  laborBurdenPct                     Decimal   @default(0) @db.Decimal(5, 4)
   // Exception-alert tuning (Phase 25). Uncovered shifts within this many hours
   // alert managers; a job this many minutes past its start with nobody clocked
   // in alerts the supervisor + managers.
-  uncoveredAlertLeadHours Int @default(24)
-  missedClockInGraceMin   Int @default(30)
+  uncoveredAlertLeadHours            Int       @default(24)
+  missedClockInGraceMin              Int       @default(30)
   // Customer communications (Phase 26).
-  visitReminderLeadHours  Int     @default(24)
-  paymentRemindersEnabled Boolean @default(true)
-  issueEscalationEnabled  Boolean @default(true)
+  visitReminderLeadHours             Int       @default(24)
+  paymentRemindersEnabled            Boolean   @default(true)
+  issueEscalationEnabled             Boolean   @default(true)
   // Issue routing (Phase 31): fallback owner when no rule matches (null = leave unassigned).
-  defaultIssueAssigneeId  String?
+  defaultIssueAssigneeId             String?
   // Automatic corrective work orders (Phase 42). When enabled, a failed
   // inspection auto-creates a NON-billable corrective work order. If
   // criticalOnly is set, only a failed CRITICAL item triggers it. The due date
   // is derived from severity using the two configurable day counts.
-  autoCorrectiveWorkOrders  Boolean @default(false)
-  correctiveOnCriticalOnly  Boolean @default(false)
-  correctiveDueDaysStandard Int     @default(3)
-  correctiveDueDaysCritical Int     @default(1)
+  autoCorrectiveWorkOrders           Boolean   @default(false)
+  correctiveOnCriticalOnly           Boolean   @default(false)
+  correctiveDueDaysStandard          Int       @default(3)
+  correctiveDueDaysCritical          Int       @default(1)
   // Task ownership & verification (P1). When peer verification is enabled,
   // authorized coworkers (cleaners) may verify another employee's completed
   // task — never their own. Off by default: only managers/supervisors/inspectors
   // verify until a company opts in.
-  peerVerificationEnabled   Boolean @default(false)
+  peerVerificationEnabled            Boolean   @default(false)
   // When independent verification IS required, a completed task waits for a
   // DIFFERENT employee to verify it (self-verification is never allowed). When
   // it is NOT required (the default), employees complete tasks normally and the
   // work is marked COMPLETED — still distinct from VERIFIED, and a supervisor
   // may still verify optionally.
-  verificationRequired      Boolean @default(false)
-  subscriptionStatus    String    @default("trialing") // trialing | active | past_due | canceled
+  verificationRequired               Boolean   @default(false)
+  subscriptionStatus                 String    @default("trialing") // trialing | active | past_due | canceled
   // ── CleanWare SaaS subscription (Phase 50) ───────────────────────────────
   // Stripe is the source of truth for subscription STATE; these columns mirror
   // it for fast reads and to map inbound webhooks back to the org. ALL nullable
@@ -485,159 +485,165 @@ model Organization {
   // deliberately). The two Stripe ids are unique (Postgres permits many NULLs),
   // binding one org to at most one Stripe customer/subscription — part of the
   // guard against duplicate subscriptions.
-  stripeCustomerId     String?   @unique
-  stripeSubscriptionId String?   @unique
-  billingInterval      String?   // "monthly" | "annual" (null until subscribed)
-  purchasedSeats       Int       @default(0) // extra seats beyond the plan's included count
-  currentPeriodEnd     DateTime? // paid-through date, from Stripe
-  cancelAtPeriodEnd    Boolean   @default(false) // set via portal; access ends at period end
+  stripeCustomerId                   String?   @unique
+  stripeSubscriptionId               String?   @unique
+  billingInterval                    String? // "monthly" | "annual" (null until subscribed)
+  purchasedSeats                     Int       @default(0) // extra seats beyond the plan's included count
+  currentPeriodEnd                   DateTime? // paid-through date, from Stripe
+  cancelAtPeriodEnd                  Boolean   @default(false) // set via portal; access ends at period end
   // Default IANA timezone for scheduling. Service locations may override.
-  timezone              String    @default("America/New_York")
+  timezone                           String    @default("America/New_York")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users              User[]
-  customers          Customer[]
-  serviceLocations   ServiceLocation[]
-  checklistTemplates ChecklistTemplate[]
-  servicePlans       ServicePlan[]
-  jobs               Job[]
-  timeEntries        TimeEntry[]
-  auditEvents        AuditEvent[]
-  jobPhotos          JobPhoto[]
-  issues             Issue[]
-  inspectionTemplates InspectionTemplate[]
-  inspections         Inspection[]
-  invoices            Invoice[]
-  leads               Lead[]
-  estimates           Estimate[]
-  assets              Asset[]
-  supplies            Supply[]
-  supplyUsages        SupplyUsage[]
-  contracts           Contract[]
-  productionRates     ProductionRate[]
-  availabilities      Availability[]
-  timeOffRequests     TimeOffRequest[]
-  credentials         Credential[]
+  users                      User[]
+  customers                  Customer[]
+  serviceLocations           ServiceLocation[]
+  checklistTemplates         ChecklistTemplate[]
+  servicePlans               ServicePlan[]
+  jobs                       Job[]
+  timeEntries                TimeEntry[]
+  auditEvents                AuditEvent[]
+  jobPhotos                  JobPhoto[]
+  issues                     Issue[]
+  inspectionTemplates        InspectionTemplate[]
+  inspections                Inspection[]
+  invoices                   Invoice[]
+  leads                      Lead[]
+  estimates                  Estimate[]
+  assets                     Asset[]
+  supplies                   Supply[]
+  supplyUsages               SupplyUsage[]
+  contracts                  Contract[]
+  productionRates            ProductionRate[]
+  availabilities             Availability[]
+  timeOffRequests            TimeOffRequest[]
+  credentials                Credential[]
   siteCredentialRequirements SiteCredentialRequirement[]
-  accessItems         AccessItem[]
-  exportRuns          ExportRun[]
-  portalInvites       PortalInvite[]
-  quoteRequests       QuoteRequest[]
-  jobPostings         JobPosting[]
-  applicants          Applicant[]
-  interviews          Interview[]
-  serviceAreas        ServiceArea[]
-  excludedAddresses   ExcludedAddress[]
-  excludedContacts    ExcludedContact[]
-  excludedZones       ExcludedZone[]
-  workOrders          WorkOrder[]
-  changeOrders        ChangeOrder[]
-  notificationPrefs   NotificationPreference[]
-  notificationLogs    NotificationLog[]
-  importBatches       ImportBatch[]
-  idempotencyClaims   IdempotencyClaim[]
-  customerMessages    CustomerMessage[]
-  proposals           Proposal[]
-  serviceRequests     ServiceRequest[]
-  surveyResponses     SurveyResponse[]
-  issueSlaRules       IssueSlaRule[]
-  issueRoutingRules   IssueRoutingRule[]
-  qrCodes             QrCode[]
-  custodyEvents       CustodyEvent[]
-  payRules            PayRule[]
-  jobEarnings         JobEarning[]
-  sops                Sop[]
-  sopAcknowledgments  SopAcknowledgment[]
-  sopIssueMappings    SopIssueMapping[]
-  taxRates            TaxRate[]
-  payPeriods          PayPeriod[]
-  shiftDifferentialRules ShiftDifferentialRule[]
-  collectionSteps     CollectionStep[]
-  collectionActivities CollectionActivity[]
-  indirectCostPools   IndirectCostPool[]
-  laborBudgets        LaborBudget[]
-  skills              Skill[]
-  employeeSkills      EmployeeSkill[]
-  siteSkillRequirements SiteSkillRequirement[]
-  onboardingPackets     OnboardingPacket[]
-  onboardingPacketItems OnboardingPacketItem[]
-  onboardingAssignments OnboardingAssignment[]
-  onboardingTasks       OnboardingTask[]
-  timeClockKiosks       TimeClockKiosk[]
-  employeeReports       EmployeeReport[]
+  accessItems                AccessItem[]
+  exportRuns                 ExportRun[]
+  portalInvites              PortalInvite[]
+  quoteRequests              QuoteRequest[]
+  jobPostings                JobPosting[]
+  applicants                 Applicant[]
+  interviews                 Interview[]
+  serviceAreas               ServiceArea[]
+  excludedAddresses          ExcludedAddress[]
+  excludedContacts           ExcludedContact[]
+  excludedZones              ExcludedZone[]
+  workOrders                 WorkOrder[]
+  changeOrders               ChangeOrder[]
+  notificationPrefs          NotificationPreference[]
+  notificationLogs           NotificationLog[]
+  importBatches              ImportBatch[]
+  idempotencyClaims          IdempotencyClaim[]
+  customerMessages           CustomerMessage[]
+  proposals                  Proposal[]
+  serviceRequests            ServiceRequest[]
+  surveyResponses            SurveyResponse[]
+  issueSlaRules              IssueSlaRule[]
+  issueRoutingRules          IssueRoutingRule[]
+  qrCodes                    QrCode[]
+  custodyEvents              CustodyEvent[]
+  payRules                   PayRule[]
+  jobEarnings                JobEarning[]
+  sops                       Sop[]
+  sopAcknowledgments         SopAcknowledgment[]
+  sopIssueMappings           SopIssueMapping[]
+  taxRates                   TaxRate[]
+  payPeriods                 PayPeriod[]
+  shiftDifferentialRules     ShiftDifferentialRule[]
+  collectionSteps            CollectionStep[]
+  collectionActivities       CollectionActivity[]
+  indirectCostPools          IndirectCostPool[]
+  laborBudgets               LaborBudget[]
+  skills                     Skill[]
+  employeeSkills             EmployeeSkill[]
+  siteSkillRequirements      SiteSkillRequirement[]
+  onboardingPackets          OnboardingPacket[]
+  onboardingPacketItems      OnboardingPacketItem[]
+  onboardingAssignments      OnboardingAssignment[]
+  onboardingTasks            OnboardingTask[]
+  timeClockKiosks            TimeClockKiosk[]
+  employeeReports            EmployeeReport[]
+  complaintResponsibilities  ComplaintResponsibility[]
 
   @@index([isDemo, demoExpiresAt])
   @@schema("cleaning")
 }
 
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
+  id             String    @id @default(cuid())
+  email          String    @unique
   name           String
   password       String
-  role           UserRole @default(CLEANER)
+  role           UserRole  @default(CLEANER)
   phone          String?
   // SMS opt-out (STOP keyword / manual). Honored before any SMS send (Phase 21).
-  smsOptOut      Boolean  @default(false)
-  isActive       Boolean  @default(true)
+  smsOptOut      Boolean   @default(false)
+  isActive       Boolean   @default(true)
   organizationId String
   managerId      String?
   customerId     String? // set for CLIENT portal users (Phase 16)
   lastLoginAt    DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  manager         User?            @relation("UserHierarchy", fields: [managerId], references: [id])
-  reports         User[]           @relation("UserHierarchy")
-  employeeProfile EmployeeProfile?
-  jobAssignments  JobAssignment[]
-  timeEntries     TimeEntry[]      @relation("TimeEntryWorker")
-  approvedTimeEntries TimeEntry[]  @relation("TimeEntryApprover")
-  createdJobs     Job[]            @relation("JobCreatedBy")
-  uploadedPhotos  JobPhoto[]       @relation("PhotoUploader")
-  reportedIssues  Issue[]          @relation("IssueReporter")
-  assignedIssues  Issue[]          @relation("IssueAssignee")
-  verifiedIssues  Issue[]          @relation("IssueVerifier")
-  routingRules    IssueRoutingRule[] @relation("RoutingRuleAssignee")
-  issueComments   IssueComment[]   @relation("IssueCommentAuthor")
-  inspections     Inspection[]     @relation("InspectionInspector")
-  assignedLeads   Lead[]           @relation("LeadAssignee")
-  assignedAssets       Asset[]            @relation("AssetUser")
-  custodyAssets        Asset[]            @relation("AssetCustody")
-  custodyHeld          CustodyEvent[]     @relation("CustodyHolder")
-  custodyFrom          CustodyEvent[]     @relation("CustodyFromUser")
-  custodyRecorded      CustodyEvent[]     @relation("CustodyRecorder")
-  payRules             PayRule[]          @relation("PayRuleEmployee")
-  jobEarnings          JobEarning[]       @relation("JobEarningWorker")
-  sopAcknowledgments   SopAcknowledgment[] @relation("SopAckUser")
-  performedMaintenance AssetMaintenance[] @relation("MaintenancePerformer")
-  recordedSupplyUsages SupplyUsage[]      @relation("SupplyUsageRecorder")
-  supplyAdjustments    SupplyAdjustment[] @relation("SupplyAdjuster")
-  passwordResetTokens PasswordResetToken[]
-  emailVerificationTokens EmailVerificationToken[]
-  availabilities       Availability[]     @relation("UserAvailability")
-  timeOffRequests      TimeOffRequest[]   @relation("UserTimeOff")
-  credentials          Credential[]       @relation("UserCredential")
-  heldAccessItems      AccessItem[]       @relation("AccessHolder")
-  portalCustomer       Customer?          @relation("CustomerPortalUsers", fields: [customerId], references: [id])
-  notificationPrefs    NotificationPreference[]
-  notificationLogs     NotificationLog[]
-  lockedPayPeriods     PayPeriod[]        @relation("PayPeriodLockedBy")
-  skills               EmployeeSkill[]    @relation("UserSkill")
-  onboardingAssignments OnboardingAssignment[] @relation("OnboardingUser")
+  organization                      Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  manager                           User?                     @relation("UserHierarchy", fields: [managerId], references: [id])
+  reports                           User[]                    @relation("UserHierarchy")
+  employeeProfile                   EmployeeProfile?
+  jobAssignments                    JobAssignment[]
+  timeEntries                       TimeEntry[]               @relation("TimeEntryWorker")
+  approvedTimeEntries               TimeEntry[]               @relation("TimeEntryApprover")
+  createdJobs                       Job[]                     @relation("JobCreatedBy")
+  uploadedPhotos                    JobPhoto[]                @relation("PhotoUploader")
+  reportedIssues                    Issue[]                   @relation("IssueReporter")
+  assignedIssues                    Issue[]                   @relation("IssueAssignee")
+  verifiedIssues                    Issue[]                   @relation("IssueVerifier")
+  routingRules                      IssueRoutingRule[]        @relation("RoutingRuleAssignee")
+  issueComments                     IssueComment[]            @relation("IssueCommentAuthor")
+  inspections                       Inspection[]              @relation("InspectionInspector")
+  assignedLeads                     Lead[]                    @relation("LeadAssignee")
+  assignedAssets                    Asset[]                   @relation("AssetUser")
+  custodyAssets                     Asset[]                   @relation("AssetCustody")
+  custodyHeld                       CustodyEvent[]            @relation("CustodyHolder")
+  custodyFrom                       CustodyEvent[]            @relation("CustodyFromUser")
+  custodyRecorded                   CustodyEvent[]            @relation("CustodyRecorder")
+  payRules                          PayRule[]                 @relation("PayRuleEmployee")
+  jobEarnings                       JobEarning[]              @relation("JobEarningWorker")
+  sopAcknowledgments                SopAcknowledgment[]       @relation("SopAckUser")
+  performedMaintenance              AssetMaintenance[]        @relation("MaintenancePerformer")
+  recordedSupplyUsages              SupplyUsage[]             @relation("SupplyUsageRecorder")
+  supplyAdjustments                 SupplyAdjustment[]        @relation("SupplyAdjuster")
+  passwordResetTokens               PasswordResetToken[]
+  emailVerificationTokens           EmailVerificationToken[]
+  availabilities                    Availability[]            @relation("UserAvailability")
+  timeOffRequests                   TimeOffRequest[]          @relation("UserTimeOff")
+  credentials                       Credential[]              @relation("UserCredential")
+  heldAccessItems                   AccessItem[]              @relation("AccessHolder")
+  portalCustomer                    Customer?                 @relation("CustomerPortalUsers", fields: [customerId], references: [id])
+  notificationPrefs                 NotificationPreference[]
+  notificationLogs                  NotificationLog[]
+  lockedPayPeriods                  PayPeriod[]               @relation("PayPeriodLockedBy")
+  skills                            EmployeeSkill[]           @relation("UserSkill")
+  onboardingAssignments             OnboardingAssignment[]    @relation("OnboardingUser")
   // Task ownership & verification (P1)
-  checklistAssignedTo  JobChecklistItem[]     @relation("ChecklistAssignedTo")
-  checklistVerified    JobChecklistItem[]     @relation("ChecklistVerifier")
-  checklistShares      ChecklistItemAssignee[] @relation("ChecklistAssigneeUser")
+  checklistAssignedTo               JobChecklistItem[]        @relation("ChecklistAssignedTo")
+  checklistVerified                 JobChecklistItem[]        @relation("ChecklistVerifier")
+  checklistShares                   ChecklistItemAssignee[]   @relation("ChecklistAssigneeUser")
   // Employee reporting & supervisor review (P2)
-  filedReports         EmployeeReport[]       @relation("EmployeeReportReporter")
-  reportsAbout         EmployeeReport[]       @relation("EmployeeReportSubject")
-  reviewedReports      EmployeeReport[]       @relation("EmployeeReportReviewer")
-  resolvedReports      EmployeeReport[]       @relation("EmployeeReportResolver")
-  correctiveReports    EmployeeReport[]       @relation("EmployeeReportCorrectiveAssignee")
+  filedReports                      EmployeeReport[]          @relation("EmployeeReportReporter")
+  reportsAbout                      EmployeeReport[]          @relation("EmployeeReportSubject")
+  reviewedReports                   EmployeeReport[]          @relation("EmployeeReportReviewer")
+  resolvedReports                   EmployeeReport[]          @relation("EmployeeReportResolver")
+  correctiveReports                 EmployeeReport[]          @relation("EmployeeReportCorrectiveAssignee")
+  // Customer complaint linkage & investigation (P3)
+  investigatedIssues                Issue[]                   @relation("IssueInvestigator")
+  assignedWorkOrders                WorkOrder[]               @relation("WorkOrderAssignee")
+  complaintResponsibilities         ComplaintResponsibility[] @relation("ComplaintResponsibilitySubject")
+  capturedComplaintResponsibilities ComplaintResponsibility[] @relation("ComplaintResponsibilityCapturer")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -647,22 +653,22 @@ model User {
 // this 1:1 profile carries employment + pay-rate data used for labor costing
 // and future payroll EXPORT only — never for payroll processing.
 model EmployeeProfile {
-  id               String           @id @default(cuid())
-  userId           String           @unique
-  organizationId   String
-  employeeCode     String?
-  payType          PayType          @default(HOURLY)
-  payRate          Decimal?         @db.Decimal(10, 2)
-  employmentStatus EmploymentStatus @default(ACTIVE)
-  hireDate         DateTime?
+  id                    String           @id @default(cuid())
+  userId                String           @unique
+  organizationId        String
+  employeeCode          String?
+  payType               PayType          @default(HOURLY)
+  payRate               Decimal?         @db.Decimal(10, 2)
+  employmentStatus      EmploymentStatus @default(ACTIVE)
+  hireDate              DateTime?
   // Shared time-clock kiosk PIN (Phase 49), bcrypt-hashed. Identifies the
   // employee at a shared device; never the login password. Null = no PIN set.
-  clockPinHash     String?
-  availability     String? // carried over from an Applicant on hire (Phase 18)
+  clockPinHash          String?
+  availability          String? // carried over from an Applicant on hire (Phase 18)
   emergencyContactName  String?
   emergencyContactPhone String?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -734,7 +740,7 @@ model JobEarning {
 // ─── Customers + sites ───────────────────────────────────────────────────────
 
 model Customer {
-  id                 String   @id @default(cuid())
+  id                 String       @id @default(cuid())
   organizationId     String
   name               String
   primaryContactName String?
@@ -744,34 +750,34 @@ model Customer {
   billingEmail       String?
   paymentTerms       PaymentTerms @default(DUE_ON_RECEIPT)
   notes              String?
-  isActive           Boolean  @default(true)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  isActive           Boolean      @default(true)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 
-  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  contacts         Contact[]
-  serviceLocations ServiceLocation[]
-  invoices         Invoice[]
-  estimates              Estimate[] @relation("EstimateCustomer")
-  convertedFromEstimates Estimate[] @relation("EstimateConvertedCustomer")
+  organization           Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contacts               Contact[]
+  serviceLocations       ServiceLocation[]
+  invoices               Invoice[]
+  estimates              Estimate[]           @relation("EstimateCustomer")
+  convertedFromEstimates Estimate[]           @relation("EstimateConvertedCustomer")
   // Stripe customer id for reusing a saved payment method (Phase 22). We never
   // auto-charge without explicit customer authorization.
-  stripeCustomerId String?
-  importBatchId    String? // set when created by a CSV import (Phase 23); enables rollback
+  stripeCustomerId       String?
+  importBatchId          String? // set when created by a CSV import (Phase 23); enables rollback
   // Customer communications (Phase 26). Visit reminders are opt-IN; completion
   // summaries are on by default (opt-out).
-  visitRemindersOptIn   Boolean @default(false)
-  serviceSummariesOptIn Boolean @default(true)
+  visitRemindersOptIn    Boolean              @default(false)
+  serviceSummariesOptIn  Boolean              @default(true)
   // Multi-step collections (Phase 44): opt a customer out of the dunning sequence.
-  collectionsOptOut     Boolean @default(false)
-  contracts        Contract[]
-  messages         CustomerMessage[]
-  collectionActivities CollectionActivity[]
-  serviceRequests  ServiceRequest[]
-  surveyResponses  SurveyResponse[]
-  portalUsers      User[]         @relation("CustomerPortalUsers")
-  portalInvites    PortalInvite[]
-  workOrders       WorkOrder[]
+  collectionsOptOut      Boolean              @default(false)
+  contracts              Contract[]
+  messages               CustomerMessage[]
+  collectionActivities   CollectionActivity[]
+  serviceRequests        ServiceRequest[]
+  surveyResponses        SurveyResponse[]
+  portalUsers            User[]               @relation("CustomerPortalUsers")
+  portalInvites          PortalInvite[]
+  workOrders             WorkOrder[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -798,23 +804,23 @@ model Contact {
 }
 
 model ServiceLocation {
-  id             String   @id @default(cuid())
-  organizationId String
-  customerId     String
-  name           String
-  addressLine1   String?
-  addressLine2   String?
-  city           String?
-  state          String?
-  postalCode     String?
-  country        String?  @default("US")
+  id               String   @id @default(cuid())
+  organizationId   String
+  customerId       String
+  name             String
+  addressLine1     String?
+  addressLine2     String?
+  city             String?
+  state            String?
+  postalCode       String?
+  country          String?  @default("US")
   // Geolocation is captured for future geofenced clock-in. The radius is stored
   // so enforcement can be turned on later; Phase 0 does NOT enforce geofencing.
-  latitude        Float?
-  longitude       Float?
-  geofenceRadiusM Int?
+  latitude         Float?
+  longitude        Float?
+  geofenceRadiusM  Int?
   // IANA timezone override for this site; falls back to Organization.timezone.
-  timezone        String?
+  timezone         String?
   // Site contact, used when different from the customer's primary contact.
   siteContactName  String?
   siteContactPhone String?
@@ -822,36 +828,36 @@ model ServiceLocation {
   // Sales-tax config (Phase 40). Services at this site are NOT taxable by
   // default; the customer opts in and picks the jurisdiction rate. A plan may
   // override taxability (ServicePlan.taxable) for a specific service type.
-  taxable        Boolean  @default(false)
-  taxRateId      String?
-  parentId       String?
+  taxable          Boolean  @default(false)
+  taxRateId        String?
+  parentId         String?
   // Access instructions / site notes (gate codes, alarm, parking, etc.).
-  notes          String?
-  importBatchId  String? // set when created by a CSV import (Phase 23)
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  notes            String?
+  importBatchId    String? // set when created by a CSV import (Phase 23)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  customer     Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  taxRate      TaxRate?          @relation(fields: [taxRateId], references: [id])
-  parent       ServiceLocation?  @relation("LocationHierarchy", fields: [parentId], references: [id])
-  children     ServiceLocation[] @relation("LocationHierarchy")
-  servicePlans ServicePlan[]
-  jobs         Job[]
-  issues       Issue[]
-  routingRules IssueRoutingRule[]
-  qrCodes      QrCode[]
-  custodyEvents CustodyEvent[]
-  inspections  Inspection[]
-  assets       Asset[]       @relation("AssetSite")
-  supplyUsages SupplyUsage[] @relation("SupplyUsageSite")
+  organization           Organization                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer               Customer                    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  taxRate                TaxRate?                    @relation(fields: [taxRateId], references: [id])
+  parent                 ServiceLocation?            @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children               ServiceLocation[]           @relation("LocationHierarchy")
+  servicePlans           ServicePlan[]
+  jobs                   Job[]
+  issues                 Issue[]
+  routingRules           IssueRoutingRule[]
+  qrCodes                QrCode[]
+  custodyEvents          CustodyEvent[]
+  inspections            Inspection[]
+  assets                 Asset[]                     @relation("AssetSite")
+  supplyUsages           SupplyUsage[]               @relation("SupplyUsageSite")
   credentialRequirements SiteCredentialRequirement[]
-  accessItems  AccessItem[]
-  workOrders   WorkOrder[]
-  laborBudgets LaborBudget[]
-  skillRequirements SiteSkillRequirement[]
-  timeClockKiosks TimeClockKiosk[]
+  accessItems            AccessItem[]
+  workOrders             WorkOrder[]
+  laborBudgets           LaborBudget[]
+  skillRequirements      SiteSkillRequirement[]
+  timeClockKiosks        TimeClockKiosk[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -897,35 +903,35 @@ model ChecklistTemplateItem {
 }
 
 model ServicePlan {
-  id                 String           @id @default(cuid())
-  organizationId     String
-  serviceLocationId  String
-  name               String
-  frequency          ServiceFrequency @default(WEEKLY)
-  rrule              String? // iCal RRULE string for CUSTOM cadences (never shown raw to users)
-  startTime          String?          // local wall-clock "HH:mm" in the site timezone
-  crewSize           Int              @default(1)
-  defaultDurationMin Int?
+  id                  String           @id @default(cuid())
+  organizationId      String
+  serviceLocationId   String
+  name                String
+  frequency           ServiceFrequency @default(WEEKLY)
+  rrule               String? // iCal RRULE string for CUSTOM cadences (never shown raw to users)
+  startTime           String? // local wall-clock "HH:mm" in the site timezone
+  crewSize            Int              @default(1)
+  defaultDurationMin  Int?
   checklistTemplateId String?
-  startDate          DateTime?
-  endDate            DateTime?
+  startDate           DateTime?
+  endDate             DateTime?
   // Billing (Phase 2). rate is per-job for FLAT_PER_JOB, per-hour for HOURLY.
-  billingType        BillingType      @default(FLAT_PER_JOB)
-  rate               Decimal?         @db.Decimal(12, 2)
-  currency           String           @default("USD")
+  billingType         BillingType      @default(FLAT_PER_JOB)
+  rate                Decimal?         @db.Decimal(12, 2)
+  currency            String           @default("USD")
   // Period-based billing (Phase 9). FLAT_PERIOD bills periodAmount every
   // periodFrequency regardless of visit count; billingType/rate are ignored then.
-  billingMode        BillingMode      @default(PER_JOB)
-  periodAmount       Decimal?         @db.Decimal(12, 2)
-  periodFrequency    PeriodFrequency?
+  billingMode         BillingMode      @default(PER_JOB)
+  periodAmount        Decimal?         @db.Decimal(12, 2)
+  periodFrequency     PeriodFrequency?
   // Per service-type tax override (Phase 40). null = inherit the site default;
   // true/false forces taxability for this plan. taxRateId overrides the site rate.
-  taxable            Boolean?
-  taxRateId          String?
-  contractId         String? // OPTIONAL link to a commercial contract (Phase 8)
-  isActive           Boolean          @default(true)
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
+  taxable             Boolean?
+  taxRateId           String?
+  contractId          String? // OPTIONAL link to a commercial contract (Phase 8)
+  isActive            Boolean          @default(true)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
 
   organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   serviceLocation   ServiceLocation    @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
@@ -944,12 +950,12 @@ model ServicePlan {
 // ─── Jobs (scheduled work) + assignment + per-job checklist ──────────────────
 
 model Job {
-  id                String    @id @default(cuid())
+  id                String       @id @default(cuid())
   organizationId    String
   serviceLocationId String
   servicePlanId     String?
   title             String
-  status            JobStatus @default(SCHEDULED)
+  status            JobStatus    @default(SCHEDULED)
   scheduledStart    DateTime
   scheduledEnd      DateTime?
   // The ORIGINAL recurrence instant this job was generated for (plan jobs only;
@@ -957,7 +963,7 @@ model Job {
   // scheduledStart but never plannedStart, so generation can't recreate a ghost
   // in the vacated slot. See generation.ts and the reschedule-duplicate fix.
   plannedStart      DateTime?
-  crewSize          Int?      // required/default crew size (copied from the plan)
+  crewSize          Int? // required/default crew size (copied from the plan)
   actualStart       DateTime?
   actualEnd         DateTime?
   notes             String?
@@ -965,11 +971,11 @@ model Job {
   // job ignores these (the plan's rate wins); a manual job with a rate becomes
   // billable, one without a rate is excluded-and-reported like the plan case.
   billingType       BillingType? // FLAT_PER_JOB | HOURLY
-  rate              Decimal?  @db.Decimal(12, 2)
+  rate              Decimal?     @db.Decimal(12, 2)
   currency          String?
   createdById       String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
   organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   serviceLocation ServiceLocation    @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
@@ -1044,14 +1050,14 @@ enum TaskVerificationStatus {
 }
 
 model JobChecklistItem {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   jobId         String
   label         String
   instructions  String?
-  sortOrder     Int      @default(0)
-  isRequired    Boolean  @default(true)
-  requirePhoto  Boolean  @default(false)
-  isComplete    Boolean  @default(false)
+  sortOrder     Int       @default(0)
+  isRequired    Boolean   @default(true)
+  requirePhoto  Boolean   @default(false)
+  isComplete    Boolean   @default(false)
   completedAt   DateTime?
   completedById String?
   note          String?
@@ -1069,15 +1075,16 @@ model JobChecklistItem {
   verificationNote   String? // verifier's note, or the reason on rejection
   rejectionReason    String?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  job        Job                     @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  photos     JobPhoto[]
-  assignedTo User?                   @relation("ChecklistAssignedTo", fields: [assignedToId], references: [id])
-  verifier   User?                   @relation("ChecklistVerifier", fields: [verifierId], references: [id])
-  assignees  ChecklistItemAssignee[]
+  job             Job                     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  photos          JobPhoto[]
+  assignedTo      User?                   @relation("ChecklistAssignedTo", fields: [assignedToId], references: [id])
+  verifier        User?                   @relation("ChecklistVerifier", fields: [verifierId], references: [id])
+  assignees       ChecklistItemAssignee[]
   employeeReports EmployeeReport[]
+  issueComplaints Issue[]                 @relation("IssueChecklistItem")
 
   @@index([jobId])
   @@index([assignedToId])
@@ -1170,35 +1177,35 @@ enum EmployeeReportOutcome {
 }
 
 model EmployeeReport {
-  id                 String                        @id @default(cuid())
-  organizationId     String
-  reportedById       String // the employee filing (always an internal user)
-  aboutUserId        String? // the subject/accused employee (nullable: quality note may be task-only)
-  jobId              String?
-  jobChecklistItemId String?
-  category           EmployeeReportCategory
-  confidentiality    EmployeeReportConfidentiality @default(NORMAL)
-  title              String?
-  description        String
-  status             EmployeeReportStatus          @default(SUBMITTED)
-  outcome            EmployeeReportOutcome? // the finding, preserved through RESOLVED
+  id                   String                        @id @default(cuid())
+  organizationId       String
+  reportedById         String // the employee filing (always an internal user)
+  aboutUserId          String? // the subject/accused employee (nullable: quality note may be task-only)
+  jobId                String?
+  jobChecklistItemId   String?
+  category             EmployeeReportCategory
+  confidentiality      EmployeeReportConfidentiality @default(NORMAL)
+  title                String?
+  description          String
+  status               EmployeeReportStatus          @default(SUBMITTED)
+  outcome              EmployeeReportOutcome? // the finding, preserved through RESOLVED
   // Investigation. The reviewer MUST differ from the reporter and the subject
   // (enforced server-side) — nobody investigates a complaint about themselves.
-  reviewerId         String?
-  reviewStartedAt    DateTime?
-  finding            String? // investigator's written findings
+  reviewerId           String?
+  reviewStartedAt      DateTime?
+  finding              String? // investigator's written findings
   // The subject's response, recorded by management (the subject has no direct
   // access to confidential/private reports — management solicits + records it).
-  employeeResponse   String?
-  respondedAt        DateTime?
+  employeeResponse     String?
+  respondedAt          DateTime?
   // Corrective action requested on a substantiated report (follow-up work).
   correctiveAction     String?
   correctiveDueAt      DateTime?
   correctiveAssigneeId String?
-  resolvedById       String?
-  resolvedAt         DateTime?
-  createdAt          DateTime                      @default(now())
-  updatedAt          DateTime                      @updatedAt
+  resolvedById         String?
+  resolvedAt           DateTime?
+  createdAt            DateTime                      @default(now())
+  updatedAt            DateTime                      @updatedAt
 
   organization       Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   reportedBy         User              @relation("EmployeeReportReporter", fields: [reportedById], references: [id])
@@ -1238,20 +1245,20 @@ model TimeEntry {
   clockOutAccuracyM Float?
   clockOutSource    String?
 
-  breakMinutes Int      @default(0)
-  approvedById String?
-  approvedAt   DateTime?
+  breakMinutes             Int       @default(0)
+  approvedById             String?
+  approvedAt               DateTime?
   // Snapshot of the worker's pay basis at APPROVAL time so later raises never
   // rewrite historical labor cost (same snapshot pattern as invoice lines).
-  approvedPayRate Decimal? @db.Decimal(10, 2)
-  approvedPayType String?
+  approvedPayRate          Decimal?  @db.Decimal(10, 2)
+  approvedPayType          String?
   // Shift-differential premium snapshot (Phase 43): the extra $ earned on this
   // entry from differential rules, plus a human note of which applied. Cost/
   // export only — never payroll processing.
-  approvedDifferential     Decimal? @db.Decimal(10, 2)
+  approvedDifferential     Decimal?  @db.Decimal(10, 2)
   approvedDifferentialNote String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user         User         @relation("TimeEntryWorker", fields: [userId], references: [id], onDelete: Cascade)
@@ -1352,6 +1359,32 @@ enum IssueStatus {
   @@schema("cleaning")
 }
 
+// Customer-complaint INVESTIGATION outcome (P3) — orthogonal to the SLA status
+// machine above. A complaint is an allegation until investigated; only a
+// SUBSTANTIATED outcome may ever contribute to future performance analytics
+// (enforced by the pure rule outcomeCountsAgainstEmployee). This does NOT create
+// a second complaint system: the complaint is still the Issue (source=CUSTOMER).
+enum IssueOutcome {
+  SUBSTANTIATED
+  UNSUBSTANTIATED
+  INCONCLUSIVE
+
+  @@schema("cleaning")
+}
+
+// How an employee was RESPONSIBLE for the work a complaint is about — captured
+// as an immutable snapshot at investigation time so historical responsibility
+// (original assignment, who completed it, who verified it) survives later edits
+// to the live job/checklist.
+enum ComplaintResponsibilityBasis {
+  TASK_ASSIGNEE // was assigned the checklist task
+  TASK_COMPLETER // marked the task complete
+  TASK_VERIFIER // verified/approved the task
+  JOB_ASSIGNEE // was on the job crew
+
+  @@schema("cleaning")
+}
+
 enum IssueSeverity {
   LOW
   MEDIUM
@@ -1407,51 +1440,62 @@ model IssueRoutingRule {
 }
 
 model Issue {
-  id                String        @id @default(cuid())
-  organizationId    String
-  jobId             String?
-  serviceLocationId String?
-  inspectionId      String?       @unique // at most one Issue per inspection (idempotent finalize)
-  reportedById      String? // null for external (QR/occupant) reports — no internal user
-  qrCodeId          String? // set when filed via a posted QR code (Phase 32)
-  assetId           String? // the equipment this problem is about (Phase 34)
-  reporterIpHash    String? // hashed IP of an external reporter — for durable per-IP intake caps
-  assignedToId      String? // the RESOLVER / owner
-  verifierId        String? // the VERIFIER — must differ from the resolver (Phase 30)
-  category          IssueCategory @default(OTHER)
-  severity          IssueSeverity @default(MEDIUM)
-  source            IssueSource   @default(STAFF)
-  title             String?
-  description       String
-  status            IssueStatus   @default(OPEN)
-  acknowledgedAt    DateTime?
-  resolvedAt        DateTime?
-  closedAt          DateTime?
+  id                 String        @id @default(cuid())
+  organizationId     String
+  jobId              String?
+  jobChecklistItemId String? // the specific task a complaint is about (P3)
+  serviceLocationId  String?
+  inspectionId       String?       @unique // at most one Issue per inspection (idempotent finalize)
+  reportedById       String? // null for external (QR/occupant) reports — no internal user
+  qrCodeId           String? // set when filed via a posted QR code (Phase 32)
+  assetId            String? // the equipment this problem is about (Phase 34)
+  reporterIpHash     String? // hashed IP of an external reporter — for durable per-IP intake caps
+  assignedToId       String? // the RESOLVER / owner
+  verifierId         String? // the VERIFIER — must differ from the resolver (Phase 30)
+  category           IssueCategory @default(OTHER)
+  severity           IssueSeverity @default(MEDIUM)
+  source             IssueSource   @default(STAFF)
+  title              String?
+  description        String
+  status             IssueStatus   @default(OPEN)
+  acknowledgedAt     DateTime?
+  resolvedAt         DateTime?
+  closedAt           DateTime?
   // SLA deadlines derived from severity at report time (Phase 30).
-  ackDeadline       DateTime?
-  resolveDeadline   DateTime?
-  escalationLevel   Int           @default(0) // 0 assignee → 1 supervisor → 2 managers → 3 owners
-  reopenCount       Int           @default(0)
+  ackDeadline        DateTime?
+  resolveDeadline    DateTime?
+  escalationLevel    Int           @default(0) // 0 assignee → 1 supervisor → 2 managers → 3 owners
+  reopenCount        Int           @default(0)
   // Externally reported (QR / occupant) — marked, data-isolated (Phase 32).
-  externalReporter  String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  externalReporter   String?
+  // Complaint investigation (P3): outcome/finding are orthogonal to `status`
+  // (the SLA machine). A complaint stays an allegation until `outcome` is set.
+  outcome            IssueOutcome?
+  finding            String?
+  investigatedById   String?
+  investigatedAt     DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
-  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  job             Job?             @relation(fields: [jobId], references: [id], onDelete: SetNull)
-  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
-  inspection      Inspection?      @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
-  reportedBy      User?            @relation("IssueReporter", fields: [reportedById], references: [id])
-  qrCode          QrCode?          @relation(fields: [qrCodeId], references: [id], onDelete: SetNull)
-  asset           Asset?           @relation(fields: [assetId], references: [id], onDelete: SetNull)
-  assignedTo      User?            @relation("IssueAssignee", fields: [assignedToId], references: [id])
-  verifier        User?            @relation("IssueVerifier", fields: [verifierId], references: [id])
-  comments        IssueComment[]
-  photos          JobPhoto[]
-  workOrder       WorkOrder?       @relation("WorkOrderIssue")
+  organization     Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  job              Job?                      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  checklistItem    JobChecklistItem?         @relation("IssueChecklistItem", fields: [jobChecklistItemId], references: [id], onDelete: SetNull)
+  investigatedBy   User?                     @relation("IssueInvestigator", fields: [investigatedById], references: [id])
+  responsibilities ComplaintResponsibility[]
+  serviceLocation  ServiceLocation?          @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
+  inspection       Inspection?               @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
+  reportedBy       User?                     @relation("IssueReporter", fields: [reportedById], references: [id])
+  qrCode           QrCode?                   @relation(fields: [qrCodeId], references: [id], onDelete: SetNull)
+  asset            Asset?                    @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  assignedTo       User?                     @relation("IssueAssignee", fields: [assignedToId], references: [id])
+  verifier         User?                     @relation("IssueVerifier", fields: [verifierId], references: [id])
+  comments         IssueComment[]
+  photos           JobPhoto[]
+  workOrder        WorkOrder?                @relation("WorkOrderIssue")
 
   @@index([organizationId])
   @@index([jobId])
+  @@index([jobChecklistItemId])
   @@index([qrCodeId])
   @@index([assetId])
   @@index([status])
@@ -1464,17 +1508,17 @@ model Issue {
 // independently revocable (isActive) — revoking one leaked code never affects
 // the others, so there is no need to reprint a whole building.
 model QrCode {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   organizationId    String
   serviceLocationId String
-  token             String   @unique // URL-safe public identifier
+  token             String    @unique // URL-safe public identifier
   label             String // where it's posted, e.g. "2nd floor men's restroom"
-  isActive          Boolean  @default(true)
-  scanCount         Int      @default(0)
+  isActive          Boolean   @default(true)
+  scanCount         Int       @default(0)
   lastScanAt        DateTime?
   createdById       String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   serviceLocation ServiceLocation @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
@@ -1540,6 +1584,7 @@ model WorkOrder {
   approvedById      String?
   approvedAt        DateTime?
   // Resolver/verifier split for corrective WOs — the verifier must differ.
+  assignedToId      String? // the employee asked to do the corrective work (P3)
   resolvedById      String?
   resolvedAt        DateTime?
   verifiedById      String?
@@ -1556,10 +1601,44 @@ model WorkOrder {
   issue           Issue?           @relation("WorkOrderIssue", fields: [issueId], references: [id], onDelete: SetNull)
   inspection      Inspection?      @relation("WorkOrderInspection", fields: [inspectionId], references: [id], onDelete: SetNull)
   convertedJob    Job?             @relation("WorkOrderJob", fields: [convertedJobId], references: [id], onDelete: SetNull)
+  assignedTo      User?            @relation("WorkOrderAssignee", fields: [assignedToId], references: [id])
 
   @@index([organizationId])
   @@index([status])
   @@index([inspectionId])
+  @@index([assignedToId])
+  @@schema("cleaning")
+}
+
+// Immutable snapshot of who was RESPONSIBLE for the work a customer complaint is
+// about (P3). Captured at investigation time from the live job/checklist so the
+// original task assignment, completion record, and verification history survive
+// later edits. The snapshot never establishes fault — it preserves facts; only a
+// SUBSTANTIATED complaint outcome may contribute to performance (see
+// outcomeCountsAgainstEmployee). Reuses JobChecklistItem/User; not a new system.
+model ComplaintResponsibility {
+  id                 String                       @id @default(cuid())
+  organizationId     String
+  issueId            String
+  userId             String
+  basis              ComplaintResponsibilityBasis
+  jobChecklistItemId String?
+  // Frozen snapshots at capture time (so later edits don't rewrite history).
+  taskLabel          String?
+  verificationStatus String?
+  completedAt        DateTime?
+  capturedAt         DateTime                     @default(now())
+  capturedById       String?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  issue        Issue        @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  user         User         @relation("ComplaintResponsibilitySubject", fields: [userId], references: [id])
+  capturedBy   User?        @relation("ComplaintResponsibilityCapturer", fields: [capturedById], references: [id])
+
+  @@unique([issueId, userId, basis, jobChecklistItemId])
+  @@index([organizationId])
+  @@index([issueId])
+  @@index([userId])
   @@schema("cleaning")
 }
 
@@ -1619,6 +1698,7 @@ enum NotificationEvent {
   ISSUE_UNACKED
   ISSUE_OVERDUE
   ISSUE_ESCALATED
+  CORRECTIVE_ASSIGNED
   COLLECTION_STEP
 
   @@schema("cleaning")
@@ -1788,15 +1868,15 @@ enum MessageSender {
 }
 
 model CustomerMessage {
-  id              String        @id @default(cuid())
-  organizationId  String
-  customerId      String
-  sender          MessageSender
-  authorUserId    String? // the staff or portal user who wrote it
-  body            String
-  readByStaffAt   DateTime?
+  id               String        @id @default(cuid())
+  organizationId   String
+  customerId       String
+  sender           MessageSender
+  authorUserId     String? // the staff or portal user who wrote it
+  body             String
+  readByStaffAt    DateTime?
   readByCustomerAt DateTime?
-  createdAt       DateTime      @default(now())
+  createdAt        DateTime      @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -1831,15 +1911,15 @@ model IdempotencyClaim {
 // A committed CSV import (Phase 23). Records created rows are tagged with its id
 // so the most recent import can be rolled back cleanly.
 model ImportBatch {
-  id                String    @id @default(cuid())
-  organizationId    String
-  filename          String?
-  customersCreated  Int       @default(0)
-  sitesCreated      Int       @default(0)
-  contactsCreated   Int       @default(0)
-  createdById       String?
-  createdAt         DateTime  @default(now())
-  rolledBackAt      DateTime?
+  id               String    @id @default(cuid())
+  organizationId   String
+  filename         String?
+  customersCreated Int       @default(0)
+  sitesCreated     Int       @default(0)
+  contactsCreated  Int       @default(0)
+  createdById      String?
+  createdAt        DateTime  @default(now())
+  rolledBackAt     DateTime?
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -1940,13 +2020,13 @@ enum InspectionResultValue {
 }
 
 model InspectionTemplate {
-  id            String   @id @default(cuid())
+  id             String   @id @default(cuid())
   organizationId String
-  name          String
-  passThreshold Int      @default(80) // percent required to PASS
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  name           String
+  passThreshold  Int      @default(80) // percent required to PASS
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   items        InspectionTemplateItem[]
@@ -1991,15 +2071,15 @@ model Inspection {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
-  organization    Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  serviceLocation ServiceLocation        @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
-  job             Job?                    @relation(fields: [jobId], references: [id], onDelete: SetNull)
-  inspector       User                    @relation("InspectionInspector", fields: [inspectorId], references: [id])
-  template        InspectionTemplate?     @relation(fields: [templateId], references: [id])
-  results         InspectionItemResult[]
-  photos          JobPhoto[]
-  issue           Issue?
-  correctiveWorkOrders WorkOrder[]       @relation("WorkOrderInspection")
+  organization         Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation      ServiceLocation        @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  job                  Job?                   @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  inspector            User                   @relation("InspectionInspector", fields: [inspectorId], references: [id])
+  template             InspectionTemplate?    @relation(fields: [templateId], references: [id])
+  results              InspectionItemResult[]
+  photos               JobPhoto[]
+  issue                Issue?
+  correctiveWorkOrders WorkOrder[]            @relation("WorkOrderInspection")
 
   @@index([organizationId])
   @@index([serviceLocationId])
@@ -2008,7 +2088,7 @@ model Inspection {
 }
 
 model InspectionItemResult {
-  id           String                @id @default(cuid())
+  id           String                 @id @default(cuid())
   inspectionId String
   // Snapshotted item data — historical, never re-derived from the template.
   label        String
@@ -2019,8 +2099,8 @@ model InspectionItemResult {
   sortOrder    Int
   result       InspectionResultValue?
   note         String?
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
 
   inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
   photos     JobPhoto[]
@@ -2153,37 +2233,37 @@ model TaxRate {
 }
 
 model Invoice {
-  id             String        @id @default(cuid())
-  organizationId String
-  customerId     String
+  id              String        @id @default(cuid())
+  organizationId  String
+  customerId      String
   // Per-org sequential human number (rendered as e.g. INV-0001). Uniqueness is
   // enforced by @@unique below; generation retries on P2002, like job gen.
-  invoiceNumber  Int
-  status         InvoiceStatus @default(DRAFT)
-  issueDate      DateTime      @default(now())
-  dueDate        DateTime
-  periodStart    DateTime
-  periodEnd      DateTime
-  currency       String        @default("USD")
-  subtotal       Decimal       @db.Decimal(12, 2)
+  invoiceNumber   Int
+  status          InvoiceStatus @default(DRAFT)
+  issueDate       DateTime      @default(now())
+  dueDate         DateTime
+  periodStart     DateTime
+  periodEnd       DateTime
+  currency        String        @default("USD")
+  subtotal        Decimal       @db.Decimal(12, 2)
   // Sum of per-line tax (Phase 40). 0 when no line is taxable. Tax is computed
   // from the rate snapshotted on each line, never re-derived from TaxRate.
-  taxTotal       Decimal       @default(0) @db.Decimal(12, 2)
-  total          Decimal       @db.Decimal(12, 2)
-  notes          String?
+  taxTotal        Decimal       @default(0) @db.Decimal(12, 2)
+  total           Decimal       @db.Decimal(12, 2)
+  notes           String?
   // Collections (Phase 44): pause the dunning sequence for this one invoice.
-  collectionsHold Boolean      @default(false)
-  emailedAt      DateTime? // last time it was emailed to the customer (Phase 7)
+  collectionsHold Boolean       @default(false)
+  emailedAt       DateTime? // last time it was emailed to the customer (Phase 7)
   // Unguessable token for a login-free public pay link (Phase 22). Null until a
   // pay link is generated; stable thereafter.
-  payLinkToken   String?       @unique
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  payLinkToken    String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  customer     Customer         @relation(fields: [customerId], references: [id])
-  lines        InvoiceLine[]
-  payments     InvoicePayment[]
+  organization         Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer             Customer             @relation(fields: [customerId], references: [id])
+  lines                InvoiceLine[]
+  payments             InvoicePayment[]
   collectionActivities CollectionActivity[]
 
   @@unique([organizationId, invoiceNumber])
@@ -2194,43 +2274,43 @@ model Invoice {
 }
 
 model InvoiceLine {
-  id        String @id @default(cuid())
-  invoiceId String
+  id                  String   @id @default(cuid())
+  invoiceId           String
   // Snapshot link to the job billed (NULL for ad-hoc lines). Immutable record.
-  jobId     String?
+  jobId               String?
   // Uniqueness guard: equals jobId while the invoice is non-VOID, set to NULL
   // when the invoice is voided — so a job appears on at most one non-VOID
   // invoice, but can be re-invoiced after a void. DB-enforced by @unique.
-  activeJobId String? @unique
+  activeJobId         String?  @unique
   // Flat-period idempotency guard (Phase 9): "<planId>:<periodKey>" while the
   // invoice is non-VOID, NULL when voided — so a plan-period is billed on at
   // most one non-VOID invoice. Mirrors activeJobId.
-  activePeriodKey String? @unique
+  activePeriodKey     String?  @unique
   // Snapshot link to a billable extra (change order), NULL for other lines.
-  changeOrderId   String?
+  changeOrderId       String?
   // Change-order idempotency guard (Phase 20): equals changeOrderId while the
   // invoice is non-VOID, NULL when voided — a change order bills at most once on
   // a non-VOID invoice. Mirrors activeJobId.
-  activeChangeOrderId String? @unique
+  activeChangeOrderId String?  @unique
   // False for the non-billable "covered service" detail lines listed under a
   // flat-period charge (amount 0). Billable lines sum to the invoice total.
-  billable    Boolean @default(true)
+  billable            Boolean  @default(true)
   // Snapshotted at generation — never re-derived from the plan/site/job.
-  description String
-  siteName    String?
-  serviceDate DateTime
-  quantity    Decimal  @db.Decimal(12, 2)
-  unitRate    Decimal  @db.Decimal(12, 2)
-  amount      Decimal  @db.Decimal(12, 2)
+  description         String
+  siteName            String?
+  serviceDate         DateTime
+  quantity            Decimal  @db.Decimal(12, 2)
+  unitRate            Decimal  @db.Decimal(12, 2)
+  amount              Decimal  @db.Decimal(12, 2)
   // Sales tax (Phase 40), all SNAPSHOTTED at generation so a later rate change
   // never rewrites a historical invoice. taxable records the decision; the
   // rate/name record which rate applied; taxAmount = round2(amount × taxRatePct).
-  taxable     Boolean  @default(false)
-  taxRatePct  Decimal? @db.Decimal(6, 4) // fraction (0.0700 = 7%), null when untaxed
-  taxRateName String? // jurisdiction label snapshot, e.g. "Indiana sales tax"
-  taxAmount   Decimal  @default(0) @db.Decimal(12, 2)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  taxable             Boolean  @default(false)
+  taxRatePct          Decimal? @db.Decimal(6, 4) // fraction (0.0700 = 7%), null when untaxed
+  taxRateName         String? // jurisdiction label snapshot, e.g. "Indiana sales tax"
+  taxAmount           Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   job     Job?    @relation(fields: [jobId], references: [id])
@@ -2281,20 +2361,20 @@ model Lead {
 }
 
 model Estimate {
-  id             String          @id @default(cuid())
-  organizationId String
-  leadId         String? // sourced from a lead …
-  customerId     String? // … or written for an existing customer
-  title          String
+  id                  String           @id @default(cuid())
+  organizationId      String
+  leadId              String? // sourced from a lead …
+  customerId          String? // … or written for an existing customer
+  title               String
   // Prospect / site details — used to CREATE the customer + site on conversion.
-  contactName    String?
-  contactEmail   String?
-  contactPhone   String?
-  siteName       String?
-  addressLine1   String?
-  city           String?
-  state          String?
-  postalCode     String?
+  contactName         String?
+  contactEmail        String?
+  contactPhone        String?
+  siteName            String?
+  addressLine1        String?
+  city                String?
+  state               String?
+  postalCode          String?
   // Recurring service shape carried to the ServicePlan on conversion.
   frequency           ServiceFrequency @default(WEEKLY)
   pricing             EstimatePricing  @default(PER_VISIT)
@@ -2302,11 +2382,11 @@ model Estimate {
   currency            String           @default("USD")
   checklistTemplateId String?
   // Document.
-  status     EstimateStatus @default(DRAFT)
-  validUntil DateTime?
-  subtotal   Decimal        @default(0) @db.Decimal(12, 2)
-  total      Decimal        @default(0) @db.Decimal(12, 2)
-  notes      String?
+  status              EstimateStatus   @default(DRAFT)
+  validUntil          DateTime?
+  subtotal            Decimal          @default(0) @db.Decimal(12, 2)
+  total               Decimal          @default(0) @db.Decimal(12, 2)
+  notes               String?
   // Immutability link: once set the estimate is read-only and permanently
   // bound to the customer it created (snapshot pattern, like invoices).
   convertedCustomerId String?
@@ -2314,8 +2394,8 @@ model Estimate {
   // Bid calculator worksheet snapshot (Phase 10): the full inputs + computed
   // breakdown at the time the price was produced. JSON, never re-derived.
   bidWorksheet        Json?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
 
   organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   lead              Lead?              @relation(fields: [leadId], references: [id])
@@ -2399,33 +2479,33 @@ model TimeOffRequest {
 // holds room-by-room areas captured in the field, used to prefill the bid
 // calculator. `ipHash` is set for public (online) submissions, for rate limits.
 model QuoteRequest {
-  id                 String             @id @default(cuid())
-  organizationId     String
-  source             QuoteSource
-  contactName        String
-  contactEmail       String?
-  contactPhone       String?
-  addressLine1       String?
-  city               String?
-  state              String?
-  postalCode         String?
-  propertyType       PropertyType       @default(RESIDENTIAL)
-  sqft               Int?
-  frequency          ServiceFrequency?
-  notes              String?
-  requestedDate      DateTime?
-  status             QuoteRequestStatus @default(NEW)
-  walkthrough        Json?
-  outsideServiceArea Boolean            @default(false)
-  excluded           Boolean            @default(false)
-  exclusionReason    String?
-  exclusionNote      String?
-  convertedLeadId    String?
+  id                  String             @id @default(cuid())
+  organizationId      String
+  source              QuoteSource
+  contactName         String
+  contactEmail        String?
+  contactPhone        String?
+  addressLine1        String?
+  city                String?
+  state               String?
+  postalCode          String?
+  propertyType        PropertyType       @default(RESIDENTIAL)
+  sqft                Int?
+  frequency           ServiceFrequency?
+  notes               String?
+  requestedDate       DateTime?
+  status              QuoteRequestStatus @default(NEW)
+  walkthrough         Json?
+  outsideServiceArea  Boolean            @default(false)
+  excluded            Boolean            @default(false)
+  exclusionReason     String?
+  exclusionNote       String?
+  convertedLeadId     String?
   convertedEstimateId String?
-  ipHash             String?
-  createdById        String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  ipHash              String?
+  createdById         String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -2457,23 +2537,23 @@ model JobPosting {
 // An applicant (Phase 18). A HIRED applicant converts to a User + EmployeeProfile
 // atomically and becomes read-only, permanently linked via convertedUserId.
 model Applicant {
-  id             String          @id @default(cuid())
-  organizationId String
-  jobPostingId   String?
-  name           String
-  email          String?
-  phone          String?
-  source         String?
-  appliedFor     String?
-  status         ApplicantStatus @default(NEW)
-  notes          String?
-  resumeRef      String?
-  availability   String?
+  id              String          @id @default(cuid())
+  organizationId  String
+  jobPostingId    String?
+  name            String
+  email           String?
+  phone           String?
+  source          String?
+  appliedFor      String?
+  status          ApplicantStatus @default(NEW)
+  notes           String?
+  resumeRef       String?
+  availability    String?
   convertedUserId String?
-  convertedAt    DateTime?
-  ipHash         String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  convertedAt     DateTime?
+  ipHash          String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   jobPosting   JobPosting?  @relation(fields: [jobPostingId], references: [id], onDelete: SetNull)
@@ -2600,17 +2680,17 @@ model ExcludedZone {
 // token lets them set a password and activate their CLIENT user. Degrades to a
 // copyable link when email is unconfigured.
 model PortalInvite {
-  id              String   @id @default(cuid())
-  organizationId  String
-  customerId      String
-  email           String
-  token           String   @unique
-  status          String   @default("PENDING") // PENDING | ACCEPTED | REVOKED
-  invitedById     String?
-  acceptedUserId  String?
-  expiresAt       DateTime
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  organizationId String
+  customerId     String
+  email          String
+  token          String   @unique
+  status         String   @default("PENDING") // PENDING | ACCEPTED | REVOKED
+  invitedById    String?
+  acceptedUserId String?
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -2647,20 +2727,20 @@ model ExportRun {
 // explicit, audited action by OWNER/ADMIN/MANAGER. Custody is `holderUserId`;
 // every transfer/reveal is logged to AuditEvent.
 model AccessItem {
-  id                String           @id @default(cuid())
-  organizationId    String
-  serviceLocationId String
-  type              AccessItemType
-  identifier        String
-  description       String?
-  status            AccessItemStatus @default(AVAILABLE)
-  holderUserId      String?
-  heldSince         DateTime? // when the current holder took it (for "how long out"); null when not out (Phase 36)
-  custodyNotReturned Boolean  @default(false) // holder left without returning it (offboarding override); stays outstanding, flagged
-  replacesId        String?   @unique // this item was cut to replace a lost one — the chain stays intact (Phase 36)
-  secretCiphertext  String? // AES-256-GCM blob for CODE/ALARM_CODE; never listed
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  id                 String           @id @default(cuid())
+  organizationId     String
+  serviceLocationId  String
+  type               AccessItemType
+  identifier         String
+  description        String?
+  status             AccessItemStatus @default(AVAILABLE)
+  holderUserId       String?
+  heldSince          DateTime? // when the current holder took it (for "how long out"); null when not out (Phase 36)
+  custodyNotReturned Boolean          @default(false) // holder left without returning it (offboarding override); stays outstanding, flagged
+  replacesId         String?          @unique // this item was cut to replace a lost one — the chain stays intact (Phase 36)
+  secretCiphertext   String? // AES-256-GCM blob for CODE/ALARM_CODE; never listed
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 
   organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   serviceLocation ServiceLocation @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
@@ -2772,21 +2852,21 @@ model ProductionRate {
 // depreciation, or maintenance scheduling.
 
 model Asset {
-  id               String        @id @default(cuid())
-  organizationId   String
-  name             String
-  category         AssetCategory @default(EQUIPMENT)
-  serial           String?
-  purchaseDate     DateTime?
-  purchaseCost     Decimal?      @db.Decimal(12, 2)
-  status           AssetStatus   @default(ACTIVE)
-  assignedToSiteId String?
-  assignedToUserId String?
-  custodyUserId    String? // current custody holder (checkout), distinct from long-term assignment (Phase 36)
-  custodySince     DateTime? // when the current holder checked it out
-  custodyNotReturned Boolean @default(false) // holder left without returning it (offboarding override); stays outstanding, flagged
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  id                 String        @id @default(cuid())
+  organizationId     String
+  name               String
+  category           AssetCategory @default(EQUIPMENT)
+  serial             String?
+  purchaseDate       DateTime?
+  purchaseCost       Decimal?      @db.Decimal(12, 2)
+  status             AssetStatus   @default(ACTIVE)
+  assignedToSiteId   String?
+  assignedToUserId   String?
+  custodyUserId      String? // current custody holder (checkout), distinct from long-term assignment (Phase 36)
+  custodySince       DateTime? // when the current holder checked it out
+  custodyNotReturned Boolean       @default(false) // holder left without returning it (offboarding override); stays outstanding, flagged
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   assignedToSite ServiceLocation?   @relation("AssetSite", fields: [assignedToSiteId], references: [id])
@@ -2937,25 +3017,25 @@ enum SopStatus {
 // A logical SOP document (stable across versions). Applicability targets who it
 // is for. Editing a PUBLISHED SOP creates a new immutable SopVersion.
 model Sop {
-  id             String      @id @default(cuid())
-  organizationId String
-  title          String
-  category       SopCategory
-  status         SopStatus   @default(DRAFT)
-  currentVersion Int         @default(1)
-  effectiveDate  DateTime?
-  keywords       String?
-  attachmentUrl  String? // optional link to a PDF/diagram/SDS; content is what's searched
-  requiresAck    Boolean     @default(false)
-  reackIntervalDays Int? // optional re-acknowledgment interval (e.g. 365 for annual)
+  id                    String      @id @default(cuid())
+  organizationId        String
+  title                 String
+  category              SopCategory
+  status                SopStatus   @default(DRAFT)
+  currentVersion        Int         @default(1)
+  effectiveDate         DateTime?
+  keywords              String?
+  attachmentUrl         String? // optional link to a PDF/diagram/SDS; content is what's searched
+  requiresAck           Boolean     @default(false)
+  reackIntervalDays     Int? // optional re-acknowledgment interval (e.g. 365 for annual)
   // Applicability: everyone, or any of these role / site / service-plan targets.
-  appliesEveryone      Boolean  @default(true)
-  appliesRoles         String[] @default([])
-  appliesSiteIds       String[] @default([])
-  appliesServicePlanIds String[] @default([])
-  createdById    String?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  appliesEveryone       Boolean     @default(true)
+  appliesRoles          String[]    @default([])
+  appliesSiteIds        String[]    @default([])
+  appliesServicePlanIds String[]    @default([])
+  createdById           String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 
   organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   versions        SopVersion[]

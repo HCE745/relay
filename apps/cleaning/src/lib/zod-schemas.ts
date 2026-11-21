@@ -596,6 +596,33 @@ export const employeeReportListQuerySchema = z.object({
   mine: z.coerce.boolean().optional(),
 })
 
+// ── Customer complaint investigation (P3) ────────────────────────────────────
+export const COMPLAINT_OUTCOMES = ["SUBSTANTIATED", "UNSUBSTANTIATED", "INCONCLUSIVE"] as const
+
+/** Link a complaint (customer Issue) to the specific checklist task it is about. */
+export const complaintLinkTaskSchema = z.object({
+  jobChecklistItemId: optionalId, // null clears the link
+})
+
+/** Record the investigation outcome + written finding on a complaint. */
+export const complaintOutcomeSchema = z.object({
+  outcome: z.enum(COMPLAINT_OUTCOMES),
+  finding: optionalString,
+})
+
+/** Create + assign corrective rework for a substantiated complaint. */
+export const complaintCorrectiveSchema = z.object({
+  assigneeId: optionalId,
+  description: z.string().trim().min(1).max(500),
+  dueAt: z.string().datetime().optional().nullable().or(z.literal("").transform(() => null)),
+  billable: z.boolean().optional(),
+})
+
+export const complaintListQuerySchema = z.object({
+  status: z.enum(["OPEN", "ACKNOWLEDGED", "RESOLVED", "CLOSED"]).optional(),
+  outcome: z.enum(COMPLAINT_OUTCOMES).optional(),
+})
+
 export const ISSUE_CATEGORIES = [
   "QUALITY",
   "SAFETY",

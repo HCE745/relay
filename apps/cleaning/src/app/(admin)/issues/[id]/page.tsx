@@ -13,6 +13,9 @@ import { PageHeader } from "@/components/ui/placeholder"
 import { Card } from "@/components/ui/controls"
 import { IssueStatusBar, IssueAssignee, IssueCommentBox, IssueAssetLink } from "@/components/issues/issue-actions"
 import { IssueToWorkOrderButton } from "@/components/issues/issue-to-work-order"
+import { ComplaintInvestigation, type ComplaintDto } from "@/components/complaints/complaint-investigation"
+import { getComplaintCase } from "@/lib/data/complaints"
+import type { ComplaintOutcome, ResponsibilityBasis } from "@/lib/complaints/investigation"
 
 export const dynamic = "force-dynamic"
 
@@ -51,6 +54,32 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
   const mappedSops = (await orgHasCapability(orgId, "operations.sopLibrary"))
     ? await sopsForIssueCategory(orgId, issue.category)
     : []
+
+  // Customer complaint? Load the investigation case and build the panel DTO.
+  let complaintDto: ComplaintDto | null = null
+  if (issue.source === "CUSTOMER") {
+    const { issue: c } = await getComplaintCase(orgId, id)
+    complaintDto = {
+      issueId: c.id,
+      status: c.status,
+      outcome: (c.outcome as ComplaintOutcome | null) ?? null,
+      finding: c.finding,
+      investigatedByName: c.investigatedBy?.name ?? null,
+      linkedTaskId: c.jobChecklistItemId,
+      jobTaskOptions: c.job?.checklistItems ?? [],
+      responsibilities: c.responsibilities.map((r) => ({
+        id: r.id,
+        userName: r.user.name,
+        basis: r.basis as ResponsibilityBasis,
+        taskLabel: r.taskLabel,
+        verificationStatus: r.verificationStatus,
+      })),
+      corrective: c.workOrder
+        ? { id: c.workOrder.id, status: c.workOrder.status, assigneeName: c.workOrder.assignedTo?.name ?? null }
+        : null,
+      assignableUsers: users,
+    }
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -114,6 +143,8 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
           </div>
         ) : null}
       </Card>
+
+      {complaintDto ? <ComplaintInvestigation dto={complaintDto} /> : null}
 
       <Card className="p-5">
         <h2 className="mb-2 text-sm font-semibold text-slate-700">Description</h2>
@@ -212,6 +243,11 @@ function lifecycleLabel(action: string, newValue: string | null): string {
     case "comment": return "Note added"
     case "link-asset": return "Linked to an asset"
     case "unlink-asset": return "Asset unlinked"
+    case "complaint.link-task": return "Linked to a task"
+    case "complaint.unlink-task": return "Task unlinked"
+    case "complaint.responsibility-captured": return "Responsibility captured"
+    case "complaint.outcome": return `Finding → ${newValue}`
+    case "complaint.corrective-assigned": return "Corrective work assigned"
     default: return action
   }
 }

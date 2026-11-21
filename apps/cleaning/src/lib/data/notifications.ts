@@ -12,6 +12,7 @@ export const STAFF_NOTIFICATION_EVENTS: { event: NotificationEventKey; label: st
   { event: "SHIFT_UNCOVERED", label: "A shift is uncovered (managers)", roles: "managers" },
   { event: "MISSED_CLOCK_IN", label: "A cleaner misses a clock-in (supervisors/managers)", roles: "managers" },
   { event: "CREDENTIAL_EXPIRING", label: "A credential is expiring (managers)", roles: "managers" },
+  { event: "CORRECTIVE_ASSIGNED", label: "I'm assigned corrective / follow-up work", roles: "all" },
 ]
 
 /** Current user's channel choices across all staff events (defaults applied). */

@@ -14,10 +14,11 @@ type NavSection = { label?: string; items: NavItem[] }
 function buildSections(): NavSection[] {
   return [
     {
+      label: "Customers",
       items: [
-        { href: "/super-admin",              label: "Overview",   icon: LayoutDashboard, exact: true },
-        { href: "/super-admin/organizations", label: "Customers",  icon: Building2 },
-        { href: "/super-admin/onboarding",    label: "Onboarding", icon: Sparkles },
+        { href: "/super-admin",              label: "Overview",             icon: LayoutDashboard, exact: true },
+        { href: "/super-admin/organizations", label: "Customers",            icon: Building2 },
+        { href: "/super-admin/onboarding",   label: "Customer Onboarding",  icon: Sparkles },
       ],
     },
     {

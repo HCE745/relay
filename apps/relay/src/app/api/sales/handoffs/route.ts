@@ -167,6 +167,16 @@ export async function POST(req: NextRequest) {
   // ── Create handoff ───────────────────────────────────────────────────────
   // The partial unique index on (prospectId WHERE status='pending_review') is the
   // concurrency-safe guard. If a concurrent insert races here, the DB rejects it.
+  //
+  // opportunityId has a full unique constraint. To allow re-submission after
+  // rejection or cancellation with the same opportunity, we release the slot first.
+  if (body.opportunityId) {
+    await prisma.onboardingHandoff.updateMany({
+      where: { opportunityId: body.opportunityId, status: { in: ["rejected", "cancelled"] } },
+      data:  { opportunityId: null },
+    })
+  }
+
   try {
     const handoff = await prisma.onboardingHandoff.create({
       data: {

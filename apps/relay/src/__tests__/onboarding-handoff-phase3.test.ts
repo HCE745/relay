@@ -16,23 +16,25 @@ import { NextRequest } from "next/server"
 vi.mock("server-only", () => ({}))
 vi.mock("@/lib/sales-auth", () => ({ getSalesSession: vi.fn() }))
 
-const mockHandoffCreate     = vi.fn()
-const mockHandoffFindMany   = vi.fn()
-const mockHandoffFindUnique = vi.fn()
-const mockHandoffUpdate     = vi.fn()
+const mockHandoffCreate      = vi.fn()
+const mockHandoffFindMany    = vi.fn()
+const mockHandoffFindUnique  = vi.fn()
+const mockHandoffUpdate      = vi.fn()
+const mockHandoffUpdateMany  = vi.fn()
 const mockProspectFindUnique = vi.fn()
-const mockProspectUpdate    = vi.fn()
-const mockOppFindUnique     = vi.fn()
-const mockCoFindMany        = vi.fn()
-const mockTx                = vi.fn()
+const mockProspectUpdate     = vi.fn()
+const mockOppFindUnique      = vi.fn()
+const mockCoFindMany         = vi.fn()
+const mockTx                 = vi.fn()
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     onboardingHandoff: {
-      create:     (...a: unknown[]) => mockHandoffCreate(...a),
-      findMany:   (...a: unknown[]) => mockHandoffFindMany(...a),
-      findUnique: (...a: unknown[]) => mockHandoffFindUnique(...a),
-      update:     (...a: unknown[]) => mockHandoffUpdate(...a),
+      create:      (...a: unknown[]) => mockHandoffCreate(...a),
+      findMany:    (...a: unknown[]) => mockHandoffFindMany(...a),
+      findUnique:  (...a: unknown[]) => mockHandoffFindUnique(...a),
+      update:      (...a: unknown[]) => mockHandoffUpdate(...a),
+      updateMany:  (...a: unknown[]) => mockHandoffUpdateMany(...a),
     },
     prospect:          { findUnique: (...a: unknown[]) => mockProspectFindUnique(...a), update: (...a: unknown[]) => mockProspectUpdate(...a) },
     crmOpportunity:    { findUnique: (...a: unknown[]) => mockOppFindUnique(...a) },
@@ -133,6 +135,7 @@ describe("POST /api/sales/handoffs (Phase 3 submission)", () => {
     mockProspectFindUnique.mockResolvedValue(MOCK_PROSPECT)
     mockHandoffCreate.mockResolvedValue({ id: "h-new", ...BASE_SUBMIT, status: "pending_review", createdAt: new Date() })
     mockProspectUpdate.mockResolvedValue({})
+    mockHandoffUpdateMany.mockResolvedValue({ count: 0 })
   })
 
   async function post(body: unknown) {
@@ -235,6 +238,13 @@ describe("POST /api/sales/handoffs (Phase 3 submission)", () => {
   it("validates opportunity belongs to prospect", async () => {
     mockOppFindUnique.mockResolvedValue({ id: "opp1", prospectId: "other-prospect" })
     expect((await post({ ...BASE_SUBMIT, opportunityId: "opp1" })).status).toBe(400)
+  })
+
+  it("allows re-submit with same opportunity after rejection (releases unique slot)", async () => {
+    // POST handler nulls opportunityId on old rejected/cancelled rows before inserting.
+    // This releases the full unique slot so the new handoff can reference the same opp.
+    mockOppFindUnique.mockResolvedValue({ id: "opp1", prospectId: "p1" })
+    expect((await post({ ...BASE_SUBMIT, opportunityId: "opp1" })).status).toBe(201)
   })
 })
 

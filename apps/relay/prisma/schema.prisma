@@ -3924,7 +3924,7 @@ model OnboardingHandoff {
 
   // CRM linkage
   prospectId         String
-  opportunityId      String?   @unique // DB-level: one handoff per opportunity
+  opportunityId      String?   @unique // DB-level uniqueness; POST handler nulls old rejected/cancelled rows before re-submit
 
   // Who submitted
   submittedById      String

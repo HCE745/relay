@@ -35,7 +35,7 @@ CREATE TABLE "OnboardingHandoff" (
     CONSTRAINT "OnboardingHandoff_pkey" PRIMARY KEY ("id")
 );
 
--- Unique: one handoff per opportunity
+-- Unique: one active handoff per opportunity (POST handler nulls old rejected/cancelled rows before re-submit)
 CREATE UNIQUE INDEX "OnboardingHandoff_opportunityId_key"
     ON "OnboardingHandoff"("opportunityId");
 

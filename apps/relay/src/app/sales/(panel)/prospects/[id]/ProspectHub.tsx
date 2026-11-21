@@ -9,7 +9,7 @@ import {
   Edit3, Save, ExternalLink, Link2, Star, Shield, Zap,
   FileText, AlertCircle, ArrowUpRight, ArrowDownLeft,
   Eye, Send, X, Trash2, MousePointerClick, Loader2,
-  Clock, Award, ChevronRight,
+  Clock, Award, ChevronRight, PackageCheck, RotateCcw,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DemoSession, DemoEngagementResponse } from "@/app/api/sales/prospects/[id]/demo-engagement/route"
@@ -55,6 +55,21 @@ interface Email {
 }
 
 interface Note { id: string; noteText: string; createdAt: string }
+
+interface HandoffSummary {
+  id: string
+  status: string
+  plan: string
+  estimatedFacilities: number
+  salesNotes: string | null
+  primaryContactName: string
+  primaryContactEmail: string
+  primaryContactPhone: string | null
+  opportunityId: string | null
+  rejectionReason: string | null
+  customerOnboardingId: string | null
+  createdAt: string
+}
 
 interface Company {
   id: string; companyName: string; website: string | null; industry: string | null
@@ -126,16 +141,97 @@ export function ProspectHub({
   salesUsers,
   currentUserId,
   isManager,
+  existingHandoff,
+  relayOrganizationId,
 }: {
-  company:      Company
-  salesUsers:   { id: string; name: string }[]
-  currentUserId: string | null
-  isManager:    boolean
+  company:               Company
+  salesUsers:            { id: string; name: string }[]
+  currentUserId:         string | null
+  isManager:             boolean
+  existingHandoff?:      HandoffSummary | null
+  relayOrganizationId?:  string | null
 }) {
   const router = useRouter()
   const [company, setCompany]     = useState(initialCompany)
   const [tab, setTab]             = useState<Tab>("Timeline")
   const [saving, setSaving]       = useState(false)
+
+  // ── Handoff state ───────────────────────────────────────────────────────────
+  const [handoff, setHandoff]           = useState<HandoffSummary | null>(existingHandoff ?? null)
+  const [showHandoffModal, setShowHandoffModal] = useState(false)
+  const [handoffSubmitting, setHandoffSubmitting] = useState(false)
+  const [handoffError, setHandoffError]           = useState<string | null>(null)
+  const [cancellingHandoff, setCancellingHandoff] = useState(false)
+
+  const primaryContact = company.contacts.find(c => c.isPrimaryContact) ?? company.contacts[0] ?? null
+  const openOppsForHandoff = company.opportunities.filter(
+    o => o.stage !== "Closed Won" && o.stage !== "Closed Lost"
+  )
+
+  const [handoffForm, setHandoffForm] = useState({
+    companyName:               company.companyName,
+    primaryContactName:        primaryContact?.name ?? "",
+    primaryContactEmail:       primaryContact?.email ?? "",
+    primaryContactPhone:       primaryContact?.phone ?? "",
+    opportunityId:             openOppsForHandoff[0]?.id ?? "",
+    plan:                      "essentials",
+    estimatedFacilities:       "1",
+    trialStartDate:            "",
+    salesNotes:                "",
+    customerAgreementConfirmed: false,
+  })
+
+  async function submitHandoff() {
+    setHandoffError(null)
+    if (!handoffForm.primaryContactEmail.trim()) {
+      setHandoffError("Primary contact email is required.")
+      return
+    }
+    if (!handoffForm.customerAgreementConfirmed) {
+      setHandoffError("Please confirm the customer has agreed to the terms.")
+      return
+    }
+    setHandoffSubmitting(true)
+    try {
+      const res = await fetch("/api/sales/handoffs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prospectId:                company.id,
+          companyName:               handoffForm.companyName.trim(),
+          primaryContactName:        handoffForm.primaryContactName.trim(),
+          primaryContactEmail:       handoffForm.primaryContactEmail.trim(),
+          primaryContactPhone:       handoffForm.primaryContactPhone.trim() || null,
+          opportunityId:             handoffForm.opportunityId || null,
+          plan:                      handoffForm.plan,
+          estimatedFacilities:       parseInt(handoffForm.estimatedFacilities) || 1,
+          trialStartDate:            handoffForm.trialStartDate || null,
+          salesNotes:                handoffForm.salesNotes.trim() || null,
+          customerAgreementConfirmed: true,
+        }),
+      })
+      const data = await res.json() as { handoff?: HandoffSummary; error?: string }
+      if (!res.ok) {
+        setHandoffError(data.error ?? "Failed to submit handoff.")
+        return
+      }
+      setHandoff(data.handoff ?? null)
+      setShowHandoffModal(false)
+    } finally {
+      setHandoffSubmitting(false)
+    }
+  }
+
+  async function cancelHandoff() {
+    if (!handoff) return
+    setCancellingHandoff(true)
+    try {
+      const res = await fetch(`/api/sales/handoffs/${handoff.id}`, { method: "DELETE" })
+      if (res.ok) setHandoff(null)
+    } finally {
+      setCancellingHandoff(false)
+    }
+  }
 
   // ── Demo Engagement state ───────────────────────────────────────────────────
   const [demoData, setDemoData]       = useState<DemoEngagementResponse | null>(null)
@@ -527,9 +623,59 @@ export function ProspectHub({
             >
               <Briefcase className="w-3.5 h-3.5" /> New Opp
             </Link>
+            {/* ── Onboarding handoff button / status ── */}
+            {relayOrganizationId ? (
+              <span className="flex items-center gap-1.5 px-3 py-2 bg-teal-900/40 border border-teal-700/40 text-teal-400 text-sm rounded-lg">
+                <PackageCheck className="w-3.5 h-3.5" /> Customer
+              </span>
+            ) : handoff && handoff.status === "pending_review" ? (
+              <div className="flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 px-3 py-2 bg-yellow-900/30 border border-yellow-700/40 text-yellow-400 text-sm rounded-lg">
+                  <Clock className="w-3.5 h-3.5" /> Onboarding In Review
+                </span>
+                <button
+                  onClick={cancelHandoff}
+                  disabled={cancellingHandoff}
+                  title="Cancel handoff request"
+                  className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {cancellingHandoff ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <X className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            ) : handoff && handoff.status === "accepted" ? (
+              <span className="flex items-center gap-1.5 px-3 py-2 bg-green-900/30 border border-green-700/40 text-green-400 text-sm rounded-lg">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Onboarding Accepted
+              </span>
+            ) : handoff && handoff.status === "rejected" ? (
+              <button
+                onClick={() => { setHandoffForm(f => ({ ...f })); setHandoffError(null); setShowHandoffModal(true) }}
+                className="flex items-center gap-1.5 px-3 py-2 bg-red-900/30 border border-red-700/40 text-red-400 hover:text-red-300 text-sm rounded-lg transition-colors"
+                title={`Rejected: ${handoff.rejectionReason ?? ""}`}
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Re-submit Onboarding
+              </button>
+            ) : (
+              <button
+                onClick={() => { setHandoffError(null); setShowHandoffModal(true) }}
+                className="flex items-center gap-1.5 px-3 py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <PackageCheck className="w-3.5 h-3.5" /> Request Onboarding
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Handoff status banner (rejected only) */}
+      {handoff?.status === "rejected" && handoff.rejectionReason && (
+        <div className="mb-4 flex items-start gap-3 px-4 py-3 bg-red-900/20 border border-red-800/40 rounded-xl text-sm">
+          <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-red-300 font-medium">Onboarding request rejected</p>
+            <p className="text-red-400/70 text-xs mt-0.5">{handoff.rejectionReason}</p>
+          </div>
+        </div>
+      )}
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -1508,6 +1654,200 @@ export function ProspectHub({
           </div>
         </div>
       )}
+
+      {/* ── Onboarding Handoff Modal ──────────────────────────────────────── */}
+      {showHandoffModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+          onClick={() => setShowHandoffModal(false)}
+        >
+          <div
+            className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+              <div>
+                <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                  <PackageCheck className="w-4 h-4 text-emerald-400" />
+                  Request White-Glove Onboarding
+                </h2>
+                <p className="text-sm text-gray-500 mt-0.5">{company.companyName}</p>
+              </div>
+              <button
+                onClick={() => setShowHandoffModal(false)}
+                className="text-gray-500 hover:text-white transition-colors p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div className="px-6 py-5 space-y-4">
+
+              {/* Rejection reason (re-submit flow) */}
+              {handoff?.status === "rejected" && handoff.rejectionReason && (
+                <div className="bg-red-900/20 border border-red-700/40 rounded-lg px-4 py-3">
+                  <p className="text-xs font-semibold text-red-400 mb-1">Previous rejection reason</p>
+                  <p className="text-sm text-red-300">{handoff.rejectionReason}</p>
+                </div>
+              )}
+
+              {/* Company name */}
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Company Name</label>
+                <input
+                  type="text"
+                  value={handoffForm.companyName}
+                  onChange={e => setHandoffForm(f => ({ ...f, companyName: e.target.value }))}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Contact Name + Email */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Primary Contact Name</label>
+                  <input
+                    type="text"
+                    value={handoffForm.primaryContactName}
+                    onChange={e => setHandoffForm(f => ({ ...f, primaryContactName: e.target.value }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Contact Email <span className="text-red-400">*</span></label>
+                  <input
+                    type="email"
+                    value={handoffForm.primaryContactEmail}
+                    onChange={e => setHandoffForm(f => ({ ...f, primaryContactEmail: e.target.value }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              {/* Contact Phone */}
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Contact Phone (optional)</label>
+                <input
+                  type="tel"
+                  value={handoffForm.primaryContactPhone}
+                  onChange={e => setHandoffForm(f => ({ ...f, primaryContactPhone: e.target.value }))}
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Opportunity */}
+              {openOppsForHandoff.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Linked Opportunity</label>
+                  <select
+                    value={handoffForm.opportunityId}
+                    onChange={e => setHandoffForm(f => ({ ...f, opportunityId: e.target.value }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="">None</option>
+                    {openOppsForHandoff.map(o => (
+                      <option key={o.id} value={o.id}>{o.title}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Plan + Facilities */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Plan</label>
+                  <select
+                    value={handoffForm.plan}
+                    onChange={e => setHandoffForm(f => ({ ...f, plan: e.target.value }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="essentials">Essentials</option>
+                    <option value="professional">Professional</option>
+                    <option value="enterprise">Enterprise</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Est. Facilities</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={handoffForm.estimatedFacilities}
+                    onChange={e => setHandoffForm(f => ({ ...f, estimatedFacilities: e.target.value }))}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              {/* Trial Start Date */}
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Trial Start Date (optional)</label>
+                <input
+                  type="date"
+                  value={handoffForm.trialStartDate}
+                  onChange={e => setHandoffForm(f => ({ ...f, trialStartDate: e.target.value }))}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Sales Notes */}
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Sales Notes (optional)</label>
+                <textarea
+                  value={handoffForm.salesNotes}
+                  onChange={e => setHandoffForm(f => ({ ...f, salesNotes: e.target.value }))}
+                  rows={3}
+                  placeholder="Key context for the onboarding team…"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 resize-none"
+                />
+              </div>
+
+              {/* Agreement checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={handoffForm.customerAgreementConfirmed}
+                  onChange={e => setHandoffForm(f => ({ ...f, customerAgreementConfirmed: e.target.checked }))}
+                  className="mt-0.5 accent-emerald-500"
+                />
+                <span className="text-xs text-gray-400">
+                  I confirm the customer has agreed to the Relay terms of service and is ready to begin onboarding.
+                </span>
+              </label>
+
+              {handoffError && (
+                <p className="text-sm text-red-400 bg-red-900/20 border border-red-700/40 rounded-lg px-3 py-2">
+                  {handoffError}
+                </p>
+              )}
+            </div>
+
+            {/* Modal footer */}
+            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-800">
+              <button
+                onClick={() => setShowHandoffModal(false)}
+                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitHandoff}
+                disabled={handoffSubmitting || !handoffForm.customerAgreementConfirmed}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                {handoffSubmitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <PackageCheck className="w-4 h-4" />
+                )}
+                {handoff?.status === "rejected" ? "Re-submit Request" : "Submit Request"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
@@ -1638,4 +1978,3 @@ function DemoSessionCard({
     </div>
   )
 }
-

@@ -11,7 +11,7 @@ export default async function ProspectDetailPage({ params }: { params: Promise<{
 
   const { id } = await params
 
-  const [prospect, salesUsers] = await Promise.all([
+  const [prospect, salesUsers, existingHandoff] = await Promise.all([
     prisma.prospect.findUnique({
       where: { id },
       include: {
@@ -75,6 +75,16 @@ export default async function ProspectDetailPage({ params }: { params: Promise<{
       select: { id: true, name: true },
       orderBy: { name: "asc" },
     }),
+    prisma.onboardingHandoff.findFirst({
+      where: { prospectId: id, status: { in: ["pending_review", "accepted", "rejected"] } },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true, status: true, plan: true, estimatedFacilities: true,
+        salesNotes: true, primaryContactName: true, primaryContactEmail: true,
+        primaryContactPhone: true, opportunityId: true, rejectionReason: true,
+        customerOnboardingId: true, createdAt: true,
+      },
+    }),
   ])
 
   if (!prospect) notFound()
@@ -87,6 +97,8 @@ export default async function ProspectDetailPage({ params }: { params: Promise<{
       salesUsers={salesUsers}
       currentUserId={session.salesUserId ?? null}
       isManager={isManager}
+      existingHandoff={existingHandoff as never}
+      relayOrganizationId={prospect.relayOrganizationId}
     />
   )
 }

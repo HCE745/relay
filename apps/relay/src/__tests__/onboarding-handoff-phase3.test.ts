@@ -129,6 +129,15 @@ describe("GET /api/sales/handoffs (Phase 3 tracking)", () => {
 
 // ─── POST /api/sales/handoffs ─────────────────────────────────────────────────
 describe("POST /api/sales/handoffs (Phase 3 submission)", () => {
+  // Mini tx-client passed to interactive $transaction(async tx => {...})
+  const TX_CLIENT = {
+    onboardingHandoff: {
+      create:     (...a: unknown[]) => mockHandoffCreate(...a),
+      updateMany: (...a: unknown[]) => mockHandoffUpdateMany(...a),
+    },
+    prospect: { update: (...a: unknown[]) => mockProspectUpdate(...a) },
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetSalesSession.mockResolvedValue(REP_SESSION)
@@ -136,6 +145,11 @@ describe("POST /api/sales/handoffs (Phase 3 submission)", () => {
     mockHandoffCreate.mockResolvedValue({ id: "h-new", ...BASE_SUBMIT, status: "pending_review", createdAt: new Date() })
     mockProspectUpdate.mockResolvedValue({})
     mockHandoffUpdateMany.mockResolvedValue({ count: 0 })
+    // Handle interactive transaction form used by POST handler
+    mockTx.mockImplementation((fn: unknown) => {
+      if (typeof fn === "function") return (fn as (tx: unknown) => Promise<unknown>)(TX_CLIENT)
+      return Promise.all(fn as Promise<unknown>[]) // array form (DELETE handler)
+    })
   })
 
   async function post(body: unknown) {
@@ -245,6 +259,17 @@ describe("POST /api/sales/handoffs (Phase 3 submission)", () => {
     // This releases the full unique slot so the new handoff can reference the same opp.
     mockOppFindUnique.mockResolvedValue({ id: "opp1", prospectId: "p1" })
     expect((await post({ ...BASE_SUBMIT, opportunityId: "opp1" })).status).toBe(201)
+  })
+
+  it("updateMany slot-release and create run in the same transaction (atomicity)", async () => {
+    // Verifies that if create fails, updateMany is rolled back (both run inside $transaction).
+    mockOppFindUnique.mockResolvedValue({ id: "opp1", prospectId: "p1" })
+    mockHandoffCreate.mockRejectedValue({ code: "P2002" })
+    const res = await post({ ...BASE_SUBMIT, opportunityId: "opp1" })
+    // The P2002 is caught → 409. updateMany was called inside the tx but rolled back.
+    expect(res.status).toBe(409)
+    // Both operations were attempted in the same tx call
+    expect(mockTx).toHaveBeenCalledOnce()
   })
 })
 

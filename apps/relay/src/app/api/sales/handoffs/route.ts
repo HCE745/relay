@@ -164,45 +164,57 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ── Create handoff ───────────────────────────────────────────────────────
-  // The partial unique index on (prospectId WHERE status='pending_review') is the
-  // concurrency-safe guard. If a concurrent insert races here, the DB rejects it.
+  // ── Create handoff (atomic) ──────────────────────────────────────────────
+  // All three writes run in one transaction:
+  //   1. If re-submitting with the same opportunityId: null the old slot on
+  //      any rejected/cancelled rows so the full unique index is satisfied.
+  //   2. Create the new handoff row.
+  //   3. Set prospect.onboardingStatus = in_progress.
+  // The partial unique index on (prospectId WHERE status='pending_review')
+  // is the concurrent-duplicate guard; a racing insert is rejected with P2002.
   //
-  // opportunityId has a full unique constraint. To allow re-submission after
-  // rejection or cancellation with the same opportunity, we release the slot first.
-  if (body.opportunityId) {
-    await prisma.onboardingHandoff.updateMany({
-      where: { opportunityId: body.opportunityId, status: { in: ["rejected", "cancelled"] } },
-      data:  { opportunityId: null },
-    })
-  }
+  // Extract validated fields into local consts so TypeScript narrows correctly
+  // inside the async transaction closure.
+  const pId     = body.prospectId as string
+  const oppId   = body.opportunityId
+  const co      = { name: body.companyName.trim(), cname: body.primaryContactName.trim(),
+                    cemail: body.primaryContactEmail.trim().toLowerCase(),
+                    cphone: body.primaryContactPhone?.trim() ?? undefined }
+  const extra   = { estimatedFacilities: body.estimatedFacilities ?? 1,
+                    trialStartDate: body.trialStartDate ? new Date(body.trialStartDate) : undefined,
+                    salesNotes: body.salesNotes?.trim() ?? undefined }
 
   try {
-    const handoff = await prisma.onboardingHandoff.create({
-      data: {
-        prospectId:                body.prospectId,
-        opportunityId:             body.opportunityId ?? undefined,
-        submittedById:             info.salesUserId,
-        submittedByName:           info.salesUserName,
-        onboardingType:            "white_glove",
-        isTest:                    body.isTest === true,
-        companyName:               body.companyName.trim(),
-        primaryContactName:        body.primaryContactName.trim(),
-        primaryContactEmail:       body.primaryContactEmail.trim().toLowerCase(),
-        primaryContactPhone:       body.primaryContactPhone?.trim() ?? undefined,
-        plan,
-        estimatedFacilities:       body.estimatedFacilities ?? 1,
-        trialStartDate:            body.trialStartDate ? new Date(body.trialStartDate) : undefined,
-        salesNotes:                body.salesNotes?.trim() ?? undefined,
-        customerAgreementConfirmed: true,
-        status:                    "pending_review",
-      },
-    })
-
-    // Update prospect onboarding status to in_progress
-    await prisma.prospect.update({
-      where: { id: body.prospectId },
-      data:  { onboardingStatus: "in_progress" },
+    const handoff = await prisma.$transaction(async (tx) => {
+      if (oppId) {
+        await tx.onboardingHandoff.updateMany({
+          where: { opportunityId: oppId, status: { in: ["rejected", "cancelled"] } },
+          data:  { opportunityId: null },
+        })
+      }
+      const h = await tx.onboardingHandoff.create({
+        data: {
+          prospectId:                pId,
+          opportunityId:             oppId ?? undefined,
+          submittedById:             info.salesUserId,
+          submittedByName:           info.salesUserName,
+          onboardingType:            "white_glove",
+          isTest:                    body.isTest === true,
+          companyName:               co.name,
+          primaryContactName:        co.cname,
+          primaryContactEmail:       co.cemail,
+          primaryContactPhone:       co.cphone,
+          plan,
+          ...extra,
+          customerAgreementConfirmed: true,
+          status:                    "pending_review",
+        },
+      })
+      await tx.prospect.update({
+        where: { id: pId },
+        data:  { onboardingStatus: "in_progress" },
+      })
+      return h
     })
 
     return NextResponse.json({ handoff }, { status: 201 })

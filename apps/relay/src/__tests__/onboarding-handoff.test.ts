@@ -24,6 +24,7 @@ vi.mock("@/lib/sales-auth", () => ({ getSalesSession: vi.fn() }))
 vi.mock("@/lib/sa-audit", () => ({ logSAAction: vi.fn() }))
 
 const mockCreate       = vi.fn()
+const mockUpdateMany   = vi.fn()
 const mockFindUnique   = vi.fn()
 const mockFindFirst    = vi.fn()
 const mockFindMany     = vi.fn()
@@ -42,6 +43,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     onboardingHandoff: {
       create:     (...a: unknown[]) => mockCreate(...a),
+      updateMany: (...a: unknown[]) => mockUpdateMany(...a),
       findUnique: (...a: unknown[]) => mockFindUnique(...a),
       findFirst:  (...a: unknown[]) => mockFindFirst(...a),
       findMany:   (...a: unknown[]) => mockFindMany(...a),
@@ -122,6 +124,20 @@ describe("POST /api/sales/handoffs", () => {
     mockProspectFind.mockResolvedValue(BASE_PROSPECT)
     mockCreate.mockResolvedValue({ id: "handoff-1" })
     mockProspectUpdate.mockResolvedValue({})
+    mockUpdateMany.mockResolvedValue({ count: 0 })
+    // POST handler uses $transaction(async tx => {...}) — pass through to the same mocks
+    mockTx.mockImplementation((fn: unknown) => {
+      if (typeof fn === "function") {
+        return (fn as (tx: unknown) => Promise<unknown>)({
+          onboardingHandoff: {
+            create:     (...a: unknown[]) => mockCreate(...a),
+            updateMany: (...a: unknown[]) => mockUpdateMany(...a),
+          },
+          prospect: { update: (...a: unknown[]) => mockProspectUpdate(...a) },
+        })
+      }
+      return Promise.all(fn as Promise<unknown>[])
+    })
   })
 
   async function post(body: unknown) {

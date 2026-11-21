@@ -30,6 +30,9 @@ export type AuditAction =
   | "CREATE_CUSTOMER_ONBOARDING"
   | "UPDATE_CUSTOMER_ONBOARDING"
   | "LAUNCH_CUSTOMER_ONBOARDING"
+  // Sales-to-Onboarding Handoff
+  | "ACCEPT_ONBOARDING_HANDOFF"
+  | "REJECT_ONBOARDING_HANDOFF"
 
 export async function logSAAction({
   superAdminId,
@@ -48,7 +51,7 @@ export async function logSAAction({
   action: AuditAction
   orgId: string
   orgName: string
-  targetType: "organization" | "user" | "other"
+  targetType: "organization" | "user" | "other" | "onboarding_handoff"
   targetId: string
   targetName: string
   before?: Record<string, unknown>

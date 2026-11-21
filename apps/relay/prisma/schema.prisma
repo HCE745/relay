@@ -2658,6 +2658,7 @@ model Prospect {
   emails          CrmEmail[]          @relation("ProspectEmails")
   goals           SalesGoal[]         @relation("ProspectGoals")
   researchResults ProspectResearchResult[] @relation("ResearchResultProspect")
+  onboardingHandoffs OnboardingHandoff[] @relation("HandoffProspect")
 
   @@index([aiFitScore])
   @@index([currentCrmStatus])
@@ -2872,6 +2873,9 @@ model SalesUser {
   researchLists            ProspectResearchList[] @relation("SalesUserResearchLists")
   researchJobs             ProspectResearchJob[]  @relation("SalesUserResearchJobs")
   crmRepImpersonationLogs  CrmRepImpersonationLog[] @relation("RepImpersonationLog")
+  // Onboarding handoff
+  onboardingSpecialist     Boolean   @default(false)
+  submittedHandoffs        OnboardingHandoff[] @relation("HandoffSubmitter")
 }
 
 model SalesUserInvite {
@@ -3020,6 +3024,7 @@ model CrmOpportunity {
   offers        SalesOffer[]        @relation("OpportunityOffers")
   objections    CrmObjection[]      @relation("OpportunityObjections")
   salesActivities SalesCrmActivity[] @relation("OpportunityActivities")
+  onboardingHandoff OnboardingHandoff? @relation("HandoffOpportunity")
 
   @@index([assignedToId])
   @@index([stage])
@@ -3909,4 +3914,64 @@ model ProspectResearchJob {
   @@index([superAdminId])
   @@index([createdAt])
   @@index([lockedUntil])
+}
+
+// Sales-to-Onboarding Handoff
+// Bridges a CRM opportunity to the white-glove CustomerOnboarding workflow.
+// Exists BEFORE the Organization is created; acceptance atomically creates both.
+model OnboardingHandoff {
+  id                 String    @id @default(cuid())
+
+  // CRM linkage
+  prospectId         String
+  opportunityId      String?   @unique // DB-level: one handoff per opportunity
+
+  // Who submitted
+  submittedById      String
+  submittedByName    String
+
+  // White-glove only in this implementation; self-service deferred
+  onboardingType     String    @default("white_glove") // "white_glove"
+  isTest             Boolean   @default(false)
+
+  // Customer info (prefilled from CRM, editable on submission)
+  companyName        String
+  primaryContactName  String
+  primaryContactEmail String
+  primaryContactPhone String?
+  plan               String    @default("essentials")
+  estimatedFacilities Int      @default(1)
+  trialStartDate     DateTime?
+  salesNotes         String?   @db.Text
+
+  // Customer agreement confirmed by salesperson at submission
+  customerAgreementConfirmed Boolean @default(false)
+
+  // Queue status
+  // "pending_review" | "accepted" | "rejected" | "cancelled"
+  status             String    @default("pending_review")
+
+  // Review outcome (set by SA / specialist on accept or reject)
+  reviewedById       String?
+  reviewedByName     String?
+  reviewedAt         DateTime?
+  rejectionReason    String?   @db.Text
+
+  // Downstream link: set atomically on acceptance
+  customerOnboardingId String? @unique // → CustomerOnboarding.id
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  prospect     Prospect        @relation("HandoffProspect",    fields: [prospectId],   references: [id])
+  opportunity  CrmOpportunity? @relation("HandoffOpportunity", fields: [opportunityId], references: [id], onDelete: SetNull)
+  submittedBy  SalesUser       @relation("HandoffSubmitter",   fields: [submittedById], references: [id])
+
+  @@index([prospectId])
+  @@index([submittedById])
+  @@index([status])
+  @@index([createdAt])
+  // Partial unique index enforcing at most one pending_review per prospect is added
+  // as raw SQL in the migration: CREATE UNIQUE INDEX "handoff_prospect_active_key"
+  // ON "OnboardingHandoff"("prospectId") WHERE (status = 'pending_review');
 }

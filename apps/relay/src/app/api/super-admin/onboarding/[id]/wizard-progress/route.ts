@@ -88,10 +88,11 @@ export async function PATCH(req: NextRequest, { params }: RouteCtx) {
   }
 
   const updated: WizardProgress = {
-    currentStepKey: body.currentStepKey ?? current.currentStepKey,
-    completedSteps: [...completedSet],
-    skippedSteps:   [...skippedSet],
-    lastSavedAt:    new Date().toISOString(),
+    currentStepKey:  body.currentStepKey ?? current.currentStepKey,
+    completedSteps:  [...completedSet],
+    skippedSteps:    [...skippedSet],
+    lastSavedAt:     new Date().toISOString(),
+    stagedEmployees: current.stagedEmployees ?? [],  // preserve staged employees on nav updates
   }
 
   const dbData: Record<string, unknown> = { wizardProgress: updated }

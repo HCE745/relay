@@ -48,16 +48,18 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
     }),
   ])
 
+  const progress = (record.wizardProgress ?? null) as WizardProgress | null
+  const stagedEmployeeCount = (progress?.stagedEmployees ?? []).length
+
   // Data-readiness: completion criteria for Steps 1–5 (data-driven, not manual)
   const dataReadiness: Record<string, boolean> = {
     overview:         !!record.primaryContactEmail?.trim() && !!record.trialStartDate,
     locations:        locationCount >= 1,
     departments:      deptCount >= 1,
     "employee-types": empTypeCount >= 1,
-    "employee-list":  userCount >= 1,
+    "employee-list":  stagedEmployeeCount >= 1,  // wizard-prepared employees, not arbitrary existing org users
   }
 
-  const progress = (record.wizardProgress ?? null) as WizardProgress | null
   const stepsWithStatus = getStepWithStatuses(progress)
 
   // For data-driven steps, override completion with actual data readiness

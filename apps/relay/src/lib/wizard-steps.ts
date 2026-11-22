@@ -25,11 +25,26 @@ export type WizardStep = {
   optional:    boolean
 }
 
+// A staged employee: prepared for invitation during wizard, NOT yet sent.
+// Stored in wizardProgress JSON — no Invitation record is created until launch.
+export type StagedEmployee = {
+  id:             string   // cuid()-style client ID, never a DB row ID
+  name:           string
+  email:          string
+  role:           string   // baseRole: EMPLOYEE | SUPERVISOR | MANAGER | HR | ADMIN
+  employeeTypeId: string | null
+  departmentId:   string | null
+  locationId:     string | null
+  managerId:      string | null
+  createdAt:      string
+}
+
 export type WizardProgress = {
-  currentStepKey: string | null
-  completedSteps: string[]
-  skippedSteps:   string[]
-  lastSavedAt:    string | null
+  currentStepKey:   string | null
+  completedSteps:   string[]
+  skippedSteps:     string[]
+  lastSavedAt:      string | null
+  stagedEmployees:  StagedEmployee[]
 }
 
 export type StepStatus = "current" | "completed" | "skipped" | "incomplete"
@@ -125,9 +140,10 @@ export function getStepWithStatuses(
 
 export function defaultProgress(): WizardProgress {
   return {
-    currentStepKey: WIZARD_STEPS[0].key,
-    completedSteps: [],
-    skippedSteps:   [],
-    lastSavedAt:    null,
+    currentStepKey:  WIZARD_STEPS[0].key,
+    completedSteps:  [],
+    skippedSteps:    [],
+    lastSavedAt:     null,
+    stagedEmployees: [],
   }
 }

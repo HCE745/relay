@@ -25,6 +25,7 @@ vi.mock("@/lib/session", () => ({ getSession: vi.fn() }))
 const mockOnboardingFindUnique = vi.fn()
 const mockOnboardingUpdate     = vi.fn()
 const mockAuditCreate          = vi.fn()
+const mockCountZero            = vi.fn().mockResolvedValue(0)
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -33,6 +34,11 @@ vi.mock("@/lib/prisma", () => ({
       update:     (...a: unknown[]) => mockOnboardingUpdate(...a),
     },
     configurationAuditLog: { create: (...a: unknown[]) => mockAuditCreate(...a) },
+    location:     { count: (...a: unknown[]) => mockCountZero(...a) },
+    department:   { count: (...a: unknown[]) => mockCountZero(...a) },
+    employeeType: { count: (...a: unknown[]) => mockCountZero(...a) },
+    user:         { count: (...a: unknown[]) => mockCountZero(...a) },
+    invitation:   { count: (...a: unknown[]) => mockCountZero(...a) },
   },
 }))
 
@@ -75,6 +81,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockAuditCreate.mockResolvedValue({})
   mockOnboardingUpdate.mockResolvedValue({})
+  mockCountZero.mockResolvedValue(0)
 })
 
 // ─── GET /wizard ──────────────────────────────────────────────────────────────
@@ -112,10 +119,15 @@ describe("GET /wizard", () => {
   })
 
   it("returns correct step statuses for in-progress wizard", async () => {
+    // Phase C: data-driven steps (overview, locations) derive completion from real data counts,
+    // not from wizardProgress.completedSteps. Set up data so both are truly complete.
     const { GET } = await import("@/app/api/super-admin/onboarding/[id]/wizard/route")
     mockGetSession.mockResolvedValue(SA_SESSION)
+    // overview is complete: primaryContactEmail + trialStartDate present
+    // locations is complete: mockCountZero overridden to return 1 for location
     mockOnboardingFindUnique.mockResolvedValue({
       ...BASE_ONBOARDING,
+      trialStartDate: new Date("2026-12-01"),
       wizardProgress: {
         currentStepKey: "departments",
         completedSteps: ["overview", "locations"],
@@ -123,6 +135,12 @@ describe("GET /wizard", () => {
         lastSavedAt:    "2026-11-22T00:00:00.000Z",
       },
     })
+    // Mock location count = 1 so locations step shows completed
+    mockCountZero.mockResolvedValueOnce(1) // location.count
+      .mockResolvedValueOnce(0)            // department.count
+      .mockResolvedValueOnce(0)            // employeeType.count
+      .mockResolvedValueOnce(0)            // user.count
+      .mockResolvedValueOnce(0)            // invitation.count
     const res = await GET(makeRequest("GET"), makeCtx())
     const body = await res.json() as { steps: Array<{ key: string; status: string }>; completedCount: number }
     expect(body.completedCount).toBe(2)
@@ -164,10 +182,13 @@ describe("GET /wizard", () => {
   })
 
   it("resume: currentStepKey from saved progress is used", async () => {
+    // Phase C: data-driven steps derive completion from counts, not wizardProgress.completedSteps.
+    // Mock all data-driven steps as having data (counts > 0, trialStartDate set).
     const { GET } = await import("@/app/api/super-admin/onboarding/[id]/wizard/route")
     mockGetSession.mockResolvedValue(SA_SESSION)
     mockOnboardingFindUnique.mockResolvedValue({
       ...BASE_ONBOARDING,
+      trialStartDate: new Date("2026-12-01"),
       wizardProgress: {
         currentStepKey: "feature-flags",
         completedSteps: ["overview", "locations", "departments", "employee-types", "issue-settings", "notifications", "sops", "qr-codes"],
@@ -175,6 +196,13 @@ describe("GET /wizard", () => {
         lastSavedAt:    "2026-11-22T10:00:00Z",
       },
     })
+    // All data-driven counts > 0 so overview/locations/departments/employee-types show completed
+    mockCountZero
+      .mockResolvedValueOnce(1)  // location.count
+      .mockResolvedValueOnce(1)  // department.count
+      .mockResolvedValueOnce(1)  // employeeType.count
+      .mockResolvedValueOnce(0)  // user.count (employee-list not in completedSteps)
+      .mockResolvedValueOnce(0)  // invitation.count
     const res = await GET(makeRequest("GET"), makeCtx())
     const body = await res.json() as { progress: { currentStepKey: string }; completedCount: number }
     expect(body.progress.currentStepKey).toBe("feature-flags")

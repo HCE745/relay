@@ -11,6 +11,11 @@ import {
 import {
   WIZARD_STEPS, type WizardStepWithStatus, type WizardProgress,
 } from "@/lib/wizard-steps"
+import { StepOverview }       from "./steps/StepOverview"
+import { StepLocations }      from "./steps/StepLocations"
+import { StepDepartments }    from "./steps/StepDepartments"
+import { StepEmployeeTypes }  from "./steps/StepEmployeeTypes"
+import { StepEmployees }      from "./steps/StepEmployees"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -30,7 +35,11 @@ type WizardData = {
   completedCount:      number
   skippedCount:        number
   progress:            WizardProgress
+  dataReadiness:       Record<string, boolean>
 }
+
+// Steps whose completion is determined by real data counts, not manual marking
+const DATA_DRIVEN_STEPS = new Set(["overview", "locations", "departments", "employee-types", "employee-list"])
 
 // ── Icons per step ────────────────────────────────────────────────────────────
 
@@ -177,6 +186,9 @@ export default function WizardPage() {
   const [completedSet, setCompletedSet] = useState<Set<string>>(new Set())
   const [skippedSet, setSkippedSet]     = useState<Set<string>>(new Set())
 
+  // Data-driven readiness: initialized from server dataReadiness, updated by step components
+  const [stepReadyMap, setStepReadyMap] = useState<Record<string, boolean>>({})
+
   // Ref to avoid stale closures in save functions
   const currentKeyRef = useRef(currentKey)
   useEffect(() => { currentKeyRef.current = currentKey }, [currentKey])
@@ -192,6 +204,7 @@ export default function WizardPage() {
       setCurrentKey(p.currentStepKey ?? WIZARD_STEPS[0].key)
       setCompletedSet(new Set(p.completedSteps))
       setSkippedSet(new Set(p.skippedSteps))
+      setStepReadyMap(json.dataReadiness ?? {})
     } catch {
       setError("Failed to load wizard.")
     } finally {
@@ -230,6 +243,14 @@ export default function WizardPage() {
     }
   }
 
+  // Stable callbacks for the current step component's onReady/onNotReady
+  const handleCurrentStepReady = useCallback(() => {
+    setStepReadyMap(m => ({ ...m, [currentKey]: true }))
+  }, [currentKey])
+  const handleCurrentStepNotReady = useCallback(() => {
+    setStepReadyMap(m => ({ ...m, [currentKey]: false }))
+  }, [currentKey])
+
   // ── Navigation ────────────────────────────────────────────────────────────
 
   const stepIndex   = WIZARD_STEPS.findIndex(s => s.key === currentKey)
@@ -238,20 +259,30 @@ export default function WizardPage() {
   const isPostLaunch = data?.isPostLaunch ?? false
 
   function getStepStatus(key: string): "current" | "completed" | "skipped" | "incomplete" {
-    if (key === currentKey)       return "current"
-    if (completedSet.has(key))    return "completed"
-    if (skippedSet.has(key))      return "skipped"
+    if (key === currentKey) return "current"
+    // Data-driven steps: use stepReadyMap instead of manual completedSet
+    if (DATA_DRIVEN_STEPS.has(key)) {
+      return stepReadyMap[key] ? "completed" : "incomplete"
+    }
+    if (completedSet.has(key)) return "completed"
+    if (skippedSet.has(key))   return "skipped"
     return "incomplete"
   }
 
   async function handleNext() {
     if (isLastStep) return
-    // Mark current step complete, advance position
-    const nextKey = WIZARD_STEPS[stepIndex + 1].key
-    setCompletedSet(s => new Set([...s, currentKey]))
-    skippedSet.delete(currentKey)
+    const nextKey        = WIZARD_STEPS[stepIndex + 1].key
+    const isDataDriven   = DATA_DRIVEN_STEPS.has(currentKey)
+    // For data-driven steps, server derives completion from real data — don't manually mark
+    if (!isDataDriven) {
+      setCompletedSet(s => new Set([...s, currentKey]))
+      skippedSet.delete(currentKey)
+    }
     setCurrentKey(nextKey)
-    await saveProgress({ currentStepKey: nextKey, markCompleted: currentKey })
+    await saveProgress({
+      currentStepKey: nextKey,
+      ...(isDataDriven ? {} : { markCompleted: currentKey }),
+    })
   }
 
   async function handlePrev() {
@@ -318,8 +349,12 @@ export default function WizardPage() {
   const currentStepDef = WIZARD_STEPS.find(s => s.key === currentKey) ?? WIZARD_STEPS[0]
   const placeholder    = STEP_PLACEHOLDER[currentKey] ?? { heading: "", lines: [] }
   const StepIcon       = STEP_ICONS[currentKey] ?? Circle
-  const completedCount = completedSet.size
+  // Count completed: data-driven steps use stepReadyMap, manual steps use completedSet
+  const completedCount = WIZARD_STEPS.filter(s =>
+    DATA_DRIVEN_STEPS.has(s.key) ? stepReadyMap[s.key] : completedSet.has(s.key)
+  ).length
   const pct            = Math.round((completedCount / WIZARD_STEPS.length) * 100)
+  const currentStepIsDataDriven = DATA_DRIVEN_STEPS.has(currentKey)
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -490,14 +525,18 @@ export default function WizardPage() {
             {getStepStatus(currentKey) === "completed" && (
               <div className="mb-6 flex items-center gap-2 px-4 py-2.5 bg-green-950/30 border border-green-800/40 rounded-xl">
                 <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
-                <span className="text-sm text-green-300 font-medium">Step marked complete</span>
-                <button
-                  onClick={() => handleUnmark(currentKey)}
-                  disabled={saving || isPostLaunch}
-                  className="ml-auto text-xs text-gray-500 hover:text-gray-300 disabled:opacity-40"
-                >
-                  Unmark
-                </button>
+                <span className="text-sm text-green-300 font-medium">
+                  {currentStepIsDataDriven ? "Step complete — data configured" : "Step marked complete"}
+                </span>
+                {!currentStepIsDataDriven && (
+                  <button
+                    onClick={() => handleUnmark(currentKey)}
+                    disabled={saving || isPostLaunch}
+                    className="ml-auto text-xs text-gray-500 hover:text-gray-300 disabled:opacity-40"
+                  >
+                    Unmark
+                  </button>
+                )}
               </div>
             )}
 
@@ -515,28 +554,64 @@ export default function WizardPage() {
               </div>
             )}
 
-            {/* Placeholder content card */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
-              <p className="text-sm font-semibold text-gray-200 mb-4">{placeholder.heading}</p>
-              <ul className="space-y-3">
-                {placeholder.lines.map((line, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-gray-400">
-                    <span className="flex-shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-indigo-500/60 mt-2" />
-                    {line}
-                  </li>
-                ))}
-              </ul>
-
-              {!isPostLaunch && (
-                <div className="mt-6 pt-5 border-t border-gray-800 flex items-center gap-3">
-                  <div className="flex-1 p-3 bg-gray-800/60 border border-dashed border-gray-700 rounded-lg text-center">
-                    <p className="text-xs text-gray-500 font-medium">
-                      Configuration form coming in Phase C
-                    </p>
-                    <p className="text-[11px] text-gray-600 mt-0.5">
-                      You can mark this step complete to track progress.
-                    </p>
-                  </div>
+            {/* Step content */}
+            <div className="mb-6">
+              {currentKey === "overview" && (
+                <StepOverview
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {currentKey === "locations" && (
+                <StepLocations
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {currentKey === "departments" && (
+                <StepDepartments
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {currentKey === "employee-types" && (
+                <StepEmployeeTypes
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {currentKey === "employee-list" && (
+                <StepEmployees
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {!DATA_DRIVEN_STEPS.has(currentKey) && (
+                <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+                  <p className="text-sm font-semibold text-gray-200 mb-4">{placeholder.heading}</p>
+                  <ul className="space-y-3">
+                    {placeholder.lines.map((line, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-gray-400">
+                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-indigo-500/60 mt-2" />
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
@@ -603,8 +678,8 @@ export default function WizardPage() {
                   </button>
                 )}
 
-                {/* Mark Complete (pre-launch, not already done, not last step) */}
-                {!isPostLaunch && getStepStatus(currentKey) !== "completed" && (
+                {/* Mark Complete — only for non-data-driven steps */}
+                {!isPostLaunch && !currentStepIsDataDriven && getStepStatus(currentKey) !== "completed" && (
                   <button
                     onClick={() => handleMarkComplete(currentKey)}
                     disabled={saving}

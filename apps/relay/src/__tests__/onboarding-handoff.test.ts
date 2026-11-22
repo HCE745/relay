@@ -169,6 +169,17 @@ describe("POST /api/sales/handoffs", () => {
     expect(res.status).toBe(403)
   })
 
+  it("returns 403 for super admin (salesUserId 'sa' is not a real SalesUser FK)", async () => {
+    mockGetSalesSession.mockResolvedValue({
+      salesUserId: "sa", salesUserRole: "super_admin", salesUserName: "Super Admin",
+      isSuperAdmin: true, isManager: true, isRep: false, isDemo: false, isCrmImpersonation: false,
+    })
+    const res = await post({ prospectId: "p1", companyName: "X", primaryContactName: "Y", primaryContactEmail: "y@x.com", customerAgreementConfirmed: true })
+    expect(res.status).toBe(403)
+    const body = await res.json() as { error: string }
+    expect(body.error).toMatch(/super admin/i)
+  })
+
   it("returns 400 when companyName missing", async () => {
     const res = await post({ prospectId: "p1", primaryContactName: "Y", primaryContactEmail: "y@x.com", customerAgreementConfirmed: true })
     expect(res.status).toBe(400)

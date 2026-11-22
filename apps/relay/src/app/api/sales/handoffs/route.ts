@@ -79,6 +79,14 @@ export async function POST(req: NextRequest) {
   if (info.isDemo || info.isCrmImpersonation) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
+  // Super admins use salesUserId "sa" (not a real SalesUser row) — submitting would
+  // fail the FK constraint on submittedById.  They should impersonate a rep instead.
+  if (info.isSuperAdmin) {
+    return NextResponse.json(
+      { error: "Super admins cannot submit handoffs directly. Use 'View CRM as Rep' to submit on behalf of a sales rep." },
+      { status: 403 },
+    )
+  }
 
   const body = await req.json() as {
     prospectId?:               string
@@ -219,15 +227,22 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ handoff }, { status: 201 })
   } catch (err: unknown) {
-    // Unique constraint violation on the partial index → concurrent duplicate
-    if (
-      typeof err === "object" && err !== null && "code" in err &&
-      (err as { code: string }).code === "P2002"
-    ) {
-      return NextResponse.json(
-        { error: "A pending onboarding request already exists for this prospect." },
-        { status: 409 },
-      )
+    if (typeof err === "object" && err !== null && "code" in err) {
+      const code = (err as { code: string }).code
+      // Unique constraint violation on the partial index → concurrent duplicate
+      if (code === "P2002") {
+        return NextResponse.json(
+          { error: "A pending onboarding request already exists for this prospect." },
+          { status: 409 },
+        )
+      }
+      // FK constraint — safety net if salesUserId is not a valid SalesUser id
+      if (code === "P2003") {
+        return NextResponse.json(
+          { error: "Submission failed: your user account is not associated with a valid sales rep. Contact your administrator." },
+          { status: 400 },
+        )
+      }
     }
     console.error("[POST /api/sales/handoffs]", err)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

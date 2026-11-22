@@ -141,6 +141,7 @@ export function ProspectHub({
   salesUsers,
   currentUserId,
   isManager,
+  isSuperAdmin,
   existingHandoff,
   relayOrganizationId,
 }: {
@@ -148,6 +149,7 @@ export function ProspectHub({
   salesUsers:            { id: string; name: string }[]
   currentUserId:         string | null
   isManager:             boolean
+  isSuperAdmin:          boolean
   existingHandoff?:      HandoffSummary | null
   relayOrganizationId?:  string | null
 }) {
@@ -179,6 +181,7 @@ export function ProspectHub({
     trialStartDate:            "",
     salesNotes:                "",
     customerAgreementConfirmed: false,
+    isTest:                    false,
   })
 
   async function submitHandoff() {
@@ -208,6 +211,7 @@ export function ProspectHub({
           trialStartDate:            handoffForm.trialStartDate || null,
           salesNotes:                handoffForm.salesNotes.trim() || null,
           customerAgreementConfirmed: true,
+          isTest:                    handoffForm.isTest,
         }),
       })
       const data = await res.json() as { handoff?: HandoffSummary; error?: string }
@@ -654,6 +658,13 @@ export function ProspectHub({
               >
                 <RotateCcw className="w-3.5 h-3.5" /> Re-submit Onboarding
               </button>
+            ) : isSuperAdmin ? (
+              <span
+                className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-gray-700 text-gray-500 text-sm rounded-lg cursor-not-allowed"
+                title="Super admins cannot submit handoffs. Use 'View CRM as Rep' to submit on behalf of a sales rep."
+              >
+                <PackageCheck className="w-3.5 h-3.5" /> Request Onboarding
+              </span>
             ) : (
               <button
                 onClick={() => { setHandoffError(null); setShowHandoffModal(true) }}
@@ -1766,7 +1777,7 @@ export function ProspectHub({
                   >
                     <option value="essentials">Essentials</option>
                     <option value="professional">Professional</option>
-                    <option value="enterprise">Enterprise</option>
+                    <option value="custom">Enterprise / Custom</option>
                   </select>
                 </div>
                 <div>
@@ -1814,6 +1825,24 @@ export function ProspectHub({
                 />
                 <span className="text-xs text-gray-400">
                   I confirm the customer has agreed to the Relay terms of service and is ready to begin onboarding.
+                </span>
+              </label>
+
+              {/* Test onboarding checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer border-t border-gray-800 pt-4">
+                <input
+                  type="checkbox"
+                  checked={handoffForm.isTest}
+                  onChange={e => setHandoffForm(f => ({ ...f, isTest: e.target.checked }))}
+                  className="mt-0.5 accent-amber-500"
+                />
+                <span className="text-xs text-gray-400">
+                  <span className="text-amber-400 font-medium">Test Onboarding</span> — creates a demo organization only. No real customer communications will be sent.
+                  {handoffForm.isTest && (
+                    <span className="block mt-1 text-amber-500/80">
+                      Contact email must contain <code className="text-amber-400">+test</code>, end with <code className="text-amber-400">@example.com</code>, or <code className="text-amber-400">@relay-test.internal</code>.
+                    </span>
+                  )}
                 </span>
               </label>
 

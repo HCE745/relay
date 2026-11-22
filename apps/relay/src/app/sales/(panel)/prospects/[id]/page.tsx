@@ -89,7 +89,8 @@ export default async function ProspectDetailPage({ params }: { params: Promise<{
 
   if (!prospect) notFound()
 
-  const isManager = !!(session.superAdmin || session.salesUserRole === "admin_sales")
+  const isManager   = !!(session.superAdmin || session.salesUserRole === "admin_sales")
+  const isSuperAdmin = !!session.superAdmin
 
   return (
     <ProspectHub
@@ -97,6 +98,7 @@ export default async function ProspectDetailPage({ params }: { params: Promise<{
       salesUsers={salesUsers}
       currentUserId={session.salesUserId ?? null}
       isManager={isManager}
+      isSuperAdmin={isSuperAdmin}
       existingHandoff={existingHandoff as never}
       relayOrganizationId={prospect.relayOrganizationId}
     />

@@ -6,7 +6,7 @@ import Link from "next/link"
 import { format } from "date-fns"
 import {
   ChevronLeft, Loader2, CheckSquare, Square, Save, Rocket, AlertTriangle,
-  ExternalLink, CheckCircle2, Clock, Mail, UserCheck,
+  ExternalLink, CheckCircle2, Clock, Mail, UserCheck, Wand2,
 } from "lucide-react"
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -16,6 +16,13 @@ type ChecklistItem = {
   label:           string
   completedAt:     string | null
   completedByName: string | null
+}
+
+type WizardProgress = {
+  currentStepKey: string | null
+  completedSteps: string[]
+  skippedSteps:   string[]
+  lastSavedAt:    string | null
 }
 
 type Onboarding = {
@@ -30,6 +37,7 @@ type Onboarding = {
   ownerId:             string
   ownerName:           string
   checklist:           ChecklistItem[]
+  wizardProgress:      WizardProgress | null
   trialStartDate:      string | null
   launchedAt:          string | null
   invitationSentAt:    string | null
@@ -298,6 +306,16 @@ export default function OnboardingDetailPage() {
             Created {format(new Date(data.createdAt), "MMM d, yyyy")} · Owner: {data.ownerName}
           </p>
         </div>
+        {/* White-glove wizard button */}
+        {!isLive && !isInvitationSent && (
+          <Link
+            href={`/super-admin/onboarding/${id}/wizard`}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-700 hover:bg-indigo-600 rounded-lg transition-colors flex-shrink-0"
+          >
+            <Wand2 className="w-3.5 h-3.5" />
+            {data.wizardProgress?.currentStepKey ? "Continue Setup" : "Start Setup"}
+          </Link>
+        )}
         <Link
           href={`/super-admin/organizations/${data.organizationId}`}
           className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"

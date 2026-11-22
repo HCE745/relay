@@ -771,6 +771,7 @@ model CustomerOnboarding {
   ownerId             String    // super admin ID (denormalized; SuperAdmin not FK'd)
   ownerName           String
   checklist           Json      @default("[]") // ChecklistItem[]
+  wizardProgress      Json?                   // WizardProgress — step nav state for the white-glove wizard
   trialStartDate      DateTime?
   launchedAt          DateTime?
   invitationSentAt    DateTime?

@@ -103,7 +103,6 @@ export default async function ProspectDetailPage({ params }: { params: Promise<{
       salesUsers={salesUsers}
       currentUserId={currentUserId}
       isManager={isManager}
-      isSuperAdmin={isSuperAdmin}
       existingHandoff={existingHandoff as never}
       relayOrganizationId={prospect.relayOrganizationId}
     />

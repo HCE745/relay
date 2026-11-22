@@ -54,7 +54,7 @@ export async function getSalesSession(): Promise<SalesSessionInfo | null> {
     return {
       salesUserId: "sa",
       salesUserRole: "super_admin",
-      salesUserName: "Super Admin",
+      salesUserName: session.name ?? "Super Admin",
       isSuperAdmin: true,
       isManager: true,
       isRep: false,

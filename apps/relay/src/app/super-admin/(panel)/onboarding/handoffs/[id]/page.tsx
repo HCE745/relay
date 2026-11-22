@@ -51,7 +51,7 @@ type Handoff = {
   salesNotes: string | null
   customerAgreementConfirmed: boolean
   status: string
-  submittedById: string
+  submittedById: string | null
   submittedByName: string
   reviewedByName: string | null
   reviewedAt: string | null

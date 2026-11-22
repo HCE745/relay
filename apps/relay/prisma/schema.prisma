@@ -3926,8 +3926,8 @@ model OnboardingHandoff {
   prospectId         String
   opportunityId      String?   @unique // DB-level uniqueness; POST handler nulls old rejected/cancelled rows before re-submit
 
-  // Who submitted
-  submittedById      String
+  // Who submitted (null for direct super-admin submissions; non-null for sales reps and impersonated reps)
+  submittedById      String?
   submittedByName    String
 
   // White-glove only in this implementation; self-service deferred
@@ -3965,7 +3965,7 @@ model OnboardingHandoff {
 
   prospect     Prospect        @relation("HandoffProspect",    fields: [prospectId],   references: [id])
   opportunity  CrmOpportunity? @relation("HandoffOpportunity", fields: [opportunityId], references: [id], onDelete: SetNull)
-  submittedBy  SalesUser       @relation("HandoffSubmitter",   fields: [submittedById], references: [id])
+  submittedBy  SalesUser?      @relation("HandoffSubmitter",   fields: [submittedById], references: [id])
 
   @@index([prospectId])
   @@index([submittedById])

@@ -141,7 +141,6 @@ export function ProspectHub({
   salesUsers,
   currentUserId,
   isManager,
-  isSuperAdmin,
   existingHandoff,
   relayOrganizationId,
 }: {
@@ -149,7 +148,6 @@ export function ProspectHub({
   salesUsers:            { id: string; name: string }[]
   currentUserId:         string | null
   isManager:             boolean
-  isSuperAdmin:          boolean
   existingHandoff?:      HandoffSummary | null
   relayOrganizationId?:  string | null
 }) {
@@ -658,13 +656,6 @@ export function ProspectHub({
               >
                 <RotateCcw className="w-3.5 h-3.5" /> Re-submit Onboarding
               </button>
-            ) : isSuperAdmin ? (
-              <span
-                className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-gray-700 text-gray-500 text-sm rounded-lg cursor-not-allowed"
-                title="Super admins cannot submit handoffs. Use 'View CRM as Rep' to submit on behalf of a sales rep."
-              >
-                <PackageCheck className="w-3.5 h-3.5" /> Request Onboarding
-              </span>
             ) : (
               <button
                 onClick={() => { setHandoffError(null); setShowHandoffModal(true) }}

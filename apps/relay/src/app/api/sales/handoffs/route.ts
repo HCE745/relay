@@ -77,19 +77,11 @@ export async function POST(req: NextRequest) {
   const info = await getSalesSession()
   if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   // Demo sessions are blocked (no real data operations allowed).
-  // CRM impersonation IS allowed: getSalesSession() resolves salesUserId to the real
-  // impersonated SalesUser.id, so the submittedById FK is valid and the handoff is
-  // correctly attributed to the rep being impersonated.
+  // Direct SA and CRM-impersonation sessions are both allowed:
+  //   - Impersonation: getSalesSession() resolves salesUserId to the rep's real SalesUser.id
+  //   - Direct SA: submittedById is stored as null (submittedByName carries the name)
   if (info.isDemo) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
-  // Direct SA (no impersonation) uses the synthetic salesUserId "sa", which is not a
-  // real SalesUser row and would violate the submittedById FK constraint.
-  if (info.isSuperAdmin) {
-    return NextResponse.json(
-      { error: "Super admins cannot submit handoffs directly. Use 'View CRM as Rep' to submit on behalf of a sales rep." },
-      { status: 403 },
-    )
   }
 
   const body = await req.json() as {
@@ -208,7 +200,8 @@ export async function POST(req: NextRequest) {
         data: {
           prospectId:                pId,
           opportunityId:             oppId ?? undefined,
-          submittedById:             info.salesUserId,
+          // null for direct SA (no SalesUser row); real FK for rep and CRM-impersonation
+          submittedById:             info.isSuperAdmin ? null : info.salesUserId,
           submittedByName:           info.salesUserName,
           onboardingType:            "white_glove",
           isTest:                    body.isTest === true,
@@ -238,13 +231,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           { error: "A pending onboarding request already exists for this prospect." },
           { status: 409 },
-        )
-      }
-      // FK constraint — safety net if salesUserId is not a valid SalesUser id
-      if (code === "P2003") {
-        return NextResponse.json(
-          { error: "Submission failed: your user account is not associated with a valid sales rep. Contact your administrator." },
-          { status: 400 },
         )
       }
     }

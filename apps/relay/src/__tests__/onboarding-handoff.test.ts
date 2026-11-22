@@ -169,7 +169,7 @@ describe("POST /api/sales/handoffs", () => {
     expect(res.status).toBe(403)
   })
 
-  it("returns 403 for super admin (salesUserId 'sa' is not a real SalesUser FK)", async () => {
+  it("returns 403 for direct super admin (salesUserId 'sa' is not a real SalesUser FK)", async () => {
     mockGetSalesSession.mockResolvedValue({
       salesUserId: "sa", salesUserRole: "super_admin", salesUserName: "Super Admin",
       isSuperAdmin: true, isManager: true, isRep: false, isDemo: false, isCrmImpersonation: false,
@@ -178,6 +178,24 @@ describe("POST /api/sales/handoffs", () => {
     expect(res.status).toBe(403)
     const body = await res.json() as { error: string }
     expect(body.error).toMatch(/super admin/i)
+  })
+
+  it("allows CRM impersonation and attributes handoff to the impersonated rep", async () => {
+    // SA using "View CRM as Rep" — getSalesSession() resolves salesUserId to the real rep FK
+    mockGetSalesSession.mockResolvedValue({
+      salesUserId: "rep-1", salesUserRole: "sales_rep", salesUserName: "Alice",
+      isSuperAdmin: false, isManager: false, isRep: true, isDemo: false, isCrmImpersonation: true,
+    })
+    const res = await post({
+      prospectId: "prospect-1", companyName: "Acme", primaryContactName: "Jane",
+      primaryContactEmail: "jane@acme.com", customerAgreementConfirmed: true,
+    })
+    expect(res.status).toBe(201)
+    expect(mockCreate).toHaveBeenCalledOnce()
+    // submittedById must be the real rep ID, never "sa"
+    const createCall = mockCreate.mock.calls[0][0] as { data: { submittedById: string } }
+    expect(createCall.data.submittedById).toBe("rep-1")
+    expect(createCall.data.submittedById).not.toBe("sa")
   })
 
   it("returns 400 when companyName missing", async () => {

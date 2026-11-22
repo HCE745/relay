@@ -76,11 +76,15 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const info = await getSalesSession()
   if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if (info.isDemo || info.isCrmImpersonation) {
+  // Demo sessions are blocked (no real data operations allowed).
+  // CRM impersonation IS allowed: getSalesSession() resolves salesUserId to the real
+  // impersonated SalesUser.id, so the submittedById FK is valid and the handoff is
+  // correctly attributed to the rep being impersonated.
+  if (info.isDemo) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
-  // Super admins use salesUserId "sa" (not a real SalesUser row) — submitting would
-  // fail the FK constraint on submittedById.  They should impersonate a rep instead.
+  // Direct SA (no impersonation) uses the synthetic salesUserId "sa", which is not a
+  // real SalesUser row and would violate the submittedById FK constraint.
   if (info.isSuperAdmin) {
     return NextResponse.json(
       { error: "Super admins cannot submit handoffs directly. Use 'View CRM as Rep' to submit on behalf of a sales rep." },

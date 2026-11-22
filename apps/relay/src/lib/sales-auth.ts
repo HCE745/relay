@@ -9,7 +9,7 @@ export interface SalesSessionInfo {
   isManager: boolean    // admin_sales or superAdmin
   isRep: boolean
   isDemo: boolean
-  isCrmImpersonation: boolean  // SA is viewing CRM as this rep (read-only, no sends)
+  isCrmImpersonation: boolean  // SA is viewing CRM as this rep; blocks email sends but allows internal ops like handoff submission
 }
 
 export async function getSalesSession(): Promise<SalesSessionInfo | null> {

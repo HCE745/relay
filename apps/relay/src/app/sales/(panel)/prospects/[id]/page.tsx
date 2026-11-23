@@ -89,13 +89,19 @@ export default async function ProspectDetailPage({ params }: { params: Promise<{
 
   if (!prospect) notFound()
 
-  const isManager = !!(session.superAdmin || session.salesUserRole === "admin_sales")
+  // When a super admin uses "View CRM as Rep," session.superAdmin stays true but
+  // crmImpersonatedSalesUserId is set.  In that mode the SA acts as a rep:
+  // isSuperAdmin and isManager are both false, and currentUserId is the rep's real ID.
+  const isImpersonating = !!session.superAdmin && !!session.crmImpersonatedSalesUserId
+  const isManager       = !isImpersonating && !!(session.superAdmin || session.salesUserRole === "admin_sales")
+  const isSuperAdmin    = !!session.superAdmin && !isImpersonating
+  const currentUserId   = session.crmImpersonatedSalesUserId ?? session.salesUserId ?? null
 
   return (
     <ProspectHub
       company={prospect as never}
       salesUsers={salesUsers}
-      currentUserId={session.salesUserId ?? null}
+      currentUserId={currentUserId}
       isManager={isManager}
       existingHandoff={existingHandoff as never}
       relayOrganizationId={prospect.relayOrganizationId}

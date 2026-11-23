@@ -244,9 +244,14 @@ describe("POST /api/sales/handoffs (Phase 3 submission)", () => {
     expect((await post(BASE_SUBMIT)).status).toBe(403)
   })
 
-  it("returns 403 for CRM impersonation", async () => {
+  it("allows CRM impersonation and attributes handoff to the impersonated rep", async () => {
+    // POST now permits impersonation: getSalesSession() resolves salesUserId to the real FK.
     mockGetSalesSession.mockResolvedValue(IMPERSONATION)
-    expect((await post(BASE_SUBMIT)).status).toBe(403)
+    const res = await post(BASE_SUBMIT)
+    expect(res.status).toBe(201)
+    const createCall = mockHandoffCreate.mock.calls[0][0] as { data: { submittedById: string } }
+    expect(createCall.data.submittedById).toBe("rep1")
+    expect(createCall.data.submittedById).not.toBe("sa")
   })
 
   it("validates opportunity belongs to prospect", async () => {

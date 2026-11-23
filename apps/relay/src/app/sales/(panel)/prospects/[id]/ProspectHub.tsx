@@ -179,6 +179,7 @@ export function ProspectHub({
     trialStartDate:            "",
     salesNotes:                "",
     customerAgreementConfirmed: false,
+    isTest:                    false,
   })
 
   async function submitHandoff() {
@@ -208,6 +209,7 @@ export function ProspectHub({
           trialStartDate:            handoffForm.trialStartDate || null,
           salesNotes:                handoffForm.salesNotes.trim() || null,
           customerAgreementConfirmed: true,
+          isTest:                    handoffForm.isTest,
         }),
       })
       const data = await res.json() as { handoff?: HandoffSummary; error?: string }
@@ -1766,7 +1768,7 @@ export function ProspectHub({
                   >
                     <option value="essentials">Essentials</option>
                     <option value="professional">Professional</option>
-                    <option value="enterprise">Enterprise</option>
+                    <option value="custom">Enterprise / Custom</option>
                   </select>
                 </div>
                 <div>
@@ -1814,6 +1816,24 @@ export function ProspectHub({
                 />
                 <span className="text-xs text-gray-400">
                   I confirm the customer has agreed to the Relay terms of service and is ready to begin onboarding.
+                </span>
+              </label>
+
+              {/* Test onboarding checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer border-t border-gray-800 pt-4">
+                <input
+                  type="checkbox"
+                  checked={handoffForm.isTest}
+                  onChange={e => setHandoffForm(f => ({ ...f, isTest: e.target.checked }))}
+                  className="mt-0.5 accent-amber-500"
+                />
+                <span className="text-xs text-gray-400">
+                  <span className="text-amber-400 font-medium">Test Onboarding</span> — creates a demo organization only. No real customer communications will be sent.
+                  {handoffForm.isTest && (
+                    <span className="block mt-1 text-amber-500/80">
+                      Contact email must contain <code className="text-amber-400">+test</code>, end with <code className="text-amber-400">@example.com</code>, or <code className="text-amber-400">@relay-test.internal</code>.
+                    </span>
+                  )}
                 </span>
               </label>
 

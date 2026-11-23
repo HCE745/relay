@@ -76,7 +76,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const info = await getSalesSession()
   if (!info) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if (info.isDemo || info.isCrmImpersonation) {
+  // Demo sessions are blocked (no real data operations allowed).
+  // Direct SA and CRM-impersonation sessions are both allowed:
+  //   - Impersonation: getSalesSession() resolves salesUserId to the rep's real SalesUser.id
+  //   - Direct SA: submittedById is stored as null (submittedByName carries the name)
+  if (info.isDemo) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -196,7 +200,8 @@ export async function POST(req: NextRequest) {
         data: {
           prospectId:                pId,
           opportunityId:             oppId ?? undefined,
-          submittedById:             info.salesUserId,
+          // null for direct SA (no SalesUser row); real FK for rep and CRM-impersonation
+          submittedById:             info.isSuperAdmin ? null : info.salesUserId,
           submittedByName:           info.salesUserName,
           onboardingType:            "white_glove",
           isTest:                    body.isTest === true,
@@ -219,15 +224,15 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ handoff }, { status: 201 })
   } catch (err: unknown) {
-    // Unique constraint violation on the partial index → concurrent duplicate
-    if (
-      typeof err === "object" && err !== null && "code" in err &&
-      (err as { code: string }).code === "P2002"
-    ) {
-      return NextResponse.json(
-        { error: "A pending onboarding request already exists for this prospect." },
-        { status: 409 },
-      )
+    if (typeof err === "object" && err !== null && "code" in err) {
+      const code = (err as { code: string }).code
+      // Unique constraint violation on the partial index → concurrent duplicate
+      if (code === "P2002") {
+        return NextResponse.json(
+          { error: "A pending onboarding request already exists for this prospect." },
+          { status: 409 },
+        )
+      }
     }
     console.error("[POST /api/sales/handoffs]", err)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

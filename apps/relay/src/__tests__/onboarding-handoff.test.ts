@@ -169,6 +169,63 @@ describe("POST /api/sales/handoffs", () => {
     expect(res.status).toBe(403)
   })
 
+  // ── Auth regression: 4 cases ──────────────────────────────────────────────
+
+  it("direct super-admin: returns 201 and stores submittedById=null", async () => {
+    mockGetSalesSession.mockResolvedValue({
+      salesUserId: "sa", salesUserRole: "super_admin", salesUserName: "Will Hunt",
+      isSuperAdmin: true, isManager: true, isRep: false, isDemo: false, isCrmImpersonation: false,
+    })
+    // SA can submit for any prospect (not assigned check only applies to isRep)
+    mockProspectFind.mockResolvedValue({ ...BASE_PROSPECT, assignedToId: "rep-other" })
+    const res = await post({
+      prospectId: "prospect-1", companyName: "Acme", primaryContactName: "Jane",
+      primaryContactEmail: "jane@acme.com", customerAgreementConfirmed: true,
+    })
+    expect(res.status).toBe(201)
+    const createCall = mockCreate.mock.calls[0][0] as { data: { submittedById: null; submittedByName: string } }
+    expect(createCall.data.submittedById).toBeNull()
+    expect(createCall.data.submittedByName).toBe("Will Hunt")
+  })
+
+  it("CRM impersonation: returns 201 and attributes handoff to the impersonated rep", async () => {
+    // SA using "View CRM as Rep" — getSalesSession() resolves salesUserId to the real rep FK
+    mockGetSalesSession.mockResolvedValue({
+      salesUserId: "rep-1", salesUserRole: "sales_rep", salesUserName: "Alice",
+      isSuperAdmin: false, isManager: false, isRep: true, isDemo: false, isCrmImpersonation: true,
+    })
+    const res = await post({
+      prospectId: "prospect-1", companyName: "Acme", primaryContactName: "Jane",
+      primaryContactEmail: "jane@acme.com", customerAgreementConfirmed: true,
+    })
+    expect(res.status).toBe(201)
+    expect(mockCreate).toHaveBeenCalledOnce()
+    // submittedById must be the real rep FK, never "sa" or null
+    const createCall = mockCreate.mock.calls[0][0] as { data: { submittedById: string } }
+    expect(createCall.data.submittedById).toBe("rep-1")
+    expect(createCall.data.submittedById).not.toBe("sa")
+  })
+
+  it("regular sales rep: returns 201 and stores their real FK", async () => {
+    // Default REP_SESSION is already set in beforeEach
+    const res = await post({
+      prospectId: "prospect-1", companyName: "Acme", primaryContactName: "Jane",
+      primaryContactEmail: "jane@acme.com", customerAgreementConfirmed: true,
+    })
+    expect(res.status).toBe(201)
+    const createCall = mockCreate.mock.calls[0][0] as { data: { submittedById: string } }
+    expect(createCall.data.submittedById).toBe("rep-1")
+  })
+
+  it("demo session: returns 403 regardless of other fields", async () => {
+    mockGetSalesSession.mockResolvedValue({ ...REP_SESSION, isDemo: true })
+    const res = await post({
+      prospectId: "prospect-1", companyName: "Acme", primaryContactName: "Jane",
+      primaryContactEmail: "jane@acme.com", customerAgreementConfirmed: true,
+    })
+    expect(res.status).toBe(403)
+  })
+
   it("returns 400 when companyName missing", async () => {
     const res = await post({ prospectId: "p1", primaryContactName: "Y", primaryContactEmail: "y@x.com", customerAgreementConfirmed: true })
     expect(res.status).toBe(400)

@@ -3,12 +3,15 @@ import { resolveCapabilities, parseOverrides, type PackageTier } from "../entitl
 import { sendEmail, isEmailConfigured } from "../email"
 import { sendSms, isSmsConfigured } from "../sms"
 
-// Capability check without the server-only page-guards import, so dispatch stays
-// importable from scripts/tests. Pure resolver over the org's tier + overrides.
-async function orgHasNotifications(orgId: string): Promise<boolean> {
-  const org = await systemDb.organization.findUnique({ where: { id: orgId }, select: { packageTier: true, capabilityOverrides: true } })
-  if (!org) return false
-  return resolveCapabilities({ packageTier: org.packageTier as PackageTier, capabilityOverrides: parseOverrides(org.capabilityOverrides) }).has("workforce.notifications")
+// Org context for dispatch: the notifications capability AND whether the org is
+// a demo sandbox. Resolved without the server-only page-guards import, so dispatch
+// stays importable from scripts/tests. isDemo short-circuits every real send —
+// the public demo must never dispatch a genuine email or SMS.
+async function orgNotifyContext(orgId: string): Promise<{ hasCapability: boolean; isDemo: boolean }> {
+  const org = await systemDb.organization.findUnique({ where: { id: orgId }, select: { packageTier: true, capabilityOverrides: true, isDemo: true } })
+  if (!org) return { hasCapability: false, isDemo: false }
+  const hasCapability = resolveCapabilities({ packageTier: org.packageTier as PackageTier, capabilityOverrides: parseOverrides(org.capabilityOverrides) }).has("workforce.notifications")
+  return { hasCapability, isDemo: !!org.isDemo }
 }
 
 // Central notification dispatch (Phase 21). Resolves each recipient's per-event
@@ -79,6 +82,7 @@ export async function notifyCustomer(orgId: string, customerId: string, event: N
   const to = c?.email || c?.contacts[0]?.email || null
   const log = (status: "SENT" | "FAILED" | "SKIPPED", detail?: string, providerId?: string) =>
     db.notificationLog.create({ data: { organizationId: orgId, userId: null, channel: "EMAIL", event, toAddress: to ?? "(none)", subject: msg.subject, body: msg.body, status, detail, providerId } })
+  if ((await orgNotifyContext(orgId)).isDemo) { await log("SKIPPED", "demo_suppressed"); return }
   if (!to) { await log("SKIPPED", "no_customer_email"); return }
   if (!deps.isEmailConfigured()) { await log("SKIPPED", "email_unconfigured"); return }
   const r = await deps.sendEmail({ to, subject: msg.subject, text: msg.body })
@@ -101,6 +105,7 @@ export async function notifyCustomerVia(
     db.notificationLog.create({ data: { organizationId: orgId, userId: null, channel, event, toAddress: to ?? "(none)", subject: msg.subject, body: msg.body, status, detail, providerId } })
   const done = async (status: "SENT" | "FAILED" | "SKIPPED", detail?: string, providerId?: string) => { await log(status, detail, providerId); return { status, detail } }
 
+  if ((await orgNotifyContext(orgId)).isDemo) return done("SKIPPED", "demo_suppressed")
   if (!to) return done("SKIPPED", channel === "SMS" ? "no_customer_phone" : "no_customer_email")
   if (channel === "EMAIL") {
     if (!deps.isEmailConfigured()) return done("SKIPPED", "email_unconfigured")
@@ -117,11 +122,12 @@ export async function notifyUserEvent(orgId: string, userId: string, event: Noti
   const db = orgDb(orgId)
   const user = await db.user.findFirst({ where: { id: userId, isActive: true }, select: { id: true, email: true, phone: true, smsOptOut: true } })
   if (!user) return
-  const [hasCap, pref] = await Promise.all([
-    orgHasNotifications(orgId),
+  const [ctx, pref] = await Promise.all([
+    orgNotifyContext(orgId),
     db.notificationPreference.findFirst({ where: { userId, event } }),
   ])
-  const ch = resolveChannels(hasCap, pref)
+  if (ctx.isDemo) return // demo sandbox: never dispatch a real email or SMS
+  const ch = resolveChannels(ctx.hasCapability, pref)
   if (ch.email && user.email) await deliver(orgId, user.id, "EMAIL", event, user.email, msg, deps)
   if (ch.sms && user.phone && !user.smsOptOut) await deliver(orgId, user.id, "SMS", event, user.phone, msg, deps)
 }

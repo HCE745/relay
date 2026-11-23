@@ -48,6 +48,9 @@ export async function createCheckoutForToken(token: string, baseUrl: string): Pr
   if (!isStripeConfigured()) throw new ConflictError("Online payments are not enabled")
   const payable = await getPayableByToken(token)
   assertFound(payable, "Invoice")
+  // The public demo must never reach a real payment processor.
+  const { isDemoOrg } = await import("../demo/provision")
+  if (await isDemoOrg(payable!.organizationId)) throw new ConflictError("Online payments are disabled in the demo")
   if (!payable!.payable) throw new ConflictError("This invoice is not payable online")
   const amountCents = Math.round(Number(payable!.balance) * 100)
   if (amountCents <= 0) throw new ConflictError("Nothing is due on this invoice")

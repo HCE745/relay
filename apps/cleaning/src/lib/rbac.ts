@@ -37,52 +37,76 @@ export type AdminNavItem = {
   section?: string // optional group header rendered above the first item of a run
 }
 
+// Seven top-level workspaces group every destination. The `section` is the only
+// thing that changed from the historical flat list — keys, hrefs and required
+// capabilities are untouched, so role access and subscription gating are
+// identical. Items are ordered so each section's members are contiguous (the
+// sidebar prints a header above the first item of each run).
 export const ADMIN_NAV: AdminNavItem[] = [
-  { key: "dashboard",   label: "Dashboard",   href: "/dashboard" },
-  { key: "schedule",    label: "Schedule",    href: "/schedule",    requiredCap: "core.scheduling" },
-  { key: "jobs",        label: "Jobs",        href: "/jobs",        requiredCap: "core.jobs" },
-  { key: "customers",   label: "Customers",   href: "/customers",   requiredCap: "core.customers" },
-  { key: "locations",   label: "Locations",   href: "/locations",   requiredCap: "core.locations" },
-  { key: "team",        label: "Team",        href: "/team",        requiredCap: "workforce.employees" },
-  { key: "time",        label: "Time",        href: "/time",        requiredCap: "workforce.timeTracking" },
-  { key: "pay-periods", label: "Pay periods", href: "/time/periods", requiredCap: "workforce.payrollExport" },
-  { key: "differentials", label: "Shift differentials", href: "/differentials", requiredCap: "workforce.laborCosting" },
-  { key: "coverage",    label: "Coverage",    href: "/coverage",    requiredCap: "workforce.coverage" },
-  { key: "skills",      label: "Skills",      href: "/skills",      requiredCap: "workforce.coverage" },
-  { key: "kiosks",      label: "Kiosks",      href: "/kiosks",      requiredCap: "workforce.timeTracking" },
-  { key: "compliance",  label: "Compliance",  href: "/compliance",  requiredCap: "workforce.compliance" },
-  { key: "access",      label: "Access & keys", href: "/access",     requiredCap: "operations.accessControl" },
-  { key: "inspections", label: "Inspections", href: "/inspections", requiredCap: "quality.inspections" },
-  { key: "issues",      label: "Issues",      href: "/issues",      requiredCap: "operations.issues" },
-  { key: "issues",      label: "Customer complaints", href: "/issues/complaints", requiredCap: "operations.issues" },
-  { key: "employee-reports", label: "Workplace reports", href: "/reports/employee", requiredCap: "operations.employeeReports" },
-  { key: "sops",        label: "SOPs",        href: "/sops",        requiredCap: "operations.sopLibrary" },
-  { key: "service-requests", label: "Service requests", href: "/service-requests", requiredCap: "core.jobs" },
-  { key: "service-areas", label: "Service areas", href: "/service-areas", requiredCap: "operations.serviceAreas" },
-  { key: "quotes",      label: "Quotes",      href: "/quotes",      requiredCap: "crm.quoting", section: "Sales" },
-  { key: "leads",       label: "Leads",       href: "/leads",       requiredCap: "crm.estimates", section: "Sales" },
-  { key: "estimates",   label: "Estimates",   href: "/estimates",   requiredCap: "crm.estimates", section: "Sales" },
-  { key: "contracts",   label: "Contracts",   href: "/contracts",   requiredCap: "crm.contracts", section: "Sales" },
-  { key: "work-orders", label: "Work orders", href: "/work-orders", requiredCap: "operations.workOrders", section: "Sales" },
-  { key: "performance", label: "Performance",  href: "/performance", requiredCap: "workforce.performanceAnalytics", section: "Workforce" },
-  { key: "hiring",      label: "Hiring",      href: "/hiring",      requiredCap: "workforce.hiring", section: "Workforce" },
-  { key: "onboarding",  label: "Onboarding",  href: "/onboarding",  requiredCap: "workforce.hiring", section: "Workforce" },
-  { key: "invoices",    label: "Invoices",    href: "/billing/invoices",  requiredCap: "billing.invoicing", section: "Billing" },
-  { key: "payments",    label: "Payments",    href: "/billing/payments",  requiredCap: "billing.invoicing", section: "Billing" },
-  { key: "ar-aging",    label: "AR Aging",    href: "/billing/ar-aging",  requiredCap: "billing.arAging",   section: "Billing" },
-  { key: "tax",         label: "Sales tax",   href: "/billing/tax",       requiredCap: "billing.salesTax",  section: "Billing" },
-  { key: "collections", label: "Collections", href: "/billing/collections", requiredCap: "billing.invoicing", section: "Billing" },
-  { key: "profitability", label: "Profitability", href: "/reports/profitability", requiredCap: "reporting.profitability", section: "Reports" },
-  { key: "satisfaction", label: "Satisfaction", href: "/reports/satisfaction", requiredCap: "quality.inspections", section: "Reports" },
-  { key: "supply-spend", label: "Supply spend", href: "/reports/supply-spend", requiredCap: "reporting.profitability", section: "Reports" },
-  { key: "indirect-costs", label: "Indirect costs", href: "/reports/indirect-costs", requiredCap: "erp.siteProfitability", section: "Reports" },
-  { key: "labor-budgets", label: "Labor budgets", href: "/reports/labor-budgets", requiredCap: "erp.laborBudgets", section: "Reports" },
-  { key: "exports",     label: "Exports",     href: "/exports",     requiredCap: "integrations.exports", section: "Reports" },
-  { key: "import",      label: "Import",      href: "/import",      requiredCap: "operations.dataImport", section: "Reports" },
-  { key: "assets",      label: "Assets",      href: "/assets",      requiredCap: "assets.management",  section: "Inventory" },
-  { key: "supplies",    label: "Supplies",    href: "/supplies",    requiredCap: "supplies.inventory", section: "Inventory" },
-  { key: "settings",    label: "Settings",    href: "/settings" },
+  // ── Overview ───────────────────────────────────────────────────────────────
+  { key: "dashboard",   label: "Dashboard",   href: "/dashboard", section: "Overview" },
+
+  // ── Operations ───────────────────────────────────────────────────────────────
+  { key: "schedule",    label: "Schedule",    href: "/schedule",    requiredCap: "core.scheduling",       section: "Operations" },
+  { key: "jobs",        label: "Jobs",        href: "/jobs",        requiredCap: "core.jobs",             section: "Operations" },
+  { key: "service-requests", label: "Service requests", href: "/service-requests", requiredCap: "core.jobs", section: "Operations" },
+  { key: "work-orders", label: "Work orders", href: "/work-orders", requiredCap: "operations.workOrders", section: "Operations" },
+  { key: "inspections", label: "Inspections", href: "/inspections", requiredCap: "quality.inspections",   section: "Operations" },
+  { key: "issues",      label: "Issues",      href: "/issues",      requiredCap: "operations.issues",     section: "Operations" },
+  { key: "issues",      label: "Customer complaints", href: "/issues/complaints", requiredCap: "operations.issues", section: "Operations" },
+  { key: "employee-reports", label: "Workplace reports", href: "/reports/employee", requiredCap: "operations.employeeReports", section: "Operations" },
+  { key: "sops",        label: "SOPs",        href: "/sops",        requiredCap: "operations.sopLibrary", section: "Operations" },
+  { key: "access",      label: "Access & keys", href: "/access",    requiredCap: "operations.accessControl", section: "Operations" },
+  { key: "service-areas", label: "Service areas", href: "/service-areas", requiredCap: "operations.serviceAreas", section: "Operations" },
+
+  // ── Customers ───────────────────────────────────────────────────────────────
+  { key: "customers",   label: "Customers",   href: "/customers",   requiredCap: "core.customers",   section: "Customers" },
+  { key: "locations",   label: "Locations",   href: "/locations",   requiredCap: "core.locations",   section: "Customers" },
+  { key: "quotes",      label: "Quotes",      href: "/quotes",      requiredCap: "crm.quoting",      section: "Customers" },
+  { key: "leads",       label: "Leads",       href: "/leads",       requiredCap: "crm.estimates",    section: "Customers" },
+  { key: "estimates",   label: "Estimates",   href: "/estimates",   requiredCap: "crm.estimates",    section: "Customers" },
+  { key: "contracts",   label: "Contracts",   href: "/contracts",   requiredCap: "crm.contracts",    section: "Customers" },
+
+  // ── Workforce ───────────────────────────────────────────────────────────────
+  { key: "team",        label: "Team",        href: "/team",        requiredCap: "workforce.employees",     section: "Workforce" },
+  { key: "time",        label: "Time",        href: "/time",        requiredCap: "workforce.timeTracking",  section: "Workforce" },
+  { key: "pay-periods", label: "Pay periods", href: "/time/periods", requiredCap: "workforce.payrollExport", section: "Workforce" },
+  { key: "differentials", label: "Shift differentials", href: "/differentials", requiredCap: "workforce.laborCosting", section: "Workforce" },
+  { key: "coverage",    label: "Coverage",    href: "/coverage",    requiredCap: "workforce.coverage",      section: "Workforce" },
+  { key: "skills",      label: "Skills",      href: "/skills",      requiredCap: "workforce.coverage",      section: "Workforce" },
+  { key: "kiosks",      label: "Kiosks",      href: "/kiosks",      requiredCap: "workforce.timeTracking",  section: "Workforce" },
+  { key: "compliance",  label: "Compliance",  href: "/compliance",  requiredCap: "workforce.compliance",    section: "Workforce" },
+  { key: "performance", label: "Performance", href: "/performance", requiredCap: "workforce.performanceAnalytics", section: "Workforce" },
+  { key: "hiring",      label: "Hiring",      href: "/hiring",      requiredCap: "workforce.hiring",        section: "Workforce" },
+  { key: "onboarding",  label: "Onboarding",  href: "/onboarding",  requiredCap: "workforce.hiring",        section: "Workforce" },
+
+  // ── Finance ───────────────────────────────────────────────────────────────
+  { key: "invoices",    label: "Invoices",    href: "/billing/invoices",    requiredCap: "billing.invoicing", section: "Finance" },
+  { key: "payments",    label: "Payments",    href: "/billing/payments",    requiredCap: "billing.invoicing", section: "Finance" },
+  { key: "ar-aging",    label: "AR Aging",    href: "/billing/ar-aging",    requiredCap: "billing.arAging",   section: "Finance" },
+  { key: "tax",         label: "Sales tax",   href: "/billing/tax",         requiredCap: "billing.salesTax",  section: "Finance" },
+  { key: "collections", label: "Collections", href: "/billing/collections", requiredCap: "billing.invoicing", section: "Finance" },
+
+  // ── Analytics ───────────────────────────────────────────────────────────────
+  { key: "profitability", label: "Profitability", href: "/reports/profitability", requiredCap: "reporting.profitability", section: "Analytics" },
+  { key: "satisfaction", label: "Satisfaction", href: "/reports/satisfaction", requiredCap: "quality.inspections",      section: "Analytics" },
+  { key: "supply-spend", label: "Supply spend", href: "/reports/supply-spend", requiredCap: "reporting.profitability",  section: "Analytics" },
+  { key: "indirect-costs", label: "Indirect costs", href: "/reports/indirect-costs", requiredCap: "erp.siteProfitability", section: "Analytics" },
+  { key: "labor-budgets", label: "Labor budgets", href: "/reports/labor-budgets", requiredCap: "erp.laborBudgets",       section: "Analytics" },
+
+  // ── Administration ───────────────────────────────────────────────────────────
+  { key: "exports",     label: "Exports",     href: "/exports",     requiredCap: "integrations.exports",  section: "Administration" },
+  { key: "import",      label: "Import",      href: "/import",      requiredCap: "operations.dataImport", section: "Administration" },
+  { key: "assets",      label: "Assets",      href: "/assets",      requiredCap: "assets.management",     section: "Administration" },
+  { key: "supplies",    label: "Supplies",    href: "/supplies",    requiredCap: "supplies.inventory",    section: "Administration" },
+  { key: "settings",    label: "Settings",    href: "/settings",    section: "Administration" },
 ]
+
+/** The seven workspace sections, in sidebar order. */
+export const NAV_SECTIONS = [
+  "Overview", "Operations", "Customers", "Workforce", "Finance", "Analytics", "Administration",
+] as const
+export type NavSection = (typeof NAV_SECTIONS)[number]
 
 /** All known admin route keys — used to scope middleware RBAC enforcement. */
 export const ADMIN_ROUTE_KEYS: ReadonlySet<string> = new Set(ADMIN_NAV.map((i) => i.key))

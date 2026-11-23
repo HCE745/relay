@@ -214,6 +214,25 @@ body {
   background: var(--color-slate-50); /* matches the existing thead fill, retints per theme */
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Collapsible admin navigation. The shell wrapper carries data-nav
+   ("expanded" | "collapsed"), server-rendered from the cln-nav cookie so there
+   is no flash, and the collapse toggle flips it on the client with no reload.
+   The rail width and the content offset move together, and label/section/footer
+   text (.nav-collapsible) is hidden in the collapsed rail — icons remain.
+   Desktop only; on mobile the rail is a drawer and these rules don't apply.
+   ───────────────────────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  [data-nav] .nav-rail { width: 16rem; transition: width 0.15s ease; }
+  [data-nav="collapsed"] .nav-rail { width: 4rem; }
+  [data-nav] .nav-content { padding-left: 16rem; transition: padding-left 0.15s ease; }
+  [data-nav="collapsed"] .nav-content { padding-left: 4rem; }
+  [data-nav="collapsed"] .nav-collapsible { display: none; }
+  [data-nav="collapsed"] .nav-link { justify-content: center; }
+  [data-nav="collapsed"] .nav-collapsed-only { display: inline; }
+}
+.nav-collapsed-only { display: none; }
+
 /* Honor the user's motion preference: kill transitions/animations entirely. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

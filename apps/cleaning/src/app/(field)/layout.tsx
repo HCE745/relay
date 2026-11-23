@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session"
 import { experienceForRole } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { logout } from "@/lib/auth-actions"
+import { FieldTabBar } from "@/components/field/field-tabbar"
 
 export const dynamic = "force-dynamic"
 
@@ -40,6 +41,11 @@ export default async function FieldLayout({ children }: { children: React.ReactN
     )
   }
 
+  const [hasPerformance, hasSops] = await Promise.all([
+    orgHasCapability(session.organizationId, "workforce.performanceAnalytics"),
+    orgHasCapability(session.organizationId, "operations.sopLibrary"),
+  ])
+
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-slate-50">
       <header className="pt-safe sticky top-0 z-10 bg-brand text-white">
@@ -56,6 +62,7 @@ export default async function FieldLayout({ children }: { children: React.ReactN
         </div>
       </header>
       <main className="flex-1 px-4 py-4">{children}</main>
+      <FieldTabBar hasPerformance={hasPerformance} hasSops={hasSops} />
     </div>
   )
 }

@@ -21,6 +21,22 @@ function base(children: React.ReactNode, className?: string) {
   )
 }
 
+export function ChevronLeftIcon({ className }: IconProps) {
+  return base(<path d="M15 6l-6 6 6 6" />, className)
+}
+
+export function ChevronRightIcon({ className }: IconProps) {
+  return base(<path d="M9 6l6 6-6 6" />, className)
+}
+
+export function PanelLeftIcon({ className }: IconProps) {
+  return base(<><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /></>, className)
+}
+
+export function ListChecksIcon({ className }: IconProps) {
+  return base(<><path d="M3 5l1.5 1.5L7 4" /><path d="M3 12l1.5 1.5L7 10" /><path d="M3 19l1.5 1.5L7 17" /><path d="M11 5h10" /><path d="M11 12h10" /><path d="M11 19h10" /></>, className)
+}
+
 export function BuildingIcon({ className }: IconProps) {
   return base(
     <>

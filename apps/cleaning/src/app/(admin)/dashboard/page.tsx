@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
-import { canManageAccounts } from "@/lib/rbac"
+import { canManageAccounts, canAccessAdminRoute } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getOrgTimezone } from "@/lib/data/org"
 import { getDashboardMetrics, getOperations } from "@/lib/data/dashboard"
@@ -21,6 +21,7 @@ import { PageHeader } from "@/components/ui/placeholder"
 import { EngravedDivider } from "@/components/theme/ornament"
 import { Card } from "@/components/ui/controls"
 import { SetupChecklist } from "@/components/dashboard/setup-checklist"
+import { QuickActions, type QuickAction } from "@/components/dashboard/quick-actions"
 
 export const dynamic = "force-dynamic"
 
@@ -100,12 +101,34 @@ export default async function DashboardPage() {
 
   const attentionCount = needsAttention.filter((t) => t.value > 0).length
 
+  // Operational shortcuts — each shown only when the role can reach the route AND
+  // the plan includes the capability. Reuses the same RBAC/capability checks as
+  // the sidebar, so nothing here points somewhere the user can't go.
+  const role = session.role
+  const actionDefs: { action: QuickAction; routeKey: string; cap?: string }[] = [
+    { action: { key: "schedule", label: "Schedule", href: "/schedule", icon: "schedule" }, routeKey: "schedule", cap: "core.scheduling" },
+    { action: { key: "inspection", label: "Record inspection", href: "/inspections", icon: "inspection" }, routeKey: "inspections", cap: "quality.inspections" },
+    { action: { key: "time", label: "Approve time", href: "/time?status=pending", icon: "time" }, routeKey: "time", cap: "workforce.timeTracking" },
+    { action: { key: "estimate", label: "New estimate", href: "/estimates/new", icon: "estimate" }, routeKey: "estimates", cap: "crm.estimates" },
+    { action: { key: "invoice", label: "Invoices", href: "/billing/invoices", icon: "invoice" }, routeKey: "invoices", cap: "billing.invoicing" },
+    { action: { key: "customer", label: "Add customer", href: "/customers", icon: "customer" }, routeKey: "customers", cap: "core.customers" },
+  ]
+  const quickActions: QuickAction[] = (
+    await Promise.all(
+      actionDefs.map(async (d) =>
+        canAccessAdminRoute(role, d.routeKey) && (!d.cap || (await orgHasCapability(orgId, d.cap))) ? d.action : null,
+      ),
+    )
+  ).filter((a): a is QuickAction => a !== null)
+
   return (
     <div>
       <PageHeader
         title={session.role === "SUPERVISOR" ? "Supervisor Dashboard" : "Dashboard"}
         subtitle={`What needs attention today · ${session.name}`}
       />
+
+      <QuickActions actions={quickActions} />
 
       {showSetup ? <SetupChecklist progress={progress} /> : null}
 

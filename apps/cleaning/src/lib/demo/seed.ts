@@ -440,7 +440,158 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     await setClockPin(orgId, staff.cleanerIds[i], String(1000 + i * 1111).padStart(4, "0"))
   }
 
+  // ── Accountability (P1–P4): task ownership + verification, a workplace report,
+  //    a substantiated + an unsubstantiated customer complaint, corrective work,
+  //    and the responsibility snapshot that feeds the performance dashboards. ──
+  await seedAccountability(orgId, now, staff, ctx)
+
   return { owner: staff.owner }
+}
+
+// P1–P4 showcase. Self-contained: one completed commercial job whose checklist
+// items carry real owners, completions and verifications (one REJECTED → rework),
+// plus workplace reports, two customer complaints (one SUBSTANTIATED with primary
+// + shared responsibility and completed corrective work, one UNSUBSTANTIATED that
+// deliberately does NOT count against anyone), so every accountability screen —
+// task verification, complaints, workplace reports, and the performance
+// dashboards (derived on read) — renders live, fairly-attributed data.
+async function seedAccountability(
+  orgId: string,
+  now: Date,
+  staff: Staff & { owner: { id: string; email: string; name: string } },
+  ctx: { customers: { id: string; name: string; isComm: boolean }[]; sites: { id: string; customerId: string; isComm: boolean }[]; completedJobIds: string[]; commercialTplId: string },
+) {
+  const days = (n: number) => new Date(now.getTime() + n * DAY)
+  const commSite = ctx.sites.find((s) => s.isComm) ?? ctx.sites[0]
+  if (!commSite || staff.cleanerIds.length < 3) return
+  const customerId = commSite.customerId
+  const [cA, cB, cC] = staff.cleanerIds // primary owner, shared owner, third cleaner
+  const sup = staff.supervisorIds[0]
+  const mgr = staff.managerId
+
+  // Require independent verification so the demo shows the full ladder (a cleaner
+  // can never approve their own work).
+  await systemDb.organization.update({ where: { id: orgId }, data: { verificationRequired: true, peerVerificationEnabled: false } })
+
+  const start = days(-1)
+  const end = new Date(start.getTime() + 3 * 3_600_000)
+  const job = await systemDb.job.create({
+    data: {
+      organizationId: orgId, serviceLocationId: commSite.id,
+      title: "Northgate Office Tower — nightly (accountability)", status: "COMPLETED",
+      plannedStart: start, scheduledStart: start, scheduledEnd: end, actualStart: start, actualEnd: end,
+      crewSize: 3, createdById: mgr,
+      assignments: { create: [cA, cB, cC].map((uid) => ({ organizationId: orgId, userId: uid, status: "COMPLETED" as const })) },
+    },
+    select: { id: true },
+  })
+
+  type ItemSpec = { label: string; owner: string; shared?: string[]; completer: string; status: "VERIFIED" | "REJECTED" }
+  const specs: ItemSpec[] = [
+    { label: "Restrooms: clean & restock", owner: cA, shared: [cB], completer: cA, status: "REJECTED" }, // the complained-about task
+    { label: "Disinfect high-touch surfaces", owner: cA, completer: cA, status: "VERIFIED" },
+    { label: "Vacuum all carpeted areas", owner: cB, completer: cB, status: "VERIFIED" },
+    { label: "Empty all waste & replace liners", owner: cC, completer: cC, status: "VERIFIED" },
+    { label: "Mop hard floors", owner: cC, completer: cC, status: "VERIFIED" },
+  ]
+  let sort = 1
+  let rejectedItemId = ""
+  for (const s of specs) {
+    const verified = s.status === "VERIFIED"
+    const it = await systemDb.jobChecklistItem.create({
+      data: {
+        jobId: job.id, label: s.label, sortOrder: sort++, isRequired: true, requirePhoto: false,
+        assignedToId: s.owner,
+        isComplete: verified, completedById: s.completer, completedAt: end,
+        verificationStatus: s.status, verifierId: sup, verifiedAt: end,
+        rejectionReason: verified ? null : "Restrooms not fully restocked; redo before next service.",
+        verificationNote: verified ? "Meets scope." : null,
+      },
+      select: { id: true },
+    })
+    const owners = [s.owner, ...(s.shared ?? [])]
+    await systemDb.checklistItemAssignee.createMany({ data: owners.map((userId) => ({ jobChecklistItemId: it.id, userId })) })
+    if (!verified) rejectedItemId = it.id
+  }
+
+  // Immutable responsibility trail for the rejected task (assign → submit → reject).
+  const trail: { actor: string; action: string; newValue: string; metadata: Prisma.InputJsonValue }[] = [
+    { actor: sup, action: "task.assign", newValue: cA, metadata: { assigneeIds: [cA, cB], jobId: job.id } },
+    { actor: cA, action: "task.submit", newValue: "COMPLETED_AWAITING_VERIFICATION", metadata: { jobId: job.id } },
+    { actor: sup, action: "task.reject", newValue: "REJECTED", metadata: { jobId: job.id } },
+  ]
+  for (const t of trail) {
+    await systemDb.auditEvent.create({
+      data: { organizationId: orgId, actorUserId: t.actor, entityType: "JobChecklistItem", entityId: rejectedItemId, action: t.action, newValue: t.newValue, metadata: t.metadata },
+    })
+  }
+
+  // ── P2 workplace reports: a substantiated work-quality note tied to the task,
+  //    and an unproven conduct allegation resolved UNSUBSTANTIATED. ──
+  await systemDb.employeeReport.create({
+    data: {
+      organizationId: orgId, reportedById: cB, aboutUserId: cA, jobId: job.id, jobChecklistItemId: rejectedItemId,
+      category: "INCOMPLETE_WORK", confidentiality: "NORMAL",
+      title: "Restroom restock incomplete", description: "Paper towels weren't refilled in the east restroom before sign-off.",
+      status: "RESOLVED", outcome: "SUBSTANTIATED",
+      reviewerId: sup, reviewStartedAt: days(-1), finding: "Confirmed against the inspection photos; coached on the restroom checklist.",
+      resolvedById: mgr, resolvedAt: now,
+    },
+  })
+  await systemDb.employeeReport.create({
+    data: {
+      organizationId: orgId, reportedById: cC, aboutUserId: cB, category: "LEFT_EARLY", confidentiality: "PRIVATE",
+      title: "Possible early departure", description: "Thought a crew member may have left before the shift ended.",
+      status: "RESOLVED", outcome: "UNSUBSTANTIATED",
+      reviewerId: mgr, reviewStartedAt: days(-2), finding: "Clock records show a full shift. No issue — allegation not substantiated.",
+      resolvedById: mgr, resolvedAt: now,
+    },
+  })
+
+  // ── P3 customer complaint (SUBSTANTIATED) linked to the rejected task, with a
+  //    primary + shared responsibility snapshot and completed corrective work. ──
+  const complaint = await systemDb.issue.create({
+    data: {
+      organizationId: orgId, serviceLocationId: commSite.id, jobId: job.id, jobChecklistItemId: rejectedItemId,
+      reportedById: mgr, source: "CUSTOMER", category: "QUALITY", severity: "HIGH", externalReporter: "Northgate Facilities",
+      title: "Restrooms not properly cleaned", description: "Client reported the 3rd-floor restrooms weren't restocked and a floor was missed.",
+      status: "RESOLVED", resolvedAt: now,
+      outcome: "SUBSTANTIATED", finding: "Inspection confirmed the missed restroom restock. Coaching delivered and a corrective reclean completed.",
+      investigatedById: mgr, investigatedAt: days(-1),
+      ackDeadline: days(-1), resolveDeadline: days(1),
+    },
+    select: { id: true },
+  })
+  await systemDb.complaintResponsibility.createMany({
+    data: [
+      { organizationId: orgId, issueId: complaint.id, userId: cA, basis: "TASK_ASSIGNEE", isPrimary: true, jobChecklistItemId: rejectedItemId, taskLabel: "Restrooms: clean & restock", verificationStatus: "REJECTED", completedAt: end, capturedById: mgr },
+      { organizationId: orgId, issueId: complaint.id, userId: cB, basis: "TASK_ASSIGNEE", isPrimary: false, jobChecklistItemId: rejectedItemId, taskLabel: "Restrooms: clean & restock", verificationStatus: "REJECTED", completedAt: end, capturedById: mgr },
+    ],
+  })
+  await systemDb.workOrder.create({
+    data: {
+      organizationId: orgId, customerId, serviceLocationId: commSite.id, type: "ADDITIONAL",
+      description: "Corrective reclean: restock and re-verify the 3rd-floor restrooms per the complaint.",
+      priority: "HIGH", billable: false, isCorrective: true, issueId: complaint.id, assignedToId: cA,
+      dueAt: days(1), status: "VERIFIED", resolvedById: cA, resolvedAt: now, verifiedById: sup, createdById: mgr,
+    },
+  })
+
+  // An UNSUBSTANTIATED customer complaint: a responsibility is recorded, but the
+  // outcome means it never counts against the employee's performance record.
+  const complaint2 = await systemDb.issue.create({
+    data: {
+      organizationId: orgId, serviceLocationId: commSite.id, reportedById: mgr, source: "CUSTOMER", category: "QUALITY", severity: "MEDIUM",
+      externalReporter: "Northgate Facilities", title: "Lobby looked dusty", description: "Client felt the lobby hadn't been dusted.",
+      status: "RESOLVED", resolvedAt: now, outcome: "UNSUBSTANTIATED",
+      finding: "Inspection photos show the lobby was dusted on service; no fault found.", investigatedById: mgr, investigatedAt: days(-1),
+      ackDeadline: days(-1), resolveDeadline: days(1),
+    },
+    select: { id: true },
+  })
+  await systemDb.complaintResponsibility.create({
+    data: { organizationId: orgId, issueId: complaint2.id, userId: cC, basis: "JOB_ASSIGNEE", isPrimary: false, capturedById: mgr },
+  })
 }
 
 // Everything needed so NO admin screen renders empty: CRM, assets/supplies +

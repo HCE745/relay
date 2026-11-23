@@ -1622,6 +1622,7 @@ model ComplaintResponsibility {
   issueId            String
   userId             String
   basis              ComplaintResponsibilityBasis
+  isPrimary          Boolean                      @default(false) // the designated primary task owner
   jobChecklistItemId String?
   // Frozen snapshots at capture time (so later edits don't rewrite history).
   taskLabel          String?

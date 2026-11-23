@@ -71,11 +71,12 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
         id: r.id,
         userName: r.user.name,
         basis: r.basis as ResponsibilityBasis,
+        isPrimary: r.isPrimary,
         taskLabel: r.taskLabel,
         verificationStatus: r.verificationStatus,
       })),
       corrective: c.workOrder
-        ? { id: c.workOrder.id, status: c.workOrder.status, assigneeName: c.workOrder.assignedTo?.name ?? null }
+        ? { id: c.workOrder.id, status: c.workOrder.status, isCorrective: c.workOrder.isCorrective, assigneeName: c.workOrder.assignedTo?.name ?? null }
         : null,
       assignableUsers: users,
     }

@@ -11,8 +11,9 @@
 --   * WorkOrder gains assignedToId so corrective rework can be assigned to (and
 --     tracked for) a specific employee, reusing the existing corrective WO flow.
 --   * ComplaintResponsibility: an IMMUTABLE snapshot of who was responsible for
---     the work (original assignment, completion, verification), captured at
---     investigation time so history survives later edits to the live job.
+--     the work (original assignment incl. shared co-owners via isPrimary,
+--     completion, verification), captured at investigation time so history
+--     survives later edits to the live job.
 --   * One neutral notification event (CORRECTIVE_ASSIGNED) for the assignee.
 --   * Two enums, indexes, and foreign keys. No drops, no NOT-NULL backfills, no
 --     data edits. Adding these changes no existing behavior.
@@ -42,6 +43,7 @@ CREATE TABLE "cleaning"."ComplaintResponsibility" (
     "issueId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "basis" "cleaning"."ComplaintResponsibilityBasis" NOT NULL,
+    "isPrimary" BOOLEAN NOT NULL DEFAULT false,
     "jobChecklistItemId" TEXT,
     "taskLabel" TEXT,
     "verificationStatus" TEXT,

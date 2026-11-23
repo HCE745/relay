@@ -7,6 +7,7 @@ import {
   isCustomerComplaint,
   canRecordOutcome,
   deriveResponsibilities,
+  buildCorrectiveAttachPatch,
   type ComplaintOutcome,
 } from "../complaints/investigation"
 
@@ -120,7 +121,12 @@ export async function captureResponsibility(orgId: string, id: string, actorId: 
   const it = issue!.jobChecklistItemId
     ? await db.jobChecklistItem.findFirst({
         where: { id: issue!.jobChecklistItemId },
-        select: { id: true, label: true, assignedToId: true, completedById: true, verifierId: true, verificationStatus: true, completedAt: true },
+        select: {
+          id: true, label: true, assignedToId: true, completedById: true, verifierId: true, verificationStatus: true, completedAt: true,
+          // P1 shared ownership — the full set of task owners, so every co-owner is
+          // captured as a task-level assignee (not merely general job crew).
+          assignees: { select: { userId: true } },
+        },
       })
     : null
   const crew = issue!.jobId
@@ -133,6 +139,7 @@ export async function captureResponsibility(orgId: string, id: string, actorId: 
           id: it.id,
           label: it.label,
           assignedToId: it.assignedToId,
+          sharedAssigneeIds: it.assignees.map((a) => a.userId),
           completedById: it.completedById,
           verifierId: it.verifierId,
           verificationStatus: it.verificationStatus, // TaskVerificationStatus ⊆ string
@@ -149,6 +156,7 @@ export async function captureResponsibility(orgId: string, id: string, actorId: 
       issueId: id,
       userId: r.userId,
       basis: r.basis as "TASK_ASSIGNEE",
+      isPrimary: r.isPrimary,
       jobChecklistItemId: r.jobChecklistItemId,
       taskLabel: r.taskLabel,
       verificationStatus: r.verificationStatus,
@@ -190,10 +198,17 @@ export async function recordComplaintOutcome(
 }
 
 /**
- * Create + assign corrective rework for a complaint. Reuses the corrective
- * WorkOrder (non-billable by default), one per complaint (Issue.workOrder is
- * unique). The assignee is notified with NEUTRAL wording — the notification
- * never exposes the complaint text, the customer's accusation, or any finding.
+ * Assign + track corrective rework for a complaint.
+ *   • If the complaint has NO work order, create a corrective one (non-billable
+ *     by default).
+ *   • If one ALREADY exists (e.g. a billable remediation converted from the
+ *     complaint), ATTACH the corrective assignment to it instead of creating a
+ *     duplicate — setting only the owner and due date. Its billing arrangement
+ *     (billable / type / amount / status / converted job) is left untouched, and
+ *     the corrective instruction is preserved in the audit history, not by
+ *     overwriting the existing work order's description.
+ * The assignee is notified with NEUTRAL wording — never the complaint text, the
+ * customer's accusation, or any finding.
  */
 export async function assignCorrectiveWork(
   orgId: string,
@@ -203,11 +218,6 @@ export async function assignCorrectiveWork(
 ) {
   const db = orgDb(orgId)
   const issue = await loadComplaint(orgId, id)
-  if (issue.workOrder) throw new ConflictError("This complaint already has a work order")
-
-  const customerId = issue.serviceLocation?.customer?.id
-  if (!customerId) throw new RequirementsError("Can't tell which customer this is for", ["Link the complaint to a site or job first"])
-  const serviceLocationId = issue.serviceLocation?.id ?? undefined
 
   let assigneeId: string | null = null
   if (input.assigneeId) {
@@ -216,26 +226,44 @@ export async function assignCorrectiveWork(
     assigneeId = input.assigneeId
   }
 
-  const wo = await db.workOrder.create({
-    data: {
-      organizationId: orgId,
-      customerId,
-      serviceLocationId,
-      type: "ADDITIONAL",
-      description: input.description.slice(0, 500),
-      priority: "NORMAL",
-      billable: input.billable ?? false, // rework is on us by default
-      isCorrective: true,
-      issueId: id,
-      assignedToId: assigneeId,
-      dueAt: input.dueAt ? new Date(input.dueAt) : null,
-      status: "REQUESTED",
-      createdById: actorId,
-    },
-    select: { id: true },
-  })
+  let workOrderId: string
+  let reusedExisting = false
+  if (issue.workOrder) {
+    // Reuse the existing work order — never create a duplicate, never touch
+    // billing. Only the corrective owner + due date may change.
+    reusedExisting = true
+    workOrderId = issue.workOrder.id
+    const patch = buildCorrectiveAttachPatch({ assigneeId: input.assigneeId ?? null, dueAt: input.dueAt ?? null })
+    if (Object.keys(patch).length) {
+      await db.workOrder.updateMany({ where: { id: workOrderId }, data: patch })
+    }
+  } else {
+    const customerId = issue.serviceLocation?.customer?.id
+    if (!customerId) throw new RequirementsError("Can't tell which customer this is for", ["Link the complaint to a site or job first"])
+    const serviceLocationId = issue.serviceLocation?.id ?? undefined
+    const wo = await db.workOrder.create({
+      data: {
+        organizationId: orgId,
+        customerId,
+        serviceLocationId,
+        type: "ADDITIONAL",
+        description: input.description.slice(0, 500),
+        priority: "NORMAL",
+        billable: input.billable ?? false, // rework is on us by default
+        isCorrective: true,
+        issueId: id,
+        assignedToId: assigneeId,
+        dueAt: input.dueAt ? new Date(input.dueAt) : null,
+        status: "REQUESTED",
+        createdById: actorId,
+      },
+      select: { id: true },
+    })
+    workOrderId = wo.id
+  }
+
   await recordAudit(orgId, actorId, ENTITY, id, "complaint.corrective-assigned", {
-    metadata: { workOrderId: wo.id, assigneeId, dueAt: input.dueAt ?? null },
+    metadata: { workOrderId, assigneeId, dueAt: input.dueAt ?? null, reusedExisting, instruction: input.description.slice(0, 500) },
   })
   // Neutral, accusation-free notice to the assignee.
   if (assigneeId) {

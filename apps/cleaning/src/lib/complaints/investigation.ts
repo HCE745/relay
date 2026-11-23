@@ -55,6 +55,9 @@ export type ChecklistSnapshot = {
   id: string
   label: string | null
   assignedToId: string | null
+  // The FULL set of task owners (P1 shared ownership — ChecklistItemAssignee).
+  // Normally includes the primary assignedToId too; de-duplicated here.
+  sharedAssigneeIds?: string[]
   completedById: string | null
   verifierId: string | null
   verificationStatus: string | null
@@ -68,13 +71,19 @@ export type DerivedResponsibility = {
   taskLabel: string | null
   verificationStatus: string | null
   completedAt: Date | null
+  // True only for the designated PRIMARY task owner (the item's assignedToId).
+  // Shared co-owners are TASK_ASSIGNEE with isPrimary = false.
+  isPrimary: boolean
 }
 
 /**
  * PURE: derive the responsible-employee snapshot for a complaint from a checklist
  * item snapshot and the job crew. Deterministic and de-duplicated:
- *   • The linked task yields up to three rows — who was ASSIGNED it, who
- *     COMPLETED it, and who VERIFIED it (the same person can hold more than one).
+ *   • Every task OWNER is a task-level assignee (TASK_ASSIGNEE) — the designated
+ *     primary (assignedToId) with isPrimary = true, each shared co-owner with
+ *     isPrimary = false. Shared owners are NEVER demoted to general job crew.
+ *   • The task also yields who COMPLETED it and who VERIFIED it (the same person
+ *     can hold more than one basis — distinct rows).
  *   • Remaining job crew (not already captured via the task) are JOB_ASSIGNEE.
  * This preserves historical responsibility as fact; it establishes NO fault.
  */
@@ -86,10 +95,10 @@ export function deriveResponsibilities(input: {
   const seen = new Set<string>() // userId|basis|itemId
   const usersWithTaskBasis = new Set<string>()
 
-  const push = (userId: string | null, basis: ResponsibilityBasis, item: ChecklistSnapshot | null) => {
+  const push = (userId: string | null, basis: ResponsibilityBasis, item: ChecklistSnapshot | null, isPrimary = false) => {
     if (!userId) return
     const key = `${userId}|${basis}|${item?.id ?? ""}`
-    if (seen.has(key)) return
+    if (seen.has(key)) return // de-dupe (e.g. the primary also appears among shared owners)
     seen.add(key)
     if (basis !== "JOB_ASSIGNEE") usersWithTaskBasis.add(userId)
     out.push({
@@ -99,12 +108,15 @@ export function deriveResponsibilities(input: {
       taskLabel: item?.label ?? null,
       verificationStatus: item?.verificationStatus ?? null,
       completedAt: item?.completedAt ?? null,
+      isPrimary,
     })
   }
 
   const it = input.checklistItem
   if (it) {
-    push(it.assignedToId, "TASK_ASSIGNEE", it)
+    // Primary first (isPrimary true) so it wins the de-dupe over any shared copy.
+    push(it.assignedToId, "TASK_ASSIGNEE", it, true)
+    for (const uid of it.sharedAssigneeIds ?? []) push(uid, "TASK_ASSIGNEE", it, false)
     push(it.completedById, "TASK_COMPLETER", it)
     push(it.verifierId, "TASK_VERIFIER", it)
   }
@@ -114,4 +126,23 @@ export function deriveResponsibilities(input: {
     push(uid, "JOB_ASSIGNEE", null)
   }
   return out
+}
+
+/**
+ * PURE: the SAFE field patch for attaching corrective work to an EXISTING work
+ * order (billable or otherwise). It may set only the corrective owner and due
+ * date — never a billing/scheduling field (billable, type, quotedAmount, status,
+ * isCorrective, convertedJobId) — so an existing billing arrangement is preserved
+ * and no duplicate work order is created.
+ */
+export const CORRECTIVE_ATTACH_FIELDS = ["assignedToId", "dueAt"] as const
+
+export function buildCorrectiveAttachPatch(input: { assigneeId?: string | null; dueAt?: string | null }): {
+  assignedToId?: string | null
+  dueAt?: Date
+} {
+  const patch: { assignedToId?: string | null; dueAt?: Date } = {}
+  if (input.assigneeId !== undefined) patch.assignedToId = input.assigneeId ?? null
+  if (input.dueAt) patch.dueAt = new Date(input.dueAt) // only set when provided; never cleared
+  return patch
 }

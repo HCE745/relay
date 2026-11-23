@@ -5,6 +5,8 @@ import {
   isAllegation,
   canRecordOutcome,
   deriveResponsibilities,
+  buildCorrectiveAttachPatch,
+  CORRECTIVE_ATTACH_FIELDS,
   COMPLAINT_OUTCOMES,
   type ChecklistSnapshot,
 } from "../investigation"
@@ -50,32 +52,84 @@ describe("employee protection — only substantiated counts", () => {
 })
 
 describe("historical responsibility snapshot (pure)", () => {
-  it("captures assignee, completer, and verifier of the linked task", () => {
+  const base = { jobChecklistItemId: "task1", taskLabel: "Mop the lobby", verificationStatus: "VERIFIED", completedAt: item().completedAt }
+
+  it("captures assignee (primary), completer, and verifier of the linked task", () => {
     const rows = deriveResponsibilities({ checklistItem: item() })
     // alice is both assignee and completer → two distinct rows; bob verified.
     expect(rows).toEqual([
-      { userId: "alice", basis: "TASK_ASSIGNEE", jobChecklistItemId: "task1", taskLabel: "Mop the lobby", verificationStatus: "VERIFIED", completedAt: item().completedAt },
-      { userId: "alice", basis: "TASK_COMPLETER", jobChecklistItemId: "task1", taskLabel: "Mop the lobby", verificationStatus: "VERIFIED", completedAt: item().completedAt },
-      { userId: "bob", basis: "TASK_VERIFIER", jobChecklistItemId: "task1", taskLabel: "Mop the lobby", verificationStatus: "VERIFIED", completedAt: item().completedAt },
+      { userId: "alice", basis: "TASK_ASSIGNEE", isPrimary: true, ...base },
+      { userId: "alice", basis: "TASK_COMPLETER", isPrimary: false, ...base },
+      { userId: "bob", basis: "TASK_VERIFIER", isPrimary: false, ...base },
     ])
+  })
+
+  it("captures ALL shared task owners as task-level assignees, with only the designated primary flagged", () => {
+    // alice is primary; carol & dave are shared co-owners; the owner set also
+    // (redundantly) lists alice. verifier/ completer cleared to isolate ownership.
+    const rows = deriveResponsibilities({
+      checklistItem: item({
+        assignedToId: "alice",
+        sharedAssigneeIds: ["alice", "carol", "dave"],
+        completedById: null,
+        verifierId: null,
+      }),
+    })
+    const assignees = rows.filter((r) => r.basis === "TASK_ASSIGNEE")
+    // Every owner is TASK_ASSIGNEE (no one demoted to crew); alice not duplicated.
+    expect(assignees.map((r) => r.userId)).toEqual(["alice", "carol", "dave"])
+    // Exactly one primary — the designated assignedToId.
+    expect(assignees.filter((r) => r.isPrimary).map((r) => r.userId)).toEqual(["alice"])
+    expect(assignees.every((r) => r.jobChecklistItemId === "task1")).toBe(true)
+  })
+
+  it("a shared task owner is NOT also listed as general job crew", () => {
+    const rows = deriveResponsibilities({
+      checklistItem: item({ assignedToId: "alice", sharedAssigneeIds: ["alice", "carol"], completedById: null, verifierId: null }),
+      jobAssigneeIds: ["carol", "erin"], // carol is a task owner; erin is only crew
+    })
+    expect(rows.some((r) => r.userId === "carol" && r.basis === "JOB_ASSIGNEE")).toBe(false)
+    expect(rows.filter((r) => r.userId === "carol")).toEqual([
+      { userId: "carol", basis: "TASK_ASSIGNEE", isPrimary: false, jobChecklistItemId: "task1", taskLabel: "Mop the lobby", verificationStatus: "VERIFIED", completedAt: item().completedAt },
+    ])
+    expect(rows.find((r) => r.userId === "erin")).toMatchObject({ basis: "JOB_ASSIGNEE", isPrimary: false })
   })
 
   it("adds crew members as JOB_ASSIGNEE, but never double-lists someone already on the task", () => {
     const rows = deriveResponsibilities({ checklistItem: item(), jobAssigneeIds: ["alice", "carol"] })
-    // alice already captured via the task → not re-added as crew; carol is new crew.
     const carol = rows.filter((r) => r.userId === "carol")
-    expect(carol).toEqual([{ userId: "carol", basis: "JOB_ASSIGNEE", jobChecklistItemId: null, taskLabel: null, verificationStatus: null, completedAt: null }])
+    expect(carol).toEqual([{ userId: "carol", basis: "JOB_ASSIGNEE", isPrimary: false, jobChecklistItemId: null, taskLabel: null, verificationStatus: null, completedAt: null }])
     expect(rows.some((r) => r.userId === "alice" && r.basis === "JOB_ASSIGNEE")).toBe(false)
   })
 
   it("is empty when there is nothing to attribute, and ignores null actors", () => {
     expect(deriveResponsibilities({})).toEqual([])
-    expect(deriveResponsibilities({ checklistItem: item({ assignedToId: null, completedById: null, verifierId: null }) })).toEqual([])
+    expect(deriveResponsibilities({ checklistItem: item({ assignedToId: null, sharedAssigneeIds: [], completedById: null, verifierId: null }) })).toEqual([])
   })
 
-  it("dedupes repeated crew ids", () => {
+  it("dedupes repeated shared/crew ids", () => {
     const rows = deriveResponsibilities({ jobAssigneeIds: ["dan", "dan"] })
     expect(rows).toHaveLength(1)
     expect(rows[0]).toMatchObject({ userId: "dan", basis: "JOB_ASSIGNEE" })
+  })
+})
+
+describe("corrective work on an EXISTING work order — billing preserved", () => {
+  it("the attach patch only ever touches the owner and due date", () => {
+    const patch = buildCorrectiveAttachPatch({ assigneeId: "alice", dueAt: "2026-12-01T00:00:00.000Z" })
+    expect(Object.keys(patch).sort()).toEqual(["assignedToId", "dueAt"])
+    // Never a billing/scheduling field.
+    for (const forbidden of ["billable", "type", "quotedAmount", "status", "isCorrective", "convertedJobId", "description"]) {
+      expect(patch).not.toHaveProperty(forbidden)
+    }
+    // Every key is in the allowlist.
+    expect(Object.keys(patch).every((k) => (CORRECTIVE_ATTACH_FIELDS as readonly string[]).includes(k))).toBe(true)
+  })
+
+  it("sets the owner (incl. explicit unassign) and omits an absent due date", () => {
+    expect(buildCorrectiveAttachPatch({ assigneeId: "bob" })).toEqual({ assignedToId: "bob" })
+    expect(buildCorrectiveAttachPatch({ assigneeId: null })).toEqual({ assignedToId: null }) // explicit unassign
+    expect(buildCorrectiveAttachPatch({})).toEqual({}) // nothing provided → no-op patch
+    expect(buildCorrectiveAttachPatch({ dueAt: "2026-12-01T00:00:00.000Z" })).toEqual({ dueAt: new Date("2026-12-01T00:00:00.000Z") })
   })
 })

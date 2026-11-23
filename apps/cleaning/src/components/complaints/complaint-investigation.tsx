@@ -10,10 +10,11 @@ type Responsibility = {
   id: string
   userName: string
   basis: ResponsibilityBasis
+  isPrimary: boolean
   taskLabel: string | null
   verificationStatus: string | null
 }
-type CorrectiveWO = { id: string; status: string; assigneeName: string | null } | null
+type CorrectiveWO = { id: string; status: string; isCorrective: boolean; assigneeName: string | null } | null
 
 export type ComplaintDto = {
   issueId: string
@@ -123,6 +124,7 @@ export function ComplaintInvestigation({ dto }: { dto: ComplaintDto }) {
               <li key={r.id} className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
                 <span className="font-medium">{r.userName}</span>
                 <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">{RESPONSIBILITY_BASIS_LABELS[r.basis]}</span>
+                {r.isPrimary ? <span className="rounded bg-brand/10 px-1.5 py-0.5 text-xs font-medium text-brand">primary</span> : null}
                 {r.taskLabel ? <span className="text-xs text-slate-400">{r.taskLabel}</span> : null}
                 {r.verificationStatus ? <span className="text-xs text-slate-400">· {r.verificationStatus.toLowerCase().replace(/_/g, " ")}</span> : null}
               </li>
@@ -164,34 +166,41 @@ export function ComplaintInvestigation({ dto }: { dto: ComplaintDto }) {
         <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Corrective work</div>
         {dto.corrective ? (
           <div className="rounded-lg bg-white/70 px-3 py-2 text-sm text-slate-700">
-            Corrective work order · <span className="font-medium">{dto.corrective.status}</span>
+            {dto.corrective.isCorrective ? "Corrective work order" : "Work order"} · <span className="font-medium">{dto.corrective.status}</span>
             {dto.corrective.assigneeName ? ` · ${dto.corrective.assigneeName}` : " · unassigned"}
             <p className="mt-1 text-xs text-slate-500">Track rework to completion and verification in Work orders.</p>
           </div>
-        ) : (
-          <form onSubmit={createCorrective} className="space-y-2">
-            <input
-              value={cDesc}
-              onChange={(e) => setCDesc(e.target.value)}
-              placeholder="What rework is needed (kept neutral — the assignee won't see the complaint)…"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            />
-            <div className="flex flex-wrap gap-2">
-              <select value={cAssignee} onChange={(e) => setCAssignee(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
-                <option value="">Assign later</option>
-                {dto.assignableUsers.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
-              </select>
-              <input type="date" value={cDue} onChange={(e) => setCDue(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        ) : null}
+        <form onSubmit={createCorrective} className="mt-2 space-y-2">
+          <input
+            value={cDesc}
+            onChange={(e) => setCDesc(e.target.value)}
+            placeholder={dto.corrective ? "What rework is needed (recorded in history; neutral to the assignee)…" : "What rework is needed (kept neutral — the assignee won't see the complaint)…"}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          />
+          <div className="flex flex-wrap gap-2">
+            <select value={cAssignee} onChange={(e) => setCAssignee(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+              <option value="">Assign later</option>
+              {dto.assignableUsers.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+            </select>
+            <input type="date" value={cDue} onChange={(e) => setCDue(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+            {/* Billable only applies when CREATING a new work order — never when
+                attaching to an existing one, whose billing stays untouched. */}
+            {!dto.corrective ? (
               <label className="flex items-center gap-1.5 text-xs text-slate-600">
                 <input type="checkbox" checked={cBillable} onChange={(e) => setCBillable(e.target.checked)} /> Billable
               </label>
-              <button type="submit" disabled={busy || !cDesc.trim()} className="rounded-lg bg-brand px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
-                {busy ? "Creating…" : "Create corrective work"}
-              </button>
-            </div>
-            <p className="text-xs text-slate-500">The assignee is notified neutrally — no accusation or customer detail is shared.</p>
-          </form>
-        )}
+            ) : null}
+            <button type="submit" disabled={busy || !cDesc.trim()} className="rounded-lg bg-brand px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
+              {busy ? "Saving…" : dto.corrective ? "Assign to existing work order" : "Create corrective work"}
+            </button>
+          </div>
+          <p className="text-xs text-slate-500">
+            {dto.corrective
+              ? "Attaches to the existing work order — no duplicate is created and its billing is unchanged."
+              : "The assignee is notified neutrally — no accusation or customer detail is shared."}
+          </p>
+        </form>
       </div>
 
       {error ? <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}

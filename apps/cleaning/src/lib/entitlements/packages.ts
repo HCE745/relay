@@ -75,6 +75,7 @@ const BUSINESS_CAPS: Capability[] = [
   "workforce.laborCosting",
   "workforce.compliance",
   "reporting.profitability",
+  "workforce.performanceAnalytics",
   "erp.laborBudgets",
   "erp.siteProfitability",
   "assets.management",

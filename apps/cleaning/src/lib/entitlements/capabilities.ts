@@ -60,6 +60,7 @@ export const CAPABILITIES = [
   "workforce.commissionPay", // commission / crew-based pay rules + earnings (export only)
   "workforce.laborCosting", // shift differentials + labor burden (costing/export only)
   "workforce.compliance", // employee credentials + site requirements
+  "workforce.performanceAnalytics", // employee accountability/performance history + dashboards (P4)
   "reporting.profitability", // site/customer/plan margin (pay-rate-derived)
   "erp.laborBudgets",
   "erp.siteProfitability",

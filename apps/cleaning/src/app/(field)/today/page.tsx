@@ -62,12 +62,13 @@ export default async function TodayPage() {
   const dayStart = now.startOf("day").toJSDate()
   const dayEnd = now.endOf("day").toJSDate()
 
-  const [jobs, canCoverage, hasNotifications, prefs, hasSops] = await Promise.all([
+  const [jobs, canCoverage, hasNotifications, prefs, hasSops, hasPerformance] = await Promise.all([
     listCleanerDayJobs(orgId, session.userId, dayStart, dayEnd),
     orgHasCapability(orgId, "workforce.coverage"),
     orgHasCapability(orgId, "workforce.notifications"),
     getUserPrefs(orgId, session.userId),
     orgHasCapability(orgId, "operations.sopLibrary"),
+    orgHasCapability(orgId, "workforce.performanceAnalytics"),
   ])
   const outstandingSops = hasSops ? (await outstandingAcks(orgId, session.userId, session.role)).length : 0
   const cleanerPrefs = prefs.filter((p) => p.roles === "all") // staff-wide events only for cleaners
@@ -98,6 +99,13 @@ export default async function TodayPage() {
           {outstandingSops > 0
             ? <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">{outstandingSops} to acknowledge</span>
             : <span className="text-xs text-slate-400">Search &amp; read →</span>}
+        </Link>
+      ) : null}
+
+      {hasPerformance ? (
+        <Link href="/my-work" className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 active:bg-slate-50">
+          <span className="text-sm font-semibold text-slate-800">My work history</span>
+          <span className="text-xs text-slate-400">Completion &amp; quality →</span>
         </Link>
       ) : null}
 

@@ -1,6 +1,6 @@
 import { orgDb } from "../org-db"
 import { recordAudit } from "./audit"
-import { assertFound } from "./errors"
+import { assertFound, ConflictError } from "./errors"
 import type { z } from "zod"
 import type {
   serviceAreaCreateSchema, excludedAddressSchema, excludedContactSchema, excludedZoneSchema,
@@ -53,18 +53,144 @@ const ENTITY: Record<Kind, string> = { address: "ExcludedAddress", contact: "Exc
 export function listExclusions(orgId: string) {
   const db = orgDb(orgId)
   return Promise.all([
-    db.excludedAddress.findMany({ orderBy: { createdAt: "desc" } }),
+    db.excludedAddress.findMany({
+      orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+      include: { customer: { select: { id: true, name: true, archivedAt: true } }, serviceLocation: { select: { id: true, name: true } } },
+    }),
     db.excludedContact.findMany({ orderBy: { createdAt: "desc" } }),
     db.excludedZone.findMany({ orderBy: { createdAt: "desc" } }),
   ]).then(([addresses, contacts, zones]) => ({ addresses, contacts, zones }))
 }
 
+/** How many address exclusions reference a customer (any status) — used to warn
+ *  on archive and to block a hard delete that would orphan incident history. */
+export function customerExclusionCount(orgId: string, customerId: string) {
+  return orgDb(orgId).excludedAddress.count({ where: { customerId } })
+}
+
 export async function createExcludedAddress(orgId: string, actorId: string, input: AddressInput) {
-  const row = await orgDb(orgId).excludedAddress.create({
-    data: { organizationId: orgId, addressLine1: input.addressLine1, city: input.city, state: input.state, postalCode: input.postalCode, reason: input.reason, note: input.note, createdById: actorId },
+  const db = orgDb(orgId)
+  // Snapshot the linked customer's name so the association survives archiving.
+  let customerNameSnapshot: string | undefined
+  if (input.customerId) {
+    const c = await db.customer.findFirst({ where: { id: input.customerId }, select: { name: true } })
+    customerNameSnapshot = c?.name
+  }
+  const row = await db.excludedAddress.create({
+    data: {
+      organizationId: orgId,
+      addressLine1: input.addressLine1, city: input.city, state: input.state, postalCode: input.postalCode,
+      reason: input.reason, note: input.note, createdById: actorId,
+      customerId: input.customerId ?? null,
+      serviceLocationId: input.serviceLocationId ?? null,
+      customerNameSnapshot: customerNameSnapshot ?? null,
+      incidentDate: input.incidentDate ? new Date(input.incidentDate) : null,
+      occupantName: input.occupantName ?? null,
+      occupantPhone: input.occupantPhone ?? null,
+      occupantEmail: input.occupantEmail ?? null,
+      isPropertySpecific: input.isPropertySpecific ?? false,
+      events: {
+        create: { organizationId: orgId, type: "CREATED", actorId, note: input.note ?? null },
+      },
+    },
   })
-  await recordAudit(orgId, actorId, ENTITY.address, row.id, "create", { newValue: input.reason, metadata: { reason: input.reason, note: input.note, addressLine1: input.addressLine1 } })
+  await recordAudit(orgId, actorId, ENTITY.address, row.id, "create", { newValue: input.reason, metadata: { reason: input.reason, note: input.note, addressLine1: input.addressLine1, customerId: input.customerId, isPropertySpecific: input.isPropertySpecific } })
   return row
+}
+
+// Full detail for one address exclusion: incident fields, the audit trail, the
+// linked customer + location, and the customer's contracts (for navigation).
+export async function getExcludedAddressDetail(orgId: string, id: string) {
+  const db = orgDb(orgId)
+  const row = await db.excludedAddress.findFirst({
+    where: { id },
+    include: {
+      events: { orderBy: { createdAt: "desc" } },
+      customer: { select: { id: true, name: true, archivedAt: true, contracts: { select: { id: true, title: true, status: true }, orderBy: { createdAt: "desc" } } } },
+      serviceLocation: { select: { id: true, name: true } },
+    },
+  })
+  return row
+}
+
+/**
+ * Record a verified occupant change. This documents the NEW occupant's identity
+ * and sets occupantChangeVerifiedAt — the evidence that lets management lift a
+ * person-specific exclusion. It deliberately does NOT create a new exclusion or
+ * re-point the incident's customer link: a previous occupant's misconduct is
+ * never auto-transferred to whoever lives there now.
+ */
+export async function recordOccupantChange(
+  orgId: string, actorId: string, id: string,
+  input: { occupantName?: string; occupantPhone?: string; occupantEmail?: string; verifiedAt?: string; note?: string },
+) {
+  const db = orgDb(orgId)
+  const existing = await db.excludedAddress.findFirst({ where: { id }, select: { id: true } })
+  assertFound(existing, "Exclusion")
+  const verifiedAt = input.verifiedAt ? new Date(input.verifiedAt) : new Date()
+  await db.excludedAddress.updateMany({
+    where: { id },
+    data: {
+      occupantName: input.occupantName ?? null,
+      occupantPhone: input.occupantPhone ?? null,
+      occupantEmail: input.occupantEmail ?? null,
+      occupantChangeVerifiedAt: verifiedAt,
+    },
+  })
+  await db.exclusionEvent.create({
+    data: { organizationId: orgId, excludedAddressId: id, type: "OCCUPANT_CHANGE", actorId, note: input.note ?? null,
+      occupantName: input.occupantName ?? null, occupantPhone: input.occupantPhone ?? null, occupantEmail: input.occupantEmail ?? null, verifiedAt },
+  })
+  await recordAudit(orgId, actorId, ENTITY.address, id, "occupant_change", { metadata: { occupantName: input.occupantName, verifiedAt: verifiedAt.toISOString() } })
+  return db.excludedAddress.findFirst({ where: { id } })
+}
+
+/** Lift an exclusion (management, after review). Preserves the record + its
+ *  customer association — status becomes LIFTED, never deleted. */
+export async function liftExclusion(orgId: string, actorId: string, id: string, reason: string) {
+  const db = orgDb(orgId)
+  const existing = await db.excludedAddress.findFirst({ where: { id }, select: { status: true } })
+  assertFound(existing, "Exclusion")
+  if (existing!.status === "LIFTED") throw new ConflictError("This exclusion is already lifted")
+  await db.excludedAddress.updateMany({ where: { id }, data: { status: "LIFTED", liftedAt: new Date(), liftedById: actorId, liftReason: reason } })
+  await db.exclusionEvent.create({ data: { organizationId: orgId, excludedAddressId: id, type: "LIFTED", actorId, note: reason } })
+  await recordAudit(orgId, actorId, ENTITY.address, id, "lift", { metadata: { reason } })
+  return db.excludedAddress.findFirst({ where: { id } })
+}
+
+/** Reinstate a previously lifted exclusion. */
+export async function reinstateExclusion(orgId: string, actorId: string, id: string, reason: string) {
+  const db = orgDb(orgId)
+  const existing = await db.excludedAddress.findFirst({ where: { id }, select: { status: true } })
+  assertFound(existing, "Exclusion")
+  if (existing!.status === "ACTIVE") throw new ConflictError("This exclusion is already active")
+  await db.excludedAddress.updateMany({ where: { id }, data: { status: "ACTIVE", liftedAt: null, liftedById: null, liftReason: null } })
+  await db.exclusionEvent.create({ data: { organizationId: orgId, excludedAddressId: id, type: "REINSTATED", actorId, note: reason } })
+  await recordAudit(orgId, actorId, ENTITY.address, id, "reinstate", { metadata: { reason } })
+  return db.excludedAddress.findFirst({ where: { id } })
+}
+
+/** Link/relink the incident to a customer + service location (snapshots name). */
+export async function linkExclusionRecord(
+  orgId: string, actorId: string, id: string,
+  input: { customerId?: string | null; serviceLocationId?: string | null; incidentDate?: string | null; isPropertySpecific?: boolean },
+) {
+  const db = orgDb(orgId)
+  const data: Record<string, unknown> = {}
+  if (input.customerId !== undefined) {
+    data.customerId = input.customerId
+    if (input.customerId) {
+      const c = await db.customer.findFirst({ where: { id: input.customerId }, select: { name: true } })
+      data.customerNameSnapshot = c?.name ?? null
+    }
+  }
+  if (input.serviceLocationId !== undefined) data.serviceLocationId = input.serviceLocationId
+  if (input.incidentDate !== undefined) data.incidentDate = input.incidentDate ? new Date(input.incidentDate) : null
+  if (input.isPropertySpecific !== undefined) data.isPropertySpecific = input.isPropertySpecific
+  const { count } = await db.excludedAddress.updateMany({ where: { id }, data })
+  if (count === 0) return null
+  await recordAudit(orgId, actorId, ENTITY.address, id, "link", { metadata: input })
+  return db.excludedAddress.findFirst({ where: { id } })
 }
 export async function createExcludedContact(orgId: string, actorId: string, input: ContactInput) {
   const row = await orgDb(orgId).excludedContact.create({
@@ -86,9 +212,16 @@ async function logUpdate(orgId: string, actorId: string, kind: Kind, id: string,
 }
 export async function updateExcludedAddress(orgId: string, actorId: string, id: string, input: Partial<AddressInput>) {
   const db = orgDb(orgId)
-  const { count } = await db.excludedAddress.updateMany({ where: { id }, data: { ...input } })
+  // Map explicitly so `incidentDate` (a string on the wire) becomes a Date and
+  // no unexpected field reaches Prisma.
+  const data: Record<string, unknown> = {}
+  for (const k of ["addressLine1", "city", "state", "postalCode", "reason", "note", "occupantName", "occupantPhone", "occupantEmail", "isPropertySpecific"] as const) {
+    if (input[k] !== undefined) data[k] = input[k]
+  }
+  if (input.incidentDate !== undefined) data.incidentDate = input.incidentDate ? new Date(input.incidentDate) : null
+  const { count } = await db.excludedAddress.updateMany({ where: { id }, data })
   if (count === 0) return null
-  await logUpdate(orgId, actorId, "address", id, { ...input })
+  await logUpdate(orgId, actorId, "address", id, data)
   return db.excludedAddress.findFirst({ where: { id } })
 }
 export async function updateExcludedContact(orgId: string, actorId: string, id: string, input: Partial<ContactInput>) {

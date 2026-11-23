@@ -445,7 +445,55 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
   //    and the responsibility snapshot that feeds the performance dashboards. ──
   await seedAccountability(orgId, now, staff, ctx)
 
+  // ── Inspection templates + a recurring/randomized schedule (Phase 46) so the
+  //    Inspections screen shows a reusable checklist and a live schedule. ──
+  await seedInspectionScheduling(orgId, now, staff, ctx)
+
   return { owner: staff.owner }
+}
+
+// A real InspectionTemplate (the seeded historical inspections only snapshot a
+// name) plus one active recurring schedule that draws a random inspector from
+// the supervisors — so templates, "New inspection" and the schedule table all
+// have live demo data.
+async function seedInspectionScheduling(
+  orgId: string,
+  now: Date,
+  staff: Staff & { owner: { id: string; email: string; name: string } },
+  ctx: { sites: { id: string; isComm: boolean }[] },
+) {
+  const site = ctx.sites.find((s) => s.isComm) ?? ctx.sites[0]
+  if (!site) return
+  const template = await systemDb.inspectionTemplate.create({
+    data: {
+      organizationId: orgId,
+      name: "Commercial QC",
+      passThreshold: 80,
+      items: {
+        create: [
+          { label: "Restrooms cleaned & restocked", points: 3, isCritical: true, requirePhoto: true, sortOrder: 0 },
+          { label: "Floors vacuumed / mopped", points: 2, sortOrder: 1 },
+          { label: "High-touch surfaces disinfected", points: 2, isCritical: true, sortOrder: 2 },
+          { label: "Trash emptied & liners replaced", points: 1, sortOrder: 3 },
+          { label: "Entry glass & mats clean", points: 1, sortOrder: 4 },
+        ],
+      },
+    },
+    select: { id: true },
+  })
+  await systemDb.scheduledInspection.create({
+    data: {
+      organizationId: orgId,
+      serviceLocationId: site.id,
+      templateId: template.id,
+      cadence: "WEEKLY",
+      nextRunAt: new Date(now.getTime() + 2 * DAY),
+      reminderLeadHours: 24,
+      randomizeInspector: true,
+      inspectorPoolIds: staff.supervisorIds,
+      createdById: staff.managerId,
+    },
+  })
 }
 
 // P1–P4 showcase. Self-contained: one completed commercial job whose checklist
@@ -591,6 +639,34 @@ async function seedAccountability(
   })
   await systemDb.complaintResponsibility.create({
     data: { organizationId: orgId, issueId: complaint2.id, userId: cC, basis: "JOB_ASSIGNEE", isPrimary: false, capturedById: mgr },
+  })
+
+  // ── Service-area exclusions with incident linkage (Phase 46) ──
+  // (1) A person/customer-specific do-not-serve, linked to the customer account,
+  //     with a verified occupant change on file (so it can be reviewed + lifted).
+  await systemDb.excludedAddress.create({
+    data: {
+      organizationId: orgId, addressLine1: "4120 Birchwood Ln", city: "Austin", state: "TX", postalCode: "78704",
+      reason: "NON_PAYMENT", note: "Repeated non-payment and disputed invoices.",
+      createdById: mgr, customerId, customerNameSnapshot: ctx.customers.find((c) => c.id === customerId)?.name ?? null,
+      serviceLocationId: commSite.id, incidentDate: days(-120), isPropertySpecific: false,
+      occupantName: "Pat Delgado", occupantPhone: "(512) 555-0147", occupantChangeVerifiedAt: days(-10),
+      events: {
+        create: [
+          { organizationId: orgId, type: "CREATED", actorId: mgr, actorName: "Morgan Manager", note: "Account sent to do-not-serve after 90+ days non-payment.", createdAt: days(-120) },
+          { organizationId: orgId, type: "OCCUPANT_CHANGE", actorId: sup, actorName: "Sam Supervisor", occupantName: "New tenant (verified via lease)", verifiedAt: days(-10), note: "Prior occupant moved out; new tenant unrelated to the debt.", createdAt: days(-10) },
+        ],
+      },
+    },
+  })
+  // (2) A property-specific SAFETY concern that persists regardless of occupant.
+  await systemDb.excludedAddress.create({
+    data: {
+      organizationId: orgId, addressLine1: "88 Canyon Rd", city: "Austin", state: "TX", postalCode: "78730",
+      reason: "SAFETY_INCIDENT", note: "Aggressive unrestrained dog on site — crew safety.",
+      createdById: sup, isPropertySpecific: true, incidentDate: days(-45),
+      events: { create: { organizationId: orgId, type: "CREATED", actorId: sup, actorName: "Sam Supervisor", note: "Crew withdrew after a safety incident.", createdAt: days(-45) } },
+    },
   })
 }
 

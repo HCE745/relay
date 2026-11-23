@@ -47,8 +47,25 @@ export async function updateCustomer(orgId: string, id: string, input: UpdateInp
   return db.customer.findFirst({ where: { id } })
 }
 
-/** Archive = soft delete (isActive=false). We never hard-delete customers. */
-export async function archiveCustomer(orgId: string, id: string) {
-  const { count } = await orgDb(orgId).customer.updateMany({ where: { id }, data: { isActive: false } })
+/**
+ * Archive = soft delete. We NEVER hard-delete customers — archiving preserves
+ * the record (and any linked service-exclusion incident history and its customer
+ * association) while removing them from active lists. Records who archived it
+ * and why for the audit trail.
+ */
+export async function archiveCustomer(orgId: string, id: string, actorId?: string, reason?: string) {
+  const { count } = await orgDb(orgId).customer.updateMany({
+    where: { id },
+    data: { isActive: false, archivedAt: new Date(), archivedById: actorId ?? null, archiveReason: reason ?? null },
+  })
+  return count > 0
+}
+
+/** Restore an archived customer to active. */
+export async function restoreCustomer(orgId: string, id: string) {
+  const { count } = await orgDb(orgId).customer.updateMany({
+    where: { id },
+    data: { isActive: true, archivedAt: null, archivedById: null, archiveReason: null },
+  })
   return count > 0
 }

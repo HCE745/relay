@@ -22,7 +22,7 @@ export default async function SignUpPage() {
           <SignUpForm />
         ) : (
           <p className="rounded-lg bg-slate-50 px-4 py-6 text-center text-sm text-slate-600 ring-1 ring-slate-200">
-            Self-service sign-up isn&rsquo;t open yet. Please contact HCE Cleaning to get started.
+            Self-service sign-up isn&rsquo;t open yet. Please contact CleanWare to get started.
           </p>
         )}
       </div>

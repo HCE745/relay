@@ -2,7 +2,8 @@ import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { Suspense } from "react"
 import { getSession } from "@/lib/session"
-import { experienceForRole, navForRole } from "@/lib/rbac"
+import { experienceForRole, navForRole, canManageAccounts } from "@/lib/rbac"
+import { HelpMenu } from "@/components/help/help-menu"
 import { getOrgCapabilities } from "@/lib/entitlements-server"
 import { CapabilityProvider } from "@/lib/entitlements"
 import { AdminSidebar } from "@/components/layout/admin-sidebar"
@@ -39,11 +40,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           initialCollapsed={collapsed}
         />
         <div className="nav-content">
-          {session.isDemo ? <DemoBanner /> : null}
+          {session.isDemo ? <DemoBanner role={session.role} /> : null}
           {/* Contextual top bar: breadcrumbs + the active workspace's sub-nav. */}
           <div className="sticky top-0 z-20 border-b border-slate-200 bg-white/85 px-4 backdrop-blur sm:px-6 lg:px-8">
-            <div className="mx-auto flex h-12 max-w-[1400px] items-center">
+            <div className="mx-auto flex h-12 max-w-[1400px] items-center justify-between gap-3">
               <Breadcrumbs nav={navClient} />
+              <HelpMenu canReviewFeedback={canManageAccounts(session.role)} />
             </div>
             <div className="mx-auto max-w-[1400px]">
               <WorkspaceSubnav nav={navClient} />
@@ -53,7 +55,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               shell only — the field app and portal never get ornament. */}
           <main className="cln-ornament mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
         </div>
-        {session.isDemo ? <ProductTour isDemo /> : null}
+        {/* Mounted for everyone: demo auto-starts the overview tour; in the live
+            app it stays idle until Help → Guided Tutorials starts a flow. */}
+        <ProductTour isDemo={session.isDemo ?? false} />
         <CommandPalette nav={nav.map((n) => ({ label: n.label, href: n.href }))} />
         <Suspense fallback={null}><PeekHost /></Suspense>
       </div>

@@ -529,6 +529,8 @@ model Organization {
   applicants                 Applicant[]
   interviews                 Interview[]
   serviceAreas               ServiceArea[]
+  scheduledInspections       ScheduledInspection[]
+  feedbackSubmissions        FeedbackSubmission[]
   excludedAddresses          ExcludedAddress[]
   excludedContacts           ExcludedContact[]
   excludedZones              ExcludedZone[]
@@ -751,11 +753,19 @@ model Customer {
   paymentTerms       PaymentTerms @default(DUE_ON_RECEIPT)
   notes              String?
   isActive           Boolean      @default(true)
+  // Archiving (Phase 46): archiving is preferred over deletion. A customer with
+  // any service-exclusion history can be archived but NOT hard-deleted, so the
+  // documented incident keeps its customer association. archivedAt is the flag;
+  // isActive is also set false so existing active-only filters keep working.
+  archivedAt         DateTime?
+  archivedById       String?
+  archiveReason      String?
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
 
   organization           Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   contacts               Contact[]
+  excludedAddresses      ExcludedAddress[]
   serviceLocations       ServiceLocation[]
   invoices               Invoice[]
   estimates              Estimate[]           @relation("EstimateCustomer")
@@ -850,6 +860,8 @@ model ServiceLocation {
   qrCodes                QrCode[]
   custodyEvents          CustodyEvent[]
   inspections            Inspection[]
+  scheduledInspections   ScheduledInspection[]
+  excludedAddresses      ExcludedAddress[]
   assets                 Asset[]                     @relation("AssetSite")
   supplyUsages           SupplyUsage[]               @relation("SupplyUsageSite")
   credentialRequirements SiteCredentialRequirement[]
@@ -2032,6 +2044,7 @@ model InspectionTemplate {
   organization Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   items        InspectionTemplateItem[]
   inspections  Inspection[]
+  scheduled    ScheduledInspection[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -2107,6 +2120,122 @@ model InspectionItemResult {
   photos     JobPhoto[]
 
   @@index([inspectionId])
+  @@schema("cleaning")
+}
+
+// Recurring / scheduled inspections (Phase 46). A schedule materializes DRAFT
+// inspections at a site on a cadence and (optionally) reminds the inspector
+// ahead of each run. The inspector may be fixed, or randomly drawn from an
+// eligible pool at materialization time, so no one can predict who inspects when.
+enum InspectionCadence {
+  ONCE
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+
+  @@schema("cleaning")
+}
+
+model ScheduledInspection {
+  id                   String            @id @default(cuid())
+  organizationId       String
+  serviceLocationId    String
+  templateId           String
+  cadence              InspectionCadence @default(ONCE)
+  nextRunAt            DateTime
+  lastRunAt            DateTime?
+  reminderLeadHours    Int               @default(24)
+  reminderSentForRunAt DateTime? // dedupes the reminder for the current nextRunAt
+  randomizeInspector   Boolean           @default(false)
+  inspectorPoolIds     String[] // eligible inspectors to draw from when randomizing
+  assignedInspectorId  String? // used when not randomizing
+  active               Boolean           @default(true)
+  createdById          String?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation    @relation(fields: [serviceLocationId], references: [id], onDelete: Cascade)
+  template        InspectionTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([active, nextRunAt])
+  @@schema("cleaning")
+}
+
+// ─── Help & feedback (Phase 46) ──────────────────────────────────────────────
+// In-app bug reports and feature requests, with optional screenshot/recording
+// attachments stored privately via the storage abstraction. Visible to
+// management only. Demo submissions are flagged and never emailed anywhere.
+enum FeedbackType {
+  BUG
+  FEATURE
+  QUESTION
+
+  @@schema("cleaning")
+}
+
+enum FeedbackStatus {
+  NEW
+  IN_REVIEW
+  PLANNED
+  RESOLVED
+  CLOSED
+
+  @@schema("cleaning")
+}
+
+enum FeedbackAttachmentKind {
+  SCREENSHOT
+  RECORDING
+  UPLOAD
+
+  @@schema("cleaning")
+}
+
+model FeedbackSubmission {
+  id               String         @id @default(cuid())
+  organizationId   String
+  type             FeedbackType
+  status           FeedbackStatus @default(NEW)
+  title            String
+  description      String
+  pageUrl          String?
+  userAgent        String?
+  submittedById    String?
+  submittedByName  String?
+  submittedByEmail String?
+  isDemo           Boolean        @default(false)
+  // Explicit consent captured when the submission includes visual evidence.
+  consentVisual    Boolean        @default(false)
+  resolutionNote   String?
+  resolvedById     String?
+  resolvedAt       DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  attachments  FeedbackAttachment[]
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@schema("cleaning")
+}
+
+model FeedbackAttachment {
+  id             String                 @id @default(cuid())
+  organizationId String
+  submissionId   String
+  kind           FeedbackAttachmentKind
+  storageRef     String // opaque ref from the storage abstraction (private)
+  contentType    String
+  sizeBytes      Int
+  name           String?
+  createdAt      DateTime               @default(now())
+
+  submission FeedbackSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
   @@schema("cleaning")
 }
 
@@ -2620,7 +2749,34 @@ model ServiceArea {
   @@schema("cleaning")
 }
 
-// Do-not-serve list: a specific address.
+// Active vs. lifted. A lifted exclusion is NEVER deleted — the incident and its
+// customer association are preserved; lifting only stops it from matching intake.
+enum ExclusionStatus {
+  ACTIVE
+  LIFTED
+
+  @@schema("cleaning")
+}
+
+// Audit trail for an address exclusion: creation, occupant-change verification,
+// lifts and reinstatements. OCCUPANT_CHANGE rows carry the new occupant's
+// verified identity — the evidence that lets management lift a person-specific
+// exclusion without erasing the original incident.
+enum ExclusionEventType {
+  CREATED
+  NOTE
+  OCCUPANT_CHANGE
+  LIFTED
+  REINSTATED
+
+  @@schema("cleaning")
+}
+
+// Do-not-serve list: a specific address. (Phase 46) An address exclusion is now
+// tied to the customer account and service location of the incident, keeps a
+// name snapshot so the association survives archiving, and distinguishes a
+// person-specific exclusion from a property-specific safety concern that should
+// persist even after the occupant changes.
 model ExcludedAddress {
   id             String          @id @default(cuid())
   organizationId String
@@ -2634,10 +2790,61 @@ model ExcludedAddress {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  // Incident linkage (all optional — a bare address can still be excluded).
+  customerId           String?
+  serviceLocationId    String?
+  // Snapshot of who the incident was about, kept even if the customer is
+  // archived or the FK is later nulled — the historical relationship persists.
+  customerNameSnapshot String?
+  occupantName         String?
+  occupantPhone        String?
+  occupantEmail        String?
+  incidentDate         DateTime?
+
+  // A property-specific SAFETY concern (e.g. an unsafe dog, hazardous access)
+  // remains relevant after the occupant changes; a person-specific exclusion
+  // does not transfer to a new occupant.
+  isPropertySpecific Boolean @default(false)
+
+  // Lifecycle. Lifting preserves the record (status=LIFTED), who lifted it and why.
+  status                   ExclusionStatus @default(ACTIVE)
+  liftedAt                 DateTime?
+  liftedById               String?
+  liftReason               String?
+  // Set when a verified occupant change is on file (evidence for lifting a
+  // person-specific exclusion without blindly transferring misconduct).
+  occupantChangeVerifiedAt DateTime?
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer        Customer?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
+  events          ExclusionEvent[]
 
   @@index([organizationId])
   @@index([postalCode])
+  @@index([customerId])
+  @@index([serviceLocationId])
+  @@schema("cleaning")
+}
+
+model ExclusionEvent {
+  id                String             @id @default(cuid())
+  organizationId    String
+  excludedAddressId String
+  type              ExclusionEventType
+  actorId           String?
+  actorName         String?
+  note              String?
+  // OCCUPANT_CHANGE payload (the new occupant's verified identity).
+  occupantName      String?
+  occupantPhone     String?
+  occupantEmail     String?
+  verifiedAt        DateTime?
+  createdAt         DateTime           @default(now())
+
+  excludedAddress ExcludedAddress @relation(fields: [excludedAddressId], references: [id], onDelete: Cascade)
+
+  @@index([excludedAddressId])
   @@schema("cleaning")
 }
 

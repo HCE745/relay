@@ -4,6 +4,8 @@ import { experienceForRole } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { logout } from "@/lib/auth-actions"
 import { FieldTabBar } from "@/components/field/field-tabbar"
+import { DemoRolePicker } from "@/components/demo/demo-role-picker"
+import { BRAND } from "@/lib/brand"
 
 export const dynamic = "force-dynamic"
 
@@ -51,7 +53,7 @@ export default async function FieldLayout({ children }: { children: React.ReactN
       <header className="pt-safe sticky top-0 z-10 bg-brand text-white">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <div className="text-xs uppercase tracking-wide text-white/70">HCE Cleaning</div>
+            <div className="text-xs uppercase tracking-wide text-white/70">{BRAND.name}</div>
             <div className="text-sm font-semibold">{session.name}</div>
           </div>
           <form action={logout}>
@@ -61,6 +63,11 @@ export default async function FieldLayout({ children }: { children: React.ReactN
           </form>
         </div>
       </header>
+      {session.isDemo ? (
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-b border-brand-200 bg-brand-50 px-3 py-1.5">
+          <DemoRolePicker current={session.role} tone="onLight" />
+        </div>
+      ) : null}
       <main className="flex-1 px-4 py-4">{children}</main>
       <FieldTabBar hasPerformance={hasPerformance} hasSops={hasSops} />
     </div>

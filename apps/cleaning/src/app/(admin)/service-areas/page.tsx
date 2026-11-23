@@ -30,7 +30,15 @@ export default async function ServiceAreasPage() {
           officeLabel: a.officeLabel, active: a.active,
         }))}
         exclusions={{
-          addresses: exclusions.addresses.map((e) => ({ id: e.id, label: [e.addressLine1, e.city, e.postalCode].filter(Boolean).join(", "), reason: e.reason, note: e.note })),
+          addresses: exclusions.addresses.map((e) => ({
+            id: e.id,
+            label: [e.addressLine1, e.city, e.postalCode].filter(Boolean).join(", "),
+            reason: e.reason,
+            note: e.note,
+            status: e.status,
+            propertySpecific: e.isPropertySpecific,
+            customerName: e.customer?.name ?? e.customerNameSnapshot ?? null,
+          })),
           contacts: exclusions.contacts.map((e) => ({ id: e.id, label: [e.name, e.phone, e.email].filter(Boolean).join(" · ") || "-", reason: e.reason, note: e.note })),
           zones: exclusions.zones.map((e) => ({ id: e.id, label: e.value, reason: e.reason, note: e.note })),
         }}

@@ -3,6 +3,7 @@ import { parseBody, runWrite } from "@/lib/api"
 import { portalInviteSchema } from "@/lib/zod-schemas"
 import { createPortalInvite } from "@/lib/data/portal"
 import { isEmailConfigured, sendEmail } from "@/lib/email"
+import { BRAND } from "@/lib/brand"
 
 const CAP = "portal.customerAccess"
 
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     const invite = await createPortalInvite(g.orgId, body.data.customerId, body.data.email, g.session.userId, appUrl)
     let emailed = false
     if (isEmailConfigured()) {
-      await sendEmail({ to: invite.email, subject: "Your HCE Cleaning portal invitation", text: `You've been invited to the customer portal.\n\nActivate your account: ${invite.link}\n\nThis link expires in 7 days.` })
+      await sendEmail({ to: invite.email, subject: `Your ${BRAND.name} portal invitation`, text: `You've been invited to the customer portal.\n\nActivate your account: ${invite.link}\n\nThis link expires in 7 days.` })
       emailed = true
     }
     // Only return the raw link when we could NOT email it.

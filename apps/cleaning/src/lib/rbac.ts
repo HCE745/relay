@@ -171,7 +171,7 @@ export function canManageOrg(role: string): boolean {
 }
 
 // Inspections: supervisors perform QC alongside managers/admins.
-const INSPECTOR_ROLES: ReadonlySet<Role> = new Set<Role>(["OWNER", "ADMIN", "MANAGER", "SUPERVISOR"])
+export const INSPECTOR_ROLES: ReadonlySet<Role> = new Set<Role>(["OWNER", "ADMIN", "MANAGER", "SUPERVISOR"])
 
 /** True if the role may perform and finalize inspections. */
 export function canInspect(role: string): boolean {

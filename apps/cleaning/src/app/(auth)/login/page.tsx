@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { landingPathForRole } from "@/lib/rbac"
 import { LoginForm } from "./login-form"
+import { Wordmark } from "@/components/brand/wordmark"
 
 export default async function LoginPage() {
   const session = await getSession()
@@ -14,7 +15,7 @@ export default async function LoginPage() {
           <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-lg font-bold text-white">
             C
           </div>
-          <h1 className="text-xl font-semibold text-slate-900">HCE Cleaning</h1>
+          <Wordmark tone="onLight" size={34} className="justify-center" />
           <p className="mt-1 text-sm text-slate-500">Sign in to your workspace</p>
         </div>
         <LoginForm />

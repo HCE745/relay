@@ -89,7 +89,7 @@ export default async function BillingSettingsPage() {
           <Card className="p-6">
             <h2 className="mb-1 text-sm font-semibold text-slate-700">Upgrade</h2>
             <p className="text-sm text-slate-600">
-              Online billing isn&rsquo;t enabled yet. To add a payment method or change your plan, contact HCE Cleaning.
+              Online billing isn&rsquo;t enabled yet. To add a payment method or change your plan, contact CleanWare.
             </p>
           </Card>
         )

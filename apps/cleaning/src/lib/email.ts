@@ -1,4 +1,5 @@
 // Minimal transactional email over Resend's REST API (no SDK dependency).
+import { brandEmailFrom } from "./brand"
 //
 // "Configured" requires BOTH a Resend API key AND an explicit From address on a
 // domain you control — sending from Resend's shared onboarding address is a dev
@@ -22,7 +23,7 @@ export async function sendEmail(opts: {
   attachments?: EmailAttachment[]
 }): Promise<EmailResult> {
   const key = process.env.RESEND_API_KEY
-  const from = process.env.CLEANING_EMAIL_FROM || "HCE Cleaning <onboarding@resend.dev>"
+  const from = process.env.CLEANING_EMAIL_FROM || brandEmailFrom()
   const to = Array.isArray(opts.to) ? opts.to : [opts.to]
   if (to.length === 0) return { delivered: false, error: "No recipient" }
 

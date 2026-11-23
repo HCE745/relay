@@ -2,15 +2,18 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
-import { canViewSchedule, canManageAccounts } from "@/lib/rbac"
+import { canViewSchedule, canManageAccounts, canInspect, INSPECTOR_ROLES } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { listRecentInspections } from "@/lib/scheduling/inspections"
+import { listScheduledInspections, daysUntil } from "@/lib/scheduling/scheduled-inspections"
 import { listInspectionTemplates } from "@/lib/data/inspection-templates"
+import { orgDb, systemDb } from "@/lib/org-db"
 import { getOrgTimezone } from "@/lib/data/org"
 import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, StatusPill, StatusBadge, EmptyState } from "@/components/ui/controls"
-import { ClipboardCheckIcon } from "@/components/ui/icons"
+import { ClipboardCheckIcon, RepeatIcon } from "@/components/ui/icons"
 import { NewTemplateButton } from "@/components/inspections/template-dialogs"
+import { NewInspectionButton, ScheduleInspectionButton, ScheduleRowActions } from "@/components/inspections/scheduling"
 
 export const dynamic = "force-dynamic"
 const CAP = "quality.inspections"
@@ -30,11 +33,26 @@ export default async function InspectionsPage({ searchParams }: { searchParams: 
 
   const orgId = session.organizationId
   const canManage = canManageAccounts(session.role)
-  const [tz, allInspections, templates] = await Promise.all([
+  const canRun = canInspect(session.role)
+  const [tz, allInspections, templates, schedules, siteRows, inspectorRows] = await Promise.all([
     getOrgTimezone(orgId),
     listRecentInspections(orgId),
     listInspectionTemplates(orgId),
+    listScheduledInspections(orgId),
+    orgDb(orgId).serviceLocation.findMany({
+      orderBy: [{ customer: { name: "asc" } }, { name: "asc" }],
+      select: { id: true, name: true, customer: { select: { name: true } } },
+    }),
+    systemDb.user.findMany({
+      where: { organizationId: orgId, isActive: true, role: { in: [...INSPECTOR_ROLES] } },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
   ])
+  const sites = siteRows.map((s) => ({ id: s.id, label: `${s.customer.name} · ${s.name}` }))
+  const activeTemplates = templates.filter((t) => t.isActive).map((t) => ({ id: t.id, name: t.name }))
+  const inspectors = inspectorRows.map((u) => ({ id: u.id, name: u.name }))
+  const scheduleTools = canRun ? { sites, templates: activeTemplates, inspectors } : null
 
   const { outcome } = await searchParams
   const failOnly = outcome === "FAIL"
@@ -43,7 +61,19 @@ export default async function InspectionsPage({ searchParams }: { searchParams: 
   return (
     <div className="space-y-8">
       <div>
-        <PageHeader title="Inspections" subtitle="Quality control" icon={<ClipboardCheckIcon />} />
+        <PageHeader
+          title="Inspections"
+          subtitle="Quality control"
+          icon={<ClipboardCheckIcon />}
+          action={
+            scheduleTools ? (
+              <div className="flex gap-2">
+                <ScheduleInspectionButton {...scheduleTools} />
+                <NewInspectionButton {...scheduleTools} />
+              </div>
+            ) : undefined
+          }
+        />
         {failOnly ? (
           <div className="mb-4 flex items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
@@ -67,7 +97,7 @@ export default async function InspectionsPage({ searchParams }: { searchParams: 
             <EmptyState
               icon={<ClipboardCheckIcon />}
               title="No inspections yet"
-              description="Inspections are started from a completed job. Open a completed job and tap “Inspect work” to run one."
+              description="Start one with “New inspection” above (pick a site and checklist), from a completed job, or set up a recurring schedule."
               actionLabel="View jobs"
               actionHref="/jobs"
             />
@@ -111,6 +141,46 @@ export default async function InspectionsPage({ searchParams }: { searchParams: 
           </Card>
         )}
       </div>
+
+      {schedules.length > 0 ? (
+        <div>
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <RepeatIcon className="h-4 w-4 text-slate-400" /> Recurring & scheduled
+          </h2>
+          <Card className="overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-4 py-2.5 font-medium">Site</th>
+                  <th className="px-4 py-2.5 font-medium">Checklist</th>
+                  <th className="px-4 py-2.5 font-medium">Repeats</th>
+                  <th className="px-4 py-2.5 font-medium">Next</th>
+                  <th className="px-4 py-2.5 font-medium">Inspector</th>
+                  <th className="px-4 py-2.5 font-medium" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {schedules.map((s) => {
+                  const days = daysUntil(s.nextRunAt)
+                  return (
+                    <tr key={s.id} className={s.active ? "" : "opacity-60"}>
+                      <td className="px-4 py-3 font-medium text-slate-900">{s.serviceLocation.customer.name} · {s.serviceLocation.name}</td>
+                      <td className="px-4 py-3 text-slate-600">{s.template.name}</td>
+                      <td className="px-4 py-3 text-slate-600">{s.cadence === "ONCE" ? "Once" : s.cadence === "BIWEEKLY" ? "Every 2 weeks" : s.cadence.charAt(0) + s.cadence.slice(1).toLowerCase()}</td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {DateTime.fromJSDate(s.nextRunAt, { zone: tz }).toFormat("MMM d")}
+                        {s.active ? <span className="ml-1 text-xs text-slate-400">({days <= 0 ? "due" : `in ${days}d`})</span> : null}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">{s.randomizeInspector ? <StatusBadge tone="purple">Random</StatusBadge> : "Assigned"}</td>
+                      <td className="px-4 py-3 text-right">{canManage ? <ScheduleRowActions id={s.id} active={s.active} /> : <StatusPill active={s.active} />}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      ) : null}
 
       <div>
         <div className="mb-3 flex items-center justify-between">

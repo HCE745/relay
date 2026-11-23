@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button, Card, Field, Input, Select, StatusBadge } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
 import { EXCLUSION_REASONS } from "@/lib/zod-schemas"
 
 type Area = { id: string; name: string; zipCodes: string[]; radiusMiles: number | null; officeLabel: string | null; active: boolean }
-type Exclusion = { id: string; label: string; reason: string; note: string | null }
+type Exclusion = { id: string; label: string; reason: string; note: string | null; status?: string; customerName?: string | null; propertySpecific?: boolean }
 type Exclusions = { addresses: Exclusion[]; contacts: Exclusion[]; zones: Exclusion[] }
 
 const REASON_LABEL = (r: string) => r.replaceAll("_", " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase())
@@ -84,15 +85,27 @@ function ExclusionList({ kind, title, hint, items }: { kind: "address" | "contac
         </div>
       ) : null}
       <ul className="mt-3 space-y-2">
-        {items.length === 0 ? <li className="rounded-lg border border-dashed border-slate-200 p-3 text-center text-xs text-slate-300">None</li> : items.map((e) => (
-          <li key={e.id} className="flex items-start justify-between gap-2 rounded-lg border border-slate-200 p-2.5">
+        {items.length === 0 ? <li className="rounded-lg border border-dashed border-slate-200 p-3 text-center text-xs text-slate-300">None</li> : items.map((e) => {
+          const lifted = e.status === "LIFTED"
+          return (
+          <li key={e.id} className={`flex items-start justify-between gap-2 rounded-lg border border-slate-200 p-2.5 ${lifted ? "opacity-60" : ""}`}>
             <div className="min-w-0">
               <div className="truncate text-sm text-slate-800">{e.label}</div>
-              <div className="mt-0.5 flex items-center gap-1.5"><StatusBadge tone="warning">{REASON_LABEL(e.reason)}</StatusBadge>{e.note ? <span className="truncate text-xs text-slate-400">{e.note}</span> : null}</div>
+              <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                <StatusBadge tone="warning">{REASON_LABEL(e.reason)}</StatusBadge>
+                {lifted ? <StatusBadge tone="neutral">Lifted</StatusBadge> : null}
+                {e.propertySpecific ? <StatusBadge tone="info">Property</StatusBadge> : null}
+                {e.customerName ? <span className="truncate text-xs text-slate-500">{e.customerName}</span> : null}
+                {e.note ? <span className="truncate text-xs text-slate-400">{e.note}</span> : null}
+              </div>
             </div>
-            <button onClick={() => remove(e.id)} disabled={busy} className="shrink-0 text-xs text-slate-400 hover:text-red-600">Remove</button>
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              {kind === "address" ? <Link href={`/service-areas/exclusions/${e.id}`} className="text-xs font-medium text-brand-700 hover:text-brand-800">Details</Link> : null}
+              <button onClick={() => remove(e.id)} disabled={busy} className="text-xs text-slate-400 hover:text-red-600">Remove</button>
+            </div>
           </li>
-        ))}
+          )
+        })}
       </ul>
     </Card>
   )

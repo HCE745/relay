@@ -964,7 +964,30 @@ export const excludedAddressSchema = z.object({
   city: optionalString,
   state: optionalString,
   postalCode: optionalString,
+  // Incident linkage (Phase 46) — all optional.
+  customerId: optionalString,
+  serviceLocationId: optionalString,
+  incidentDate: optionalString,
+  occupantName: optionalString,
+  occupantPhone: optionalString,
+  occupantEmail: optionalEmail,
+  isPropertySpecific: z.boolean().optional(),
   ...exclusionBase,
+})
+// Occupant-change + lift/reinstate action schemas.
+export const occupantChangeSchema = z.object({
+  occupantName: optionalString,
+  occupantPhone: optionalString,
+  occupantEmail: optionalEmail,
+  verifiedAt: optionalString,
+  note: optionalString,
+})
+export const exclusionLiftSchema = z.object({ reason: z.string().trim().min(1, "A reason is required").max(500) })
+export const exclusionLinkSchema = z.object({
+  customerId: optionalString,
+  serviceLocationId: optionalString,
+  incidentDate: optionalString,
+  isPropertySpecific: z.boolean().optional(),
 })
 export const excludedContactSchema = z
   .object({ name: optionalString, phone: optionalString, email: optionalEmail, ...exclusionBase })

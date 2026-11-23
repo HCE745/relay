@@ -35,7 +35,7 @@ export function RegisterForm() {
           ))}
         </select>
       </Field>
-      <Field label="Setup code" hint="Provided by your HCE Cleaning contact">
+      <Field label="Setup code" hint="Provided by your CleanWare contact">
         <input name="bootstrapToken" required className={input} />
       </Field>
 

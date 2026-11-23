@@ -6,6 +6,7 @@ import { ConflictError, RequirementsError } from "./errors"
 import { formatMoney, invoiceNo } from "../money"
 import { renderInvoicePdf, renderEstimatePdf, type InvoicePdfData, type EstimatePdfData } from "../pdf/render"
 import { isEmailConfigured, sendEmail } from "../email"
+import { BRAND } from "../brand"
 
 const fmtDate = (d: Date) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
 const num = (d: { toString(): string }) => Number(d.toString()).toString()
@@ -26,7 +27,7 @@ async function invoicePdfData(orgId: string, id: string): Promise<{ data: Invoic
   return {
     number: inv.invoiceNumber,
     data: {
-      orgName: org?.name ?? "HCE Cleaning",
+      orgName: org?.name ?? BRAND.name,
       invoiceNo: invoiceNo(inv.invoiceNumber),
       statusLabel: INV_STATUS[inv.status] ?? inv.status,
       billTo,
@@ -71,7 +72,7 @@ export async function sendInvoiceEmail(orgId: string, id: string): Promise<{ sen
 
   const built = await invoicePdfData(orgId, id)
   const pdf = await renderInvoicePdf(built!.data)
-  const orgName = org?.name ?? "HCE Cleaning"
+  const orgName = org?.name ?? BRAND.name
   const label = invoiceNo(inv.invoiceNumber)
   const res = await sendEmail({
     to,
@@ -105,7 +106,7 @@ export async function estimatePdfData(orgId: string, id: string): Promise<{ data
   return {
     title: est.title,
     data: {
-      orgName: org?.name ?? "HCE Cleaning",
+      orgName: org?.name ?? BRAND.name,
       title: est.title,
       statusLabel: est.convertedCustomerId ? "Converted" : (EST_STATUS[est.status] ?? est.status),
       preparedFor,

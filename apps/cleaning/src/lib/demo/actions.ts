@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { createDemoOrg, DemoLimitError, type DemoOwner } from "./provision"
 import { createDemoSession, getDemoSession, deleteDemoSession } from "../demo-session"
+import { DEMO_ROLES, type DemoRole } from "./roles"
 import type { DemoMix } from "./seed"
 
 type Result = { error: string } | undefined
@@ -55,4 +56,41 @@ export async function reseedDemo(_prev: Result, formData: FormData): Promise<Res
 export async function exitDemo() {
   await deleteDemoSession()
   redirect("/demo")
+}
+
+// ── Demo-only role/perspective switching ─────────────────────────────────────
+// Re-issues the demo session as a seeded staff member of the requested role, so
+// a visitor can experience the app's real permissions, navigation and dashboards
+// for an Owner, Manager, Supervisor or Cleaner. HARD-GATED to demo sessions:
+// there is no code path from a real staff session into this, and it only ever
+// assumes an identity that already belongs to the visitor's own demo org.
+export async function switchDemoRole(formData: FormData): Promise<void> {
+  const session = await getDemoSession()
+  if (!session) redirect("/demo")
+  const role = String(formData.get("role") || "") as DemoRole
+  if (!DEMO_ROLES.includes(role)) redirect("/dashboard")
+
+  const { systemDb } = await import("../org-db")
+  // Defense in depth: confirm the session's org really is a demo org before we
+  // ever mint a session as one of its users.
+  const org = await systemDb.organization.findFirst({
+    where: { id: session!.organizationId, isDemo: true },
+    select: { id: true, packageTier: true },
+  })
+  if (!org) redirect("/demo")
+
+  const user = await systemDb.user.findFirst({
+    where: { organizationId: org.id, role, isActive: true },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, email: true, name: true },
+  })
+  // No seeded user for this role — stay where we are.
+  if (!user) redirect(role === "CLEANER" ? "/today" : "/dashboard")
+
+  await createDemoSession({
+    userId: user.id, email: user.email, name: user.name, role,
+    organizationId: org.id, packageTier: org.packageTier, onboardingCompleted: true,
+  })
+  // Cleaners live in the field app; everyone else in the admin workspace.
+  redirect(role === "CLEANER" ? "/today" : "/dashboard")
 }

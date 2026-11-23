@@ -4,6 +4,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { logout } from "@/lib/auth-actions"
+import { BRAND } from "@/lib/brand"
+import { Wordmark } from "@/components/brand/wordmark"
 import type { AdminNavItem } from "@/lib/rbac"
 import {
   HomeIcon, CalendarIcon, BriefcaseIcon, BuildingIcon, MapPinIcon, UsersIcon, ClockIcon,
@@ -124,11 +126,9 @@ export function AdminSidebar({
 
   const brand = (
     <div className="flex items-center gap-2 px-5 py-4">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">
-        C
-      </div>
+      <Wordmark tone="onDark" size={32} showName={false} />
       <div className="nav-collapsible">
-        <div className="cln-display text-sm font-semibold text-white">HCE Cleaning</div>
+        <div className="cln-display text-sm font-semibold text-white">{BRAND.name}</div>
         <div className="text-[11px] uppercase tracking-wide text-slate-400">{packageTier}</div>
       </div>
     </div>
@@ -186,7 +186,7 @@ export function AdminSidebar({
     <>
       {/* Mobile top bar */}
       <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
-        <span className="font-semibold text-slate-900">HCE Cleaning</span>
+        <Wordmark tone="onLight" size={26} />
         <button
           onClick={() => setOpen((v) => !v)}
           className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm"

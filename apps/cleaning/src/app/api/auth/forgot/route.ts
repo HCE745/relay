@@ -2,6 +2,7 @@ import { parseBody, ok } from "@/lib/api"
 import { forgotPasswordSchema } from "@/lib/zod-schemas"
 import { createPasswordReset } from "@/lib/data/auth-tokens"
 import { sendEmail } from "@/lib/email"
+import { BRAND } from "@/lib/brand"
 
 // Public. Always returns ok (never reveals whether an account exists).
 export async function POST(request: Request) {
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
     const link = `${process.env.CLEANING_APP_URL || origin}/reset-password?token=${result.token}`
     await sendEmail({
       to: result.email,
-      subject: "Reset your HCE Cleaning password",
+      subject: `Reset your ${BRAND.name} password`,
       text: `Hi ${result.name},\n\nReset your password using this link (valid for 1 hour):\n${link}\n\nIf you didn't request this, you can ignore this email.`,
     })
   }

@@ -20,6 +20,10 @@
     {
       "path": "/api/cron/customer-comms",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/inspections",
+      "schedule": "0 7 * * *"
     }
   ]
 }

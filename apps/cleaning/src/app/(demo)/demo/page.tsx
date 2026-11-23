@@ -2,6 +2,7 @@ import Link from "next/link"
 import { getDemoSession } from "@/lib/demo-session"
 import { exitDemo } from "@/lib/demo/actions"
 import { DemoEntry } from "@/components/demo/demo-entry"
+import { BRAND } from "@/lib/brand"
 
 export const dynamic = "force-dynamic"
 
@@ -11,7 +12,7 @@ export default async function DemoLandingPage() {
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="mx-auto max-w-lg px-4 py-16">
-        <h1 className="text-center text-3xl font-bold tracking-tight text-slate-900">HCE Cleaning: Live Demo</h1>
+        <h1 className="text-center text-3xl font-bold tracking-tight text-slate-900">{BRAND.name}: Live Demo</h1>
         <p className="mx-auto mt-2 max-w-md text-center text-sm text-slate-500">
           Explore a fully-working cleaning ERP with realistic data: schedule, jobs, inspections, invoices and reports —
           plus task ownership &amp; verification, customer complaints, and employee performance dashboards.

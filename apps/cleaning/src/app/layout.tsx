@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import { Playfair_Display } from "next/font/google"
 import { THEME_COOKIE, normalizeTheme } from "@/lib/theme"
 import "./globals.css"
+import { BRAND } from "@/lib/brand"
 
 // Victorian-theme display face (titles/headings only). preload:false means the
 // files are fetched only when an element actually uses the family — i.e. only for
@@ -19,7 +20,7 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: "HCE Cleaning",
+  title: BRAND.name,
   description: "Cleaning ERP & Field Service",
 }
 

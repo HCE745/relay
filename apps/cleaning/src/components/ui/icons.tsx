@@ -25,6 +25,34 @@ export function ChevronLeftIcon({ className }: IconProps) {
   return base(<path d="M15 6l-6 6 6 6" />, className)
 }
 
+export function HelpCircleIcon({ className }: IconProps) {
+  return base(<><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .9-1 1.7" /><path d="M12 17h.01" /></>, className)
+}
+
+export function MessageSquareIcon({ className }: IconProps) {
+  return base(<path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />, className)
+}
+
+export function BookOpenIcon({ className }: IconProps) {
+  return base(<><path d="M12 7v13" /><path d="M3 5.5A2 2 0 0 1 5 4h4a3 3 0 0 1 3 3 3 3 0 0 1 3-3h4a2 2 0 0 1 2 1.5V18a2 2 0 0 0-2-1.5h-4a3 3 0 0 0-3 1.5 3 3 0 0 0-3-1.5H5A2 2 0 0 0 3 18z" /></>, className)
+}
+
+export function BugIcon({ className }: IconProps) {
+  return base(<><rect x="8" y="6" width="8" height="12" rx="4" /><path d="M12 3v3M5 9h3M5 14h3M16 9h3M16 14h3M6 5l2 2M18 5l-2 2M9 20l1.5-2M15 20l-1.5-2" /></>, className)
+}
+
+export function LightbulbIcon({ className }: IconProps) {
+  return base(<><path d="M9 18h6" /><path d="M10 21h4" /><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.1V16h6v-.4c0-.8.4-1.5 1-2.1A6 6 0 0 0 12 3z" /></>, className)
+}
+
+export function RepeatIcon({ className }: IconProps) {
+  return base(<><path d="M17 2l4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="M7 22l-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /></>, className)
+}
+
+export function CalendarClockIcon({ className }: IconProps) {
+  return base(<><path d="M21 10V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h6" /><path d="M8 2v4M16 2v4M3 10h18" /><circle cx="17.5" cy="16.5" r="4" /><path d="M17.5 15v1.7l1.2.8" /></>, className)
+}
+
 export function ChevronRightIcon({ className }: IconProps) {
   return base(<path d="M9 6l6 6-6 6" />, className)
 }

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { STEPS, type Step } from "./steps"
+import { type Step } from "./steps"
+import { FLOWS } from "./flows"
 
 // Guided demo tour engine. Mounted in the admin layout, demo-only. Spotlights a
 // real element per step, shows a short tooltip, persists position across
@@ -83,21 +84,27 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
   const [navigating, setNavigating] = useState(false)
   // True when the tour was just reopened mid-way, so we can say "resuming".
   const [resumed, setResumed] = useState(false)
+  // Which walkthrough is running. "overview" is the demo tour; Help → Guided
+  // Tutorials starts a short, task-focused flow in the live app.
+  const [flowId, setFlowId] = useState("overview")
 
+  const STEPS = (FLOWS[flowId] ?? FLOWS.overview).steps
   const step: Step | undefined = STEPS[idx]
   const total = STEPS.length
   const isLast = idx === total - 1
 
-  // Boot: auto-start on first demo entry; resume saved position otherwise.
+  // Boot: auto-start on first demo entry; resume saved position otherwise. The
+  // auto-started tour is always the overview flow (flowId defaults to it).
   useEffect(() => {
-    if (!isDemo || STEPS.length === 0) return
+    const overviewLen = FLOWS.overview.steps.length
+    if (!isDemo || overviewLen === 0) return
     // Never run inside an iframe — the breakage checker loads real admin pages in
     // a hidden frame, and a tour booting there would navigate the frame away.
     if (typeof window !== "undefined" && window.self !== window.top) return
     if (ss(SK_DISMISSED) === "1") return
     const savedStep = ss(SK_STEP)
     if (ss(SK_STARTED) === "1") {
-      setIdx(savedStep ? Math.min(parseInt(savedStep, 10) || 0, STEPS.length - 1) : 0)
+      setIdx(savedStep ? Math.min(parseInt(savedStep, 10) || 0, overviewLen - 1) : 0)
       setPhase("active")
     } else {
       ssSet(SK_STARTED, "1")
@@ -113,10 +120,23 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
   useEffect(() => {
     function onClick(e: MouseEvent) {
       const t = e.target as HTMLElement
+      // Help → Guided Tutorials: start a specific task flow in the live app.
+      const tut = t.closest<HTMLElement>("[data-action='start-cln-tutorial']")
+      if (tut) {
+        const flow = tut.dataset.flow || "overview"
+        ssSet(SK_DISMISSED, "")
+        setFlowId(FLOWS[flow] ? flow : "overview")
+        setIdx(0)
+        setResumed(false)
+        setRect(null)
+        setPhase("active")
+        return
+      }
       if (t.closest("[data-action='start-cln-tour']")) {
         ssSet(SK_DISMISSED, "")
         ssSet(SK_STARTED, "1")
-        const saved = Math.min(parseInt(ss(SK_STEP) || "0", 10) || 0, STEPS.length - 1)
+        setFlowId("overview")
+        const saved = Math.min(parseInt(ss(SK_STEP) || "0", 10) || 0, FLOWS.overview.steps.length - 1)
         setIdx(saved)
         setResumed(saved > 0) // show the "resuming" hint only when landing mid-tour
         setRect(null)
@@ -125,6 +145,7 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
         ssSet(SK_DISMISSED, "")
         ssSet(SK_STARTED, "1")
         ssSet(SK_STEP, "0")
+        setFlowId("overview")
         setIdx(0)
         setResumed(false)
         setRect(null)
@@ -187,7 +208,9 @@ export function ProductTour({ isDemo }: { isDemo: boolean }) {
     return () => document.removeEventListener("keydown", onKey)
   }, [phase, dismiss])
 
-  if (!isDemo || phase !== "active" || !step) return null
+  // Runs in the live app too (Guided Tutorials); the demo-only behavior is the
+  // auto-start on entry, which stays gated on isDemo in the boot effect above.
+  if (phase !== "active" || !step) return null
 
   const showSpotlight = !!rect && !navigating
   const pos = cardPos(showSpotlight ? rect : null)

@@ -52,6 +52,46 @@ export async function createInspectionFromJob(orgId: string, jobId: string, insp
   })
 }
 
+// Ad-hoc inspection NOT tied to a job (a site inspection). Snapshots the
+// template + items exactly like createInspectionFromJob, so scoring/finalize are
+// identical — the only difference is jobId stays null.
+export async function createInspectionForSite(orgId: string, serviceLocationId: string, inspectorId: string, templateId: string) {
+  const db = orgDb(orgId)
+  const site = await db.serviceLocation.findFirst({ where: { id: serviceLocationId }, select: { id: true } })
+  assertFound(site, "Service location")
+
+  const template = await db.inspectionTemplate.findFirst({
+    where: { id: templateId },
+    include: { items: { orderBy: { sortOrder: "asc" } } },
+  })
+  assertFound(template, "Inspection template")
+  if (!template!.items.length) throw new ConflictError("This template has no items")
+
+  return db.inspection.create({
+    data: {
+      organizationId: orgId,
+      serviceLocationId,
+      jobId: null,
+      inspectorId,
+      templateId,
+      templateName: template!.name,
+      passThreshold: template!.passThreshold,
+      status: "DRAFT",
+      results: {
+        create: template!.items.map((it) => ({
+          label: it.label,
+          instructions: it.instructions,
+          points: it.points,
+          isCritical: it.isCritical,
+          requirePhoto: it.requirePhoto,
+          sortOrder: it.sortOrder,
+        })),
+      },
+    },
+    include: { results: { orderBy: { sortOrder: "asc" } } },
+  })
+}
+
 const inspectionInclude = {
   results: { orderBy: { sortOrder: "asc" }, include: { photos: { select: { id: true } } } },
   inspector: { select: { name: true } },

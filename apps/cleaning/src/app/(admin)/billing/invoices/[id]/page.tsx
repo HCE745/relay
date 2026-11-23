@@ -16,6 +16,7 @@ import { InvoiceActions } from "@/components/billing/invoice-actions"
 import { PrintButton } from "@/components/billing/print-button"
 import { SharePayLink } from "@/components/pay/share-pay-link"
 import { isStripeConfigured } from "@/lib/stripe"
+import { BRAND } from "@/lib/brand"
 
 export const dynamic = "force-dynamic"
 const CAP = "billing.invoicing"
@@ -87,7 +88,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         {/* Document header */}
         <div className="flex flex-wrap items-start justify-between gap-6 border-b border-slate-100 pb-6">
           <div>
-            <div className="text-lg font-semibold text-slate-900">{org?.name ?? "HCE Cleaning"}</div>
+            <div className="text-lg font-semibold text-slate-900">{org?.name ?? BRAND.name}</div>
             <div className="mt-4 text-xs uppercase tracking-wide text-slate-400">Bill to</div>
             <div className="text-sm font-medium text-slate-800">{invoice.customer.name}</div>
             {invoice.customer.billingEmail || invoice.customer.email ? (

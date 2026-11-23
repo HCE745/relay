@@ -22,7 +22,7 @@ function appBaseUrl(): string {
  */
 export async function signUp(_prev: SignUpResult, formData: FormData): Promise<SignUpResult> {
   if (!isPublicRegistrationEnabled()) {
-    return { error: "Self-service sign-up isn't open yet. Please contact HCE Cleaning to get started." }
+    return { error: "Self-service sign-up isn't open yet. Please contact CleanWare to get started." }
   }
 
   const parsed = signUpSchema.safeParse({

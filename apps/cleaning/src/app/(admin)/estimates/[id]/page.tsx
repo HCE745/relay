@@ -12,6 +12,7 @@ import { PageHeader, UpgradeNotice } from "@/components/ui/placeholder"
 import { Card, StatusBadge, type BadgeTone } from "@/components/ui/controls"
 import { PrintButton } from "@/components/billing/print-button"
 import { EstimateActions } from "@/components/estimates/estimate-actions"
+import { BRAND } from "@/lib/brand"
 
 export const dynamic = "force-dynamic"
 const CAP = "crm.estimates"
@@ -92,7 +93,7 @@ export default async function EstimateDetailPage({ params }: { params: Promise<{
       <Card className="p-8">
         <div className="flex flex-wrap items-start justify-between gap-6 border-b border-slate-100 pb-6">
           <div>
-            <div className="text-lg font-semibold text-slate-900">{org?.name ?? "HCE Cleaning"}</div>
+            <div className="text-lg font-semibold text-slate-900">{org?.name ?? BRAND.name}</div>
             <div className="mt-1 text-xs uppercase tracking-wide text-slate-400">Estimate</div>
             <div className="mt-4 text-xs uppercase tracking-wide text-slate-400">Prepared for</div>
             <div className="text-sm font-medium text-slate-800">{est.customer?.name ?? est.lead?.company ?? est.contactName ?? "-"}</div>

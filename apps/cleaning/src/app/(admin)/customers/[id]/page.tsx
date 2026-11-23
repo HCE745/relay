@@ -4,6 +4,8 @@ import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getCustomer } from "@/lib/data/customers"
+import { customerExclusionCount } from "@/lib/data/service-areas"
+import { CustomerArchiveButton } from "@/components/customers/customer-archive"
 import { getCustomerBilling } from "@/lib/data/invoices"
 import { listPortalUsers, listPortalInvites } from "@/lib/data/portal"
 import { PortalAccess } from "@/components/portal/portal-access"
@@ -37,6 +39,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const customer = await getCustomer(session.organizationId, id)
   if (!customer) notFound()
 
+  const exclusionCount = await customerExclusionCount(session.organizationId, id)
   const hasBilling = await orgHasCapability(session.organizationId, "billing.invoicing")
   const billing = hasBilling ? await getCustomerBilling(session.organizationId, id) : null
   const hasPortal = await orgHasCapability(session.organizationId, "portal.customerAccess")
@@ -56,8 +59,15 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <div className="flex items-center gap-3">
             <StatusPill active={customer.isActive} />
             <EditCustomerButton customer={customer} />
+            <CustomerArchiveButton customerId={customer.id} isArchived={!!customer.archivedAt} exclusionCount={exclusionCount} />
           </div>
         </div>
+        {exclusionCount > 0 ? (
+          <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+            This customer is linked to {exclusionCount} documented service {exclusionCount === 1 ? "exclusion" : "exclusions"}.{" "}
+            <Link href="/service-areas" className="underline">Review in Service areas →</Link>
+          </div>
+        ) : null}
       </div>
 
       {(customer.email || customer.phone || customer.billingAddress || customer.billingEmail || customer.notes) && (

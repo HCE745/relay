@@ -6,7 +6,7 @@ export const THEMES = [
   {
     id: "default",
     label: "Default",
-    description: "The standard HCE Cleaning look — bright, teal-accented, soft corners.",
+    description: "The standard CleanWare look — bright, teal-accented, soft corners.",
     swatches: ["#f6f8fb", "#0d9488", "#0f172a"],
   },
   {

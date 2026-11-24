@@ -4,6 +4,8 @@ import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { getCustomer } from "@/lib/data/customers"
+import { getCustomerAccountActivity } from "@/lib/data/customer-activity"
+import { CustomerAccountActivity } from "@/components/customers/account-activity"
 import { customerExclusionCount } from "@/lib/data/service-areas"
 import { CustomerArchiveButton } from "@/components/customers/customer-archive"
 import { getCustomerBilling } from "@/lib/data/invoices"
@@ -47,6 +49,17 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const [portalUsers, portalInvites] = hasPortal
     ? await Promise.all([listPortalUsers(session.organizationId, id), listPortalInvites(session.organizationId, id)])
     : [[], []]
+
+  const activity = await getCustomerAccountActivity(session.organizationId, id)
+  const activityCaps = {
+    jobs: await orgHasCapability(session.organizationId, "core.jobs"),
+    servicePlans: await orgHasCapability(session.organizationId, "core.servicePlans"),
+    contracts: await orgHasCapability(session.organizationId, "crm.contracts"),
+    estimates: await orgHasCapability(session.organizationId, "crm.estimates"),
+    inspections: await orgHasCapability(session.organizationId, "quality.inspections"),
+    issues: await orgHasCapability(session.organizationId, "operations.issues"),
+    workOrders: await orgHasCapability(session.organizationId, "operations.workOrders"),
+  }
 
   return (
     <div className="space-y-6">
@@ -153,6 +166,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
       <ContactsSection customerId={customer.id} contacts={customer.contacts} />
       <SitesSection customerId={customer.id} sites={customer.serviceLocations} />
+      <CustomerAccountActivity customerId={customer.id} activity={activity} caps={activityCaps} />
       {hasPortal ? (
         <PortalAccess
           customerId={customer.id}

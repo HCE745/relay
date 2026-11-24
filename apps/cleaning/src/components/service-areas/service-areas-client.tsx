@@ -4,29 +4,41 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button, Card, Field, Input, Select, StatusBadge } from "@/components/ui/controls"
+import { Modal } from "@/components/ui/modal"
 import { apiSend } from "@/lib/client"
 import { EXCLUSION_REASONS } from "@/lib/zod-schemas"
 
 type Area = { id: string; name: string; zipCodes: string[]; radiusMiles: number | null; officeLabel: string | null; active: boolean }
-type Exclusion = { id: string; label: string; reason: string; note: string | null; status?: string; customerName?: string | null; propertySpecific?: boolean }
+type Exclusion = { id: string; label: string; reason: string; note: string | null; status?: string; customerName?: string | null; propertySpecific?: boolean; value?: string; name?: string | null; phone?: string | null; email?: string | null }
 type Exclusions = { addresses: Exclusion[]; contacts: Exclusion[]; zones: Exclusion[] }
 
 const REASON_LABEL = (r: string) => r.replaceAll("_", " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase())
 
-function ServiceAreaForm() {
+// One form for both create and edit — an existing area is passed as `area`.
+function ServiceAreaForm({ area, onDone }: { area?: Area; onDone?: () => void }) {
   const router = useRouter()
-  const [v, setV] = useState({ name: "", zipCodes: "", radiusMiles: "", officeLabel: "" })
+  const editing = !!area
+  const [v, setV] = useState({
+    name: area?.name ?? "",
+    zipCodes: area?.zipCodes.join(", ") ?? "",
+    radiusMiles: area?.radiusMiles != null ? String(area.radiusMiles) : "",
+    officeLabel: area?.officeLabel ?? "",
+  })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement>) => setV({ ...v, [k]: e.target.value })
   async function save() {
     setBusy(true); setError(null)
-    const res = await apiSend("/api/service-areas", "POST", { name: v.name, zipCodes: v.zipCodes, radiusMiles: v.radiusMiles || undefined, officeLabel: v.officeLabel || undefined })
+    const payload = { name: v.name, zipCodes: v.zipCodes, radiusMiles: v.radiusMiles || undefined, officeLabel: v.officeLabel || undefined }
+    const res = editing
+      ? await apiSend(`/api/service-areas/${area!.id}`, "PATCH", payload)
+      : await apiSend("/api/service-areas", "POST", payload)
     setBusy(false); if (!res.ok) return setError(res.error)
-    setV({ name: "", zipCodes: "", radiusMiles: "", officeLabel: "" }); router.refresh()
+    if (!editing) setV({ name: "", zipCodes: "", radiusMiles: "", officeLabel: "" })
+    router.refresh(); onDone?.()
   }
-  return (
-    <Card className="p-4">
+  const body = (
+    <>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Area name" htmlFor="sa-name"><Input id="sa-name" value={v.name} onChange={set("name")} placeholder="North office" /></Field>
         <Field label="Office / branch label" htmlFor="sa-office"><Input id="sa-office" value={v.officeLabel} onChange={set("officeLabel")} placeholder="HQ" /></Field>
@@ -34,8 +46,64 @@ function ServiceAreaForm() {
         <Field label="Radius (miles, optional)" htmlFor="sa-radius" hint="needs geocoding to evaluate"><Input id="sa-radius" value={v.radiusMiles} onChange={set("radiusMiles")} inputMode="decimal" placeholder="25" /></Field>
       </div>
       {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
-      <div className="mt-3 flex justify-end"><Button onClick={save} disabled={busy || !v.name}>Add area</Button></div>
-    </Card>
+      <div className="mt-3 flex justify-end gap-2">
+        {editing ? <Button variant="ghost" onClick={() => onDone?.()} disabled={busy}>Cancel</Button> : null}
+        <Button onClick={save} disabled={busy || !v.name}>{editing ? "Save changes" : "Add area"}</Button>
+      </div>
+    </>
+  )
+  return editing ? body : <Card className="p-4">{body}</Card>
+}
+
+const EXCLUSION_LABELS = { address: "address", contact: "contact", zone: "zone" } as const
+
+// Shared quick-edit modal for a zone or contact exclusion (address edits live on
+// the exclusion detail page, which carries the occupant-change workflow).
+function ExclusionEditModal({ kind, item, onClose }: { kind: "contact" | "zone"; item: Exclusion; onClose: () => void }) {
+  const router = useRouter()
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [v, setV] = useState({
+    value: item.value ?? item.label ?? "",
+    name: item.name ?? "",
+    phone: item.phone ?? "",
+    email: item.email ?? "",
+    reason: item.reason,
+    note: item.note ?? "",
+  })
+  async function save() {
+    setBusy(true); setError(null)
+    const payload: Record<string, unknown> =
+      kind === "zone"
+        ? { value: v.value, reason: v.reason, note: v.note || undefined }
+        : { name: v.name || undefined, phone: v.phone || undefined, email: v.email || undefined, reason: v.reason, note: v.note || undefined }
+    const res = await apiSend(`/api/exclusions/${kind}/${item.id}`, "PATCH", payload)
+    setBusy(false); if (!res.ok) return setError(res.error)
+    router.refresh(); onClose()
+  }
+  return (
+    <Modal open onClose={onClose} title={`Edit ${EXCLUSION_LABELS[kind]} exclusion`}>
+      <div className="space-y-3">
+        {kind === "zone" ? (
+          <Field label="ZIP or area" htmlFor="ex-value"><Input id="ex-value" value={v.value} onChange={(e) => setV({ ...v, value: e.target.value })} /></Field>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Field label="Name" htmlFor="ex-name"><Input id="ex-name" value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} /></Field>
+            <Field label="Phone" htmlFor="ex-phone"><Input id="ex-phone" value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} /></Field>
+            <Field label="Email" htmlFor="ex-email"><Input id="ex-email" value={v.email} onChange={(e) => setV({ ...v, email: e.target.value })} /></Field>
+          </div>
+        )}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Reason" htmlFor="ex-reason"><Select id="ex-reason" value={v.reason} onChange={(e) => setV({ ...v, reason: e.target.value })}>{EXCLUSION_REASONS.map((r) => <option key={r} value={r}>{REASON_LABEL(r)}</option>)}</Select></Field>
+          <Field label="Note" htmlFor="ex-note"><Input id="ex-note" value={v.note} onChange={(e) => setV({ ...v, note: e.target.value })} placeholder="Optional" /></Field>
+        </div>
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
+          <Button onClick={save} disabled={busy || (kind === "zone" ? !v.value : !(v.name || v.phone || v.email))}>Save changes</Button>
+        </div>
+      </div>
+    </Modal>
   )
 }
 
@@ -44,6 +112,7 @@ function ExclusionList({ kind, title, hint, items }: { kind: "address" | "contac
   const [adding, setAdding] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [editing, setEditing] = useState<Exclusion | null>(null)
   const [v, setV] = useState({ value: "", reason: EXCLUSION_REASONS[0] as string, note: "" })
 
   async function add() {
@@ -100,13 +169,20 @@ function ExclusionList({ kind, title, hint, items }: { kind: "address" | "contac
               </div>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1">
-              {kind === "address" ? <Link href={`/service-areas/exclusions/${e.id}`} className="text-xs font-medium text-brand-700 hover:text-brand-800">Details</Link> : null}
+              {kind === "address" ? (
+                <Link href={`/service-areas/exclusions/${e.id}`} className="text-xs font-medium text-brand-700 hover:text-brand-800">Details</Link>
+              ) : (
+                <button onClick={() => setEditing(e)} disabled={busy} className="text-xs font-medium text-brand-700 hover:text-brand-800">Edit</button>
+              )}
               <button onClick={() => remove(e.id)} disabled={busy} className="text-xs text-slate-400 hover:text-red-600">Remove</button>
             </div>
           </li>
           )
         })}
       </ul>
+      {editing && kind !== "address" ? (
+        <ExclusionEditModal kind={kind} item={editing} onClose={() => setEditing(null)} />
+      ) : null}
     </Card>
   )
 }
@@ -114,6 +190,7 @@ function ExclusionList({ kind, title, hint, items }: { kind: "address" | "contac
 export function ServiceAreasClient({ areas, exclusions }: { areas: Area[]; exclusions: Exclusions }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
+  const [editArea, setEditArea] = useState<Area | null>(null)
   async function toggle(a: Area) { setBusy(true); await apiSend(`/api/service-areas/${a.id}`, "PATCH", { active: !a.active }); setBusy(false); router.refresh() }
   async function del(id: string) { setBusy(true); await apiSend(`/api/service-areas/${id}`, "DELETE"); setBusy(false); router.refresh() }
 
@@ -132,7 +209,8 @@ export function ServiceAreasClient({ areas, exclusions }: { areas: Area[]; exclu
               </div>
               <div className="mt-1 text-xs text-slate-500">{a.officeLabel ?? "-"}</div>
               <div className="mt-2 text-xs text-slate-600">{a.zipCodes.length ? `ZIPs: ${a.zipCodes.join(", ")}` : a.radiusMiles ? `Radius: ${a.radiusMiles} mi` : "No coverage set"}</div>
-              <div className="mt-3 flex gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={() => setEditArea(a)} disabled={busy}>Edit</Button>
                 <Button size="sm" variant="secondary" onClick={() => toggle(a)} disabled={busy}>{a.active ? "Deactivate" : "Activate"}</Button>
                 <Button size="sm" variant="ghost" onClick={() => del(a.id)} disabled={busy}>Delete</Button>
               </div>
@@ -150,6 +228,11 @@ export function ServiceAreasClient({ areas, exclusions }: { areas: Area[]; exclu
           <ExclusionList kind="zone" title="Zones" hint="A ZIP or named area" items={exclusions.zones} />
         </div>
       </section>
+      {editArea ? (
+        <Modal open onClose={() => setEditArea(null)} title="Edit service area">
+          <ServiceAreaForm area={editArea} onDone={() => setEditArea(null)} />
+        </Modal>
+      ) : null}
     </div>
   )
 }

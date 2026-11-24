@@ -20,6 +20,16 @@ export function listLeads(orgId: string) {
   return orgDb(orgId).lead.findMany({ orderBy: { createdAt: "desc" }, include: leadInclude })
 }
 
+export function getLead(orgId: string, id: string) {
+  return orgDb(orgId).lead.findFirst({
+    where: { id },
+    include: {
+      assignedTo: { select: { id: true, name: true } },
+      estimates: { orderBy: { createdAt: "desc" }, select: { id: true, title: true, status: true, createdAt: true } },
+    },
+  })
+}
+
 export async function createLead(orgId: string, input: CreateInput) {
   if (input.assignedToId) await assertAssignee(orgId, input.assignedToId)
   return orgDb(orgId).lead.create({ data: { ...input, organizationId: orgId } })

@@ -54,6 +54,7 @@ export default async function EmployeeReportDetailPage({ params }: { params: Pro
     title: report.title,
     description: report.description,
     subjectName: report.about?.name ?? null,
+    subjectUserId: report.aboutUserId ?? null,
     reporterName: report.reportedBy?.name ?? null,
     reviewerName: report.reviewer?.name ?? null,
     reviewerId: report.reviewerId,

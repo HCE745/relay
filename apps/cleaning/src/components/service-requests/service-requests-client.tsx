@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button, Card, StatusBadge, type BadgeTone } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
 
-type Req = { id: string; type: string; status: string; requestedDate: string | null; requestedTime: string | null; note: string | null; customer: string; jobTitle: string; siteName: string; scheduledStart: string }
+type Req = { id: string; type: string; status: string; requestedDate: string | null; requestedTime: string | null; note: string | null; customer: string; customerId: string; jobId: string; jobTitle: string; siteName: string; scheduledStart: string }
 const TONE: Record<string, BadgeTone> = { PENDING: "warning", APPROVED: "success", DECLINED: "neutral" }
 
 export function ServiceRequestsClient({ requests }: { requests: Req[] }) {
@@ -22,8 +23,8 @@ export function ServiceRequestsClient({ requests }: { requests: Req[] }) {
   const Row = ({ r }: { r: Req }) => (
     <li className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
       <div className="min-w-0">
-        <div className="font-medium text-slate-800">{r.customer}: {r.type === "CANCEL" ? "Cancel" : "Reschedule"}</div>
-        <div className="text-slate-500">{r.jobTitle} · {r.siteName} · currently {new Date(r.scheduledStart).toLocaleString()}</div>
+        <div className="font-medium text-slate-800"><Link href={`/customers/${r.customerId}`} className="hover:text-brand">{r.customer}</Link>: {r.type === "CANCEL" ? "Cancel" : "Reschedule"}</div>
+        <div className="text-slate-500"><Link href={`/jobs/${r.jobId}`} className="hover:text-brand">{r.jobTitle}</Link> · {r.siteName} · currently {new Date(r.scheduledStart).toLocaleString()}</div>
         {r.type === "RESCHEDULE" && r.requestedDate ? <div className="text-xs text-brand">Requested: {r.requestedDate} {r.requestedTime ?? ""}</div> : null}
         {r.note ? <div className="text-xs text-slate-400">“{r.note}”</div> : null}
       </div>

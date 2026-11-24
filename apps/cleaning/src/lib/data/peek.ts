@@ -95,7 +95,7 @@ export async function peekEmployee(orgId: string, id: string): Promise<PeekData 
   })
   if (!u) return null
   return {
-    kind: "Employee", title: u.name, subtitle: title(u.role), href: `/team`, fullLabel: "Open Team",
+    kind: "Employee", title: u.name, subtitle: title(u.role), href: `/team/${u.id}`, fullLabel: "Open profile",
     fields: [
       { label: "Status", value: u.isActive ? "Active" : "Inactive" },
       { label: "Phone", value: u.phone || "-" },

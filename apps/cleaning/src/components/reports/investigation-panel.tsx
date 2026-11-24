@@ -16,6 +16,7 @@ type ReportDto = {
   title: string | null
   description: string
   subjectName: string | null
+  subjectUserId: string | null
   reporterName: string | null
   reviewerName: string | null
   reviewerId: string | null
@@ -87,7 +88,7 @@ export function InvestigationPanel({
         {report.title ? <p className="mt-1 text-sm font-medium text-slate-700">{report.title}</p> : null}
         <dl className="mt-3 grid gap-x-6 gap-y-1 text-xs text-slate-500 sm:grid-cols-2">
           <div>Filed by {report.reporterName ?? "unknown"} · {fmt(report.createdAt)}</div>
-          <div>{report.subjectName ? <>About {report.subjectName}</> : "No named subject"}</div>
+          <div>{report.subjectName ? <>About {report.subjectUserId ? <a className="text-brand hover:underline" href={`/team/${report.subjectUserId}`}>{report.subjectName}</a> : report.subjectName}</> : "No named subject"}</div>
           {report.reviewerName ? <div>Reviewer: {report.reviewerName}</div> : null}
           {report.jobId ? (
             <div>

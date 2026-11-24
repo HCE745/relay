@@ -26,7 +26,7 @@ export default async function ServiceRequestsPage() {
       <ServiceRequestsClient
         requests={requests.map((r) => ({
           id: r.id, type: r.type, status: r.status, requestedDate: r.requestedDate, requestedTime: r.requestedTime, note: r.note,
-          customer: r.customer.name, jobTitle: r.job.title, siteName: r.job.serviceLocation.name, scheduledStart: r.job.scheduledStart.toISOString(),
+          customer: r.customer.name, customerId: r.customerId, jobId: r.jobId, jobTitle: r.job.title, siteName: r.job.serviceLocation.name, scheduledStart: r.job.scheduledStart.toISOString(),
         }))}
       />
     </div>

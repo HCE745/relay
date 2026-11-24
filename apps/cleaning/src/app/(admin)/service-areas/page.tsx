@@ -39,8 +39,8 @@ export default async function ServiceAreasPage() {
             propertySpecific: e.isPropertySpecific,
             customerName: e.customer?.name ?? e.customerNameSnapshot ?? null,
           })),
-          contacts: exclusions.contacts.map((e) => ({ id: e.id, label: [e.name, e.phone, e.email].filter(Boolean).join(" · ") || "-", reason: e.reason, note: e.note })),
-          zones: exclusions.zones.map((e) => ({ id: e.id, label: e.value, reason: e.reason, note: e.note })),
+          contacts: exclusions.contacts.map((e) => ({ id: e.id, label: [e.name, e.phone, e.email].filter(Boolean).join(" · ") || "-", reason: e.reason, note: e.note, name: e.name, phone: e.phone, email: e.email })),
+          zones: exclusions.zones.map((e) => ({ id: e.id, label: e.value, reason: e.reason, note: e.note, value: e.value })),
         }}
       />
     </div>

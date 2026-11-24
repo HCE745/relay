@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
@@ -59,7 +60,7 @@ export default async function LeadsPage() {
               {leads.map((l) => (
                 <tr key={l.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-slate-900">{l.company || l.name}</div>
+                    <Link href={`/leads/${l.id}`} className="font-medium text-slate-900 hover:text-brand">{l.company || l.name}</Link>
                     <div className="text-xs text-slate-500">{l.company ? l.name : l.email || l.phone || ""}</div>
                   </td>
                   <td className="px-4 py-3"><StatusBadge tone={TONE[l.status] ?? "neutral"}>{LABEL[l.status] ?? l.status}</StatusBadge></td>

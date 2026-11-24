@@ -38,7 +38,7 @@ export async function globalSearch(orgId: string, qRaw: string, ctx: Ctx): Promi
 
   if (can("workforce.employees", team)) tasks.push(
     db.user.findMany({ where: { role: { not: "CLIENT" }, OR: [{ name: contains }, { email: contains }] }, take: LIMIT, select: { id: true, name: true, role: true } })
-      .then((rows) => rows.map((r) => ({ type: "Employee", id: r.id, label: r.name, sublabel: r.role.charAt(0) + r.role.slice(1).toLowerCase(), href: `/team` }))))
+      .then((rows) => rows.map((r) => ({ type: "Employee", id: r.id, label: r.name, sublabel: r.role.charAt(0) + r.role.slice(1).toLowerCase(), href: `/team/${r.id}` }))))
 
   if (can("billing.invoicing", accounts)) {
     const n = Number(q.replace(/\D/g, ""))
@@ -53,7 +53,7 @@ export async function globalSearch(orgId: string, qRaw: string, ctx: Ctx): Promi
 
   if (can("operations.workOrders", accounts)) tasks.push(
     db.workOrder.findMany({ where: { description: contains }, orderBy: { createdAt: "desc" }, take: LIMIT, select: { id: true, description: true, type: true, status: true } })
-      .then((rows) => rows.map((r) => ({ type: "Work order", id: r.id, label: r.description.slice(0, 50), sublabel: r.status.toLowerCase(), href: `/work-orders` }))))
+      .then((rows) => rows.map((r) => ({ type: "Work order", id: r.id, label: r.description.slice(0, 50), sublabel: r.status.toLowerCase(), href: `/work-orders/${r.id}` }))))
 
   const groups = await Promise.all(tasks)
   return groups.flat()

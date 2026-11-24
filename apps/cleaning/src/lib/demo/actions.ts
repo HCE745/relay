@@ -28,6 +28,8 @@ async function startSession(d: DemoOwner) {
 }
 
 export async function enterDemo(_prev: Result, formData: FormData): Promise<Result> {
+  // TEMP DIAG: prove this function body executes at all (before any DB call).
+  if (formData.get("diagprobe") === "1") return { error: "DIAG-REACHED-TOP" }
   const mix = parseMix(formData.get("mix"))
   try {
     const d = await createDemoOrg(await clientIp(), mix)

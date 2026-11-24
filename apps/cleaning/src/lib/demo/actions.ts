@@ -34,7 +34,11 @@ export async function enterDemo(_prev: Result, formData: FormData): Promise<Resu
     await startSession(d)
   } catch (e) {
     if (e instanceof DemoLimitError) return { error: e.message }
-    throw e
+    // TEMP DIAG: surface the real error in the response body for live debugging.
+    const code = (e as { code?: string })?.code
+    const name = (e as Error)?.name
+    const msg = (e instanceof Error ? e.message : String(e)).replace(/\s+/g, " ").slice(0, 400)
+    return { error: `DIAG name=${name} code=${code ?? "n/a"} msg=${msg}` }
   }
   redirect("/dashboard")
 }

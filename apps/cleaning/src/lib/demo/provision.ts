@@ -53,48 +53,53 @@ export type DemoOwner = { orgId: string; owner: { id: string; email: string; nam
  * existing demo org first and skips the limits (net-zero, same visitor).
  */
 export async function createDemoOrg(ip: string, mix: DemoMix, opts: { replaceOrgId?: string } = {}): Promise<DemoOwner> {
-  const now = new Date()
   const ipHash = hashIp(ip)
 
-  if (opts.replaceOrgId) {
-    // Reseed: remove the old demo org (only if it really is a demo org).
-    await systemDb.organization.deleteMany({ where: { id: opts.replaceOrgId, isDemo: true } })
-  } else {
-    if ((await countActiveDemos(now)) >= MAX_CONCURRENT_DEMOS) {
-      throw new DemoLimitError("capacity", "The demo is at capacity right now. Please try again shortly.")
-    }
-    const recent = await systemDb.organization.count({
-      where: { demoIpHash: ipHash, createdAt: { gt: new Date(now.getTime() - PER_IP_WINDOW_MS) } },
-    })
-    if (recent >= PER_IP_MAX) {
-      throw new DemoLimitError("rate_limit", "You've started several demos recently. Please wait a little while before starting another.")
-    }
-  }
-
-  // Create + seed with a bounded retry on transient connection drops. Each
-  // attempt uses a fresh org so a partially-seeded workspace never survives; the
-  // partial is deleted (isDemo-guarded, cascades only its own rows) before retry.
+  // The WHOLE flow (limit pre-checks + create + seed) runs inside a bounded
+  // retry, because the very first query can throw "Connection closed" when the
+  // serverless pg pool hands out a connection the server already closed — the
+  // retry then runs on a fresh connection. Each attempt uses a fresh org so a
+  // partially-seeded workspace never survives; DemoLimitError is never retried.
   const MAX_ATTEMPTS = 3
   let lastErr: unknown
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    const org = await systemDb.organization.create({
-      data: {
-        name: "Demo Workspace", slug: `demo-${randomBytes(6).toString("hex")}`, packageTier: "ENTERPRISE",
-        isDemo: true, demoExpiresAt: new Date(now.getTime() + DEMO_TTL_MS), demoIpHash: ipHash,
-        onboardingCompletedAt: now, subscriptionStatus: "active", timezone: "America/Chicago",
-      },
-      select: { id: true },
-    })
+    const now = new Date()
+    let orgId: string | null = null
     try {
+      if (opts.replaceOrgId) {
+        // Reseed: remove the old demo org (only if it really is a demo org).
+        await systemDb.organization.deleteMany({ where: { id: opts.replaceOrgId, isDemo: true } })
+      } else {
+        if ((await countActiveDemos(now)) >= MAX_CONCURRENT_DEMOS) {
+          throw new DemoLimitError("capacity", "The demo is at capacity right now. Please try again shortly.")
+        }
+        const recent = await systemDb.organization.count({
+          where: { demoIpHash: ipHash, createdAt: { gt: new Date(now.getTime() - PER_IP_WINDOW_MS) } },
+        })
+        if (recent >= PER_IP_MAX) {
+          throw new DemoLimitError("rate_limit", "You've started several demos recently. Please wait a little while before starting another.")
+        }
+      }
+
+      const org = await systemDb.organization.create({
+        data: {
+          name: "Demo Workspace", slug: `demo-${randomBytes(6).toString("hex")}`, packageTier: "ENTERPRISE",
+          isDemo: true, demoExpiresAt: new Date(now.getTime() + DEMO_TTL_MS), demoIpHash: ipHash,
+          onboardingCompletedAt: now, subscriptionStatus: "active", timezone: "America/Chicago",
+        },
+        select: { id: true },
+      })
+      orgId = org.id
       const { owner } = await seedDemoOrg(org.id, mix)
       return { orgId: org.id, owner }
     } catch (e) {
       lastErr = e
       const code = (e as { code?: string })?.code
       const msg = (e instanceof Error ? e.message : String(e)).replace(/\s+/g, " ").slice(0, 300)
-      console.error(`[demo-provision] seed attempt ${attempt}/${MAX_ATTEMPTS} failed: code=${code ?? "n/a"} transient=${isTransientDbError(e)} msg=${msg}`)
-      // Clean up the half-seeded org regardless, so no orphan/partial persists.
-      await systemDb.organization.deleteMany({ where: { id: org.id, isDemo: true } }).catch(() => {})
+      console.error(`[demo-provision] attempt ${attempt}/${MAX_ATTEMPTS} failed: code=${code ?? "n/a"} transient=${isTransientDbError(e)} orgCreated=${!!orgId} msg=${msg}`)
+      // Clean up a half-seeded org, so no orphan/partial persists.
+      if (orgId) await systemDb.organization.deleteMany({ where: { id: orgId, isDemo: true } }).catch(() => {})
+      if (e instanceof DemoLimitError) throw e // a real limit, not a transient fault
       if (!isTransientDbError(e) || attempt === MAX_ATTEMPTS) throw e
       await sleep(250 * attempt) // brief backoff, then retry on a fresh connection
     }

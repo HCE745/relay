@@ -40,7 +40,9 @@ export async function enterDemo(_prev: Result, formData: FormData): Promise<Resu
     const msg = (e instanceof Error ? e.message : String(e)).replace(/\s+/g, " ").slice(0, 400)
     return { error: `DIAG name=${name} code=${code ?? "n/a"} msg=${msg}` }
   }
-  redirect("/dashboard")
+  // TEMP DIAG: skip the redirect so the seed's success is observable in the body
+  // (the redirect would render /dashboard, whose own error would mask this).
+  return { error: "DIAG-SUCCESS: seed + session OK (redirect skipped for diag)" }
 }
 
 export async function reseedDemo(_prev: Result, formData: FormData): Promise<Result> {

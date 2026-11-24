@@ -16,7 +16,7 @@ export default async function DemoLandingPage() {
   const session = await getDemoSession()
 
   return (
-    <div className="min-h-screen bg-slate-100" data-build-marker="diag-mk1">
+    <div className="min-h-screen bg-slate-100">
       <div className="mx-auto max-w-lg px-4 py-16">
         <h1 className="text-center text-3xl font-bold tracking-tight text-slate-900">{BRAND.name}: Live Demo</h1>
         <p className="mx-auto mt-2 max-w-md text-center text-sm text-slate-500">

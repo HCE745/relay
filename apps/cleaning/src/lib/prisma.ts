@@ -9,15 +9,6 @@ function createPrismaClient() {
   const adapter = new PrismaPg({
     connectionString,
     max: parseInt(process.env.DATABASE_POOL_MAX ?? "3", 10),
-    // Serverless + Supabase pooler: a low-traffic function instance can hold an
-    // idle pooled connection long enough for the server to close it, after which
-    // the next query on that handed-out connection throws "Connection closed".
-    // Close our idle connections first (well under the server's idle window) so a
-    // fresh one is created on the next query, and keep TCP alive to avoid silent
-    // drops. connectionTimeout bounds how long we wait for a new connection.
-    idleTimeoutMillis: 10_000,
-    keepAlive: true,
-    connectionTimeoutMillis: 10_000,
   })
   return new PrismaClient({ adapter })
 }

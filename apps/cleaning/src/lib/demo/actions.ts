@@ -28,23 +28,15 @@ async function startSession(d: DemoOwner) {
 }
 
 export async function enterDemo(_prev: Result, formData: FormData): Promise<Result> {
-  // TEMP DIAG: prove this function body executes at all (before any DB call).
-  if (formData.get("diagprobe") === "1") return { error: "DIAG-REACHED-TOP" }
   const mix = parseMix(formData.get("mix"))
   try {
     const d = await createDemoOrg(await clientIp(), mix)
     await startSession(d)
   } catch (e) {
     if (e instanceof DemoLimitError) return { error: e.message }
-    // TEMP DIAG: surface the real error in the response body for live debugging.
-    const code = (e as { code?: string })?.code
-    const name = (e as Error)?.name
-    const msg = (e instanceof Error ? e.message : String(e)).replace(/\s+/g, " ").slice(0, 400)
-    return { error: `DIAG name=${name} code=${code ?? "n/a"} msg=${msg}` }
+    throw e
   }
-  // TEMP DIAG: skip the redirect so the seed's success is observable in the body
-  // (the redirect would render /dashboard, whose own error would mask this).
-  return { error: "DIAG-SUCCESS: seed + session OK (redirect skipped for diag)" }
+  redirect("/dashboard")
 }
 
 export async function reseedDemo(_prev: Result, formData: FormData): Promise<Result> {

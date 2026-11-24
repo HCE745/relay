@@ -94,7 +94,7 @@ export default async function FieldJobPage({ params }: { params: Promise<{ id: s
       {hasSupplies ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-slate-700">Supplies used</h2>
-          <SupplyUsagePanel jobId={job.id} supplies={supplies} />
+          <SupplyUsagePanel jobId={job.id} supplies={supplies.map((s) => ({ id: s.id, name: s.name, unit: s.unit, usageUnit: s.usageUnit ?? null, stockPerUsage: s.stockPerUsage != null ? Number(s.stockPerUsage) : null }))} />
         </div>
       ) : null}
     </div>

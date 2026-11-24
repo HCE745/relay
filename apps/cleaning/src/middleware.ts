@@ -52,6 +52,9 @@ const PUBLIC_PATHS = [
 // field route bounces cleaners back to /today (the tab/menu link looks broken),
 // so this MUST list every top-level field path segment.
 const FIELD_PREFIXES = ["/today", "/job", "/my-work", "/my-reports", "/my-sops", "/my-schedule", "/my-time", "/me"]
+// Routes usable by BOTH experiences (cleaners scan a QR; managers open the same
+// log). Exempt from the field/management experience redirect; pages self-guard.
+const SHARED_PREFIXES = ["/station"]
 
 function isUnder(pathname: string, base: string) {
   return pathname === base || pathname.startsWith(base + "/")
@@ -97,6 +100,9 @@ export async function middleware(request: NextRequest) {
   if (pathname === "/") {
     return NextResponse.redirect(new URL(landingPathForRole(role), request.url))
   }
+
+  // Shared routes (e.g. /station) are reachable from either experience.
+  if (SHARED_PREFIXES.some((p) => isUnder(pathname, p))) return NextResponse.next()
 
   const experience = experienceForRole(role)
   const isField = FIELD_PREFIXES.some((p) => isUnder(pathname, p))

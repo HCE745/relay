@@ -2,6 +2,7 @@ import { orgDb, systemDb } from "../org-db"
 import { assertFound, ForbiddenActionError, ConflictError, RequirementsError } from "../data/errors"
 import { sendServiceSummarySafe } from "../data/customer-comms"
 import { recomputeJobEarnings } from "../data/commission"
+import { materializeEstimatedConsumption } from "../data/inventory"
 import { resolveCapabilities, parseOverrides, type PackageTier } from "../entitlements"
 
 // Geofencing capability check without the server-only page-guards import.
@@ -186,6 +187,9 @@ export async function clockOut(orgId: string, jobId: string, userId: string, loc
       sendServiceSummarySafe(orgId, jobId)
       // Commission/crew-based earnings (Phase 37); no-op unless the org has it.
       await recomputeJobEarnings(orgId, jobId).catch(() => {})
+      // Estimated supply consumption (Phase 51); idempotent + no-op unless the
+      // org enabled invAutoEstimate. Never blocks job completion.
+      await materializeEstimatedConsumption(orgId, jobId).catch(() => {})
     }
   }
   return { closed: true, jobCompleted }

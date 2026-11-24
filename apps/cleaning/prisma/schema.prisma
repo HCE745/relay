@@ -494,6 +494,14 @@ model Organization {
   // Default IANA timezone for scheduling. Service locations may override.
   timezone                           String    @default("America/New_York")
 
+  // ── Inventory & supply tracking policy (Phase 51) — per-company, all default
+  // OFF so existing orgs keep the simple org-level stock behaviour until they opt
+  // in. A small residential company may use only station logs + estimated usage;
+  // a large commercial one may enable full location tracking.
+  invTrackLocations     Boolean @default(false) // location-based stock (warehouses/vehicles/stations/sites)
+  invAutoEstimate       Boolean @default(false) // auto-record estimated consumption on job completion
+  invRequireManualUsage Boolean @default(false) // require cleaners to log actual usage per job
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -515,6 +523,11 @@ model Organization {
   assets                     Asset[]
   supplies                   Supply[]
   supplyUsages               SupplyUsage[]
+  inventoryLocations         InventoryLocation[]
+  stockLevels                StockLevel[]
+  stockTransactions          StockTransaction[]
+  expectedSupplyUsages       ExpectedSupplyUsage[]
+  replenishmentRequests      ReplenishmentRequest[]
   contracts                  Contract[]
   productionRates            ProductionRate[]
   availabilities             Availability[]
@@ -646,6 +659,10 @@ model User {
   assignedWorkOrders                WorkOrder[]               @relation("WorkOrderAssignee")
   complaintResponsibilities         ComplaintResponsibility[] @relation("ComplaintResponsibilitySubject")
   capturedComplaintResponsibilities ComplaintResponsibility[] @relation("ComplaintResponsibilityCapturer")
+  assignedInventoryLocations        InventoryLocation[]       @relation("InventoryLocationHolder")
+  stockTransactions                 StockTransaction[]        @relation("StockTransactionActor")
+  requestedReplenishments           ReplenishmentRequest[]    @relation("ReplenishmentRequester")
+  reviewedReplenishments            ReplenishmentRequest[]    @relation("ReplenishmentReviewer")
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -870,6 +887,7 @@ model ServiceLocation {
   laborBudgets           LaborBudget[]
   skillRequirements      SiteSkillRequirement[]
   timeClockKiosks        TimeClockKiosk[]
+  inventoryLocations     InventoryLocation[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -892,6 +910,7 @@ model ChecklistTemplate {
   items        ChecklistTemplateItem[]
   servicePlans ServicePlan[]
   estimates    Estimate[]
+  expectedSupplyUsages ExpectedSupplyUsage[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -952,6 +971,7 @@ model ServicePlan {
   taxRate           TaxRate?           @relation(fields: [taxRateId], references: [id])
   jobs              Job[]
   laborBudgets      LaborBudget[]
+  expectedSupplyUsages ExpectedSupplyUsage[]
 
   @@index([organizationId])
   @@index([serviceLocationId])
@@ -1004,6 +1024,7 @@ model Job {
   inspections     Inspection[]
   invoiceLines    InvoiceLine[]
   supplyUsages    SupplyUsage[]
+  stockTransactions StockTransaction[]
   changeOrders    ChangeOrder[]
   workOrder       WorkOrder?         @relation("WorkOrderJob")
   serviceRequests ServiceRequest[]
@@ -3110,16 +3131,41 @@ model Supply {
   id               String   @id @default(cuid())
   organizationId   String
   name             String
+  // `unit` is the STOCK unit — the base unit all stock levels and transactions are
+  // kept in (e.g. "roll", "gal", "each"). Purchase/usage units convert to it.
   unit             String   @default("unit")
   currentStock     Decimal  @default(0) @db.Decimal(12, 2)
   reorderThreshold Decimal  @default(0) @db.Decimal(12, 2)
   costPerUnit      Decimal? @db.Decimal(12, 2)
+
+  // Consumable (deducted on use), reusable (cloths/mops — returned dirty, must be
+  // laundered before they are clean stock again), or equipment (durable, checked
+  // out not consumed).
+  kind             SupplyKind @default(CONSUMABLE)
+
+  // Flexible units of measure (Phase 51). Purchasing and employee-facing usage
+  // units convert to the stock unit so staff never do math:
+  //   buy "case" (unitsPerPurchase stock units each) · use "bottle refill"
+  //   (stockPerUsage stock units each, may be fractional).
+  purchaseUnit     String? // e.g. "case", "box"
+  unitsPerPurchase Decimal? @db.Decimal(12, 4) // stock units per 1 purchase unit
+  usageUnit        String? // employee-facing, e.g. "bottle refill", "pair"
+  stockPerUsage    Decimal? @db.Decimal(12, 4) // stock units consumed per 1 usage unit
+
+  // When true, stock is tracked per InventoryLocation (StockLevel rows) instead of
+  // the single org-level currentStock. Off by default → existing behaviour.
+  trackByLocation  Boolean  @default(false)
+
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   usages       SupplyUsage[]
   adjustments  SupplyAdjustment[]
+  stockLevels  StockLevel[]
+  transactions StockTransaction[]
+  expectedUsages        ExpectedSupplyUsage[]
+  replenishmentRequests ReplenishmentRequest[]
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -3592,5 +3638,181 @@ model TimeClockKiosk {
   serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
+  @@schema("cleaning")
+}
+
+// ── Inventory & supply management (Phase 51) ─────────────────────────────────
+// Location-based stock, flexible units, estimated consumption, supply-station
+// logs, reusable returns and replenishment. All additive; the existing org-level
+// Supply.currentStock remains the fallback when trackByLocation is off.
+
+enum SupplyKind {
+  CONSUMABLE // deducted on use (liners, chemicals, paper)
+  REUSABLE // laundered/reused (microfiber, mop heads) — dirty ≠ clean stock
+  EQUIPMENT // durable, checked out not consumed (vacuums, machines)
+
+  @@schema("cleaning")
+}
+
+enum InventoryLocationKind {
+  WAREHOUSE // central office/warehouse
+  SUPPLY_STATION // a stocked station staff draw from (QR-scannable)
+  CUSTOMER_SITE // supplies kept at a customer location / closet
+  VEHICLE // a company vehicle
+  EMPLOYEE // carried by a specific employee
+
+  @@schema("cleaning")
+}
+
+enum StockTxnType {
+  RECEIPT // stock purchased/received into a location
+  TRANSFER // moved between locations (from → to)
+  CONSUMPTION // used on a job / consumed
+  ADJUSTMENT // manual correction (signed via quantity + note)
+  LOSS // lost/shrinkage
+  DAMAGE // damaged, removed from usable stock
+  RETURN_CLEAN // unused supply returned to a location (clean, usable)
+  RETURN_DIRTY // reusable returned dirty (into dirtyQuantity, NOT usable yet)
+  LAUNDERED // dirty reusables cleaned → moved back to usable stock
+
+  @@schema("cleaning")
+}
+
+enum ReplenishmentStatus {
+  OPEN
+  APPROVED
+  FULFILLED
+  DECLINED
+  CLOSED
+
+  @@schema("cleaning")
+}
+
+model InventoryLocation {
+  id                String                @id @default(cuid())
+  organizationId    String
+  name              String
+  kind              InventoryLocationKind @default(WAREHOUSE)
+  // Optional bindings depending on kind.
+  serviceLocationId String? // CUSTOMER_SITE
+  holderUserId      String? // VEHICLE/EMPLOYEE custodian
+  // Supply-station QR token (null unless a station). Scanned to open the log.
+  qrToken           String?               @unique
+  isActive          Boolean               @default(true)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceLocation ServiceLocation? @relation(fields: [serviceLocationId], references: [id], onDelete: SetNull)
+  holder          User?            @relation("InventoryLocationHolder", fields: [holderUserId], references: [id], onDelete: SetNull)
+  stockLevels     StockLevel[]
+  transactionsFrom StockTransaction[] @relation("StockTxnFrom")
+  transactionsTo   StockTransaction[] @relation("StockTxnTo")
+  replenishmentRequests ReplenishmentRequest[]
+
+  @@index([organizationId])
+  @@index([kind])
+  @@schema("cleaning")
+}
+
+model StockLevel {
+  id                  String   @id @default(cuid())
+  organizationId      String
+  supplyId            String
+  inventoryLocationId String
+  quantity            Decimal  @default(0) @db.Decimal(12, 2) // usable (clean) stock units
+  dirtyQuantity       Decimal  @default(0) @db.Decimal(12, 2) // reusables awaiting laundering
+  minLevel            Decimal? @db.Decimal(12, 2) // par level → replenishment alert when below
+  updatedAt           DateTime @updatedAt
+
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supply            Supply            @relation(fields: [supplyId], references: [id], onDelete: Cascade)
+  inventoryLocation InventoryLocation @relation(fields: [inventoryLocationId], references: [id], onDelete: Cascade)
+
+  @@unique([supplyId, inventoryLocationId])
+  @@index([organizationId])
+  @@index([inventoryLocationId])
+  @@schema("cleaning")
+}
+
+model StockTransaction {
+  id             String       @id @default(cuid())
+  organizationId String
+  supplyId       String
+  type           StockTxnType
+  quantity       Decimal      @db.Decimal(12, 2) // stock units, always positive; type sets direction
+  fromLocationId String?
+  toLocationId   String?
+  actorUserId    String?
+  jobId          String?
+  note           String?
+  // Estimated (auto, from expected-usage config) vs confirmed (real/manual). Kept
+  // distinct so estimated-vs-actual variance is reportable.
+  isEstimated    Boolean      @default(false)
+  costPerUnit    Decimal?     @db.Decimal(12, 2) // snapshot at txn time
+  // Idempotency: a natural key (e.g. "job:<id>:est:<supplyId>") prevents duplicate
+  // deductions (duplicate job-completion events, double submits).
+  sourceKey      String?      @unique
+  createdAt      DateTime     @default(now())
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supply       Supply             @relation(fields: [supplyId], references: [id], onDelete: Cascade)
+  fromLocation InventoryLocation? @relation("StockTxnFrom", fields: [fromLocationId], references: [id], onDelete: SetNull)
+  toLocation   InventoryLocation? @relation("StockTxnTo", fields: [toLocationId], references: [id], onDelete: SetNull)
+  actor        User?              @relation("StockTransactionActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  job          Job?               @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([supplyId])
+  @@index([jobId])
+  @@index([createdAt])
+  @@schema("cleaning")
+}
+
+model ExpectedSupplyUsage {
+  id                  String   @id @default(cuid())
+  organizationId      String
+  supplyId            String
+  // Expected quantity in USAGE units (converted to stock units when materialized).
+  quantity            Decimal  @db.Decimal(12, 2)
+  // Scope — exactly one of these is set. Plan overrides template for its jobs.
+  checklistTemplateId String?
+  servicePlanId       String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supply            Supply             @relation(fields: [supplyId], references: [id], onDelete: Cascade)
+  checklistTemplate ChecklistTemplate? @relation(fields: [checklistTemplateId], references: [id], onDelete: Cascade)
+  servicePlan       ServicePlan?       @relation(fields: [servicePlanId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([checklistTemplateId])
+  @@index([servicePlanId])
+  @@schema("cleaning")
+}
+
+model ReplenishmentRequest {
+  id                  String              @id @default(cuid())
+  organizationId      String
+  supplyId            String?
+  inventoryLocationId String?
+  requestedById       String
+  quantity            Decimal?            @db.Decimal(12, 2)
+  note                String?
+  status              ReplenishmentStatus @default(OPEN)
+  reviewedById        String?
+  reviewedAt          DateTime?
+  resolutionNote      String?
+  createdAt           DateTime            @default(now())
+
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supply            Supply?            @relation(fields: [supplyId], references: [id], onDelete: SetNull)
+  inventoryLocation InventoryLocation? @relation(fields: [inventoryLocationId], references: [id], onDelete: SetNull)
+  requestedBy       User               @relation("ReplenishmentRequester", fields: [requestedById], references: [id])
+  reviewedBy        User?              @relation("ReplenishmentReviewer", fields: [reviewedById], references: [id])
+
+  @@index([organizationId])
+  @@index([status])
   @@schema("cleaning")
 }

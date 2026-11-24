@@ -21,7 +21,7 @@ export function listSupplies(orgId: string) {
 
 /** Cleaner-facing: names + units only — no stock levels or costs. */
 export function listSuppliesForField(orgId: string) {
-  return orgDb(orgId).supply.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, unit: true } })
+  return orgDb(orgId).supply.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, unit: true, usageUnit: true, stockPerUsage: true, kind: true } })
 }
 
 export function getSupply(orgId: string, id: string) {
@@ -52,6 +52,12 @@ export function createSupply(orgId: string, input: CreateInput) {
       currentStock: dec(input.currentStock) ?? ZERO,
       reorderThreshold: dec(input.reorderThreshold) ?? ZERO,
       costPerUnit: dec(input.costPerUnit),
+      kind: input.kind ?? "CONSUMABLE",
+      purchaseUnit: input.purchaseUnit ?? null,
+      unitsPerPurchase: input.unitsPerPurchase != null ? dec(String(input.unitsPerPurchase)) : null,
+      usageUnit: input.usageUnit ?? null,
+      stockPerUsage: input.stockPerUsage != null ? dec(String(input.stockPerUsage)) : null,
+      trackByLocation: input.trackByLocation ?? false,
     },
   })
 }
@@ -63,6 +69,12 @@ export async function updateSupply(orgId: string, id: string, input: UpdateInput
   if (input.unit !== undefined) data.unit = input.unit
   if (input.reorderThreshold !== undefined) data.reorderThreshold = dec(input.reorderThreshold) ?? ZERO
   if (input.costPerUnit !== undefined) data.costPerUnit = dec(input.costPerUnit)
+  if (input.kind !== undefined) data.kind = input.kind
+  if (input.purchaseUnit !== undefined) data.purchaseUnit = input.purchaseUnit ?? null
+  if (input.unitsPerPurchase !== undefined) data.unitsPerPurchase = input.unitsPerPurchase != null ? dec(String(input.unitsPerPurchase)) : null
+  if (input.usageUnit !== undefined) data.usageUnit = input.usageUnit ?? null
+  if (input.stockPerUsage !== undefined) data.stockPerUsage = input.stockPerUsage != null ? dec(String(input.stockPerUsage)) : null
+  if (input.trackByLocation !== undefined) data.trackByLocation = input.trackByLocation
   const { count } = await orgDb(orgId).supply.updateMany({ where: { id }, data })
   if (count === 0) return null
   return getSupply(orgId, id)
@@ -113,6 +125,12 @@ export async function recordSupplyUsage(
       data: { organizationId: orgId, supplyId: input.supplyId, quantity: qty, costPerUnit: supply!.costPerUnit, jobId, serviceLocationId: job.serviceLocationId, recordedById: userId },
     }),
     db.supply.updateMany({ where: { id: input.supplyId }, data: { currentStock: clamped } }),
+    // Also record a CONFIRMED consumption transaction (Phase 51) so actual field
+    // usage is comparable to estimated usage in variance reporting. currentStock
+    // is already decremented above, so this txn only logs the movement.
+    db.stockTransaction.create({
+      data: { organizationId: orgId, supplyId: input.supplyId, type: "CONSUMPTION", quantity: qty, actorUserId: userId, jobId, isEstimated: false, costPerUnit: supply!.costPerUnit, note: "Field supply usage" },
+    }),
   ])
   return { ok: true }
 }

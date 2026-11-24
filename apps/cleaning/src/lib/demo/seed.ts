@@ -674,6 +674,51 @@ async function seedAccountability(
 // usage, compliance, access, coverage/availability, exports, a portal invite,
 // extra invoice statuses, and a few dashboard-tile triggers. Uses existing
 // models only — no migration.
+// Inventory & supply subsystem demo (Phase 51): policy on, a few locations with
+// stock, expected usage on the commercial template, and an open replenishment
+// request — so every new screen shows real data.
+async function seedInventory(
+  orgId: string,
+  staff: { cleanerIds: string[]; managerId: string },
+  ctx: { sites: { id: string }[]; commercialTplId: string },
+  byName: Record<string, string>,
+) {
+  await systemDb.organization.update({ where: { id: orgId }, data: { invTrackLocations: true, invAutoEstimate: true } })
+
+  const warehouse = await systemDb.inventoryLocation.create({ data: { organizationId: orgId, name: "Main warehouse", kind: "WAREHOUSE" } })
+  const station = await systemDb.inventoryLocation.create({ data: { organizationId: orgId, name: "Front supply station", kind: "SUPPLY_STATION", qrToken: `stn-demo${Date.now().toString(36).slice(-6)}` } })
+  await systemDb.inventoryLocation.create({ data: { organizationId: orgId, name: "Van 2", kind: "VEHICLE", holderUserId: staff.cleanerIds[0] ?? null } })
+  if (ctx.sites[0]) await systemDb.inventoryLocation.create({ data: { organizationId: orgId, name: "Tower A supply closet", kind: "CUSTOMER_SITE", serviceLocationId: ctx.sites[0].id } })
+
+  // Stock the location-tracked supplies at the warehouse + station.
+  const tracked: [string, number, number][] = [
+    ["All-purpose cleaner (gal)", 24, 8],
+    ["Trash liners (roll)", 90, 30],
+    ["Microfiber cloths", 80, 24],
+  ]
+  for (const [name, wh, st] of tracked) {
+    const supplyId = byName[name]
+    if (!supplyId) continue
+    await systemDb.stockLevel.create({ data: { organizationId: orgId, supplyId, inventoryLocationId: warehouse.id, quantity: String(wh), minLevel: "20" } })
+    await systemDb.stockLevel.create({ data: { organizationId: orgId, supplyId, inventoryLocationId: station.id, quantity: String(st), minLevel: "10" } })
+  }
+  // A dirty-reusable return already recorded at the station (microfiber).
+  if (byName["Microfiber cloths"]) {
+    await systemDb.stockLevel.updateMany({ where: { supplyId: byName["Microfiber cloths"], inventoryLocationId: station.id }, data: { dirtyQuantity: "16" } })
+  }
+
+  // Expected usage per commercial clean (auto-deducts on completion).
+  const exp: [string, number][] = [["All-purpose cleaner (gal)", 3], ["Trash liners (roll)", 10]]
+  for (const [name, q] of exp) {
+    if (byName[name]) await systemDb.expectedSupplyUsage.create({ data: { organizationId: orgId, supplyId: byName[name], quantity: String(q), checklistTemplateId: ctx.commercialTplId } })
+  }
+
+  // An open replenishment request from the field.
+  if (byName["Paper towels (case)"]) {
+    await systemDb.replenishmentRequest.create({ data: { organizationId: orgId, supplyId: byName["Paper towels (case)"], inventoryLocationId: station.id, requestedById: staff.cleanerIds[0] ?? staff.managerId, quantity: "6", note: "Station is almost out of paper towels", status: "OPEN" } })
+  }
+}
+
 async function seedExtras(
   orgId: string, stamp: number, now: Date, week: Date, todayOffset: number,
   staff: Staff & { owner: { id: string; email: string; name: string } },
@@ -688,13 +733,20 @@ async function seedExtras(
 
   // ── Supplies (one below reorder) + usage against completed jobs ──
   const supplyDefs = [
-    { name: "All-purpose cleaner (gal)", unit: "gal", currentStock: "38", reorderThreshold: "10", costPerUnit: "12.50" },
-    { name: "Paper towels (case)", unit: "case", currentStock: "6", reorderThreshold: "24", costPerUnit: "28.00" }, // BELOW reorder
-    { name: "Trash liners (case)", unit: "case", currentStock: "140", reorderThreshold: "50", costPerUnit: "19.00" },
-    { name: "Disinfectant wipes (case)", unit: "case", currentStock: "15", reorderThreshold: "20", costPerUnit: "22.75" }, // BELOW reorder
+    { name: "All-purpose cleaner (gal)", unit: "gal", currentStock: "38", reorderThreshold: "10", costPerUnit: "12.50", kind: "CONSUMABLE" as const, purchaseUnit: "case", unitsPerPurchase: "4", usageUnit: "bottle refill", stockPerUsage: "0.1", trackByLocation: true },
+    { name: "Paper towels (case)", unit: "case", currentStock: "6", reorderThreshold: "24", costPerUnit: "28.00", kind: "CONSUMABLE" as const }, // BELOW reorder
+    { name: "Trash liners (roll)", unit: "roll", currentStock: "140", reorderThreshold: "50", costPerUnit: "19.00", kind: "CONSUMABLE" as const, purchaseUnit: "case", unitsPerPurchase: "12", usageUnit: "bag", stockPerUsage: "0.02", trackByLocation: true },
+    { name: "Disinfectant wipes (case)", unit: "case", currentStock: "15", reorderThreshold: "20", costPerUnit: "22.75", kind: "CONSUMABLE" as const }, // BELOW reorder
+    { name: "Microfiber cloths", unit: "each", currentStock: "120", reorderThreshold: "40", costPerUnit: "1.25", kind: "REUSABLE" as const, usageUnit: "cloth", stockPerUsage: "1", trackByLocation: true },
   ]
   const supplies = []
-  for (const s of supplyDefs) supplies.push(await systemDb.supply.create({ data: { organizationId: orgId, ...s }, select: { id: true, costPerUnit: true } }))
+  const supplyByName: Record<string, string> = {}
+  for (const s of supplyDefs) {
+    const created = await systemDb.supply.create({ data: { organizationId: orgId, ...s }, select: { id: true, costPerUnit: true, name: true } })
+    supplies.push(created)
+    supplyByName[created.name] = created.id
+  }
+  await seedInventory(orgId, staff, ctx, supplyByName)
   // Record usage on completed jobs so supply cost flows into profitability + spend.
   const usageJobs = ctx.completedJobIds.slice(0, 8)
   for (let i = 0; i < usageJobs.length; i++) {

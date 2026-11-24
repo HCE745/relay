@@ -43,7 +43,7 @@ export default async function SupplyDetailPage({ params }: { params: Promise<{ i
           <div className="flex items-center gap-2">
             <AdjustStockButton supplyId={supply.id} unit={supply.unit} />
             <EditSupplyButton
-              supply={{ id: supply.id, name: supply.name, unit: supply.unit, reorderThreshold: supply.reorderThreshold.toString(), costPerUnit: supply.costPerUnit ? supply.costPerUnit.toString() : "" }}
+              supply={{ id: supply.id, name: supply.name, unit: supply.unit, reorderThreshold: supply.reorderThreshold.toString(), costPerUnit: supply.costPerUnit ? supply.costPerUnit.toString() : "", kind: supply.kind, purchaseUnit: supply.purchaseUnit, unitsPerPurchase: supply.unitsPerPurchase ? supply.unitsPerPurchase.toString() : "", usageUnit: supply.usageUnit, stockPerUsage: supply.stockPerUsage ? supply.stockPerUsage.toString() : "", trackByLocation: supply.trackByLocation }}
             />
           </div>
         </div>

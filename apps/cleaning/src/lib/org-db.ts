@@ -48,6 +48,11 @@ export const ORG_SCOPED_MODELS: ReadonlySet<string> = new Set([
   "Asset",
   "Supply",
   "SupplyUsage",
+  "InventoryLocation",
+  "StockLevel",
+  "StockTransaction",
+  "ExpectedSupplyUsage",
+  "ReplenishmentRequest",
   "Contract",
   // Phases 10–16 — every one carries organizationId and MUST be scoped.
   "ProductionRate",

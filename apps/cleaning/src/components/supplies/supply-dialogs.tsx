@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Modal } from "@/components/ui/modal"
-import { Button, Field, Input } from "@/components/ui/controls"
+import { Button, Field, Input, Select } from "@/components/ui/controls"
 import { apiSend } from "@/lib/client"
 
 export type SupplyValues = {
@@ -13,6 +13,12 @@ export type SupplyValues = {
   currentStock?: string | null
   reorderThreshold?: string | null
   costPerUnit?: string | null
+  kind?: string | null
+  purchaseUnit?: string | null
+  unitsPerPurchase?: string | null
+  usageUnit?: string | null
+  stockPerUsage?: string | null
+  trackByLocation?: boolean | null
 }
 
 function SupplyForm({ initial, onDone }: { initial?: SupplyValues; onDone: () => void }) {
@@ -23,10 +29,17 @@ function SupplyForm({ initial, onDone }: { initial?: SupplyValues; onDone: () =>
     currentStock: initial?.currentStock ?? "0",
     reorderThreshold: initial?.reorderThreshold ?? "0",
     costPerUnit: initial?.costPerUnit ?? "",
+    kind: initial?.kind ?? "CONSUMABLE",
+    purchaseUnit: initial?.purchaseUnit ?? "",
+    unitsPerPurchase: initial?.unitsPerPurchase ?? "",
+    usageUnit: initial?.usageUnit ?? "",
+    stockPerUsage: initial?.stockPerUsage ?? "",
+    trackByLocation: initial?.trackByLocation ?? false,
   })
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const set = (k: keyof SupplyValues) => (e: React.ChangeEvent<HTMLInputElement>) => setV((p) => ({ ...p, [k]: e.target.value }))
+  const [adv, setAdv] = useState(false)
+  const set = (k: keyof SupplyValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setV((p) => ({ ...p, [k]: e.target.value }))
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -40,6 +53,12 @@ function SupplyForm({ initial, onDone }: { initial?: SupplyValues; onDone: () =>
       costPerUnit: v.costPerUnit?.trim() || undefined,
     }
     if (!initial?.id) payload.currentStock = v.currentStock?.trim() || "0"
+    payload.kind = v.kind || "CONSUMABLE"
+    payload.purchaseUnit = v.purchaseUnit?.trim() || undefined
+    payload.unitsPerPurchase = v.unitsPerPurchase?.trim() ? Number(v.unitsPerPurchase) : undefined
+    payload.usageUnit = v.usageUnit?.trim() || undefined
+    payload.stockPerUsage = v.stockPerUsage?.trim() ? Number(v.stockPerUsage) : undefined
+    payload.trackByLocation = !!v.trackByLocation
     const res = initial?.id
       ? await apiSend(`/api/supplies/${initial.id}`, "PATCH", payload)
       : await apiSend("/api/supplies", "POST", payload)
@@ -60,6 +79,29 @@ function SupplyForm({ initial, onDone }: { initial?: SupplyValues; onDone: () =>
         <Field label="Reorder at" htmlFor="s-thresh" hint="Flag as low at or below"><Input id="s-thresh" inputMode="decimal" value={v.reorderThreshold ?? ""} onChange={set("reorderThreshold")} /></Field>
         <Field label="Cost per unit" htmlFor="s-cost"><Input id="s-cost" inputMode="decimal" value={v.costPerUnit ?? ""} onChange={set("costPerUnit")} placeholder="0.00" /></Field>
       </div>
+
+      <button type="button" onClick={() => setAdv((a) => !a)} className="text-sm font-medium text-brand-700">{adv ? "Hide" : "Inventory options"} (units, type, location)</button>
+      {adv ? (
+        <div className="space-y-3 rounded-lg bg-slate-50 p-3">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Type" htmlFor="s-kind" hint="reusables track dirty vs clean">
+              <Select id="s-kind" value={v.kind ?? "CONSUMABLE"} onChange={set("kind")}>
+                <option value="CONSUMABLE">Consumable</option>
+                <option value="REUSABLE">Reusable (cloth/mop)</option>
+                <option value="EQUIPMENT">Equipment</option>
+              </Select>
+            </Field>
+            <label className="flex items-center gap-2 pt-6 text-sm text-slate-700"><input type="checkbox" checked={!!v.trackByLocation} onChange={(e) => setV((p) => ({ ...p, trackByLocation: e.target.checked }))} className="h-4 w-4 accent-brand-700" /> Track stock by location</label>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Purchase unit" htmlFor="s-pu" hint="e.g. case"><Input id="s-pu" value={v.purchaseUnit ?? ""} onChange={set("purchaseUnit")} /></Field>
+            <Field label={`Stock units per purchase unit`} htmlFor="s-upp" hint={`1 ${v.purchaseUnit || "case"} = ? ${v.unit || "unit"}`}><Input id="s-upp" inputMode="decimal" value={v.unitsPerPurchase ?? ""} onChange={set("unitsPerPurchase")} /></Field>
+            <Field label="Usage unit" htmlFor="s-uu" hint="e.g. bottle refill"><Input id="s-uu" value={v.usageUnit ?? ""} onChange={set("usageUnit")} /></Field>
+            <Field label="Stock units per usage unit" htmlFor="s-spu" hint={`1 ${v.usageUnit || "refill"} = ? ${v.unit || "unit"}`}><Input id="s-spu" inputMode="decimal" value={v.stockPerUsage ?? ""} onChange={set("stockPerUsage")} /></Field>
+          </div>
+        </div>
+      ) : null}
+
       {error ? <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>

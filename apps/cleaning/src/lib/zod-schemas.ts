@@ -1150,6 +1150,13 @@ export const supplyCreateSchema = z.object({
   currentStock: optionalMoney, // opening stock
   reorderThreshold: optionalMoney,
   costPerUnit: optionalMoney,
+  // Inventory config (Phase 51) — all optional/additive.
+  kind: z.enum(["CONSUMABLE", "REUSABLE", "EQUIPMENT"]).optional(),
+  purchaseUnit: z.string().trim().max(40).optional().or(z.literal("").transform(() => undefined)),
+  unitsPerPurchase: z.coerce.number().min(0).optional(),
+  usageUnit: z.string().trim().max(40).optional().or(z.literal("").transform(() => undefined)),
+  stockPerUsage: z.coerce.number().min(0).optional(),
+  trackByLocation: z.boolean().optional(),
 })
 export const supplyUpdateSchema = supplyCreateSchema.partial()
 export type SupplyCreateInput = z.infer<typeof supplyCreateSchema>
@@ -1215,3 +1222,60 @@ export const changeOrderCreateSchema = z
   })
   .refine((v) => v.jobId || v.contractId, { message: "Attach the extra to a job or a contract" })
 export const changeOrderDecisionSchema = z.object({ decision: z.enum(["APPROVED", "DECLINED"]) })
+
+// ── Inventory & supply (Phase 51) ────────────────────────────────────────────
+const posNum = z.coerce.number().min(0)
+export const inventoryLocationCreateSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(120),
+  kind: z.enum(["WAREHOUSE", "SUPPLY_STATION", "CUSTOMER_SITE", "VEHICLE", "EMPLOYEE"]),
+  serviceLocationId: optionalString,
+  holderUserId: optionalString,
+})
+export const inventoryLocationUpdateSchema = z.object({ name: z.string().trim().min(1).max(120).optional(), isActive: z.boolean().optional() })
+export const stockTxnSchema = z.object({
+  supplyId: z.string().min(1),
+  type: z.enum(["RECEIPT", "TRANSFER", "CONSUMPTION", "ADJUSTMENT", "LOSS", "DAMAGE", "RETURN_CLEAN", "RETURN_DIRTY", "LAUNDERED"]),
+  quantity: z.coerce.number(),
+  unit: z.enum(["stock", "purchase", "usage"]).optional(),
+  fromLocationId: optionalString,
+  toLocationId: optionalString,
+  jobId: optionalString,
+  note: optionalString,
+})
+export const stationLogSchema = z.object({
+  lines: z.array(z.object({
+    supplyId: z.string().min(1),
+    action: z.enum(["TAKEN", "REFILLED", "RETURN_CLEAN", "RETURN_DIRTY", "DAMAGED"]),
+    quantity: z.coerce.number().min(0.0001),
+    unit: z.enum(["stock", "usage"]).optional(),
+  })).min(1, "Add at least one line"),
+})
+export const replenishmentCreateSchema = z.object({
+  supplyId: optionalString,
+  inventoryLocationId: optionalString,
+  quantity: z.coerce.number().min(0).optional(),
+  note: optionalString,
+})
+export const replenishmentReviewSchema = z.object({
+  status: z.enum(["APPROVED", "FULFILLED", "DECLINED", "CLOSED"]),
+  resolutionNote: optionalString,
+})
+export const expectedUsageSchema = z.object({
+  supplyId: z.string().min(1),
+  quantity: posNum,
+  checklistTemplateId: optionalString,
+  servicePlanId: optionalString,
+})
+export const supplyInventoryFieldsSchema = z.object({
+  kind: z.enum(["CONSUMABLE", "REUSABLE", "EQUIPMENT"]).optional(),
+  purchaseUnit: optionalString,
+  unitsPerPurchase: z.coerce.number().min(0).optional(),
+  usageUnit: optionalString,
+  stockPerUsage: z.coerce.number().min(0).optional(),
+  trackByLocation: z.boolean().optional(),
+})
+export const inventoryPolicySchema = z.object({
+  invTrackLocations: z.boolean().optional(),
+  invAutoEstimate: z.boolean().optional(),
+  invRequireManualUsage: z.boolean().optional(),
+})

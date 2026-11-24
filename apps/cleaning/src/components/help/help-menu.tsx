@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { HelpCircleIcon, BookOpenIcon, LightbulbIcon, BugIcon, MessageSquareIcon } from "@/components/ui/icons"
+import { HelpCircleIcon, BookOpenIcon, LightbulbIcon, BugIcon, MessageSquareIcon, CogIcon } from "@/components/ui/icons"
 import { FeedbackDialog } from "./feedback-dialog"
 import { TutorialPicker } from "./tutorial-picker"
 
@@ -61,6 +61,9 @@ export function HelpMenu({ isPlatformAdmin = false }: { isPlatformAdmin?: boolea
           {isPlatformAdmin ? (
             <>
               <div className="my-1 border-t border-slate-100" />
+              <Link href="/platform" onClick={() => setOpen(false)} className={item}>
+                <CogIcon className="h-4 w-4 text-slate-400" /> Super Admin portal
+              </Link>
               <Link href="/feedback" onClick={() => setOpen(false)} className={item}>
                 <MessageSquareIcon className="h-4 w-4 text-slate-400" /> Product feedback console
               </Link>

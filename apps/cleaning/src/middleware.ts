@@ -48,7 +48,10 @@ const PUBLIC_PATHS = [
   "/apple-icon",
   "/manifest.webmanifest",
 ]
-const FIELD_PREFIXES = ["/today", "/job"]
+// Every route under the (field) group — cleaners live entirely here. Omitting a
+// field route bounces cleaners back to /today (the tab/menu link looks broken),
+// so this MUST list every top-level field path segment.
+const FIELD_PREFIXES = ["/today", "/job", "/my-work", "/my-reports", "/my-sops", "/my-schedule", "/my-time", "/me"]
 
 function isUnder(pathname: string, base: string) {
   return pathname === base || pathname.startsWith(base + "/")

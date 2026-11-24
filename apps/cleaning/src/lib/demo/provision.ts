@@ -23,6 +23,24 @@ function hashIp(ip: string): string {
   return createHash("sha256").update(`${salt}:${ip}`).digest("hex")
 }
 
+// The demo seed is a long sequence of writes in ONE request; a pooled Postgres
+// connection can be closed by the server mid-run ("Connection closed" /
+// "Connection terminated" / Prisma P1017), which is transient — a fresh
+// connection on the next attempt succeeds. We retry the WHOLE seed (not single
+// statements) so a half-seeded org never persists.
+function isTransientDbError(e: unknown): boolean {
+  const msg = (e instanceof Error ? e.message : String(e)).toLowerCase()
+  const code = (e as { code?: string })?.code
+  return (
+    code === "P1017" || // Prisma: server closed the connection
+    code === "P1001" || // Prisma: can't reach database server
+    code === "ECONNRESET" ||
+    /connection closed|connection terminated|connection.*reset|socket hang up|server has closed|terminating connection/.test(msg)
+  )
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
 export async function countActiveDemos(now = new Date()): Promise<number> {
   return systemDb.organization.count({ where: { isDemo: true, demoExpiresAt: { gt: now } } })
 }
@@ -53,16 +71,32 @@ export async function createDemoOrg(ip: string, mix: DemoMix, opts: { replaceOrg
     }
   }
 
-  const org = await systemDb.organization.create({
-    data: {
-      name: "Demo Workspace", slug: `demo-${randomBytes(6).toString("hex")}`, packageTier: "ENTERPRISE",
-      isDemo: true, demoExpiresAt: new Date(now.getTime() + DEMO_TTL_MS), demoIpHash: ipHash,
-      onboardingCompletedAt: now, subscriptionStatus: "active", timezone: "America/Chicago",
-    },
-    select: { id: true },
-  })
-  const { owner } = await seedDemoOrg(org.id, mix)
-  return { orgId: org.id, owner }
+  // Create + seed with a bounded retry on transient connection drops. Each
+  // attempt uses a fresh org so a partially-seeded workspace never survives; the
+  // partial is deleted (isDemo-guarded, cascades only its own rows) before retry.
+  const MAX_ATTEMPTS = 3
+  let lastErr: unknown
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const org = await systemDb.organization.create({
+      data: {
+        name: "Demo Workspace", slug: `demo-${randomBytes(6).toString("hex")}`, packageTier: "ENTERPRISE",
+        isDemo: true, demoExpiresAt: new Date(now.getTime() + DEMO_TTL_MS), demoIpHash: ipHash,
+        onboardingCompletedAt: now, subscriptionStatus: "active", timezone: "America/Chicago",
+      },
+      select: { id: true },
+    })
+    try {
+      const { owner } = await seedDemoOrg(org.id, mix)
+      return { orgId: org.id, owner }
+    } catch (e) {
+      lastErr = e
+      // Clean up the half-seeded org regardless, so no orphan/partial persists.
+      await systemDb.organization.deleteMany({ where: { id: org.id, isDemo: true } }).catch(() => {})
+      if (!isTransientDbError(e) || attempt === MAX_ATTEMPTS) throw e
+      await sleep(250 * attempt) // brief backoff, then retry on a fresh connection
+    }
+  }
+  throw lastErr
 }
 
 /**

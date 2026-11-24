@@ -147,3 +147,34 @@ export function getFeedbackAttachment(orgId: string, id: string) {
     select: { id: true, storageRef: true, contentType: true, name: true },
   })
 }
+
+// ── CleanWare platform-admin (cross-org) views ───────────────────────────────
+// Used ONLY behind isPlatformAdmin — software feedback is CleanWare product data,
+// aggregated across every customer org, never scoped to the viewer's own org.
+export function listAllFeedback(filter: { status?: FeedbackStatus; type?: FeedbackKind } = {}) {
+  return systemDb.feedbackSubmission.findMany({
+    where: { ...(filter.status ? { status: filter.status } : {}), ...(filter.type ? { type: filter.type } : {}) },
+    orderBy: [{ createdAt: "desc" }],
+    select: { ...listSelect, organization: { select: { name: true } } },
+  })
+}
+export function feedbackCountsAll() {
+  return systemDb.feedbackSubmission.groupBy({ by: ["status"], _count: { _all: true } })
+}
+export function getFeedbackAny(id: string) {
+  return systemDb.feedbackSubmission.findFirst({
+    where: { id },
+    include: { attachments: { orderBy: { createdAt: "asc" } }, organization: { select: { name: true } } },
+  })
+}
+export function getFeedbackAttachmentAny(id: string) {
+  return systemDb.feedbackAttachment.findFirst({ where: { id }, select: { id: true, storageRef: true, contentType: true, name: true } })
+}
+export async function updateFeedbackStatusAny(actorId: string, id: string, status: FeedbackStatus, resolutionNote?: string) {
+  const resolved = status === "RESOLVED" || status === "CLOSED"
+  await systemDb.feedbackSubmission.updateMany({
+    where: { id },
+    data: { status, resolutionNote: resolutionNote ?? undefined, resolvedById: resolved ? actorId : null, resolvedAt: resolved ? new Date() : null },
+  })
+  return systemDb.feedbackSubmission.findFirst({ where: { id }, include: { attachments: true } })
+}

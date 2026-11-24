@@ -1,22 +1,21 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
-import { canManageAccounts } from "@/lib/rbac"
-import { getFeedback, FEEDBACK_STATUSES } from "@/lib/data/feedback"
-import { getOrgTimezone } from "@/lib/data/org"
+import { isPlatformAdmin } from "@/lib/platform-admin"
+import { getFeedbackAny, FEEDBACK_STATUSES } from "@/lib/data/feedback"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card, StatusBadge, Select, Textarea, Button } from "@/components/ui/controls"
 import { setFeedbackStatus } from "../actions"
 
 export const dynamic = "force-dynamic"
+const fmtDT = (d: Date) => new Date(d).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
 
 export default async function FeedbackDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession()
   if (!session) redirect("/login")
-  if (!canManageAccounts(session.role)) redirect("/dashboard")
+  if (!isPlatformAdmin(session)) redirect("/dashboard")
   const { id } = await params
-  const [fb, tz] = await Promise.all([getFeedback(session.organizationId, id), getOrgTimezone(session.organizationId)])
+  const fb = await getFeedbackAny(id)
   if (!fb) notFound()
 
   const typeLabel = fb.type.charAt(0) + fb.type.slice(1).toLowerCase()
@@ -26,7 +25,7 @@ export default async function FeedbackDetailPage({ params }: { params: Promise<{
       <Link href="/feedback" className="text-sm text-slate-500 hover:text-slate-700">← All feedback</Link>
       <PageHeader
         title={fb.title}
-        subtitle={`${typeLabel} · from ${fb.submittedByName ?? "a team member"} · ${DateTime.fromJSDate(fb.createdAt, { zone: tz }).toFormat("MMM d, yyyy 'at' h:mm a")}`}
+        subtitle={`${typeLabel} · ${fb.organization?.name ?? "Unknown org"} · from ${fb.submittedByName ?? "a user"} · ${fmtDT(fb.createdAt)}`}
         action={<StatusBadge tone="info">{fb.status.replace("_", " ")}</StatusBadge>}
       />
       {fb.isDemo ? <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">Submitted from a demo workspace.</div> : null}
@@ -80,9 +79,7 @@ export default async function FeedbackDetailPage({ params }: { params: Promise<{
           </div>
           <Button type="submit">Save</Button>
         </form>
-        {fb.resolvedAt ? (
-          <p className="text-xs text-slate-400">Last resolved {DateTime.fromJSDate(fb.resolvedAt, { zone: tz }).toRelative()}.</p>
-        ) : null}
+        {fb.resolvedAt ? <p className="text-xs text-slate-400">Last resolved {fmtDT(fb.resolvedAt)}.</p> : null}
       </Card>
     </div>
   )

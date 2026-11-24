@@ -2,7 +2,8 @@ import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { Suspense } from "react"
 import { getSession } from "@/lib/session"
-import { experienceForRole, navForRole, canManageAccounts } from "@/lib/rbac"
+import { experienceForRole, navForRole } from "@/lib/rbac"
+import { isPlatformAdmin } from "@/lib/platform-admin"
 import { HelpMenu } from "@/components/help/help-menu"
 import { getOrgCapabilities } from "@/lib/entitlements-server"
 import { CapabilityProvider } from "@/lib/entitlements"
@@ -45,7 +46,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="sticky top-0 z-20 border-b border-slate-200 bg-white/85 px-4 backdrop-blur sm:px-6 lg:px-8">
             <div className="mx-auto flex h-12 max-w-[1400px] items-center justify-between gap-3">
               <Breadcrumbs nav={navClient} />
-              <HelpMenu canReviewFeedback={canManageAccounts(session.role)} />
+              <HelpMenu isPlatformAdmin={isPlatformAdmin(session)} />
             </div>
             <div className="mx-auto max-w-[1400px]">
               <WorkspaceSubnav nav={navClient} />

@@ -111,6 +111,18 @@ export default async function IssueDetailPage({ params }: { params: Promise<{ id
         />
         <Detail label="Resolve by" value={issue.resolveDeadline ? DateTime.fromJSDate(issue.resolveDeadline, { zone: tz }).toFormat("MMM d, h:mm a") + (issue.status !== "CLOSED" && issue.status !== "RESOLVED" && issue.resolveDeadline < new Date() ? " · OVERDUE" : "") : "-"} />
         <Detail label="Owner (resolver)" value={issue.assignedTo?.name ?? "Unassigned"} />
+        {issue.serviceLocation ? (
+          <div>
+            <dt className="text-xs uppercase tracking-wide text-slate-400">Customer</dt>
+            <dd className="text-sm"><Link href={`/customers/${issue.serviceLocation.customer.id}`} className="text-brand hover:underline">{issue.serviceLocation.customer.name}</Link></dd>
+          </div>
+        ) : null}
+        {issue.serviceLocation ? (
+          <div>
+            <dt className="text-xs uppercase tracking-wide text-slate-400">Service location</dt>
+            <dd className="text-sm"><Link href="/locations" className="text-brand hover:underline">{issue.serviceLocation.name}</Link></dd>
+          </div>
+        ) : null}
         <Detail label="Verified by" value={issue.verifier?.name ?? (issue.status === "CLOSED" ? "-" : "Pending verification")} />
         {issue.escalationLevel > 0 ? <Detail label="Escalation level" value={String(issue.escalationLevel)} /> : null}
         {issue.reopenCount > 0 ? <Detail label="Reopened" value={`${issue.reopenCount}×`} /> : null}

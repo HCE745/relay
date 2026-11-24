@@ -162,9 +162,12 @@ export function FeedbackDialog({ mode, onClose }: { mode: "BUG" | "FEATURE"; onC
   }
 
   return (
-    <div className="fixed inset-0 z-[9500] flex items-end justify-center bg-slate-900/50 p-0 sm:items-center sm:p-4" onClick={onClose}>
-      <div className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5">
+    // The overlay itself scrolls (min-h-full + items-center) so a tall dialog is
+    // never clipped at the top of the viewport; the body scrolls internally too.
+    <div className="fixed inset-0 z-[9500] overflow-y-auto bg-slate-900/50" onClick={onClose}>
+      <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+      <div className="flex max-h-[100dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-3.5">
           <h2 className="text-base font-semibold text-slate-900">{isBug ? "Report a bug" : "Request a feature"}</h2>
           <button onClick={onClose} aria-label="Close" className="rounded p-1 text-slate-400 hover:text-slate-700">
             <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" /></svg>
@@ -266,7 +269,7 @@ export function FeedbackDialog({ mode, onClose }: { mode: "BUG" | "FEATURE"; onC
         )}
 
         {!done ? (
-          <div className="flex items-center justify-end gap-2 border-t border-slate-100 px-5 py-3">
+          <div className="flex shrink-0 items-center justify-end gap-2 border-t border-slate-100 px-5 py-3">
             <button onClick={onClose} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-700">Cancel</button>
             <button onClick={submit} disabled={busy === "submit"}
               className="rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-800 disabled:opacity-60">
@@ -274,6 +277,7 @@ export function FeedbackDialog({ mode, onClose }: { mode: "BUG" | "FEATURE"; onC
             </button>
           </div>
         ) : null}
+      </div>
       </div>
     </div>
   )

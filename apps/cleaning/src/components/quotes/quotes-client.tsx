@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Modal } from "@/components/ui/modal"
 import { Button, Card, Field, Input, Select, Textarea, StatusBadge, type BadgeTone } from "@/components/ui/controls"
@@ -83,7 +84,7 @@ function QuoteCard({ q }: { q: QuoteRow }) {
     <Card className="p-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="truncate font-semibold text-slate-900">{q.contactName}</div>
+          <Link href={`/quotes/${q.id}`} className="block truncate font-semibold text-slate-900 hover:text-brand">{q.contactName}</Link>
           <div className="truncate text-xs text-slate-500">{SOURCE_LABEL[q.source]} · {q.propertyType === "COMMERCIAL" ? "Commercial" : "Residential"}{q.sqft ? ` · ${q.sqft.toLocaleString()} sqft` : ""}</div>
           <div className="truncate text-xs text-slate-400">{[q.contactPhone, q.city && q.state ? `${q.city}, ${q.state}` : null].filter(Boolean).join(" · ") || "-"}</div>
         </div>

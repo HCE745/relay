@@ -34,6 +34,19 @@ export function advanceRun(from: Date, cadence: Cadence): Date | null {
   return d
 }
 
+// Upcoming scheduled inspections whose next run falls in a window — calendar
+// events for the unified schedule. Includes the fixed inspector (if any).
+export function listScheduledInspectionsInWindow(orgId: string, start: Date, end: Date) {
+  return orgDb(orgId).scheduledInspection.findMany({
+    where: { active: true, nextRunAt: { gte: start, lte: end } },
+    orderBy: { nextRunAt: "asc" },
+    include: {
+      serviceLocation: { select: { id: true, name: true, customerId: true, timezone: true, customer: { select: { name: true } } } },
+      template: { select: { name: true } },
+    },
+  })
+}
+
 export function listScheduledInspections(orgId: string) {
   return orgDb(orgId).scheduledInspection.findMany({
     orderBy: [{ active: "desc" }, { nextRunAt: "asc" }],

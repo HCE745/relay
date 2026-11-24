@@ -90,8 +90,9 @@ function WorkOrderCard({ wo }: { wo: WorkOrder }) {
     <Card className="p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="truncate font-semibold text-slate-900">{wo.customerName}{wo.siteName ? ` · ${wo.siteName}` : ""}</div>
+          <Link href={`/work-orders/${wo.id}`} className="block truncate font-semibold text-slate-900 hover:text-brand">{wo.customerName}{wo.siteName ? ` · ${wo.siteName}` : ""}</Link>
           <div className="mt-0.5 line-clamp-2 text-sm text-slate-600">{wo.description}</div>
+          <Link href={`/work-orders/${wo.id}`} className="mt-1 inline-block text-xs font-medium text-brand-700 hover:text-brand-800">View details →</Link>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           <StatusBadge tone={S_TONE[wo.status] ?? "neutral"}>{wo.status}</StatusBadge>

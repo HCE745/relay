@@ -1,10 +1,8 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { DateTime } from "luxon"
 import { getSession } from "@/lib/session"
-import { canManageAccounts } from "@/lib/rbac"
-import { listFeedback, feedbackCounts, type FeedbackStatus, type FeedbackKind } from "@/lib/data/feedback"
-import { getOrgTimezone } from "@/lib/data/org"
+import { isPlatformAdmin } from "@/lib/platform-admin"
+import { listAllFeedback, feedbackCountsAll, type FeedbackStatus, type FeedbackKind } from "@/lib/data/feedback"
 import { PageHeader } from "@/components/ui/placeholder"
 import { Card, StatusBadge, EmptyState } from "@/components/ui/controls"
 import { MessageSquareIcon, BugIcon, LightbulbIcon } from "@/components/ui/icons"
@@ -20,30 +18,28 @@ const TYPE_META: Record<FeedbackKind, { label: string; Icon: (p: { className?: s
   QUESTION: { label: "Question", Icon: MessageSquareIcon },
 }
 const STATUSES: FeedbackStatus[] = ["NEW", "IN_REVIEW", "PLANNED", "RESOLVED", "CLOSED"]
+const fmt = (d: Date) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" })
 
+// CleanWare PLATFORM product console — software bug reports & feature requests
+// across all customer orgs. Gated to platform admins; a cleaning company's OWNER
+// has no access (org ownership is not platform administration).
 export default async function FeedbackListPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const session = await getSession()
   if (!session) redirect("/login")
-  if (!canManageAccounts(session.role)) redirect("/dashboard")
+  if (!isPlatformAdmin(session)) redirect("/dashboard")
 
   const { status } = await searchParams
   const activeStatus = STATUSES.includes(status as FeedbackStatus) ? (status as FeedbackStatus) : undefined
-  const [rows, counts, tz] = await Promise.all([
-    listFeedback(session.organizationId, { status: activeStatus }),
-    feedbackCounts(session.organizationId),
-    getOrgTimezone(session.organizationId),
-  ])
+  const [rows, counts] = await Promise.all([listAllFeedback({ status: activeStatus }), feedbackCountsAll()])
   const countFor = (s: FeedbackStatus) => counts.find((c) => c.status === s)?._count._all ?? 0
   const total = counts.reduce((a, c) => a + c._count._all, 0)
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Feedback" subtitle="Bug reports and feature requests from your team" icon={<MessageSquareIcon />} />
+      <PageHeader title="Product feedback" subtitle="CleanWare platform — bug reports & feature requests from all organizations" icon={<MessageSquareIcon />} />
 
       <div className="flex flex-wrap gap-2">
-        <Link href="/feedback" className={`rounded-full px-3 py-1 text-sm font-medium ${!activeStatus ? "bg-brand-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
-          All ({total})
-        </Link>
+        <Link href="/feedback" className={`rounded-full px-3 py-1 text-sm font-medium ${!activeStatus ? "bg-brand-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>All ({total})</Link>
         {STATUSES.map((s) => (
           <Link key={s} href={`/feedback?status=${s}`} className={`rounded-full px-3 py-1 text-sm font-medium ${activeStatus === s ? "bg-brand-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
             {s.replace("_", " ")} ({countFor(s)})
@@ -60,7 +56,7 @@ export default async function FeedbackListPage({ searchParams }: { searchParams:
               <tr>
                 <th className="px-4 py-2.5 font-medium">Title</th>
                 <th className="px-4 py-2.5 font-medium">Type</th>
-                <th className="px-4 py-2.5 font-medium">From</th>
+                <th className="px-4 py-2.5 font-medium">Org</th>
                 <th className="px-4 py-2.5 font-medium">When</th>
                 <th className="px-4 py-2.5 font-medium">Status</th>
               </tr>
@@ -76,8 +72,8 @@ export default async function FeedbackListPage({ searchParams }: { searchParams:
                       {r.isDemo ? <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">DEMO</span> : null}
                     </td>
                     <td className="px-4 py-3 text-slate-600"><span className="inline-flex items-center gap-1.5"><meta.Icon className="h-4 w-4 text-slate-400" />{meta.label}</span></td>
-                    <td className="px-4 py-3 text-slate-600">{r.submittedByName ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{DateTime.fromJSDate(r.createdAt, { zone: tz }).toFormat("MMM d")}</td>
+                    <td className="px-4 py-3 text-slate-600">{r.organization?.name ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-600">{fmt(r.createdAt)}</td>
                     <td className="px-4 py-3"><StatusBadge tone={STATUS_TONE[r.status]}>{r.status.replace("_", " ")}</StatusBadge></td>
                   </tr>
                 )

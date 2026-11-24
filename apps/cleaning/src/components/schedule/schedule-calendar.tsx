@@ -5,8 +5,12 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { jobStatusStyle, JOB_STATUS, JOB_STATUS_ORDER } from "@/components/jobs/job-status"
 
+export type CalKind = "job" | "inspection" | "corrective"
+
 export type CalJob = {
   id: string
+  kind: CalKind // "job" unless an inspection/corrective overlay event
+  href: string // where clicking the block navigates
   status: string
   customerName: string
   siteName: string
@@ -43,6 +47,7 @@ type Props = {
   endHour: number
   cleaners: { id: string; name: string }[]
   customers: { id: string; name: string }[]
+  locations: { id: string; name: string }[]
   nav: CalendarNav
   newJob: React.ReactNode | null
 }
@@ -83,19 +88,23 @@ function packLanes(dayJobs: CalJob[]) {
 }
 
 export function ScheduleCalendar(props: Props) {
-  const { view, jobs, days, todayKey, startHour, endHour, cleaners, customers, nav, newJob } = props
+  const { view, jobs, days, todayKey, startHour, endHour, cleaners, customers, locations, nav, newJob } = props
   const router = useRouter()
   const [cleanerFilter, setCleanerFilter] = useState("all")
   const [customerFilter, setCustomerFilter] = useState("all")
+  const [locationFilter, setLocationFilter] = useState("all")
+  const [typeFilter, setTypeFilter] = useState<"all" | CalKind>("all")
 
   const shown = useMemo(
     () =>
       jobs.filter(
         (j) =>
+          (typeFilter === "all" || j.kind === typeFilter) &&
           (customerFilter === "all" || j.customerId === customerFilter) &&
+          (locationFilter === "all" || j.siteId === locationFilter) &&
           (cleanerFilter === "all" || (cleanerFilter === "unassigned" ? j.unassigned : j.cleanerIds.includes(cleanerFilter))),
       ),
-    [jobs, cleanerFilter, customerFilter],
+    [jobs, cleanerFilter, customerFilter, locationFilter, typeFilter],
   )
 
   const byDay = useMemo(() => {
@@ -104,7 +113,7 @@ export function ScheduleCalendar(props: Props) {
     return m
   }, [shown])
 
-  const unassignedCount = shown.filter((j) => j.unassigned).length
+  const unassignedCount = shown.filter((j) => j.kind === "job" && j.unassigned).length
   const filterSelect = "rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
   const navBtn = "inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
 
@@ -137,14 +146,24 @@ export function ScheduleCalendar(props: Props) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <select value={cleanerFilter} onChange={(e) => setCleanerFilter(e.target.value)} className={filterSelect} aria-label="Filter by cleaner">
-            <option value="all">All cleaners</option>
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as "all" | CalKind)} className={filterSelect} aria-label="Filter by type">
+            <option value="all">All types</option>
+            <option value="job">Jobs</option>
+            <option value="inspection">Inspections</option>
+            <option value="corrective">Corrective work</option>
+          </select>
+          <select value={cleanerFilter} onChange={(e) => setCleanerFilter(e.target.value)} className={filterSelect} aria-label="Filter by person">
+            <option value="all">All people</option>
             <option value="unassigned">Unassigned only</option>
             {cleaners.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
           </select>
           <select value={customerFilter} onChange={(e) => setCustomerFilter(e.target.value)} className={filterSelect} aria-label="Filter by customer">
             <option value="all">All customers</option>
             {customers.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+          </select>
+          <select value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} className={filterSelect} aria-label="Filter by location">
+            <option value="all">All locations</option>
+            {locations.map((l) => (<option key={l.id} value={l.id}>{l.name}</option>))}
           </select>
           {newJob}
         </div>
@@ -161,6 +180,12 @@ export function ScheduleCalendar(props: Props) {
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-700">
           <span className="h-2.5 w-2.5 rounded-full bg-orange-500 ring-2 ring-orange-200" />
           Unassigned
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-xs text-indigo-700">
+          <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" /> Inspection
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-xs text-rose-700">
+          <span className="h-2.5 w-2.5 rounded-full bg-rose-500" /> Corrective
         </span>
         {unassignedCount > 0 ? (
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-800">
@@ -181,6 +206,20 @@ export function ScheduleCalendar(props: Props) {
 }
 
 function JobBlockBody({ job, compact }: { job: CalJob; compact?: boolean }) {
+  if (job.kind !== "job") {
+    const tag = job.kind === "inspection" ? "Inspection" : "Corrective"
+    return (
+      <>
+        <div className="flex items-center justify-between gap-1">
+          <span className="truncate text-[11px] font-semibold opacity-80">{job.timeLabel}</span>
+          <span className="shrink-0 rounded bg-white/60 px-1 text-[9px] font-bold uppercase tracking-wide">{tag}</span>
+        </div>
+        <div className="truncate text-[13px] font-semibold leading-tight">{job.customerName}</div>
+        {!compact ? <div className="truncate text-[11px] opacity-70">{job.siteName}</div> : null}
+        {job.cleaners.length ? <div className="truncate text-[11px] opacity-75">{job.cleaners.join(", ")}</div> : null}
+      </>
+    )
+  }
   return (
     <>
       <div className="flex items-center justify-between gap-1">
@@ -199,6 +238,8 @@ function JobBlockBody({ job, compact }: { job: CalJob; compact?: boolean }) {
 }
 
 function blockClasses(job: CalJob) {
+  if (job.kind === "inspection") return "border border-indigo-300 bg-indigo-100 text-indigo-950"
+  if (job.kind === "corrective") return "border border-rose-300 bg-rose-100 text-rose-950"
   if (job.unassigned) return "border-2 border-orange-400 bg-orange-100 text-orange-950 ring-1 ring-orange-300"
   const s = jobStatusStyle(job.status)
   return `border ${s.block} ${job.understaffed ? "ring-2 ring-orange-300" : ""}`
@@ -266,7 +307,7 @@ function TimeGrid({
                   return (
                     <button
                       key={job.id}
-                      onClick={() => router.push(`/jobs/${job.id}`)}
+                      onClick={() => router.push(job.href)}
                       className={`absolute overflow-hidden rounded-lg px-2 py-1 text-left shadow-sm transition hover:z-10 hover:shadow-md ${blockClasses(job)}`}
                       style={{ top, height, left: `calc(${lane * widthPct}% + 2px)`, width: `calc(${widthPct}% - 4px)` }}
                     >
@@ -314,10 +355,16 @@ function MonthGrid({
                 {shownJobs.map((job) => (
                   <button
                     key={job.id}
-                    onClick={() => router.push(`/jobs/${job.id}`)}
+                    onClick={() => router.push(job.href)}
                     className={`flex w-full items-center gap-1 overflow-hidden rounded-md px-1.5 py-1 text-left ${blockClasses(job)}`}
                   >
-                    {job.unassigned ? <span className="shrink-0 text-[10px] font-bold">⚠</span> : <span className={`h-2 w-2 shrink-0 rounded-full ${jobStatusStyle(job.status).dot}`} />}
+                    {job.kind !== "job" ? (
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${job.kind === "inspection" ? "bg-indigo-500" : "bg-rose-500"}`} />
+                    ) : job.unassigned ? (
+                      <span className="shrink-0 text-[10px] font-bold">⚠</span>
+                    ) : (
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${jobStatusStyle(job.status).dot}`} />
+                    )}
                     <span className="truncate text-[11px] font-medium">{job.customerName}</span>
                   </button>
                 ))}

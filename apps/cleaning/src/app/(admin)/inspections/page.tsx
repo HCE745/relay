@@ -52,7 +52,22 @@ export default async function InspectionsPage({ searchParams }: { searchParams: 
   const sites = siteRows.map((s) => ({ id: s.id, label: `${s.customer.name} · ${s.name}` }))
   const activeTemplates = templates.filter((t) => t.isActive).map((t) => ({ id: t.id, name: t.name }))
   const inspectors = inspectorRows.map((u) => ({ id: u.id, name: u.name }))
-  const scheduleTools = canRun ? { sites, templates: activeTemplates, inspectors } : null
+  // Prerequisites for creating an inspection: at least one active template and
+  // one service location. When missing, we explain + offer the fix (a disabled
+  // button with no reason is the defect we're correcting).
+  const canCreate = sites.length > 0 && activeTemplates.length > 0
+  const missing: string[] = []
+  if (activeTemplates.length === 0) missing.push("an inspection template")
+  if (sites.length === 0) missing.push("a service location")
+  const scheduleTools = canRun && canCreate ? { sites, templates: activeTemplates, inspectors } : null
+  const headerAction = scheduleTools ? (
+    <div className="flex gap-2"><ScheduleInspectionButton {...scheduleTools} /><NewInspectionButton {...scheduleTools} /></div>
+  ) : canRun ? (
+    <div className="flex flex-col items-end gap-1 text-right">
+      <p className="text-xs text-slate-500">To start inspecting, add {missing.join(" and ")}.</p>
+      {canManage && activeTemplates.length === 0 ? <NewTemplateButton /> : null}
+    </div>
+  ) : undefined
 
   const { outcome } = await searchParams
   const failOnly = outcome === "FAIL"
@@ -65,14 +80,7 @@ export default async function InspectionsPage({ searchParams }: { searchParams: 
           title="Inspections"
           subtitle="Quality control"
           icon={<ClipboardCheckIcon />}
-          action={
-            scheduleTools ? (
-              <div className="flex gap-2">
-                <ScheduleInspectionButton {...scheduleTools} />
-                <NewInspectionButton {...scheduleTools} />
-              </div>
-            ) : undefined
-          }
+          action={headerAction}
         />
         {failOnly ? (
           <div className="mb-4 flex items-center gap-2">

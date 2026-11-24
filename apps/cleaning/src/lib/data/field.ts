@@ -30,6 +30,33 @@ export async function listCleanerDayJobs(orgId: string, userId: string, dayStart
   })
 }
 
+// Personal schedule: the cleaner's assigned jobs across a date window (used by
+// /my-schedule). Same assignment constraint as the day view.
+export function listCleanerJobsInWindow(orgId: string, userId: string, start: Date, end: Date) {
+  return orgDb(orgId).job.findMany({
+    where: {
+      status: { not: "CANCELLED" },
+      assignments: { some: { userId } },
+      scheduledStart: { gte: start, lte: end },
+    },
+    orderBy: { scheduledStart: "asc" },
+    include: {
+      serviceLocation: { select: { name: true, timezone: true, customer: { select: { name: true } } } },
+      checklistItems: { select: { isComplete: true } },
+    },
+  })
+}
+
+// Clock history: the cleaner's own recent time entries (used by /my-time).
+export function listCleanerTimeEntries(orgId: string, userId: string, take = 30) {
+  return orgDb(orgId).timeEntry.findMany({
+    where: { userId },
+    orderBy: { clockInAt: "desc" },
+    take,
+    include: { job: { select: { title: true, serviceLocation: { select: { name: true, customer: { select: { name: true } } } } } } },
+  })
+}
+
 export function getFieldJob(orgId: string, userId: string, jobId: string) {
   return orgDb(orgId).job.findFirst({
     where: { id: jobId, assignments: { some: { userId } } },

@@ -1,18 +1,20 @@
-import { requireAccountManager } from "@/lib/guards"
-import { notFound } from "@/lib/api"
+import { getSession } from "@/lib/session"
+import { isPlatformAdmin } from "@/lib/platform-admin"
+import { notFound, forbidden, unauthorized } from "@/lib/api"
 import { getStorage } from "@/lib/storage"
-import { getFeedbackAttachment } from "@/lib/data/feedback"
+import { getFeedbackAttachmentAny } from "@/lib/data/feedback"
 
 export const runtime = "nodejs"
 type Ctx = { params: Promise<{ id: string }> }
 
-// Feedback attachments are PRIVATE and management-only. Streamed server-side,
-// org-scoped, after an account-manager guard — never a public URL.
+// Feedback attachments are PRIVATE CleanWare product data. Streamed server-side
+// only to platform admins — a customer org role (even OWNER) can never reach it.
 export async function GET(_request: Request, { params }: Ctx) {
-  const g = await requireAccountManager()
-  if (!g.ok) return g.response
+  const session = await getSession()
+  if (!session) return unauthorized()
+  if (!isPlatformAdmin(session)) return forbidden()
   const { id } = await params
-  const att = await getFeedbackAttachment(g.orgId, id)
+  const att = await getFeedbackAttachmentAny(id)
   if (!att) return notFound()
   const bytes = await getStorage().get(att.storageRef)
   if (!bytes) return notFound()

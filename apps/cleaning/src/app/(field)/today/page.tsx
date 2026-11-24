@@ -80,9 +80,11 @@ export default async function TodayPage() {
     list.length ? (
       <section className="space-y-2">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</h2>
-        {list.map((j) => (
-          <JobCard key={j.id} job={j} tz={tz} />
-        ))}
+        <div className="grid gap-2 sm:grid-cols-2">
+          {list.map((j) => (
+            <JobCard key={j.id} job={j} tz={tz} />
+          ))}
+        </div>
       </section>
     ) : null
 

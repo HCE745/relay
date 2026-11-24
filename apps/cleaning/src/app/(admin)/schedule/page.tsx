@@ -4,6 +4,8 @@ import { getSession } from "@/lib/session"
 import { canViewSchedule, canManageSchedule } from "@/lib/rbac"
 import { orgHasCapability } from "@/lib/page-guards"
 import { listJobsInWindow } from "@/lib/data/jobs"
+import { listScheduledInspectionsInWindow } from "@/lib/scheduling/scheduled-inspections"
+import { listCorrectiveWorkOrdersInWindow } from "@/lib/data/work-orders"
 import { listAllSites } from "@/lib/data/service-locations"
 import { listChecklistTemplates } from "@/lib/data/checklist-templates"
 import { getOrgTimezone } from "@/lib/data/org"
@@ -58,10 +60,14 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
 
   const canManage = canManageSchedule(session.role)
   // Pad the fetch window ±1 day so site-local bucketing never drops boundary jobs.
-  const [jobs, sites, templates] = await Promise.all([
-    listJobsInWindow(orgId, firstDay.minus({ days: 1 }).toJSDate(), lastDay.plus({ days: 2 }).toJSDate()),
+  const winStart = firstDay.minus({ days: 1 }).toJSDate()
+  const winEnd = lastDay.plus({ days: 2 }).toJSDate()
+  const [jobs, sites, templates, schedInspections, correctiveWOs] = await Promise.all([
+    listJobsInWindow(orgId, winStart, winEnd),
     canManage ? listAllSites(orgId) : Promise.resolve([]),
     canManage ? listChecklistTemplates(orgId) : Promise.resolve([]),
+    listScheduledInspectionsInWindow(orgId, winStart, winEnd),
+    listCorrectiveWorkOrdersInWindow(orgId, winStart, winEnd),
   ])
 
   // Precompute every block's position in the SITE's local timezone via the
@@ -81,6 +87,8 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
     const cleanerIds = job.assignments.map((a) => a.user.id)
     calJobs.push({
       id: job.id,
+      kind: "job",
+      href: `/jobs/${job.id}`,
       status: job.status,
       customerName: job.serviceLocation.customer.name,
       siteName: job.serviceLocation.name,
@@ -98,6 +106,47 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
       understaffed: job.crewSize != null && job.assignments.length > 0 && job.assignments.length < job.crewSize,
     })
   }
+
+  // Overlay inspection + corrective-work events so the schedule is ONE unified
+  // operational calendar (not a separate module). Positioned at their time.
+  const minuteOf = (dt: DateTime) => dt.hour * 60 + dt.minute
+  for (const s of schedInspections) {
+    const itz = s.serviceLocation.timezone ?? tz
+    const dayKey = dateKeyInZone(s.nextRunAt, itz)
+    if (!visibleKeys.has(dayKey)) continue
+    const startMin = minuteOf(DateTime.fromJSDate(s.nextRunAt, { zone: itz }))
+    calJobs.push({
+      id: `insp-${s.id}`, kind: "inspection", href: "/inspections", status: "SCHEDULED",
+      customerName: s.serviceLocation.customer.name, siteName: `${s.template.name} inspection`,
+      siteId: s.serviceLocation.id, customerId: s.serviceLocation.customerId,
+      timeLabel: formatTimeInZone(s.nextRunAt, itz), endLabel: "",
+      dayKey, startMin, endMin: Math.min(24 * 60, startMin + 45),
+      cleaners: [], cleanerIds: [], crewSize: null, unassigned: false, understaffed: false,
+    })
+  }
+  for (const w of correctiveWOs) {
+    if (!w.dueAt) continue
+    const wtz = w.serviceLocation?.timezone ?? tz
+    const dayKey = dateKeyInZone(w.dueAt, wtz)
+    if (!visibleKeys.has(dayKey)) continue
+    const startMin = minuteOf(DateTime.fromJSDate(w.dueAt, { zone: wtz }))
+    calJobs.push({
+      id: `wo-${w.id}`, kind: "corrective", href: `/work-orders/${w.id}`, status: w.status,
+      customerName: w.customer.name, siteName: w.serviceLocation?.name ?? "Corrective work",
+      siteId: w.serviceLocation?.id ?? "", customerId: w.customer.id,
+      timeLabel: formatTimeInZone(w.dueAt, wtz), endLabel: "",
+      dayKey, startMin, endMin: Math.min(24 * 60, startMin + 45),
+      cleaners: w.assignedTo ? [w.assignedTo.name] : [], cleanerIds: w.assignedTo ? [w.assignedTo.id] : [],
+      crewSize: null, unassigned: false, understaffed: false,
+    })
+  }
+
+  // Location filter options — real location names from the source records.
+  const locationMap = new Map<string, string>()
+  for (const j of jobs) locationMap.set(j.serviceLocation.id, j.serviceLocation.name)
+  for (const s of schedInspections) locationMap.set(s.serviceLocation.id, s.serviceLocation.name)
+  for (const w of correctiveWOs) if (w.serviceLocation) locationMap.set(w.serviceLocation.id, w.serviceLocation.name)
+  const locations = [...locationMap.entries()].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
 
   // Time-grid bounds (week/day): frame the day, expand to fit early/late work.
   const starts = calJobs.map((j) => j.startMin)
@@ -142,7 +191,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
 
   return (
     <div>
-      <PageHeader title="Schedule" subtitle="Plan the week, spot unassigned work at a glance" />
+      <PageHeader title="Schedule" subtitle="Jobs, inspections & corrective work — filter by person, customer, location or type" />
       <ScheduleCalendar
         view={view}
         jobs={calJobs}
@@ -152,6 +201,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
         endHour={endHour}
         cleaners={cleaners}
         customers={customers}
+        locations={locations}
         nav={{
           prevHref: step(prevDt),
           nextHref: step(nextDt),

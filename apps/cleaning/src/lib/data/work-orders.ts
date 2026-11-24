@@ -25,7 +25,31 @@ export function listWorkOrders(orgId: string, opts: { status?: string } = {}) {
 }
 
 export function getWorkOrder(orgId: string, id: string) {
-  return orgDb(orgId).workOrder.findFirst({ where: { id }, include: { customer: { select: { name: true } }, serviceLocation: { select: { name: true } } } })
+  return orgDb(orgId).workOrder.findFirst({
+    where: { id },
+    include: {
+      customer: { select: { id: true, name: true } },
+      serviceLocation: { select: { id: true, name: true } },
+      issue: { select: { id: true, title: true, description: true } },
+      inspection: { select: { id: true } },
+      convertedJob: { select: { id: true, title: true } },
+      assignedTo: { select: { id: true, name: true } },
+    },
+  })
+}
+
+// Corrective work orders with a due date in a window — calendar events for the
+// unified schedule. Non-terminal only (open corrective work still to be done).
+export function listCorrectiveWorkOrdersInWindow(orgId: string, start: Date, end: Date) {
+  return orgDb(orgId).workOrder.findMany({
+    where: { isCorrective: true, dueAt: { gte: start, lte: end }, status: { notIn: ["VERIFIED", "DECLINED", "COMPLETED"] } },
+    orderBy: { dueAt: "asc" },
+    include: {
+      customer: { select: { id: true, name: true } },
+      serviceLocation: { select: { id: true, name: true, timezone: true } },
+      assignedTo: { select: { id: true, name: true } },
+    },
+  })
 }
 
 export function createWorkOrder(orgId: string, input: CreateInput, createdById: string) {

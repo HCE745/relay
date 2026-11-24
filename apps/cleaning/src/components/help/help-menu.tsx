@@ -11,7 +11,7 @@ import { TutorialPicker } from "./tutorial-picker"
 // management-only link to review submitted feedback.
 type Overlay = null | "tutorials" | "bug" | "feature"
 
-export function HelpMenu({ canReviewFeedback = false }: { canReviewFeedback?: boolean }) {
+export function HelpMenu({ isPlatformAdmin = false }: { isPlatformAdmin?: boolean }) {
   const [open, setOpen] = useState(false)
   const [overlay, setOverlay] = useState<Overlay>(null)
   const ref = useRef<HTMLDivElement>(null)
@@ -58,11 +58,11 @@ export function HelpMenu({ canReviewFeedback = false }: { canReviewFeedback?: bo
           <button className={item} onClick={() => { setOpen(false); setOverlay("feature") }}>
             <MessageSquareIcon className="h-4 w-4 text-slate-400" /> Request a feature
           </button>
-          {canReviewFeedback ? (
+          {isPlatformAdmin ? (
             <>
               <div className="my-1 border-t border-slate-100" />
               <Link href="/feedback" onClick={() => setOpen(false)} className={item}>
-                <MessageSquareIcon className="h-4 w-4 text-slate-400" /> Review feedback
+                <MessageSquareIcon className="h-4 w-4 text-slate-400" /> Product feedback console
               </Link>
             </>
           ) : null}

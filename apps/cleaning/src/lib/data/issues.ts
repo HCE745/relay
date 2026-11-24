@@ -105,7 +105,7 @@ const detailInclude = {
   reportedBy: { select: { name: true } },
   assignedTo: { select: { id: true, name: true } },
   verifier: { select: { id: true, name: true } },
-  serviceLocation: { select: { id: true, name: true, customer: { select: { name: true } } } },
+  serviceLocation: { select: { id: true, name: true, customer: { select: { id: true, name: true } } } },
   job: { select: { id: true, title: true } },
   inspection: { select: { id: true, templateName: true, score: true, outcome: true } },
   asset: { select: { id: true, name: true, category: true, status: true } },

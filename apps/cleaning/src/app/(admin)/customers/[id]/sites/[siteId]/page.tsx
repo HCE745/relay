@@ -4,6 +4,9 @@ import { getSession } from "@/lib/session"
 import { canManageAccounts } from "@/lib/rbac"
 import { DateTime } from "luxon"
 import { getServiceLocation } from "@/lib/data/service-locations"
+import { getSiteActivity } from "@/lib/data/site-activity"
+import { SiteActivitySection } from "@/components/sites/site-activity"
+import { orgHasCapability } from "@/lib/page-guards"
 import { listChecklistTemplates } from "@/lib/data/checklist-templates"
 import { getChecklistTemplate } from "@/lib/data/checklist-templates"
 import { getOrgTimezone } from "@/lib/data/org"
@@ -38,6 +41,13 @@ export default async function SiteDetailPage({
   )).filter(Boolean) as ChecklistTemplate[]
 
   const address = [site.addressLine1, site.city, site.state, site.postalCode].filter(Boolean).join(", ")
+
+  const siteActivity = await getSiteActivity(orgId, siteId)
+  const siteActivityCaps = {
+    jobs: await orgHasCapability(orgId, "core.jobs"),
+    issues: await orgHasCapability(orgId, "operations.issues"),
+    workOrders: await orgHasCapability(orgId, "operations.workOrders"),
+  }
 
   return (
     <div className="space-y-6">
@@ -106,6 +116,8 @@ export default async function SiteDetailPage({
           </ul>
         </Card>
       ) : null}
+
+      <SiteActivitySection activity={siteActivity} caps={siteActivityCaps} />
 
       <ScopeSection templates={templates} />
       <ServicePlansSection

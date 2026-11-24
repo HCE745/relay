@@ -123,8 +123,13 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
   const week = startOfWeek(now)
   const todayOffset = Math.floor((now.getTime() - week.getTime()) / DAY)
 
+  const t0 = Date.now()
+  const mark = (s: string) => console.log(`[seed] ${s} +${Date.now() - t0}ms`)
+  mark("start")
+
   const staff = await seedStaff(orgId, stamp)
   const { commercialTplId, residentialTplId } = await seedTemplates(orgId)
+  mark("staff+templates")
 
   // Choose the account mix.
   const total = 6
@@ -369,7 +374,9 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
     ],
   })
 
+  mark("core (customers/jobs/invoices/tax/pay)")
   await seedExtras(orgId, stamp, now, week, todayOffset, staff, ctx, () => invoiceNo++)
+  mark("extras")
 
   // ── Labor budgets (Phase 46): a contract, a site and a plan run-rate ──
   const budContract = await systemDb.contract.findFirst({ where: { organizationId: orgId }, select: { id: true } })
@@ -443,11 +450,14 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
   // ── Accountability (P1–P4): task ownership + verification, a workplace report,
   //    a substantiated + an unsubstantiated customer complaint, corrective work,
   //    and the responsibility snapshot that feeds the performance dashboards. ──
+  mark("before accountability")
   await seedAccountability(orgId, now, staff, ctx)
+  mark("accountability")
 
   // ── Inspection templates + a recurring/randomized schedule (Phase 46) so the
   //    Inspections screen shows a reusable checklist and a live schedule. ──
   await seedInspectionScheduling(orgId, now, staff, ctx)
+  mark("inspection-scheduling (end of main seed)")
 
   return { owner: staff.owner }
 }

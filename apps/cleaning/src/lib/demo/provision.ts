@@ -90,6 +90,9 @@ export async function createDemoOrg(ip: string, mix: DemoMix, opts: { replaceOrg
       return { orgId: org.id, owner }
     } catch (e) {
       lastErr = e
+      const code = (e as { code?: string })?.code
+      const msg = (e instanceof Error ? e.message : String(e)).replace(/\s+/g, " ").slice(0, 300)
+      console.error(`[demo-provision] seed attempt ${attempt}/${MAX_ATTEMPTS} failed: code=${code ?? "n/a"} transient=${isTransientDbError(e)} msg=${msg}`)
       // Clean up the half-seeded org regardless, so no orphan/partial persists.
       await systemDb.organization.deleteMany({ where: { id: org.id, isDemo: true } }).catch(() => {})
       if (!isTransientDbError(e) || attempt === MAX_ATTEMPTS) throw e

@@ -51,3 +51,14 @@ export async function applyInboundSmsKeyword(fromPhone: string, keyword: "stop" 
   await systemDb.user.updateMany({ where: { id: { in: matches.map((m) => m.id) } }, data: { smsOptOut: keyword === "stop" } })
   return matches.length
 }
+
+/** Recent notices the office has sent this user (email/SMS log) — shown in-app as
+ *  an operational feed. Not a chat platform; read-only. */
+export function listUserNotices(orgId: string, userId: string, take = 15) {
+  return orgDb(orgId).notificationLog.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take,
+    select: { id: true, subject: true, body: true, event: true, channel: true, createdAt: true },
+  })
+}

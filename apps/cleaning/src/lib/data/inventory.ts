@@ -321,3 +321,12 @@ export async function usageVariance(orgId: string, start: Date, end: Date) {
   }
   return map
 }
+
+/** Active supply stations a field worker can open (QR or from the app). */
+export function listFieldStations(orgId: string) {
+  return orgDb(orgId).inventoryLocation.findMany({
+    where: { kind: "SUPPLY_STATION", isActive: true },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  })
+}

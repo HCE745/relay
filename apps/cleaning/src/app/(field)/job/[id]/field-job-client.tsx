@@ -101,7 +101,12 @@ export function FieldJobClient(props: {
       <div className="rounded-2xl border border-slate-200 bg-white p-4">
         <div className="text-lg font-semibold text-slate-900">{props.customerName}</div>
         <div className="text-sm text-slate-600">{props.siteName}</div>
-        {props.address ? <div className="mt-1 text-sm text-slate-400">{props.address}</div> : null}
+        {props.address ? (
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <span className="text-sm text-slate-400">{props.address}</span>
+            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(props.address)}`} target="_blank" rel="noopener noreferrer" className="rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 active:bg-sky-100">Directions →</a>
+          </div>
+        ) : null}
         <div className="mt-2 text-sm text-slate-500">{props.scheduledLabel}</div>
         {props.siteNotes ? (
           <div className="mt-3 rounded-lg bg-amber-50 p-2.5 text-sm text-amber-800">

@@ -68,16 +68,20 @@ export async function applyStockTransaction(orgId: string, input: StockTxnInput)
   if (qty <= 0 && input.type !== "ADJUSTMENT") throw new Error("Quantity must be positive")
 
   return db.$transaction(async (tx) => {
-    const bumpLevel = (locationId: string, cleanDelta: number, dirtyDelta: number) =>
-      tx.stockLevel.upsert({
-        where: { supplyId_inventoryLocationId: { supplyId: input.supplyId, inventoryLocationId: locationId } },
-        create: { organizationId: orgId, supplyId: input.supplyId, inventoryLocationId: locationId, quantity: Math.max(0, cleanDelta), dirtyQuantity: Math.max(0, dirtyDelta) },
-        update: { quantity: { increment: cleanDelta }, dirtyQuantity: { increment: dirtyDelta } },
-      })
+    // Upsert is blocked on the org-scoped client (its unique where can't carry
+    // organizationId), so emulate it with findFirst + create/updateMany.
+    const bumpLevel = async (locationId: string, cleanDelta: number, dirtyDelta: number) => {
+      const existing = await tx.stockLevel.findFirst({ where: { supplyId: input.supplyId, inventoryLocationId: locationId }, select: { id: true } })
+      if (existing) {
+        await tx.stockLevel.updateMany({ where: { id: existing.id }, data: { quantity: { increment: cleanDelta }, dirtyQuantity: { increment: dirtyDelta } } })
+      } else {
+        await tx.stockLevel.create({ data: { organizationId: orgId, supplyId: input.supplyId, inventoryLocationId: locationId, quantity: Math.max(0, cleanDelta), dirtyQuantity: Math.max(0, dirtyDelta) } })
+      }
+    }
 
     // Idempotency: if this sourceKey already produced a txn, do nothing.
     if (input.sourceKey) {
-      const existing = await tx.stockTransaction.findUnique({ where: { sourceKey: input.sourceKey }, select: { id: true } })
+      const existing = await tx.stockTransaction.findFirst({ where: { sourceKey: input.sourceKey }, select: { id: true } })
       if (existing) return null
     }
 
@@ -93,7 +97,7 @@ export async function applyStockTransaction(orgId: string, input: StockTxnInput)
       if (locId) await bumpLevel(locId, eff.cleanDelta, eff.dirtyDelta)
       // Org-level clean total mirrors the net clean change (TRANSFER is net-zero).
       if (eff.cleanDelta !== 0) {
-        await tx.supply.update({ where: { id: input.supplyId }, data: { currentStock: { increment: eff.cleanDelta } } })
+        await tx.supply.updateMany({ where: { id: input.supplyId }, data: { currentStock: { increment: eff.cleanDelta } } })
       }
     }
 
@@ -199,7 +203,8 @@ export async function setExpectedUsage(orgId: string, input: { supplyId: string;
     select: { id: true },
   })
   if (existing) {
-    return orgDb(orgId).expectedSupplyUsage.update({ where: { id: existing.id }, data: { quantity: input.quantity } })
+    await orgDb(orgId).expectedSupplyUsage.updateMany({ where: { id: existing.id }, data: { quantity: input.quantity } })
+    return orgDb(orgId).expectedSupplyUsage.findFirst({ where: { id: existing.id } })
   }
   return orgDb(orgId).expectedSupplyUsage.create({
     data: { organizationId: orgId, supplyId: input.supplyId, quantity: input.quantity, checklistTemplateId: input.checklistTemplateId ?? null, servicePlanId: input.servicePlanId ?? null },
@@ -220,7 +225,7 @@ export async function removeExpectedUsage(orgId: string, id: string) {
  */
 export async function materializeEstimatedConsumption(orgId: string, jobId: string) {
   const db = orgDb(orgId)
-  const org = await db.organization.findUnique({ where: { id: orgId }, select: { invAutoEstimate: true } })
+  const org = await db.organization.findFirst({ where: { id: orgId }, select: { invAutoEstimate: true } })
   if (!org?.invAutoEstimate) return { recorded: 0 }
 
   const job = await db.job.findFirst({

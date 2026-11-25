@@ -371,6 +371,14 @@ export async function seedDemoOrg(orgId: string, mix: DemoMix): Promise<{ owner:
 
   await seedExtras(orgId, stamp, now, week, todayOffset, staff, ctx, () => invoiceNo++)
 
+  // Supervisor scoping (Phase 52): split sites between the two supervisors and
+  // put the cleaners under the first, so the "My team" view shows real data.
+  const allSites = ctx.sites
+  const half = Math.ceil(allSites.length / 2)
+  if (staff.supervisorIds[0]) await systemDb.serviceLocation.updateMany({ where: { id: { in: allSites.slice(0, half).map((s) => s.id) } }, data: { supervisorId: staff.supervisorIds[0] } })
+  if (staff.supervisorIds[1]) await systemDb.serviceLocation.updateMany({ where: { id: { in: allSites.slice(half).map((s) => s.id) } }, data: { supervisorId: staff.supervisorIds[1] } })
+  if (staff.supervisorIds[0]) await systemDb.employeeProfile.updateMany({ where: { userId: { in: staff.cleanerIds } }, data: { supervisorId: staff.supervisorIds[0] } })
+
   // ── Labor budgets (Phase 46): a contract, a site and a plan run-rate ──
   const budContract = await systemDb.contract.findFirst({ where: { organizationId: orgId }, select: { id: true } })
   const budSite = await systemDb.serviceLocation.findFirst({ where: { organizationId: orgId }, select: { id: true } })

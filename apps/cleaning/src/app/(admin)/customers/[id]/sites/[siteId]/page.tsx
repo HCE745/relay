@@ -6,6 +6,8 @@ import { DateTime } from "luxon"
 import { getServiceLocation } from "@/lib/data/service-locations"
 import { getSiteActivity } from "@/lib/data/site-activity"
 import { SiteActivitySection } from "@/components/sites/site-activity"
+import { listSupervisors } from "@/lib/data/supervisor"
+import { SupervisorSelect } from "@/components/supervisor/supervisor-select"
 import { orgHasCapability } from "@/lib/page-guards"
 import { listChecklistTemplates } from "@/lib/data/checklist-templates"
 import { getChecklistTemplate } from "@/lib/data/checklist-templates"
@@ -42,6 +44,7 @@ export default async function SiteDetailPage({
 
   const address = [site.addressLine1, site.city, site.state, site.postalCode].filter(Boolean).join(", ")
 
+  const supervisors = await listSupervisors(orgId)
   const siteActivity = await getSiteActivity(orgId, siteId)
   const siteActivityCaps = {
     jobs: await orgHasCapability(orgId, "core.jobs"),
@@ -77,6 +80,11 @@ export default async function SiteDetailPage({
           </div>
         </div>
       </div>
+
+      <Card className="flex flex-wrap items-center justify-between gap-3 p-4">
+        <SupervisorSelect endpoint={`/api/sites/${site.id}/supervisor`} current={site.supervisorId} supervisors={supervisors} />
+        <span className="text-xs text-slate-400">The supervisor responsible for this location sees it on their “My team” page.</span>
+      </Card>
 
       {(site.siteContactName || site.notes) && (
         <Card className="grid gap-4 p-5 sm:grid-cols-2">

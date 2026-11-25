@@ -660,6 +660,8 @@ model User {
   complaintResponsibilities         ComplaintResponsibility[] @relation("ComplaintResponsibilitySubject")
   capturedComplaintResponsibilities ComplaintResponsibility[] @relation("ComplaintResponsibilityCapturer")
   assignedInventoryLocations        InventoryLocation[]       @relation("InventoryLocationHolder")
+  supervisedSites                   ServiceLocation[]         @relation("SiteSupervisor")
+  supervisedEmployees               EmployeeProfile[]         @relation("EmployeeSupervisor")
   stockTransactions                 StockTransaction[]        @relation("StockTransactionActor")
   requestedReplenishments           ReplenishmentRequest[]    @relation("ReplenishmentRequester")
   reviewedReplenishments            ReplenishmentRequest[]    @relation("ReplenishmentReviewer")
@@ -686,10 +688,13 @@ model EmployeeProfile {
   availability          String? // carried over from an Applicant on hire (Phase 18)
   emergencyContactName  String?
   emergencyContactPhone String?
+  // The supervisor this employee reports to (Phase 52) — the crew-scoping axis.
+  supervisorId          String?
   createdAt             DateTime         @default(now())
   updatedAt             DateTime         @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  supervisor User? @relation("EmployeeSupervisor", fields: [supervisorId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
   @@schema("cleaning")
@@ -834,6 +839,9 @@ model ServiceLocation {
   id               String   @id @default(cuid())
   organizationId   String
   customerId       String
+  // Supervisor responsible for this site (Phase 52) — the location-scoping axis
+  // for the supervisor experience. Nullable; SetNull if the user is removed.
+  supervisorId     String?
   name             String
   addressLine1     String?
   addressLine2     String?
@@ -888,6 +896,7 @@ model ServiceLocation {
   skillRequirements      SiteSkillRequirement[]
   timeClockKiosks        TimeClockKiosk[]
   inventoryLocations     InventoryLocation[]
+  supervisor             User?                   @relation("SiteSupervisor", fields: [supervisorId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
   @@index([customerId])

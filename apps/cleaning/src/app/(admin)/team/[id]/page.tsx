@@ -6,6 +6,7 @@ import { orgHasCapability } from "@/lib/page-guards"
 import { getEmployeeProfile } from "@/lib/data/employee-profile"
 import { getEmployeePerformance } from "@/lib/data/performance"
 import { getOrgTimezone } from "@/lib/data/org"
+import { listSupervisors } from "@/lib/data/supervisor"
 import { EmployeeProfile } from "@/components/team/employee-profile"
 
 export const dynamic = "force-dynamic"
@@ -28,6 +29,7 @@ export default async function EmployeeProfilePage({ params }: { params: Promise<
     orgHasCapability(orgId, "operations.employeeReports"),
   ])
   const perf = hasPerformance ? await getEmployeePerformance(orgId, id) : null
+  const supervisors = (await listSupervisors(orgId)).filter((s) => s.id !== id)
 
   const u = profile.user
   const ep = u.employeeProfile
@@ -82,6 +84,7 @@ export default async function EmployeeProfilePage({ params }: { params: Promise<
         completed: perf.summary.tasks.completed,
       } : null}
       reportsHref={hasReports ? "/reports/employee" : null}
+      supervisorAssign={{ endpoint: `/api/team/${id}/supervisor`, current: ep?.supervisorId ?? null, supervisors }}
     />
   )
 }

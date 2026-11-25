@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { Card, StatusBadge } from "@/components/ui/controls"
 import { UserRowActions, type TeamUser } from "@/components/team/team-dialogs"
+import { SupervisorSelect } from "@/components/supervisor/supervisor-select"
 
 // Serializable shapes passed from the server page (no Prisma types cross the boundary).
 export type ProfileProps = {
@@ -22,6 +23,7 @@ export type ProfileProps = {
   onboarding: { id: string; packetName: string; assignedAt: string; completedAt: string | null; total: number; done: number }[]
   performance: PerfSummary | null
   reportsHref: string | null
+  supervisorAssign?: { endpoint: string; current: string | null; supervisors: { id: string; name: string; role: string }[] }
 }
 type JobRow = { id: string; title: string; when: string; customer: string; site: string; status: string; progress: string }
 type TimeRow = { id: string; day: string; span: string; hours: string; status: string; job: string | null }
@@ -120,6 +122,11 @@ function Overview(props: ProfileProps) {
           <Row label="Open onboarding" value={String(props.onboarding.filter((o) => !o.completedAt).length)} />
           <Row label="SOPs to acknowledge" value={props.outstandingSops > 0 ? <span className="font-semibold text-amber-700">{props.outstandingSops}</span> : "0"} />
         </div>
+        {props.supervisorAssign ? (
+          <div className="mt-3 border-t border-slate-100 pt-3">
+            <SupervisorSelect endpoint={props.supervisorAssign.endpoint} current={props.supervisorAssign.current} supervisors={props.supervisorAssign.supervisors} label="Reports to" />
+          </div>
+        ) : null}
       </Card>
     </div>
   )

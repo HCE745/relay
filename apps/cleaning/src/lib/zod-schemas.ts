@@ -1279,3 +1279,6 @@ export const inventoryPolicySchema = z.object({
   invAutoEstimate: z.boolean().optional(),
   invRequireManualUsage: z.boolean().optional(),
 })
+
+// ── Supervisor scoping (Phase 52) ────────────────────────────────────────────
+export const supervisorAssignSchema = z.object({ supervisorId: z.string().trim().min(1).optional().or(z.literal("").transform(() => undefined)).nullable() })

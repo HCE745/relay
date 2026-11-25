@@ -1,5 +1,9 @@
 import "server-only"
 import { systemDb } from "../org-db"
+import { CAPABILITIES } from "../entitlements/capabilities"
+import { capabilitiesForTier, type PackageTier } from "../entitlements/packages"
+import { parseOverrides } from "../entitlements/can-use"
+import { recordAudit } from "./audit"
 
 // CleanWare PLATFORM administration data — cross-tenant reads for the internal
 // Super Admin portal. Every function here intentionally bypasses org scoping
@@ -74,4 +78,42 @@ export async function listActiveDemos() {
     select: { id: true, name: true, slug: true, createdAt: true, demoExpiresAt: true, _count: { select: { users: true, customers: true } } },
     take: 300,
   })
+}
+
+// Entitlement management — the SAFE layer: per-org capability overrides on top of
+// the Stripe-driven tier. This never changes Stripe or the tier itself (those
+// stay the source of truth for billing); it only grants/revokes individual
+// capabilities for an org, e.g. a courtesy feature or a temporary disable.
+export async function getOrgEntitlements(id: string) {
+  const org = await systemDb.organization.findUnique({ where: { id }, select: { id: true, name: true, packageTier: true, capabilityOverrides: true } })
+  if (!org) return null
+  const base = capabilitiesForTier(org.packageTier as PackageTier)
+  const ov = parseOverrides(org.capabilityOverrides)
+  const add = new Set(ov?.add ?? [])
+  const remove = new Set(ov?.remove ?? [])
+  const rows = CAPABILITIES.filter((c) => !c.startsWith("enterprise.")).map((cap) => ({
+    cap,
+    inTier: base.has(cap),
+    added: add.has(cap),
+    removed: remove.has(cap),
+    effective: (base.has(cap) || add.has(cap)) && !remove.has(cap),
+  }))
+  return { org: { id: org.id, name: org.name, packageTier: org.packageTier }, rows }
+}
+
+export async function setOrgCapabilityOverride(id: string, capability: string, mode: "add" | "remove" | "default", actorEmail: string) {
+  if (!CAPABILITIES.includes(capability as (typeof CAPABILITIES)[number])) return false
+  const org = await systemDb.organization.findUnique({ where: { id }, select: { capabilityOverrides: true } })
+  if (!org) return false
+  const ov = parseOverrides(org.capabilityOverrides) ?? { add: [], remove: [] }
+  const add = new Set(ov.add ?? [])
+  const remove = new Set(ov.remove ?? [])
+  add.delete(capability); remove.delete(capability)
+  if (mode === "add") add.add(capability)
+  else if (mode === "remove") remove.add(capability)
+  const next = { add: [...add], remove: [...remove] }
+  await systemDb.organization.update({ where: { id }, data: { capabilityOverrides: next } })
+  // Audit trail on the target org (actor is a platform admin, recorded in metadata).
+  await recordAudit(id, null, "Organization", id, "entitlement_override", { field: capability, newValue: mode, metadata: { by: actorEmail, platformAction: true } }).catch(() => {})
+  return true
 }

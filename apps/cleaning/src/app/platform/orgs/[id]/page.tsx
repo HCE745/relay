@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getOrganizationDetail } from "@/lib/data/platform"
+import { getOrganizationDetail, getOrgEntitlements } from "@/lib/data/platform"
+import { EntitlementsEditor } from "@/components/platform/entitlements-editor"
 
 export const dynamic = "force-dynamic"
 
@@ -9,7 +10,7 @@ const fmt = (d: Date | null) => (d ? new Date(d).toLocaleDateString("en-US", { m
 
 export default async function OrgDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const data = await getOrganizationDetail(id)
+  const [data, entitlements] = await Promise.all([getOrganizationDetail(id), getOrgEntitlements(id)])
   if (!data) notFound()
   const { org, users, feedback } = data
 
@@ -69,7 +70,15 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ id: 
         </section>
       ) : null}
 
-      <p className="rounded-xl border border-slate-800 bg-slate-900 p-3 text-xs text-slate-500">Read-only view. Plan and billing changes are handled through Stripe; this portal does not mutate customer billing or impersonate users.</p>
+      {entitlements ? (
+        <section>
+          <h2 className="mb-1 text-sm font-semibold text-slate-200">Entitlements</h2>
+          <p className="mb-2 text-xs text-slate-500">Per-org capability overrides on top of the <span className="text-slate-300">{org.packageTier}</span> plan. Grants/revokes here take effect immediately and do <span className="text-slate-300">not</span> change Stripe billing or the plan tier.</p>
+          <EntitlementsEditor orgId={org.id} rows={entitlements.rows} />
+        </section>
+      ) : null}
+
+      <p className="rounded-xl border border-slate-800 bg-slate-900 p-3 text-xs text-slate-500">Plan tier and billing state remain driven by Stripe; this portal adjusts only per-org capability overrides, and does not impersonate users. Entitlement changes are written to the organization&apos;s audit log.</p>
     </div>
   )
 }

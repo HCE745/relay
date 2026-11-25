@@ -8,9 +8,10 @@ export const dynamic = "force-dynamic"
 // The demo `enterDemo`/`reseed` server actions run inside THIS route's function
 // and seed a full workspace (hundreds of writes) in one request. The platform
 // default function timeout can cut that off mid-seed, which surfaces to Postgres
-// as "Connection closed". Give the seed real headroom (60s is allowed on every
-// plan tier); normal page renders finish in well under a second regardless.
-export const maxDuration = 60
+// as "Connection closed" or a Vercel runtime timeout. The seed does hundreds of
+// sequential writes over the pooler, so give it real headroom (Pro allows up to
+// 300s). Normal page renders finish in well under a second regardless.
+export const maxDuration = 180
 
 export default async function DemoLandingPage() {
   const session = await getDemoSession()

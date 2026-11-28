@@ -47,6 +47,7 @@ const mockBadgeFindFirst   = vi.fn()
 const mockUserFindUnique   = vi.fn()
 const mockDeviceFindUnique = vi.fn()
 const mockDeviceUpdate     = vi.fn()
+const mockAuditCreate      = vi.fn().mockResolvedValue({})
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -58,13 +59,14 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: (...a: unknown[]) => mockDeviceFindUnique(...a),
       update:     (...a: unknown[]) => mockDeviceUpdate(...a),
     },
+    authAuditLog:       { create:     (...a: unknown[]) => mockAuditCreate(...a) },
   },
 }))
 
 vi.mock("@/lib/ratelimit", () => ({
   checkLimit: vi.fn().mockResolvedValue(null),
   getIP:      vi.fn().mockReturnValue("127.0.0.1"),
-  limiters:   { employeeLogin: null },
+  limiters:   { employeeLogin: null, employeeLoginDevice: null, employeeLoginOrg: null },
 }))
 
 // bcryptjs mock: compare returns true when hash === "VALID_HASH"

@@ -143,9 +143,10 @@ export async function createEmployeeSession(params: CreateEmployeeSessionParams)
 }
 
 // Extends the session's expiry to now + inactivityTimeout, capped by max session duration.
-// Called by the heartbeat endpoint.
+// Called by the heartbeat endpoint. Works for both employee quick-access sessions and
+// standard email+password sessions bound to a registered device that has an inactivity
+// policy — both use createSession() with inactivityTimeoutSeconds encoded in the JWT.
 export async function extendEmployeeSession(session: SessionPayload): Promise<boolean> {
-  if (session.sessionType !== "employee") return false
   if (!session.inactivityTimeoutSeconds) return false  // no inactivity timeout — nothing to extend
 
   const nowSecs   = Math.floor(Date.now() / 1000)

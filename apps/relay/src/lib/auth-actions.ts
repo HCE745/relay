@@ -1,7 +1,7 @@
 "use server"
 
 import bcrypt from "bcryptjs"
-import { headers } from "next/headers"
+import { headers, cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { after } from "next/server"
 import { prisma } from "./prisma"
@@ -10,6 +10,9 @@ import { checkLimitAction, limiters } from "./ratelimit"
 import { CURRENT_TERMS_VERSION, CURRENT_PRIVACY_VERSION } from "./legal-versions"
 import { syncRegistrationToCrm } from "./registration-crm-sync"
 import { TRIAL_DAYS } from "./billing-config"
+import { normalizeCredential, computeCredentialIndex } from "./credential-hmac"
+import { resolveSessionPolicy } from "./employee-session"
+import type { AuthPolicyConfig } from "./employee-session"
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string
@@ -41,6 +44,55 @@ export async function login(formData: FormData) {
 
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
 
+  // Apply registered-device session policy when a valid device cookie is present.
+  // This ensures standard (email+password) logins on registered devices respect the
+  // same inactivity timeout and max session duration as quick-access logins.
+  const cookieStore = await cookies()
+  const deviceToken = cookieStore.get("relay-device")?.value ?? null
+
+  let devicePayload: {
+    deviceId?: string
+    deviceSessionVersion?: number
+    sessionIssuedAt?: number
+    inactivityTimeoutSeconds?: number
+    maxSessionDurationSeconds?: number
+  } = {}
+
+  if (deviceToken) {
+    const tokenIndex = computeCredentialIndex(normalizeCredential(deviceToken))
+    const device = await prisma.registeredDevice.findUnique({
+      where: { deviceTokenIndex: tokenIndex },
+      select: {
+        id: true, sessionVersion: true, isActive: true,
+        organizationId: true,
+        inactivityTimeoutSeconds: true, maxSessionDurationSeconds: true,
+        disableInactivityTimeout: true, disableMaxSessionDuration: true,
+      },
+    })
+    if (device && device.isActive && device.organizationId === user.organizationId) {
+      const orgData = await prisma.organization.findUnique({
+        where: { id: user.organizationId },
+        select: { authPolicyConfig: true },
+      })
+      const policy = resolveSessionPolicy(
+        (orgData?.authPolicyConfig ?? null) as AuthPolicyConfig | null,
+        device,
+      )
+      devicePayload = {
+        deviceId:             device.id,
+        deviceSessionVersion: device.sessionVersion,
+        sessionIssuedAt:      Math.floor(Date.now() / 1000),
+        ...(policy.inactivityTimeoutSeconds  !== null && { inactivityTimeoutSeconds:  policy.inactivityTimeoutSeconds }),
+        ...(policy.maxSessionDurationSeconds !== null && { maxSessionDurationSeconds: policy.maxSessionDurationSeconds }),
+      }
+      // Update lastSeenAt non-blockingly
+      void prisma.registeredDevice.update({
+        where: { id: device.id },
+        data:  { lastSeenAt: new Date() },
+      }).catch(() => undefined)
+    }
+  }
+
   await createSession({
     userId: user.id,
     email: user.email,
@@ -53,6 +105,7 @@ export async function login(formData: FormData) {
     subscriptionStatus: user.organization.subscriptionStatus,
     plan: user.organization.plan,
     productLine: user.organization.productLine,
+    ...devicePayload,
   })
 
   redirect("/dashboard")

@@ -233,6 +233,7 @@ model Organization {
   employeeCredentials     EmployeeCredential[]
   employeeBadges          EmployeeBadge[]
   registeredDevices       RegisteredDevice[]
+  singleCodeLookups       SingleCodeLookup[]
 }
 
 model CustomView {
@@ -4094,4 +4095,53 @@ model RegisteredDevice {
   department                Department?   @relation(fields: [departmentId], references: [id], onDelete: SetNull)
 
   @@index([organizationId, isActive])
+}
+
+// ── Employee Auth Corrections (Phase 1 / Migration 0074) ──────────────────────
+
+// Unified single-code lookup table.
+// Prevents cross-method HMAC collisions: an Employee ID value and an access code
+// value that hash to the same HMAC index would otherwise be indistinguishable
+// during lookup. This table enforces that any given HMAC value is registered at
+// most once per organization across ALL single-code credential methods.
+//
+// Key rotation: rotating CREDENTIAL_HMAC_SECRET invalidates all existing indices.
+// All credential records (EmployeeCredential, SingleCodeLookup) must be re-computed
+// after a key rotation. See CREDENTIAL_HMAC_SECRET documentation in .env.example.
+model SingleCodeLookup {
+  id              String       @id @default(cuid())
+  organizationId  String
+  credentialIndex String       // HMAC-SHA256(CREDENTIAL_HMAC_SECRET, normalizedValue)
+
+  createdAt       DateTime     @default(now())
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, credentialIndex])
+  @@index([organizationId])
+}
+
+// Append-only audit log for authentication events.
+// Never stores raw credentials. Covers employee quick-access logins,
+// standard email+password logins on registered devices, and admin actions
+// (device registration, revocation, session invalidation).
+model AuthAuditLog {
+  id              String    @id @default(cuid())
+  organizationId  String?
+  userId          String?
+  deviceId        String?
+  // "EMPLOYEE_ID" | "ACCESS_CODE" | "BADGE" | "EMAIL_PASSWORD"
+  authMethod      String?
+  // "SUCCESS" | "FAILURE"
+  outcome         String
+  // "INVALID_CREDENTIAL" | "USER_INACTIVE" | "DEVICE_REVOKED" | "METHOD_NOT_PERMITTED"
+  // | "RATE_LIMITED" | "DEVICE_REGISTERED" | "DEVICE_REVOKED_ADMIN" | "SESSION_INVALIDATED"
+  failureReason   String?
+  ipAddress       String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([organizationId, createdAt])
+  @@index([userId, createdAt])
+  @@index([deviceId, createdAt])
 }

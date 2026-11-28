@@ -8,6 +8,7 @@ import {
   getSessionToken,
   deleteSessionCookie,
 } from "@hce/auth"
+import { prisma } from "@/lib/prisma"
 
 const _sessionSecret = process.env.SESSION_SECRET
 if (!_sessionSecret) {
@@ -60,19 +61,64 @@ export type SessionPayload = {
 }
 
 export async function createSession(payload: SessionPayload) {
+  // When the payload encodes a device session policy, derive expiry from that policy.
+  // This applies to both employee sessions and standard sessions on registered devices.
+  // "Disabled" policy (both fields null/undefined) falls back to the 7-day default —
+  // the session remains version-checked on every request and is therefore still revocable.
+  const DEFAULT_SECS = 60 * 60 * 24 * 7
+  let expiresInSec = DEFAULT_SECS
+
+  if (payload.inactivityTimeoutSeconds !== undefined || payload.maxSessionDurationSeconds !== undefined) {
+    const candidates: number[] = []
+    if (payload.inactivityTimeoutSeconds  !== undefined) candidates.push(payload.inactivityTimeoutSeconds)
+    if (payload.maxSessionDurationSeconds !== undefined) candidates.push(payload.maxSessionDurationSeconds)
+    if (candidates.length > 0) {
+      expiresInSec = Math.min(...candidates)
+    }
+  }
+
   const token = await signJwt(payload as unknown as Record<string, unknown>, SECRET, {
-    expiresIn: "7d",
+    expiresIn: `${expiresInSec}s`,
   })
   await setSessionCookie("session", token, {
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: expiresInSec,
   })
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
   const token = await getSessionToken("session")
   if (!token) return null
-  return verifyJwt<SessionPayload>(token, SECRET)
+  const payload = await verifyJwt<SessionPayload>(token, SECRET)
+  if (!payload) return null
+
+  // For sessions bound to a registered device (employee or standard), verify the device
+  // has not been revoked or had its sessions invalidated since this JWT was issued.
+  // SameSite=Strict on the session cookie means cross-site requests cannot even send
+  // the cookie, so CSRF is mitigated at the transport layer for all device-bound requests.
+  if (payload.deviceId !== undefined && payload.deviceSessionVersion !== undefined) {
+    const device = await prisma.registeredDevice.findUnique({
+      where:  { id: payload.deviceId },
+      select: { sessionVersion: true, isActive: true },
+    })
+    if (!device || !device.isActive || device.sessionVersion !== payload.deviceSessionVersion) {
+      return null
+    }
+  }
+
+  // For employee quick-access sessions, verify the employee session version.
+  // Incremented on deactivation, password change, or admin force-logout.
+  if (payload.sessionType === "employee" && payload.employeeSessionVersion !== undefined) {
+    const user = await prisma.user.findUnique({
+      where:  { id: payload.userId },
+      select: { employeeSessionVersion: true, isActive: true },
+    })
+    if (!user || !user.isActive || user.employeeSessionVersion !== payload.employeeSessionVersion) {
+      return null
+    }
+  }
+
+  return payload
 }
 
 export async function deleteSession() {

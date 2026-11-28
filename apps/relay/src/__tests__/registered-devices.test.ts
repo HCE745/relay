@@ -27,6 +27,10 @@ vi.mock("@hce/auth", () => ({
   deleteSessionCookie: vi.fn(),
 }))
 
+vi.mock("@/lib/ratelimit", () => ({
+  getIP: vi.fn().mockReturnValue("127.0.0.1"),
+}))
+
 const mockSetCookie    = vi.fn()
 const mockDeleteCookie = vi.fn()
 const mockGetCookie    = vi.fn().mockReturnValue(undefined)
@@ -55,6 +59,7 @@ const mockDeviceFindUnique = vi.fn()
 const mockLocationFindFirst  = vi.fn()
 const mockDeptFindFirst      = vi.fn()
 const mockUserUpdate         = vi.fn()
+const mockAuditCreate        = vi.fn().mockResolvedValue({})
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -68,6 +73,7 @@ vi.mock("@/lib/prisma", () => ({
     location:   { findFirst: (...a: unknown[]) => mockLocationFindFirst(...a) },
     department: { findFirst: (...a: unknown[]) => mockDeptFindFirst(...a) },
     user:       { update:    (...a: unknown[]) => mockUserUpdate(...a) },
+    authAuditLog: { create:  (...a: unknown[]) => mockAuditCreate(...a) },
   },
 }))
 
@@ -259,5 +265,48 @@ describe("DELETE /api/settings/devices/[id]", () => {
     )
     // second update: session version increment from invalidateDeviceSessions
     expect(mockDeviceUpdate).toHaveBeenCalledTimes(2)
+  })
+})
+
+// ── POST /api/settings/devices/[id]/rotate ────────────────────────────────────
+
+describe("POST /api/settings/devices/[id]/rotate", () => {
+  function makeCtx(id = "dev-1") { return { params: Promise.resolve({ id }) } }
+  function makePost() {
+    return new NextRequest("http://localhost/api/settings/devices/dev-1/rotate", { method: "POST" })
+  }
+
+  it("returns 404 when device not found", async () => {
+    const { POST } = await import("@/app/api/settings/devices/[id]/rotate/route")
+    mockDeviceFindFirst.mockResolvedValue(null)
+    const res = await POST(makePost(), makeCtx())
+    expect(res.status).toBe(404)
+  })
+
+  it("returns 409 when device is revoked", async () => {
+    const { POST } = await import("@/app/api/settings/devices/[id]/rotate/route")
+    mockDeviceFindFirst.mockResolvedValue({ ...BASE_DEVICE, isActive: false })
+    const res = await POST(makePost(), makeCtx())
+    expect(res.status).toBe(409)
+  })
+
+  it("rotates token: updates index+hash and increments sessionVersion", async () => {
+    const { POST } = await import("@/app/api/settings/devices/[id]/rotate/route")
+    // No relay-device cookie — caller is not on this device
+    mockGetCookie.mockReturnValue(undefined)
+    const res = await POST(makePost(), makeCtx())
+    expect(res.status).toBe(200)
+    const body = await res.json() as { ok: boolean; cookieUpdated: boolean }
+    expect(body.ok).toBe(true)
+    expect(body.cookieUpdated).toBe(false)  // no cookie match
+    expect(mockDeviceUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          deviceTokenIndex: expect.any(String),
+          deviceTokenHash:  expect.any(String),
+          sessionVersion:   { increment: 1 },
+        }),
+      })
+    )
   })
 })

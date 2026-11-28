@@ -2,7 +2,19 @@ import "server-only"
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
+import { getIP } from "@/lib/ratelimit"
 import { invalidateDeviceSessions } from "@/lib/employee-session"
+
+function auditLog(params: {
+  organizationId?: string
+  userId?: string
+  deviceId?: string
+  outcome: "SUCCESS" | "FAILURE"
+  failureReason?: string
+  ipAddress?: string
+}) {
+  void prisma.authAuditLog.create({ data: { authMethod: undefined, ...params } }).catch(() => undefined)
+}
 
 export const dynamic = "force-dynamic"
 
@@ -122,8 +134,16 @@ export async function DELETE(_req: NextRequest, { params }: RouteCtx) {
     data:  { isActive: false, revokedAt: new Date() },
   })
 
-  // Invalidate all active sessions bound to this device immediately
   await invalidateDeviceSessions(id)
+
+  auditLog({
+    organizationId: session.organizationId,
+    userId:         session.userId,
+    deviceId:       id,
+    outcome:        "SUCCESS",
+    failureReason:  "DEVICE_REVOKED_ADMIN",
+    ipAddress:      getIP(_req),
+  })
 
   return NextResponse.json({ ok: true })
 }

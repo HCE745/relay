@@ -8,6 +8,19 @@ import { normalizeCredential, computeCredentialIndex } from "@/lib/credential-hm
 import { createEmployeeSession } from "@/lib/employee-session"
 import type { AuthPolicyConfig } from "@/lib/employee-session"
 
+// Writes an auth audit event without blocking the response.
+function auditLog(params: {
+  organizationId?: string
+  userId?: string
+  deviceId?: string
+  authMethod?: string
+  outcome: "SUCCESS" | "FAILURE"
+  failureReason?: string
+  ipAddress?: string
+}) {
+  void prisma.authAuditLog.create({ data: params }).catch(() => undefined)
+}
+
 export const dynamic = "force-dynamic"
 
 // POST /api/auth/employee
@@ -20,12 +33,15 @@ export const dynamic = "force-dynamic"
 // Org is resolved from the registered-device cookie when present; otherwise
 // organizationSlug is required.
 export async function POST(request: NextRequest) {
-  const blocked = await checkLimit(
+  const ip = getIP(request)
+
+  // ── Layered rate limiting: IP (first, cheapest) ───────────────────────────
+  const ipBlocked = await checkLimit(
     limiters.employeeLogin,
-    `emp-login:${getIP(request)}`,
+    `emp-login:ip:${ip}`,
     "Too many login attempts. Please try again later.",
   )
-  if (blocked) return blocked
+  if (ipBlocked) return ipBlocked
 
   const body = await request.json() as { credential?: string; organizationSlug?: string }
   const rawCredential = body.credential?.trim()
@@ -39,16 +55,17 @@ export async function POST(request: NextRequest) {
 
   let orgId:  string
   let device: Awaited<ReturnType<typeof prisma.registeredDevice.findUnique>> | null = null
+  let deviceTokenIndex: string | null = null
 
   if (deviceToken) {
-    const normalized  = normalizeCredential(deviceToken)
-    const tokenIndex  = computeCredentialIndex(normalized)
+    const normalizedToken = normalizeCredential(deviceToken)
+    deviceTokenIndex      = computeCredentialIndex(normalizedToken)
     device = await prisma.registeredDevice.findUnique({
-      where: { deviceTokenIndex: tokenIndex },
+      where: { deviceTokenIndex },
     })
     if (!device || !device.isActive) {
-      // Stale or revoked device cookie — treat as unregistered
       device = null
+      deviceTokenIndex = null
     }
     if (!device && !body.organizationSlug) {
       return NextResponse.json({ error: "Organization is required" }, { status: 400 })
@@ -57,7 +74,6 @@ export async function POST(request: NextRequest) {
 
   if (device) {
     orgId = device.organizationId
-    // Update lastSeenAt
     void prisma.registeredDevice.update({
       where: { id: device.id },
       data:  { lastSeenAt: new Date() },
@@ -71,9 +87,34 @@ export async function POST(request: NextRequest) {
       select: { id: true, subscriptionStatus: true },
     })
     if (!org || org.subscriptionStatus === "canceled" || org.subscriptionStatus === "expired") {
+      auditLog({ outcome: "FAILURE", failureReason: "INVALID_CREDENTIAL", ipAddress: ip })
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
     orgId = org.id
+  }
+
+  // ── Layered rate limiting: device (validated HMAC index, not raw client input) ──
+  if (deviceTokenIndex) {
+    const deviceBlocked = await checkLimit(
+      limiters.employeeLoginDevice,
+      `emp-login:dev:${deviceTokenIndex}`,
+      "Too many login attempts on this device. Please try again later.",
+    )
+    if (deviceBlocked) {
+      auditLog({ organizationId: orgId, deviceId: device?.id, outcome: "FAILURE", failureReason: "RATE_LIMITED", ipAddress: ip })
+      return deviceBlocked
+    }
+  }
+
+  // ── Layered rate limiting: org ────────────────────────────────────────────
+  const orgBlocked = await checkLimit(
+    limiters.employeeLoginOrg,
+    `emp-login:org:${orgId}`,
+    "Too many login attempts for this organization. Please try again later.",
+  )
+  if (orgBlocked) {
+    auditLog({ organizationId: orgId, deviceId: device?.id, outcome: "FAILURE", failureReason: "RATE_LIMITED", ipAddress: ip })
+    return orgBlocked
   }
 
   // ── Credential lookup ─────────────────────────────────────────────────────
@@ -111,32 +152,39 @@ export async function POST(request: NextRequest) {
   })
 
   if (!empIdMatch && !accessCodeMatch && !badgeMatch) {
-    // Avoid leaking which credentials exist — always return same error
+    auditLog({ organizationId: orgId, deviceId: device?.id, outcome: "FAILURE", failureReason: "INVALID_CREDENTIAL", ipAddress: ip })
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
   }
 
   // ── Verification ──────────────────────────────────────────────────────────
   let userId: string
+  let authMethod: string
 
   if (empIdMatch) {
-    // Employee ID: HMAC match is sufficient (ID is not secret; not bcrypt-verified)
-    userId = empIdMatch.userId
+    userId     = empIdMatch.userId
+    authMethod = "EMPLOYEE_ID"
   } else if (accessCodeMatch) {
     if (!accessCodeMatch.accessCodeHash) {
+      auditLog({ organizationId: orgId, deviceId: device?.id, outcome: "FAILURE", failureReason: "INVALID_CREDENTIAL", ipAddress: ip })
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
     const ok = await compare(rawCredential, accessCodeMatch.accessCodeHash)
-    if (!ok) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
-    userId = accessCodeMatch.userId
-  } else {
-    // badgeMatch guaranteed non-null here
-    if (badgeMatch!.credentialHash) {
-      // Relay-generated badge — bcrypt verify
-      const ok = await compare(rawCredential, badgeMatch!.credentialHash)
-      if (!ok) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+    if (!ok) {
+      auditLog({ organizationId: orgId, deviceId: device?.id, outcome: "FAILURE", failureReason: "INVALID_CREDENTIAL", ipAddress: ip })
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
-    // Third-party badge: HMAC match is sufficient
-    userId = badgeMatch!.userId
+    userId     = accessCodeMatch.userId
+    authMethod = "ACCESS_CODE"
+  } else {
+    if (badgeMatch!.credentialHash) {
+      const ok = await compare(rawCredential, badgeMatch!.credentialHash)
+      if (!ok) {
+        auditLog({ organizationId: orgId, deviceId: device?.id, outcome: "FAILURE", failureReason: "INVALID_CREDENTIAL", ipAddress: ip })
+        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      }
+    }
+    userId     = badgeMatch!.userId
+    authMethod = "BADGE"
   }
 
   // ── Load user ─────────────────────────────────────────────────────────────
@@ -149,6 +197,7 @@ export async function POST(request: NextRequest) {
   })
 
   if (!user || !user.isActive || user.organizationId !== orgId) {
+    auditLog({ organizationId: orgId, userId, deviceId: device?.id, authMethod, outcome: "FAILURE", failureReason: "USER_INACTIVE", ipAddress: ip })
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
   }
 
@@ -162,11 +211,9 @@ export async function POST(request: NextRequest) {
   // Check permitted methods on device (if registered)
   if (device) {
     const permitted = device.permittedMethods as string[]
-    if (permitted.length > 0) {
-      const usedMethod = empIdMatch ? "EMPLOYEE_ID" : accessCodeMatch ? "ACCESS_CODE" : "BADGE"
-      if (!permitted.includes(usedMethod)) {
-        return NextResponse.json({ error: "This authentication method is not permitted on this device" }, { status: 403 })
-      }
+    if (permitted.length > 0 && !permitted.includes(authMethod)) {
+      auditLog({ organizationId: orgId, userId: user.id, deviceId: device.id, authMethod, outcome: "FAILURE", failureReason: "METHOD_NOT_PERMITTED", ipAddress: ip })
+      return NextResponse.json({ error: "This authentication method is not permitted on this device" }, { status: 403 })
     }
   }
 
@@ -192,5 +239,6 @@ export async function POST(request: NextRequest) {
     orgPolicy,
   })
 
+  auditLog({ organizationId: orgId, userId: user.id, deviceId: device?.id, authMethod, outcome: "SUCCESS", ipAddress: ip })
   return NextResponse.json({ ok: true })
 }

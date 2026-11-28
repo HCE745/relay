@@ -5,8 +5,20 @@ import { hash } from "bcryptjs"
 import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
+import { getIP } from "@/lib/ratelimit"
 import { normalizeCredential, computeCredentialIndex } from "@/lib/credential-hmac"
 import { invalidateDeviceSessions } from "@/lib/employee-session"
+
+function auditLog(params: {
+  organizationId?: string
+  userId?: string
+  deviceId?: string
+  outcome: "SUCCESS" | "FAILURE"
+  failureReason?: string
+  ipAddress?: string
+}) {
+  void prisma.authAuditLog.create({ data: { authMethod: undefined, ...params } }).catch(() => undefined)
+}
 
 export const dynamic = "force-dynamic"
 
@@ -106,6 +118,15 @@ export async function POST(request: NextRequest) {
     },
   })
 
+  auditLog({
+    organizationId: session.organizationId,
+    userId:         session.userId,
+    deviceId:       device.id,
+    outcome:        "SUCCESS",
+    failureReason:  "DEVICE_REGISTERED",
+    ipAddress:      getIP(request),
+  })
+
   // Set the persistent device-identity cookie (HttpOnly, Secure, SameSite=Strict)
   const isProduction = process.env.NODE_ENV === "production"
   const cookieStore  = await cookies()
@@ -155,6 +176,15 @@ export async function DELETE(_req: NextRequest) {
     data:  { isActive: false, revokedAt: new Date() },
   })
   await invalidateDeviceSessions(device.id)
+
+  auditLog({
+    organizationId: session.organizationId,
+    userId:         session.userId,
+    deviceId:       device.id,
+    outcome:        "SUCCESS",
+    failureReason:  "DEVICE_REVOKED_ADMIN",
+    ipAddress:      getIP(_req),
+  })
 
   cookieStore.delete("relay-device")
 

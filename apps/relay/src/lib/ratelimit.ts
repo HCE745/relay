@@ -28,8 +28,11 @@ function make(tokens: number, window: `${number} ${"ms" | "s" | "m" | "h" | "d"}
 
 export const limiters = {
   // Auth — IP-based
-  login:         make(5,   "10 m"),  // 5 attempts / 10 min
-  employeeLogin: make(10,  "5 m"),   // 10 quick-access attempts / 5 min / IP
+  login:              make(5,   "10 m"),  // 5 attempts / 10 min
+  employeeLogin:      make(10,  "5 m"),   // 10 quick-access attempts / 5 min / IP
+  // Layered employee login limits (manufacturing sites share public IPs; layer by device + org)
+  employeeLoginDevice: make(10, "5 m"),  // 10 attempts / 5 min per validated device HMAC index
+  employeeLoginOrg:    make(50, "5 m"),  // 50 attempts / 5 min per organization
   register:      make(3,   "1 h"),   // 3 new accounts / hour
   forgotPw:      make(3,   "1 h"),   // 3 reset requests / hour
 

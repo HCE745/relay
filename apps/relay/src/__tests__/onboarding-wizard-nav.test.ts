@@ -39,6 +39,8 @@ vi.mock("@/lib/prisma", () => ({
     employeeType: { count: (...a: unknown[]) => mockCountZero(...a) },
     user:         { count: (...a: unknown[]) => mockCountZero(...a) },
     invitation:   { count: (...a: unknown[]) => mockCountZero(...a) },
+    sOP:          { count: (...a: unknown[]) => mockCountZero(...a) },
+    qrCode:       { count: (...a: unknown[]) => mockCountZero(...a) },
   },
 }))
 
@@ -196,13 +198,15 @@ describe("GET /wizard", () => {
         lastSavedAt:    "2026-11-22T10:00:00Z",
       },
     })
-    // All data-driven counts > 0 so overview/locations/departments/employee-types show completed
+    // All data-driven counts > 0 so overview/locations/departments/employee-types/sops/qr-codes show completed
     mockCountZero
       .mockResolvedValueOnce(1)  // location.count
       .mockResolvedValueOnce(1)  // department.count
       .mockResolvedValueOnce(1)  // employeeType.count
       .mockResolvedValueOnce(0)  // user.count (employee-list not in completedSteps)
       .mockResolvedValueOnce(0)  // invitation.count
+      .mockResolvedValueOnce(1)  // sOP.count
+      .mockResolvedValueOnce(1)  // qrCode.count
     const res = await GET(makeRequest("GET"), makeCtx())
     const body = await res.json() as { progress: { currentStepKey: string }; completedCount: number }
     expect(body.progress.currentStepKey).toBe("feature-flags")

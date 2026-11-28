@@ -44,6 +44,8 @@ vi.mock("@/lib/prisma", () => ({
     employeeType: { count: (...a: unknown[]) => mockCountFn(...a), findUnique: (...a: unknown[]) => mockEmpTypeFindUnique(...a) },
     user:         { count: (...a: unknown[]) => mockCountFn(...a) },
     invitation:   { count: (...a: unknown[]) => mockCountFn(...a) },
+    sOP:          { count: (...a: unknown[]) => mockCountFn(...a) },
+    qrCode:       { count: (...a: unknown[]) => mockCountFn(...a) },
   },
 }))
 

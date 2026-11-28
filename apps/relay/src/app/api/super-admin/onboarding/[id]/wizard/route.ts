@@ -38,7 +38,7 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
   const orgId = record.organizationId
 
   // Parallel counts for data-driven step completion
-  const [locationCount, deptCount, empTypeCount, userCount, pendingInviteCount] = await Promise.all([
+  const [locationCount, deptCount, empTypeCount, userCount, pendingInviteCount, sopCount, qrCodeCount] = await Promise.all([
     prisma.location.count({ where: { organizationId: orgId, isActive: true } }),
     prisma.department.count({ where: { organizationId: orgId } }),
     prisma.employeeType.count({ where: { organizationId: orgId } }),
@@ -46,18 +46,22 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
     prisma.invitation.count({
       where: { organizationId: orgId, usedAt: null, expiresAt: { gt: new Date() } },
     }),
+    prisma.sOP.count({ where: { organizationId: orgId, isActive: true } }),
+    prisma.qrCode.count({ where: { organizationId: orgId, isActive: true } }),
   ])
 
   const progress = (record.wizardProgress ?? null) as WizardProgress | null
   const stagedEmployeeCount = (progress?.stagedEmployees ?? []).length
 
-  // Data-readiness: completion criteria for Steps 1–5 (data-driven, not manual)
+  // Data-readiness: completion criteria for data-driven steps
   const dataReadiness: Record<string, boolean> = {
     overview:         !!record.primaryContactEmail?.trim() && !!record.trialStartDate,
     locations:        locationCount >= 1,
     departments:      deptCount >= 1,
     "employee-types": empTypeCount >= 1,
     "employee-list":  stagedEmployeeCount >= 1,  // wizard-prepared employees, not arbitrary existing org users
+    "sops":           sopCount >= 1,             // at least one active SOP created
+    "qr-codes":       qrCodeCount >= 1,          // at least one active QR code created
   }
 
   const stepsWithStatus = getStepWithStatuses(progress)
@@ -65,7 +69,7 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
   // For data-driven steps, override completion with actual data readiness
   const DATA_DRIVEN = new Set(Object.keys(dataReadiness))
   const stepsResolved = stepsWithStatus.map(s => {
-    if (s.key !== (progress?.currentStepKey ?? WIZARD_STEPS[0].key) && DATA_DRIVEN.has(s.key)) {
+    if (s.key !== (progress?.currentStepKey ?? WIZARD_STEPS[0].key) && DATA_DRIVEN.has(s.key) && s.status !== "skipped") {
       return { ...s, status: (dataReadiness[s.key] ? "completed" : "incomplete") as typeof s.status }
     }
     return s
@@ -91,7 +95,7 @@ export async function GET(_req: NextRequest, { params }: RouteCtx) {
     completedCount,
     skippedCount,
     progress: progress ?? defaultProgress(),
-    counts: { locationCount, deptCount, empTypeCount, userCount, pendingInviteCount },
+    counts: { locationCount, deptCount, empTypeCount, userCount, pendingInviteCount, sopCount, qrCodeCount },
     dataReadiness,
   })
 }

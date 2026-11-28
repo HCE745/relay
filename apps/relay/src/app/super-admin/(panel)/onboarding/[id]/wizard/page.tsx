@@ -15,6 +15,11 @@ import { StepOverview }       from "./steps/StepOverview"
 import { StepLocations }      from "./steps/StepLocations"
 import { StepDepartments }    from "./steps/StepDepartments"
 import { StepEmployeeTypes }  from "./steps/StepEmployeeTypes"
+import { StepIssueSettings }  from "./steps/StepIssueSettings"
+import { StepNotifications }  from "./steps/StepNotifications"
+import { StepSOPs }           from "./steps/StepSOPs"
+import { StepQrCodes }        from "./steps/StepQrCodes"
+import { StepFeatureFlags }   from "./steps/StepFeatureFlags"
 import { StepEmployees }      from "./steps/StepEmployees"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -39,7 +44,7 @@ type WizardData = {
 }
 
 // Steps whose completion is determined by real data counts, not manual marking
-const DATA_DRIVEN_STEPS = new Set(["overview", "locations", "departments", "employee-types", "employee-list"])
+const DATA_DRIVEN_STEPS = new Set(["overview", "locations", "departments", "employee-types", "employee-list", "sops", "qr-codes"])
 
 // ── Icons per step ────────────────────────────────────────────────────────────
 
@@ -601,7 +606,52 @@ export default function WizardPage() {
                   onNotReady={handleCurrentStepNotReady}
                 />
               )}
-              {!DATA_DRIVEN_STEPS.has(currentKey) && (
+              {currentKey === "issue-settings" && (
+                <StepIssueSettings
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {currentKey === "notifications" && (
+                <StepNotifications
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {currentKey === "sops" && (
+                <StepSOPs
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {currentKey === "qr-codes" && (
+                <StepQrCodes
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {currentKey === "feature-flags" && (
+                <StepFeatureFlags
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {!DATA_DRIVEN_STEPS.has(currentKey) && currentKey !== "issue-settings" && currentKey !== "notifications" && currentKey !== "feature-flags" && (
                 <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
                   <p className="text-sm font-semibold text-gray-200 mb-4">{placeholder.heading}</p>
                   <ul className="space-y-3">

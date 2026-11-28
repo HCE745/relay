@@ -33,6 +33,8 @@ vi.mock("@/lib/prisma", () => ({
     location:           { count: (...a: unknown[]) => mockCountFn(...a) },
     department:         { count: (...a: unknown[]) => mockCountFn(...a) },
     employeeType:       { count: (...a: unknown[]) => mockCountFn(...a) },
+    sOP:                { count: (...a: unknown[]) => mockCountFn(...a) },
+    qrCode:             { count: (...a: unknown[]) => mockCountFn(...a) },
   },
 }))
 

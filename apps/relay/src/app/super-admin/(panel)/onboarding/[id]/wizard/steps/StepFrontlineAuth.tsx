@@ -36,6 +36,16 @@ const TIMEOUT_PRESETS = [
 
 type TimeoutPresetValue = null | 900 | 3600 | 14400
 
+// Preset max session durations shown as radio options.
+const MAX_DURATION_PRESETS = [
+  { value: null,   label: "No hard limit",             description: "Sessions extend freely as long as the inactivity policy allows." },
+  { value: 28800,  label: "8 hours",                   description: "Session hard-expires after 8 hours regardless of activity. Suitable for a full shift." },
+  { value: 43200,  label: "12 hours",                  description: "Session hard-expires after 12 hours. Suitable for double-shift operations." },
+  { value: 86400,  label: "24 hours",                  description: "Session hard-expires after 24 hours." },
+] as const
+
+type MaxDurationPresetValue = null | 28800 | 43200 | 86400
+
 const METHOD_LABELS: Record<string, { label: string; detail: string }> = {
   EMPLOYEE_ID: {
     label:  "Employee ID lookup",
@@ -178,6 +188,27 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
     void savePolicy({ inactivityTimeoutSeconds: value })
   }
 
+  function setMaxDurationPreset(value: MaxDurationPresetValue) {
+    if (isPostLaunch) return
+    const updated = { ...policy, maxSessionDurationSeconds: value }
+    setPolicy(updated)
+    void savePolicy({ maxSessionDurationSeconds: value })
+  }
+
+  function toggleDisableInactivity(checked: boolean) {
+    if (isPostLaunch) return
+    const updated = { ...policy, disableInactivityTimeout: checked }
+    setPolicy(updated)
+    void savePolicy({ disableInactivityTimeout: checked })
+  }
+
+  function toggleDisableMaxDuration(checked: boolean) {
+    if (isPostLaunch) return
+    const updated = { ...policy, disableMaxSessionDuration: checked }
+    setPolicy(updated)
+    void savePolicy({ disableMaxSessionDuration: checked })
+  }
+
   // ── Part B — save advisory prefs to wizardProgress ─────────────────────────
 
   const savePrefs = useCallback(async (updated: FrontlineAuthPrefs) => {
@@ -210,6 +241,14 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
   const isCustomTimeout =
     policy.inactivityTimeoutSeconds !== null &&
     !TIMEOUT_PRESETS.some(p => p.value === policy.inactivityTimeoutSeconds)
+
+  const currentMaxDurationPreset =
+    (MAX_DURATION_PRESETS as readonly { value: MaxDurationPresetValue | number | null }[])
+      .find(p => p.value === policy.maxSessionDurationSeconds)?.value as MaxDurationPresetValue | undefined
+
+  const isCustomMaxDuration =
+    policy.maxSessionDurationSeconds !== null &&
+    !MAX_DURATION_PRESETS.some(p => p.value === policy.maxSessionDurationSeconds)
 
   const itNotes =
     prefs.scannerVendor && IT_SETUP_NOTES[prefs.scannerVendor]
@@ -322,6 +361,91 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
               </div>
             )}
           </div>
+        </div>
+
+        {/* Max session duration */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-2">
+            <Clock className="w-3.5 h-3.5" />
+            Maximum Session Duration (Hard Limit)
+          </h3>
+          <p className="text-xs text-gray-500">
+            Sets an absolute expiry from the original login time, regardless of activity.
+            Useful for ensuring employees must re-authenticate at the start of each shift.
+          </p>
+          <div className="space-y-2">
+            {MAX_DURATION_PRESETS.map(preset => (
+              <label
+                key={String(preset.value)}
+                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                  currentMaxDurationPreset === preset.value
+                    ? "bg-indigo-950/30 border-indigo-700"
+                    : "bg-gray-800/40 border-gray-700 hover:border-gray-600"
+                } ${isPostLaunch ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                <input
+                  type="radio"
+                  name="maxDuration"
+                  checked={currentMaxDurationPreset === preset.value}
+                  onChange={() => setMaxDurationPreset(preset.value as MaxDurationPresetValue)}
+                  disabled={isPostLaunch}
+                  className="mt-0.5 accent-indigo-500"
+                />
+                <span>
+                  <span className="block text-sm text-gray-200 font-medium">{preset.label}</span>
+                  <span className="block text-xs text-gray-500 mt-0.5">{preset.description}</span>
+                </span>
+              </label>
+            ))}
+            {isCustomMaxDuration && (
+              <div className="px-3 py-2.5 bg-amber-950/20 border border-amber-900/40 rounded-lg">
+                <p className="text-xs text-amber-300">
+                  Custom max duration: {policy.maxSessionDurationSeconds}s. Preserved as-is.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Per-device override flags */}
+        <div className="space-y-3 pt-2 border-t border-gray-800">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Device-Level Overrides</h3>
+          <p className="text-xs text-gray-500">
+            When enabled, individual registered devices can disable the inactivity timeout or maximum
+            session duration independently of the organization default. Devices that disable both
+            restrictions remain subject to the default 7-day session expiry and administrative revocation.
+          </p>
+          <label className={`flex items-start gap-3 cursor-pointer ${isPostLaunch ? "opacity-50" : ""}`}>
+            <input
+              type="checkbox"
+              checked={policy.disableInactivityTimeout}
+              onChange={e => toggleDisableInactivity(e.target.checked)}
+              disabled={isPostLaunch}
+              className="mt-0.5 accent-indigo-500"
+            />
+            <span>
+              <span className="block text-sm text-gray-200 font-medium">Allow devices to disable inactivity timeout</span>
+              <span className="block text-xs text-gray-500 mt-0.5">
+                A per-device override can disable inactivity-based expiry for dedicated single-user workstations.
+              </span>
+            </span>
+          </label>
+          <label className={`flex items-start gap-3 cursor-pointer ${isPostLaunch ? "opacity-50" : ""}`}>
+            <input
+              type="checkbox"
+              checked={policy.disableMaxSessionDuration}
+              onChange={e => toggleDisableMaxDuration(e.target.checked)}
+              disabled={isPostLaunch}
+              className="mt-0.5 accent-indigo-500"
+            />
+            <span>
+              <span className="block text-sm text-gray-200 font-medium">Allow devices to disable maximum session duration</span>
+              <span className="block text-xs text-gray-500 mt-0.5">
+                A per-device override can remove the hard limit for specific workstations (e.g. permanent
+                supervisor stations where re-authentication at shift boundaries is not practical).
+              </span>
+            </span>
+          </label>
         </div>
       </section>
 

@@ -142,6 +142,13 @@ public class ZebraDataWedgePlugin extends Plugin {
         BroadcastReceiver resultReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                // Correlate result with our specific request; ignore unrelated DataWedge results.
+                // COMMAND_IDENTIFIER is echoed back from the original SET_CONFIG broadcast.
+                String commandId = intent.getStringExtra("COMMAND_IDENTIFIER");
+                if (!"RELAY_CONFIGURE".equals(commandId)) {
+                    Log.d(TAG, "Ignoring DataWedge result for unrelated COMMAND_IDENTIFIER: " + commandId);
+                    return;
+                }
                 if (!resolved.compareAndSet(false, true)) return;
                 timeoutHandler.removeCallbacksAndMessages(null);
                 try { context.unregisterReceiver(holder[0]); } catch (Exception ignored) {}

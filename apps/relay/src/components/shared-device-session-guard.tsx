@@ -18,7 +18,6 @@
 // Renders nothing — purely behavioural.
 
 import { useEffect, useRef, useCallback } from "react"
-import { useRouter } from "next/navigation"
 
 const HEARTBEAT_DEBOUNCE_MS = 30_000   // min gap between heartbeat calls on activity
 const BACKGROUND_POLL_MS    = 120_000  // poll /api/auth/me every 2 min to catch revocation
@@ -42,7 +41,6 @@ export function SharedDeviceSessionGuard({
   hasInactivityTimeout,
   inactivityTimeoutMs,
 }: Props) {
-  const router           = useRouter()
   const expiryTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pollIntervalRef  = useRef<ReturnType<typeof setInterval> | null>(null)
   const lastHeartbeatAt  = useRef(0)
@@ -54,9 +52,12 @@ export function SharedDeviceSessionGuard({
     redirectedRef.current = true
     if (expiryTimerRef.current)  clearTimeout(expiryTimerRef.current)
     if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
-    // router.replace prevents the browser back button from returning to the expired session
-    router.replace("/login")
-  }, [router])
+    // window.location.replace does a hard navigation: clears all in-memory React state,
+    // the Next.js router cache, and browser history entry for the employee session.
+    // router.replace() alone does not flush the Next.js App Router cache, so a subsequent
+    // employee could see stale page data for a brief period.
+    window.location.replace("/login")
+  }, [])
 
   const scheduleExpiryAt = useCallback((expiresAtMs: number) => {
     if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current)

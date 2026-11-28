@@ -1,7 +1,7 @@
 import "server-only"
 import { NextResponse } from "next/server"
 import { getSession } from "@/lib/session"
-import { validateEmployeeSession, extendEmployeeSession } from "@/lib/employee-session"
+import { validateEmployeeSession, extendEmployeeSession, type ExtendSessionResult } from "@/lib/employee-session"
 
 export const dynamic = "force-dynamic"
 
@@ -30,11 +30,10 @@ export async function POST() {
     }
   }
 
-  const extended = await extendEmployeeSession(session)
-  if (!extended) {
-    // No inactivity timeout configured or session at hard cap — not an error
-    return NextResponse.json({ ok: true, extended: false })
-  }
-
-  return NextResponse.json({ ok: true, extended: true })
+  const result: ExtendSessionResult = await extendEmployeeSession(session)
+  return NextResponse.json({
+    ok:              true,
+    extended:        result.extended,
+    newExpiresAtMs:  result.newExpiresAtMs,
+  })
 }

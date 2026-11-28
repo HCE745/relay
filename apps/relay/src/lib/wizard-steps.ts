@@ -40,14 +40,15 @@ export type StagedEmployee = {
   createdAt:      string
 }
 
+// Advisory deployment-planning prefs stored in wizardProgress JSON.
+// Actual session timeout and permitted-method policy lives in org.authPolicyConfig.
 export type FrontlineAuthPrefs = {
   useKioskMode:          boolean
   useQrBadges:           boolean
   useThirdPartyBadges:   boolean
-  usePinAuth:            boolean
+  useAccessCodeAuth:     boolean   // employee enters an alphanumeric access code at the kiosk
   hasIndustrialScanners: boolean
   scannerVendor:         string
-  sessionPolicy:         "default" | "short" | "medium" | "long"
   notes:                 string
 }
 

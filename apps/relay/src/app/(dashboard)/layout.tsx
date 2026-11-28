@@ -295,8 +295,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <PushRegistration />
       <StatusBarConfig />
       <OfflineBanner />
-      {/* Renew session on activity when device has inactivity timeout policy */}
-      <SharedDeviceSessionGuard enabled={!!session.inactivityTimeoutSeconds} />
+      {/* Enforce session duration policies on registered-device sessions.
+          Enabled when either inactivity timeout OR max session duration is set.
+          Covers all four policy combinations (inactivity-only, max-only, both, disabled). */}
+      <SharedDeviceSessionGuard
+        enabled={!!(session.inactivityTimeoutSeconds || session.maxSessionDurationSeconds)}
+        sessionExpiresAtMs={session.exp ? session.exp * 1000 : null}
+        hasInactivityTimeout={!!session.inactivityTimeoutSeconds}
+        inactivityTimeoutMs={session.inactivityTimeoutSeconds ? session.inactivityTimeoutSeconds * 1000 : null}
+      />
       </div>
     </div>
     </NextIntlClientProvider>

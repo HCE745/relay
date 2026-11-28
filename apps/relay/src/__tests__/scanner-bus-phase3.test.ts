@@ -131,14 +131,15 @@ describe("resolveSessionPolicy", () => {
 // ── 2. extendEmployeeSession hard-cap enforcement ────────────────────────────
 
 describe("extendEmployeeSession", () => {
-  it("returns false when session has no inactivityTimeoutSeconds", async () => {
+  it("returns extended=false when session has no inactivityTimeoutSeconds", async () => {
     const { extendEmployeeSession } = await import("@/lib/employee-session")
     const session = { userId: "u1", email: "e@e.com", name: "E", role: "EMPLOYEE", organizationId: "o1" }
     const result = await extendEmployeeSession(session as never)
-    expect(result).toBe(false)
+    expect(result.extended).toBe(false)
+    expect(result.newExpiresAtMs).toBeNull()
   })
 
-  it("returns false when past hard cap", async () => {
+  it("returns extended=false when past hard cap", async () => {
     const { extendEmployeeSession } = await import("@/lib/employee-session")
     const nowSecs = Math.floor(Date.now() / 1000)
     const session = {
@@ -149,7 +150,8 @@ describe("extendEmployeeSession", () => {
       maxSessionDurationSeconds: 3600,     // 1h cap → already expired
     }
     const result = await extendEmployeeSession(session as never)
-    expect(result).toBe(false)
+    expect(result.extended).toBe(false)
+    expect(result.newExpiresAtMs).toBeNull()
   })
 
   it("caps renewal at hard max session duration", async () => {
@@ -167,7 +169,8 @@ describe("extendEmployeeSession", () => {
       maxSessionDurationSeconds: 1800,     // 30-min hard cap → ~100s left
     }
     const result = await extendEmployeeSession(session as never)
-    expect(result).toBe(true)
+    expect(result.extended).toBe(true)
+    expect(result.newExpiresAtMs).toBeGreaterThan(Date.now())
     // setSessionCookie("session", token, { maxAge }) — check third arg
     const [, , opts] = mockSetCookie.mock.calls[0] as [string, string, { maxAge: number }]
     // maxAge should be <= remaining hard-cap time (~100s), not 1800s

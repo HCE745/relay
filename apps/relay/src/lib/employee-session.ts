@@ -146,8 +146,13 @@ export async function createEmployeeSession(params: CreateEmployeeSessionParams)
 // Called by the heartbeat endpoint. Works for both employee quick-access sessions and
 // standard email+password sessions bound to a registered device that has an inactivity
 // policy — both use createSession() with inactivityTimeoutSeconds encoded in the JWT.
-export async function extendEmployeeSession(session: SessionPayload): Promise<boolean> {
-  if (!session.inactivityTimeoutSeconds) return false  // no inactivity timeout — nothing to extend
+export type ExtendSessionResult = {
+  extended:      boolean
+  newExpiresAtMs: number | null
+}
+
+export async function extendEmployeeSession(session: SessionPayload): Promise<ExtendSessionResult> {
+  if (!session.inactivityTimeoutSeconds) return { extended: false, newExpiresAtMs: null }
 
   const nowSecs   = Math.floor(Date.now() / 1000)
   const issuedAt  = (session as unknown as Record<string, unknown>).sessionIssuedAt as number | undefined ?? nowSecs
@@ -157,7 +162,7 @@ export async function extendEmployeeSession(session: SessionPayload): Promise<bo
   const hardCap   = maxDur !== null ? issuedAt + maxDur : Infinity
   const exp       = Math.min(newExpiry, hardCap)
 
-  if (exp <= nowSecs) return false  // already past hard cap
+  if (exp <= nowSecs) return { extended: false, newExpiresAtMs: null }
 
   const expiresInSec = exp - nowSecs
   const token = await signJwt(session as unknown as Record<string, unknown>, getSecret(), {
@@ -169,7 +174,7 @@ export async function extendEmployeeSession(session: SessionPayload): Promise<bo
     maxAge: expiresInSec,
   })
 
-  return true
+  return { extended: true, newExpiresAtMs: exp * 1000 }
 }
 
 // ── Session validation ────────────────────────────────────────────────────────

@@ -21,25 +21,36 @@ import java.util.Set;
  * dynamically-registered receivers must explicitly declare RECEIVER_EXPORTED to accept
  * broadcasts from outside the application process.
  *
- * Using RECEIVER_NOT_EXPORTED for these receivers would silently prevent all vendor
- * scanner service deliveries, breaking scanner input entirely.
+ * Using RECEIVER_NOT_EXPORTED silently prevents all vendor scanner service deliveries.
+ * We use RECEIVER_EXPORTED; the security boundary is server-side credential validation.
  *
- * We use RECEIVER_EXPORTED and apply the following defense-in-depth measures instead:
+ * # Sender identity limitations for unordered broadcasts
  *
- *   1. Application-defined intent action (io.getrelay.app.ACTION_SCAN): reduces the
- *      surface to only senders that explicitly target Relay's action string.
- *   2. Sender package allowlist (validateSender): rejects intents from packages not
- *      on the known scanner service list in non-debug builds.
- *   3. Server-side validation: scan payloads are NEVER used to bypass authentication.
- *      The credential value extracted from a scan is passed to the same server-side
- *      validation endpoint that all other credential inputs go through.
+ * Android does NOT provide reliable caller-package information for UNORDERED broadcasts.
+ * Context.getCallingPackage() returns null for broadcast delivery. The KNOWN_SCANNER_PACKAGES
+ * allowlist is an advisory heuristic: it filters obviously wrong intents (e.g., unexpected
+ * action strings) but CANNOT verify the sending package's identity for unordered broadcasts.
+ *
+ * The practical mitigations in this codebase are:
+ *
+ *   1. Application-defined intent action (io.getrelay.app.ACTION_SCAN): any sender must
+ *      explicitly target this action — an incidental intent with this action from a rogue
+ *      app requires that app to be installed and to send this exact string.
+ *   2. Payload length limits: barcode strings are capped at MAX_BARCODE_LENGTH bytes.
+ *      Oversized payloads are rejected before any processing.
+ *   3. Server-side credential validation: scan payloads are NEVER used to bypass
+ *      authentication. The extracted value is passed through the same server-side
+ *      validation endpoint as all other credential inputs.
+ *
+ * The KNOWN_SCANNER_PACKAGES set is maintained for informational logging and future use
+ * with ordered broadcasts (where getCallingPackage() is available), but it is NOT
+ * currently an enforced security control for unordered scanner service broadcasts.
  *
  * # Note on signature permissions
  *
  * We declare io.getrelay.app.permission.SCAN_DELIVER (protectionLevel="signature") in
- * AndroidManifest.xml for use by IT-managed scanner configuration tools. We do NOT
- * require it on the receivers because vendor scanner services will not hold it; requiring
- * it would silently drop all vendor broadcasts.
+ * AndroidManifest.xml for IT-managed scanner configuration tools. We do NOT require it
+ * on the scan receivers because vendor scanner services will not hold it.
  *
  * References:
  *   https://developer.android.com/guide/components/broadcasts#security-and-best-practices
@@ -48,7 +59,19 @@ import java.util.Set;
  */
 public class ScanReceiverHelper {
 
-    /** Known scanner service packages. Used as an allowlist for sender validation. */
+    /**
+     * Maximum accepted barcode string length in characters.
+     * Payloads exceeding this limit are rejected before processing.
+     * Most barcode symbologies produce ≤ 100 characters; this cap allows generous content
+     * while preventing excessively large strings from reaching application logic.
+     */
+    public static final int MAX_BARCODE_LENGTH = 1024;
+
+    /**
+     * Known scanner service packages.
+     * Advisory reference for logging and ordered-broadcast validation.
+     * NOT an enforced security control for unordered broadcasts — see class Javadoc.
+     */
     public static final Set<String> KNOWN_SCANNER_PACKAGES = Collections.unmodifiableSet(
         new HashSet<>(Arrays.asList(
         // Zebra DataWedge
@@ -109,33 +132,44 @@ public class ScanReceiverHelper {
     }
 
     /**
-     * Validates that an incoming broadcast comes from a known scanner service package.
+     * Performs basic structural validation on an incoming broadcast intent.
      *
-     * Returns true (allow) if:
-     *   - The calling package is in KNOWN_SCANNER_PACKAGES, OR
-     *   - The calling package is null (some system broadcasts do not set it), OR
-     *   - The app is a debug build (allows test broadcasts during development).
+     * Rejects intents with no action. Logs the action for auditability.
      *
-     * Returns false (reject) only when the sender is a positively identified non-scanner app.
-     *
-     * Important: this is defense-in-depth, NOT the primary security boundary.
-     * Server-side credential validation is the enforced security boundary.
+     * IMPORTANT: For unordered broadcasts (the delivery model used by all scanner vendor
+     * services), Android does NOT expose the sender's package identity — getCallingPackage()
+     * returns null. The KNOWN_SCANNER_PACKAGES set cannot be used to enforce an allowlist
+     * here. The primary security boundary is server-side credential validation; scan payloads
+     * are treated as untrusted input regardless of origin. Payload length is enforced
+     * separately via validatePayloadLength().
      */
     public static boolean validateSender(Context context, Intent intent, String tag) {
-        // On Android 6+ the calling package is available via context in ordered broadcasts.
-        // For regular (unordered) broadcasts this is typically null.
-        // We use the application ID in the action string as the primary validation.
         String action = intent.getAction();
         if (action == null) {
             Log.w(tag, "Received intent with null action — rejected");
             return false;
         }
-
-        // The action must be one we registered — if it arrived here it already is,
-        // but log it for auditability.
+        // Log the action for audit. Package identity is not available for unordered broadcasts.
         Log.d(tag, "Received scan broadcast action=" + action);
+        return true;
+    }
 
-        // All further credential validation happens server-side.
+    /**
+     * Validates that a barcode string payload is within acceptable length bounds.
+     *
+     * Returns true when the value is non-null and ≤ MAX_BARCODE_LENGTH characters.
+     * Returns false for null or oversized payloads, which are rejected before processing.
+     */
+    public static boolean validatePayloadLength(String value, String tag) {
+        if (value == null) {
+            Log.w(tag, "Scan payload is null — rejected");
+            return false;
+        }
+        if (value.length() > MAX_BARCODE_LENGTH) {
+            Log.w(tag, "Scan payload exceeds maximum length (" + value.length()
+                + " > " + MAX_BARCODE_LENGTH + ") — rejected");
+            return false;
+        }
         return true;
     }
 }

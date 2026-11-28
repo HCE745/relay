@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -56,6 +60,9 @@ public class ZebraDataWedgePlugin extends Plugin {
     private static final String DW_CONFIG_ACTION   = "com.symbol.datawedge.api.ACTION";
     private static final String DW_CREATE_PROFILE  = "com.symbol.datawedge.api.CREATE_PROFILE";
     private static final String DW_SET_CONFIG      = "com.symbol.datawedge.api.SET_CONFIG";
+    // DataWedge result action — received after SET_CONFIG with SEND_RESULT = "true"
+    private static final String DW_RESULT_ACTION   = "com.symbol.datawedge.api.RESULT_ACTION";
+    private static final long   DW_CONFIG_TIMEOUT_MS = 5_000;
 
     // DataWedge scan-data extra keys
     private static final String EXTRA_DATA_STRING  = "com.symbol.datawedge.data_string";
@@ -111,13 +118,13 @@ public class ZebraDataWedgePlugin extends Plugin {
      *   - Associated app: io.getrelay.app / * (all activities)
      *   - Barcode input: enabled
      *   - Intent output: enabled, action=io.getrelay.app.ACTION_SCAN, delivery=broadcast
-     *   - Keystroke output: disabled (avoids double delivery via keyboard wedge)
      *
-     * This uses the DataWedge Intent API (documented at techdocs.zebra.com).
-     * It does NOT require any proprietary SDK — only standard Android broadcast intents.
+     * Waits up to DW_CONFIG_TIMEOUT_MS for a DataWedge RESULT_ACTION confirmation.
+     * Returns { ok: true, profile } on success, or { ok: false, result, errorCode } on
+     * failure. Returns { ok: false, result: "TIMEOUT" } if DataWedge does not respond
+     * (e.g., locked by MDM policy — the profile may still have been created).
      *
-     * Enterprise MDM note: If DataWedge is locked by enterprise policy, this call
-     * is silently rejected by DataWedge. Manual configuration remains the fallback.
+     * This uses the DataWedge Intent API and requires no proprietary SDK.
      */
     @PluginMethod
     public void configureProfile(PluginCall call) {
@@ -126,15 +133,65 @@ public class ZebraDataWedgePlugin extends Plugin {
             return;
         }
 
+        final AtomicBoolean resolved    = new AtomicBoolean(false);
+        final BroadcastReceiver[] holder = new BroadcastReceiver[1];
+        final Handler timeoutHandler    = new Handler(Looper.getMainLooper());
+
+        // Register a one-shot listener for the DataWedge configuration result.
+        // DataWedge sends RESULT_ACTION when SEND_RESULT = "true" in the config broadcast.
+        BroadcastReceiver resultReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (!resolved.compareAndSet(false, true)) return;
+                timeoutHandler.removeCallbacksAndMessages(null);
+                try { context.unregisterReceiver(holder[0]); } catch (Exception ignored) {}
+
+                String command = intent.getStringExtra("COMMAND");
+                String result  = intent.getStringExtra("RESULT");
+                Bundle info    = intent.getBundleExtra("RESULT_INFO");
+
+                Log.d(TAG, "DataWedge config result: command=" + command + " result=" + result);
+
+                JSObject jsResult = new JSObject();
+                if ("SUCCESS".equals(result)) {
+                    jsResult.put("ok", true);
+                    jsResult.put("profile", RELAY_DW_PROFILE);
+                } else {
+                    jsResult.put("ok", false);
+                    jsResult.put("result", result != null ? result : "UNKNOWN");
+                    if (info != null) {
+                        jsResult.put("errorCode", info.getString("RESULT_CODE", "unknown"));
+                    }
+                }
+                call.resolve(jsResult);
+            }
+        };
+        holder[0] = resultReceiver;
+
+        IntentFilter resultFilter = new IntentFilter(DW_RESULT_ACTION);
+        ScanReceiverHelper.registerExportedReceiver(getContext(), resultReceiver, resultFilter, TAG);
+
+        // Timeout: DataWedge locked by MDM or not running will not send a result.
+        timeoutHandler.postDelayed(() -> {
+            if (!resolved.compareAndSet(false, true)) return;
+            try { getContext().unregisterReceiver(holder[0]); } catch (Exception ignored) {}
+            Log.w(TAG, "DataWedge config timed out after " + DW_CONFIG_TIMEOUT_MS + "ms — MDM lock or DataWedge not running");
+            call.resolve(new JSObject()
+                .put("ok",      false)
+                .put("result",  "TIMEOUT")
+                .put("profile", RELAY_DW_PROFILE)
+                .put("note",    "DataWedge did not confirm. If DataWedge is running, the profile may still have been created."));
+        }, DW_CONFIG_TIMEOUT_MS);
+
         try {
-            // Step 1: Create the profile (no-op if it already exists)
+            // Step 1: Create the profile (no-op if it already exists; no result broadcast)
             Intent createIntent = new Intent();
             createIntent.setAction(DW_CONFIG_ACTION);
             createIntent.putExtra(DW_CREATE_PROFILE, RELAY_DW_PROFILE);
             createIntent.setPackage("com.symbol.datawedge");
             getContext().sendBroadcast(createIntent);
 
-            // Step 2: Configure the profile
+            // Step 2: Configure the profile with SEND_RESULT = "true" to get the result back
             Intent configIntent = new Intent();
             configIntent.setAction(DW_CONFIG_ACTION);
             configIntent.setPackage("com.symbol.datawedge");
@@ -144,16 +201,13 @@ public class ZebraDataWedgePlugin extends Plugin {
             profileConfig.putString("PROFILE_ENABLED", "true");
             profileConfig.putString("CONFIG_MODE", "UPDATE");
 
-            // Associate the profile with this application
             Bundle appConfig = new Bundle();
             appConfig.putString("PACKAGE_NAME", "io.getrelay.app");
             appConfig.putStringArray("ACTIVITY_LIST", new String[]{"*"});
             profileConfig.putParcelableArray("APP_LIST", new Bundle[]{appConfig});
 
-            // Plugin configuration array
             Bundle[] plugins = new Bundle[2];
 
-            // Barcode input plugin — enable scanning
             Bundle barcodeInput = new Bundle();
             barcodeInput.putString("PLUGIN_NAME", "BARCODE");
             barcodeInput.putString("RESET_CONFIG", "false");
@@ -163,7 +217,6 @@ public class ZebraDataWedgePlugin extends Plugin {
             barcodeInput.putBundle("PARAM_LIST", barcodeParams);
             plugins[0] = barcodeInput;
 
-            // Intent output plugin — deliver scans to Relay
             Bundle intentOutput = new Bundle();
             intentOutput.putString("PLUGIN_NAME", "INTENT");
             intentOutput.putString("RESET_CONFIG", "false");
@@ -171,20 +224,26 @@ public class ZebraDataWedgePlugin extends Plugin {
             intentParams.putString("intent_output_enabled", "true");
             intentParams.putString("intent_action",   ACTION_SCAN_INTENT);
             intentParams.putString("intent_category", "");
-            intentParams.putString("intent_delivery", "2");  // 2 = broadcast intent
+            intentParams.putString("intent_delivery", "2");  // 2 = broadcast
             intentOutput.putBundle("PARAM_LIST", intentParams);
             plugins[1] = intentOutput;
 
             profileConfig.putParcelableArray("PLUGIN_CONFIG", plugins);
 
             configIntent.putExtra(DW_SET_CONFIG, profileConfig);
-            getContext().sendBroadcast(configIntent);
+            configIntent.putExtra("SEND_RESULT", "true");
+            configIntent.putExtra("COMMAND_IDENTIFIER", "RELAY_CONFIGURE");
 
-            Log.d(TAG, "DataWedge profile '" + RELAY_DW_PROFILE + "' configured");
-            call.resolve(new JSObject().put("ok", true).put("profile", RELAY_DW_PROFILE));
+            getContext().sendBroadcast(configIntent);
+            Log.d(TAG, "DataWedge SET_CONFIG broadcast sent for profile '" + RELAY_DW_PROFILE + "' — awaiting result");
+
         } catch (Exception e) {
-            Log.e(TAG, "DataWedge profile configuration failed: " + e.getMessage());
-            call.reject("DataWedge configuration failed: " + e.getMessage());
+            if (resolved.compareAndSet(false, true)) {
+                timeoutHandler.removeCallbacksAndMessages(null);
+                try { getContext().unregisterReceiver(holder[0]); } catch (Exception ignored) {}
+                Log.e(TAG, "DataWedge configuration broadcast failed: " + e.getMessage());
+                call.reject("DataWedge configuration failed: " + e.getMessage());
+            }
         }
     }
 
@@ -228,7 +287,8 @@ public class ZebraDataWedgePlugin extends Plugin {
         String dataString = intent.getStringExtra(EXTRA_DATA_STRING);
         String labelType  = intent.getStringExtra(EXTRA_LABEL_TYPE);
 
-        if (dataString == null || dataString.isEmpty()) {
+        if (!ScanReceiverHelper.validatePayloadLength(dataString, TAG)) return;
+        if (dataString.isEmpty()) {
             Log.w(TAG, "Received scan intent with empty data_string — ignored");
             return;
         }

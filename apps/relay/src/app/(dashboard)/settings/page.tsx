@@ -16,7 +16,7 @@ import { IssueTemplatesManager } from "@/components/settings/issue-templates-man
 import { NotificationPrefsForm } from "@/components/settings/notification-prefs-form"
 import { DEFAULT_ACCESS, type PageAccessConfig, type PageKey } from "@/lib/page-access"
 import Link from "next/link"
-import { Users, GitBranch, CreditCard, Sliders } from "lucide-react"
+import { Users, GitBranch, CreditCard, Sliders, Monitor, ShieldCheck } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -154,6 +154,44 @@ export default async function SettingsPage() {
               <div>
                 <p className="font-medium text-gray-900 text-sm">Workspace</p>
                 <p className="text-xs text-gray-500">Customize navigation labels and terminology across your workspace</p>
+              </div>
+            </div>
+            <span className="text-gray-400 text-sm">→</span>
+          </Link>
+        )}
+
+        {/* Auth Policy — ADMIN only */}
+        {isAdmin && (
+          <Link
+            href="/settings/auth-policy"
+            className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-300 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                <ShieldCheck className="w-4.5 h-4.5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900 text-sm">Employee Auth Policy</p>
+                <p className="text-xs text-gray-500">Configure kiosk login methods and session timeouts</p>
+              </div>
+            </div>
+            <span className="text-gray-400 text-sm">→</span>
+          </Link>
+        )}
+
+        {/* Registered Devices — ADMIN only */}
+        {isAdmin && (
+          <Link
+            href="/settings/devices"
+            className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-300 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                <Monitor className="w-4.5 h-4.5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900 text-sm">Registered Devices</p>
+                <p className="text-xs text-gray-500">Manage kiosk devices and their credentials</p>
               </div>
             </div>
             <span className="text-gray-400 text-sm">→</span>

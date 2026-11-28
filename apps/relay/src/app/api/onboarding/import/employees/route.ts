@@ -1,17 +1,20 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
 import { randomUUID } from "crypto"
+import { hash } from "bcryptjs"
 import { getSession } from "@/lib/session"
 import { prisma } from "@/lib/prisma"
 import { sendEmail } from "@/lib/email"
+import { normalizeCredential, computeCredentialIndex, maskCredential } from "@/lib/credential-hmac"
+import { reserveSingleCodeLookup, clearUserSingleCodeLookups } from "@/lib/single-code-lookup"
 
 export const dynamic = "force-dynamic"
 
 // ── CSV template ─────────────────────────────────────────────────────────────
 
-const TEMPLATE_HEADER = "name,email,role,employee_type_name,location_name,department_name"
-const TEMPLATE_EXAMPLE = `Alex Johnson,alex@example.com,EMPLOYEE,Field Technician,Main Plant,Maintenance
-Jordan Smith,jordan@example.com,MANAGER,Shift Supervisor,Warehouse A,Operations`
+const TEMPLATE_HEADER = "name,email,role,employee_type_name,location_name,department_name,employee_id,access_code"
+const TEMPLATE_EXAMPLE = `Alex Johnson,alex@example.com,EMPLOYEE,Field Technician,Main Plant,Maintenance,EMP-001,
+Jordan Smith,jordan@example.com,MANAGER,Shift Supervisor,Warehouse A,Operations,,ACDE23`
 
 // GET /api/onboarding/import/employees
 // Returns a downloadable CSV template.
@@ -131,6 +134,8 @@ export async function POST(request: NextRequest) {
     employeeTypeName: string | null
     locationName: string | null
     departmentName: string | null
+    employeeIdValue: string | null
+    accessCodeValue: string | null
     warnings: string[]
   }
 
@@ -155,6 +160,8 @@ export async function POST(request: NextRequest) {
     const rawEtName  = col("employee_type_name") >= 0 ? parts[col("employee_type_name")]?.trim() : undefined
     const rawLocName = col("location_name")       >= 0 ? parts[col("location_name")]?.trim()      : undefined
     const rawDeptName = col("department_name")    >= 0 ? parts[col("department_name")]?.trim()     : undefined
+    const rawEmpId   = col("employee_id")         >= 0 ? parts[col("employee_id")]?.trim()         : undefined
+    const rawCode    = col("access_code")         >= 0 ? parts[col("access_code")]?.trim()          : undefined
 
     const et   = rawEtName  ? etByName.get(rawEtName.toLowerCase())   : undefined
     const loc  = rawLocName ? locByName.get(rawLocName.toLowerCase())  : undefined
@@ -172,6 +179,8 @@ export async function POST(request: NextRequest) {
       employeeTypeName: rawEtName ?? null,
       locationName:     rawLocName ?? null,
       departmentName:   rawDeptName ?? null,
+      employeeIdValue:  rawEmpId  || null,
+      accessCodeValue:  rawCode   || null,
       warnings,
     })
   }
@@ -190,9 +199,27 @@ export async function POST(request: NextRequest) {
       ...existingInvites.map(i => i.email),
     ])
 
+    // Check credential collisions for rows that have them
+    const credentialWarnings = new Map<string, string[]>()
+    for (const row of validRows) {
+      const rowWarns: string[] = []
+      if (row.employeeIdValue) {
+        const idx = computeCredentialIndex(normalizeCredential(row.employeeIdValue))
+        const clash = await prisma.singleCodeLookup.findFirst({ where: { organizationId: orgId, credentialIndex: idx } })
+        if (clash) rowWarns.push(`Employee ID "${maskCredential(row.employeeIdValue)}" is already in use — will be skipped`)
+      }
+      if (row.accessCodeValue) {
+        const idx = computeCredentialIndex(normalizeCredential(row.accessCodeValue))
+        const clash = await prisma.singleCodeLookup.findFirst({ where: { organizationId: orgId, credentialIndex: idx } })
+        if (clash) rowWarns.push(`Access code "${maskCredential(row.accessCodeValue)}" is already in use — will be skipped`)
+      }
+      if (rowWarns.length) credentialWarnings.set(row.email, rowWarns)
+    }
+
     const previewRows = validRows.map(r => ({
       ...r,
       status: existingEmailSet.has(r.email) ? "skip" as const : "invite" as const,
+      warnings: [...r.warnings, ...(credentialWarnings.get(r.email) ?? [])],
     }))
 
     return NextResponse.json({ rows: previewRows, errors })
@@ -204,9 +231,59 @@ export async function POST(request: NextRequest) {
 
   for (const row of validRows) {
     // Check for existing user or pending invite
-    const existingUser = await prisma.user.findUnique({ where: { email: row.email }, select: { id: true } })
+    const existingUser = await prisma.user.findUnique({
+      where: { email: row.email },
+      select: { id: true, employeeCredential: { select: { employeeIdIndex: true, accessCodeIndex: true } } },
+    })
+    const rawLocName  = row.locationName
+    const rawDeptName = row.departmentName
+    const loc  = rawLocName  ? locByName.get(rawLocName.toLowerCase())   : undefined
+    const dept = rawDeptName ? deptByName.get(rawDeptName.toLowerCase()) : undefined
+
+    // For existing users: apply credentials and skip invitation
     if (existingUser) {
-      errors.push(`${row.email} already has an account — skipped`)
+      if (row.employeeIdValue || row.accessCodeValue) {
+        const existing = existingUser.employeeCredential ?? null
+        try {
+          await prisma.$transaction(async (tx) => {
+            const updateCred: Record<string, unknown> = {}
+            if (row.employeeIdValue) {
+              const normalized = normalizeCredential(row.employeeIdValue)
+              const newIdx     = computeCredentialIndex(normalized)
+              if (newIdx !== existing?.employeeIdIndex) {
+                await clearUserSingleCodeLookups(tx, orgId, existing?.employeeIdIndex ?? null, null)
+                await reserveSingleCodeLookup(tx, orgId, row.employeeIdValue)
+                updateCred.employeeIdIndex   = newIdx
+                updateCred.employeeIdEnabled = true
+                await tx.user.update({ where: { id: existingUser.id }, data: { employeeId: row.employeeIdValue } })
+              }
+            }
+            if (row.accessCodeValue) {
+              const normalized = normalizeCredential(row.accessCodeValue)
+              const newIdx     = computeCredentialIndex(normalized)
+              if (newIdx !== existing?.accessCodeIndex) {
+                await clearUserSingleCodeLookups(tx, orgId, null, existing?.accessCodeIndex ?? null)
+                await reserveSingleCodeLookup(tx, orgId, row.accessCodeValue)
+                updateCred.accessCodeIndex   = newIdx
+                updateCred.accessCodeHash    = await hash(row.accessCodeValue, 12)
+                updateCred.accessCodeMasked  = maskCredential(row.accessCodeValue)
+                updateCred.accessCodeEnabled = true
+              }
+            }
+            if (Object.keys(updateCred).length > 0) {
+              await tx.employeeCredential.upsert({
+                where:  { userId: existingUser.id },
+                create: { userId: existingUser.id, organizationId: orgId, ...updateCred },
+                update: updateCred,
+              })
+            }
+          })
+        } catch {
+          errors.push(`Failed to set credentials for ${row.email}`)
+        }
+      } else {
+        errors.push(`${row.email} already has an account — skipped`)
+      }
       continue
     }
 
@@ -218,11 +295,6 @@ export async function POST(request: NextRequest) {
       errors.push(`Invitation for ${row.email} already pending — skipped`)
       continue
     }
-
-    const rawLocName  = row.locationName
-    const rawDeptName = row.departmentName
-    const loc  = rawLocName  ? locByName.get(rawLocName.toLowerCase())   : undefined
-    const dept = rawDeptName ? deptByName.get(rawDeptName.toLowerCase()) : undefined
 
     const token     = randomUUID()
     const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000)

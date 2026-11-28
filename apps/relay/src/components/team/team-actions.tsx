@@ -4,8 +4,9 @@ import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import { toast } from "@/lib/toast"
-import { KeyRound, X, ChevronDown, UserCog, ToggleLeft, ToggleRight, UserCheck, Pencil, MapPin } from "lucide-react"
+import { KeyRound, X, ChevronDown, UserCog, ToggleLeft, ToggleRight, UserCheck, Pencil, MapPin, CreditCard } from "lucide-react"
 import { PeoplePicker } from "@/components/ui/people-picker"
+import { EmployeeCredentialsModal } from "@/components/team/employee-credentials-modal"
 
 interface OrgUser {
   id: string
@@ -34,7 +35,7 @@ interface Props {
   assignedLocationIds?: string[]
 }
 
-type Modal = "password" | "manager" | "permissions" | "editName" | "locations" | null
+type Modal = "password" | "manager" | "permissions" | "editName" | "locations" | "credentials" | null
 
 export function TeamActions({
   userId,
@@ -192,6 +193,15 @@ export function TeamActions({
                 Assign Locations
               </button>
             )}
+            {isAdminLevel && (
+              <button
+                onClick={() => openModal("credentials")}
+                className="flex items-center gap-2.5 w-full px-3.5 py-2 hover:bg-gray-50 text-gray-700"
+              >
+                <CreditCard className="w-3.5 h-3.5 text-gray-400" />
+                Employee Credentials
+              </button>
+            )}
             {canResetPassword && (
               <button
                 onClick={() => openModal("password")}
@@ -218,6 +228,15 @@ export function TeamActions({
           </div>
         </>,
         document.body
+      )}
+
+      {/* Employee Credentials Modal */}
+      {modal === "credentials" && (
+        <EmployeeCredentialsModal
+          userId={userId}
+          userName={userName}
+          onClose={closeModal}
+        />
       )}
 
       {/* Reset Password Modal */}

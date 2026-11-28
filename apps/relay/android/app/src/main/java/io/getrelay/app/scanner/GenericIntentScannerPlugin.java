@@ -195,7 +195,9 @@ public class GenericIntentScannerPlugin extends Plugin {
         scanReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                handleScanBroadcast(intent);
+                if (ScanReceiverHelper.validateSender(context, intent, TAG)) {
+                    handleScanBroadcast(intent);
+                }
             }
         };
 
@@ -206,17 +208,9 @@ public class GenericIntentScannerPlugin extends Plugin {
         }
         filter.addAction(BLUEBIRD_ACTION);  // byte[] extra — handled separately
 
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                getContext().registerReceiver(scanReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
-            } else {
-                getContext().registerReceiver(scanReceiver, filter);
-            }
-            registered = true;
-            Log.d(TAG, "Generic scanner receiver registered for " + BRAND_MAP.size() + " actions");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to register generic receiver: " + e.getMessage());
-        }
+        ScanReceiverHelper.registerExportedReceiver(getContext(), scanReceiver, filter, TAG);
+        registered = true;
+        Log.d(TAG, "Generic scanner receiver registered for " + BRAND_MAP.size() + " actions");
     }
 
     private void unregisterScanReceiver() {

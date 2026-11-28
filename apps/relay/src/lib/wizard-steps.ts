@@ -14,6 +14,7 @@ export type WizardStepKey =
   | "sops"
   | "qr-codes"
   | "feature-flags"
+  | "frontline-auth"
   | "employee-list"
   | "readiness"
 
@@ -39,12 +40,24 @@ export type StagedEmployee = {
   createdAt:      string
 }
 
+export type FrontlineAuthPrefs = {
+  useKioskMode:          boolean
+  useQrBadges:           boolean
+  useThirdPartyBadges:   boolean
+  usePinAuth:            boolean
+  hasIndustrialScanners: boolean
+  scannerVendor:         string
+  sessionPolicy:         "default" | "short" | "medium" | "long"
+  notes:                 string
+}
+
 export type WizardProgress = {
-  currentStepKey:   string | null
-  completedSteps:   string[]
-  skippedSteps:     string[]
-  lastSavedAt:      string | null
-  stagedEmployees:  StagedEmployee[]
+  currentStepKey:    string | null
+  completedSteps:    string[]
+  skippedSteps:      string[]
+  lastSavedAt:       string | null
+  stagedEmployees:   StagedEmployee[]
+  frontlineAuthPrefs?: FrontlineAuthPrefs  // optional; stored here to avoid a migration
 }
 
 export type StepStatus = "current" | "completed" | "skipped" | "incomplete"
@@ -107,13 +120,19 @@ export const WIZARD_STEPS: WizardStep[] = [
     optional: false,
   },
   {
-    key: "employee-list", number: 10,
+    key: "frontline-auth", number: 10,
+    title: "Frontline Authentication",
+    description: "Configure scanner deployment, shared-device session policies, and badge authentication for frontline workers.",
+    optional: true,
+  },
+  {
+    key: "employee-list", number: 11,
     title: "Employee Invitation List",
     description: "Prepare the employee list to be invited after the customer accepts their account.",
     optional: true,
   },
   {
-    key: "readiness", number: 11,
+    key: "readiness", number: 12,
     title: "Launch Readiness",
     description: "Final checklist review before sending the customer their invitation.",
     optional: false,

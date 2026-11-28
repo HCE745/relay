@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   ChevronLeft, ChevronRight, Check, Minus, ArrowRight, Loader2,
   CheckCircle2, Circle, AlertTriangle, Building2, Settings, Users,
-  MapPin, FileText, QrCode, Bell, Rocket, Flag, UserPlus,
+  MapPin, FileText, QrCode, Bell, Rocket, Flag, UserPlus, Scan,
 } from "lucide-react"
 import {
   WIZARD_STEPS, type WizardStepWithStatus, type WizardProgress,
@@ -21,6 +21,7 @@ import { StepSOPs }           from "./steps/StepSOPs"
 import { StepQrCodes }        from "./steps/StepQrCodes"
 import { StepFeatureFlags }   from "./steps/StepFeatureFlags"
 import { StepEmployees }      from "./steps/StepEmployees"
+import { StepFrontlineAuth }  from "./steps/StepFrontlineAuth"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -58,6 +59,7 @@ const STEP_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   "sops":            FileText,
   "qr-codes":        QrCode,
   "feature-flags":   Flag,
+  "frontline-auth":  Scan,
   "employee-list":   UserPlus,
   "readiness":       Rocket,
 }
@@ -153,6 +155,14 @@ const STEP_PLACEHOLDER: Record<string, { heading: string; lines: string[] }> = {
       "QR codes, regions, executive briefings, health scores, and more.",
       "Advanced escalations and trend detection can be enabled here.",
       "Feature flags take effect immediately in the customer's environment.",
+    ],
+  },
+  "frontline-auth": {
+    heading: "Configure frontline authentication for shared-device deployments.",
+    lines: [
+      "Select which scan-based login methods this customer will use (QR badges, barcode cards, PIN).",
+      "If industrial scanners are deployed, choose the vendor and review IT setup notes.",
+      "For kiosk mode, set the session timeout policy for shared devices.",
     ],
   },
   "employee-list": {
@@ -651,7 +661,16 @@ export default function WizardPage() {
                   onNotReady={handleCurrentStepNotReady}
                 />
               )}
-              {!DATA_DRIVEN_STEPS.has(currentKey) && currentKey !== "issue-settings" && currentKey !== "notifications" && currentKey !== "feature-flags" && (
+              {currentKey === "frontline-auth" && (
+                <StepFrontlineAuth
+                  key={currentKey}
+                  onboardingId={id}
+                  isPostLaunch={isPostLaunch}
+                  onReady={handleCurrentStepReady}
+                  onNotReady={handleCurrentStepNotReady}
+                />
+              )}
+              {!DATA_DRIVEN_STEPS.has(currentKey) && currentKey !== "issue-settings" && currentKey !== "notifications" && currentKey !== "feature-flags" && currentKey !== "frontline-auth" && (
                 <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
                   <p className="text-sm font-semibold text-gray-200 mb-4">{placeholder.heading}</p>
                   <ul className="space-y-3">

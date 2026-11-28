@@ -104,20 +104,20 @@ describe("GET /wizard", () => {
     expect(res.status).toBe(404)
   })
 
-  it("returns all 11 steps with correct structure for fresh wizard", async () => {
+  it("returns all 12 steps with correct structure for fresh wizard", async () => {
     const { GET } = await import("@/app/api/super-admin/onboarding/[id]/wizard/route")
     mockGetSession.mockResolvedValue(SA_SESSION)
     mockOnboardingFindUnique.mockResolvedValue(BASE_ONBOARDING)
     const res = await GET(makeRequest("GET"), makeCtx())
     expect(res.status).toBe(200)
     const body = await res.json() as { steps: Array<{ key: string; status: string }>; totalSteps: number; completedCount: number }
-    expect(body.totalSteps).toBe(11)
-    expect(body.steps).toHaveLength(11)
+    expect(body.totalSteps).toBe(12)
+    expect(body.steps).toHaveLength(12)
     expect(body.completedCount).toBe(0)
     // Fresh wizard: first step is current, rest are incomplete
     expect(body.steps[0].status).toBe("current")
     expect(body.steps[1].status).toBe("incomplete")
-    expect(body.steps[10].status).toBe("incomplete")
+    expect(body.steps[11].status).toBe("incomplete")
   })
 
   it("returns correct step statuses for in-progress wizard", async () => {

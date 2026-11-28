@@ -16,57 +16,71 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 /**
  * HoneywellScannerPlugin — Capacitor plugin for Honeywell and Datalogic scan intent delivery.
  *
- * Honeywell devices (Dolphin, CN, CT, EDA, Thor, ScanPal series):
- *   The Honeywell Scan Wedge feature delivers scan data as a broadcast intent.
- *   Unlike Zebra DataWedge, Honeywell Scan Wedge is configured in the device's
- *   "Scan Wedge" settings app or via MDM. This plugin listens for the standard
- *   Honeywell intent action.
+ * # Honeywell scanner integration options
  *
- * Datalogic devices (Memor, Skorpio, Falcon):
- *   Datalogic Intent Wedge similarly delivers scan data as a broadcast intent.
- *   See: https://datalogic.github.io/wedge/overview/
- *   Intent action: "com.datalogic.decode.action.SCAN"
- *   Intent extra key: "com.datalogic.decode.intentwedge.barcode_string"
+ * Honeywell provides two distinct integration paths:
  *
- * IMPORTANT — what this plugin does NOT do:
- *   - Does NOT modify Honeywell Scan Wedge configuration.
- *   - Does NOT modify Datalogic Intent Wedge configuration.
- *   - IT administrators configure the wedge application independently.
+ * 1. AIDC Manager SDK (direct scanner control):
+ *    - Requires the Honeywell AIDC SDK jar/AAR, which must be placed in the project.
+ *    - Provides scan session acquisition/release (AidcManager.openBarcodeReader).
+ *    - Not used here: the SDK is not included in this project; no hardware purchases
+ *      were authorized. This path requires direct Honeywell SDK integration.
  *
- * Recommended Honeywell Scan Wedge configuration:
- *   - Scan Wedge mode: Intent
- *   - Intent action: "io.getrelay.app.ACTION_SCAN" (same as DataWedge)
- *   - Intent type: Broadcast
- *   - Barcode data extra: "com.honeywell.aidc.barcodedata"
+ * 2. Intent Wedge (IT-configured broadcast delivery):
+ *    - Configured by IT in the device's Scan Wedge settings or via MDM.
+ *    - Does NOT require scanner acquisition/release commands from the app.
+ *    - The app listens for the configured broadcast action.
+ *    - This is the approach used by this plugin (no SDK dependency).
  *
- * This plugin handles both Honeywell's standard extra key and the Datalogic extra key,
- * emitting a unified "scan" event to the WebView.
+ * This plugin uses path 2 (Intent Wedge). No scanner acquisition or release commands
+ * are sent — that is only relevant for path 1.
  *
- * References:
- *   Honeywell: https://hsmftp.honeywell.com/tech-pubs/
- *   Datalogic: https://datalogic.github.io/wedge/overview/
+ * # Receiver configuration
+ *
+ * Honeywell Scan Wedge runs as a separate system process. RECEIVER_EXPORTED is required
+ * on Android 13+ for the same reason as ZebraDataWedgePlugin. See ScanReceiverHelper.
+ *
+ * # Datalogic Intent Wedge
+ *
+ * Datalogic devices (Memor, Skorpio, Falcon, Joya) deliver scan data via:
+ *   Action:     com.datalogic.decode.action.SCAN
+ *   Data extra: com.datalogic.decode.intentwedge.barcode_string (String)
+ *   Type extra: com.datalogic.decode.intentwedge.barcode_symbology (String)
+ *
+ * Source: https://datalogic.github.io/wedge/overview/
+ *
+ * Configuration: via ScanConfig app → Intent Wedge → enable, action default is
+ * com.datalogic.decode.action.SCAN. No additional configuration needed to use the
+ * default action. Custom action is optional.
+ *
+ * # Honeywell extra key variants
+ *
+ * Different Honeywell firmware families use different extra key names:
+ *   CT-series, EDA-series (newer): com.honeywell.aidc.barcodedata
+ *   Some older CN/Dolphin firmware:  DATA_STRING
+ *   Thor/ScanPal some versions:      barcode_string
+ * This plugin checks all three in priority order.
  */
 @CapacitorPlugin(name = "HoneywellScanner")
 public class HoneywellScannerPlugin extends Plugin {
 
     private static final String TAG = "HoneywellScanner";
 
-    // Honeywell Scan Wedge intent action (configure in Scan Wedge app)
-    // We reuse the same application-defined action used for Zebra, so a single
-    // IT configuration works across scanner brands.
-    private static final String ACTION_SCAN_INTENT = ZebraDataWedgePlugin.ACTION_SCAN_INTENT;
+    // Relay application-defined action (Honeywell Scan Wedge can be configured to use this)
+    private static final String RELAY_ACTION = ZebraDataWedgePlugin.ACTION_SCAN_INTENT;
 
-    // Datalogic Intent Wedge — standard action and extra key
-    private static final String DATALOGIC_ACTION      = "com.datalogic.decode.action.SCAN";
-    private static final String DATALOGIC_EXTRA_DATA  = "com.datalogic.decode.intentwedge.barcode_string";
-    private static final String DATALOGIC_EXTRA_TYPE  = "com.datalogic.decode.intentwedge.barcode_symbology";
+    // Datalogic native action
+    private static final String DATALOGIC_ACTION     = "com.datalogic.decode.action.SCAN";
+    private static final String DATALOGIC_EXTRA_DATA = "com.datalogic.decode.intentwedge.barcode_string";
+    private static final String DATALOGIC_EXTRA_TYPE = "com.datalogic.decode.intentwedge.barcode_symbology";
 
-    // Honeywell standard extra keys
-    // Different Honeywell firmware versions use slightly different extra key names.
-    private static final String HONEYWELL_EXTRA_DATA  = "com.honeywell.aidc.barcodedata";
-    // Some older Honeywell devices use "DATA_STRING":
-    private static final String HONEYWELL_EXTRA_DATA2 = "DATA_STRING";
-    private static final String HONEYWELL_EXTRA_TYPE  = "com.honeywell.aidc.labeltype";
+    // Honeywell extra key names in priority order
+    private static final String[] HONEYWELL_DATA_EXTRAS = {
+        "com.honeywell.aidc.barcodedata",
+        "DATA_STRING",
+        "barcode_string",
+    };
+    private static final String HONEYWELL_TYPE_EXTRA = "com.honeywell.aidc.labeltype";
 
     private BroadcastReceiver scanReceiver;
     private boolean           registered = false;
@@ -91,21 +105,20 @@ public class HoneywellScannerPlugin extends Plugin {
         unregisterScanReceiver();
     }
 
-    /**
-     * @PluginMethod isAvailable — returns true if running on a Honeywell or Datalogic device.
-     */
     @PluginMethod
     public void isAvailable(PluginCall call) {
-        String manufacturer = Build.MANUFACTURER;
-        if (manufacturer == null) manufacturer = "";
+        String manufacturer = Build.MANUFACTURER != null ? Build.MANUFACTURER : "";
         String lc = manufacturer.toLowerCase();
-        boolean isHoneywell  = lc.contains("honeywell");
-        boolean isDatalogic  = lc.contains("datalogic");
+        boolean isHoneywell = lc.contains("honeywell");
+        boolean isDatalogic = lc.contains("datalogic");
         JSObject result = new JSObject();
         result.put("available",   isHoneywell || isDatalogic);
         result.put("isHoneywell", isHoneywell);
         result.put("isDatalogic", isDatalogic);
         result.put("manufacturer", manufacturer);
+        // Report integration path so JS can show appropriate user guidance
+        result.put("integrationPath", "INTENT_WEDGE");
+        result.put("requiresAidcSdk", false);
         call.resolve(result);
     }
 
@@ -117,25 +130,18 @@ public class HoneywellScannerPlugin extends Plugin {
         scanReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                handleScanBroadcast(intent);
+                if (ScanReceiverHelper.validateSender(context, intent, TAG)) {
+                    handleScanBroadcast(intent);
+                }
             }
         };
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_SCAN_INTENT);  // shared relay action (Honeywell + Zebra)
-        filter.addAction(DATALOGIC_ACTION);    // Datalogic native action
+        filter.addAction(RELAY_ACTION);
+        filter.addAction(DATALOGIC_ACTION);
 
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                getContext().registerReceiver(scanReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
-            } else {
-                getContext().registerReceiver(scanReceiver, filter);
-            }
-            registered = true;
-            Log.d(TAG, "Honeywell/Datalogic scan receiver registered");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to register Honeywell/Datalogic receiver: " + e.getMessage());
-        }
+        ScanReceiverHelper.registerExportedReceiver(getContext(), scanReceiver, filter, TAG);
+        registered = true;
     }
 
     private void unregisterScanReceiver() {
@@ -154,40 +160,37 @@ public class HoneywellScannerPlugin extends Plugin {
     private void handleScanBroadcast(Intent intent) {
         if (intent == null) return;
 
-        String action     = intent.getAction();
-        String dataString = null;
-        String labelType  = null;
+        String action    = intent.getAction();
+        String data      = null;
+        String labelType = null;
         String source;
 
         if (DATALOGIC_ACTION.equals(action)) {
-            // Datalogic Intent Wedge
-            dataString = intent.getStringExtra(DATALOGIC_EXTRA_DATA);
-            labelType  = intent.getStringExtra(DATALOGIC_EXTRA_TYPE);
-            source     = "DATALOGIC_WEDGE";
+            data      = intent.getStringExtra(DATALOGIC_EXTRA_DATA);
+            labelType = intent.getStringExtra(DATALOGIC_EXTRA_TYPE);
+            source    = "DATALOGIC_WEDGE";
         } else {
-            // Honeywell Scan Wedge (or any device configured with ACTION_SCAN_INTENT)
-            dataString = intent.getStringExtra(HONEYWELL_EXTRA_DATA);
-            if (dataString == null) {
-                dataString = intent.getStringExtra(HONEYWELL_EXTRA_DATA2);
+            // Honeywell: check extra key variants in priority order
+            for (String key : HONEYWELL_DATA_EXTRAS) {
+                String v = intent.getStringExtra(key);
+                if (v != null && !v.isEmpty()) {
+                    data = v;
+                    break;
+                }
             }
-            if (dataString == null) {
-                // Try DataWedge key as fallback (this receiver also fires for DataWedge
-                // when ZebraDataWedgePlugin is not installed — defensive)
-                dataString = intent.getStringExtra("com.symbol.datawedge.data_string");
-            }
-            labelType = intent.getStringExtra(HONEYWELL_EXTRA_TYPE);
+            labelType = intent.getStringExtra(HONEYWELL_TYPE_EXTRA);
             source    = "HONEYWELL_WEDGE";
         }
 
-        if (dataString == null || dataString.isEmpty()) {
+        if (data == null || data.isEmpty()) {
             Log.w(TAG, "Received scan intent (" + action + ") with empty data — ignored");
             return;
         }
 
-        Log.d(TAG, "Scan [" + source + "]: type=" + labelType + " value=" + dataString);
+        Log.d(TAG, "Scan [" + source + "]: len=" + data.length());
 
         JSObject event = new JSObject();
-        event.put("value",     dataString);
+        event.put("value",     data);
         event.put("source",    source);
         event.put("labelType", labelType != null ? labelType : "");
 

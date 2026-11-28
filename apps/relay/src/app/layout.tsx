@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Geist, Manrope } from "next/font/google"
 import { Toaster } from "sonner"
+import { NativeScannerInit } from "@/components/native-scanner-init"
 import "./globals.css"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="h-full bg-gray-50 font-sans antialiased">
+        <NativeScannerInit />
         {children}
         <Toaster
           position="bottom-right"

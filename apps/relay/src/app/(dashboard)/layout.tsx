@@ -27,6 +27,7 @@ import { ReadOnlyProvider } from "@/components/layout/read-only-context"
 import { TermsUpdateModal } from "@/components/legal/terms-update-modal"
 import { LegalFooter } from "@/components/legal/legal-footer"
 import { CURRENT_TERMS_VERSION, CURRENT_PRIVACY_VERSION } from "@/lib/legal-versions"
+import { SharedDeviceSessionGuard } from "@/components/shared-device-session-guard"
 
 export const dynamic = "force-dynamic"
 
@@ -294,6 +295,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <PushRegistration />
       <StatusBarConfig />
       <OfflineBanner />
+      {/* Renew session on activity when device has inactivity timeout policy */}
+      <SharedDeviceSessionGuard enabled={!!session.inactivityTimeoutSeconds} />
       </div>
     </div>
     </NextIntlClientProvider>

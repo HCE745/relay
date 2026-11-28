@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { X, RefreshCw, Plus, Trash2, QrCode, Barcode, Copy, Check, KeyRound, CreditCard, ShieldCheck } from "lucide-react"
+import { X, RefreshCw, Plus, Trash2, QrCode, Barcode, Copy, Check, KeyRound, CreditCard, ShieldCheck, ScanLine } from "lucide-react"
 import { toast } from "@/lib/toast"
+import { useScannerField } from "@/lib/scanner-bus"
+import { ScanButton } from "@/components/scanner/camera-scanner"
 
 interface Badge {
   id: string
@@ -51,6 +53,12 @@ export function EmployeeCredentialsModal({ userId, userName, onClose }: Props) {
 
   const [saving, setSaving]  = useState(false)
   const [err, setErr]        = useState<string | null>(null)
+
+  // Scanner enrollment for third-party badge
+  const [badgeEnrollOpen, setBadgeEnrollOpen] = useState(false)
+  const scanFieldRef = useScannerField((value) => {
+    setThirdPartyDraft(value)
+  })
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -350,26 +358,57 @@ export function EmployeeCredentialsModal({ userId, userName, onClose }: Props) {
               </div>
 
               {/* Third-party badge */}
-              <details className="group">
+              <details open={badgeEnrollOpen} onToggle={e => setBadgeEnrollOpen((e.currentTarget as HTMLDetailsElement).open)} className="group">
                 <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700 list-none flex items-center gap-1">
                   <Plus className="w-3.5 h-3.5" />
                   Register third-party badge
                 </summary>
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    placeholder="Badge value or scan"
-                    value={thirdPartyDraft}
-                    onChange={e => setThirdPartyDraft(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                <div className="mt-2 space-y-2">
+                  {/* Manual / paste entry */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Type, paste, or scan badge value"
+                      value={thirdPartyDraft}
+                      onChange={e => setThirdPartyDraft(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter" && thirdPartyDraft.trim()) { e.preventDefault(); void addThirdPartyBadge() } }}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={addThirdPartyBadge}
+                      disabled={saving || !thirdPartyDraft.trim()}
+                      className="px-3 py-2 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 disabled:opacity-60"
+                    >
+                      Register
+                    </button>
+                  </div>
+
+                  {/* Dedicated scanner input field (for USB/BT wedge scanners) */}
+                  <div className="border border-dashed border-gray-200 rounded-lg p-2">
+                    <p className="text-xs text-gray-400 mb-1.5 flex items-center gap-1">
+                      <ScanLine className="w-3.5 h-3.5" />
+                      Hardware scanner — click field, then scan
+                    </p>
+                    <input
+                      ref={scanFieldRef}
+                      data-scanner-field="true"
+                      type="text"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      placeholder="Click here, then scan badge…"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer font-mono tracking-widest"
+                      title="Click to focus, then scan your badge"
+                    />
+                  </div>
+
+                  {/* Camera scanner */}
+                  <ScanButton
+                    label="Scan with camera"
+                    onScan={(value) => {
+                      setThirdPartyDraft(value)
+                    }}
                   />
-                  <button
-                    onClick={addThirdPartyBadge}
-                    disabled={saving || !thirdPartyDraft.trim()}
-                    className="px-3 py-2 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 disabled:opacity-60"
-                  >
-                    Register
-                  </button>
                 </div>
               </details>
             </section>

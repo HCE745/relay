@@ -1,64 +1,94 @@
 // ScannerBus — central event bus for all credential scanning inputs.
 //
-// Supports:
-//   - Hardware keyboard-wedge scanners (USB/Bluetooth HID, Android keyboard-wedge)
-//   - Camera scanner events (emitted by CameraScanner component)
-//   - Manual entry (direct calls to emit())
+// Three scanner input modes:
+//   WEDGE_AUTO    — global keydown listener, timing-based detection (HID/USB/BT wedge)
+//   FOCUSED_FIELD — dedicated <input> element; scanner output fills it, Enter submits
+//   BOTH          — focused field primary, wedge fallback when no field has focus
 //
-// Keyboard-wedge detection:
-//   HID scanners emulate a keyboard and send characters rapidly (< WEDGE_CHAR_INTERVAL_MS
-//   between keystrokes), terminated by Enter. Normal typing is slower.
-//   Detection also supports configurable prefix/suffix stripping.
+// Keyboard-wedge detection (WEDGE_AUTO / BOTH):
+//   HID scanners emulate a keyboard and send characters rapidly (< intervalMs
+//   between keystrokes), terminated by Enter or carriage-return.
+//   Configurable prefix/suffix stripping, minimum length, and timing threshold.
 //
-// Context management:
-//   Handlers are registered per-context (component mount). Remove them on unmount.
-//   Only one context typically handles a scan; the bus stops propagation on first return true.
+// Limitations:
+//   - Timing-based detection can mis-fire on fast typists or under CPU load.
+//   - Bluetooth scanners with high latency may exceed the default 30 ms threshold.
+//   - If timing is unreliable, switch to FOCUSED_FIELD mode and use useScannerField().
+//   - On Android WebView, keyboard-wedge scanner output is indistinguishable from typing
+//     unless the scanner is configured to use a prefix/suffix or the field is focused.
 //
 // Scanners must NOT auto-navigate to URLs embedded in credential values.
 // Never interpret arbitrary typing as scanner input — only use the wedge detector
 // or explicit camera/manual calls.
 
 export type ScanEvent = {
-  value: string
-  source: "KEYBOARD_WEDGE" | "CAMERA" | "MANUAL"
+  value:  string
+  source: "KEYBOARD_WEDGE" | "CAMERA" | "MANUAL" | "FOCUSED_FIELD"
 }
 
 export type ScanHandler = (event: ScanEvent) => boolean | void  // return true to stop propagation
 
-const WEDGE_CHAR_INTERVAL_MS = 30   // keystrokes faster than this are likely a scanner
-const WEDGE_MIN_LENGTH       = 4    // ignore very short bursts
+export type ScannerMode = "WEDGE_AUTO" | "FOCUSED_FIELD" | "BOTH"
 
-// Global scanner configuration (can be updated at runtime)
-let wedgePrefix = ""
-let wedgeSuffix = ""
-
-export function configureWedge(opts: { prefix?: string; suffix?: string }) {
-  if (opts.prefix !== undefined) wedgePrefix = opts.prefix
-  if (opts.suffix !== undefined) wedgeSuffix = opts.suffix
+export interface ScannerConfig {
+  /** Detection mode. Default: WEDGE_AUTO. */
+  mode:        ScannerMode
+  /** Max milliseconds between consecutive wedge keystrokes. Default: 30. */
+  intervalMs:  number
+  /** Minimum character count for a wedge burst to be treated as a scan. Default: 4. */
+  minLength:   number
+  /** Prefix to strip from wedge scan values. Default: "". */
+  prefix:      string
+  /** Suffix to strip from wedge scan values. Default: "". */
+  suffix:      string
 }
 
-class ScannerBus {
-  private handlers:   ScanHandler[] = []
-  private buffer:     string        = ""
-  private lastKeyAt:  number        = 0
-  private listening   = false
+const DEFAULT_CONFIG: ScannerConfig = {
+  mode:       "WEDGE_AUTO",
+  intervalMs: 30,
+  minLength:  4,
+  prefix:     "",
+  suffix:     "",
+}
 
-  // ── Handler registration ────────────────────────────────────────────────────
+// Global configuration — updated at runtime
+let config: ScannerConfig = { ...DEFAULT_CONFIG }
+
+export function configureScannerBus(opts: Partial<ScannerConfig>) {
+  config = { ...config, ...opts }
+}
+
+/** @deprecated Use configureScannerBus({ prefix, suffix }) */
+export function configureWedge(opts: { prefix?: string; suffix?: string }) {
+  if (opts.prefix !== undefined) config.prefix = opts.prefix
+  if (opts.suffix !== undefined) config.suffix = opts.suffix
+}
+
+// ── ScannerBus class ────────────────────────────────────────────────────────
+
+class ScannerBus {
+  private handlers:  ScanHandler[] = []
+  private buffer:    string        = ""
+  private lastKeyAt: number        = 0
+  private listening  = false
+
+  // ── Handler registration ──────────────────────────────────────────────────
 
   register(handler: ScanHandler): () => void {
     this.handlers.push(handler)
-    if (!this.listening) this.startListening()
+    if (!this.listening && typeof window !== "undefined") this.startListening()
     return () => { this.handlers = this.handlers.filter(h => h !== handler) }
   }
 
-  // ── Emit ────────────────────────────────────────────────────────────────────
+  // ── Emit ──────────────────────────────────────────────────────────────────
 
   emit(event: ScanEvent) {
-    // Strip prefix/suffix from wedge scans
     let value = event.value
-    if (event.source === "KEYBOARD_WEDGE") {
-      if (wedgePrefix && value.startsWith(wedgePrefix)) value = value.slice(wedgePrefix.length)
-      if (wedgeSuffix && value.endsWith(wedgeSuffix))   value = value.slice(0, -wedgeSuffix.length)
+
+    // Strip prefix/suffix from wedge and focused-field scans
+    if (event.source === "KEYBOARD_WEDGE" || event.source === "FOCUSED_FIELD") {
+      if (config.prefix && value.startsWith(config.prefix)) value = value.slice(config.prefix.length)
+      if (config.suffix && value.endsWith(config.suffix))   value = value.slice(0, -config.suffix.length)
     }
     if (!value) return
 
@@ -68,7 +98,7 @@ class ScannerBus {
     }
   }
 
-  // ── Keyboard-wedge detection ─────────────────────────────────────────────────
+  // ── Keyboard-wedge detection ──────────────────────────────────────────────
 
   private startListening() {
     if (typeof window === "undefined") return
@@ -83,22 +113,27 @@ class ScannerBus {
   }
 
   private onKeyDown = (e: KeyboardEvent) => {
-    // Ignore modifier-key combos (Ctrl+C etc.) and special keys except Enter
+    // Skip wedge detection when mode is FOCUSED_FIELD
+    if (config.mode === "FOCUSED_FIELD") return
+
+    // In BOTH mode, skip wedge detection when a focused scanner field is active
+    if (config.mode === "BOTH" && e.target instanceof HTMLInputElement
+        && (e.target as HTMLInputElement).dataset.scannerField === "true") return
+
+    // Ignore modifier-key combos (Ctrl+C etc.) and special keys except Enter/CR
     if (e.ctrlKey || e.altKey || e.metaKey) return
 
     const now = Date.now()
 
-    // Enter terminates a possible wedge sequence
-    if (e.key === "Enter") {
+    // Enter or carriage-return terminates a possible wedge sequence
+    if (e.key === "Enter" || e.key === "Return") {
       const elapsed = now - this.lastKeyAt
       const buf = this.buffer
 
-      // Reset buffer regardless
-      this.buffer  = ""
+      this.buffer    = ""
       this.lastKeyAt = 0
 
-      if (buf.length >= WEDGE_MIN_LENGTH && elapsed < WEDGE_CHAR_INTERVAL_MS * 3) {
-        // Looks like a completed scanner burst — emit
+      if (buf.length >= config.minLength && elapsed < config.intervalMs * 3) {
         e.stopPropagation()
         e.preventDefault()
         this.emit({ value: buf, source: "KEYBOARD_WEDGE" })
@@ -108,8 +143,8 @@ class ScannerBus {
 
     // Only accumulate printable single characters
     if (e.key.length !== 1) {
-      // Non-printable key (Escape, Tab, Arrow, etc.) — reset buffer
-      this.buffer = ""
+      // Non-printable key — reset buffer
+      this.buffer    = ""
       this.lastKeyAt = 0
       return
     }
@@ -117,15 +152,73 @@ class ScannerBus {
     const interval = now - this.lastKeyAt
     this.lastKeyAt = now
 
-    if (this.buffer.length === 0 || interval < WEDGE_CHAR_INTERVAL_MS) {
-      // Within scanner speed — accumulate
+    if (this.buffer.length === 0 || interval < config.intervalMs) {
       this.buffer += e.key
     } else {
-      // Gap too large — this is normal typing; reset and start fresh
-      this.buffer  = e.key
+      // Gap too large — normal typing; reset and start fresh
+      this.buffer = e.key
     }
   }
 }
 
 // Singleton — shared across the whole app
 export const scannerBus = typeof window !== "undefined" ? new ScannerBus() : null!
+
+// ── useScannerField hook ──────────────────────────────────────────────────────
+//
+// Returns a ref to attach to a dedicated <input> element.
+// The input acts as the scanner's focused field: scanner output fills it and
+// Enter/CR triggers onScan. No timing heuristics — any input ending in Enter
+// is treated as a scan, so the input should not be used for free-form typing.
+//
+// Usage:
+//   const fieldRef = useScannerField((value) => handleScan(value))
+//   <input ref={fieldRef} data-scanner-field="true" ... />
+//
+// When the field is visible, keep it focused or provide a "Re-focus scanner"
+// button that calls fieldRef.current?.focus().
+
+import { useRef, useEffect } from "react"
+
+export function useScannerField(
+  onScan: (value: string) => void,
+  opts?: { autoFocus?: boolean }
+) {
+  const ref     = useRef<HTMLInputElement>(null)
+  const onScanRef = useRef(onScan)
+  onScanRef.current = onScan   // keep current without re-registering
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    if (opts?.autoFocus) el.focus()
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Enter" && e.key !== "Return") return
+
+      const value = el!.value.trim()
+      if (!value) return
+
+      e.preventDefault()
+      e.stopPropagation()
+
+      // Clear the field first so the handler can refocus cleanly
+      el!.value = ""
+
+      let stripped = value
+      if (config.prefix && stripped.startsWith(config.prefix)) stripped = stripped.slice(config.prefix.length)
+      if (config.suffix && stripped.endsWith(config.suffix))   stripped = stripped.slice(0, -config.suffix.length)
+      if (!stripped) return
+
+      // Emit on the bus so global handlers also receive it
+      scannerBus?.emit({ value: stripped, source: "FOCUSED_FIELD" })
+      onScanRef.current(stripped)
+    }
+
+    el.addEventListener("keydown", handleKeyDown)
+    return () => el.removeEventListener("keydown", handleKeyDown)
+  }, [opts?.autoFocus])  // eslint-disable-line react-hooks/exhaustive-deps
+
+  return ref
+}

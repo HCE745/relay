@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { KeyRound, Camera, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
 import { CameraScanner } from "@/components/scanner/camera-scanner"
 import { scannerBus } from "@/lib/scanner-bus"
+import { initNativeScannerBridge } from "@/lib/native-scanner-bridge"
 
 // Quick Access kiosk login page.
 //
@@ -26,6 +27,11 @@ export default function KioskLoginPage() {
   const [orgSlug,    setOrgSlug]     = useState<string | null>(null)
 
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Initialize native scanner bridge (Zebra, Honeywell, Datalogic, etc.)
+  useEffect(() => {
+    void initNativeScannerBridge()
+  }, [])
 
   // Resolve org slug from session storage (set when redirecting from standard login)
   useEffect(() => {

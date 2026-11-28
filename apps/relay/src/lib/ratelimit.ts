@@ -28,9 +28,10 @@ function make(tokens: number, window: `${number} ${"ms" | "s" | "m" | "h" | "d"}
 
 export const limiters = {
   // Auth — IP-based
-  login:       make(5,   "10 m"),  // 5 attempts / 10 min
-  register:    make(3,   "1 h"),   // 3 new accounts / hour
-  forgotPw:    make(3,   "1 h"),   // 3 reset requests / hour
+  login:         make(5,   "10 m"),  // 5 attempts / 10 min
+  employeeLogin: make(10,  "5 m"),   // 10 quick-access attempts / 5 min / IP
+  register:      make(3,   "1 h"),   // 3 new accounts / hour
+  forgotPw:      make(3,   "1 h"),   // 3 reset requests / hour
 
   // Submission — user-based
   issues:      make(50,  "1 h"),   // 50 issues / hour / user

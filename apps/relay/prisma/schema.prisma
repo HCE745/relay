@@ -227,6 +227,12 @@ model Organization {
   configurationAuditLogs  ConfigurationAuditLog[]
   crmProspectId           String?                  @unique // CRM Prospect linked at registration
   customerOnboarding      CustomerOnboarding?
+
+  // ── Employee auth (Phase 1) ────────────────────────────────────────────────
+  authPolicyConfig        Json?
+  employeeCredentials     EmployeeCredential[]
+  employeeBadges          EmployeeBadge[]
+  registeredDevices       RegisteredDevice[]
 }
 
 model CustomView {
@@ -363,6 +369,15 @@ model User {
   dashboardLayouts            DashboardLayout[]
   dashboardReports            DashboardReport[]
   dashboardAlerts             DashboardAlert[]
+
+  // ── Employee auth (Phase 1) ────────────────────────────────────────────────
+  employeeId              String?
+  employeeSessionVersion  Int     @default(0)
+  employeeCredential      EmployeeCredential?
+  employeeBadges          EmployeeBadge[]
+  registeredDevicesAdmin  RegisteredDevice[] @relation("DeviceRegisteredBy")
+
+  @@index([organizationId, employeeId])
 }
 
 model PasswordResetToken {
@@ -412,6 +427,7 @@ model Location {
   customerSurveys         CustomerSurvey[]
   customerSurveyResponses CustomerSurveyResponse[]
   slug                    String?  // URL-safe identifier for public feedback links; unique per org scope via DB index
+  registeredDevices       RegisteredDevice[]
 }
 
 model Department {
@@ -432,6 +448,7 @@ model Department {
   invitations  Invitation[]
   sops         SOP[]
   qrCodes      QrCode[]
+  registeredDevices RegisteredDevice[]
 }
 
 model Asset {
@@ -3975,4 +3992,106 @@ model OnboardingHandoff {
   // Partial unique index enforcing at most one pending_review per prospect is added
   // as raw SQL in the migration: CREATE UNIQUE INDEX "handoff_prospect_active_key"
   // ON "OnboardingHandoff"("prospectId") WHERE (status = 'pending_review');
+}
+
+// ── Employee Auth Models (Phase 1) ────────────────────────────────────────────
+
+// One credential configuration per employee.
+// Lookup indices are HMAC-SHA256(CREDENTIAL_HMAC_SECRET, normalizedValue); never plaintext.
+model EmployeeCredential {
+  id             String       @id @default(cuid())
+  userId         String       @unique
+  organizationId String
+
+  // Employee ID auth (source: User.employeeId)
+  employeeIdEnabled  Boolean  @default(false)
+  employeeIdIndex    String?  // HMAC of normalized User.employeeId
+
+  // Custom access code auth
+  accessCodeEnabled  Boolean  @default(false)
+  accessCodeIndex    String?  // HMAC of normalized code — for lookup
+  accessCodeHash     String?  // bcrypt hash — for verification
+  accessCodeMasked   String?  // e.g. "***4X2" — for display only
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+// Individual badge credentials per employee. Supports multiple badges (QR, barcode, third-party).
+model EmployeeBadge {
+  id              String       @id @default(cuid())
+  userId          String
+  organizationId  String
+
+  // "RELAY_QR" | "RELAY_BARCODE" | "THIRD_PARTY"
+  badgeType       String
+  // HMAC of normalized credential value — unique per org for fast lookup
+  credentialIndex String
+  // bcrypt hash for Relay-generated credentials; null for third-party
+  credentialHash  String?
+  // Masked display, e.g. "***abc123"
+  maskedDisplay   String
+
+  isActive        Boolean      @default(true)
+  revokedAt       DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, credentialIndex])
+  @@index([userId, isActive])
+  @@index([organizationId, isActive])
+}
+
+// Devices registered by an administrator to display a persistent login experience.
+model RegisteredDevice {
+  id                        String       @id @default(cuid())
+  organizationId            String
+  registeredByUserId        String?
+
+  deviceName                String
+  locationId                String?
+  departmentId              String?
+  stationId                 String?       // free-text workstation identifier
+
+  // "STANDARD" | "QUICK_ACCESS"
+  loginMode                 String        @default("STANDARD")
+
+  // JSON array: ["EMPLOYEE_ID","ACCESS_CODE","BADGE"]
+  permittedMethods          Json          @default("[]")
+
+  // Per-device session policy overrides (null = inherit org default)
+  inactivityTimeoutSeconds  Int?
+  maxSessionDurationSeconds Int?
+  disableInactivityTimeout  Boolean       @default(false)
+  disableMaxSessionDuration Boolean       @default(false)
+
+  // Device token (HttpOnly cookie) — stored as HMAC index + bcrypt hash, never plaintext
+  deviceTokenIndex          String        @unique
+  deviceTokenHash           String
+
+  platform                  String?
+  deviceInfo                Json?
+
+  isActive                  Boolean       @default(true)
+  // Increment to invalidate all current sessions on this device
+  sessionVersion            Int           @default(0)
+
+  registeredAt              DateTime      @default(now())
+  lastSeenAt                DateTime?
+  revokedAt                 DateTime?
+
+  organization              Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  registeredBy              User?         @relation("DeviceRegisteredBy", fields: [registeredByUserId], references: [id], onDelete: SetNull)
+  location                  Location?     @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  department                Department?   @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, isActive])
 }

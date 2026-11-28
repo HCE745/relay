@@ -47,6 +47,16 @@ export type SessionPayload = {
   // Demo sessions
   isDemo?: boolean            // true = this session is an isolated sales demo
   exp?: number
+
+  // ── Employee quick-access sessions (Phase 1) ───────────────────────────────
+  sessionType?:               "standard" | "employee"
+  deviceId?:                  string   // RegisteredDevice.id — set when session is device-bound
+  deviceSessionVersion?:      number   // snapshot of RegisteredDevice.sessionVersion at login
+  employeeSessionVersion?:    number   // snapshot of User.employeeSessionVersion at login
+  // Session policy encoded at login — used by heartbeat endpoint to enforce cap
+  sessionIssuedAt?:           number   // Unix seconds at original login (stable across heartbeats)
+  maxSessionDurationSeconds?: number   // null-encoded as undefined — no max
+  inactivityTimeoutSeconds?:  number   // null-encoded as undefined — no inactivity timeout
 }
 
 export async function createSession(payload: SessionPayload) {

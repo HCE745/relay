@@ -13,18 +13,24 @@ export default async function DevicesPage() {
   if (!session) redirect("/login")
   if (session.role !== "ADMIN") redirect("/settings")
 
-  const devices = await prisma.registeredDevice.findMany({
-    where:   { organizationId: session.organizationId },
-    orderBy: { registeredAt: "desc" },
-    select: {
-      id: true, deviceName: true, loginMode: true, permittedMethods: true,
-      platform: true, isActive: true, registeredAt: true, lastSeenAt: true,
-      revokedAt: true,
-      inactivityTimeoutSeconds: true, maxSessionDurationSeconds: true,
-      location:   { select: { id: true, name: true } },
-      department: { select: { id: true, name: true } },
-    },
-  })
+  const orgId = session.organizationId
+
+  const [devices, locations, departments] = await Promise.all([
+    prisma.registeredDevice.findMany({
+      where:   { organizationId: orgId },
+      orderBy: { registeredAt: "desc" },
+      select: {
+        id: true, deviceName: true, loginMode: true, permittedMethods: true,
+        platform: true, isActive: true, registeredAt: true, lastSeenAt: true,
+        revokedAt: true,
+        inactivityTimeoutSeconds: true, maxSessionDurationSeconds: true,
+        location:   { select: { id: true, name: true } },
+        department: { select: { id: true, name: true } },
+      },
+    }),
+    prisma.location.findMany({ where: { organizationId: orgId }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    prisma.department.findMany({ where: { organizationId: orgId }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
+  ])
 
   // Serialize Dates → strings and cast JSON → string[] for the client component
   const serializedDevices = devices.map(d => ({
@@ -58,7 +64,7 @@ export default async function DevicesPage() {
           <p className="text-xs text-gray-400 mb-6">
             Devices registered as kiosks. Each device has a persistent identity credential stored in a secure cookie. Revoking a device immediately ends all active employee sessions on it.
           </p>
-          <DevicesClient devices={serializedDevices} />
+          <DevicesClient devices={serializedDevices} locations={locations} departments={departments} />
         </div>
       </div>
     </div>

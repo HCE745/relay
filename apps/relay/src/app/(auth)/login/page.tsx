@@ -3,14 +3,17 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { login } from "@/lib/auth-actions"
-import { Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react"
+import { Eye, EyeOff, ArrowLeft, CheckCircle, Camera } from "lucide-react"
 import { RelayWordmark } from "@/components/logo"
+import { ScanButton } from "@/components/scanner/camera-scanner"
+import { useRouter } from "next/navigation"
 
 const REMEMBER_KEY = "relay-remembered-email"
 
 type View = "login" | "forgot" | "forgot-sent" | "forgot-username" | "forgot-username-sent"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [view,           setView]           = useState<View>("login")
   const [error,          setError]          = useState("")
   const [loading,        setLoading]        = useState(false)
@@ -32,6 +35,17 @@ export default function LoginPage() {
       setRememberMe(true)
     }
   }, [])
+
+  // Detect registered kiosk devices: redirect to Quick Access login automatically
+  useEffect(() => {
+    void fetch("/api/auth/device-info").then(r => r.json()).then((info: { isRegistered?: boolean; loginMode?: string; kioskPath?: string; organizationSlug?: string }) => {
+      if (info.isRegistered && info.loginMode === "QUICK_ACCESS") {
+        // Persist org slug for the kiosk page (registered devices auto-resolve, but keep as fallback)
+        try { if (info.organizationSlug) sessionStorage.setItem("kiosk-org-slug", info.organizationSlug) } catch { /* noop */ }
+        router.replace(info.kioskPath ?? "/kiosk/login")
+      }
+    }).catch(() => undefined)
+  }, [router])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -182,7 +196,19 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              <p className="mt-6 text-center text-sm text-gray-500">
+              {/* Quick Access scan button — for employees using badge/QR/barcode on a standard login page */}
+              <div className="mt-4 border-t border-gray-100 pt-4">
+                <ScanButton
+                  label="Scan QR or Barcode"
+                  onScan={(value) => {
+                    // Redirect to Quick Access login with the scanned credential pre-filled
+                    try { sessionStorage.setItem("kiosk-prefill", value) } catch { /* noop */ }
+                    router.push("/kiosk/login")
+                  }}
+                />
+              </div>
+
+              <p className="mt-4 text-center text-sm text-gray-500">
                 Don&apos;t have an account?{" "}
                 <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
                   Get started with Relay

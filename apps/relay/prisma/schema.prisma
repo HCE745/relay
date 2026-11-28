@@ -234,6 +234,7 @@ model Organization {
   employeeBadges          EmployeeBadge[]
   registeredDevices       RegisteredDevice[]
   singleCodeLookups       SingleCodeLookup[]
+  stagedCredentials       StagedCredential[]
 }
 
 model CustomView {
@@ -768,10 +769,11 @@ model Invitation {
   usedAt         DateTime?
   createdAt      DateTime  @default(now())
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  invitedBy    User?        @relation("SentInvitations", fields: [invitedById], references: [id])
-  department   Department?  @relation(fields: [departmentId], references: [id])
-  location     Location?    @relation(fields: [locationId], references: [id])
+  organization       Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy          User?              @relation("SentInvitations", fields: [invitedById], references: [id])
+  department         Department?        @relation(fields: [departmentId], references: [id])
+  location           Location?          @relation(fields: [locationId], references: [id])
+  stagedCredentials  StagedCredential[]
 }
 
 // ─── White-Glove Customer Onboarding ─────────────────────────────────────────
@@ -4144,4 +4146,37 @@ model AuthAuditLog {
   @@index([organizationId, createdAt])
   @@index([userId, createdAt])
   @@index([deviceId, createdAt])
+}
+
+// Staged credentials for invited employees.
+// Slots are reserved in SingleCodeLookup at invite creation time to prevent collisions.
+// On invitation acceptance, promoted to EmployeeCredential/EmployeeBadge.
+// On expiry/cancellation, the SingleCodeLookup entries are released and these records deleted.
+model StagedCredential {
+  id              String    @id @default(cuid())
+  organizationId  String
+  invitationId    String
+  // "EMPLOYEE_ID" | "ACCESS_CODE" | "BADGE"
+  credentialType  String
+  // HMAC-SHA256(CREDENTIAL_HMAC_SECRET, normalizedValue) — same algo as SingleCodeLookup
+  credentialIndex String
+  // bcrypt hash of the raw credential value
+  credentialHash  String
+  // e.g. "***1234" — safe to display in UI
+  maskedDisplay   String
+  // optional label for BADGE type
+  label           String?
+  // raw value for EMPLOYEE_ID only (stored plaintext on User.employeeId anyway; null for secrets)
+  rawValue        String?
+  // copied from Invitation.expiresAt for standalone cleanup
+  expiresAt       DateTime
+
+  createdAt       DateTime  @default(now())
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitation      Invitation   @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([invitationId])
+  @@index([organizationId])
 }

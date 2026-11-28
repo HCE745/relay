@@ -7,14 +7,24 @@ import { prisma } from "@/lib/prisma"
 import { sendEmail } from "@/lib/email"
 import { normalizeCredential, computeCredentialIndex, maskCredential } from "@/lib/credential-hmac"
 import { reserveSingleCodeLookup, clearUserSingleCodeLookups } from "@/lib/single-code-lookup"
+import { stageCredentialsForInvitation, type StagedCredentialInput } from "@/lib/staged-credentials"
 
 export const dynamic = "force-dynamic"
 
 // ── CSV template ─────────────────────────────────────────────────────────────
 
-const TEMPLATE_HEADER = "name,email,role,employee_type_name,location_name,department_name,employee_id,access_code"
-const TEMPLATE_EXAMPLE = `Alex Johnson,alex@example.com,EMPLOYEE,Field Technician,Main Plant,Maintenance,EMP-001,
-Jordan Smith,jordan@example.com,MANAGER,Shift Supervisor,Warehouse A,Operations,,ACDE23`
+const TEMPLATE_HEADER = [
+  "name", "email", "role", "employee_type_name", "location_name", "department_name",
+  "employee_id", "employee_id_enabled", "single_code_method", "access_code",
+  "badge_auth_enabled", "badge_value_1", "badge_label_1", "badge_value_2", "badge_label_2",
+  "badge_value_3", "badge_label_3",
+].join(",")
+
+const TEMPLATE_EXAMPLE = [
+  "Alex Johnson,alex@example.com,EMPLOYEE,Field Technician,Main Plant,Maintenance,EMP-001,true,EMPLOYEE_ID,,,,,,,",
+  "Jordan Smith,jordan@example.com,MANAGER,Shift Supervisor,Warehouse A,Operations,,,ACCESS_CODE,ACDE23,,,,,,,",
+  "Taylor Brown,taylor@example.com,EMPLOYEE,,,,,,,,true,BADGE1234,,BADGE5678,,",
+].join("\n")
 
 // GET /api/onboarding/import/employees
 // Returns a downloadable CSV template.
@@ -131,12 +141,16 @@ export async function POST(request: NextRequest) {
     name: string
     email: string
     role: string
-    employeeTypeName: string | null
-    locationName: string | null
-    departmentName: string | null
-    employeeIdValue: string | null
-    accessCodeValue: string | null
-    warnings: string[]
+    employeeTypeName:  string | null
+    locationName:      string | null
+    departmentName:    string | null
+    employeeIdValue:   string | null
+    employeeIdEnabled: boolean
+    singleCodeMethod:  "EMPLOYEE_ID" | "ACCESS_CODE" | null
+    accessCodeValue:   string | null
+    badgeAuthEnabled:  boolean
+    badgeValues:       Array<{ value: string; label: string | null }>
+    warnings:          string[]
   }
 
   const validRows: PreviewRow[] = []
@@ -156,12 +170,25 @@ export async function POST(request: NextRequest) {
       continue
     }
 
-    const rawRole    = parts[col("role")]?.trim()
-    const rawEtName  = col("employee_type_name") >= 0 ? parts[col("employee_type_name")]?.trim() : undefined
-    const rawLocName = col("location_name")       >= 0 ? parts[col("location_name")]?.trim()      : undefined
-    const rawDeptName = col("department_name")    >= 0 ? parts[col("department_name")]?.trim()     : undefined
-    const rawEmpId   = col("employee_id")         >= 0 ? parts[col("employee_id")]?.trim()         : undefined
-    const rawCode    = col("access_code")         >= 0 ? parts[col("access_code")]?.trim()          : undefined
+    const rawRole       = parts[col("role")]?.trim()
+    const rawEtName     = col("employee_type_name")  >= 0 ? parts[col("employee_type_name")]?.trim()  : undefined
+    const rawLocName    = col("location_name")        >= 0 ? parts[col("location_name")]?.trim()       : undefined
+    const rawDeptName   = col("department_name")      >= 0 ? parts[col("department_name")]?.trim()      : undefined
+    // Preserve raw value: trim only (no case folding, no leading zero removal)
+    const rawEmpId      = col("employee_id")          >= 0 ? (parts[col("employee_id")] ?? "").trim()   : undefined
+    const empIdEnabled  = col("employee_id_enabled")  >= 0 ? (parts[col("employee_id_enabled")] ?? "").trim().toLowerCase() === "true" : undefined
+    const singleMethod  = col("single_code_method")   >= 0 ? (parts[col("single_code_method")] ?? "").trim().toUpperCase() : undefined
+    // Preserve raw code (may have leading zeros)
+    const rawCode       = col("access_code")          >= 0 ? (parts[col("access_code")] ?? "").trim()   : undefined
+    const badgeEnabled  = col("badge_auth_enabled")   >= 0 ? (parts[col("badge_auth_enabled")] ?? "").trim().toLowerCase() === "true" : undefined
+    // Up to 3 badge values/labels — preserved as-is (no case folding)
+    const badgeValues: Array<{ value: string; label: string | null }> = []
+    for (let b = 1; b <= 3; b++) {
+      const valCol = `badge_value_${b}`, lblCol = `badge_label_${b}`
+      const bv = col(valCol) >= 0 ? (parts[col(valCol)] ?? "").trim() : ""
+      const bl = col(lblCol) >= 0 ? (parts[col(lblCol)] ?? "").trim() : ""
+      if (bv) badgeValues.push({ value: bv, label: bl || null })
+    }
 
     const et   = rawEtName  ? etByName.get(rawEtName.toLowerCase())   : undefined
     const loc  = rawLocName ? locByName.get(rawLocName.toLowerCase())  : undefined
@@ -174,13 +201,23 @@ export async function POST(request: NextRequest) {
     if (rawLocName && !loc)  warnings.push(`Location "${rawLocName}" not found — skipping location assignment`)
     if (rawDeptName && !dept) warnings.push(`Department "${rawDeptName}" not found — skipping department assignment`)
 
+    // Validate single_code_method constraint
+    const validSingleMethod = singleMethod === "EMPLOYEE_ID" || singleMethod === "ACCESS_CODE" ? singleMethod : undefined
+    if (singleMethod && !validSingleMethod) {
+      warnings.push(`single_code_method "${singleMethod}" is invalid — must be EMPLOYEE_ID or ACCESS_CODE`)
+    }
+
     validRows.push({
       rowNum, name, email, role,
-      employeeTypeName: rawEtName ?? null,
-      locationName:     rawLocName ?? null,
-      departmentName:   rawDeptName ?? null,
-      employeeIdValue:  rawEmpId  || null,
-      accessCodeValue:  rawCode   || null,
+      employeeTypeName:  rawEtName ?? null,
+      locationName:      rawLocName ?? null,
+      departmentName:    rawDeptName ?? null,
+      employeeIdValue:   rawEmpId   || null,
+      employeeIdEnabled: empIdEnabled ?? (rawEmpId ? true : false),
+      singleCodeMethod:  validSingleMethod ?? null,
+      accessCodeValue:   rawCode    || null,
+      badgeAuthEnabled:  badgeEnabled ?? (badgeValues.length > 0),
+      badgeValues,
       warnings,
     })
   }
@@ -199,20 +236,24 @@ export async function POST(request: NextRequest) {
       ...existingInvites.map(i => i.email),
     ])
 
-    // Check credential collisions for rows that have them
+    // Check credential collisions — includes both live SingleCodeLookup and staged credentials
     const credentialWarnings = new Map<string, string[]>()
     for (const row of validRows) {
       const rowWarns: string[] = []
-      if (row.employeeIdValue) {
-        const idx = computeCredentialIndex(normalizeCredential(row.employeeIdValue))
-        const clash = await prisma.singleCodeLookup.findFirst({ where: { organizationId: orgId, credentialIndex: idx } })
-        if (clash) rowWarns.push(`Employee ID "${maskCredential(row.employeeIdValue)}" is already in use — will be skipped`)
+
+      async function checkCollision(rawVal: string, label: string) {
+        const idx = computeCredentialIndex(normalizeCredential(rawVal))
+        const [live, staged] = await Promise.all([
+          prisma.singleCodeLookup.findFirst({ where: { organizationId: orgId, credentialIndex: idx } }),
+          prisma.stagedCredential.findFirst({ where: { organizationId: orgId, credentialIndex: idx } }),
+        ])
+        if (live || staged) rowWarns.push(`${label} "${maskCredential(rawVal)}" is already in use — will be skipped`)
       }
-      if (row.accessCodeValue) {
-        const idx = computeCredentialIndex(normalizeCredential(row.accessCodeValue))
-        const clash = await prisma.singleCodeLookup.findFirst({ where: { organizationId: orgId, credentialIndex: idx } })
-        if (clash) rowWarns.push(`Access code "${maskCredential(row.accessCodeValue)}" is already in use — will be skipped`)
-      }
+
+      if (row.employeeIdValue) await checkCollision(row.employeeIdValue, "Employee ID")
+      if (row.accessCodeValue) await checkCollision(row.accessCodeValue, "Access code")
+      for (const bv of row.badgeValues) await checkCollision(bv.value, `Badge "${bv.label ?? bv.value.slice(0, 8)}"`)
+
       if (rowWarns.length) credentialWarnings.set(row.email, rowWarns)
     }
 
@@ -300,26 +341,64 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000)
 
     try {
-      await prisma.invitation.create({
-        data: {
-          organizationId: orgId,
-          email:          row.email,
-          token,
-          role:           row.role,
-          departmentId:   dept?.id ?? null,
-          locationId:     loc?.id  ?? null,
-          invitedById:    session.userId,
-          expiresAt,
-        },
+      await prisma.$transaction(async (tx) => {
+        const invitation = await tx.invitation.create({
+          data: {
+            organizationId: orgId,
+            email:          row.email,
+            token,
+            role:           row.role,
+            departmentId:   dept?.id ?? null,
+            locationId:     loc?.id  ?? null,
+            invitedById:    session.userId,
+            expiresAt,
+          },
+        })
+
+        // Stage any credentials for the invited employee
+        const credentialsToStage: StagedCredentialInput[] = []
+        if (row.employeeIdValue) {
+          credentialsToStage.push({
+            credentialType: "EMPLOYEE_ID",
+            rawValue: row.employeeIdValue,
+          })
+        }
+        if (row.accessCodeValue) {
+          credentialsToStage.push({
+            credentialType: "ACCESS_CODE",
+            rawValue: row.accessCodeValue,
+          })
+        }
+        for (const bv of row.badgeValues) {
+          credentialsToStage.push({
+            credentialType: "BADGE",
+            rawValue: bv.value,
+            label: bv.label ?? undefined,
+          })
+        }
+
+        if (credentialsToStage.length > 0) {
+          await stageCredentialsForInvitation(tx, {
+            organizationId: orgId,
+            invitationId: invitation.id,
+            expiresAt,
+            credentials: credentialsToStage,
+          })
+        }
       })
+
       invited++
       pendingEmails.push({
         to:      row.email,
         subject: `You've been invited to join ${org?.name ?? "Relay"}`,
         html:    inviteHtml(org?.name ?? "Relay", `${appUrl}/invite/${token}`, row.name),
       })
-    } catch {
-      errors.push(`Failed to invite ${row.email}`)
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message.startsWith("collision:")) {
+        errors.push(`Credential collision for ${row.email}: ${err.message.slice("collision:".length)} — skipped`)
+      } else {
+        errors.push(`Failed to invite ${row.email}`)
+      }
     }
   }
 

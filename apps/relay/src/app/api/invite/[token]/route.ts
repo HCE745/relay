@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createSession } from "@/lib/session"
 import bcrypt from "bcryptjs"
+import { applyStagedCredentials } from "@/lib/staged-credentials"
 
 // GET: validate token and return invitation info for the acceptance form
 export async function GET(
@@ -125,37 +126,48 @@ export async function POST(
   // Build user data — set userType and expiresAt for external collaborators
   const isExternal = invitation.userType === "EXTERNAL"
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email: invitation.email,
-      password: hashedPassword,
-      role: invitation.role,
+  const user = await prisma.$transaction(async (tx) => {
+    const newUser = await tx.user.create({
+      data: {
+        name,
+        email: invitation.email,
+        password: hashedPassword,
+        role: invitation.role,
+        organizationId: invitation.organizationId,
+        departmentId: invitation.departmentId,
+        locationId: invitation.locationId,
+        managerId,
+        userType: isExternal ? "EXTERNAL" : "INTERNAL",
+        ...(isExternal && invitation.accountExpiresAt
+          ? { expiresAt: invitation.accountExpiresAt }
+          : {}),
+      },
+    })
+
+    // Also create a UserOrgMembership for the primary org to support future multi-org switching
+    await tx.userOrgMembership.create({
+      data: {
+        userId: newUser.id,
+        organizationId: newUser.organizationId,
+        role: newUser.role,
+        isActive: true,
+      },
+    })
+
+    // Apply any staged credentials (from CSV import or admin pre-provisioning)
+    await applyStagedCredentials(tx, {
       organizationId: invitation.organizationId,
-      departmentId: invitation.departmentId,
-      locationId: invitation.locationId,
-      managerId,
-      userType: isExternal ? "EXTERNAL" : "INTERNAL",
-      ...(isExternal && invitation.accountExpiresAt
-        ? { expiresAt: invitation.accountExpiresAt }
-        : {}),
-    },
-  })
+      invitationId: invitation.id,
+      userId: newUser.id,
+    })
 
-  // Also create a UserOrgMembership for the primary org to support future multi-org switching
-  await prisma.userOrgMembership.create({
-    data: {
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: user.role,
-      isActive: true,
-    },
-  })
+    // Mark invitation as used
+    await tx.invitation.update({
+      where: { token },
+      data: { usedAt: new Date() },
+    })
 
-  // Mark invitation as used
-  await prisma.invitation.update({
-    where: { token },
-    data: { usedAt: new Date() },
+    return newUser
   })
 
   // Read org subscription state so the session reflects trialing/plan correctly from first login

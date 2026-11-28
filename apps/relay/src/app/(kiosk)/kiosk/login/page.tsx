@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { useRouter } from "next/navigation"
+import { Suspense, useState, useEffect, useRef, useCallback } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { KeyRound, Camera, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
 import { CameraScanner } from "@/components/scanner/camera-scanner"
 import { scannerBus } from "@/lib/scanner-bus"
@@ -17,8 +17,9 @@ import { initNativeScannerBridge } from "@/lib/native-scanner-bridge"
 //
 // After successful login, redirects to /kiosk/dashboard (or ?next= param).
 // Admin access: an admin's email+password login from /login stays on the standard login page.
-export default function KioskLoginPage() {
+function KioskLoginContent() {
   const router = useRouter()
+  const params = useSearchParams()
 
   const [credential, setCredential] = useState("")
   const [scanning,   setScanning]   = useState(false)
@@ -33,13 +34,18 @@ export default function KioskLoginPage() {
     void initNativeScannerBridge()
   }, [])
 
-  // Resolve org slug from session storage (set when redirecting from standard login)
+  // Resolve org slug — priority: ?org= URL param → sessionStorage (set by registered-device redirect)
+  // The URL param allows unenrolled devices to authenticate for a specific organization via a
+  // shared link: /kiosk/login?org=their-slug. No global credential lookup is performed;
+  // the org identity is provided explicitly by the URL.
   useEffect(() => {
+    const paramSlug = params.get("org")
+    if (paramSlug) { setOrgSlug(paramSlug); return }
     try {
       const slug = sessionStorage.getItem("kiosk-org-slug")
       if (slug) setOrgSlug(slug)
     } catch { /* sessionStorage unavailable */ }
-  }, [])
+  }, [params])
 
   // Register a ScannerBus handler for hardware wedge scans
   useEffect(() => {
@@ -185,5 +191,13 @@ export default function KioskLoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function KioskLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-900" />}>
+      <KioskLoginContent />
+    </Suspense>
   )
 }

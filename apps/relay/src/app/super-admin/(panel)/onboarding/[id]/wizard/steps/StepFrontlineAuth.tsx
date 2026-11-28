@@ -119,6 +119,11 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
   const [loading, setLoading]     = useState(true)
   const [showIt, setShowIt]       = useState(false)
 
+  const [customTimeoutInput,     setCustomTimeoutInput]     = useState("")
+  const [customTimeoutMode,      setCustomTimeoutMode]      = useState(false)
+  const [customMaxDurationInput, setCustomMaxDurationInput] = useState("")
+  const [customMaxDurationMode,  setCustomMaxDurationMode]  = useState(false)
+
   // Load both Part A (org policy) and Part B (advisory prefs) on mount
   useEffect(() => {
     async function load() {
@@ -147,6 +152,18 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
 
   // This step is optional; always signal ready
   useEffect(() => { onReady() }, [onReady])
+
+  // Sync custom inputs when policy loads from server with an existing custom value
+  useEffect(() => {
+    if (policy.inactivityTimeoutSeconds !== null &&
+        !TIMEOUT_PRESETS.some(p => p.value === policy.inactivityTimeoutSeconds)) {
+      setCustomTimeoutInput(String(Math.round(policy.inactivityTimeoutSeconds / 60)))
+    }
+    if (policy.maxSessionDurationSeconds !== null &&
+        !MAX_DURATION_PRESETS.some(p => p.value === policy.maxSessionDurationSeconds)) {
+      setCustomMaxDurationInput(String(Math.round(policy.maxSessionDurationSeconds / 60)))
+    }
+  }, [policy.inactivityTimeoutSeconds, policy.maxSessionDurationSeconds])
 
   // ── Part A — save authPolicyConfig to org ───────────────────────────────────
 
@@ -183,6 +200,7 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
 
   function setTimeoutPreset(value: TimeoutPresetValue) {
     if (isPostLaunch) return
+    setCustomTimeoutMode(false)
     const updated = { ...policy, inactivityTimeoutSeconds: value }
     setPolicy(updated)
     void savePolicy({ inactivityTimeoutSeconds: value })
@@ -190,9 +208,30 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
 
   function setMaxDurationPreset(value: MaxDurationPresetValue) {
     if (isPostLaunch) return
+    setCustomMaxDurationMode(false)
     const updated = { ...policy, maxSessionDurationSeconds: value }
     setPolicy(updated)
     void savePolicy({ maxSessionDurationSeconds: value })
+  }
+
+  function applyCustomTimeout() {
+    if (isPostLaunch) return
+    const mins = parseInt(customTimeoutInput, 10)
+    if (isNaN(mins) || mins < 1) return
+    setCustomTimeoutMode(false)
+    const updated = { ...policy, inactivityTimeoutSeconds: mins * 60 }
+    setPolicy(updated)
+    void savePolicy({ inactivityTimeoutSeconds: mins * 60 })
+  }
+
+  function applyCustomMaxDuration() {
+    if (isPostLaunch) return
+    const mins = parseInt(customMaxDurationInput, 10)
+    if (isNaN(mins) || mins < 1) return
+    setCustomMaxDurationMode(false)
+    const updated = { ...policy, maxSessionDurationSeconds: mins * 60 }
+    setPolicy(updated)
+    void savePolicy({ maxSessionDurationSeconds: mins * 60 })
   }
 
   function toggleDisableInactivity(checked: boolean) {
@@ -241,6 +280,7 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
   const isCustomTimeout =
     policy.inactivityTimeoutSeconds !== null &&
     !TIMEOUT_PRESETS.some(p => p.value === policy.inactivityTimeoutSeconds)
+  const showCustomTimeoutInput = customTimeoutMode || isCustomTimeout
 
   const currentMaxDurationPreset =
     (MAX_DURATION_PRESETS as readonly { value: MaxDurationPresetValue | number | null }[])
@@ -249,6 +289,7 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
   const isCustomMaxDuration =
     policy.maxSessionDurationSeconds !== null &&
     !MAX_DURATION_PRESETS.some(p => p.value === policy.maxSessionDurationSeconds)
+  const showCustomMaxDurationInput = customMaxDurationMode || isCustomMaxDuration
 
   const itNotes =
     prefs.scannerVendor && IT_SETUP_NOTES[prefs.scannerVendor]
@@ -334,7 +375,7 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
               <label
                 key={String(preset.value)}
                 className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                  currentTimeoutPreset === preset.value
+                  !showCustomTimeoutInput && currentTimeoutPreset === preset.value
                     ? "bg-indigo-950/30 border-indigo-700"
                     : "bg-gray-800/40 border-gray-700 hover:border-gray-600"
                 } ${isPostLaunch ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -342,7 +383,7 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
                 <input
                   type="radio"
                   name="inactivityTimeout"
-                  checked={currentTimeoutPreset === preset.value}
+                  checked={!showCustomTimeoutInput && currentTimeoutPreset === preset.value}
                   onChange={() => setTimeoutPreset(preset.value as TimeoutPresetValue)}
                   disabled={isPostLaunch}
                   className="mt-0.5 accent-indigo-500"
@@ -353,13 +394,43 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
                 </span>
               </label>
             ))}
-            {isCustomTimeout && (
-              <div className="px-3 py-2.5 bg-amber-950/20 border border-amber-900/40 rounded-lg">
-                <p className="text-xs text-amber-300">
-                  Custom timeout: {policy.inactivityTimeoutSeconds}s. This was set outside the wizard presets and is preserved as-is.
-                </p>
-              </div>
-            )}
+            {/* Custom duration option — reveals a minute-precision input */}
+            <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+              showCustomTimeoutInput ? "bg-indigo-950/30 border-indigo-700" : "bg-gray-800/40 border-gray-700 hover:border-gray-600"
+            } ${isPostLaunch ? "opacity-50 cursor-not-allowed" : ""}`}>
+              <input
+                type="radio"
+                name="inactivityTimeout"
+                checked={showCustomTimeoutInput}
+                onChange={() => {
+                  setCustomTimeoutMode(true)
+                  if (!customTimeoutInput && policy.inactivityTimeoutSeconds)
+                    setCustomTimeoutInput(String(Math.round(policy.inactivityTimeoutSeconds / 60)))
+                }}
+                disabled={isPostLaunch}
+                className="mt-0.5 accent-indigo-500"
+              />
+              <span className="flex-1">
+                <span className="block text-sm text-gray-200 font-medium">Custom duration</span>
+                <span className="block text-xs text-gray-500 mt-0.5">Enter a specific inactivity timeout in minutes.</span>
+                {showCustomTimeoutInput && (
+                  <span className="flex items-center gap-2 mt-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="1440"
+                      value={customTimeoutInput}
+                      onChange={e => setCustomTimeoutInput(e.target.value)}
+                      onBlur={applyCustomTimeout}
+                      disabled={isPostLaunch}
+                      placeholder="e.g. 30"
+                      className="w-24 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
+                    />
+                    <span className="text-xs text-gray-500">minutes</span>
+                  </span>
+                )}
+              </span>
+            </label>
           </div>
         </div>
 
@@ -378,7 +449,7 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
               <label
                 key={String(preset.value)}
                 className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                  currentMaxDurationPreset === preset.value
+                  !showCustomMaxDurationInput && currentMaxDurationPreset === preset.value
                     ? "bg-indigo-950/30 border-indigo-700"
                     : "bg-gray-800/40 border-gray-700 hover:border-gray-600"
                 } ${isPostLaunch ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -386,7 +457,7 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
                 <input
                   type="radio"
                   name="maxDuration"
-                  checked={currentMaxDurationPreset === preset.value}
+                  checked={!showCustomMaxDurationInput && currentMaxDurationPreset === preset.value}
                   onChange={() => setMaxDurationPreset(preset.value as MaxDurationPresetValue)}
                   disabled={isPostLaunch}
                   className="mt-0.5 accent-indigo-500"
@@ -397,13 +468,43 @@ export function StepFrontlineAuth({ onboardingId, isPostLaunch, onReady, onNotRe
                 </span>
               </label>
             ))}
-            {isCustomMaxDuration && (
-              <div className="px-3 py-2.5 bg-amber-950/20 border border-amber-900/40 rounded-lg">
-                <p className="text-xs text-amber-300">
-                  Custom max duration: {policy.maxSessionDurationSeconds}s. Preserved as-is.
-                </p>
-              </div>
-            )}
+            {/* Custom duration option — reveals a minute-precision input */}
+            <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+              showCustomMaxDurationInput ? "bg-indigo-950/30 border-indigo-700" : "bg-gray-800/40 border-gray-700 hover:border-gray-600"
+            } ${isPostLaunch ? "opacity-50 cursor-not-allowed" : ""}`}>
+              <input
+                type="radio"
+                name="maxDuration"
+                checked={showCustomMaxDurationInput}
+                onChange={() => {
+                  setCustomMaxDurationMode(true)
+                  if (!customMaxDurationInput && policy.maxSessionDurationSeconds)
+                    setCustomMaxDurationInput(String(Math.round(policy.maxSessionDurationSeconds / 60)))
+                }}
+                disabled={isPostLaunch}
+                className="mt-0.5 accent-indigo-500"
+              />
+              <span className="flex-1">
+                <span className="block text-sm text-gray-200 font-medium">Custom duration</span>
+                <span className="block text-xs text-gray-500 mt-0.5">Enter a specific maximum session length in minutes.</span>
+                {showCustomMaxDurationInput && (
+                  <span className="flex items-center gap-2 mt-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="10080"
+                      value={customMaxDurationInput}
+                      onChange={e => setCustomMaxDurationInput(e.target.value)}
+                      onBlur={applyCustomMaxDuration}
+                      disabled={isPostLaunch}
+                      placeholder="e.g. 480"
+                      className="w-24 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
+                    />
+                    <span className="text-xs text-gray-500">minutes</span>
+                  </span>
+                )}
+              </span>
+            </label>
           </div>
         </div>
 
